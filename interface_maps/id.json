@@ -1,0 +1,11 @@
+{
+   "id.IdProfile": "managers", 
+   "id.IdManager": "managers", 
+   "id.IdProxyManager": "managers", 
+   "id.IdLookupSession": "sessions", 
+   "id.IdIssueSession": "sessions", 
+   "id.IdAdminSession": "sessions", 
+   "id.Id": "primitives", 
+   "id.IdForm": "objects", 
+   "id.IdList": "objects"
+}

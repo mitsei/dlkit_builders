@@ -1,0 +1,141 @@
+    ##
+    # Implemented via osid.calendaring.Time init.txt template
+
+    ##
+    # The default TimeType identifier triple for the Python datetime 
+    # module should probably come from a config file or something. But here it 
+    # here it is for now:
+    _defaultTimeAuthority = 'python.org'
+    _defaultTimeNamespace = 'datetime.time'
+    _defaultTimeIdentifier = 'PYTIME'
+    
+    ##
+    # These are being explicitly declared  as attribute to make sure
+    # none of them fall through to __getattr__.
+    global _timeType
+    global _hour
+    global _minute
+    global _second
+    global _milliseconds
+    global _microseconds
+    global _nanoseconds
+    global _picoseconds
+    global _femtoseconds
+    global _attoseconds
+    global _zeptoseconds
+    global _yoctoseconds
+    global _xoxxoseconds
+    global _weebleseconds
+    global _vatoseconds
+    global _undaseconds
+    global _planckSeconds
+    global _granularity
+    global _granularityMultiplier
+
+    
+    def __init__(self, pythonDateTimeObject = None,
+                       timeType = None,
+                       hour = 0,
+                       minute = 0,
+                       second = 0,
+                       milliseconds = 0,
+                       microseconds = 0,
+                       nanoseconds = 0,
+                       picoseconds = 0,
+                       femtoseconds = 0,
+                       attoseconds = 0,
+                       zeptoseconds = 0,
+                       yoctoseconds = 0,
+                       xoxxoseconds = 0,
+                       weebleseconds = 0,
+                       vatoseconds = 0,
+                       undaseconds = 0,
+                       planckSeconds = 0,
+                       granularity = None,
+                       granularityMultiplier = None):
+
+        import datetime
+        self._myDateTime = pythonDateTimeObject
+        if pythonDateTimeObject:
+            self._hour = pythonDateTimeObject.hour
+            self._minute = pythonDateTimeObject.minute
+            self._second = pythonDateTimeObject.second
+            self._milliseconds = pythonDateTimeObject.microsecond % 1000
+            self._microseconds = pythonDateTimeObject.microsecond // 1000
+            if self._microseconds:
+                self._granularity = 'MICROSECOND'
+            elif self._milliseconds:
+                self._granularity = 'MILLISECOND'
+            else:
+                self._granularity = 'SECOND' # default to seconds
+        else:
+            self._hour = hour
+            self._minute = minute
+            self._second = second
+            self._milliseconds = milliseconds
+            self._microseconds = microseconds
+        self._nanoseconds = nanoseconds
+        self._picoseconds = picoseconds
+        self._femtoseconds = femtoseconds
+        self._attoseconds = attoseconds
+        self._zeptoseconds = zeptoseconds
+        self._yoctoseconds = yoctoseconds
+        self._xoxxoseconds = xoxxoseconds
+        self._weebleseconds = weebleseconds
+        self._vatoseconds = vatoseconds
+        self._undaseconds = undaseconds
+        self._planckSeconds = planckSeconds
+
+        if planckSeconds:   self._granularity = 'PLANCKSECOND'
+        elif undaseconds:   self._granularity = 'UNDASECOND'
+        elif vatoseconds:   self._granularity = 'VATOSECOND'
+        elif weebleseconds: self._granularity = 'WEEBLESECOND'
+        elif xoxxoseconds:  self._granularity = 'XOXXOSECOND'
+        elif yoctoseconds:  self._granularity = 'YOCTOSECOND'
+        elif zeptoseconds:  self._granularity = 'ZEPTOSECOND'
+        elif attoseconds:   self._granularity = 'ATTOSECOND'
+        elif femtoseconds:  self._granularity = 'FEMTOSECOND'
+        elif picoseconds:   self._granularity = 'PICOSECOND'
+        elif nanoseconds:   self._granularity = 'NANOSECOND'
+        elif microseconds:  self._granularity = 'MICROSECOND'
+        elif milliseconds:  self._granularity = 'MILLISECOND'
+        else: self._granularity = 'SECOND' # default to seconds
+        self._granularityMultiplier = granularityMultiplier
+        
+        if timeType:
+            self._timeType = timeType
+        else:
+            if pythonDateTimeObject:
+                self._timeType = self._get_type(self._defaultTimeAuthority,
+                                               self._defaultTimeNamespace,
+                                               self._defaultTimeIdentifier)
+            else:
+                self._timeType = self._get_type('unknown',
+                                               'unknown',
+                                               'unknown')
+
+    def _get_type(self, authority, namespace, identifier):
+        from type_kit.dj_type import Type
+        try:
+            from type_kit.dj_type import TypeManager
+        except:
+            returnType = self._init_type(authority, namespace, identifier)
+        else:
+            if not TypeManager().supportsTypeLookup():
+                returnType = self._init_type(authority, namespace, identifier)
+            else:
+                try: 
+                    returnType = TypeManager().TypeLookupSession().getType()
+                except:
+                    returnType = self._init_type(authority, namespace, identifier)
+        return returnType
+
+    def _init_type(self, authority, namespace, identifier):
+        from type_kit.dj_type import Type
+        return Type(authority = authority,
+                    namespace = namespace,
+                    identifier = identifier)
+           
+    def __getattr__(self, attrName):
+        if self._myDateTime:
+            return getattr(self._myDateTime, attrName)

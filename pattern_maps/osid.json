@@ -1,0 +1,5283 @@
+{
+   "impl_log": {
+      "managers": {}, 
+      "sessions": {}
+   }, 
+   "package_objects_caps": [
+      "OsidRelationship", 
+      "OsidCatalog", 
+      "OsidRule", 
+      "OsidEnabler", 
+      "OsidConstrainer", 
+      "OsidProcessor", 
+      "OsidGovernator", 
+      "OsidCompendium"
+   ], 
+   "package_objects_under": [
+      "osid_relationship", 
+      "osid_catalog", 
+      "osid_rule", 
+      "osid_enabler", 
+      "osid_constrainer", 
+      "osid_processor", 
+      "osid_governator", 
+      "osid_compendium"
+   ], 
+   "package_cataloged_objects_caps": [], 
+   "package_cataloged_objects_under": [], 
+   "package_objects_under_to_caps": {
+      "osid_relationship": "OsidRelationship", 
+      "osid_catalog": "OsidCatalog", 
+      "osid_rule": "OsidRule", 
+      "osid_enabler": "OsidEnabler", 
+      "osid_constrainer": "OsidConstrainer", 
+      "osid_processor": "OsidProcessor", 
+      "osid_governator": "OsidGovernator", 
+      "osid_compendium": "OsidCompendium"
+   }, 
+   "package_relationships_caps": [], 
+   "package_relationships_under": [], 
+   "package_rules_caps": [
+      "OsidEnabler", 
+      "OsidConstrainer", 
+      "OsidProcessor"
+   ], 
+   "package_rules_under": [
+      "osid_enabler", 
+      "osid_constrainer", 
+      "osid_processor"
+   ], 
+   "package_catalog_caps": "NoCatalog", 
+   "package_catalog_under": "no_catalog", 
+   "package_relationships_detail": {}, 
+   "OsidRelationship.arg_detail": {}, 
+   "OsidRelationship.persisted_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidRelationship.initialized_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidCatalog.arg_detail": {}, 
+   "OsidCatalog.persisted_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidCatalog.initialized_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidRule.arg_detail": {
+      "rule": [
+         {
+            "var_name": "rule_id", 
+            "array": false, 
+            "arg_type": "osid.id.Id"
+         }
+      ]
+   }, 
+   "OsidRule.persisted_data": {
+      "no_catalog": "OsidCatalog", 
+      "rule": "osid.id.Id"
+   }, 
+   "OsidRule.initialized_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidEnabler.arg_detail": {
+      "schedule": [
+         {
+            "var_name": "schedule_id", 
+            "array": false, 
+            "arg_type": "osid.id.Id"
+         }
+      ], 
+      "event": [
+         {
+            "var_name": "event_id", 
+            "array": false, 
+            "arg_type": "osid.id.Id"
+         }
+      ], 
+      "cyclic_event": [
+         {
+            "var_name": "cyclic_event_id", 
+            "array": false, 
+            "arg_type": "osid.id.Id"
+         }
+      ], 
+      "demographic": [
+         {
+            "var_name": "resource_id", 
+            "array": false, 
+            "arg_type": "osid.id.Id"
+         }
+      ]
+   }, 
+   "OsidEnabler.persisted_data": {
+      "no_catalog": "OsidCatalog", 
+      "schedule": "osid.id.Id", 
+      "event": "osid.id.Id", 
+      "cyclic_event": "osid.id.Id", 
+      "demographic": "osid.id.Id"
+   }, 
+   "OsidEnabler.initialized_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidConstrainer.arg_detail": {}, 
+   "OsidConstrainer.persisted_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidConstrainer.initialized_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidProcessor.arg_detail": {}, 
+   "OsidProcessor.persisted_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidProcessor.initialized_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidGovernator.arg_detail": {}, 
+   "OsidGovernator.persisted_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidGovernator.initialized_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidCompendium.arg_detail": {
+      "start_date": [
+         {
+            "var_name": "date", 
+            "array": false, 
+            "arg_type": "osid.calendaring.DateTime"
+         }
+      ], 
+      "end_date": [
+         {
+            "var_name": "date", 
+            "array": false, 
+            "arg_type": "osid.calendaring.DateTime"
+         }
+      ], 
+      "interpolated": [
+         {
+            "var_name": "interpolated", 
+            "array": false, 
+            "arg_type": "boolean"
+         }
+      ], 
+      "extrapolated": [
+         {
+            "var_name": "extrapolated", 
+            "array": false, 
+            "arg_type": "boolean"
+         }
+      ]
+   }, 
+   "OsidCompendium.persisted_data": {
+      "no_catalog": "OsidCatalog", 
+      "start_date": "osid.calendaring.DateTime", 
+      "end_date": "osid.calendaring.DateTime", 
+      "interpolated": "boolean", 
+      "extrapolated": "boolean"
+   }, 
+   "OsidCompendium.initialized_data": {
+      "no_catalog": "OsidCatalog"
+   }, 
+   "OsidRelationship.instance_data": {
+      "end_reason": "osid.id.Id"
+   }, 
+   "OsidRelationship.aggregate_data": {}, 
+   "OsidRelationship.return_types": {
+      "end_reason": "osid.process.State"
+   }, 
+   "OsidCatalog.instance_data": {}, 
+   "OsidRule.instance_data": {}, 
+   "OsidRule.aggregate_data": {}, 
+   "OsidRule.return_types": {
+      "rule": "osid.rules.Rule"
+   }, 
+   "OsidEnabler.instance_data": {
+      "effective_by_schedule": "boolean", 
+      "effective_by_event": "boolean", 
+      "effective_by_cyclic_event": "boolean", 
+      "effective_for_demographic": "boolean"
+   }, 
+   "OsidEnabler.aggregate_data": {}, 
+   "OsidEnabler.return_types": {
+      "schedule": "osid.calendaring.Schedule", 
+      "event": "osid.calendaring.Event", 
+      "cyclic_event": "osid.calendaring.cycle.CyclicEvent", 
+      "demographic": "osid.resource.Resource"
+   }, 
+   "OsidConstrainer.instance_data": {}, 
+   "OsidProcessor.instance_data": {}, 
+   "OsidGovernator.instance_data": {}, 
+   "OsidCompendium.instance_data": {}, 
+   "OsidCompendium.aggregate_data": {}, 
+   "OsidCompendium.return_types": {
+      "start_date": "osid.calendaring.DateTime", 
+      "end_date": "osid.calendaring.DateTime"
+   }, 
+   "Metadata.get_element_id": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "get_element_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "element_id", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_element_label": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "get_element_label", 
+         "return_type_full": "osid.locale.DisplayText", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "element_label", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_instructions": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "get_instructions", 
+         "return_type_full": "osid.locale.DisplayText", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "instructions", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_syntax": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "get_syntax", 
+         "return_type_full": "osid.Syntax", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "syntax", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.is_array": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "is_array", 
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "array", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.is_required": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "is_required", 
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "required", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.is_read_only": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "is_read_only", 
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "read_only", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.is_linked": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "is_linked", 
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "linked", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.is_value_known": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "is_value_known", 
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "value_known", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.has_value": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "has_value", 
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['']", 
+         "module_name": "metadata", 
+         "var_name": "value", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_units": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "get_units", 
+         "return_type_full": "osid.locale.DisplayText", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "units", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_elements": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "get_minimum_elements", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "minimum_elements", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_elements": {
+      "pattern": "osid.Metadata.get_element_id", 
+      "kwargs": {
+         "method_name": "get_maximum_elements", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "module_name": "metadata", 
+         "var_name": "maximum_elements", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_cardinal": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_cardinal", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "syntax_list": "['CARDINAL']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_cardinal", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_cardinal": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_cardinal", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "syntax_list": "['CARDINAL']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_cardinal", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_cardinal_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_cardinal_set", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "syntax_list": "['CARDINAL']", 
+         "module_name": "metadata", 
+         "var_name": "cardinal_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_cardinal_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_cardinal_values", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "syntax_list": "['CARDINAL']", 
+         "module_name": "metadata", 
+         "var_name": "default_cardinal_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_cardinal_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_cardinal_values", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "syntax_list": "['CARDINAL']", 
+         "module_name": "metadata", 
+         "var_name": "existing_cardinal_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_coordinate_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_coordinate_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['COORDINATE', 'SPATIALUNIT']", 
+         "module_name": "metadata", 
+         "var_name": "coordinate_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.supports_coordinate_type": {
+      "pattern": "osid.Metadata.supports_coordinate_type", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['``COORDINATE``']", 
+         "arg0_name": "coordinate_type", 
+         "method_name": "supports_coordinate_type", 
+         "var_name": "coordinate_types", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_axes_for_coordinate_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_axes_for_coordinate_type", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata", 
+         "package_name": "osid"
+      }
+   }, 
+   "Metadata.get_minimum_coordinate_values": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_minimum_coordinate_values", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata", 
+         "package_name": "osid"
+      }
+   }, 
+   "Metadata.get_maximum_coordinate_values": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_maximum_coordinate_values", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata", 
+         "package_name": "osid"
+      }
+   }, 
+   "Metadata.get_coordinate_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_coordinate_set", 
+         "return_type_full": "osid.mapping.Coordinate", 
+         "package_name": "osid", 
+         "syntax_list": "['COORDINATE']", 
+         "module_name": "metadata", 
+         "var_name": "coordinate_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_coordinate_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_coordinate_values", 
+         "return_type_full": "osid.mapping.Coordinate", 
+         "package_name": "osid", 
+         "syntax_list": "['COORDINATE']", 
+         "module_name": "metadata", 
+         "var_name": "default_coordinate_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_coordinate_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_coordinate_values", 
+         "return_type_full": "osid.mapping.Coordinate", 
+         "package_name": "osid", 
+         "syntax_list": "['COORDINATE']", 
+         "module_name": "metadata", 
+         "var_name": "existing_coordinate_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_currency_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_currency_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['CURRENCY']", 
+         "module_name": "metadata", 
+         "var_name": "currency_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.supports_currency_type": {
+      "pattern": "osid.Metadata.supports_coordinate_type", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['``CURRENCY``']", 
+         "arg0_name": "currency_type", 
+         "method_name": "supports_currency_type", 
+         "var_name": "currency_types", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_currency": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_currency", 
+         "return_type_full": "osid.financials.Currency", 
+         "package_name": "osid", 
+         "syntax_list": "['CURRENCY']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_currency", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_currency": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_currency", 
+         "return_type_full": "osid.financials.Currency", 
+         "package_name": "osid", 
+         "syntax_list": "['CURRENCY']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_currency", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_currency_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_currency_set", 
+         "return_type_full": "osid.financials.Currency", 
+         "package_name": "osid", 
+         "syntax_list": "['CURRENCY']", 
+         "module_name": "metadata", 
+         "var_name": "currency_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_currency_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_currency_values", 
+         "return_type_full": "osid.financials.Currency", 
+         "package_name": "osid", 
+         "syntax_list": "['CURRENCY']", 
+         "module_name": "metadata", 
+         "var_name": "default_currency_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_currency_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_currency_values", 
+         "return_type_full": "osid.financials.Currency", 
+         "package_name": "osid", 
+         "syntax_list": "['CURRENCY']", 
+         "module_name": "metadata", 
+         "var_name": "existing_currency_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_date_time_resolution": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_date_time_resolution", 
+         "return_type_full": "osid.calendaring.DateTimeResolution", 
+         "package_name": "osid", 
+         "syntax_list": "['DATETIME,', 'DURATION', 'TIME']", 
+         "module_name": "metadata", 
+         "var_name": "date_time_resolution", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_calendar_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_calendar_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['DATETIME', 'DURATION']", 
+         "module_name": "metadata", 
+         "var_name": "calendar_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.supports_calendar_type": {
+      "pattern": "osid.Metadata.supports_coordinate_type", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['``DATETIME``', '``DURATION``']", 
+         "arg0_name": "calendar_type", 
+         "method_name": "supports_calendar_type", 
+         "var_name": "calendar_types", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_time_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_time_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['DATETIME,', 'DURATION,', 'TIME']", 
+         "module_name": "metadata", 
+         "var_name": "time_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.supports_time_type": {
+      "pattern": "osid.Metadata.supports_coordinate_type", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['``DATETIME,', 'DURATION,``', '``TIME``']", 
+         "arg0_name": "time_type", 
+         "method_name": "supports_time_type", 
+         "var_name": "time_types", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_date_time": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_date_time", 
+         "return_type_full": "osid.calendaring.DateTime", 
+         "package_name": "osid", 
+         "syntax_list": "['DATETIME']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_date_time", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_date_time": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_date_time", 
+         "return_type_full": "osid.calendaring.DateTime", 
+         "package_name": "osid", 
+         "syntax_list": "['DATETIME']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_date_time", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_date_time_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_date_time_set", 
+         "return_type_full": "osid.calendaring.DateTime", 
+         "package_name": "osid", 
+         "syntax_list": "['DATETIME']", 
+         "module_name": "metadata", 
+         "var_name": "date_time_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_date_time_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_date_time_values", 
+         "return_type_full": "osid.calendaring.DateTime", 
+         "package_name": "osid", 
+         "syntax_list": "['DATETIME']", 
+         "module_name": "metadata", 
+         "var_name": "default_date_time_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_date_time_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_date_time_values", 
+         "return_type_full": "osid.calendaring.DateTime", 
+         "package_name": "osid", 
+         "syntax_list": "['DATETIME']", 
+         "module_name": "metadata", 
+         "var_name": "existing_date_time_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_decimal_scale": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_decimal_scale", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "syntax_list": "['DECIMAL']", 
+         "module_name": "metadata", 
+         "var_name": "decimal_scale", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_decimal": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_decimal", 
+         "return_type_full": "decimal", 
+         "package_name": "osid", 
+         "syntax_list": "['DECIMAL']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_decimal", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_decimal": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_decimal", 
+         "return_type_full": "decimal", 
+         "package_name": "osid", 
+         "syntax_list": "['DECIMAL']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_decimal", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_decimal_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_decimal_set", 
+         "return_type_full": "decimal", 
+         "package_name": "osid", 
+         "syntax_list": "['DECIMAL']", 
+         "module_name": "metadata", 
+         "var_name": "decimal_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_decimal_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_decimal_values", 
+         "return_type_full": "decimal", 
+         "package_name": "osid", 
+         "syntax_list": "['DECIMAL']", 
+         "module_name": "metadata", 
+         "var_name": "default_decimal_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_decimal_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_decimal_values", 
+         "return_type_full": "decimal", 
+         "package_name": "osid", 
+         "syntax_list": "['DECIMAL']", 
+         "module_name": "metadata", 
+         "var_name": "existing_decimal_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_distance_resolution": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_distance_resolution", 
+         "return_type_full": "osid.mapping.DistanceResolution", 
+         "package_name": "osid", 
+         "syntax_list": "['DISTANCE']", 
+         "module_name": "metadata", 
+         "var_name": "distance_resolution", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_distance": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_distance", 
+         "return_type_full": "osid.mapping.Distance", 
+         "package_name": "osid", 
+         "syntax_list": "['DISTANCE']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_distance", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_distance": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_distance", 
+         "return_type_full": "osid.mapping.Distance", 
+         "package_name": "osid", 
+         "syntax_list": "['DISTANCE']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_distance", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_distance_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_distance_set", 
+         "return_type_full": "osid.mapping.Distance", 
+         "package_name": "osid", 
+         "syntax_list": "['DISTANCE']", 
+         "module_name": "metadata", 
+         "var_name": "distance_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_distance_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_distance_values", 
+         "return_type_full": "osid.mapping.Distance", 
+         "package_name": "osid", 
+         "syntax_list": "['DISTANCE']", 
+         "module_name": "metadata", 
+         "var_name": "default_distance_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_distance_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_distance_values", 
+         "return_type_full": "osid.mapping.Distance", 
+         "package_name": "osid", 
+         "syntax_list": "['DISTANCE']", 
+         "module_name": "metadata", 
+         "var_name": "existing_distance_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_duration": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_duration", 
+         "return_type_full": "osid.calendaring.Duration", 
+         "package_name": "osid", 
+         "syntax_list": "['DURATION']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_duration", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_duration": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_duration", 
+         "return_type_full": "osid.calendaring.Duration", 
+         "package_name": "osid", 
+         "syntax_list": "['DURATION']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_duration", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_duration_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_duration_set", 
+         "return_type_full": "osid.calendaring.Duration", 
+         "package_name": "osid", 
+         "syntax_list": "['DURATION']", 
+         "module_name": "metadata", 
+         "var_name": "duration_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_duration_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_duration_values", 
+         "return_type_full": "osid.calendaring.Duration", 
+         "package_name": "osid", 
+         "syntax_list": "['DURATION']", 
+         "module_name": "metadata", 
+         "var_name": "default_duration_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_duration_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_duration_values", 
+         "return_type_full": "osid.calendaring.Duration", 
+         "package_name": "osid", 
+         "syntax_list": "['DURATION']", 
+         "module_name": "metadata", 
+         "var_name": "existing_duration_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_heading_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_heading_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['HEADING']", 
+         "module_name": "metadata", 
+         "var_name": "heading_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.supports_heading_type": {
+      "pattern": "osid.Metadata.supports_coordinate_type", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['``HEADING``']", 
+         "arg0_name": "heading_type", 
+         "method_name": "supports_heading_type", 
+         "var_name": "heading_types", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_axes_for_heading_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_axes_for_heading_type", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata", 
+         "package_name": "osid"
+      }
+   }, 
+   "Metadata.get_minimum_heading_values": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_minimum_heading_values", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata", 
+         "package_name": "osid"
+      }
+   }, 
+   "Metadata.get_maximum_heading_values": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_maximum_heading_values", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata", 
+         "package_name": "osid"
+      }
+   }, 
+   "Metadata.get_heading_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_heading_set", 
+         "return_type_full": "osid.mapping.Heading", 
+         "package_name": "osid", 
+         "syntax_list": "['HEADING']", 
+         "module_name": "metadata", 
+         "var_name": "heading_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_heading_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_heading_values", 
+         "return_type_full": "osid.mapping.Heading", 
+         "package_name": "osid", 
+         "syntax_list": "['HEADING']", 
+         "module_name": "metadata", 
+         "var_name": "default_heading_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_heading_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_heading_values", 
+         "return_type_full": "osid.mapping.Heading", 
+         "package_name": "osid", 
+         "syntax_list": "['HEADING']", 
+         "module_name": "metadata", 
+         "var_name": "existing_heading_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_id_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_id_set", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "osid", 
+         "syntax_list": "['ID']", 
+         "module_name": "metadata", 
+         "var_name": "id_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_id_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_id_values", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "osid", 
+         "syntax_list": "['ID']", 
+         "module_name": "metadata", 
+         "var_name": "default_id_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_id_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_id_values", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "osid", 
+         "syntax_list": "['ID']", 
+         "module_name": "metadata", 
+         "var_name": "existing_id_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_integer": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_integer", 
+         "return_type_full": "integer", 
+         "package_name": "osid", 
+         "syntax_list": "['INTEGER']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_integer", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_integer": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_integer", 
+         "return_type_full": "integer", 
+         "package_name": "osid", 
+         "syntax_list": "['INTEGER']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_integer", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_integer_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_integer_set", 
+         "return_type_full": "integer", 
+         "package_name": "osid", 
+         "syntax_list": "['INTEGER']", 
+         "module_name": "metadata", 
+         "var_name": "integer_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_integer_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_integer_values", 
+         "return_type_full": "integer", 
+         "package_name": "osid", 
+         "syntax_list": "['INTEGER']", 
+         "module_name": "metadata", 
+         "var_name": "default_integer_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_integer_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_integer_values", 
+         "return_type_full": "integer", 
+         "package_name": "osid", 
+         "syntax_list": "['INTEGER']", 
+         "module_name": "metadata", 
+         "var_name": "existing_integer_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_object_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_object_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['OBJECT']", 
+         "module_name": "metadata", 
+         "var_name": "object_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.supports_object_type": {
+      "pattern": "osid.Metadata.supports_coordinate_type", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['``OBJECT``']", 
+         "arg0_name": "object_type", 
+         "method_name": "supports_object_type", 
+         "var_name": "object_types", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_object_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_object_set", 
+         "return_type_full": "object", 
+         "package_name": "osid", 
+         "syntax_list": "['OBJECT']", 
+         "module_name": "metadata", 
+         "var_name": "object_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_object_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_object_values", 
+         "return_type_full": "object", 
+         "package_name": "osid", 
+         "syntax_list": "['OBJECT']", 
+         "module_name": "metadata", 
+         "var_name": "default_object_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_object_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_object_values", 
+         "return_type_full": "object", 
+         "package_name": "osid", 
+         "syntax_list": "['OBJECT']", 
+         "module_name": "metadata", 
+         "var_name": "existing_object_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_spatial_unit_record_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_spatial_unit_record_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['SPATIALUNIT']", 
+         "module_name": "metadata", 
+         "var_name": "spatial_unit_record_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.supports_spatial_unit_record_type": {
+      "pattern": "osid.Metadata.supports_coordinate_type", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['``SPATIALUNIT``']", 
+         "arg0_name": "spatial_unit_record_type", 
+         "method_name": "supports_spatial_unit_record_type", 
+         "var_name": "spatial_unit_record_types", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_spatial_unit_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_spatial_unit_set", 
+         "return_type_full": "osid.mapping.SpatialUnit", 
+         "package_name": "osid", 
+         "syntax_list": "['SPATIALUNIT']", 
+         "module_name": "metadata", 
+         "var_name": "spatial_unit_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_spatial_unit_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_spatial_unit_values", 
+         "return_type_full": "osid.mapping.SpatialUnit", 
+         "package_name": "osid", 
+         "syntax_list": "['SPATIALUNIT']", 
+         "module_name": "metadata", 
+         "var_name": "default_spatial_unit_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_spatial_unit_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_spatial_unit_values", 
+         "return_type_full": "osid.mapping.SpatialUnit", 
+         "package_name": "osid", 
+         "syntax_list": "['SPATIALUNIT']", 
+         "module_name": "metadata", 
+         "var_name": "existing_spatial_unit_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_speed": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_speed", 
+         "return_type_full": "osid.mapping.Speed", 
+         "package_name": "osid", 
+         "syntax_list": "['SPEED']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_speed", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_speed": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_speed", 
+         "return_type_full": "osid.mapping.Speed", 
+         "package_name": "osid", 
+         "syntax_list": "['SPEED']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_speed", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_speed_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_speed_set", 
+         "return_type_full": "osid.mapping.Speed", 
+         "package_name": "osid", 
+         "syntax_list": "['SPEED']", 
+         "module_name": "metadata", 
+         "var_name": "speed_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_speed_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_speed_values", 
+         "return_type_full": "osid.mapping.Speed", 
+         "package_name": "osid", 
+         "syntax_list": "['SPEED']", 
+         "module_name": "metadata", 
+         "var_name": "default_speed_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_speed_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_speed_values", 
+         "return_type_full": "osid.mapping.Speed", 
+         "package_name": "osid", 
+         "syntax_list": "['SPEED']", 
+         "module_name": "metadata", 
+         "var_name": "existing_speed_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_string_length": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_string_length", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "syntax_list": "['STRING']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_string_length", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_string_length": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_string_length", 
+         "return_type_full": "cardinal", 
+         "package_name": "osid", 
+         "syntax_list": "['STRING']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_string_length", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_string_match_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_string_match_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['STRING']", 
+         "module_name": "metadata", 
+         "var_name": "string_match_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.supports_string_match_type": {
+      "pattern": "osid.Metadata.supports_coordinate_type", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['``STRING``']", 
+         "arg0_name": "string_match_type", 
+         "method_name": "supports_string_match_type", 
+         "var_name": "string_match_types", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_string_expression": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_string_expression", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata", 
+         "package_name": "osid"
+      }
+   }, 
+   "Metadata.get_string_format_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_string_format_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['STRING']", 
+         "module_name": "metadata", 
+         "var_name": "string_format_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_string_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_string_set", 
+         "return_type_full": "string", 
+         "package_name": "osid", 
+         "syntax_list": "['STRING']", 
+         "module_name": "metadata", 
+         "var_name": "string_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_string_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_string_values", 
+         "return_type_full": "string", 
+         "package_name": "osid", 
+         "syntax_list": "['STRING']", 
+         "module_name": "metadata", 
+         "var_name": "default_string_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_string_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_string_values", 
+         "return_type_full": "string", 
+         "package_name": "osid", 
+         "syntax_list": "['STRING']", 
+         "module_name": "metadata", 
+         "var_name": "existing_string_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_time": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_time", 
+         "return_type_full": "osid.calendaring.Time", 
+         "package_name": "osid", 
+         "syntax_list": "['TIME']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_time", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_time": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_time", 
+         "return_type_full": "osid.calendaring.Time", 
+         "package_name": "osid", 
+         "syntax_list": "['TIME']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_time", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_time_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_time_set", 
+         "return_type_full": "osid.calendaring.Time", 
+         "package_name": "osid", 
+         "syntax_list": "['TIME']", 
+         "module_name": "metadata", 
+         "var_name": "time_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_time_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_time_values", 
+         "return_type_full": "osid.calendaring.Time", 
+         "package_name": "osid", 
+         "syntax_list": "['TIME']", 
+         "module_name": "metadata", 
+         "var_name": "default_time_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_time_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_time_values", 
+         "return_type_full": "osid.calendaring.Time", 
+         "package_name": "osid", 
+         "syntax_list": "['TIME']", 
+         "module_name": "metadata", 
+         "var_name": "existing_time_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_type_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_type_set", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['TYPE']", 
+         "module_name": "metadata", 
+         "var_name": "type_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_type_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_type_values", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['TYPE']", 
+         "module_name": "metadata", 
+         "var_name": "default_type_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_type_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_type_values", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['TYPE']", 
+         "module_name": "metadata", 
+         "var_name": "existing_type_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_version_types": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_version_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "osid", 
+         "syntax_list": "['VERSION']", 
+         "module_name": "metadata", 
+         "var_name": "version_types", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.supports_version_type": {
+      "pattern": "osid.Metadata.supports_coordinate_type", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "osid", 
+         "syntax_list": "['``VERSION``']", 
+         "arg0_name": "version_type", 
+         "method_name": "supports_version_type", 
+         "var_name": "version_types", 
+         "module_name": "metadata", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_minimum_version": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_minimum_version", 
+         "return_type_full": "osid.installation.Version", 
+         "package_name": "osid", 
+         "syntax_list": "['VERSION']", 
+         "module_name": "metadata", 
+         "var_name": "minimum_version", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_maximum_version": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_maximum_version", 
+         "return_type_full": "osid.installation.Version", 
+         "package_name": "osid", 
+         "syntax_list": "['VERSION']", 
+         "module_name": "metadata", 
+         "var_name": "maximum_version", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_version_set": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_version_set", 
+         "return_type_full": "osid.installation.Version", 
+         "package_name": "osid", 
+         "syntax_list": "['VERSION']", 
+         "module_name": "metadata", 
+         "var_name": "version_set", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_default_version_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_default_version_values", 
+         "return_type_full": "osid.installation.Version", 
+         "package_name": "osid", 
+         "syntax_list": "['TIME']", 
+         "module_name": "metadata", 
+         "var_name": "default_version_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Metadata.get_existing_version_values": {
+      "pattern": "osid.Metadata.get_minimum_cardinal", 
+      "kwargs": {
+         "method_name": "get_existing_version_values", 
+         "return_type_full": "osid.installation.Version", 
+         "package_name": "osid", 
+         "syntax_list": "['VERSION']", 
+         "module_name": "metadata", 
+         "var_name": "existing_version_values", 
+         "interface_name": "Metadata"
+      }
+   }, 
+   "Identifiable.get_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_id", 
+         "module_name": "markers", 
+         "interface_name": "Identifiable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Identifiable.is_current": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_current", 
+         "module_name": "markers", 
+         "interface_name": "Identifiable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Extensible.get_record_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_record_types", 
+         "module_name": "markers", 
+         "interface_name": "Extensible", 
+         "package_name": "osid"
+      }
+   }, 
+   "Extensible.has_record_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_record_type", 
+         "module_name": "markers", 
+         "interface_name": "Extensible", 
+         "package_name": "osid"
+      }
+   }, 
+   "Browsable.get_properties": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_properties", 
+         "module_name": "markers", 
+         "interface_name": "Browsable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Browsable.get_properties_by_record_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_properties_by_record_type", 
+         "module_name": "markers", 
+         "interface_name": "Browsable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Temporal.is_effective": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_effective", 
+         "module_name": "markers", 
+         "interface_name": "Temporal", 
+         "package_name": "osid"
+      }
+   }, 
+   "Temporal.get_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_start_date", 
+         "module_name": "markers", 
+         "interface_name": "Temporal", 
+         "package_name": "osid"
+      }
+   }, 
+   "Temporal.get_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_date", 
+         "module_name": "markers", 
+         "interface_name": "Temporal", 
+         "package_name": "osid"
+      }
+   }, 
+   "Containable.is_sequestered": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_sequestered", 
+         "module_name": "markers", 
+         "interface_name": "Containable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Sourceable.get_provider_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_provider_id", 
+         "module_name": "markers", 
+         "interface_name": "Sourceable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Sourceable.get_provider": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_provider", 
+         "module_name": "markers", 
+         "interface_name": "Sourceable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Sourceable.get_branding_ids": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branding_ids", 
+         "module_name": "markers", 
+         "interface_name": "Sourceable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Sourceable.get_branding": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branding", 
+         "module_name": "markers", 
+         "interface_name": "Sourceable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Sourceable.get_license": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_license", 
+         "module_name": "markers", 
+         "interface_name": "Sourceable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Operable.is_active": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_active", 
+         "module_name": "markers", 
+         "interface_name": "Operable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Operable.is_enabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_enabled", 
+         "module_name": "markers", 
+         "interface_name": "Operable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Operable.is_disabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_disabled", 
+         "module_name": "markers", 
+         "interface_name": "Operable", 
+         "package_name": "osid"
+      }
+   }, 
+   "Operable.is_operational": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_operational", 
+         "module_name": "markers", 
+         "interface_name": "Operable", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.get_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_id", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.get_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_name", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.get_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_description", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.get_version": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_version", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.get_release_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_release_date", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.supports_osid_version": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_osid_version", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.get_locales": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_locales", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.supports_journal_rollback": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_journal_rollback", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.supports_journal_branching": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_journal_branching", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.get_branch_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branch_id", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.get_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branch", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.get_proxy_record_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_proxy_record_types", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProfile.supports_proxy_record_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_proxy_record_type", 
+         "module_name": "managers", 
+         "interface_name": "OsidProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidManager.initialize": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "initialize", 
+         "module_name": "managers", 
+         "interface_name": "OsidManager", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidManager.rollback_service": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "rollback_service", 
+         "module_name": "managers", 
+         "interface_name": "OsidManager", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidManager.change_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "change_branch", 
+         "module_name": "managers", 
+         "interface_name": "OsidManager", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProxyManager.initialize": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "initialize", 
+         "module_name": "managers", 
+         "interface_name": "OsidProxyManager", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProxyManager.rollback_service": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "rollback_service", 
+         "module_name": "managers", 
+         "interface_name": "OsidProxyManager", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidProxyManager.change_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "change_branch", 
+         "module_name": "managers", 
+         "interface_name": "OsidProxyManager", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.get_locale": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_locale", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.is_authenticated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_authenticated", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.get_authenticated_agent_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_authenticated_agent_id", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.get_authenticated_agent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_authenticated_agent", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.get_effective_agent_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_effective_agent_id", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.get_effective_agent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_effective_agent", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.get_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_date", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.get_clock_rate": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_clock_rate", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.get_format_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_format_type", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.supports_transactions": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_transactions", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSession.start_transaction": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "start_transaction", 
+         "module_name": "sessions", 
+         "interface_name": "OsidSession", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObject.get_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_name", 
+         "module_name": "objects", 
+         "interface_name": "OsidObject", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObject.get_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_description", 
+         "module_name": "objects", 
+         "interface_name": "OsidObject", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObject.get_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_genus_type", 
+         "module_name": "objects", 
+         "interface_name": "OsidObject", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObject.is_of_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_of_genus_type", 
+         "module_name": "objects", 
+         "interface_name": "OsidObject", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationship.has_end_reason": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_end_reason", 
+         "module_name": "objects", 
+         "interface_name": "OsidRelationship", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationship.get_end_reason_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_reason_id", 
+         "module_name": "objects", 
+         "interface_name": "OsidRelationship", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationship.get_end_reason": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_reason", 
+         "module_name": "objects", 
+         "interface_name": "OsidRelationship", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRule.has_rule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_rule", 
+         "module_name": "objects", 
+         "interface_name": "OsidRule", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRule.get_rule_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_rule_id", 
+         "module_name": "objects", 
+         "interface_name": "OsidRule", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRule.get_rule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_rule", 
+         "module_name": "objects", 
+         "interface_name": "OsidRule", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.is_effective_by_schedule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_effective_by_schedule", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.get_schedule_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_schedule_id", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.get_schedule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_schedule", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.is_effective_by_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_effective_by_event", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.get_event_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_event_id", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.get_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_event", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.is_effective_by_cyclic_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_effective_by_cyclic_event", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.get_cyclic_event_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_cyclic_event_id", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.get_cyclic_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_cyclic_event", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.is_effective_for_demographic": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_effective_for_demographic", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.get_demographic_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_demographic_id", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnabler.get_demographic": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_demographic", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnabler", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendium.get_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_start_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendium", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendium.get_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendium", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendium.is_interpolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_interpolated", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendium", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendium.is_extrapolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_extrapolated", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendium", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidQuery.get_string_match_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_string_match_types", 
+         "module_name": "queries", 
+         "interface_name": "OsidQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidQuery.supports_string_match_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_string_match_type", 
+         "module_name": "queries", 
+         "interface_name": "OsidQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidQuery.match_keyword": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_keyword", 
+         "module_name": "queries", 
+         "interface_name": "OsidQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidQuery.clear_keyword_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_keyword_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidQuery.match_any": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any", 
+         "module_name": "queries", 
+         "interface_name": "OsidQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidQuery.clear_any_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_any_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidIdentifiableQuery.match_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidIdentifiableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidIdentifiableQuery.clear_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidIdentifiableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidExtensibleQuery.match_record_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_record_type", 
+         "module_name": "queries", 
+         "interface_name": "OsidExtensibleQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidExtensibleQuery.match_any_record": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_record", 
+         "module_name": "queries", 
+         "interface_name": "OsidExtensibleQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidExtensibleQuery.clear_record_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_record_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidExtensibleQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.match_effective": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_effective", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.clear_effective_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_effective_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.match_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_start_date", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.match_any_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_start_date", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.clear_start_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_start_date_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.match_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_end_date", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.match_any_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_end_date", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.clear_end_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_end_date_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.match_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_date", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQuery.clear_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_date_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidTemporalQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidContainableQuery.match_sequestered": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_sequestered", 
+         "module_name": "queries", 
+         "interface_name": "OsidContainableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidContainableQuery.clear_sequestered_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_sequestered_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidContainableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.match_provider_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_provider_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.clear_provider_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_provider_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.supports_provider_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_provider_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.get_provider_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_provider_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.match_any_provider": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_provider", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.clear_provider_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_provider_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.match_branding_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_branding_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.clear_branding_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_branding_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.supports_branding_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_branding_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.get_branding_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branding_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.match_any_branding": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_branding", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.clear_branding_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_branding_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.match_license": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_license", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.match_any_license": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_license", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQuery.clear_license_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_license_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidSourceableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQuery.match_active": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_active", 
+         "module_name": "queries", 
+         "interface_name": "OsidOperableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQuery.clear_active_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_active_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidOperableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQuery.match_enabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_enabled", 
+         "module_name": "queries", 
+         "interface_name": "OsidOperableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQuery.clear_enabled_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_enabled_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidOperableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQuery.match_disabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_disabled", 
+         "module_name": "queries", 
+         "interface_name": "OsidOperableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQuery.clear_disabled_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_disabled_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidOperableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQuery.match_operational": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_operational", 
+         "module_name": "queries", 
+         "interface_name": "OsidOperableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQuery.clear_operational_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_operational_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidOperableQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_display_name", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_display_name", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_display_name_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_display_name_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_description", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_description", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_description_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_description_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_genus_type", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_genus_type", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_genus_type_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_genus_type_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_parent_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_parent_genus_type", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_parent_genus_type_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_parent_genus_type_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_subject_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_subject_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_subject_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_subject_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.supports_subject_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_subject_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.get_subject_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_subject_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_subject": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_subject", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_subject_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_subject_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.supports_subject_relevancy_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_subject_relevancy_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.get_subject_relevancy_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_subject_relevancy_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_subject_relevancy_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_subject_relevancy_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_state_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_state_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_state_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_state_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.supports_state_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_state_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.get_state_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_state_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_state": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_state", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_state_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_state_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_comment_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_comment_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_comment_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_comment_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.supports_comment_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_comment_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.get_comment_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_comment_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_comment": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_comment", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_comment_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_comment_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_journal_entry_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_journal_entry_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_journal_entry_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_journal_entry_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.supports_journal_entry_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_journal_entry_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.get_journal_entry_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entry_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_journal_entry": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_journal_entry", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_journal_entry_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_journal_entry_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.supports_statistic_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_statistic_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.get_statistic_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_statistic_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_statistic": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_statistic", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_statistic_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_statistic_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_credit_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_credit_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_credit_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_credit_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.supports_credit_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_credit_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.get_credit_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_credit_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_credit": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_credit", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_credit_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_credit_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_relationship_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_relationship_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_relationship_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_relationship_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.supports_relationship_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_relationship_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.get_relationship_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationship_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_any_relationship": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_relationship", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_relationship_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_relationship_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.match_relationship_peer_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_relationship_peer_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQuery.clear_relationship_peer_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_relationship_peer_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidObjectQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipQuery.match_end_reason_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_end_reason_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidRelationshipQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipQuery.clear_end_reason_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_end_reason_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidRelationshipQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipQuery.supports_end_reason_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_end_reason_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidRelationshipQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipQuery.get_end_reason_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_reason_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidRelationshipQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipQuery.match_any_end_reason": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_end_reason", 
+         "module_name": "queries", 
+         "interface_name": "OsidRelationshipQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipQuery.clear_end_reason_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_end_reason_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidRelationshipQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleQuery.match_rule_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_rule_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidRuleQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleQuery.clear_rule_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_rule_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidRuleQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleQuery.supports_rule_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_rule_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidRuleQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleQuery.get_rule_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_rule_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidRuleQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleQuery.match_any_rule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_rule", 
+         "module_name": "queries", 
+         "interface_name": "OsidRuleQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleQuery.clear_rule_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_rule_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidRuleQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.match_schedule_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_schedule_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.clear_schedule_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_schedule_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.supports_schedule_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_schedule_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.get_schedule_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_schedule_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.match_any_schedule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_schedule", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.clear_schedule_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_schedule_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.match_event_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_event_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.clear_event_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_event_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.supports_event_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_event_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.get_event_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_event_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.match_any_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_event", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.clear_event_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_event_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.match_cyclic_event_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_cyclic_event_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.clear_cyclic_event_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_cyclic_event_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.supports_cyclic_event_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_cyclic_event_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.get_cyclic_event_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_cyclic_event_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.match_any_cyclic_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_cyclic_event", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.clear_cyclic_event_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_cyclic_event_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.match_demographic_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_demographic_id", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.clear_demographic_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_demographic_id_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.supports_demographic_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_demographic_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.get_demographic_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_demographic_query", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.match_any_demographic": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_demographic", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQuery.clear_demographic_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_demographic_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidEnablerQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.match_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_start_date", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.match_any_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_start_date", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.clear_start_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_start_date_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.match_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_end_date", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.match_any_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_any_end_date", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.clear_end_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_end_date_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.match_interpolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_interpolated", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.clear_interpolated_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_interpolated_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.match_extrapolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "match_extrapolated", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQuery.clear_extrapolated_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_extrapolated_terms", 
+         "module_name": "queries", 
+         "interface_name": "OsidCompendiumQuery", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidQueryInspector.get_keyword_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_keyword_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidQueryInspector.get_any_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_any_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidIdentifiableQueryInspector.get_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidIdentifiableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidExtensibleQueryInspector.get_record_type_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_record_type_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidExtensibleQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQueryInspector.get_effective_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_effective_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidTemporalQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQueryInspector.get_start_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_start_date_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidTemporalQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQueryInspector.get_end_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_date_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidTemporalQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalQueryInspector.get_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_date_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidTemporalQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidContainableQueryInspector.get_sequestered_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_sequestered_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidContainableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQueryInspector.get_provider_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_provider_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidSourceableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQueryInspector.get_provider_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_provider_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidSourceableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQueryInspector.get_branding_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branding_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidSourceableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQueryInspector.get_branding_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branding_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidSourceableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableQueryInspector.get_license_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_license_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidSourceableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQueryInspector.get_active_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_active_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidOperableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQueryInspector.get_enabled_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_enabled_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidOperableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQueryInspector.get_disabled_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_disabled_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidOperableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableQueryInspector.get_operational_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_operational_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidOperableQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_display_name_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_name_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_description_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_description_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_genus_type_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_genus_type_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_parent_genus_type_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_parent_genus_type_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_subject_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_subject_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_subject_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_subject_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_subject_relevancy_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_subject_relevancy_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_state_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_state_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_state_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_state_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_comment_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_comment_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_comment_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_comment_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_journal_entry_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entry_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_journal_entry_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entry_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_statistic_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_statistic_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_credit_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_credit_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_credit_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_credit_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_relationship_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationship_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_relationship_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationship_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectQueryInspector.get_relationship_peer_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationship_peer_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidObjectQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipQueryInspector.get_end_reason_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_reason_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidRelationshipQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipQueryInspector.get_end_reason_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_reason_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidRelationshipQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleQueryInspector.get_rule_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_rule_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidRuleQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleQueryInspector.get_rule_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_rule_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidRuleQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQueryInspector.get_schedule_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_schedule_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidEnablerQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQueryInspector.get_schedule_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_schedule_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidEnablerQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQueryInspector.get_event_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_event_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidEnablerQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQueryInspector.get_event_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_event_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidEnablerQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQueryInspector.get_cyclic_event_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_cyclic_event_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidEnablerQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQueryInspector.get_cyclic_event_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_cyclic_event_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidEnablerQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQueryInspector.get_demographic_id_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_demographic_id_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidEnablerQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerQueryInspector.get_demographic_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_demographic_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidEnablerQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQueryInspector.get_start_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_start_date_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidCompendiumQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQueryInspector.get_end_date_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_date_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidCompendiumQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQueryInspector.get_interpolated_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_interpolated_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidCompendiumQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumQueryInspector.get_extrapolated_terms": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_extrapolated_terms", 
+         "module_name": "query_inspectors", 
+         "interface_name": "OsidCompendiumQueryInspector", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidForm.is_for_update": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_for_update", 
+         "module_name": "objects", 
+         "interface_name": "OsidForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidForm.get_default_locale": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_default_locale", 
+         "module_name": "objects", 
+         "interface_name": "OsidForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidForm.get_locales": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_locales", 
+         "module_name": "objects", 
+         "interface_name": "OsidForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidForm.set_locale": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_locale", 
+         "module_name": "objects", 
+         "interface_name": "OsidForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidForm.get_journal_comment_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_comment_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidForm.set_journal_comment": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_journal_comment", 
+         "module_name": "objects", 
+         "interface_name": "OsidForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidForm.is_valid": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_valid", 
+         "module_name": "objects", 
+         "interface_name": "OsidForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidForm.get_validation_messages": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_validation_messages", 
+         "module_name": "objects", 
+         "interface_name": "OsidForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidForm.get_invalid_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_invalid_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidExtensibleForm.get_required_record_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_required_record_types", 
+         "module_name": "objects", 
+         "interface_name": "OsidExtensibleForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalForm.get_start_date_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_start_date_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidTemporalForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalForm.set_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_start_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidTemporalForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalForm.clear_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_start_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidTemporalForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalForm.get_end_date_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_date_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidTemporalForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalForm.set_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_end_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidTemporalForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalForm.clear_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_end_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidTemporalForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidContainableForm.get_sequestered_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_sequestered_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidContainableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidContainableForm.set_sequestered": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_sequestered", 
+         "module_name": "objects", 
+         "interface_name": "OsidContainableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidContainableForm.clear_sequestered": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_sequestered", 
+         "module_name": "objects", 
+         "interface_name": "OsidContainableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableForm.get_provider_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_provider_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidSourceableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableForm.set_provider": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_provider", 
+         "module_name": "objects", 
+         "interface_name": "OsidSourceableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableForm.clear_provider": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_provider", 
+         "module_name": "objects", 
+         "interface_name": "OsidSourceableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableForm.get_branding_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branding_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidSourceableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableForm.set_branding": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_branding", 
+         "module_name": "objects", 
+         "interface_name": "OsidSourceableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableForm.clear_branding": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_branding", 
+         "module_name": "objects", 
+         "interface_name": "OsidSourceableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableForm.get_license_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_license_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidSourceableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableForm.set_license": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_license", 
+         "module_name": "objects", 
+         "interface_name": "OsidSourceableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableForm.clear_license": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_license", 
+         "module_name": "objects", 
+         "interface_name": "OsidSourceableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableForm.get_enabled_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_enabled_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidOperableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableForm.set_enabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_enabled", 
+         "module_name": "objects", 
+         "interface_name": "OsidOperableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableForm.clear_enabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_enabled", 
+         "module_name": "objects", 
+         "interface_name": "OsidOperableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableForm.get_disabled_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_disabled_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidOperableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableForm.set_disabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_disabled", 
+         "module_name": "objects", 
+         "interface_name": "OsidOperableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableForm.clear_disabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_disabled", 
+         "module_name": "objects", 
+         "interface_name": "OsidOperableForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectForm.get_display_name_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_name_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidObjectForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectForm.set_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_display_name", 
+         "module_name": "objects", 
+         "interface_name": "OsidObjectForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectForm.clear_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_display_name", 
+         "module_name": "objects", 
+         "interface_name": "OsidObjectForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectForm.get_description_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_description_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidObjectForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectForm.set_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_description", 
+         "module_name": "objects", 
+         "interface_name": "OsidObjectForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectForm.clear_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_description", 
+         "module_name": "objects", 
+         "interface_name": "OsidObjectForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectForm.get_genus_type_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_genus_type_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidObjectForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectForm.set_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_genus_type", 
+         "module_name": "objects", 
+         "interface_name": "OsidObjectForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectForm.clear_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_genus_type", 
+         "module_name": "objects", 
+         "interface_name": "OsidObjectForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleForm.get_rule_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_rule_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidRuleForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleForm.set_rule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_rule", 
+         "module_name": "objects", 
+         "interface_name": "OsidRuleForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleForm.clear_rule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_rule", 
+         "module_name": "objects", 
+         "interface_name": "OsidRuleForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.get_schedule_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_schedule_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.set_schedule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_schedule", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.clear_schedule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_schedule", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.get_event_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_event_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.set_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_event", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.clear_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_event", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.get_cyclic_event_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_cyclic_event_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.set_cyclic_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_cyclic_event", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.clear_cyclic_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_cyclic_event", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.get_demographic_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_demographic_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.set_demographic": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_demographic", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerForm.clear_demographic": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_demographic", 
+         "module_name": "objects", 
+         "interface_name": "OsidEnablerForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.get_start_date_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_start_date_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.set_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_start_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.clear_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_start_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.get_end_date_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_date_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.set_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_end_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.clear_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_end_date", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.get_interpolated_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_interpolated_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.set_interpolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_interpolated", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.clear_interpolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_interpolated", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.get_extrapolated_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_extrapolated_metadata", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.set_extrapolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_extrapolated", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumForm.clear_extrapolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_extrapolated", 
+         "module_name": "objects", 
+         "interface_name": "OsidCompendiumForm", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidIdentifiableSearchOrder.order_by_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_id", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidIdentifiableSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalSearchOrder.order_by_effective": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_effective", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidTemporalSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalSearchOrder.order_by_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_start_date", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidTemporalSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidTemporalSearchOrder.order_by_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_end_date", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidTemporalSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidContainableSearchOrder.order_by_sequestered": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_sequestered", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidContainableSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableSearchOrder.order_by_provider": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_provider", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidSourceableSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableSearchOrder.supports_provider_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_provider_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidSourceableSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSourceableSearchOrder.get_provider_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_provider_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidSourceableSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableSearchOrder.order_by_active": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_active", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidOperableSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableSearchOrder.order_by_enabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_enabled", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidOperableSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableSearchOrder.order_by_disabled": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_disabled", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidOperableSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidOperableSearchOrder.order_by_operational": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_operational", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidOperableSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectSearchOrder.order_by_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_display_name", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidObjectSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectSearchOrder.order_by_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_description", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidObjectSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectSearchOrder.order_by_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_genus_type", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidObjectSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectSearchOrder.order_by_state": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_state", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidObjectSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectSearchOrder.order_by_cumulative_rating": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_cumulative_rating", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidObjectSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectSearchOrder.order_by_statistic": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_statistic", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidObjectSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectSearchOrder.order_by_create_time": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_create_time", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidObjectSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidObjectSearchOrder.order_by_last_modified_time": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_last_modified_time", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidObjectSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipSearchOrder.order_by_end_reason": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_end_reason", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidRelationshipSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipSearchOrder.supports_end_reason_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_end_reason_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidRelationshipSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRelationshipSearchOrder.get_end_reason_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_end_reason_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidRelationshipSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleSearchOrder.order_by_rule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_rule", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidRuleSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleSearchOrder.supports_rule_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_rule_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidRuleSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuleSearchOrder.get_rule_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_rule_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidRuleSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.order_by_schedule": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_schedule", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.supports_schedule_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_schedule_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.get_schedule_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_schedule_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.order_by_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_event", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.supports_event_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_event_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.get_event_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_event_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.order_by_cyclic_event": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_cyclic_event", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.supports_cyclic_event_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_cyclic_event_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.get_cyclic_event_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_cyclic_event_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.order_by_demographic": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_demographic", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.supports_demographic_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_demographic_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidEnablerSearchOrder.get_demographic_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_demographic_search_order", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidEnablerSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumSearchOrder.order_by_start_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_start_date", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidCompendiumSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumSearchOrder.order_by_end_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_end_date", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidCompendiumSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumSearchOrder.order_by_interpolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_interpolated", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidCompendiumSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidCompendiumSearchOrder.order_by_extrapolated": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "order_by_extrapolated", 
+         "module_name": "search_orders", 
+         "interface_name": "OsidCompendiumSearchOrder", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSearch.limit_result_set": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "limit_result_set", 
+         "module_name": "searches", 
+         "interface_name": "OsidSearch", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidSearchResults.get_result_size": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_result_size", 
+         "module_name": "searches", 
+         "interface_name": "OsidSearchResults", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidReceiver.up": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "up", 
+         "module_name": "receivers", 
+         "interface_name": "OsidReceiver", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidReceiver.down": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "down", 
+         "module_name": "receivers", 
+         "interface_name": "OsidReceiver", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidList.has_next": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_next", 
+         "module_name": "objects", 
+         "interface_name": "OsidList", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidList.available": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "available", 
+         "module_name": "objects", 
+         "interface_name": "OsidList", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidList.skip": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "skip", 
+         "module_name": "objects", 
+         "interface_name": "OsidList", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidNode.is_root": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_root", 
+         "module_name": "objects", 
+         "interface_name": "OsidNode", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidNode.has_parents": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_parents", 
+         "module_name": "objects", 
+         "interface_name": "OsidNode", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidNode.get_parent_ids": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_parent_ids", 
+         "module_name": "objects", 
+         "interface_name": "OsidNode", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidNode.is_leaf": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_leaf", 
+         "module_name": "objects", 
+         "interface_name": "OsidNode", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidNode.has_children": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_children", 
+         "module_name": "objects", 
+         "interface_name": "OsidNode", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidNode.get_child_ids": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_child_ids", 
+         "module_name": "objects", 
+         "interface_name": "OsidNode", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRecord.implements_record_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "implements_record_type", 
+         "module_name": "records", 
+         "interface_name": "OsidRecord", 
+         "package_name": "osid"
+      }
+   }, 
+   "Property.get_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_name", 
+         "module_name": "properties", 
+         "interface_name": "Property", 
+         "package_name": "osid"
+      }
+   }, 
+   "Property.get_display_label": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_label", 
+         "module_name": "properties", 
+         "interface_name": "Property", 
+         "package_name": "osid"
+      }
+   }, 
+   "Property.get_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_description", 
+         "module_name": "properties", 
+         "interface_name": "Property", 
+         "package_name": "osid"
+      }
+   }, 
+   "Property.get_value": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_value", 
+         "module_name": "properties", 
+         "interface_name": "Property", 
+         "package_name": "osid"
+      }
+   }, 
+   "PropertyList.get_next_property": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_next_property", 
+         "module_name": "properties", 
+         "interface_name": "PropertyList", 
+         "package_name": "osid"
+      }
+   }, 
+   "PropertyList.get_next_properties": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_next_properties", 
+         "module_name": "properties", 
+         "interface_name": "PropertyList", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuntimeProfile.supports_configuration": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_configuration", 
+         "module_name": "managers", 
+         "interface_name": "OsidRuntimeProfile", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuntimeManager.get_manager": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_manager", 
+         "module_name": "managers", 
+         "interface_name": "OsidRuntimeManager", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuntimeManager.get_proxy_manager": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_proxy_manager", 
+         "module_name": "managers", 
+         "interface_name": "OsidRuntimeManager", 
+         "package_name": "osid"
+      }
+   }, 
+   "OsidRuntimeManager.get_configuration": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_configuration", 
+         "module_name": "managers", 
+         "interface_name": "OsidRuntimeManager", 
+         "package_name": "osid"
+      }
+   }
+}

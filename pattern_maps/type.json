@@ -1,0 +1,557 @@
+{
+   "impl_log": {
+      "managers": {}, 
+      "sessions": {}
+   }, 
+   "package_objects_caps": [], 
+   "package_objects_under": [], 
+   "package_cataloged_objects_caps": [
+      "Type"
+   ], 
+   "package_cataloged_objects_under": [
+      "type"
+   ], 
+   "package_objects_under_to_caps": {}, 
+   "package_relationships_caps": [], 
+   "package_relationships_under": [], 
+   "package_rules_caps": [], 
+   "package_rules_under": [], 
+   "package_catalog_caps": "NoCatalog", 
+   "package_catalog_under": "no_catalog", 
+   "package_relationships_detail": {}, 
+   "TypeAdminSession.instance_data": {}, 
+   "TypeProfile.supports_type_lookup": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_type_lookup", 
+         "module_name": "managers", 
+         "interface_name": "TypeProfile", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeProfile.supports_type_admin": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_type_admin", 
+         "module_name": "managers", 
+         "interface_name": "TypeProfile", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeManager.get_type_lookup_session": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_type_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "TypeManager", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeManager.get_type_admin_session": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_type_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "TypeManager", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeProxyManager.get_type_lookup_session": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_type_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "TypeProxyManager", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeProxyManager.get_type_admin_session": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_type_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "TypeProxyManager", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.can_lookup_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_lookup_types", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.has_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_types_by_domain": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_types_by_domain", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_types_by_authority": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_types_by_authority", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_types_by_domain_and_authority": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_types_by_domain_and_authority", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_types", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.is_equivalent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_equivalent", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.implies_support": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "implies_support", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.has_base_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_base_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_base_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_base_types", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_relation_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relation_types", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_source_types_by_relation_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_types_by_relation_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_destination_types_by_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_destination_types_by_source", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_destination_types_by_source_and_relation_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_destination_types_by_source_and_relation_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_destination_types_by_relation_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_destination_types_by_relation_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_source_types_by_destination": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_types_by_destination", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeLookupSession.get_source_types_by_destination_and_relation_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_types_by_destination_and_relation_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeLookupSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.can_create_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_create_types", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.get_type_form_for_create": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_type_form_for_create", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.create_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "create_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.can_update_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_update_types", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.get_type_form_for_update": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_type_form_for_update", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.update_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "update_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.can_delete_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_delete_types", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.can_delete_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_delete_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.delete_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "delete_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.make_equivalent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "make_equivalent", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.add_base_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "add_base_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.remove_base_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "remove_base_type", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.add_type_relation": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "add_type_relation", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeAdminSession.remove_type_relation": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "remove_type_relation", 
+         "module_name": "sessions", 
+         "interface_name": "TypeAdminSession", 
+         "package_name": "type"
+      }
+   }, 
+   "Type.get_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_name", 
+         "module_name": "primitives", 
+         "interface_name": "Type", 
+         "package_name": "type"
+      }
+   }, 
+   "Type.get_display_label": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_label", 
+         "module_name": "primitives", 
+         "interface_name": "Type", 
+         "package_name": "type"
+      }
+   }, 
+   "Type.get_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_description", 
+         "module_name": "primitives", 
+         "interface_name": "Type", 
+         "package_name": "type"
+      }
+   }, 
+   "Type.get_domain": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_domain", 
+         "module_name": "primitives", 
+         "interface_name": "Type", 
+         "package_name": "type"
+      }
+   }, 
+   "Type.get_authority": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_authority", 
+         "module_name": "primitives", 
+         "interface_name": "Type", 
+         "package_name": "type"
+      }
+   }, 
+   "Type.get_identifier_namespace": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_identifier_namespace", 
+         "module_name": "primitives", 
+         "interface_name": "Type", 
+         "package_name": "type"
+      }
+   }, 
+   "Type.get_identifier": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_identifier", 
+         "module_name": "primitives", 
+         "interface_name": "Type", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.get_display_name_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_name_metadata", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.set_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_display_name", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.clear_display_name": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_display_name", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.get_display_label_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_display_label_metadata", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.set_display_label": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_display_label", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.clear_display_label": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_display_label", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.get_description_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_description_metadata", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.set_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_description", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.clear_description": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_description", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.get_domain_metadata": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_domain_metadata", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.set_domain": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "set_domain", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeForm.clear_domain": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "clear_domain", 
+         "module_name": "objects", 
+         "interface_name": "TypeForm", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeList.get_next_type": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_type", 
+         "module_name": "objects", 
+         "return_type_full": "osid.type.Type", 
+         "interface_name": "TypeList", 
+         "package_name": "type"
+      }
+   }, 
+   "TypeList.get_next_types": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_types", 
+         "return_type_full": "osid.type.Type", 
+         "package_name": "type", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "interface_name": "TypeList"
+      }
+   }
+}

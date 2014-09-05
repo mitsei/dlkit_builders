@@ -1,0 +1,3455 @@
+{
+   "impl_log": {
+      "managers": {
+         "AuthenticationProfile": {
+            "supports_agency_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agency_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agency_hierarchy_design": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_visible_federation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agency_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_smart_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_agency_assignment": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agency_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_authentication_acquisition": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agency_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_authentication_process": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agency_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agent_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_authentication_validation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agency_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_agency_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_authentication_keys": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AuthenticationManager": {
+            "get_agent_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_smart_agency_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_admin_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_agency_assignment_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_keys_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_query_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_agency_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_search_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_batch_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_hierarchy_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_notification_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_lookup_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_process_manager": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AuthenticationProxyManager": {
+            "get_agent_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_smart_agency_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_admin_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_agency_assignment_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_batch_proxy_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_query_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_process_proxy_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_agency_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_keys_proxy_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_search_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_hierarchy_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_notification_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_lookup_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }, 
+      "sessions": {
+         "AgentLookupSession": {
+            "get_agents_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agents_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agents_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_agents": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agents_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_agent_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_agent_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agents": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgentQuerySession": {
+            "get_agent_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agents_by_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_search_agents": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgentSearchSession": {
+            "get_agents_by_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_search_order": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgentAdminSession": {
+            "can_create_agents": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_agent_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_agent": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "update_agent": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_agents": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_agent": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "alias_agent": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_agents": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "create_agent": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_agent_aliases": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agent_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_agent": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgentNotificationSession": {
+            "register_for_deleted_agents": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agency_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_agents": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_register_for_agent_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_agent": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_federated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_agent": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_agents": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgentAgencySession": {
+            "get_agent_ids_by_agency": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_agent_agency_mappings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agents_by_agencies": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agency_ids_by_agent": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agencies_by_agent": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agents_by_agency": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agent_ids_by_agencies": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgentAgencyAssignmentSession": {
+            "assign_agent_to_agency": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_assignable_agency_ids_for_agent": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "unassign_agent_from_agency": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_assignable_agency_ids": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_assign_agents": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_assign_agents_to_agency": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgentSmartAgencySession": {
+            "get_agent_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agent_search_order": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "apply_agent_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agency_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "apply_agent_sequencing": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "inspect_agent_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_manage_smart_agencies": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_agent_query_from_inspector": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgencyLookupSession": {
+            "get_agencies_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agencies_by_provider": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agencies_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agencies_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agencies_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgencyQuerySession": {
+            "get_agency_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agencies_by_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_search_agencies": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgencySearchSession": {
+            "get_agency_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_search_order": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agencies_by_search": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgencyAdminSession": {
+            "update_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "alias_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_agency_aliases": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_agency_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "create_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_agencies": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgencyNotificationSession": {
+            "can_register_for_agency_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_agency_descendants": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_agency_ancestors": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_agency_ancestors": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_agency_descendants": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgencyHierarchySession": {
+            "get_parent_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_nodes": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_ancestor_of_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_child_of_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "has_parent_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "has_child_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_child_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_descendant_of_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_child_agency_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_parent_of_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_node_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_root_agency_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_access_agency_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_root_agencies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_parent_agency_ids": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AgencyHierarchyDesignSession": {
+            "add_child_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_modify_agency_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "add_root_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_root_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_child_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_child_agencies": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }
+   }, 
+   "package_objects_caps": [
+      "Agent"
+   ], 
+   "package_objects_under": [
+      "agent"
+   ], 
+   "package_cataloged_objects_caps": [
+      "Agent"
+   ], 
+   "package_cataloged_objects_under": [
+      "agent"
+   ], 
+   "package_objects_under_to_caps": {
+      "agent": "Agent"
+   }, 
+   "package_relationships_caps": [], 
+   "package_relationships_under": [], 
+   "package_rules_caps": [], 
+   "package_rules_under": [], 
+   "package_catalog_caps": "Agency", 
+   "package_catalog_under": "agency", 
+   "package_relationships_detail": {}, 
+   "Agent.arg_detail": {}, 
+   "Agent.persisted_data": {
+      "agency": "OsidCatalog"
+   }, 
+   "Agent.initialized_data": {
+      "agency": "OsidCatalog"
+   }, 
+   "Agent.instance_data": {
+      "agent_record": "osid.authentication.records.AgentRecord"
+   }, 
+   "Agent.aggregate_data": {}, 
+   "Agent.return_types": {
+      "agent_record": "osid.authentication.records.AgentRecord"
+   }, 
+   "AgentAdminSession.instance_data": {}, 
+   "AgencyAdminSession.instance_data": {}, 
+   "AuthenticationProfile.init_pattern": "resource.ResourceProfile", 
+   "AuthenticationProfile.supports_visible_federation": {
+      "pattern": "resource.ResourceProfile.supports_visible_federation", 
+      "kwargs": {
+         "method_name": "supports_visible_federation", 
+         "module_name": "managers", 
+         "var_name": "supports_visible_federation", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_authentication_acquisition": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_authentication_acquisition", 
+         "module_name": "managers", 
+         "var_name": "supports_authentication_acquisition", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_authentication_validation": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_authentication_validation", 
+         "module_name": "managers", 
+         "var_name": "supports_authentication_validation", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agent_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_agent_lookup", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agent_query", 
+         "module_name": "managers", 
+         "var_name": "supports_agent_query", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agent_search", 
+         "module_name": "managers", 
+         "var_name": "supports_agent_search", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agent_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_agent_admin", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agent_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_agent_notification", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_agency": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agent_agency", 
+         "module_name": "managers", 
+         "var_name": "supports_agent_agency", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_agency_assignment": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agent_agency_assignment", 
+         "module_name": "managers", 
+         "var_name": "supports_agent_agency_assignment", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_smart_agency": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agent_smart_agency", 
+         "module_name": "managers", 
+         "var_name": "supports_agent_smart_agency", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agency_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agency_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_agency_lookup", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agency_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agency_query", 
+         "module_name": "managers", 
+         "var_name": "supports_agency_query", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agency_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agency_search", 
+         "module_name": "managers", 
+         "var_name": "supports_agency_search", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agency_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agency_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_agency_admin", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agency_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agency_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_agency_notification", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agency_hierarchy": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agency_hierarchy", 
+         "module_name": "managers", 
+         "var_name": "supports_agency_hierarchy", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_agency_hierarchy_design": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_agency_hierarchy_design", 
+         "module_name": "managers", 
+         "var_name": "supports_agency_hierarchy_design", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_authentication_keys": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_authentication_keys", 
+         "module_name": "managers", 
+         "var_name": "supports_authentication_keys", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.supports_authentication_process": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_authentication_process", 
+         "module_name": "managers", 
+         "var_name": "supports_authentication_process", 
+         "interface_name": "AuthenticationProfile", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AuthenticationProfile.get_agent_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_agent_record_types", 
+         "var_name": "agent_record_types", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProfile", 
+         "object_name_under": "agent"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_agent_record_type", 
+         "var_name": "agent_record_type", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_record_type", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProfile", 
+         "object_name_under": "agent"
+      }
+   }, 
+   "AuthenticationProfile.get_agent_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_agent_search_record_types", 
+         "var_name": "agent_search_record_types", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProfile", 
+         "object_name_under": "agent_search"
+      }
+   }, 
+   "AuthenticationProfile.supports_agent_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_agent_search_record_type", 
+         "var_name": "agent_search_record_type", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProfile", 
+         "object_name_under": "agent_search"
+      }
+   }, 
+   "AuthenticationProfile.get_agency_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_agency_record_types", 
+         "var_name": "agency_record_types", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProfile", 
+         "object_name_under": "agency"
+      }
+   }, 
+   "AuthenticationProfile.supports_agency_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_agency_record_type", 
+         "var_name": "agency_record_type", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_record_type", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProfile", 
+         "object_name_under": "agency"
+      }
+   }, 
+   "AuthenticationProfile.get_agency_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_agency_search_record_types", 
+         "var_name": "agency_search_record_types", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProfile", 
+         "object_name_under": "agency_search"
+      }
+   }, 
+   "AuthenticationProfile.supports_agency_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_agency_search_record_type", 
+         "var_name": "agency_search_record_type", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProfile", 
+         "object_name_under": "agency_search"
+      }
+   }, 
+   "AuthenticationManager.init_pattern": "resource.ResourceManager", 
+   "AuthenticationManager.get_agent_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agent_lookup", 
+         "method_name": "get_agent_lookup_session", 
+         "var_name": "agent_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_lookup_session_for_agency": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "support_check": "agent_lookup", 
+         "method_name": "get_agent_lookup_session_for_agency", 
+         "var_name": "agent_lookup_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_query_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentQuerySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agent_query", 
+         "method_name": "get_agent_query_session", 
+         "var_name": "agent_query_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_query_session_for_agency": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentQuerySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "support_check": "agent_query", 
+         "method_name": "get_agent_query_session_for_agency", 
+         "var_name": "agent_query_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentSearchSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agent_search", 
+         "method_name": "get_agent_search_session", 
+         "var_name": "agent_search_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_search_session_for_agency": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentSearchSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "support_check": "agent_search", 
+         "method_name": "get_agent_search_session_for_agency", 
+         "var_name": "agent_search_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentAdminSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agent_admin", 
+         "method_name": "get_agent_admin_session", 
+         "var_name": "agent_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_admin_session_for_agency": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentAdminSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "support_check": "agent_admin", 
+         "method_name": "get_agent_admin_session_for_agency", 
+         "var_name": "agent_admin_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentNotificationSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_receiver", 
+         "support_check": "agent_notification", 
+         "method_name": "get_agent_notification_session", 
+         "var_name": "agent_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_notification_session_for_agency": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session_for_bin", 
+      "kwargs": {
+         "arg1_name": "agency_id", 
+         "return_type_full": "osid.authentication.AgentNotificationSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_receiver", 
+         "support_check": "agent_notification", 
+         "method_name": "get_agent_notification_session_for_agency", 
+         "var_name": "agent_notification_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_agency_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentAgencySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agent_agency", 
+         "method_name": "get_agent_agency_session", 
+         "var_name": "agent_agency_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_agency_assignment_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentAgencyAssignmentSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agent_agency_assignment", 
+         "method_name": "get_agent_agency_assignment_session", 
+         "var_name": "agent_agency_assignment_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agent_smart_agency_session": {
+      "pattern": "resource.ResourceManager.get_resource_smart_bin_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentSmartAgencySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "support_check": "agent_smart_agency", 
+         "method_name": "get_agent_smart_agency_session", 
+         "var_name": "agent_smart_agency_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agency_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agency_lookup", 
+         "method_name": "get_agency_lookup_session", 
+         "var_name": "agency_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agency_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencySearchSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agency_search", 
+         "method_name": "get_agency_search_session", 
+         "var_name": "agency_search_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agency_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyAdminSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agency_admin", 
+         "method_name": "get_agency_admin_session", 
+         "var_name": "agency_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agency_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyNotificationSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_receiver", 
+         "support_check": "agency_notification", 
+         "method_name": "get_agency_notification_session", 
+         "var_name": "agency_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agency_hierarchy_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyHierarchySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agency_hierarchy", 
+         "method_name": "get_agency_hierarchy_session", 
+         "var_name": "agency_hierarchy_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_agency_hierarchy_design_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyHierarchyDesignSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "support_check": "agency_hierarchy_design", 
+         "method_name": "get_agency_hierarchy_design_session", 
+         "var_name": "agency_hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_authentication_batch_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_authentication_batch_manager", 
+         "return_type_full": "osid.authentication.batch.AuthenticationBatchManager", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "var_name": "authentication_batch_manager", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_authentication_keys_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_authentication_keys_manager", 
+         "return_type_full": "osid.authentication.keys.AuthenticationKeysManager", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "var_name": "authentication_keys_manager", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationManager.get_authentication_process_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_authentication_process_manager", 
+         "return_type_full": "osid.authentication.process.AuthenticationProcessManager", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "var_name": "authentication_process_manager", 
+         "interface_name": "AuthenticationManager"
+      }
+   }, 
+   "AuthenticationProxyManager.init_pattern": "resource.ResourceProxyManager", 
+   "AuthenticationProxyManager.get_agent_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agent_lookup", 
+         "method_name": "get_agent_lookup_session", 
+         "var_name": "agent_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_lookup_session_for_agency": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "agent_lookup", 
+         "method_name": "get_agent_lookup_session_for_agency", 
+         "var_name": "agent_lookup_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_query_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentQuerySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agent_query", 
+         "method_name": "get_agent_query_session", 
+         "var_name": "agent_query_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_query_session_for_agency": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentQuerySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "agent_query", 
+         "method_name": "get_agent_query_session_for_agency", 
+         "var_name": "agent_query_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentSearchSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agent_search", 
+         "method_name": "get_agent_search_session", 
+         "var_name": "agent_search_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_search_session_for_agency": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentSearchSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "agent_search", 
+         "method_name": "get_agent_search_session_for_agency", 
+         "var_name": "agent_search_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentAdminSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agent_admin", 
+         "method_name": "get_agent_admin_session", 
+         "var_name": "agent_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_admin_session_for_agency": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentAdminSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "agent_admin", 
+         "method_name": "get_agent_admin_session_for_agency", 
+         "var_name": "agent_admin_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentNotificationSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_receiver", 
+         "support_check": "agent_notification", 
+         "method_name": "get_agent_notification_session", 
+         "var_name": "agent_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_notification_session_for_agency": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentNotificationSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_receiver", 
+         "arg0_type_full": "osid.authentication.AgentReceiver", 
+         "support_check": "agent_notification", 
+         "method_name": "get_agent_notification_session_for_agency", 
+         "var_name": "agent_notification_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_agency_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentAgencySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agent_agency", 
+         "method_name": "get_agent_agency_session", 
+         "var_name": "agent_agency_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_agency_assignment_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentAgencyAssignmentSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agent_agency_assignment", 
+         "method_name": "get_agent_agency_assignment_session", 
+         "var_name": "agent_agency_assignment_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agent_smart_agency_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentSmartAgencySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "support_check": "agent_smart_agency", 
+         "method_name": "get_agent_smart_agency_session", 
+         "var_name": "agent_smart_agency_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agency_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agency_lookup", 
+         "method_name": "get_agency_lookup_session", 
+         "var_name": "agency_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agency_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencySearchSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agency_search", 
+         "method_name": "get_agency_search_session", 
+         "var_name": "agency_search_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agency_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyAdminSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agency_admin", 
+         "method_name": "get_agency_admin_session", 
+         "var_name": "agency_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agency_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyNotificationSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_receiver", 
+         "support_check": "agency_notification", 
+         "method_name": "get_agency_notification_session", 
+         "var_name": "agency_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agency_hierarchy_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyHierarchySession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agency_hierarchy", 
+         "method_name": "get_agency_hierarchy_session", 
+         "var_name": "agency_hierarchy_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_agency_hierarchy_design_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyHierarchyDesignSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "proxy", 
+         "support_check": "agency_hierarchy_design", 
+         "method_name": "get_agency_hierarchy_design_session", 
+         "var_name": "agency_hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_authentication_batch_proxy_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_authentication_batch_proxy_manager", 
+         "return_type_full": "osid.authentication.batch.AuthenticationBatchProxyManager", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "var_name": "authentication_batch_proxy_manager", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_authentication_keys_proxy_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_authentication_keys_proxy_manager", 
+         "return_type_full": "osid.authentication.keys.AuthenticationKeysProxyManager", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "var_name": "authentication_keys_proxy_manager", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AuthenticationProxyManager.get_authentication_process_proxy_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_authentication_process_proxy_manager", 
+         "return_type_full": "osid.authentication.process.AuthenticationProcessProxyManager", 
+         "package_name": "authentication", 
+         "module_name": "managers", 
+         "var_name": "authentication_process_proxy_manager", 
+         "interface_name": "AuthenticationProxyManager"
+      }
+   }, 
+   "AgentLookupSession.init_pattern": "resource.ResourceLookupSession", 
+   "AgentLookupSession.get_agency_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_agency_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency_id", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.get_agency": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_agency", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.can_lookup_agents": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_agents", 
+         "object_name": "Agent", 
+         "var_name": "can_lookup_agents", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.use_comparative_agent_view": {
+      "pattern": "resource.ResourceLookupSession.use_comparative_resource_view", 
+      "kwargs": {
+         "method_name": "use_comparative_agent_view", 
+         "var_name": "comparative_view", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession", 
+         "object_name_under": "agent"
+      }
+   }, 
+   "AgentLookupSession.use_plenary_agent_view": {
+      "pattern": "resource.ResourceLookupSession.use_plenary_resource_view", 
+      "kwargs": {
+         "method_name": "use_plenary_agent_view", 
+         "var_name": "plenary_view", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession", 
+         "object_name_under": "agent"
+      }
+   }, 
+   "AgentLookupSession.use_federated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_agency_view", 
+         "var_name": "federated_vew", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.use_isolated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_agency_view", 
+         "var_name": "isolated_view", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.get_agent": {
+      "pattern": "resource.ResourceLookupSession.get_resource", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.Agent", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_id", 
+         "method_name": "get_agent", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.get_agents_by_ids": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_ids", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentList", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_ids", 
+         "method_name": "get_agents_by_ids", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.get_agents_by_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentList", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_genus_type", 
+         "method_name": "get_agents_by_genus_type", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.get_agents_by_parent_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_parent_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentList", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_genus_type", 
+         "method_name": "get_agents_by_parent_genus_type", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.get_agents_by_record_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_record_type", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentList", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_record_type", 
+         "method_name": "get_agents_by_record_type", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentLookupSession.get_agents": {
+      "pattern": "resource.ResourceLookupSession.get_resources", 
+      "kwargs": {
+         "method_name": "get_agents", 
+         "object_name": "Agent", 
+         "return_type_full": "osid.authentication.AgentList", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentLookupSession"
+      }
+   }, 
+   "AgentQuerySession.get_agency_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_agency_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency_id", 
+         "interface_name": "AgentQuerySession"
+      }
+   }, 
+   "AgentQuerySession.get_agency": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_agency", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency", 
+         "interface_name": "AgentQuerySession"
+      }
+   }, 
+   "AgentQuerySession.can_search_agents": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_agents", 
+         "object_name": "Agent", 
+         "var_name": "can_search_agents", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentQuerySession"
+      }
+   }, 
+   "AgentQuerySession.use_federated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_agency_view", 
+         "var_name": "federated_vew", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentQuerySession"
+      }
+   }, 
+   "AgentQuerySession.use_isolated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_agency_view", 
+         "var_name": "isolated_view", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentQuerySession"
+      }
+   }, 
+   "AgentQuerySession.get_agent_query": {
+      "pattern": "resource.ResourceQuerySession.get_resource_query", 
+      "kwargs": {
+         "method_name": "get_agent_query", 
+         "object_name": "Agent", 
+         "return_type_full": "osid.authentication.AgentQuery", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentQuerySession"
+      }
+   }, 
+   "AgentQuerySession.get_agents_by_query": {
+      "pattern": "resource.ResourceQuerySession.get_resources_by_query", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentList", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_query", 
+         "arg0_type_full": "osid.authentication.AgentQuery", 
+         "method_name": "get_agents_by_query", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentQuerySession"
+      }
+   }, 
+   "AgentSearchSession.get_agent_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search", 
+      "kwargs": {
+         "method_name": "get_agent_search", 
+         "object_name": "Agent", 
+         "return_type_full": "osid.authentication.AgentSearch", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSearchSession"
+      }
+   }, 
+   "AgentSearchSession.get_agent_search_order": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search_order", 
+      "kwargs": {
+         "method_name": "get_agent_search_order", 
+         "object_name": "Agent", 
+         "return_type_full": "osid.authentication.AgentSearchOrder", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSearchSession"
+      }
+   }, 
+   "AgentSearchSession.get_agents_by_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_by_search", 
+      "kwargs": {
+         "arg1_name": "agent_search", 
+         "return_type_full": "osid.authentication.AgentSearchResults", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_query", 
+         "arg1_type": "osid.authentication.AgentSearch", 
+         "arg0_type_full": "osid.authentication.AgentQuery", 
+         "method_name": "get_agents_by_search", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSearchSession"
+      }
+   }, 
+   "AgentSearchSession.get_agent_query_from_inspector": {
+      "pattern": "resource.ResourceSearchSession.get_resource_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentQuery", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_query_inspector", 
+         "arg0_type_full": "osid.authentication.AgentQueryInspector", 
+         "method_name": "get_agent_query_from_inspector", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSearchSession"
+      }
+   }, 
+   "AgentAdminSession.init_pattern": "resource.ResourceAdminSession", 
+   "AgentAdminSession.get_agency_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_agency_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency_id", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.get_agency": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_agency", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.can_create_agents": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_agents", 
+         "object_name": "Agent", 
+         "var_name": "can_create_agents", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.can_create_agent_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_agent_with_record_types", 
+         "object_name": "Agent", 
+         "var_name": "can_create_agent_with_record_types", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.get_agent_form_for_create": {
+      "pattern": "resource.ResourceAdminSession.get_resource_form_for_create", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentForm", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_record_types", 
+         "arg0_type_full": "osid.type.Type[]", 
+         "method_name": "get_agent_form_for_create", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.create_agent": {
+      "pattern": "resource.ResourceAdminSession.create_resource", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.Agent", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_form", 
+         "arg0_type_full": "osid.authentication.AgentForm", 
+         "method_name": "create_agent", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.can_update_agents": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_agents", 
+         "object_name": "Agent", 
+         "var_name": "can_update_agents", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.can_update_agent": {
+      "pattern": "authentication.AgentAdminSession.can_update_agent", 
+      "kwargs": {
+         "method_name": "can_update_agent", 
+         "object_name": "Agent", 
+         "var_name": "can_update_agent", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.get_agent_form_for_update": {
+      "pattern": "resource.ResourceAdminSession.get_resource_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgentForm", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_agent_form_for_update", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.update_agent": {
+      "pattern": "resource.ResourceAdminSession.update_resource", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.Agent", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_form", 
+         "arg0_type_full": "osid.authentication.AgentForm", 
+         "method_name": "update_agent", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.can_delete_agents": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_agents", 
+         "object_name": "Agent", 
+         "var_name": "can_delete_agents", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.can_delete_agent": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_agent", 
+         "object_name": "Agent", 
+         "var_name": "can_delete_agent", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.delete_agent": {
+      "pattern": "resource.ResourceAdminSession.delete_resource", 
+      "kwargs": {
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_agent", 
+         "object_name": "Agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.can_manage_agent_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_agent_aliases", 
+         "object_name": "Agent", 
+         "var_name": "can_manage_agent_aliases", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentAdminSession.alias_agent": {
+      "pattern": "resource.ResourceAdminSession.alias_resource", 
+      "kwargs": {
+         "method_name": "alias_agent", 
+         "arg1_name": "alias_id", 
+         "object_name": "Agent", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_id", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAdminSession"
+      }
+   }, 
+   "AgentNotificationSession.get_agency_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_agency_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency_id", 
+         "interface_name": "AgentNotificationSession"
+      }
+   }, 
+   "AgentNotificationSession.get_agency": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_agency", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency", 
+         "interface_name": "AgentNotificationSession"
+      }
+   }, 
+   "AgentNotificationSession.can_register_for_agent_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_agent_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "AgentNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentNotificationSession.use_federated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_agency_view", 
+         "var_name": "federated_vew", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentNotificationSession"
+      }
+   }, 
+   "AgentNotificationSession.use_isolated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_agency_view", 
+         "var_name": "isolated_view", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentNotificationSession"
+      }
+   }, 
+   "AgentNotificationSession.register_for_new_agents": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_agents", 
+         "module_name": "sessions", 
+         "interface_name": "AgentNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentNotificationSession.register_for_changed_agents": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_agents", 
+         "module_name": "sessions", 
+         "interface_name": "AgentNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentNotificationSession.register_for_changed_agent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentNotificationSession.register_for_deleted_agents": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_agents", 
+         "module_name": "sessions", 
+         "interface_name": "AgentNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentNotificationSession.register_for_deleted_agent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencySession.can_lookup_agent_agency_mappings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_lookup_agent_agency_mappings", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencySession.use_comparative_agency_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_agency_view", 
+         "var_name": "comparative_view", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencySession"
+      }
+   }, 
+   "AgentAgencySession.use_plenary_agency_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_agency_view", 
+         "var_name": "plenary_view", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencySession"
+      }
+   }, 
+   "AgentAgencySession.get_agent_ids_by_agency": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agent_ids_by_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencySession.get_agents_by_agency": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agents_by_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencySession.get_agent_ids_by_agencies": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agent_ids_by_agencies", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencySession.get_agents_by_agencies": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agents_by_agencies", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencySession.get_agency_ids_by_agent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agency_ids_by_agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencySession.get_agencies_by_agent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agencies_by_agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencyAssignmentSession.can_assign_agents": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_assign_agents", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencyAssignmentSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencyAssignmentSession.can_assign_agents_to_agency": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_assign_agents_to_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencyAssignmentSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencyAssignmentSession.get_assignable_agency_ids": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_assignable_agency_ids", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencyAssignmentSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencyAssignmentSession.get_assignable_agency_ids_for_agent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_assignable_agency_ids_for_agent", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencyAssignmentSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencyAssignmentSession.assign_agent_to_agency": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "assign_agent_to_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencyAssignmentSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentAgencyAssignmentSession.unassign_agent_from_agency": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "unassign_agent_from_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgentAgencyAssignmentSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentSmartAgencySession.get_agency_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_agency_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency_id", 
+         "interface_name": "AgentSmartAgencySession"
+      }
+   }, 
+   "AgentSmartAgencySession.get_agency": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_agency", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency", 
+         "interface_name": "AgentSmartAgencySession"
+      }
+   }, 
+   "AgentSmartAgencySession.can_manage_smart_agencies": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_manage_smart_agencies", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSmartAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentSmartAgencySession.get_agent_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agent_query", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSmartAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentSmartAgencySession.get_agent_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agent_search_order", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSmartAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentSmartAgencySession.apply_agent_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "apply_agent_query", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSmartAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentSmartAgencySession.inspect_agent_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "inspect_agent_query", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSmartAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentSmartAgencySession.apply_agent_sequencing": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "apply_agent_sequencing", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSmartAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgentSmartAgencySession.get_agent_query_from_inspector": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agent_query_from_inspector", 
+         "module_name": "sessions", 
+         "interface_name": "AgentSmartAgencySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgencyLookupSession.init_pattern": "resource.BinLookupSession", 
+   "AgencyLookupSession.can_lookup_agencies": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_agencies", 
+         "object_name": "Agency", 
+         "var_name": "can_lookup_agencies", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyLookupSession.use_comparative_agency_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_agency_view", 
+         "var_name": "comparative_view", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyLookupSession.use_plenary_agency_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_agency_view", 
+         "var_name": "plenary_view", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyLookupSession.get_agency": {
+      "pattern": "resource.BinLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_agency", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "arg0_name": "agency_id", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyLookupSession.get_agencies_by_ids": {
+      "pattern": "resource.BinLookupSession.get_bins_by_ids", 
+      "kwargs": {
+         "method_name": "get_agencies_by_ids", 
+         "return_type_full": "osid.authentication.AgencyList", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "arg0_name": "agency_ids", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyLookupSession.get_agencies_by_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_genus_type", 
+      "kwargs": {
+         "method_name": "get_agencies_by_genus_type", 
+         "return_type_full": "osid.authentication.AgencyList", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "arg0_name": "agency_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyLookupSession.get_agencies_by_parent_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_parent_genus_type", 
+      "kwargs": {
+         "method_name": "get_agencies_by_parent_genus_type", 
+         "return_type_full": "osid.authentication.AgencyList", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "arg0_name": "agency_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyLookupSession.get_agencies_by_record_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_record_type", 
+      "kwargs": {
+         "method_name": "get_agencies_by_record_type", 
+         "return_type_full": "osid.authentication.AgencyList", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "arg0_name": "agency_record_type", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyLookupSession.get_agencies_by_provider": {
+      "pattern": "resource.BinLookupSession.get_bins_by_provider", 
+      "kwargs": {
+         "method_name": "get_agencies_by_provider", 
+         "return_type_full": "osid.authentication.AgencyList", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "arg0_name": "resource_id", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyLookupSession.get_agencies": {
+      "pattern": "resource.BinLookupSession.get_bins", 
+      "kwargs": {
+         "method_name": "get_agencies", 
+         "return_type_full": "osid.authentication.AgencyList", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyLookupSession"
+      }
+   }, 
+   "AgencyQuerySession.can_search_agencies": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_agencies", 
+         "object_name": "Agency", 
+         "var_name": "can_search_agencies", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyQuerySession"
+      }
+   }, 
+   "AgencyQuerySession.get_agency_query": {
+      "pattern": "resource.BinQuerySession.get_bin_query", 
+      "kwargs": {
+         "method_name": "get_agency_query", 
+         "return_type_full": "osid.authentication.AgencyQuery", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyQuerySession"
+      }
+   }, 
+   "AgencyQuerySession.get_agencies_by_query": {
+      "pattern": "resource.BinQuerySession.get_bins", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyList", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_query", 
+         "arg0_type_full": "osid.authentication.AgencyQuery", 
+         "method_name": "get_agencies_by_query", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyQuerySession"
+      }
+   }, 
+   "AgencySearchSession.get_agency_search": {
+      "pattern": "resource.BinSearchSession.get_bin_search", 
+      "kwargs": {
+         "method_name": "get_agency_search", 
+         "return_type_full": "osid.authentication.AgencySearch", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencySearchSession"
+      }
+   }, 
+   "AgencySearchSession.get_agency_search_order": {
+      "pattern": "resource.BinSearchSession.get_bin_search_order", 
+      "kwargs": {
+         "method_name": "get_agency_search_order", 
+         "return_type_full": "osid.authentication.AgencySearchOrder", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencySearchSession"
+      }
+   }, 
+   "AgencySearchSession.get_agencies_by_search": {
+      "pattern": "resource.BinSearchSession.get_bins_by_search", 
+      "kwargs": {
+         "arg1_name": "agency_search", 
+         "return_type_full": "osid.authentication.AgencySearchResults", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_query", 
+         "arg1_type": "osid.authentication.AgencySearch", 
+         "arg0_type_full": "osid.authentication.AgencyQuery", 
+         "method_name": "get_agencies_by_search", 
+         "module_name": "sessions", 
+         "interface_name": "AgencySearchSession"
+      }
+   }, 
+   "AgencySearchSession.get_agency_query_from_inspector": {
+      "pattern": "resource.BinSearchSession.get_bin_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyQuery", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_query_inspector", 
+         "arg0_type_full": "osid.authentication.AgencyQueryInspector", 
+         "method_name": "get_agency_query_from_inspector", 
+         "module_name": "sessions", 
+         "interface_name": "AgencySearchSession"
+      }
+   }, 
+   "AgencyAdminSession.init_pattern": "resource.BinAdminSession", 
+   "AgencyAdminSession.can_create_agencies": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_agencies", 
+         "object_name": "Agency", 
+         "var_name": "can_create_agencies", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.can_create_agency_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_agency_with_record_types", 
+         "object_name": "Agency", 
+         "var_name": "can_create_agency_with_record_types", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.get_agency_form_for_create": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_create", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyForm", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_record_types", 
+         "arg0_type_full": "osid.type.Type[]", 
+         "method_name": "get_agency_form_for_create", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.create_agency": {
+      "pattern": "resource.BinAdminSession.create_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.Agency", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_form", 
+         "arg0_type_full": "osid.authentication.AgencyForm", 
+         "method_name": "create_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.can_update_agencies": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_agencies", 
+         "object_name": "Agency", 
+         "var_name": "can_update_agencies", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.get_agency_form_for_update": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.AgencyForm", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_agency_form_for_update", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.update_agency": {
+      "pattern": "resource.BinAdminSession.update_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.Agency", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_form", 
+         "arg0_type_full": "osid.authentication.AgencyForm", 
+         "method_name": "update_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.can_delete_agencies": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_agencies", 
+         "object_name": "Agency", 
+         "var_name": "can_delete_agencies", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.delete_agency": {
+      "pattern": "resource.BinAdminSession.delete_bin", 
+      "kwargs": {
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_agency", 
+         "cataloged_object_caps_list": "['Agent']", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.can_manage_agency_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_agency_aliases", 
+         "object_name": "Agency", 
+         "var_name": "can_manage_agency_aliases", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyAdminSession.alias_agency": {
+      "pattern": "resource.BinAdminSession.alias_bin", 
+      "kwargs": {
+         "method_name": "alias_agency", 
+         "arg1_name": "osid.id.Id", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "arg0_name": "agency_id", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyAdminSession"
+      }
+   }, 
+   "AgencyNotificationSession.can_register_for_agency_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_agency_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgencyNotificationSession.register_for_new_agencies": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bins", 
+      "kwargs": {
+         "method_name": "register_for_new_agencies", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgencyNotificationSession.register_for_new_agency_ancestors": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bin_ancestors", 
+      "kwargs": {
+         "method_name": "register_for_new_agency_ancestors", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id"
+      }
+   }, 
+   "AgencyNotificationSession.register_for_new_agency_descendants": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bin_descendants", 
+      "kwargs": {
+         "method_name": "register_for_new_agency_descendants", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id"
+      }
+   }, 
+   "AgencyNotificationSession.register_for_changed_agencies": {
+      "pattern": "resource.BinNotificationSession.register_for_changed_bins", 
+      "kwargs": {
+         "method_name": "register_for_changed_agencies", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgencyNotificationSession.register_for_changed_agency": {
+      "pattern": "resource.BinNotificationSession.register_for_changed_bin", 
+      "kwargs": {
+         "method_name": "register_for_changed_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id"
+      }
+   }, 
+   "AgencyNotificationSession.register_for_deleted_agencies": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bins", 
+      "kwargs": {
+         "method_name": "register_for_deleted_agencies", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgencyNotificationSession.register_for_deleted_agency": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bin", 
+      "kwargs": {
+         "method_name": "register_for_deleted_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id"
+      }
+   }, 
+   "AgencyNotificationSession.register_for_deleted_agency_ancestors": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bin_ancestors", 
+      "kwargs": {
+         "method_name": "register_for_deleted_agency_ancestors", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id"
+      }
+   }, 
+   "AgencyNotificationSession.register_for_deleted_agency_descendants": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_agency_descendants", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyNotificationSession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgencyHierarchySession.get_agency_hierarchy_id": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy_id", 
+      "kwargs": {
+         "method_name": "get_agency_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency_hierarchy_id", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.get_agency_hierarchy": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "get_agency_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency_hierarchy", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.can_access_agency_hierarchy": {
+      "pattern": "resource.BinHierarchySession.can_access_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "can_access_agency_hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "access_agency_hierarchy", 
+         "interface_name": "AgencyHierarchySession", 
+         "package_name": "authentication"
+      }
+   }, 
+   "AgencyHierarchySession.use_comparative_agency_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_agency_view", 
+         "var_name": "comparative_view", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.use_plenary_agency_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_agency_view", 
+         "var_name": "plenary_view", 
+         "package_name": "authentication", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.get_root_agency_ids": {
+      "pattern": "resource.BinHierarchySession.get_root_bin_ids", 
+      "kwargs": {
+         "method_name": "get_root_agency_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "root_agency_ids", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.get_root_agencies": {
+      "pattern": "resource.BinHierarchySession.get_root_bins", 
+      "kwargs": {
+         "method_name": "get_root_agencies", 
+         "return_type_full": "osid.authentication.AgencyList", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "root_agencies", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.has_parent_agencies": {
+      "pattern": "resource.BinHierarchySession.has_parent_bins", 
+      "kwargs": {
+         "method_name": "has_parent_agencies", 
+         "var_name": "parent_agencies", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.is_parent_of_agency": {
+      "pattern": "resource.BinHierarchySession.is_parent_of_bin", 
+      "kwargs": {
+         "arg1_name": "agency_id", 
+         "return_type_full": "boolean", 
+         "package_name": "authentication", 
+         "arg0_name": "id_", 
+         "method_name": "is_parent_of_agency", 
+         "var_name": "arent_of_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.get_parent_agency_ids": {
+      "pattern": "resource.BinHierarchySession.get_parent_bin_ids", 
+      "kwargs": {
+         "method_name": "get_parent_agency_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "module_name": "sessions", 
+         "var_name": "parent_agency_ids", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.get_parent_agencies": {
+      "pattern": "resource.BinHierarchySession.get_parent_bins", 
+      "kwargs": {
+         "method_name": "get_parent_agencies", 
+         "return_type_full": "osid.authentication.AgencyList", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "module_name": "sessions", 
+         "var_name": "parent_agencies", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.is_ancestor_of_agency": {
+      "pattern": "resource.BinHierarchySession.is_ancestor_of_bin", 
+      "kwargs": {
+         "arg1_name": "agency_id", 
+         "return_type_full": "boolean", 
+         "package_name": "authentication", 
+         "arg0_name": "id_", 
+         "method_name": "is_ancestor_of_agency", 
+         "var_name": "ncestor_of_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.has_child_agencies": {
+      "pattern": "resource.BinHierarchySession.has_child_bins", 
+      "kwargs": {
+         "method_name": "has_child_agencies", 
+         "var_name": "child_agencies", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.is_child_of_agency": {
+      "pattern": "resource.BinHierarchySession.is_child_of_bin", 
+      "kwargs": {
+         "arg1_name": "agency_id", 
+         "return_type_full": "boolean", 
+         "package_name": "authentication", 
+         "arg0_name": "id_", 
+         "method_name": "is_child_of_agency", 
+         "var_name": "hild_of_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.get_child_agency_ids": {
+      "pattern": "resource.BinHierarchySession.get_child_bin_ids", 
+      "kwargs": {
+         "method_name": "get_child_agency_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "module_name": "sessions", 
+         "var_name": "child_agency_ids", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.get_child_agencies": {
+      "pattern": "resource.BinHierarchySession.get_child_bins", 
+      "kwargs": {
+         "method_name": "get_child_agencies", 
+         "return_type_full": "osid.authentication.AgencyList", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "module_name": "sessions", 
+         "var_name": "child_agencies", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.is_descendant_of_agency": {
+      "pattern": "resource.BinHierarchySession.is_descendant_of_bin", 
+      "kwargs": {
+         "arg1_name": "agency_id", 
+         "return_type_full": "boolean", 
+         "package_name": "authentication", 
+         "arg0_name": "id_", 
+         "method_name": "is_descendant_of_agency", 
+         "var_name": "escendant_of_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession"
+      }
+   }, 
+   "AgencyHierarchySession.get_agency_node_ids": {
+      "pattern": "resource.BinHierarchySession.get_bin_node_ids", 
+      "kwargs": {
+         "arg1_name": "ancestor_levels", 
+         "return_type_full": "osid.hierarchy.Node", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "arg3_name": "include_siblings", 
+         "method_name": "get_agency_node_ids", 
+         "var_name": "agency_node_ids", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession", 
+         "arg2_name": "descendant_levels"
+      }
+   }, 
+   "AgencyHierarchySession.get_agency_nodes": {
+      "pattern": "resource.BinHierarchySession.get_bin_nodes", 
+      "kwargs": {
+         "arg1_name": "ancestor_levels", 
+         "return_type_full": "osid.authentication.AgencyNode", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "arg3_name": "include_siblings", 
+         "method_name": "get_agency_nodes", 
+         "var_name": "agency_nodes", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchySession", 
+         "arg2_name": "descendant_levels"
+      }
+   }, 
+   "AgencyHierarchyDesignSession.get_agency_hierarchy_id": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy_id", 
+      "kwargs": {
+         "method_name": "get_agency_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency_hierarchy_id", 
+         "interface_name": "AgencyHierarchyDesignSession"
+      }
+   }, 
+   "AgencyHierarchyDesignSession.get_agency_hierarchy": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "get_agency_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "authentication", 
+         "module_name": "sessions", 
+         "var_name": "agency_hierarchy", 
+         "interface_name": "AgencyHierarchyDesignSession"
+      }
+   }, 
+   "AgencyHierarchyDesignSession.can_modify_agency_hierarchy": {
+      "pattern": "resource.BinHierarchyDesignSession.can_modify_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "can_modify_agency_hierarchy", 
+         "var_name": "modify_agency_hierarchy", 
+         "package_name": "authentication", 
+         "cat_name": "Agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchyDesignSession"
+      }
+   }, 
+   "AgencyHierarchyDesignSession.add_root_agency": {
+      "pattern": "resource.BinHierarchyDesignSession.add_root_bin", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "method_name": "add_root_agency", 
+         "var_name": "root_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchyDesignSession"
+      }
+   }, 
+   "AgencyHierarchyDesignSession.remove_root_agency": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_root_bin", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "method_name": "remove_root_agency", 
+         "var_name": "root_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchyDesignSession"
+      }
+   }, 
+   "AgencyHierarchyDesignSession.add_child_agency": {
+      "pattern": "resource.BinHierarchyDesignSession.add_child_bin", 
+      "kwargs": {
+         "arg1_name": "child_id", 
+         "return_type_full": "", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "method_name": "add_child_agency", 
+         "var_name": "child_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchyDesignSession"
+      }
+   }, 
+   "AgencyHierarchyDesignSession.remove_child_agency": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_child_bin", 
+      "kwargs": {
+         "arg1_name": "child_id", 
+         "return_type_full": "", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "method_name": "remove_child_agency", 
+         "var_name": "child_agency", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchyDesignSession"
+      }
+   }, 
+   "AgencyHierarchyDesignSession.remove_child_agencies": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_child_bins", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "agency_id", 
+         "method_name": "remove_child_agencies", 
+         "var_name": "child_agencies", 
+         "module_name": "sessions", 
+         "interface_name": "AgencyHierarchyDesignSession"
+      }
+   }, 
+   "Agent.init_pattern": "resource.Resource", 
+   "Agent.get_agent_record": {
+      "pattern": "resource.Resource.get_resource_record", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.records.AgentRecord", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_agent_record", 
+         "var_name": "agent_record", 
+         "module_name": "objects", 
+         "interface_name": "Agent"
+      }
+   }, 
+   "AgentForm.init_pattern": "resource.ResourceForm", 
+   "AgentForm.get_agent_form_record": {
+      "pattern": "resource.ResourceForm.get_resource_form_record", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.records.AgentFormRecord", 
+         "package_name": "authentication", 
+         "arg0_name": "agent_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_agent_form_record", 
+         "var_name": "agent_form_record", 
+         "module_name": "objects", 
+         "interface_name": "AgentForm"
+      }
+   }, 
+   "AgentList.get_next_agent": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_agent", 
+         "return_type_full": "osid.authentication.Agent", 
+         "package_name": "authentication", 
+         "module_name": "objects", 
+         "var_name": "agent", 
+         "interface_name": "AgentList"
+      }
+   }, 
+   "AgentList.get_next_agents": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_agents", 
+         "return_type_full": "osid.authentication.Agent", 
+         "package_name": "authentication", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "agents", 
+         "interface_name": "AgentList"
+      }
+   }, 
+   "Agency.init_pattern": "resource.Bin", 
+   "AgencyForm.init_pattern": "resource.BinForm", 
+   "AgencyList.get_next_agency": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_agency", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication", 
+         "module_name": "objects", 
+         "var_name": "agency", 
+         "interface_name": "AgencyList"
+      }
+   }, 
+   "AgencyList.get_next_agencies": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_agencies", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "agencies", 
+         "interface_name": "AgencyList"
+      }
+   }, 
+   "AgencyNodeList.get_next_agency_node": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_agency_node", 
+         "return_type_full": "osid.authentication.AgencyNode", 
+         "package_name": "authentication", 
+         "module_name": "objects", 
+         "var_name": "agency_node", 
+         "interface_name": "AgencyNodeList"
+      }
+   }, 
+   "AgencyNodeList.get_next_agency_nodes": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_agency_nodes", 
+         "return_type_full": "osid.authentication.AgencyNode", 
+         "package_name": "authentication", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "agency_nodes", 
+         "interface_name": "AgencyNodeList"
+      }
+   }
+}

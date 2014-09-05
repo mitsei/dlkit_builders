@@ -1,0 +1,3888 @@
+{
+   "impl_log": {
+      "managers": {
+         "LoggingProfile": {
+            "supports_log_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_content_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_log_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_visible_federation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_entry_smart_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_entry_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_logging": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_entry_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_entry_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_logging_batch": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_entry_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_priority_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_log_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_hierarchy_design": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_priority_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_log_entry_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_entry_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_entry_log_assignment": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_content_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_log_entry_log": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LoggingManager": {
+            "get_log_entry_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_query_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_hierarchy_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_search_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logging_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_admin_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_lookup_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logging_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_smart_log_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_log_assignment_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_log_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logging_batch_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_notification_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LoggingProxyManager": {
+            "get_log_entry_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logging_batch_proxy_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_query_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_hierarchy_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_search_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logging_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_admin_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_lookup_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logging_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_smart_log_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_log_assignment_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_log_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_notification_session_for_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }, 
+      "sessions": {
+         "LoggingSession": {
+            "log": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "create_log_entry": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_form": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_log": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "log_at_priority": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogEntryLookupSession": {
+            "get_log_entries_by_priority_type_and_date": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_date_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_date": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_log_entry_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_priority_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_priority_type_and_date_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_read_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_log_entry_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogEntryQuerySession": {
+            "can_search_log_entries": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_query": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogEntrySearchSession": {
+            "get_log_entries_by_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_search_order": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogEntryAdminSession": {
+            "update_log_entry": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_log_entry_aliases": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_log_entries": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_log_entries": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "create_log_entry": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "alias_log_entry": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_log_entry": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_log_entry_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_log_entries": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogEntryNotificationSession": {
+            "register_for_new_log_entries_at_priority": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_log_entries_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_entries_at_priority": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_log_entries_at_priority": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_entries_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_federated_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_register_for_log_entry_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_log_entries": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_log_entries": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_log_entry": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_log_entry": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_log_entries_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_log_entries": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogEntryLogSession": {
+            "can_lookup_log_entry_log_mappings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_ids_by_log_entry": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_by_log_entry": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_entrie_by_log": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entries_by_log": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_ids_by_log": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogEntryLogAssignmentSession": {
+            "get_assignable_log_ids": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_assignable_log_ids_for_log_entry": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_assign_log_entries": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "unassign_log_entry_from_log": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_assign_log_entries_to_log": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "assign_log_entry_to_log": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogEntrySmartLogSession": {
+            "get_log_entry_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_manage_smart_log": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "apply_log_entry_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_query_from_inspector": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "inspect_log_entry_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "apply_log_entry_sequencing": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_log_entry_search_order": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogLookupSession": {
+            "get_logs_by_provider": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logs_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logs_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logs_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logs_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logs": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogQuerySession": {
+            "get_log_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logs_by_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_search_logs": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogSearchSession": {
+            "get_log_search_order": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_logs_by_search": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogAdminSession": {
+            "get_log_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "create_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "update_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "alias_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_log_aliases": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_log_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogNotificationSession": {
+            "register_for_deleted_log_ancestors": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_register_for_log_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_log_descendants": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_log_descendants": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_log_ancestors": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogHierarchySession": {
+            "has_parent_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_node_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_child_log_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_parent_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_descendant_of_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_ancestor_of_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "has_child_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_nodes": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_root_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_child_of_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_parent_log_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_log_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_child_logs": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_access_log_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_root_log_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_parent_of_log": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LogHierarchyDesignSession": {
+            "add_child_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "add_root_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_child_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_modify_log_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_root_log": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_log_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_child_logs": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }
+   }, 
+   "package_objects_caps": [
+      "LogEntry"
+   ], 
+   "package_objects_under": [
+      "log_entry"
+   ], 
+   "package_cataloged_objects_caps": [
+      "LogEntry"
+   ], 
+   "package_cataloged_objects_under": [
+      "log_entry"
+   ], 
+   "package_objects_under_to_caps": {
+      "log_entry": "LogEntry"
+   }, 
+   "package_relationships_caps": [], 
+   "package_relationships_under": [], 
+   "package_rules_caps": [], 
+   "package_rules_under": [], 
+   "package_catalog_caps": "Log", 
+   "package_catalog_under": "log", 
+   "package_relationships_detail": {}, 
+   "LogEntry.arg_detail": {
+      "priority": [
+         {
+            "var_name": "priority", 
+            "array": false, 
+            "arg_type": "osid.type.Type"
+         }
+      ], 
+      "timestamp": [
+         {
+            "var_name": "timestamp", 
+            "array": false, 
+            "arg_type": "osid.calendaring.DateTime"
+         }
+      ], 
+      "agent": [
+         {
+            "var_name": "agent_id", 
+            "array": false, 
+            "arg_type": "osid.calendaring.DateTime"
+         }
+      ]
+   }, 
+   "LogEntry.persisted_data": {
+      "log": "OsidCatalog", 
+      "priority": "osid.type.Type", 
+      "timestamp": "osid.calendaring.DateTime", 
+      "agent": "osid.calendaring.DateTime"
+   }, 
+   "LogEntry.initialized_data": {
+      "log": "OsidCatalog"
+   }, 
+   "LogEntry.instance_data": {
+      "resource": "osid.id.Id", 
+      "log_entry_record": "osid.logging.records.LogEntryRecord"
+   }, 
+   "LogEntry.aggregate_data": {}, 
+   "LogEntry.return_types": {
+      "priority": "osid.type.Type", 
+      "timestamp": "osid.calendaring.DateTime", 
+      "resource": "osid.resource.Resource", 
+      "agent": "osid.authentication.Agent", 
+      "log_entry_record": "osid.logging.records.LogEntryRecord"
+   }, 
+   "LogEntryAdminSession.instance_data": {}, 
+   "LogAdminSession.instance_data": {}, 
+   "LoggingProfile.init_pattern": "resource.ResourceProfile", 
+   "LoggingProfile.supports_visible_federation": {
+      "pattern": "resource.ResourceProfile.supports_visible_federation", 
+      "kwargs": {
+         "method_name": "supports_visible_federation", 
+         "module_name": "managers", 
+         "var_name": "supports_visible_federation", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_logging": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_logging", 
+         "module_name": "managers", 
+         "var_name": "supports_logging", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_entry_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_entry_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_log_entry_lookup", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_entry_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_entry_query", 
+         "module_name": "managers", 
+         "var_name": "supports_log_entry_query", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_entry_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_entry_search", 
+         "module_name": "managers", 
+         "var_name": "supports_log_entry_search", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_entry_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_entry_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_log_entry_notification", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_entry_log": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_entry_log", 
+         "module_name": "managers", 
+         "var_name": "supports_log_entry_log", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_entry_log_assignment": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_entry_log_assignment", 
+         "module_name": "managers", 
+         "var_name": "supports_log_entry_log_assignment", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_entry_smart_log": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_entry_smart_log", 
+         "module_name": "managers", 
+         "var_name": "supports_log_entry_smart_log", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_log_lookup", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_query", 
+         "module_name": "managers", 
+         "var_name": "supports_log_query", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_search", 
+         "module_name": "managers", 
+         "var_name": "supports_log_search", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_log_admin", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_log_notification", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_hierarchy": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_hierarchy", 
+         "module_name": "managers", 
+         "var_name": "supports_log_hierarchy", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_log_hierarchy_design": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_log_hierarchy_design", 
+         "module_name": "managers", 
+         "var_name": "supports_log_hierarchy_design", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_logging_batch": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_logging_batch", 
+         "module_name": "managers", 
+         "var_name": "supports_logging_batch", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.get_log_entry_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_log_entry_record_types", 
+         "var_name": "log_entry_record_types", 
+         "package_name": "logging", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "object_name_under": "log_entry"
+      }
+   }, 
+   "LoggingProfile.supports_log_entry_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_log_entry_record_type", 
+         "var_name": "log_entry_record_type", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_record_type", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "object_name_under": "log_entry"
+      }
+   }, 
+   "LoggingProfile.get_log_entry_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_log_entry_search_record_types", 
+         "var_name": "log_entry_search_record_types", 
+         "package_name": "logging", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "object_name_under": "log_entry_search"
+      }
+   }, 
+   "LoggingProfile.supports_log_entry_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_log_entry_search_record_type", 
+         "var_name": "log_entry_search_record_type", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "object_name_under": "log_entry_search"
+      }
+   }, 
+   "LoggingProfile.get_log_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_log_record_types", 
+         "var_name": "log_record_types", 
+         "package_name": "logging", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "object_name_under": "log"
+      }
+   }, 
+   "LoggingProfile.supports_log_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_log_record_type", 
+         "var_name": "log_record_type", 
+         "package_name": "logging", 
+         "arg0_name": "log_record_type", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "object_name_under": "log"
+      }
+   }, 
+   "LoggingProfile.get_log_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_log_search_record_types", 
+         "var_name": "log_search_record_types", 
+         "package_name": "logging", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "object_name_under": "log_search"
+      }
+   }, 
+   "LoggingProfile.supports_log_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_log_search_record_type", 
+         "var_name": "log_search_record_type", 
+         "package_name": "logging", 
+         "arg0_name": "log_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "object_name_under": "log_search"
+      }
+   }, 
+   "LoggingProfile.get_priority_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_priority_types", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_priority_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_priority_type", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.get_content_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_content_types", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingProfile.supports_content_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_content_type", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProfile", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingManager.init_pattern": "resource.ResourceManager", 
+   "LoggingManager.get_logging_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LoggingSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "logging", 
+         "method_name": "get_logging_session", 
+         "var_name": "logging_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_logging_session_for_log": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LoggingSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "support_check": "logging", 
+         "method_name": "get_logging_session_for_log", 
+         "var_name": "logging_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryLookupSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_entry_lookup", 
+         "method_name": "get_log_entry_lookup_session", 
+         "var_name": "log_entry_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_lookup_session_for_log": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryLookupSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "support_check": "log_entry_lookup", 
+         "method_name": "get_log_entry_lookup_session_for_log", 
+         "var_name": "log_entry_lookup_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_query_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryQuerySession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_entry_query", 
+         "method_name": "get_log_entry_query_session", 
+         "var_name": "log_entry_query_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_query_session_for_log": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryQuerySession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "support_check": "log_entry_query", 
+         "method_name": "get_log_entry_query_session_for_log", 
+         "var_name": "log_entry_query_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntrySearchSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_entry_search", 
+         "method_name": "get_log_entry_search_session", 
+         "var_name": "log_entry_search_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_search_session_for_log": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntrySearchSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "support_check": "log_entry_search", 
+         "method_name": "get_log_entry_search_session_for_log", 
+         "var_name": "log_entry_search_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryAdminSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_entry_admin", 
+         "method_name": "get_log_entry_admin_session", 
+         "var_name": "log_entry_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_admin_session_for_log": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryAdminSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "support_check": "log_entry_admin", 
+         "method_name": "get_log_entry_admin_session_for_log", 
+         "var_name": "log_entry_admin_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryNotificationSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_receiver", 
+         "support_check": "log_entry_notification", 
+         "method_name": "get_log_entry_notification_session", 
+         "var_name": "log_entry_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_notification_session_for_log": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session_for_bin", 
+      "kwargs": {
+         "arg1_name": "log_id", 
+         "return_type_full": "osid.logging.LogEntryNotificationSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_receiver", 
+         "support_check": "log_entry_notification", 
+         "method_name": "get_log_entry_notification_session_for_log", 
+         "var_name": "log_entry_notification_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_log_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryLogSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_entry_log", 
+         "method_name": "get_log_entry_log_session", 
+         "var_name": "log_entry_log_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_log_assignment_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryLogAssignmentSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_entry_log_assignment", 
+         "method_name": "get_log_entry_log_assignment_session", 
+         "var_name": "log_entry_log_assignment_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_entry_smart_log_session": {
+      "pattern": "resource.ResourceManager.get_resource_smart_bin_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntrySmartLogSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "support_check": "log_entry_smart_log", 
+         "method_name": "get_log_entry_smart_log_session", 
+         "var_name": "log_entry_smart_log_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogLookupSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_lookup", 
+         "method_name": "get_log_lookup_session", 
+         "var_name": "log_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_query_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogQuerySession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_query", 
+         "method_name": "get_log_query_session", 
+         "var_name": "log_query_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogSearchSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_search", 
+         "method_name": "get_log_search_session", 
+         "var_name": "log_search_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogAdminSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_admin", 
+         "method_name": "get_log_admin_session", 
+         "var_name": "log_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogNotificationSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_receiver", 
+         "support_check": "log_notification", 
+         "method_name": "get_log_notification_session", 
+         "var_name": "log_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_hierarchy_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogHierarchySession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_hierarchy", 
+         "method_name": "get_log_hierarchy_session", 
+         "var_name": "log_hierarchy_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_log_hierarchy_design_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogHierarchyDesignSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "support_check": "log_hierarchy_design", 
+         "method_name": "get_log_hierarchy_design_session", 
+         "var_name": "log_hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingManager.get_logging_batch_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_logging_batch_manager", 
+         "return_type_full": "osid.logging.batch.LoggingBatchManager", 
+         "package_name": "logging", 
+         "module_name": "managers", 
+         "var_name": "logging_batch_manager", 
+         "interface_name": "LoggingManager"
+      }
+   }, 
+   "LoggingProxyManager.init_pattern": "resource.ResourceProxyManager", 
+   "LoggingProxyManager.get_logging_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LoggingSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "logging", 
+         "method_name": "get_logging_session", 
+         "var_name": "logging_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_logging_session_for_log": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LoggingSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "logging", 
+         "method_name": "get_logging_session_for_log", 
+         "var_name": "logging_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryLookupSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_entry_lookup", 
+         "method_name": "get_log_entry_lookup_session", 
+         "var_name": "log_entry_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_lookup_session_for_log": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryLookupSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "log_entry_lookup", 
+         "method_name": "get_log_entry_lookup_session_for_log", 
+         "var_name": "log_entry_lookup_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_query_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryQuerySession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_entry_query", 
+         "method_name": "get_log_entry_query_session", 
+         "var_name": "log_entry_query_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_query_session_for_log": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryQuerySession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "log_entry_query", 
+         "method_name": "get_log_entry_query_session_for_log", 
+         "var_name": "log_entry_query_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntrySearchSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_entry_search", 
+         "method_name": "get_log_entry_search_session", 
+         "var_name": "log_entry_search_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_search_session_for_log": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntrySearchSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "log_entry_search", 
+         "method_name": "get_log_entry_search_session_for_log", 
+         "var_name": "log_entry_search_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryAdminSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_entry_admin", 
+         "method_name": "get_log_entry_admin_session", 
+         "var_name": "log_entry_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_admin_session_for_log": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryAdminSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "log_entry_admin", 
+         "method_name": "get_log_entry_admin_session_for_log", 
+         "var_name": "log_entry_admin_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryNotificationSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_receiver", 
+         "support_check": "log_entry_notification", 
+         "method_name": "get_log_entry_notification_session", 
+         "var_name": "log_entry_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_notification_session_for_log": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryNotificationSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_receiver", 
+         "arg0_type_full": "osid.logging.LogEntryReceiver", 
+         "support_check": "log_entry_notification", 
+         "method_name": "get_log_entry_notification_session_for_log", 
+         "var_name": "log_entry_notification_session_for_log", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_log_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryLogSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_entry_log", 
+         "method_name": "get_log_entry_log_session", 
+         "var_name": "log_entry_log_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_log_assignment_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryLogAssignmentSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_entry_log_assignment", 
+         "method_name": "get_log_entry_log_assignment_session", 
+         "var_name": "log_entry_log_assignment_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_entry_smart_log_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntrySmartLogSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "support_check": "log_entry_smart_log", 
+         "method_name": "get_log_entry_smart_log_session", 
+         "var_name": "log_entry_smart_log_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogLookupSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_lookup", 
+         "method_name": "get_log_lookup_session", 
+         "var_name": "log_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_query_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogQuerySession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_query", 
+         "method_name": "get_log_query_session", 
+         "var_name": "log_query_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogSearchSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_search", 
+         "method_name": "get_log_search_session", 
+         "var_name": "log_search_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogAdminSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_admin", 
+         "method_name": "get_log_admin_session", 
+         "var_name": "log_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogNotificationSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_receiver", 
+         "support_check": "log_notification", 
+         "method_name": "get_log_notification_session", 
+         "var_name": "log_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_hierarchy_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogHierarchySession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_hierarchy", 
+         "method_name": "get_log_hierarchy_session", 
+         "var_name": "log_hierarchy_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_log_hierarchy_design_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogHierarchyDesignSession", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "proxy", 
+         "support_check": "log_hierarchy_design", 
+         "method_name": "get_log_hierarchy_design_session", 
+         "var_name": "log_hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingProxyManager.get_logging_batch_proxy_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_logging_batch_proxy_manager", 
+         "return_type_full": "osid.logging.batch.LoggingBatchProxyManager", 
+         "package_name": "logging", 
+         "module_name": "managers", 
+         "var_name": "logging_batch_proxy_manager", 
+         "interface_name": "LoggingProxyManager"
+      }
+   }, 
+   "LoggingSession.get_log_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_log_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_id", 
+         "interface_name": "LoggingSession"
+      }
+   }, 
+   "LoggingSession.get_log": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_log", 
+         "return_type_full": "osid.logging.Log", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log", 
+         "interface_name": "LoggingSession"
+      }
+   }, 
+   "LoggingSession.can_log": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_log", 
+         "module_name": "sessions", 
+         "interface_name": "LoggingSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingSession.log": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LoggingSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingSession.log_at_priority": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "log_at_priority", 
+         "module_name": "sessions", 
+         "interface_name": "LoggingSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingSession.get_log_entry_form": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entry_form", 
+         "module_name": "sessions", 
+         "interface_name": "LoggingSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LoggingSession.create_log_entry": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "create_log_entry", 
+         "module_name": "sessions", 
+         "interface_name": "LoggingSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLookupSession.init_pattern": "resource.ResourceLookupSession", 
+   "LogEntryLookupSession.get_log_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_log_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_id", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.get_log": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_log", 
+         "return_type_full": "osid.logging.Log", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.can_read_log": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_read_log", 
+         "object_name": "LogEntry", 
+         "var_name": "can_read_log", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.use_comparative_log_entry_view": {
+      "pattern": "resource.ResourceLookupSession.use_comparative_resource_view", 
+      "kwargs": {
+         "method_name": "use_comparative_log_entry_view", 
+         "var_name": "comparative_view", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession", 
+         "object_name_under": "log_entry"
+      }
+   }, 
+   "LogEntryLookupSession.use_plenary_log_entry_view": {
+      "pattern": "resource.ResourceLookupSession.use_plenary_resource_view", 
+      "kwargs": {
+         "method_name": "use_plenary_log_entry_view", 
+         "var_name": "plenary_view", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession", 
+         "object_name_under": "log_entry"
+      }
+   }, 
+   "LogEntryLookupSession.use_federated_log_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_log_view", 
+         "var_name": "federated_vew", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.use_isolated_log_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_log_view", 
+         "var_name": "isolated_view", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entry": {
+      "pattern": "resource.ResourceLookupSession.get_resource", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntry", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_id", 
+         "method_name": "get_log_entry", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_by_ids": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_ids", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryList", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_ids", 
+         "method_name": "get_log_entries_by_ids", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_by_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryList", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_genus_type", 
+         "method_name": "get_log_entries_by_genus_type", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_by_parent_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_parent_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryList", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_genus_type", 
+         "method_name": "get_log_entries_by_parent_genus_type", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_by_record_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_record_type", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryList", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_genus_type", 
+         "method_name": "get_log_entries_by_record_type", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_by_priority_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entries_by_priority_type", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_by_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entries_by_date", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_by_priority_type_and_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entries_by_priority_type_and_date", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entries_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_by_date_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entries_by_date_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries_by_priority_type_and_date_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entries_by_priority_type_and_date_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLookupSession.get_log_entries": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entries", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLookupSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryQuerySession.get_log_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_log_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_id", 
+         "interface_name": "LogEntryQuerySession"
+      }
+   }, 
+   "LogEntryQuerySession.get_log": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_log", 
+         "return_type_full": "osid.logging.Log", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log", 
+         "interface_name": "LogEntryQuerySession"
+      }
+   }, 
+   "LogEntryQuerySession.can_search_log_entries": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_log_entries", 
+         "object_name": "LogEntry", 
+         "var_name": "can_search_log_entries", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryQuerySession"
+      }
+   }, 
+   "LogEntryQuerySession.use_federated_log_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_log_view", 
+         "var_name": "federated_vew", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryQuerySession"
+      }
+   }, 
+   "LogEntryQuerySession.use_isolated_log_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_log_view", 
+         "var_name": "isolated_view", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryQuerySession"
+      }
+   }, 
+   "LogEntryQuerySession.get_log_entry_query": {
+      "pattern": "resource.ResourceQuerySession.get_resource_query", 
+      "kwargs": {
+         "method_name": "get_log_entry_query", 
+         "object_name": "LogEntry", 
+         "return_type_full": "osid.logging.LogEntryQuery", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryQuerySession"
+      }
+   }, 
+   "LogEntryQuerySession.get_log_entries_by_query": {
+      "pattern": "resource.ResourceQuerySession.get_resources_by_query", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryList", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_query", 
+         "arg0_type_full": "osid.logging.LogEntryQuery", 
+         "method_name": "get_log_entries_by_query", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryQuerySession"
+      }
+   }, 
+   "LogEntrySearchSession.get_log_entry_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search", 
+      "kwargs": {
+         "method_name": "get_log_entry_search", 
+         "object_name": "LogEntry", 
+         "return_type_full": "osid.logging.LogEntrySearch", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySearchSession"
+      }
+   }, 
+   "LogEntrySearchSession.get_log_entry_search_order": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search_order", 
+      "kwargs": {
+         "method_name": "get_log_entry_search_order", 
+         "object_name": "LogEntry", 
+         "return_type_full": "osid.logging.LogEntrySearchOrder", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySearchSession"
+      }
+   }, 
+   "LogEntrySearchSession.get_log_entries_by_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_by_search", 
+      "kwargs": {
+         "arg1_name": "log_entry_search", 
+         "return_type_full": "osid.logging.LogEntrySearchResults", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_query", 
+         "arg1_type": "osid.logging.LogEntrySearch", 
+         "arg0_type_full": "osid.logging.LogEntryQuery", 
+         "method_name": "get_log_entries_by_search", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySearchSession"
+      }
+   }, 
+   "LogEntrySearchSession.get_log_entry_query_from_inspector": {
+      "pattern": "resource.ResourceSearchSession.get_resource_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryQuery", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_query_inspector", 
+         "arg0_type_full": "osid.logging.LogQueryInspector", 
+         "method_name": "get_log_entry_query_from_inspector", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySearchSession"
+      }
+   }, 
+   "LogEntryAdminSession.init_pattern": "resource.ResourceAdminSession", 
+   "LogEntryAdminSession.get_log_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_log_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_id", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.get_log": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_log", 
+         "return_type_full": "osid.logging.Log", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.can_create_log_entries": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_log_entries", 
+         "object_name": "LogEntry", 
+         "var_name": "can_create_log_entries", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.can_create_log_entry_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_log_entry_with_record_types", 
+         "object_name": "LogEntry", 
+         "var_name": "can_create_log_entry_with_record_types", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.get_log_entry_form_for_create": {
+      "pattern": "resource.ResourceAdminSession.get_resource_form_for_create", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogForm", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_record_types", 
+         "arg0_type_full": "osid.type.Type[]", 
+         "method_name": "get_log_entry_form_for_create", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.create_log_entry": {
+      "pattern": "resource.ResourceAdminSession.create_resource", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntry", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_form", 
+         "arg0_type_full": "osid.logging.LogEntryForm", 
+         "method_name": "create_log_entry", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.can_update_log_entries": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_log_entries", 
+         "object_name": "LogEntry", 
+         "var_name": "can_update_log_entries", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.get_log_entry_form_for_update": {
+      "pattern": "resource.ResourceAdminSession.get_resource_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntryForm", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_log_entry_form_for_update", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.update_log_entry": {
+      "pattern": "resource.ResourceAdminSession.update_resource", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogEntry", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_form", 
+         "arg0_type_full": "osid.logging.LogEntryForm", 
+         "method_name": "update_log_entry", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.can_delete_log_entries": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_log_entries", 
+         "object_name": "LogEntry", 
+         "var_name": "can_delete_log_entries", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.delete_log_entry": {
+      "pattern": "resource.ResourceAdminSession.delete_resource", 
+      "kwargs": {
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_log_entry", 
+         "object_name": "LogEntry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.can_manage_log_entry_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_log_entry_aliases", 
+         "object_name": "LogEntry", 
+         "var_name": "can_manage_log_entry_aliases", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryAdminSession.alias_log_entry": {
+      "pattern": "resource.ResourceAdminSession.alias_resource", 
+      "kwargs": {
+         "method_name": "alias_log_entry", 
+         "arg1_name": "alias_id", 
+         "object_name": "LogEntry", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_id", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryAdminSession"
+      }
+   }, 
+   "LogEntryNotificationSession.get_log_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_log_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_id", 
+         "interface_name": "LogEntryNotificationSession"
+      }
+   }, 
+   "LogEntryNotificationSession.get_log": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_log", 
+         "return_type_full": "osid.logging.Log", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log", 
+         "interface_name": "LogEntryNotificationSession"
+      }
+   }, 
+   "LogEntryNotificationSession.can_register_for_log_entry_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_log_entry_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.use_federated_log_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_log_view", 
+         "var_name": "federated_vew", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession"
+      }
+   }, 
+   "LogEntryNotificationSession.use_isolated_log_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_log_view", 
+         "var_name": "isolated_view", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_new_log_entries": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_log_entries", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_new_log_entries_at_priority": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_log_entries_at_priority", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_new_log_entries_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_log_entries_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_changed_log_entries": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_log_entries", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_changed_entries_at_priority": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_entries_at_priority", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_changed_entries_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_entries_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_changed_log_entry": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_log_entry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_deleted_log_entries": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_log_entries", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_deleted_log_entries_at_priority": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_log_entries_at_priority", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_deleted_log_entries_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_log_entries_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryNotificationSession.register_for_deleted_log_entry": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_log_entry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogSession.use_comparative_log_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_log_view", 
+         "var_name": "comparative_view", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogSession"
+      }
+   }, 
+   "LogEntryLogSession.use_plenary_log_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_log_view", 
+         "var_name": "plenary_view", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogSession"
+      }
+   }, 
+   "LogEntryLogSession.can_lookup_log_entry_log_mappings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_lookup_log_entry_log_mappings", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogSession.get_log_entry_ids_by_log": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entry_ids_by_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogSession.get_log_entries_by_log": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entries_by_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogSession.get_log_entrie_by_log": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entrie_by_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogSession.get_log_ids_by_log_entry": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_ids_by_log_entry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogSession.get_log_by_log_entry": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_by_log_entry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogAssignmentSession.can_assign_log_entries": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_assign_log_entries", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogAssignmentSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogAssignmentSession.can_assign_log_entries_to_log": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_assign_log_entries_to_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogAssignmentSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogAssignmentSession.get_assignable_log_ids": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_assignable_log_ids", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogAssignmentSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogAssignmentSession.get_assignable_log_ids_for_log_entry": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_assignable_log_ids_for_log_entry", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogAssignmentSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogAssignmentSession.assign_log_entry_to_log": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "assign_log_entry_to_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogAssignmentSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryLogAssignmentSession.unassign_log_entry_from_log": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "unassign_log_entry_from_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntryLogAssignmentSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntrySmartLogSession.get_log_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_log_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_id", 
+         "interface_name": "LogEntrySmartLogSession"
+      }
+   }, 
+   "LogEntrySmartLogSession.get_log": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_log", 
+         "return_type_full": "osid.logging.Log", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log", 
+         "interface_name": "LogEntrySmartLogSession"
+      }
+   }, 
+   "LogEntrySmartLogSession.can_manage_smart_log": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_manage_smart_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySmartLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntrySmartLogSession.get_log_entry_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entry_query", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySmartLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntrySmartLogSession.get_log_entry_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entry_search_order", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySmartLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntrySmartLogSession.apply_log_entry_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "apply_log_entry_query", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySmartLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntrySmartLogSession.inspect_log_entry_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "inspect_log_entry_query", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySmartLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntrySmartLogSession.apply_log_entry_sequencing": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "apply_log_entry_sequencing", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySmartLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntrySmartLogSession.get_log_entry_query_from_inspector": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_log_entry_query_from_inspector", 
+         "module_name": "sessions", 
+         "interface_name": "LogEntrySmartLogSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogLookupSession.init_pattern": "resource.BinLookupSession", 
+   "LogLookupSession.can_lookup_logs": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_logs", 
+         "object_name": "Log", 
+         "var_name": "can_lookup_logs", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogLookupSession.use_comparative_log_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_log_view", 
+         "var_name": "comparative_view", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogLookupSession.use_plenary_log_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_log_view", 
+         "var_name": "plenary_view", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogLookupSession.get_log": {
+      "pattern": "resource.BinLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_log", 
+         "return_type_full": "osid.logging.Log", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "arg0_name": "log_id", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogLookupSession.get_logs_by_ids": {
+      "pattern": "resource.BinLookupSession.get_bins_by_ids", 
+      "kwargs": {
+         "method_name": "get_logs_by_ids", 
+         "return_type_full": "osid.logging.LogList", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "arg0_name": "log_ids", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogLookupSession.get_logs_by_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_genus_type", 
+      "kwargs": {
+         "method_name": "get_logs_by_genus_type", 
+         "return_type_full": "osid.logging.LogList", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "arg0_name": "log_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogLookupSession.get_logs_by_parent_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_parent_genus_type", 
+      "kwargs": {
+         "method_name": "get_logs_by_parent_genus_type", 
+         "return_type_full": "osid.logging.LogList", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "arg0_name": "log_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogLookupSession.get_logs_by_record_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_record_type", 
+      "kwargs": {
+         "method_name": "get_logs_by_record_type", 
+         "return_type_full": "osid.logging.LogList", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "arg0_name": "log_record_type", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogLookupSession.get_logs_by_provider": {
+      "pattern": "resource.BinLookupSession.get_bins_by_provider", 
+      "kwargs": {
+         "method_name": "get_logs_by_provider", 
+         "return_type_full": "osid.logging.LogList", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "arg0_name": "resource_id", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogLookupSession.get_logs": {
+      "pattern": "resource.BinLookupSession.get_bins", 
+      "kwargs": {
+         "method_name": "get_logs", 
+         "return_type_full": "osid.logging.LogList", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "module_name": "sessions", 
+         "interface_name": "LogLookupSession"
+      }
+   }, 
+   "LogQuerySession.can_search_logs": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_logs", 
+         "object_name": "Log", 
+         "var_name": "can_search_logs", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogQuerySession"
+      }
+   }, 
+   "LogQuerySession.get_log_query": {
+      "pattern": "resource.BinQuerySession.get_bin_query", 
+      "kwargs": {
+         "method_name": "get_log_query", 
+         "return_type_full": "osid.logging.LogQuery", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "module_name": "sessions", 
+         "interface_name": "LogQuerySession"
+      }
+   }, 
+   "LogQuerySession.get_logs_by_query": {
+      "pattern": "resource.BinQuerySession.get_bins", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogList", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_query", 
+         "arg0_type_full": "osid.logging.LogQuery", 
+         "method_name": "get_logs_by_query", 
+         "module_name": "sessions", 
+         "interface_name": "LogQuerySession"
+      }
+   }, 
+   "LogSearchSession.get_log_search": {
+      "pattern": "resource.BinSearchSession.get_bin_search", 
+      "kwargs": {
+         "method_name": "get_log_search", 
+         "return_type_full": "osid.logging.LogSearch", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "module_name": "sessions", 
+         "interface_name": "LogSearchSession"
+      }
+   }, 
+   "LogSearchSession.get_log_search_order": {
+      "pattern": "resource.BinSearchSession.get_bin_search_order", 
+      "kwargs": {
+         "method_name": "get_log_search_order", 
+         "return_type_full": "osid.logging.LogSearchOrder", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "module_name": "sessions", 
+         "interface_name": "LogSearchSession"
+      }
+   }, 
+   "LogSearchSession.get_logs_by_search": {
+      "pattern": "resource.BinSearchSession.get_bins_by_search", 
+      "kwargs": {
+         "arg1_name": "log_search", 
+         "return_type_full": "osid.logging.LogSearchResults", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_query", 
+         "arg1_type": "osid.logging.LogSearch", 
+         "arg0_type_full": "osid.logging.LogQuery", 
+         "method_name": "get_logs_by_search", 
+         "module_name": "sessions", 
+         "interface_name": "LogSearchSession"
+      }
+   }, 
+   "LogSearchSession.get_log_query_from_inspector": {
+      "pattern": "resource.BinSearchSession.get_bin_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogQuery", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_query_inspector", 
+         "arg0_type_full": "osid.logging.LogQueryInspector", 
+         "method_name": "get_log_query_from_inspector", 
+         "module_name": "sessions", 
+         "interface_name": "LogSearchSession"
+      }
+   }, 
+   "LogAdminSession.init_pattern": "resource.BinAdminSession", 
+   "LogAdminSession.can_create_logs": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_logs", 
+         "object_name": "Log", 
+         "var_name": "can_create_logs", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.can_create_log_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_log_with_record_types", 
+         "object_name": "Log", 
+         "var_name": "can_create_log_with_record_types", 
+         "package_name": "logging", 
+         "arg0_name": "log_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.get_log_form_for_create": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_create", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogForm", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_record_types", 
+         "arg0_type_full": "osid.type.Type[]", 
+         "method_name": "get_log_form_for_create", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.create_log": {
+      "pattern": "resource.BinAdminSession.create_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.Log", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_form", 
+         "arg0_type_full": "osid.logging.LogForm", 
+         "method_name": "create_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.can_update_logs": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_logs", 
+         "object_name": "Log", 
+         "var_name": "can_update_logs", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.get_log_form_for_update": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.logging.LogForm", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_log_form_for_update", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.update_log": {
+      "pattern": "resource.BinAdminSession.update_bin", 
+      "kwargs": {
+         "return_type_full": "osid.logging.Log", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_form", 
+         "arg0_type_full": "osid.logging.LogForm", 
+         "method_name": "update_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.can_delete_logs": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_logs", 
+         "object_name": "Log", 
+         "var_name": "can_delete_logs", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.delete_log": {
+      "pattern": "resource.BinAdminSession.delete_bin", 
+      "kwargs": {
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_log", 
+         "cataloged_object_caps_list": "['LogEntry']", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.can_manage_log_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_log_aliases", 
+         "object_name": "Log", 
+         "var_name": "can_manage_log_aliases", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogAdminSession.alias_log": {
+      "pattern": "resource.BinAdminSession.alias_bin", 
+      "kwargs": {
+         "method_name": "alias_log", 
+         "arg1_name": "osid.id.Id", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "arg0_name": "log_id", 
+         "module_name": "sessions", 
+         "interface_name": "LogAdminSession"
+      }
+   }, 
+   "LogNotificationSession.can_register_for_log_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_log_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogNotificationSession.register_for_new_logs": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bins", 
+      "kwargs": {
+         "method_name": "register_for_new_logs", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogNotificationSession.register_for_new_log_ancestors": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bin_ancestors", 
+      "kwargs": {
+         "method_name": "register_for_new_log_ancestors", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging", 
+         "arg0_name": "log_id"
+      }
+   }, 
+   "LogNotificationSession.register_for_new_log_descendants": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bin_descendants", 
+      "kwargs": {
+         "method_name": "register_for_new_log_descendants", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging", 
+         "arg0_name": "log_id"
+      }
+   }, 
+   "LogNotificationSession.register_for_changed_logs": {
+      "pattern": "resource.BinNotificationSession.register_for_changed_bins", 
+      "kwargs": {
+         "method_name": "register_for_changed_logs", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogNotificationSession.register_for_changed_log": {
+      "pattern": "resource.BinNotificationSession.register_for_changed_bin", 
+      "kwargs": {
+         "method_name": "register_for_changed_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging", 
+         "arg0_name": "log_id"
+      }
+   }, 
+   "LogNotificationSession.register_for_deleted_logs": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bins", 
+      "kwargs": {
+         "method_name": "register_for_deleted_logs", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogNotificationSession.register_for_deleted_log": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bin", 
+      "kwargs": {
+         "method_name": "register_for_deleted_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging", 
+         "arg0_name": "log_id"
+      }
+   }, 
+   "LogNotificationSession.register_for_deleted_log_ancestors": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bin_ancestors", 
+      "kwargs": {
+         "method_name": "register_for_deleted_log_ancestors", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging", 
+         "arg0_name": "log_id"
+      }
+   }, 
+   "LogNotificationSession.register_for_deleted_log_descendants": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_log_descendants", 
+         "module_name": "sessions", 
+         "interface_name": "LogNotificationSession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogHierarchySession.get_log_hierarchy_id": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy_id", 
+      "kwargs": {
+         "method_name": "get_log_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_hierarchy_id", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.get_log_hierarchy": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "get_log_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_hierarchy", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.can_access_log_hierarchy": {
+      "pattern": "resource.BinHierarchySession.can_access_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "can_access_log_hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "access_log_hierarchy", 
+         "interface_name": "LogHierarchySession", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogHierarchySession.use_comparative_log_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_log_view", 
+         "var_name": "comparative_view", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.use_plenary_log_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_log_view", 
+         "var_name": "plenary_view", 
+         "package_name": "logging", 
+         "cat_name": "log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.get_root_log_ids": {
+      "pattern": "resource.BinHierarchySession.get_root_bin_ids", 
+      "kwargs": {
+         "method_name": "get_root_log_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "root_log_ids", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.get_root_logs": {
+      "pattern": "resource.BinHierarchySession.get_root_bins", 
+      "kwargs": {
+         "method_name": "get_root_logs", 
+         "return_type_full": "osid.logging.LogList", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "root_logs", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.has_parent_logs": {
+      "pattern": "resource.BinHierarchySession.has_parent_bins", 
+      "kwargs": {
+         "method_name": "has_parent_logs", 
+         "var_name": "parent_logs", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.is_parent_of_log": {
+      "pattern": "resource.BinHierarchySession.is_parent_of_bin", 
+      "kwargs": {
+         "arg1_name": "log_id", 
+         "return_type_full": "boolean", 
+         "package_name": "logging", 
+         "arg0_name": "id_", 
+         "method_name": "is_parent_of_log", 
+         "var_name": "arent_of_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.get_parent_log_ids": {
+      "pattern": "resource.BinHierarchySession.get_parent_bin_ids", 
+      "kwargs": {
+         "method_name": "get_parent_log_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "module_name": "sessions", 
+         "var_name": "parent_log_ids", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.get_parent_logs": {
+      "pattern": "resource.BinHierarchySession.get_parent_bins", 
+      "kwargs": {
+         "method_name": "get_parent_logs", 
+         "return_type_full": "osid.logging.LogList", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "module_name": "sessions", 
+         "var_name": "parent_logs", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.is_ancestor_of_log": {
+      "pattern": "resource.BinHierarchySession.is_ancestor_of_bin", 
+      "kwargs": {
+         "arg1_name": "log_id", 
+         "return_type_full": "boolean", 
+         "package_name": "logging", 
+         "arg0_name": "id_", 
+         "method_name": "is_ancestor_of_log", 
+         "var_name": "ncestor_of_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.has_child_logs": {
+      "pattern": "resource.BinHierarchySession.has_child_bins", 
+      "kwargs": {
+         "method_name": "has_child_logs", 
+         "var_name": "child_logs", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.is_child_of_log": {
+      "pattern": "resource.BinHierarchySession.is_child_of_bin", 
+      "kwargs": {
+         "arg1_name": "log_id", 
+         "return_type_full": "boolean", 
+         "package_name": "logging", 
+         "arg0_name": "id_", 
+         "method_name": "is_child_of_log", 
+         "var_name": "hild_of_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.get_child_log_ids": {
+      "pattern": "resource.BinHierarchySession.get_child_bin_ids", 
+      "kwargs": {
+         "method_name": "get_child_log_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "module_name": "sessions", 
+         "var_name": "child_log_ids", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.get_child_logs": {
+      "pattern": "resource.BinHierarchySession.get_child_bins", 
+      "kwargs": {
+         "method_name": "get_child_logs", 
+         "return_type_full": "osid.logging.LogList", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "module_name": "sessions", 
+         "var_name": "child_logs", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.is_descendant_of_log": {
+      "pattern": "resource.BinHierarchySession.is_descendant_of_bin", 
+      "kwargs": {
+         "arg1_name": "log_id", 
+         "return_type_full": "boolean", 
+         "package_name": "logging", 
+         "arg0_name": "id_", 
+         "method_name": "is_descendant_of_log", 
+         "var_name": "escendant_of_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession"
+      }
+   }, 
+   "LogHierarchySession.get_log_node_ids": {
+      "pattern": "resource.BinHierarchySession.get_bin_node_ids", 
+      "kwargs": {
+         "arg1_name": "ancestor_levels", 
+         "return_type_full": "osid.hierarchy.Node", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "arg3_name": "include_siblings", 
+         "method_name": "get_log_node_ids", 
+         "var_name": "log_node_ids", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession", 
+         "arg2_name": "descendant_levels"
+      }
+   }, 
+   "LogHierarchySession.get_log_nodes": {
+      "pattern": "resource.BinHierarchySession.get_bin_nodes", 
+      "kwargs": {
+         "arg1_name": "ancestor_levels", 
+         "return_type_full": "osid.logging.LogNode", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "arg3_name": "include_siblings", 
+         "method_name": "get_log_nodes", 
+         "var_name": "log_nodes", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchySession", 
+         "arg2_name": "descendant_levels"
+      }
+   }, 
+   "LogHierarchyDesignSession.get_log_hierarchy_id": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy_id", 
+      "kwargs": {
+         "method_name": "get_log_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_hierarchy_id", 
+         "interface_name": "LogHierarchyDesignSession"
+      }
+   }, 
+   "LogHierarchyDesignSession.get_log_hierarchy": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "get_log_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "logging", 
+         "module_name": "sessions", 
+         "var_name": "log_hierarchy", 
+         "interface_name": "LogHierarchyDesignSession"
+      }
+   }, 
+   "LogHierarchyDesignSession.can_modify_log_hierarchy": {
+      "pattern": "resource.BinHierarchyDesignSession.can_modify_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "can_modify_log_hierarchy", 
+         "var_name": "modify_log_hierarchy", 
+         "package_name": "logging", 
+         "cat_name": "Log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchyDesignSession"
+      }
+   }, 
+   "LogHierarchyDesignSession.add_root_log": {
+      "pattern": "resource.BinHierarchyDesignSession.add_root_bin", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "method_name": "add_root_log", 
+         "var_name": "root_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchyDesignSession"
+      }
+   }, 
+   "LogHierarchyDesignSession.remove_root_log": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_root_bin", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "method_name": "remove_root_log", 
+         "var_name": "root_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchyDesignSession"
+      }
+   }, 
+   "LogHierarchyDesignSession.add_child_log": {
+      "pattern": "resource.BinHierarchyDesignSession.add_child_bin", 
+      "kwargs": {
+         "arg1_name": "child_id", 
+         "return_type_full": "", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "method_name": "add_child_log", 
+         "var_name": "child_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchyDesignSession"
+      }
+   }, 
+   "LogHierarchyDesignSession.remove_child_log": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_child_bin", 
+      "kwargs": {
+         "arg1_name": "child_id", 
+         "return_type_full": "", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "method_name": "remove_child_log", 
+         "var_name": "child_log", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchyDesignSession"
+      }
+   }, 
+   "LogHierarchyDesignSession.remove_child_logs": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_child_bins", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Log", 
+         "package_name": "logging", 
+         "arg0_name": "log_id", 
+         "method_name": "remove_child_logs", 
+         "var_name": "child_logs", 
+         "module_name": "sessions", 
+         "interface_name": "LogHierarchyDesignSession"
+      }
+   }, 
+   "LogEntry.init_pattern": "resource.Resource", 
+   "LogEntry.get_priority": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_priority", 
+         "module_name": "objects", 
+         "interface_name": "LogEntry", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntry.get_timestamp": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_timestamp", 
+         "module_name": "objects", 
+         "interface_name": "LogEntry", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntry.get_resource_id": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_resource_id", 
+         "object_name": "LogEntry", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "logging", 
+         "module_name": "objects", 
+         "var_name": "resource", 
+         "interface_name": "LogEntry"
+      }
+   }, 
+   "LogEntry.get_resource": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_resource", 
+         "object_name": "LogEntry", 
+         "return_type_full": "osid.resource.Resource", 
+         "package_name": "logging", 
+         "module_name": "objects", 
+         "var_name": "resource", 
+         "interface_name": "LogEntry"
+      }
+   }, 
+   "LogEntry.get_agent_id": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agent_id", 
+         "module_name": "objects", 
+         "interface_name": "LogEntry", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntry.get_agent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_agent", 
+         "module_name": "objects", 
+         "interface_name": "LogEntry", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntry.get_log_entry_record": {
+      "pattern": "resource.Resource.get_resource_record", 
+      "kwargs": {
+         "return_type_full": "osid.logging.records.LogEntryRecord", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_log_entry_record", 
+         "var_name": "log_entry_record", 
+         "module_name": "objects", 
+         "interface_name": "LogEntry"
+      }
+   }, 
+   "LogEntryForm.init_pattern": "resource.ResourceForm", 
+   "LogEntryForm.get_priority_metadata": {
+      "pattern": "resource.ResourceForm.get_group_metadata", 
+      "kwargs": {
+         "method_name": "get_priority_metadata", 
+         "return_type_full": "osid.Metadata", 
+         "package_name": "logging", 
+         "module_name": "objects", 
+         "var_name": "priority", 
+         "interface_name": "LogEntryForm"
+      }
+   }, 
+   "LogEntryForm.set_priority": {
+      "pattern": "logging.LogEntryForm.set_priority", 
+      "kwargs": {
+         "method_name": "set_priority", 
+         "interface_name": "LogEntryForm", 
+         "var_name": "priority", 
+         "package_name": "logging", 
+         "arg0_name": "priority", 
+         "module_name": "objects", 
+         "arg0_type_full": "osid.type.Type"
+      }
+   }, 
+   "LogEntryForm.clear_priority": {
+      "pattern": "logging.LogEntryForm.clear_priority", 
+      "kwargs": {
+         "method_name": "clear_priority", 
+         "module_name": "objects", 
+         "var_name": "priority", 
+         "interface_name": "LogEntryForm", 
+         "package_name": "logging"
+      }
+   }, 
+   "LogEntryForm.get_timestamp_metadata": {
+      "pattern": "resource.ResourceForm.get_group_metadata", 
+      "kwargs": {
+         "method_name": "get_timestamp_metadata", 
+         "return_type_full": "osid.Metadata", 
+         "package_name": "logging", 
+         "module_name": "objects", 
+         "var_name": "timestamp", 
+         "interface_name": "LogEntryForm"
+      }
+   }, 
+   "LogEntryForm.set_timestamp": {
+      "pattern": "assessment.AssessmentOfferedForm.set_start_time", 
+      "kwargs": {
+         "method_name": "set_timestamp", 
+         "interface_name": "LogEntryForm", 
+         "var_name": "timestamp", 
+         "package_name": "logging", 
+         "arg0_name": "timestamp", 
+         "module_name": "objects", 
+         "arg0_type_full": "osid.calendaring.DateTime"
+      }
+   }, 
+   "LogEntryForm.get_agent_metadata": {
+      "pattern": "resource.ResourceForm.get_group_metadata", 
+      "kwargs": {
+         "method_name": "get_agent_metadata", 
+         "return_type_full": "osid.Metadata", 
+         "package_name": "logging", 
+         "module_name": "objects", 
+         "var_name": "agent", 
+         "interface_name": "LogEntryForm"
+      }
+   }, 
+   "LogEntryForm.set_agent": {
+      "pattern": "assessment.AssessmentOfferedForm.set_start_time", 
+      "kwargs": {
+         "method_name": "set_agent", 
+         "interface_name": "LogEntryForm", 
+         "var_name": "agent", 
+         "package_name": "logging", 
+         "arg0_name": "agent_id", 
+         "module_name": "objects", 
+         "arg0_type_full": "osid.calendaring.DateTime"
+      }
+   }, 
+   "LogEntryForm.get_log_entry_form_record": {
+      "pattern": "resource.ResourceForm.get_resource_form_record", 
+      "kwargs": {
+         "return_type_full": "osid.logging.records.LogEntryFormRecord", 
+         "package_name": "logging", 
+         "arg0_name": "log_entry_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_log_entry_form_record", 
+         "var_name": "log_entry_form_record", 
+         "module_name": "objects", 
+         "interface_name": "LogEntryForm"
+      }
+   }, 
+   "LogEntryList.get_next_log_entry": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_log_entry", 
+         "return_type_full": "osid.logging.LogEntry", 
+         "package_name": "logging", 
+         "module_name": "objects", 
+         "var_name": "log_entry", 
+         "interface_name": "LogEntryList"
+      }
+   }, 
+   "LogEntryList.get_next_log_entries": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_log_entries", 
+         "return_type_full": "osid.logging.LogEntry", 
+         "package_name": "logging", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "log_entries", 
+         "interface_name": "LogEntryList"
+      }
+   }, 
+   "Log.init_pattern": "resource.Bin", 
+   "LogForm.init_pattern": "resource.BinForm", 
+   "LogList.get_next_log": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_log", 
+         "return_type_full": "osid.logging.Log", 
+         "package_name": "logging", 
+         "module_name": "objects", 
+         "var_name": "log", 
+         "interface_name": "LogList"
+      }
+   }, 
+   "LogList.get_next_logs": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_logs", 
+         "return_type_full": "osid.logging.Log", 
+         "package_name": "logging", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "logs", 
+         "interface_name": "LogList"
+      }
+   }, 
+   "LogNodeList.get_next_log_node": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_log_node", 
+         "return_type_full": "osid.logging.LogNode", 
+         "package_name": "logging", 
+         "module_name": "objects", 
+         "var_name": "log_node", 
+         "interface_name": "LogNodeList"
+      }
+   }, 
+   "LogNodeList.get_next_log_nodes": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_log_nodes", 
+         "return_type_full": "osid.logging.LogNode", 
+         "package_name": "logging", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "log_nodes", 
+         "interface_name": "LogNodeList"
+      }
+   }
+}

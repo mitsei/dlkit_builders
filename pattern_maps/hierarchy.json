@@ -1,0 +1,1765 @@
+{
+   "impl_log": {
+      "managers": {
+         "HierarchyProfile": {
+            "supports_hierarchy_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_design": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_sequencing": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_traversal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_structure_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_visible_federation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_hierarchy_search": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchyManager": {
+            "get_hierarchy_sequencing_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_traversal_session_for_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_sequencing_session_for_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_traversal_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_design_session_for_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_structure_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_structure_notification_session_for_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchyProxyManager": {
+            "get_hierarchy_sequencing_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_traversal_session_for_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_sequencing_session_for_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_traversal_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_design_session_for_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_structure_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_structure_notification_session_for_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }, 
+      "sessions": {
+         "HierarchyTraversalSession": {
+            "is_ancestor": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "has_parents": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "is_parent": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "has_children": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_roots": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_children": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_access_hierarchy": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_parents": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_child": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_nodes": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "is_descendant": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchyDesignSession": {
+            "add_root": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_modify_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "add_child": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "remove_child": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_children": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_root": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchySequencingSession": {
+            "move_node_behind": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "move_node_ahead": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_sequence_hierarchy": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "sequence_nodes": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchyStructureNotificationSession": {
+            "register_for_changed_ancestor": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_hierarchy_nodes": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_hierarchy_node": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_register_for_hierarchy_structure_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_descendant": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_hierarchy_nodes": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchyLookupSession": {
+            "get_hierarchies_by_provider": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_hierarchy_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchies": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_hierarchies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchies_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_hierarchy_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchies_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchies_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchies_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchyQuerySession": {
+            "get_hierarchies_by_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_search_hierarchies": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchySearchSession": {
+            "get_hierarchy_search_order": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchies_by_search": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchyAdminSession": {
+            "can_update_hierarchies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_hierarchies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_hierarchies": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_hierarchy_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_hierarchy_aliases": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "alias_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_hierarchy_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "create_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "update_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "HierarchyNotificationSession": {
+            "can_register_for_hierarchy_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_hierarchies": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_hierarchies": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_hierarchies": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }
+   }, 
+   "package_objects_caps": [], 
+   "package_objects_under": [], 
+   "package_cataloged_objects_caps": [], 
+   "package_cataloged_objects_under": [], 
+   "package_objects_under_to_caps": {}, 
+   "package_relationships_caps": [], 
+   "package_relationships_under": [], 
+   "package_rules_caps": [], 
+   "package_rules_under": [], 
+   "package_catalog_caps": "Hierarchy", 
+   "package_catalog_under": "hierarchy", 
+   "package_relationships_detail": {}, 
+   "HierarchyAdminSession.instance_data": {}, 
+   "HierarchyProfile.init_pattern": "resource.ResourceProfile", 
+   "HierarchyProfile.supports_visible_federation": {
+      "pattern": "resource.ResourceProfile.supports_visible_federation", 
+      "kwargs": {
+         "method_name": "supports_visible_federation", 
+         "module_name": "managers", 
+         "var_name": "supports_visible_federation", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_traversal": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_traversal", 
+         "module_name": "managers", 
+         "var_name": "supports_hierarchy_traversal", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_design": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_design", 
+         "module_name": "managers", 
+         "var_name": "supports_hierarchy_design", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_sequencing": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_sequencing", 
+         "module_name": "managers", 
+         "var_name": "supports_hierarchy_sequencing", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_structure_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_structure_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_hierarchy_structure_notification", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_hierarchy_lookup", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_query", 
+         "module_name": "managers", 
+         "var_name": "supports_hierarchy_query", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_search", 
+         "module_name": "managers", 
+         "var_name": "supports_hierarchy_search", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_hierarchy_admin", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_hierarchy_notification", 
+         "interface_name": "HierarchyProfile", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.get_hierarchy_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_hierarchy_record_types", 
+         "var_name": "hierarchy_record_types", 
+         "package_name": "hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProfile", 
+         "object_name_under": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_record_type", 
+         "var_name": "hierarchy_record_type", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_record_type", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProfile", 
+         "object_name_under": "hierarchy"
+      }
+   }, 
+   "HierarchyProfile.get_hierarchy_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_hierarchy_search_record_types", 
+         "var_name": "hierarchy_search_record_types", 
+         "package_name": "hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProfile", 
+         "object_name_under": "hierarchy_search"
+      }
+   }, 
+   "HierarchyProfile.supports_hierarchy_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_hierarchy_search_record_type", 
+         "var_name": "hierarchy_search_record_type", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProfile", 
+         "object_name_under": "hierarchy_search"
+      }
+   }, 
+   "HierarchyManager.init_pattern": "resource.ResourceManager", 
+   "HierarchyManager.get_hierarchy_traversal_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyTraversalSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "support_check": "hierarchy_traversal", 
+         "method_name": "get_hierarchy_traversal_session", 
+         "var_name": "hierarchy_traversal_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_traversal_session_for_hierarchy": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyTraversalSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "support_check": "hierarchy_traversal", 
+         "method_name": "get_hierarchy_traversal_session_for_hierarchy", 
+         "var_name": "hierarchy_traversal_session_for_hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_design_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyDesignSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "support_check": "hierarchy_design", 
+         "method_name": "get_hierarchy_design_session", 
+         "var_name": "hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_design_session_for_hierarchy": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyDesignSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "support_check": "hierarchy_design", 
+         "method_name": "get_hierarchy_design_session_for_hierarchy", 
+         "var_name": "hierarchy_design_session_for_hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_sequencing_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchySequencingSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "support_check": "hierarchy_sequencing", 
+         "method_name": "get_hierarchy_sequencing_session", 
+         "var_name": "hierarchy_sequencing_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_sequencing_session_for_hierarchy": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchySequencingSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "support_check": "hierarchy_sequencing", 
+         "method_name": "get_hierarchy_sequencing_session_for_hierarchy", 
+         "var_name": "hierarchy_sequencing_session_for_hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_structure_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyStructureNotificationSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_structure_receiver", 
+         "support_check": "hierarchy_structure_notification", 
+         "method_name": "get_hierarchy_structure_notification_session", 
+         "var_name": "hierarchy_structure_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_structure_notification_session_for_hierarchy": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session_for_bin", 
+      "kwargs": {
+         "arg1_name": "hierarchy_id", 
+         "return_type_full": "osid.hierarchy.HierarchyStructureNotificationSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_structure_receiver", 
+         "support_check": "hierarchy_structure_notification", 
+         "method_name": "get_hierarchy_structure_notification_session_for_hierarchy", 
+         "var_name": "hierarchy_structure_notification_session_for_hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyLookupSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "support_check": "hierarchy_lookup", 
+         "method_name": "get_hierarchy_lookup_session", 
+         "var_name": "hierarchy_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_query_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyQuerySession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "support_check": "hierarchy_query", 
+         "method_name": "get_hierarchy_query_session", 
+         "var_name": "hierarchy_query_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchySearchSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "support_check": "hierarchy_search", 
+         "method_name": "get_hierarchy_search_session", 
+         "var_name": "hierarchy_search_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyAdminSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "support_check": "hierarchy_admin", 
+         "method_name": "get_hierarchy_admin_session", 
+         "var_name": "hierarchy_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyManager.get_hierarchy_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyNotificationSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_receiver", 
+         "support_check": "hierarchy_notification", 
+         "method_name": "get_hierarchy_notification_session", 
+         "var_name": "hierarchy_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyManager"
+      }
+   }, 
+   "HierarchyProxyManager.init_pattern": "resource.ResourceProxyManager", 
+   "HierarchyProxyManager.get_hierarchy_traversal_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyTraversalSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "proxy", 
+         "support_check": "hierarchy_traversal", 
+         "method_name": "get_hierarchy_traversal_session", 
+         "var_name": "hierarchy_traversal_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_traversal_session_for_hierarchy": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyTraversalSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "hierarchy_traversal", 
+         "method_name": "get_hierarchy_traversal_session_for_hierarchy", 
+         "var_name": "hierarchy_traversal_session_for_hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_design_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyDesignSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "proxy", 
+         "support_check": "hierarchy_design", 
+         "method_name": "get_hierarchy_design_session", 
+         "var_name": "hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_design_session_for_hierarchy": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyDesignSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "hierarchy_design", 
+         "method_name": "get_hierarchy_design_session_for_hierarchy", 
+         "var_name": "hierarchy_design_session_for_hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_sequencing_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchySequencingSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "proxy", 
+         "support_check": "hierarchy_sequencing", 
+         "method_name": "get_hierarchy_sequencing_session", 
+         "var_name": "hierarchy_sequencing_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_sequencing_session_for_hierarchy": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchySequencingSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "hierarchy_sequencing", 
+         "method_name": "get_hierarchy_sequencing_session_for_hierarchy", 
+         "var_name": "hierarchy_sequencing_session_for_hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_structure_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyStructureNotificationSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_structure_receiver", 
+         "support_check": "hierarchy_structure_notification", 
+         "method_name": "get_hierarchy_structure_notification_session", 
+         "var_name": "hierarchy_structure_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_structure_notification_session_for_hierarchy": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyStructureNotificationSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_structure_receiver", 
+         "arg0_type_full": "osid.hierarchy.HierarchyStructureReceiver", 
+         "support_check": "hierarchy_structure_notification", 
+         "method_name": "get_hierarchy_structure_notification_session_for_hierarchy", 
+         "var_name": "hierarchy_structure_notification_session_for_hierarchy", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyLookupSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "proxy", 
+         "support_check": "hierarchy_lookup", 
+         "method_name": "get_hierarchy_lookup_session", 
+         "var_name": "hierarchy_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_query_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyQuerySession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "proxy", 
+         "support_check": "hierarchy_query", 
+         "method_name": "get_hierarchy_query_session", 
+         "var_name": "hierarchy_query_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchySearchSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "proxy", 
+         "support_check": "hierarchy_search", 
+         "method_name": "get_hierarchy_search_session", 
+         "var_name": "hierarchy_search_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyAdminSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "proxy", 
+         "support_check": "hierarchy_admin", 
+         "method_name": "get_hierarchy_admin_session", 
+         "var_name": "hierarchy_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyProxyManager.get_hierarchy_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyNotificationSession", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_receiver", 
+         "support_check": "hierarchy_notification", 
+         "method_name": "get_hierarchy_notification_session", 
+         "var_name": "hierarchy_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "HierarchyProxyManager"
+      }
+   }, 
+   "HierarchyTraversalSession.get_hierarchy_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "hierarchy_id", 
+         "interface_name": "HierarchyTraversalSession"
+      }
+   }, 
+   "HierarchyTraversalSession.get_hierarchy": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "hierarchy", 
+         "interface_name": "HierarchyTraversalSession"
+      }
+   }, 
+   "HierarchyTraversalSession.can_access_hierarchy": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_access_hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.get_roots": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_roots", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.has_parents": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_parents", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.is_parent": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_parent", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.get_parents": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_parents", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.is_ancestor": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_ancestor", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.has_children": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_children", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.is_child": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_child", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.get_children": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_children", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.is_descendant": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_descendant", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyTraversalSession.get_nodes": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_nodes", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyTraversalSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyDesignSession.get_hierarchy_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "hierarchy_id", 
+         "interface_name": "HierarchyDesignSession"
+      }
+   }, 
+   "HierarchyDesignSession.get_hierarchy": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "hierarchy", 
+         "interface_name": "HierarchyDesignSession"
+      }
+   }, 
+   "HierarchyDesignSession.can_modify_hierarchy": {
+      "pattern": "ontology.SubjectHierarchyDesignSession.can_modify_subject_hierarchy", 
+      "kwargs": {
+         "return_type_full": "boolean", 
+         "package_name": "hierarchy", 
+         "cat_name": "Hierarchy", 
+         "method_name": "can_modify_hierarchy", 
+         "object_name": "", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyDesignSession"
+      }
+   }, 
+   "HierarchyDesignSession.add_root": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "add_root", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyDesignSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyDesignSession.add_child": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "add_child", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyDesignSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyDesignSession.remove_root": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "remove_root", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyDesignSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyDesignSession.remove_child": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "remove_child", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyDesignSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyDesignSession.remove_children": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "remove_children", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyDesignSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchySequencingSession.get_hierarchy_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "hierarchy_id", 
+         "interface_name": "HierarchySequencingSession"
+      }
+   }, 
+   "HierarchySequencingSession.get_hierarchy": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "hierarchy", 
+         "interface_name": "HierarchySequencingSession"
+      }
+   }, 
+   "HierarchySequencingSession.can_sequence_hierarchy": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_sequence_hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchySequencingSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchySequencingSession.move_node_ahead": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "move_node_ahead", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchySequencingSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchySequencingSession.move_node_behind": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "move_node_behind", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchySequencingSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchySequencingSession.sequence_nodes": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "sequence_nodes", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchySequencingSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyStructureNotificationSession.get_hierarchy_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "hierarchy_id", 
+         "interface_name": "HierarchyStructureNotificationSession"
+      }
+   }, 
+   "HierarchyStructureNotificationSession.get_hierarchy": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "hierarchy", 
+         "interface_name": "HierarchyStructureNotificationSession"
+      }
+   }, 
+   "HierarchyStructureNotificationSession.can_register_for_hierarchy_structure_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_hierarchy_structure_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyStructureNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyStructureNotificationSession.register_for_new_hierarchy_nodes": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_hierarchy_nodes", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyStructureNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyStructureNotificationSession.register_for_changed_ancestor": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_ancestor", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyStructureNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyStructureNotificationSession.register_for_changed_descendant": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_descendant", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyStructureNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyStructureNotificationSession.register_for_deleted_hierarchy_nodes": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_hierarchy_nodes", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyStructureNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyStructureNotificationSession.register_for_deleted_hierarchy_node": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_hierarchy_node", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyStructureNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyLookupSession.init_pattern": "resource.BinLookupSession", 
+   "HierarchyLookupSession.can_lookup_hierarchies": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_hierarchies", 
+         "object_name": "Hierarchy", 
+         "var_name": "can_lookup_hierarchies", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession"
+      }
+   }, 
+   "HierarchyLookupSession.use_comparative_hierarchy_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_hierarchy_view", 
+         "var_name": "comparative_view", 
+         "package_name": "hierarchy", 
+         "cat_name": "hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession"
+      }
+   }, 
+   "HierarchyLookupSession.use_plenary_hierarchy_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_hierarchy_view", 
+         "var_name": "plenary_view", 
+         "package_name": "hierarchy", 
+         "cat_name": "hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession"
+      }
+   }, 
+   "HierarchyLookupSession.get_hierarchy": {
+      "pattern": "resource.BinLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "hierarchy", 
+         "cat_name": "Hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession"
+      }
+   }, 
+   "HierarchyLookupSession.get_hierarchies_by_ids": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_ids", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyList", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_ids", 
+         "method_name": "get_hierarchies_by_ids", 
+         "object_name": "Hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession"
+      }
+   }, 
+   "HierarchyLookupSession.get_hierarchies_by_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyList", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_genus_type", 
+         "method_name": "get_hierarchies_by_genus_type", 
+         "object_name": "Hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession"
+      }
+   }, 
+   "HierarchyLookupSession.get_hierarchies_by_parent_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_parent_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyList", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_genus_type", 
+         "method_name": "get_hierarchies_by_parent_genus_type", 
+         "object_name": "Hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession"
+      }
+   }, 
+   "HierarchyLookupSession.get_hierarchies_by_record_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_record_type", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyList", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_record_type", 
+         "method_name": "get_hierarchies_by_record_type", 
+         "object_name": "Hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession"
+      }
+   }, 
+   "HierarchyLookupSession.get_hierarchies_by_provider": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_hierarchies_by_provider", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyLookupSession.get_hierarchies": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_hierarchies", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyLookupSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyQuerySession.can_search_hierarchies": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_hierarchies", 
+         "object_name": "Hierarchy", 
+         "var_name": "can_search_hierarchies", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyQuerySession"
+      }
+   }, 
+   "HierarchyQuerySession.get_hierarchy_query": {
+      "pattern": "resource.BinQuerySession.get_bin_query", 
+      "kwargs": {
+         "method_name": "get_hierarchy_query", 
+         "return_type_full": "osid.hierarchy.HierarchyQuery", 
+         "package_name": "hierarchy", 
+         "cat_name": "Hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyQuerySession"
+      }
+   }, 
+   "HierarchyQuerySession.get_hierarchies_by_query": {
+      "pattern": "resource.ResourceQuerySession.get_resources_by_query", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyList", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_query", 
+         "arg0_type_full": "osid.hierarchy.HierarchyQuery", 
+         "method_name": "get_hierarchies_by_query", 
+         "object_name": "Hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyQuerySession"
+      }
+   }, 
+   "HierarchySearchSession.get_hierarchy_search": {
+      "pattern": "resource.BinSearchSession.get_bin_search", 
+      "kwargs": {
+         "method_name": "get_hierarchy_search", 
+         "return_type_full": "osid.hierarchy.HierarchySearch", 
+         "package_name": "hierarchy", 
+         "cat_name": "Hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchySearchSession"
+      }
+   }, 
+   "HierarchySearchSession.get_hierarchy_search_order": {
+      "pattern": "resource.BinSearchSession.get_bin_search_order", 
+      "kwargs": {
+         "method_name": "get_hierarchy_search_order", 
+         "return_type_full": "osid.hierarchy.HierarchySearchOrder", 
+         "package_name": "hierarchy", 
+         "cat_name": "Hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchySearchSession"
+      }
+   }, 
+   "HierarchySearchSession.get_hierarchies_by_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_by_search", 
+      "kwargs": {
+         "arg1_name": "hierarchy_search", 
+         "return_type_full": "osid.hierarchy.HierarchySearchResults", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_query", 
+         "arg1_type": "osid.hierarchy.HierarchySearch", 
+         "arg0_type_full": "osid.hierarchy.HierarchyQuery", 
+         "method_name": "get_hierarchies_by_search", 
+         "object_name": "Hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchySearchSession"
+      }
+   }, 
+   "HierarchySearchSession.get_hierarchy_query_from_inspector": {
+      "pattern": "resource.BinSearchSession.get_bin_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyQuery", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_query_inspector", 
+         "arg0_type_full": "osid.hierarchy.HierarchyQueryInspector", 
+         "method_name": "get_hierarchy_query_from_inspector", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchySearchSession"
+      }
+   }, 
+   "HierarchyAdminSession.init_pattern": "resource.BinAdminSession", 
+   "HierarchyAdminSession.can_create_hierarchies": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_hierarchies", 
+         "object_name": "Hierarchy", 
+         "var_name": "can_create_hierarchies", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.can_create_hierarchy_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_hierarchy_with_record_types", 
+         "object_name": "Hierarchy", 
+         "var_name": "can_create_hierarchy_with_record_types", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.get_hierarchy_form_for_create": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_create", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyForm", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_record_types", 
+         "arg0_type_full": "osid.type.Type[]", 
+         "method_name": "get_hierarchy_form_for_create", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.create_hierarchy": {
+      "pattern": "resource.BinAdminSession.create_bin", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_form", 
+         "arg0_type_full": "osid.hierarchy.HierarchyForm", 
+         "method_name": "create_hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.can_update_hierarchies": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_hierarchies", 
+         "object_name": "Hierarchy", 
+         "var_name": "can_update_hierarchies", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.get_hierarchy_form_for_update": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.HierarchyForm", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_hierarchy_form_for_update", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.update_hierarchy": {
+      "pattern": "resource.BinAdminSession.update_bin", 
+      "kwargs": {
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_form", 
+         "arg0_type_full": "osid.hierarchy.HierarchyForm", 
+         "method_name": "update_hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.can_delete_hierarchies": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_hierarchies", 
+         "object_name": "Hierarchy", 
+         "var_name": "can_delete_hierarchies", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.delete_hierarchy": {
+      "pattern": "resource.BinAdminSession.delete_bin", 
+      "kwargs": {
+         "cat_name": "Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_hierarchy", 
+         "cataloged_object_caps_list": "['']", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.can_manage_hierarchy_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_hierarchy_aliases", 
+         "object_name": "Hierarchy", 
+         "var_name": "can_manage_hierarchy_aliases", 
+         "package_name": "hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyAdminSession.alias_hierarchy": {
+      "pattern": "resource.BinAdminSession.alias_bin", 
+      "kwargs": {
+         "method_name": "alias_hierarchy", 
+         "arg1_name": "osid.id.Id", 
+         "package_name": "hierarchy", 
+         "cat_name": "Hierarchy", 
+         "arg0_name": "hierarchy_id", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyAdminSession"
+      }
+   }, 
+   "HierarchyNotificationSession.can_register_for_hierarchy_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_hierarchy_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyNotificationSession.register_for_new_hierarchies": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_hierarchies", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyNotificationSession.register_for_changed_hierarchies": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_hierarchies", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyNotificationSession.register_for_changed_hierarchy": {
+      "pattern": "resource.BinNotificationSession.register_for_changed_bin", 
+      "kwargs": {
+         "method_name": "register_for_changed_hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyNotificationSession", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id"
+      }
+   }, 
+   "HierarchyNotificationSession.register_for_deleted_hierarchies": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_hierarchies", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyNotificationSession", 
+         "package_name": "hierarchy"
+      }
+   }, 
+   "HierarchyNotificationSession.register_for_deleted_hierarchy": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bin", 
+      "kwargs": {
+         "method_name": "register_for_deleted_hierarchy", 
+         "module_name": "sessions", 
+         "interface_name": "HierarchyNotificationSession", 
+         "package_name": "hierarchy", 
+         "arg0_name": "hierarchy_id"
+      }
+   }, 
+   "Hierarchy.init_pattern": "resource.Bin", 
+   "HierarchyForm.init_pattern": "resource.BinForm", 
+   "HierarchyList.get_next_hierarchy": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "hierarchy", 
+         "module_name": "objects", 
+         "var_name": "hierarchy", 
+         "interface_name": "HierarchyList"
+      }
+   }, 
+   "HierarchyList.get_next_hierarchies": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_hierarchies", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "hierarchy", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "hierarchies", 
+         "interface_name": "HierarchyList"
+      }
+   }, 
+   "NodeList.get_next_node": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_node", 
+         "return_type_full": "osid.hierarchy.Node", 
+         "package_name": "hierarchy", 
+         "module_name": "objects", 
+         "var_name": "node", 
+         "interface_name": "NodeList"
+      }
+   }, 
+   "NodeList.get_next_nodes": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_nodes", 
+         "return_type_full": "osid.hierarchy.Node", 
+         "package_name": "hierarchy", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "nodes", 
+         "interface_name": "NodeList"
+      }
+   }
+}

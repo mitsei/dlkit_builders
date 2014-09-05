@@ -1,0 +1,2599 @@
+{
+   "name": "transport", 
+   "version": "3.0.0", 
+   "title": "Transport Open Service Interface Definitions", 
+   "copyright": "Copyright (c) 2006 Massachusetts Institute of Technology.\n\nCopyright (c) 2010 Ingenescus. All Rights Reserved.", 
+   "license": "This Work is being provided by the copyright holder(s) subject to the\nfollowing license. By obtaining, using and/or copying this Work, you\nagree that you have read, understand, and will comply with the following\nterms and conditions.\n\nPermission to use, copy and distribute unmodified versions of this Work,\nfor any purpose, without fee or royalty is hereby granted, provided that\nyou include the above copyright notices and the terms of this license on\nALL copies of the Work or portions thereof.\n\nYou may nodify or create Derivatives of this Work only for your internal\npurposes. You shall not distribute or transfer any such Derivative of\nthis Work to any location or to any third party. For the purposes of\nthis license, \"Derivative\" shall mean any derivative of the Work as\ndefined in the United States Copyright Act of 1976, such as a\ntranslation or modification.\n\nThis Work and the information contained herein is provided on an \"AS IS\"\nbasis WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT\nNOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR\nPURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT\nHOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN\nAN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN\nCONNECTION WITH THE WORK OR THE USE OR OTHER DEALINGS IN THE WORK.\n\nThe export of software employing encryption technology may require a\nspecific license from the United States Government. It is the\nresponsibility of any person or organization contemplating export to\nobtain such a license before exporting this Work.", 
+   "summary": "The transport OSID provides a means of moving data to or from the local\nendpoint.\n\nService Endpoints\n\nThe transport OSID defines an inbound and an outbound service. An\noutbound transport service is used from a local endpoint to a single\nremote endpoint. The remote endpoint may represent one or more physical\nendpoints, such as a multicast network, but presents itself as a single\nenpoint to the consumer. The inbound service is used to receive and\nprocess data from multiple remote endpoints and is implemented using a\ncallback mechanism when a new request for association arrives.\n\nAn association or connection between two endpoints is represented by the\nsession itself. The Transport OSID defines two flavors of transport. One\nis stream oriented that makes use of ``DataInputStream`` and\n``DataOutputStream`` for reading and writing data. The other is message\noriented that makes use of ``Request`` and ``Response`` for structuring\ndata.\n\nStream-oriented Service\n\nIn the stream-oriented case, the transport OSID does not describe the\nformat or sequence of the data which must be agreed upon at both ends.\nThe OSID simply acts as a cover for specific transport or session\nrelated APIs, and provides a means for modular handling of service\nlocation for the purpose implementing a redundancy or load balancing\nscheme. The transport OSID may be used within another OSID to handle the\ntransport of serialized data that can be transformed to a higher level\nOSID object.\n\nThe data streams defined in the transport OSID are also used in other\nOSIDs where a data stream is required such as the filing OSID or an\nAsset that contains arbitrary serialized data.\n\nMessage-oriented Service\n\nThe message oriented services provide additional structure that can be\nused to specify fields, organize streams, or provide data to object\nconversions. ``Requests`` may be sent synchronously so that each request\nwaits for a ``Response,`` or asynchronously where each response is sent\nto a registered callback. A message ``Type`` describes both the\nstructure of the ``Request`` and ``Response`` messages.\n\nOutbound Example\n  OutboundStreamSession session = manager.getOutboundStreamSession();\n  \n  // simplified example of handling an authenticated service within the streams \n  DataOutputStream auth = session.sendData();\n  DataInputStream credential = authentication.getCredential(credentialViaStreamType);\n  auth.writeStream(credential);\n  DataInputStream authResponse = session.receiveData();\n  \n  // sending an rpc-style command in the stream\n  DataOutputStream out = session.sendData();\n  String cmd = \"<call><command>getSongs</command><params><param>\" + album + \"</param></call>\";\n  out.write(cmd.length(), cmd);\n  out.close();\n  \n  while(session.hasDataAvailable()) {\n      DataInputStream in = session.receiveData();\n      addSongToPlayQueue(in);\n  }\n\n\n\nInbound Example\n  public void dispatch(OutboundStreamSession session) {\n      Authentication auth = authenticateSession(session.receiveData());\n      if (authzSession.isAuthorized(auth.getAgentId, fId, qId)) {\n          String argv = parseCommandFromStream(session.receiveData());\n          if (argv[0].equals(\"getSongs\")) {\n              Song songs = getSongsFromAlbum(argv[1]);\n              for (song: songs) {\n                  DataOutputStream out = session.sendData();\n                  out.write(song.data(), song.size());\n              }\n          }\n      }\n  }\n\n\n\nMessage Example\n  OutboundMessageSession session = manager.getOutboundMessageSession();\n  \n  Request request = session.getRequest();\n  RequestHeader header = (HeaderRequestRecord) request.getRequestRecord(headerRequestRecordType);\n  header.setAuthentication(authentication);\n  // the message structure may also define interoperability cues \n  // for the consumer\n  if (header.supportsLanguage()) {\n      header.setLanguage(languageType);\n  }\n  \n  Response response = session.makeRequest(request);\n  \n  if (response.ok()) {\n      request = session.getRequest();\n      ListSongsRequest cmd = (ListSongsRequestRecord) request.getRequestRecord(listSongsMessageType);\n      cmd.setAlbum(albumName);\n      response = session.makeRequest(request);\n      if (response.ok()) {\n          ListSongsResponse songs = (ListSongsResponseRecord) response.getResponseRecord(listSongsResponseRecordType);\n  \n          // the transport provider can return data in the message, or be used\n          // to return usable objects as specified by its type\n          for (Song song : songs.getSongs()) {\n              Audio.play(song);\n          }\n      } else error(response.getStatusMessage());\n  } else error (response.getStatusMessage());\n\n", 
+   "interfaces": [
+      {
+         "fullname": "osid.transport.TransportProfile", 
+         "shortname": "TransportProfile", 
+         "category": "managers", 
+         "doc": {
+            "headline": "The ``TransportProfile`` defines the interoperability of the transport OSID.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidProfile"
+         ], 
+         "inherit_shortnames": [
+            "OsidProfile"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidProfile"
+            }
+         ], 
+         "method_names": [
+            "supports_visible_federation", 
+            "supports_outbound_stream", 
+            "supports_inbound_stream", 
+            "supports_outbound_message", 
+            "supports_inbound_message", 
+            "supports_endpoint_lookup", 
+            "get_endpoint_record_types", 
+            "supports_endpoint_record_type", 
+            "get_request_record_types", 
+            "supports_request_record_type", 
+            "get_response_record_types", 
+            "supports_response_record_type"
+         ], 
+         "methods": [
+            {
+               "name": "supports_visible_federation", 
+               "doc": {
+                  "headline": "Tests if any transport endpoint federation is exposed.", 
+                  "body": "        Federation is exposed when a specific endpoint may be used.\n        Federation is not exposed when a set of endpoints appears as a\n        single endpoint."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if federation is visible ``false``\n                otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if federation is visible ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_outbound_stream", 
+               "doc": {
+                  "headline": "Tests if outbound stream transport is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if outbound stream transport is\n                supported ``,``  ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if outbound stream transport is supported ``,``  ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_inbound_stream", 
+               "doc": {
+                  "headline": "Tests if inbound stream transport is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if incoming stream transport is\n                supported, ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if incoming stream transport is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_outbound_message", 
+               "doc": {
+                  "headline": "Tests if outbound message transport is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if outbound message transport is\n                supported ``,``  ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if outbound message transport is supported ``,``  ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_inbound_message", 
+               "doc": {
+                  "headline": "Tests if inbound message transport is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if incoming message transport is\n                supported, ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if incoming message transport is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_endpoint_lookup", 
+               "doc": {
+                  "headline": "Tests if endpoint lookup is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if endpoint lookup is supported,\n                ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if endpoint lookup is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_endpoint_record_types", 
+               "doc": {
+                  "headline": "Gets a list of supported endpoint record types.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.type.TypeList) - a list of supported endpoint\n                record types", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: a list of supported endpoint record types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_endpoint_record_type", 
+               "doc": {
+                  "headline": "Tests if an endpoint record type is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    endpoint_record_type (osid.type.Type): an endpoint\n                record type\n", 
+               "return_doc": "        return: (boolean) - ``true`` if the endpoint record type is\n                supported, ``false`` otherwise", 
+               "error_doc": "        raise:  NullArgument - ``endpoint_record_type`` is ``null``", 
+               "sphinx_param_doc": "        :param endpoint_record_type: an endpoint record type\n        :type endpoint_record_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: ``true`` if the endpoint record type is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``endpoint_record_type`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "endpoint_record_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "boolean", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_request_record_types", 
+               "doc": {
+                  "headline": "Gets a list of supported request record types.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.type.TypeList) - a list of supported request\n                record types", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: a list of supported request record types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_request_record_type", 
+               "doc": {
+                  "headline": "Tests if a request record type is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    request_record_type (osid.type.Type): a request record\n                type\n", 
+               "return_doc": "        return: (boolean) - ``true`` if the request record type is\n                supported, ``false`` otherwise", 
+               "error_doc": "        raise:  NullArgument - ``request_record_type`` is ``null``", 
+               "sphinx_param_doc": "        :param request_record_type: a request record type\n        :type request_record_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: ``true`` if the request record type is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``request_record_type`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "request_record_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "boolean", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_response_record_types", 
+               "doc": {
+                  "headline": "Gets a list of supported response record types.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.type.TypeList) - a list of supported response\n                record types", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: a list of supported response record types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_response_record_type", 
+               "doc": {
+                  "headline": "Tests if a response record type is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    response_record_type (osid.type.Type): a response record\n                type\n", 
+               "return_doc": "        return: (boolean) - ``true`` if the response record type is\n                supported, ``false`` otherwise", 
+               "error_doc": "        raise:  NullArgument - ``response_record_type`` is ``null``", 
+               "sphinx_param_doc": "        :param response_record_type: a response record type\n        :type response_record_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: ``true`` if the response record type is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``response_record_type`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "response_record_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "boolean", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.TransportManager", 
+         "shortname": "TransportManager", 
+         "category": "managers", 
+         "doc": {
+            "headline": "This manager provides access to the sessions defined in this service.", 
+            "body": "    The outbound sessions are used to connect to a remote endpoint and\n    the inbound sessions are used to receive incoming connections.\n\n    The two flavors of transport are stream and message oriented.\n    Messages offer more structured requests and responses although their\n    structure may include embedded streams."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidManager", 
+            "osid.transport.TransportProfile"
+         ], 
+         "inherit_shortnames": [
+            "OsidManager", 
+            "TransportProfile"
+         ], 
+         "inherit_pkg_names": [
+            "osid", 
+            "transport"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidManager"
+            }, 
+            {
+               "pkg_name": "transport", 
+               "name": "TransportProfile"
+            }
+         ], 
+         "method_names": [
+            "get_outbound_stream_session", 
+            "get_outbound_stream_session_for_endpoint", 
+            "get_inbound_stream_session", 
+            "get_inbound_stream_session_for_endpoint", 
+            "get_outbound_message_session", 
+            "get_outbound_message_session_for_endpoint", 
+            "get_inbound_message_session", 
+            "get_inbound_message_session_for_endpoint", 
+            "get_endpoint_lookup_session"
+         ], 
+         "methods": [
+            {
+               "name": "get_outbound_stream_session", 
+               "doc": {
+                  "headline": "Gets a service for outbound stream transport.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.OutboundStreamSession) - an\n                ``OutboundStreamSession``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_outbound_stream()`` is\n                ``false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: an ``OutboundStreamSession``\n        :rtype: ``osid.transport.OutboundStreamSession``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_outbound_stream()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_outbound_stream()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.OutboundStreamSession", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_outbound_stream_session_for_endpoint", 
+               "doc": {
+                  "headline": "Gets a service for outbound stream transport using a specified ``Endpoint``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    endpoint_id (osid.id.Id): a transport endpoint\n", 
+               "return_doc": "        return: (osid.transport.OutboundStreamSession) - an\n                ``OutboundStreamSession``", 
+               "error_doc": "        raise:  NotFound - ``endpoint_id`` is not found\n        raise:  NullArgument - ``endpoint_id`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_outbound_stream()`` or\n                ``supports_visible_federation_i()`` is ``false``", 
+               "sphinx_param_doc": "        :param endpoint_id: a transport endpoint\n        :type endpoint_id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "        :return: an ``OutboundStreamSession``\n        :rtype: ``osid.transport.OutboundStreamSession``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``endpoint_id`` is not found\n        :raise: ``NullArgument`` -- ``endpoint_id`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_outbound_stream()`` or ``supports_visible_federation_i()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_outbound_stream()`` and ``supports_visible_federation()`` are ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "endpoint_id", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id"
+               ], 
+               "return_type": "osid.transport.OutboundStreamSession", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_inbound_stream_session", 
+               "doc": {
+                  "headline": "Gets a service for inbound stream transport.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    stream_receiver (osid.transport.StreamReceiver): a\n                stream receiver\n", 
+               "return_doc": "        return: (osid.transport.InboundStreamSession) - an\n                ``InboundStreamSession``", 
+               "error_doc": "        raise:  NullArgument - ``stream_receiver`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_inbound_stream()`` is\n                ``false``", 
+               "sphinx_param_doc": "        :param stream_receiver: a stream receiver\n        :type stream_receiver: ``osid.transport.StreamReceiver``\n", 
+               "sphinx_return_doc": "        :return: an ``InboundStreamSession``\n        :rtype: ``osid.transport.InboundStreamSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``stream_receiver`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_inbound_stream()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound_stream()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.StreamReceiver", 
+                     "var_name": "stream_receiver", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.StreamReceiver"
+               ], 
+               "return_type": "osid.transport.InboundStreamSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_inbound_stream_session_for_endpoint", 
+               "doc": {
+                  "headline": "Gets a service for inbound stream transport using a specified ``Endpoint``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    stream_receiver (osid.transport.StreamReceiver): a\n                stream receiver\n        arg:    endpoint_id (osid.id.Id): a transport endpoint\n", 
+               "return_doc": "        return: (osid.transport.InboundStreamSession) - an\n                ``InboundStreamSession``", 
+               "error_doc": "        raise:  NotFound - ``endpoint_id`` is not found\n        raise:  NullArgument - ``stream_receiver`` or ``endpoint_id`` is\n                ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_inbound_stream()`` or\n                ``supports_visible_federation_i()`` is ``false``", 
+               "sphinx_param_doc": "        :param stream_receiver: a stream receiver\n        :type stream_receiver: ``osid.transport.StreamReceiver``\n        :param endpoint_id: a transport endpoint\n        :type endpoint_id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "        :return: an ``InboundStreamSession``\n        :rtype: ``osid.transport.InboundStreamSession``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``endpoint_id`` is not found\n        :raise: ``NullArgument`` -- ``stream_receiver`` or ``endpoint_id`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_inbound_stream()`` or ``supports_visible_federation_i()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound_stream()`` and ``supports_visible_federation()`` are ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.StreamReceiver", 
+                     "var_name": "stream_receiver", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "endpoint_id", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.StreamReceiver", 
+                  "osid.id.Id"
+               ], 
+               "return_type": "osid.transport.InboundStreamSession", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_outbound_message_session", 
+               "doc": {
+                  "headline": "Gets a service for outbound message transport.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.OutboundMessageSession) - an\n                ``OutboundMessageSession``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_outbound_message() is false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: an ``OutboundMessageSession``\n        :rtype: ``osid.transport.OutboundMessageSession``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_outbound_message() is false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_outbound_message()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.OutboundMessageSession", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_outbound_message_session_for_endpoint", 
+               "doc": {
+                  "headline": "Gets a service for outbound message transport using a specified Endpoint.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    endpoint_id (osid.id.Id): a transport endpoint\n", 
+               "return_doc": "        return: (osid.transport.OutboundMessageSession) - an\n                ``OutboundMessageSession``", 
+               "error_doc": "        raise:  NotFound - ``endpoint_id`` is not found\n        raise:  NullArgument - ``endpoint_id`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_outbound_message() or\n                supports_visible_federation_i() is false``", 
+               "sphinx_param_doc": "        :param endpoint_id: a transport endpoint\n        :type endpoint_id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "        :return: an ``OutboundMessageSession``\n        :rtype: ``osid.transport.OutboundMessageSession``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``endpoint_id`` is not found\n        :raise: ``NullArgument`` -- ``endpoint_id`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_outbound_message() or supports_visible_federation_i() is false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_outbound_message()`` and ``supports_visible_federation()`` are ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "endpoint_id", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id"
+               ], 
+               "return_type": "osid.transport.OutboundMessageSession", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_inbound_message_session", 
+               "doc": {
+                  "headline": "Gets a service for inbound message transport.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    message_receiver (osid.transport.MessageReceiver): a\n                message receiver\n", 
+               "return_doc": "        return: (osid.transport.InboundMessageSession) - an\n                ``InboundMessageSession``", 
+               "error_doc": "        raise:  NullArgument - ``message_receiver`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_inbound_message() is false``", 
+               "sphinx_param_doc": "        :param message_receiver: a message receiver\n        :type message_receiver: ``osid.transport.MessageReceiver``\n", 
+               "sphinx_return_doc": "        :return: an ``InboundMessageSession``\n        :rtype: ``osid.transport.InboundMessageSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``message_receiver`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_inbound_message() is false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound_message()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.MessageReceiver", 
+                     "var_name": "message_receiver", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.MessageReceiver"
+               ], 
+               "return_type": "osid.transport.InboundMessageSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_inbound_message_session_for_endpoint", 
+               "doc": {
+                  "headline": "Gets a service for inbound message transport using a specified Endpoint.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    message_receiver (osid.transport.MessageReceiver): a\n                message receiver\n        arg:    endpoint_id (osid.id.Id): a transport endpoint\n", 
+               "return_doc": "        return: (osid.transport.InboundMessageSession) - an\n                ``InboundMessageSession``", 
+               "error_doc": "        raise:  NotFound - ``endpoint_id`` is not found\n        raise:  NullArgument - ``message_receiver`` or ``endpoint_id``\n                is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_inbound_message() or\n                supports_visible_federation_i() is false``", 
+               "sphinx_param_doc": "        :param message_receiver: a message receiver\n        :type message_receiver: ``osid.transport.MessageReceiver``\n        :param endpoint_id: a transport endpoint\n        :type endpoint_id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "        :return: an ``InboundMessageSession``\n        :rtype: ``osid.transport.InboundMessageSession``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``endpoint_id`` is not found\n        :raise: ``NullArgument`` -- ``message_receiver`` or ``endpoint_id`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_inbound_message() or supports_visible_federation_i() is false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound_message()`` and ``supports_visible_federation()`` are true.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.MessageReceiver", 
+                     "var_name": "message_receiver", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "endpoint_id", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.MessageReceiver", 
+                  "osid.id.Id"
+               ], 
+               "return_type": "osid.transport.InboundMessageSession", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_endpoint_lookup_session", 
+               "doc": {
+                  "headline": "Gets the endpoint lookup service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.EndpointLookupSession) - an\n                ``EndpointLookupSesson``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_inbound()`` is ``false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: an ``EndpointLookupSesson``\n        :rtype: ``osid.transport.EndpointLookupSession``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_inbound()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.EndpointLookupSession", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.TransportProxyManager", 
+         "shortname": "TransportProxyManager", 
+         "category": "managers", 
+         "doc": {
+            "headline": "This manager provides access to the sessions defined in this service.", 
+            "body": "    The outbound sessions are used to connect to a remote endpoint and\n    the inbound sessions are used to receive incoming connections.\n\n    The two flavors of transport are stream and message oriented.\n    Messages offer more structured requests and responses although their\n    structure may include embedded streams."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidProxyManager", 
+            "osid.transport.TransportProfile"
+         ], 
+         "inherit_shortnames": [
+            "OsidProxyManager", 
+            "TransportProfile"
+         ], 
+         "inherit_pkg_names": [
+            "osid", 
+            "transport"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidProxyManager"
+            }, 
+            {
+               "pkg_name": "transport", 
+               "name": "TransportProfile"
+            }
+         ], 
+         "method_names": [
+            "get_outbound_stream_session", 
+            "get_outbound_stream_session_for_endpoint", 
+            "get_inbound_stream_session", 
+            "get_inbound_stream_session_for_endpoint", 
+            "get_outbound_message_session", 
+            "get_outbound_message_session_for_endpoint", 
+            "get_inbound_message_session", 
+            "get_inbound_message_session_for_endpoint", 
+            "get_endpoint_lookup_session"
+         ], 
+         "methods": [
+            {
+               "name": "get_outbound_stream_session", 
+               "doc": {
+                  "headline": "Gets a service for outbound stream transport.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.transport.OutboundStreamSession) - an\n                ``OutboundStreamSession``", 
+               "error_doc": "        raise:  NullArgument - ``proxy`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_outbound_stream()`` is\n                ``false``", 
+               "sphinx_param_doc": "        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``OutboundStreamSession``\n        :rtype: ``osid.transport.OutboundStreamSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_outbound_stream()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_outbound_stream()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.transport.OutboundStreamSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_outbound_stream_session_for_endpoint", 
+               "doc": {
+                  "headline": "Gets a service for outbound stream transport using a specified ``Endpoint``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    endpoint_id (osid.id.Id): a transport endpoint\n        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.transport.OutboundStreamSession) - an\n                ``OutboundStreamSession``", 
+               "error_doc": "        raise:  NotFound - ``endpoint_id`` or ``proxy`` is not found\n        raise:  NullArgument - ``endpoint_id`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_outbound_stream()`` or\n                ``supports_visible_federation_i()`` is ``false``", 
+               "sphinx_param_doc": "        :param endpoint_id: a transport endpoint\n        :type endpoint_id: ``osid.id.Id``\n        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``OutboundStreamSession``\n        :rtype: ``osid.transport.OutboundStreamSession``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``endpoint_id`` or ``proxy`` is not found\n        :raise: ``NullArgument`` -- ``endpoint_id`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_outbound_stream()`` or ``supports_visible_federation_i()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_outbound_stream()`` and ``supports_visible_federation()`` are ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "endpoint_id", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id", 
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.transport.OutboundStreamSession", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_inbound_stream_session", 
+               "doc": {
+                  "headline": "Gets a service for inbound stream transport.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    stream_receiver (osid.transport.StreamReceiver): a\n                stream receiver\n        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.transport.InboundStreamSession) - an\n                ``InboundStreamSession``", 
+               "error_doc": "        raise:  NullArgument - ``stream_receiver`` or ``proxy`` is\n                ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_inbound_stream()`` is\n                ``false``", 
+               "sphinx_param_doc": "        :param stream_receiver: a stream receiver\n        :type stream_receiver: ``osid.transport.StreamReceiver``\n        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``InboundStreamSession``\n        :rtype: ``osid.transport.InboundStreamSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``stream_receiver`` or ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_inbound_stream()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound_stream()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.StreamReceiver", 
+                     "var_name": "stream_receiver", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.StreamReceiver", 
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.transport.InboundStreamSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_inbound_stream_session_for_endpoint", 
+               "doc": {
+                  "headline": "Gets a service for inbound stream transport using a specified ``Endpoint``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    stream_receiver (osid.transport.StreamReceiver): a\n                stream receiver\n        arg:    endpoint_id (osid.id.Id): a transport endpoint\n        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.transport.InboundStreamSession) - an\n                ``InboundStreamSession``", 
+               "error_doc": "        raise:  NotFound - ``endpoint_id`` is not found\n        raise:  NullArgument - ``stream_receiver, endpoint_id`` or\n                ``porxy`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_inbound_stream()`` or\n                ``supports_visible_federation_i()`` is ``false``", 
+               "sphinx_param_doc": "        :param stream_receiver: a stream receiver\n        :type stream_receiver: ``osid.transport.StreamReceiver``\n        :param endpoint_id: a transport endpoint\n        :type endpoint_id: ``osid.id.Id``\n        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``InboundStreamSession``\n        :rtype: ``osid.transport.InboundStreamSession``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``endpoint_id`` is not found\n        :raise: ``NullArgument`` -- ``stream_receiver, endpoint_id`` or ``porxy`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_inbound_stream()`` or ``supports_visible_federation_i()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound_stream()`` and ``supports_visible_federation()`` are ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.StreamReceiver", 
+                     "var_name": "stream_receiver", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "endpoint_id", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.StreamReceiver", 
+                  "osid.id.Id", 
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.transport.InboundStreamSession", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_outbound_message_session", 
+               "doc": {
+                  "headline": "Gets a service for outbound message transport.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.transport.OutboundMessageSession) - an\n                ``OutboundMessageSession``", 
+               "error_doc": "        raise:  NullArgument - ``proxy`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_outbound_message() is false``", 
+               "sphinx_param_doc": "        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``OutboundMessageSession``\n        :rtype: ``osid.transport.OutboundMessageSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_outbound_message() is false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_outbound_message()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.transport.OutboundMessageSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_outbound_message_session_for_endpoint", 
+               "doc": {
+                  "headline": "Gets a service for outbound message transport using a specified Endpoint.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    endpoint_id (osid.id.Id): a transport endpoint\n        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.transport.OutboundMessageSession) - an\n                ``OutboundMessageSession``", 
+               "error_doc": "        raise:  NotFound - ``endpoint_id`` is not found\n        raise:  NullArgument - ``endpoint_id`` or ``proxy`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_outbound_message() or\n                supports_visible_federation_i() is false``", 
+               "sphinx_param_doc": "        :param endpoint_id: a transport endpoint\n        :type endpoint_id: ``osid.id.Id``\n        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``OutboundMessageSession``\n        :rtype: ``osid.transport.OutboundMessageSession``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``endpoint_id`` is not found\n        :raise: ``NullArgument`` -- ``endpoint_id`` or ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_outbound_message() or supports_visible_federation_i() is false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_outbound_message()`` and ``supports_visible_federation()`` are ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "endpoint_id", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id", 
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.transport.OutboundMessageSession", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_inbound_message_session", 
+               "doc": {
+                  "headline": "Gets a service for inbound message transport.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    message_receiver (osid.transport.MessageReceiver): a\n                message receiver\n        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.transport.InboundMessageSession) - an\n                ``InboundMessageSession``", 
+               "error_doc": "        raise:  NullArgument - ``message_receiver`` or ``proxy`` is\n                ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_inbound_message() is false``", 
+               "sphinx_param_doc": "        :param message_receiver: a message receiver\n        :type message_receiver: ``osid.transport.MessageReceiver``\n        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``InboundMessageSession``\n        :rtype: ``osid.transport.InboundMessageSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``message_receiver`` or ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_inbound_message() is false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound_message()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.MessageReceiver", 
+                     "var_name": "message_receiver", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.MessageReceiver", 
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.transport.InboundMessageSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_inbound_message_session_for_endpoint", 
+               "doc": {
+                  "headline": "Gets a service for inbound message transport using a specified Endpoint.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    message_receiver (osid.transport.MessageReceiver): a\n                message receiver\n        arg:    endpoint_id (osid.id.Id): a transport endpoint\n        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.transport.InboundMessageSession) - an\n                ``InboundMessageSession``", 
+               "error_doc": "        raise:  NotFound - ``endpoint_id`` is not found\n        raise:  NullArgument - ``message_receiver, endpoint_id`` or\n                ``proxy`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_inbound_message() or\n                supports_visible_federation_i() is false``", 
+               "sphinx_param_doc": "        :param message_receiver: a message receiver\n        :type message_receiver: ``osid.transport.MessageReceiver``\n        :param endpoint_id: a transport endpoint\n        :type endpoint_id: ``osid.id.Id``\n        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``InboundMessageSession``\n        :rtype: ``osid.transport.InboundMessageSession``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``endpoint_id`` is not found\n        :raise: ``NullArgument`` -- ``message_receiver, endpoint_id`` or ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_inbound_message() or supports_visible_federation_i() is false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound_message()`` and ``supports_visible_federation()`` are true.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.MessageReceiver", 
+                     "var_name": "message_receiver", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "endpoint_id", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.MessageReceiver", 
+                  "osid.id.Id", 
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.transport.InboundMessageSession", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_endpoint_lookup_session", 
+               "doc": {
+                  "headline": "Gets the endpoint lookup service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.transport.EndpointLookupSession) - an\n                ``EndpointLookupSesson``", 
+               "error_doc": "        raise:  NullArgument - ``proxy`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_inbound()`` is ``false``", 
+               "sphinx_param_doc": "        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``EndpointLookupSesson``\n        :rtype: ``osid.transport.EndpointLookupSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_inbound()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_inbound()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.transport.EndpointLookupSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.OutboundStreamSession", 
+         "shortname": "OutboundStreamSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "The outbound stream session is used to send and receive arbitrary data to and from a remote end point.", 
+            "body": "    The methods accept and return a data stream. Some protocols may send\n    or receive all data within a single stream while others may use the\n    streams as channels or frames of data.\n\n    A stream may be available for reading before all the data as arrived\n    and as such multiple streams may be processed simultaneously."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "get_endpoint_id", 
+            "get_endpoint", 
+            "send_data", 
+            "has_data_available", 
+            "receive_data"
+         ], 
+         "methods": [
+            {
+               "name": "get_endpoint_id", 
+               "doc": {
+                  "headline": "Gets the ``Endpoint``  ``Id`` associated with this session.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.Id) - the ``Endpoint``  ``Id`` associated with\n                this session", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the ``Endpoint``  ``Id`` associated with this session\n        :rtype: ``osid.id.Id``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.Id", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_endpoint", 
+               "doc": {
+                  "headline": "Gets the ``Endpoint`` associated with this session.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.Endpoint) - the ``Endpoint`` associated\n                with this session", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the ``Endpoint`` associated with this session\n        :rtype: ``osid.transport.Endpoint``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.Endpoint", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "send_data", 
+               "doc": {
+                  "headline": "Sends data to the remote transport endpoint.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.DataOutputStream) - the output stream in\n                which to send data", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the output stream in which to send data\n        :rtype: ``osid.transport.DataOutputStream``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.DataOutputStream", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational"
+               }
+            }, 
+            {
+               "name": "has_data_available", 
+               "doc": {
+                  "headline": "Tests to see if an input stream is available for retrieval.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if a stream is available for\n                reading, ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if a stream is available for reading, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "receive_data", 
+               "doc": {
+                  "headline": "Receives data from the remote transport endpoint.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.DataInputStream) - the input stream\n                containing the received data", 
+               "error_doc": "        raise:  IllegalState - ``has_data_available()`` is ``false``\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the input stream containing the received data\n        :rtype: ``osid.transport.DataInputStream``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- ``has_data_available()`` is ``false``\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.DataInputStream", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.InboundStreamSession", 
+         "shortname": "InboundStreamSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "The inbound stream session is used as a listener.", 
+            "body": "    A callback is registered using a ``StreamReceiver``. The listener is\n    closed when this session is closed."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "get_endpoint_id", 
+            "get_endpoint", 
+            "register_callback"
+         ], 
+         "methods": [
+            {
+               "name": "get_endpoint_id", 
+               "doc": {
+                  "headline": "Gets the ``Endpoint``  ``Id`` associated with this session.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.Id) - the ``Endpoint``  ``Id`` associated with\n                this session", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the ``Endpoint``  ``Id`` associated with this session\n        :rtype: ``osid.id.Id``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.Id", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_endpoint", 
+               "doc": {
+                  "headline": "Gets the ``Endpoint`` associated with this session.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.Endpoint) - the ``Endpoint`` associated\n                with this session", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the ``Endpoint`` associated with this session\n        :rtype: ``osid.transport.Endpoint``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.Endpoint", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "register_callback", 
+               "doc": {
+                  "headline": "Registers a callback to receive incoming data.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    receiver (osid.transport.StreamReceiver): a stream\n                receievr\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NullArgument - ``receiver`` is ``null``\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "        :param receiver: a stream receievr\n        :type receiver: ``osid.transport.StreamReceiver``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``receiver`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.StreamReceiver", 
+                     "var_name": "receiver", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.StreamReceiver"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.OutboundMessageSession", 
+         "shortname": "OutboundMessageSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "This session provides access to a request/response protocol provider.", 
+            "body": "    The data and format of the requests and responses are identified\n    through their respective ``Types``. While this session is used for\n    structured conversations, it doesn't preclude the use of byte\n    streams as part of a ``Request`` or ``Response``.\n\n    A ``Request`` is retrieved via ``get_request()`` and data is\n    supplied to its corresponding record. The ``Request`` is then sent\n    using ``send_request()`` along with an interface to be called when\n    the ``Response`` arrives. The FSM of the protocol is indicated\n    through the available ``Request``  ``Types`` that may change from\n    one transaction to another.\n    \n    While multiple requests may be submitted before receiving a\n    response, the requests may or may not be queued."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "get_endpoint_id", 
+            "get_endpoint", 
+            "get_request", 
+            "make_request", 
+            "send_request"
+         ], 
+         "methods": [
+            {
+               "name": "get_endpoint_id", 
+               "doc": {
+                  "headline": "Gets the ``Endpoint``  ``Id`` associated with this session.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.Id) - the ``Endpoint``  ``Id`` associated with\n                this session", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the ``Endpoint``  ``Id`` associated with this session\n        :rtype: ``osid.id.Id``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.Id", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_endpoint", 
+               "doc": {
+                  "headline": "Gets the ``Endpoint`` associated with this session.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.Endpoint) - the ``Endpoint`` associated\n                with this session", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the ``Endpoint`` associated with this session\n        :rtype: ``osid.transport.Endpoint``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.Endpoint", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_request", 
+               "doc": {
+                  "headline": "Gets a ``Request`` for use with ``sendRequest()``.", 
+                  "body": "        This is not a receive call."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.Request) - a request", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: a request\n        :rtype: ``osid.transport.Request``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.Request", 
+               "errors": {}
+            }, 
+            {
+               "name": "make_request", 
+               "doc": {
+                  "headline": "Sends a request to the remote transport endpoint and waits for a response.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    request (osid.transport.Request): the request\n        arg:    response (osid.transport.Response): callback for the\n                response\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NullArgument - ``request`` or ``receiver`` is null\n        raise:  OperationFailed - unable to complete request\n        raise:  Unsupported - ``request`` is not supported", 
+               "sphinx_param_doc": "        :param request: the request\n        :type request: ``osid.transport.Request``\n        :param response: callback for the response\n        :type response: ``osid.transport.Response``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``request`` or ``receiver`` is null\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unsupported`` -- ``request`` is not supported", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.Request", 
+                     "var_name": "request", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.transport.Response", 
+                     "var_name": "response", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.Request", 
+                  "osid.transport.Response"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNSUPPORTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "send_request", 
+               "doc": {
+                  "headline": "Sends data to the remote transport endpoint and sends the response to the callback.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    request (osid.transport.Request): the request\n        arg:    callback (osid.transport.MessageReceiver): callback for\n                the response\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NullArgument - ``request`` or ``callback`` is null\n        raise:  OperationFailed - unable to complete request\n        raise:  Unsupported - ``request`` is not supported", 
+               "sphinx_param_doc": "        :param request: the request\n        :type request: ``osid.transport.Request``\n        :param callback: callback for the response\n        :type callback: ``osid.transport.MessageReceiver``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``request`` or ``callback`` is null\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unsupported`` -- ``request`` is not supported", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.Request", 
+                     "var_name": "request", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.transport.MessageReceiver", 
+                     "var_name": "callback", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.Request", 
+                  "osid.transport.MessageReceiver"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNSUPPORTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.InboundMessageSession", 
+         "shortname": "InboundMessageSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "The inbound message session is used as a listener.", 
+            "body": "    A callback is registered using a ``StreamReceiver``. The listener is\n    closed when this session is closed."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "get_endpoint_id", 
+            "get_endpoint", 
+            "register_callback"
+         ], 
+         "methods": [
+            {
+               "name": "get_endpoint_id", 
+               "doc": {
+                  "headline": "Gets the ``Endpoint``  ``Id`` associated with this session.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.Id) - the ``Endpoint``  ``Id`` associated with\n                this session", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the ``Endpoint``  ``Id`` associated with this session\n        :rtype: ``osid.id.Id``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.Id", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_endpoint", 
+               "doc": {
+                  "headline": "Gets the ``Endpoint`` associated with this session.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.Endpoint) - the ``Endpoint`` associated\n                with this session", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the ``Endpoint`` associated with this session\n        :rtype: ``osid.transport.Endpoint``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.Endpoint", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "register_callback", 
+               "doc": {
+                  "headline": "Registers a callback to receive incoming data.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    receiver (osid.transport.MessageReceiver): a message\n                receievr\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NullArgument - ``receiver`` is ``null``\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "        :param receiver: a message receievr\n        :type receiver: ``osid.transport.MessageReceiver``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``receiver`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.MessageReceiver", 
+                     "var_name": "receiver", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.MessageReceiver"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.EndpointLookupSession", 
+         "shortname": "EndpointLookupSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "This session provides methods for retrieving ``Endpoint`` objects.", 
+            "body": "    The ``Endpoint represents`` transport destination.\n\n    This session defines two views which offer differing behaviors when\n    retrieving multiple objects.\n    \n      * comparative view: elements may be silently omitted or re-ordered\n      * plenary view: provides a complete and ordered result set or is\n        an error condition\n\n    \n    Generally, the comparative view should be used for most applications\n    as it permits operation even if there is data out of sync."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "can_lookup_endpoints", 
+            "use_comparative_endpoint_view", 
+            "use_plenary_endpoint_view", 
+            "get_endpoint", 
+            "get_endpoints_by_ids", 
+            "get_endpoints_by_genus_type", 
+            "get_endpoints_by_parent_genus_type", 
+            "get_endpoints_by_record_type", 
+            "get_endpoints_by_provider", 
+            "get_endpoints"
+         ], 
+         "methods": [
+            {
+               "name": "can_lookup_endpoints", 
+               "doc": {
+                  "headline": "Tests if this user can perform ``Endpoint`` lookups.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known all methods in this\n        session will result in a ``PermissionDenied``. This is intended\n        as a hint to an application that may opt not to offer lookup\n        operations to unauthorized users."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``false`` if lookup methods are not\n                authorized, ``true`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``false`` if lookup methods are not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "use_comparative_endpoint_view", 
+               "doc": {
+                  "headline": "The returns from the lookup methods may omit or translate elements based on this session, such as authorization, and not result in an error.", 
+                  "body": "        This view is used when greater interoperability is desired at\n        the expense of precision."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method is must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {}
+            }, 
+            {
+               "name": "use_plenary_endpoint_view", 
+               "doc": {
+                  "headline": "A complete view of the ``Endpoint`` returns is desired.", 
+                  "body": "        Methods will return what is requested or result in an error.\n        This view is used when greater precision is desired at the\n        expense of interoperability."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method is must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_endpoint", 
+               "doc": {
+                  "headline": "Gets the ``Endpoint`` specified by its ``Id``.", 
+                  "body": "        In plenary mode, the exact ``Id`` is found or a ``NotFound``\n        results. Otherwise, the returned ``Endpoint`` may have a\n        different ``Id`` than requested, such as the case where a\n        duplicate ``Id`` was assigned to a ``Endpoint`` and retained for\n        compatibility."
+               }, 
+               "arg_doc": "        arg:    endpoint_id (osid.id.Id): the ``Id`` of the ``Endpoint``\n                to retrieve\n", 
+               "return_doc": "        return: (osid.transport.Endpoint) - the ``Endpoint``", 
+               "error_doc": "        raise:  NotFound - no ``Endpoint`` found with the given ``Id``\n        raise:  NullArgument - ``Id`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param endpoint_id: the ``Id`` of the ``Endpoint`` to retrieve\n        :type endpoint_id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "        :return: the ``Endpoint``\n        :rtype: ``osid.transport.Endpoint``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- no ``Endpoint`` found with the given ``Id``\n        :raise: ``NullArgument`` -- ``Id`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "endpoint_id", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id"
+               ], 
+               "return_type": "osid.transport.Endpoint", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_endpoints_by_ids", 
+               "doc": {
+                  "headline": "Gets an ``EndpointList`` corresponding to the given ``IdList``.", 
+                  "body": "        In plenary mode, the returned list contains all of the endpoints\n        specified in the ``Id`` list, in the order of the list,\n        including duplicates, or an error results if an ``Id`` in the\n        supplied list is not found or inaccessible. Otherwise,\n        inaccessible ``Endpoint`` elements may be omitted from the list\n        and may present the elements in any order including returning a\n        unique set."
+               }, 
+               "arg_doc": "        arg:    endpoint_ids (osid.id.IdList): the list of ``Ids`` to\n                retrieve\n", 
+               "return_doc": "        return: (osid.transport.EndpointList) - the returned\n                ``Endpoint`` list", 
+               "error_doc": "        raise:  NotFound - an ``Id was`` not found\n        raise:  NullArgument - ``endpoint_ids`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param endpoint_ids: the list of ``Ids`` to retrieve\n        :type endpoint_ids: ``osid.id.IdList``\n", 
+               "sphinx_return_doc": "        :return: the returned ``Endpoint`` list\n        :rtype: ``osid.transport.EndpointList``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- an ``Id was`` not found\n        :raise: ``NullArgument`` -- ``endpoint_ids`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.IdList", 
+                     "var_name": "endpoint_ids", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.IdList"
+               ], 
+               "return_type": "osid.transport.EndpointList", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_endpoints_by_genus_type", 
+               "doc": {
+                  "headline": "Gets an ``EndpointList`` corresponding to the given endpoint genus ``Type`` which does not include endpoints of genus types derived from the specified ``Type``.", 
+                  "body": "        In plenary mode, the returned list contains all known endpoints\n        or an error results. Otherwise, the returned list may contain\n        only those endpoints that are accessible through this session."
+               }, 
+               "arg_doc": "        arg:    endpoint_genus_type (osid.type.Type): an endpoint genus\n                type\n", 
+               "return_doc": "        return: (osid.transport.EndpointList) - the returned\n                ``Endpoint`` list", 
+               "error_doc": "        raise:  NullArgument - ``endpoint_genus_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param endpoint_genus_type: an endpoint genus type\n        :type endpoint_genus_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the returned ``Endpoint`` list\n        :rtype: ``osid.transport.EndpointList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``endpoint_genus_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "endpoint_genus_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.transport.EndpointList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_endpoints_by_parent_genus_type", 
+               "doc": {
+                  "headline": "Gets an ``EndpointList`` corresponding to the given endpoint genus ``Type`` and include any additional endpoints with genus types derived from the specified ``Type``.", 
+                  "body": "        In plenary mode, the returned list contains all known endpoints\n        or an error results. Otherwise, the returned list may contain\n        only those endpoints that are accessible through this session."
+               }, 
+               "arg_doc": "        arg:    endpoints_genus_type (osid.type.Type): an endpoint genus\n                type\n", 
+               "return_doc": "        return: (osid.transport.EndpointList) - the returned\n                ``Endpoint`` list", 
+               "error_doc": "        raise:  NullArgument - ``endpoint_genus_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param endpoints_genus_type: an endpoint genus type\n        :type endpoints_genus_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the returned ``Endpoint`` list\n        :rtype: ``osid.transport.EndpointList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``endpoint_genus_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "endpoints_genus_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.transport.EndpointList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_endpoints_by_record_type", 
+               "doc": {
+                  "headline": "Gets an ``EndpointList`` containing the given endpoint record ``Type``.", 
+                  "body": "        In plenary mode, the returned list contains all known endpoints\n        or an error results. Otherwise, the returned list may contain\n        only those endpoints that are accessible through this session."
+               }, 
+               "arg_doc": "        arg:    endpoints_record_type (osid.type.Type): an endpoint\n                record type\n", 
+               "return_doc": "        return: (osid.transport.EndpointList) - the returned\n                ``Endpoint`` list", 
+               "error_doc": "        raise:  NullArgument - ``endpoint_record_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param endpoints_record_type: an endpoint record type\n        :type endpoints_record_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the returned ``Endpoint`` list\n        :rtype: ``osid.transport.EndpointList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``endpoint_record_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "endpoints_record_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.transport.EndpointList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_endpoints_by_provider", 
+               "doc": {
+                  "headline": "Gets an ``EndpointList`` containing the given endpoint record ``Type``.", 
+                  "body": "        In plenary mode, the returned list contains all known endpoints\n        or an error results. Otherwise, the returned list may contain\n        only those endpoints that are accessible through this session."
+               }, 
+               "arg_doc": "        arg:    resource_id (osid.id.Id): a resource ``Id``\n", 
+               "return_doc": "        return: (osid.transport.EndpointList) - the returned\n                ``Endpoint`` list", 
+               "error_doc": "        raise:  NullArgument - ``resource_id`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param resource_id: a resource ``Id``\n        :type resource_id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "        :return: the returned ``Endpoint`` list\n        :rtype: ``osid.transport.EndpointList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``resource_id`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "resource_id", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id"
+               ], 
+               "return_type": "osid.transport.EndpointList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_endpoints", 
+               "doc": {
+                  "headline": "Gets all ``Endpoint`` elements.", 
+                  "body": "        In plenary mode, the returned list contains all known endpoints\n        or an error results. Otherwise, the returned list may contain\n        only those endpoints that are accessible through this session."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.EndpointList) - a list of endpoints", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: a list of endpoints\n        :rtype: ``osid.transport.EndpointList``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.EndpointList", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.StreamReceiver", 
+         "shortname": "StreamReceiver", 
+         "category": "receivers", 
+         "doc": {
+            "headline": "The ``StreamReceiver`` is used to receive incoming connections.", 
+            "body": "    The receiver is provided to the service via the\n    ``InboundStreamSession`` and invoked by the transport provider when\n    a new association is created."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidReceiver"
+         ], 
+         "inherit_shortnames": [
+            "OsidReceiver"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidReceiver"
+            }
+         ], 
+         "method_names": [
+            "dispatch"
+         ], 
+         "methods": [
+            {
+               "name": "dispatch", 
+               "doc": {
+                  "headline": "Invoked by the transport provider when a new connection request or datagram is received.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    session (osid.transport.OutboundStreamSession): a\n                session to send and receive data\n", 
+               "return_doc": "", 
+               "error_doc": "", 
+               "sphinx_param_doc": "        :param session: a session to send and receive data\n        :type session: ``osid.transport.OutboundStreamSession``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.OutboundStreamSession", 
+                     "var_name": "session", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.OutboundStreamSession"
+               ], 
+               "return_type": "", 
+               "errors": {}
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.MessageReceiver", 
+         "shortname": "MessageReceiver", 
+         "category": "receivers", 
+         "doc": {
+            "headline": "The ``MessageReceiver`` is used to receive incoming connections.", 
+            "body": "    The receiver is provided to the service via the\n    ``InboundMessageSession`` and invoked by the transport provider when\n    a new association is created."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidReceiver"
+         ], 
+         "inherit_shortnames": [
+            "OsidReceiver"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidReceiver"
+            }
+         ], 
+         "method_names": [
+            "dispatch"
+         ], 
+         "methods": [
+            {
+               "name": "dispatch", 
+               "doc": {
+                  "headline": "Invoked by the transport provider when a new connection request or datagram is received.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    session (osid.transport.OutboundMessageSession): a\n                session to send and receive messages\n", 
+               "return_doc": "", 
+               "error_doc": "", 
+               "sphinx_param_doc": "        :param session: a session to send and receive messages\n        :type session: ``osid.transport.OutboundMessageSession``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.OutboundMessageSession", 
+                     "var_name": "session", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.OutboundMessageSession"
+               ], 
+               "return_type": "", 
+               "errors": {}
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.Endpoint", 
+         "shortname": "Endpoint", 
+         "category": "objects", 
+         "doc": {
+            "headline": "An ``Endpoint`` represents a transport destination.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidCatalog"
+         ], 
+         "inherit_shortnames": [
+            "OsidCatalog"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidCatalog"
+            }
+         ], 
+         "method_names": [
+            "get_endpoint_record"
+         ], 
+         "methods": [
+            {
+               "name": "get_endpoint_record", 
+               "doc": {
+                  "headline": "Gets the endpoint record corresponding to the given ``Endpoint`` record ``Type``.", 
+                  "body": "        This method is used to retrieve an object implementing the\n        requested record."
+               }, 
+               "arg_doc": "        arg:    endpoint_record_type (osid.type.Type): an endpoint\n                record type\n", 
+               "return_doc": "        return: (osid.transport.records.EndpointRecord) - the endpoint\n                record", 
+               "error_doc": "        raise:  NullArgument - ``endpoint_record_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unsupported - ``has_record_type(endpoint_record_type)``\n                is ``false``", 
+               "sphinx_param_doc": "        :param endpoint_record_type: an endpoint record type\n        :type endpoint_record_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the endpoint record\n        :rtype: ``osid.transport.records.EndpointRecord``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``endpoint_record_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unsupported`` -- ``has_record_type(endpoint_record_type)`` is ``false``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "endpoint_record_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.transport.records.EndpointRecord", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNSUPPORTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.records.EndpointRecord", 
+         "shortname": "EndpointRecord", 
+         "category": "records", 
+         "doc": {
+            "headline": "A record for an ``Endpoint``.", 
+            "body": "    The methods specified by the record type are available through the\n    underlying object."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidRecord"
+         ], 
+         "inherit_shortnames": [
+            "OsidRecord"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidRecord"
+            }
+         ], 
+         "method_names": [], 
+         "methods": []
+      }, 
+      {
+         "fullname": "osid.transport.EndpointList", 
+         "shortname": "EndpointList", 
+         "category": "objects", 
+         "doc": {
+            "headline": "Like all ``OsidLists,``  ``EndpointList`` provides a means for accessing ``Endpoint`` elements sequentially either one at a time or many at a time.", 
+            "body": "    Examples: while (el.hasNext()) { Endpoint endpoint =\n    el.getNextEndpoint(); }\n\n    or\n      while (el.hasNext()) {\n           Endpoint[] endpoints = el.getNextEndpoints(el.available());\n      }\n    \n"
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidList"
+         ], 
+         "inherit_shortnames": [
+            "OsidList"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidList"
+            }
+         ], 
+         "method_names": [
+            "get_next_endpoint", 
+            "get_next_endpoints"
+         ], 
+         "methods": [
+            {
+               "name": "get_next_endpoint", 
+               "doc": {
+                  "headline": "Gets the next ``Endpoint`` in this list.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.transport.Endpoint) - the next ``Endpoint`` in\n                this list. The ``has_next()`` method should be used to\n                test that a next ``Endpoint`` is available before\n                calling this method.", 
+               "error_doc": "        raise:  IllegalState - no more elements available in this list\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the next ``Endpoint`` in this list. The ``has_next()`` method should be used to test that a next ``Endpoint`` is available before calling this method.\n        :rtype: ``osid.transport.Endpoint``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- no more elements available in this list\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.transport.Endpoint", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }, 
+            {
+               "name": "get_next_endpoints", 
+               "doc": {
+                  "headline": "Gets the next set of ``Endpoint`` objects in this lis which must be less than or equal to whst is returned from ``available()``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    n (cardinal): the number of ``Endpoint`` elements\n                requested which should be less than or equal to\n                ``available()``\n", 
+               "return_doc": "        return: (osid.transport.Endpoint) - an array of ``Endpoint``\n                elements.The length of the array is less than or equal\n                to the number specified.", 
+               "error_doc": "        raise:  IllegalState - no more elements available in this list\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "        :param n: the number of ``Endpoint`` elements requested which should be less than or equal to ``available()``\n        :type n: ``cardinal``\n", 
+               "sphinx_return_doc": "        :return: an array of ``Endpoint`` elements.The length of the array is less than or equal to the number specified.\n        :rtype: ``osid.transport.Endpoint``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- no more elements available in this list\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "cardinal", 
+                     "var_name": "n", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "cardinal"
+               ], 
+               "return_type": "osid.transport.Endpoint", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.Request", 
+         "shortname": "Request", 
+         "category": "objects", 
+         "doc": {
+            "headline": "A ``Request`` represents a stuctured request to a service endpoint.", 
+            "body": "    The record types supported may vary on a request by request basis as\n    defined in the underlying protocol."
+         }, 
+         "inherit_fullnames": [
+            "osid.Suppliable", 
+            "osid.Extensible"
+         ], 
+         "inherit_shortnames": [
+            "Suppliable", 
+            "Extensible"
+         ], 
+         "inherit_pkg_names": [
+            "osid", 
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "Suppliable"
+            }, 
+            {
+               "pkg_name": "osid", 
+               "name": "Extensible"
+            }
+         ], 
+         "method_names": [
+            "set_id", 
+            "get_request_record"
+         ], 
+         "methods": [
+            {
+               "name": "set_id", 
+               "doc": {
+                  "headline": "Sets an identifier for this request.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    id (osid.id.Id): an identifier\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NullArgument - ``id`` is ``null``", 
+               "sphinx_param_doc": "        :param id: an identifier\n        :type id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``id`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "id_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_request_record", 
+               "doc": {
+                  "headline": "Gets the request record.", 
+                  "body": "        This method is used to retrieve an object implementing the\n        requested message."
+               }, 
+               "arg_doc": "        arg:    request_record_type (osid.type.Type): a request record\n                type\n", 
+               "return_doc": "        return: (osid.transport.records.RequestRecord) - the request\n                record", 
+               "error_doc": "        raise:  NullArgument - ``request_record_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unsupported - ``has_record_type(request_type)`` is\n                ``false``", 
+               "sphinx_param_doc": "        :param request_record_type: a request record type\n        :type request_record_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the request record\n        :rtype: ``osid.transport.records.RequestRecord``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``request_record_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unsupported`` -- ``has_record_type(request_type)`` is ``false``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "request_record_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.transport.records.RequestRecord", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNSUPPORTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.records.RequestRecord", 
+         "shortname": "RequestRecord", 
+         "category": "records", 
+         "doc": {
+            "headline": "A record for a ``Request``.", 
+            "body": "    The methods specified by the record type are available through the\n    underlying object."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidRecord"
+         ], 
+         "inherit_shortnames": [
+            "OsidRecord"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidRecord"
+            }
+         ], 
+         "method_names": [], 
+         "methods": []
+      }, 
+      {
+         "fullname": "osid.transport.Response", 
+         "shortname": "Response", 
+         "category": "objects", 
+         "doc": {
+            "headline": "A ``Response`` represents a stuctured response from a service endpoint.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidObject"
+         ], 
+         "inherit_shortnames": [
+            "OsidObject"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidObject"
+            }
+         ], 
+         "method_names": [
+            "ok", 
+            "get_status_message", 
+            "get_response_record"
+         ], 
+         "methods": [
+            {
+               "name": "ok", 
+               "doc": {
+                  "headline": "Tests if the request was successful.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if the request was successful,\n                ``false`` otherrwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if the request was successful, ``false`` otherrwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_status_message", 
+               "doc": {
+                  "headline": "Gets a status message.", 
+                  "body": "        The returned string may be empty or may contain an error message\n        is an error occurred."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.locale.DisplayText) - an error message", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: an error message\n        :rtype: ``osid.locale.DisplayText``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.locale.DisplayText", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_response_record", 
+               "doc": {
+                  "headline": "Gets the response record.", 
+                  "body": "        This method is used to retrieve an object implementing the\n        requested message."
+               }, 
+               "arg_doc": "        arg:    response_record_type (osid.type.Type): a response record\n                type\n", 
+               "return_doc": "        return: (osid.transport.records.ResponseRecord) - the response\n                record", 
+               "error_doc": "        raise:  NullArgument - ``response_message_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unsupported - ``has_record_type(response_record_type)``\n                is ``false``", 
+               "sphinx_param_doc": "        :param response_record_type: a response record type\n        :type response_record_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the response record\n        :rtype: ``osid.transport.records.ResponseRecord``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``response_message_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unsupported`` -- ``has_record_type(response_record_type)`` is ``false``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "response_record_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.transport.records.ResponseRecord", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNSUPPORTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.records.ResponseRecord", 
+         "shortname": "ResponseRecord", 
+         "category": "records", 
+         "doc": {
+            "headline": "A record for a ``Response``.", 
+            "body": "    The methods specified by the record type are available through the\n    underlying object."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidRecord"
+         ], 
+         "inherit_shortnames": [
+            "OsidRecord"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidRecord"
+            }
+         ], 
+         "method_names": [], 
+         "methods": []
+      }, 
+      {
+         "fullname": "osid.transport.DataInputStream", 
+         "shortname": "DataInputStream", 
+         "category": "objects", 
+         "doc": {
+            "headline": "The data input stream provides a means for reading data from a stream.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [], 
+         "inherit_shortnames": [], 
+         "inherit_pkg_names": [], 
+         "inheritance": [], 
+         "method_names": [
+            "at_end_of_stream", 
+            "available", 
+            "skip", 
+            "read", 
+            "close"
+         ], 
+         "methods": [
+            {
+               "name": "at_end_of_stream", 
+               "doc": {
+                  "headline": "Tests if the end of this stream has been reached.", 
+                  "body": "        This may not be a permanent condition as more data may be\n        available at a later time as in the case of tailing a file."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if the end of this stream has been\n                reached, ``false`` otherwise", 
+               "error_doc": "        raise:  IllegalState - this stream has been closed", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if the end of this stream has been reached, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- this stream has been closed", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "available", 
+               "doc": {
+                  "headline": "Gets the number of ``bytes`` available for retrieval.", 
+                  "body": "        The number returned by this method may be less than or equal to\n        the total number of ``bytes`` in this stream."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (cardinal) - the number of ``bytes`` available for\n                retrieval", 
+               "error_doc": "        raise:  IllegalState - this stream has been closed", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the number of ``bytes`` available for retrieval\n        :rtype: ``cardinal``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- this stream has been closed", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "cardinal", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "skip", 
+               "doc": {
+                  "headline": "Skips a specified number of ``bytes`` in the stream.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    n (cardinal): the number of ``bytes`` to skip\n", 
+               "return_doc": "        return: (cardinal) - the actual number of ``bytes`` skipped", 
+               "error_doc": "        raise:  IllegalState - this stream has been closed or\n                ``at_end_of_stream()`` is ``true``", 
+               "sphinx_param_doc": "        :param n: the number of ``bytes`` to skip\n        :type n: ``cardinal``\n", 
+               "sphinx_return_doc": "        :return: the actual number of ``bytes`` skipped\n        :rtype: ``cardinal``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- this stream has been closed or ``at_end_of_stream()`` is ``true``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "cardinal", 
+                     "var_name": "n", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "cardinal"
+               ], 
+               "return_type": "cardinal", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "read", 
+               "doc": {
+                  "headline": "Reads a specified number of ``bytes`` from this stream.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    buf (byte[]): the buffer in which the data is read\n        arg:    n (cardinal): the number of ``bytes`` to read\n", 
+               "return_doc": "        return: (integer) - the actual number of ``bytes`` read", 
+               "error_doc": "        raise:  IllegalState - this stream has been closed or\n                ``at_end_of_stream()`` is ``true``\n        raise:  InvalidArgument - the size of ``buf`` is less than ``n``\n        raise:  NullArgument - ``buf`` is ``null``\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "        :param buf: the buffer in which the data is read\n        :type buf: ``byte[]``\n        :param n: the number of ``bytes`` to read\n        :type n: ``cardinal``\n", 
+               "sphinx_return_doc": "        :return: the actual number of ``bytes`` read\n        :rtype: ``integer``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- this stream has been closed or ``at_end_of_stream()`` is ``true``\n        :raise: ``InvalidArgument`` -- the size of ``buf`` is less than ``n``\n        :raise: ``NullArgument`` -- ``buf`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "byte[]", 
+                     "var_name": "buf", 
+                     "array": true
+                  }, 
+                  {
+                     "arg_type": "cardinal", 
+                     "var_name": "n", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "byte[]", 
+                  "cardinal"
+               ], 
+               "return_type": "integer", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }, 
+            {
+               "name": "close", 
+               "doc": {
+                  "headline": "Closes this stream and frees up any allocated resources.", 
+                  "body": "        Methods in this object may not be invoked after this method is\n        called."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  IllegalState - this stream has been closed", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- this stream has been closed", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.transport.DataOutputStream", 
+         "shortname": "DataOutputStream", 
+         "category": "objects", 
+         "doc": {
+            "headline": "The data output stream provides a means in which data can be written to a stream.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [], 
+         "inherit_shortnames": [], 
+         "inherit_pkg_names": [], 
+         "inheritance": [], 
+         "method_names": [
+            "write", 
+            "write_stream", 
+            "close"
+         ], 
+         "methods": [
+            {
+               "name": "write", 
+               "doc": {
+                  "headline": "Writes ``n`` bytes to this stream.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    buf (byte[]): the buffer containing the data to write\n        arg:    n (cardinal): the number of ``bytes`` to write\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  IllegalState - this stream has been closed\n        raise:  InvalidArgument - ``buf`` does not contain ``n bytes``\n        raise:  NullArgument - ``buf`` is ``null``\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "        :param buf: the buffer containing the data to write\n        :type buf: ``byte[]``\n        :param n: the number of ``bytes`` to write\n        :type n: ``cardinal``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- this stream has been closed\n        :raise: ``InvalidArgument`` -- ``buf`` does not contain ``n bytes``\n        :raise: ``NullArgument`` -- ``buf`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "byte[]", 
+                     "var_name": "buf", 
+                     "array": true
+                  }, 
+                  {
+                     "arg_type": "cardinal", 
+                     "var_name": "n", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "byte[]", 
+                  "cardinal"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }, 
+            {
+               "name": "write_stream", 
+               "doc": {
+                  "headline": "Writes a stream to this stream.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    stream (osid.transport.DataInputStream): an input stream\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  IllegalState - this stream has been closed\n        raise:  NullArgument - ``stream`` is ``null``\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "        :param stream: an input stream\n        :type stream: ``osid.transport.DataInputStream``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- this stream has been closed\n        :raise: ``NullArgument`` -- ``stream`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.transport.DataInputStream", 
+                     "var_name": "stream", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.transport.DataInputStream"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }, 
+            {
+               "name": "close", 
+               "doc": {
+                  "headline": "Flushes the output, closes this stream and frees up any allocated resources.", 
+                  "body": "        Methods in this object may not be invoked after this method is\n        called."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  IllegalState - this stream has been closed", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- this stream has been closed", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract"
+               }
+            }
+         ]
+      }
+   ], 
+   "full_name": "osid.transport"
+}

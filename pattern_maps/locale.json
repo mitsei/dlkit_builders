@@ -1,0 +1,2684 @@
+{
+   "impl_log": {
+      "managers": {
+         "LocaleProfile": {
+            "supports_currency_types_for_formatting": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_spatial_unit_conversion": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_format_conversion": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_source_coordinate_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_language_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_calendar_formatting": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_source_calendar_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_unit_types_for_conversion": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_calendar_types_for_formatting": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_calendar_info": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_date_format_types_for_calendar_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_currency_types_for_formatting": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_language_types_for_translation": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_currency_types_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_visible_federation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_types_for_formatting": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_calendar_time_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_coordinate_formatting": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_types_for_time_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_types_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_time_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_spatial_unit_record_types_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_currency_format_types_for_currency_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_format_types_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_spatial_unit_record_types_for_conversion": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_time_types_for_conversion": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_numeric_format_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_format_types_for_conversion": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_types_for_formatting": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_calendar_conversion": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_source_currency_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_format_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_types_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_numeric_format_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_unit_types_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_time_types_for_formatting": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_coordinate_types_for_formatting": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_numeric_formatting": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_format_types_for_coordinate_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_currency_conversion": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_calendar_types_for_conversion": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_translation_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_language_types_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_translation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_time_types_for_calendar_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_currency_types_for_conversion": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_script_types_for_language_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_spatial_unit_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_currency_formatting": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_source_unit_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_time_format_types_for_time_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_coordinate_conversion": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_unit_conversion": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_coordinate_types_for_conversion": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_time_types_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LocaleManager": {
+            "get_unit_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_spatial_unit_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_translation_admin_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_currency_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_numeric_formatting_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_currency_formatting_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_numeric_formatting_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_info_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_currency_formatting_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_formatting_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_formatting_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_translation_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_format_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_info_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_translation_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_formatting_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_translation_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_spatial_unit_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_currency_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_formatting_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_format_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "LocaleProxyManager": {
+            "get_unit_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_spatial_unit_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_translation_admin_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_currency_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_numeric_formatting_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_currency_formatting_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_numeric_formatting_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_info_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_currency_formatting_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_formatting_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_formatting_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_translation_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_format_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_info_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_translation_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_formatting_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_translation_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_spatial_unit_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_currency_conversion_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_formatting_session_for_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_format_conversion_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }, 
+      "sessions": {
+         "TranslationSession": {
+            "can_translate": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_translation": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_target_language_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_target_script_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_language_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "translate_string": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "translate_strings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_script_type": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "TranslationAdminSession": {
+            "can_update_translation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "add_translation": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_target_language_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "remove_translation": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_target_script_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_language_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_script_type": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "NumericFormattingSession": {
+            "cardinals_to_strings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_format_numbers": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_numeric_format_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "integer_to_string": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "decimal_to_string": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "cardinal_to_string": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "string_to_cardinal": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "decimals_to_strings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "integers_to_strings": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "CalendarFormattingSession": {
+            "times_to_strings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "string_to_time": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_time_format_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "string_to_duration": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "durations_to_strings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "time_to_string": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "string_to_date_time": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_display_primitives": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "duration_to_string": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_date_format_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "datetimes_to_strings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_time_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "datetime_to_string": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "CurrencyFormattingSession": {
+            "string_to_currency": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_currency_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "currency_to_string": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "currencies_to_strings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_numeric_format_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_format_currencies": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "CoordinateFormattingSession": {
+            "can_format_coordinates": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "coordinate_to_string": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "ccoordinates_to_strings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_format_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_coordinate_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "string_to_coordinate": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "UnitConversionSession": {
+            "convert_units": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "convert_unit": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_convert_units": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "CurrencyConversionSession": {
+            "can_convert_currency": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "convert_currency": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "convert_currencies": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_currency_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_target_currency_type": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "CalendarConversionSession": {
+            "get_target_time_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "convert_calendars": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_target_calendar_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "convert_calendar": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_convert_calendars": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_calendar_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_time_type": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "CoordinateConversionSession": {
+            "convert_coordinate": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_coordinate_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_target_coordinate_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "convert_coordinates": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_convert_coordinates": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "SpatialUnitConversionSession": {
+            "convert_spatial_unit": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_convert_spatial_units": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_target_spatial_unit_record_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_spatial_unit_record_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "convert_spatial_units": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "FormatConversionSession": {
+            "can_convert_formats": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "convert_formats": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_target_format_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "convert_format": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_source_format_type": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "CalendarInfoSession": {
+            "get_calendar_info": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_time_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_examine_calendars": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_calendar_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_time_info": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }
+      }
+   }, 
+   "package_objects_caps": [], 
+   "package_objects_under": [], 
+   "package_cataloged_objects_caps": [], 
+   "package_cataloged_objects_under": [], 
+   "package_objects_under_to_caps": {}, 
+   "package_relationships_caps": [], 
+   "package_relationships_under": [], 
+   "package_rules_caps": [], 
+   "package_rules_under": [], 
+   "package_catalog_caps": "NoCatalog", 
+   "package_catalog_under": "no_catalog", 
+   "package_relationships_detail": {}, 
+   "TranslationAdminSession.instance_data": {}, 
+   "LocaleProfile.init_pattern": "resource.ResourceProfile", 
+   "LocaleProfile.supports_visible_federation": {
+      "pattern": "resource.ResourceProfile.supports_visible_federation", 
+      "kwargs": {
+         "method_name": "supports_visible_federation", 
+         "module_name": "managers", 
+         "var_name": "supports_visible_federation", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_translation": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_translation", 
+         "module_name": "managers", 
+         "var_name": "supports_translation", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_translation_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_translation_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_translation_admin", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_numeric_formatting": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_numeric_formatting", 
+         "module_name": "managers", 
+         "var_name": "supports_numeric_formatting", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_calendar_formatting": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_calendar_formatting", 
+         "module_name": "managers", 
+         "var_name": "supports_calendar_formatting", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_currency_formatting": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_currency_formatting", 
+         "module_name": "managers", 
+         "var_name": "supports_currency_formatting", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_coordinate_formatting": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_coordinate_formatting", 
+         "module_name": "managers", 
+         "var_name": "supports_coordinate_formatting", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_unit_conversion": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_unit_conversion", 
+         "module_name": "managers", 
+         "var_name": "supports_unit_conversion", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_currency_conversion": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_currency_conversion", 
+         "module_name": "managers", 
+         "var_name": "supports_currency_conversion", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_calendar_conversion": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_calendar_conversion", 
+         "module_name": "managers", 
+         "var_name": "supports_calendar_conversion", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_coordinate_conversion": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_coordinate_conversion", 
+         "module_name": "managers", 
+         "var_name": "supports_coordinate_conversion", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_spatial_unit_conversion": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_spatial_unit_conversion", 
+         "module_name": "managers", 
+         "var_name": "supports_spatial_unit_conversion", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_format_conversion": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_format_conversion", 
+         "module_name": "managers", 
+         "var_name": "supports_format_conversion", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_calendar_info": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_calendar_info", 
+         "module_name": "managers", 
+         "var_name": "supports_calendar_info", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_language_types_for_translation": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_language_types_for_translation", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_language_types_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_language_types_for_source", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_source_language_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_language_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_script_types_for_language_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_script_types_for_language_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_numeric_format_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_numeric_format_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_numeric_format_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_numeric_format_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_calendar_types_for_formatting": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_calendar_types_for_formatting", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_calendar_types_for_formatting": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_types_for_formatting", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_date_format_types_for_calendar_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_date_format_types_for_calendar_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_time_types_for_formatting": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_time_types_for_formatting", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_time_format_types_for_time_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_time_format_types_for_time_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_currency_types_for_formatting": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_currency_types_for_formatting", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_currency_types_for_formatting": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_currency_types_for_formatting", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_currency_format_types_for_currency_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_currency_format_types_for_currency_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_coordinate_types_for_formatting": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_coordinate_types_for_formatting", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_coordinate_types_for_formatting": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_coordinate_types_for_formatting", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_coordinate_format_types_for_coordinate_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_coordinate_format_types_for_coordinate_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_unit_types_for_conversion": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_unit_types_for_conversion", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_unit_types_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_unit_types_for_source", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_source_unit_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_unit_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_currency_types_for_conversion": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_currency_types_for_conversion", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_currency_types_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_currency_types_for_source", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_source_currency_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_currency_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_calendar_types_for_conversion": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_calendar_types_for_conversion", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_calendar_types_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_types_for_source", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_source_calendar_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_calendar_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_time_types_for_conversion": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_time_types_for_conversion", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_time_types_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_time_types_for_source", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_source_time_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_time_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_time_types_for_calendar_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_time_types_for_calendar_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_calendar_types_for_time_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_types_for_time_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_calendar_time_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_calendar_time_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_coordinate_types_for_conversion": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_coordinate_types_for_conversion", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_coordinate_types_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_coordinate_types_for_source", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_source_coordinate_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_coordinate_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.supports_spatial_unit_record_types_for_conversion": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_spatial_unit_record_types_for_conversion", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_spatial_unit_record_types_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_spatial_unit_record_types_for_source", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_source_spatial_unit_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_source_spatial_unit_record_types", 
+         "var_name": "source_spatial_unit_record_types", 
+         "package_name": "locale", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "object_name_under": "source_spatial_unit"
+      }
+   }, 
+   "LocaleProfile.supports_format_types_for_conversion": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_format_types_for_conversion", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_format_types_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_format_types_for_source", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProfile.get_source_format_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_format_types", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProfile", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.init_pattern": "resource.ResourceManager", 
+   "LocaleManager.get_translation_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.TranslationSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "translation", 
+         "method_name": "get_translation_session", 
+         "var_name": "translation_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_translation_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_translation_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_translation_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.TranslationAdminSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "translation_admin", 
+         "method_name": "get_translation_admin_session", 
+         "var_name": "translation_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_translation_admin_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_translation_admin_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_numeric_formatting_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.NumericFormattingSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "numeric_formatting", 
+         "method_name": "get_numeric_formatting_session", 
+         "var_name": "numeric_formatting_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_numeric_formatting_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_numeric_formatting_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_calendar_formatting_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CalendarFormattingSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "calendar_formatting", 
+         "method_name": "get_calendar_formatting_session", 
+         "var_name": "calendar_formatting_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_calendar_formatting_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_formatting_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_currency_formatting_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CurrencyFormattingSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "currency_formatting", 
+         "method_name": "get_currency_formatting_session", 
+         "var_name": "currency_formatting_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_currency_formatting_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_currency_formatting_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_coordinate_formatting_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CoordinateFormattingSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "coordinate_formatting", 
+         "method_name": "get_coordinate_formatting_session", 
+         "var_name": "coordinate_formatting_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_coordinate_formatting_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_coordinate_formatting_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_unit_conversion_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.UnitConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "unit_conversion", 
+         "method_name": "get_unit_conversion_session", 
+         "var_name": "unit_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_currency_conversion_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CurrencyConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "currency_conversion", 
+         "method_name": "get_currency_conversion_session", 
+         "var_name": "currency_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_currency_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_currency_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_calendar_conversion_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CalendarConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "calendar_conversion", 
+         "method_name": "get_calendar_conversion_session", 
+         "var_name": "calendar_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_calendar_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_coordinate_conversion_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CoordinateConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "coordinate_conversion", 
+         "method_name": "get_coordinate_conversion_session", 
+         "var_name": "coordinate_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_coordinate_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_coordinate_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_spatial_unit_conversion_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.SpatialUnitConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "spatial_unit_conversion", 
+         "method_name": "get_spatial_unit_conversion_session", 
+         "var_name": "spatial_unit_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_spatial_unit_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_spatial_unit_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_format_conversion_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.FormatConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "format_conversion", 
+         "method_name": "get_format_conversion_session", 
+         "var_name": "format_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_format_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_format_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleManager.get_calendar_info_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CalendarInfoSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "support_check": "calendar_info", 
+         "method_name": "get_calendar_info_session", 
+         "var_name": "calendar_info_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager"
+      }
+   }, 
+   "LocaleManager.get_calendar_info_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_info_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.init_pattern": "resource.ResourceProxyManager", 
+   "LocaleProxyManager.get_translation_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.TranslationSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "translation", 
+         "method_name": "get_translation_session", 
+         "var_name": "translation_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_translation_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_translation_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_translation_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.TranslationAdminSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "translation_admin", 
+         "method_name": "get_translation_admin_session", 
+         "var_name": "translation_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_translation_admin_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_translation_admin_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_numeric_formatting_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.NumericFormattingSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "numeric_formatting", 
+         "method_name": "get_numeric_formatting_session", 
+         "var_name": "numeric_formatting_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_numeric_formatting_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_numeric_formatting_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_calendar_formatting_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CalendarFormattingSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "calendar_formatting", 
+         "method_name": "get_calendar_formatting_session", 
+         "var_name": "calendar_formatting_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_calendar_formatting_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_formatting_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_currency_formatting_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CurrencyFormattingSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "currency_formatting", 
+         "method_name": "get_currency_formatting_session", 
+         "var_name": "currency_formatting_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_currency_formatting_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_currency_formatting_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_coordinate_formatting_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CoordinateFormattingSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "coordinate_formatting", 
+         "method_name": "get_coordinate_formatting_session", 
+         "var_name": "coordinate_formatting_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_coordinate_formatting_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_coordinate_formatting_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_unit_conversion_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.UnitConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "unit_conversion", 
+         "method_name": "get_unit_conversion_session", 
+         "var_name": "unit_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_currency_conversion_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CurrencyConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "currency_conversion", 
+         "method_name": "get_currency_conversion_session", 
+         "var_name": "currency_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_currency_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_currency_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_calendar_conversion_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CalendarConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "calendar_conversion", 
+         "method_name": "get_calendar_conversion_session", 
+         "var_name": "calendar_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_calendar_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_coordinate_conversion_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CoordinateConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "coordinate_conversion", 
+         "method_name": "get_coordinate_conversion_session", 
+         "var_name": "coordinate_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_coordinate_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_coordinate_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_spatial_unit_conversion_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.SpatialUnitConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "spatial_unit_conversion", 
+         "method_name": "get_spatial_unit_conversion_session", 
+         "var_name": "spatial_unit_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_spatial_unit_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_spatial_unit_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_format_conversion_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.FormatConversionSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "format_conversion", 
+         "method_name": "get_format_conversion_session", 
+         "var_name": "format_conversion_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_format_conversion_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_format_conversion_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleProxyManager.get_calendar_info_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.locale.CalendarInfoSession", 
+         "cat_name": "NoCatalog", 
+         "package_name": "locale", 
+         "arg0_name": "proxy", 
+         "support_check": "calendar_info", 
+         "method_name": "get_calendar_info_session", 
+         "var_name": "calendar_info_session", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager"
+      }
+   }, 
+   "LocaleProxyManager.get_calendar_info_session_for_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_info_session_for_type", 
+         "module_name": "managers", 
+         "interface_name": "LocaleProxyManager", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationSession.get_source_language_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_language_type", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationSession.get_source_script_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_script_type", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationSession.get_target_language_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_language_type", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationSession.get_target_script_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_script_type", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationSession.can_translate": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_translate", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationSession.get_translation": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_translation", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationSession.translate_string": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "translate_string", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationSession.translate_strings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "translate_strings", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationAdminSession.get_source_language_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_language_type", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationAdminSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationAdminSession.get_source_script_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_script_type", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationAdminSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationAdminSession.get_target_language_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_language_type", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationAdminSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationAdminSession.get_target_script_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_script_type", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationAdminSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationAdminSession.can_update_translation": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_translation", 
+         "object_name": "Translation", 
+         "var_name": "can_update_translation", 
+         "package_name": "locale", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationAdminSession"
+      }
+   }, 
+   "TranslationAdminSession.add_translation": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "add_translation", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationAdminSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "TranslationAdminSession.remove_translation": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "remove_translation", 
+         "module_name": "sessions", 
+         "interface_name": "TranslationAdminSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "NumericFormattingSession.get_numeric_format_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_numeric_format_type", 
+         "module_name": "sessions", 
+         "interface_name": "NumericFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "NumericFormattingSession.can_format_numbers": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_format_numbers", 
+         "module_name": "sessions", 
+         "interface_name": "NumericFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "NumericFormattingSession.cardinal_to_string": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "cardinal_to_string", 
+         "module_name": "sessions", 
+         "interface_name": "NumericFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "NumericFormattingSession.cardinals_to_strings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "cardinals_to_strings", 
+         "module_name": "sessions", 
+         "interface_name": "NumericFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "NumericFormattingSession.string_to_cardinal": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "string_to_cardinal", 
+         "module_name": "sessions", 
+         "interface_name": "NumericFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "NumericFormattingSession.decimal_to_string": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "decimal_to_string", 
+         "module_name": "sessions", 
+         "interface_name": "NumericFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "NumericFormattingSession.decimals_to_strings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "decimals_to_strings", 
+         "module_name": "sessions", 
+         "interface_name": "NumericFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "NumericFormattingSession.integer_to_string": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "integer_to_string", 
+         "module_name": "sessions", 
+         "interface_name": "NumericFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "NumericFormattingSession.integers_to_strings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "integers_to_strings", 
+         "module_name": "sessions", 
+         "interface_name": "NumericFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.get_calendar_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.get_time_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_time_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.get_date_format_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_date_format_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.get_time_format_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_time_format_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.can_display_primitives": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_display_primitives", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.datetime_to_string": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "datetime_to_string", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.datetimes_to_strings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "datetimes_to_strings", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.string_to_date_time": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "string_to_date_time", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.time_to_string": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "time_to_string", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.times_to_strings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "times_to_strings", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.string_to_time": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "string_to_time", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.duration_to_string": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "duration_to_string", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.durations_to_strings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "durations_to_strings", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarFormattingSession.string_to_duration": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "string_to_duration", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyFormattingSession.get_currency_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_currency_type", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyFormattingSession.get_numeric_format_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_numeric_format_type", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyFormattingSession.can_format_currencies": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_format_currencies", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyFormattingSession.currency_to_string": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "currency_to_string", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyFormattingSession.currencies_to_strings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "currencies_to_strings", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyFormattingSession.string_to_currency": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "string_to_currency", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateFormattingSession.get_coordinate_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_coordinate_type", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateFormattingSession.get_coordinate_format_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_coordinate_format_type", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateFormattingSession.can_format_coordinates": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_format_coordinates", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateFormattingSession.coordinate_to_string": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "coordinate_to_string", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateFormattingSession.ccoordinates_to_strings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "ccoordinates_to_strings", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateFormattingSession.string_to_coordinate": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "string_to_coordinate", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateFormattingSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "UnitConversionSession.can_convert_units": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_convert_units", 
+         "module_name": "sessions", 
+         "interface_name": "UnitConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "UnitConversionSession.convert_unit": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_unit", 
+         "module_name": "sessions", 
+         "interface_name": "UnitConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "UnitConversionSession.convert_units": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_units", 
+         "module_name": "sessions", 
+         "interface_name": "UnitConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyConversionSession.get_source_currency_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_currency_type", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyConversionSession.get_target_currency_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_currency_type", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyConversionSession.can_convert_currency": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_convert_currency", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyConversionSession.convert_currency": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_currency", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CurrencyConversionSession.convert_currencies": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_currencies", 
+         "module_name": "sessions", 
+         "interface_name": "CurrencyConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarConversionSession.get_source_calendar_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_calendar_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarConversionSession.get_source_time_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_time_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarConversionSession.get_target_calendar_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_calendar_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarConversionSession.get_target_time_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_time_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarConversionSession.can_convert_calendars": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_convert_calendars", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarConversionSession.convert_calendar": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_calendar", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarConversionSession.convert_calendars": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_calendars", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateConversionSession.get_source_coordinate_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_coordinate_type", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateConversionSession.get_target_coordinate_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_coordinate_type", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateConversionSession.can_convert_coordinates": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_convert_coordinates", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateConversionSession.convert_coordinate": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_coordinate", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CoordinateConversionSession.convert_coordinates": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_coordinates", 
+         "module_name": "sessions", 
+         "interface_name": "CoordinateConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "SpatialUnitConversionSession.get_source_spatial_unit_record_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_spatial_unit_record_type", 
+         "module_name": "sessions", 
+         "interface_name": "SpatialUnitConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "SpatialUnitConversionSession.get_target_spatial_unit_record_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_spatial_unit_record_type", 
+         "module_name": "sessions", 
+         "interface_name": "SpatialUnitConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "SpatialUnitConversionSession.can_convert_spatial_units": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_convert_spatial_units", 
+         "module_name": "sessions", 
+         "interface_name": "SpatialUnitConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "SpatialUnitConversionSession.convert_spatial_unit": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_spatial_unit", 
+         "module_name": "sessions", 
+         "interface_name": "SpatialUnitConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "SpatialUnitConversionSession.convert_spatial_units": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_spatial_units", 
+         "module_name": "sessions", 
+         "interface_name": "SpatialUnitConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "FormatConversionSession.get_source_format_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_source_format_type", 
+         "module_name": "sessions", 
+         "interface_name": "FormatConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "FormatConversionSession.get_target_format_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_target_format_type", 
+         "module_name": "sessions", 
+         "interface_name": "FormatConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "FormatConversionSession.can_convert_formats": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_convert_formats", 
+         "module_name": "sessions", 
+         "interface_name": "FormatConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "FormatConversionSession.convert_format": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_format", 
+         "module_name": "sessions", 
+         "interface_name": "FormatConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "FormatConversionSession.convert_formats": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "convert_formats", 
+         "module_name": "sessions", 
+         "interface_name": "FormatConversionSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarInfoSession.get_calendar_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarInfoSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarInfoSession.get_time_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_time_type", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarInfoSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarInfoSession.can_examine_calendars": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_examine_calendars", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarInfoSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarInfoSession.get_calendar_info": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_calendar_info", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarInfoSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "CalendarInfoSession.get_time_info": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_time_info", 
+         "module_name": "sessions", 
+         "interface_name": "CalendarInfoSession", 
+         "package_name": "locale"
+      }
+   }, 
+   "LocaleList.get_next_locale": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_locale", 
+         "return_type_full": "osid.locale.Locale", 
+         "package_name": "locale", 
+         "module_name": "objects", 
+         "var_name": "locale", 
+         "interface_name": "LocaleList"
+      }
+   }, 
+   "LocaleList.get_next_locales": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_locales", 
+         "return_type_full": "osid.locale.Locale", 
+         "package_name": "locale", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "locales", 
+         "interface_name": "LocaleList"
+      }
+   }
+}

@@ -1,0 +1,1943 @@
+{
+   "name": "type", 
+   "version": "3.0.0", 
+   "title": "Type Open Service Interface Definitions", 
+   "copyright": "Copyright (c) 2006-2008 Massachusetts Institute of Technology. All\nRights Reserved.", 
+   "license": "This Work is being provided by the copyright holder(s) subject to the\nfollowing license. By obtaining, using and/or copying this Work, you\nagree that you have read, understand, and will comply with the following\nterms and conditions.\n\nPermission to use, copy and distribute unmodified versions of this Work,\nfor any purpose, without fee or royalty is hereby granted, provided that\nyou include the above copyright notices and the terms of this license on\nALL copies of the Work or portions thereof.\n\nYou may modify or create Derivatives of this Work only for your internal\npurposes. You shall not distribute or transfer any such Derivative of\nthis Work to any location or to any third party. For the purposes of\nthis license, \"Derivative\" shall mean any derivative of the Work as\ndefined in the United States Copyright Act of 1976, such as a\ntranslation or modification.\n\nThis Work and the information contained herein is provided on an \"AS IS\"\nbasis WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT\nNOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR\nPURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT\nHOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN\nAN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN\nCONNECTION WITH THE WORK OR THE USE OR OTHER DEALINGS IN THE WORK.\n\nThe export of software employing encryption technology may require a\nspecific license from the United States Government. It is the\nresponsibility of any person or organization contemplating export to\nobtain such a license before exporting this Work.", 
+   "summary": "The Type OSID defines a set of interfaces for managing ``Type``\ndefinitions. ``Types`` are used as an identifier primarily for\nidentification of interface extensions throughout the OSIDs and\noccasionally used as an extensible enumeration. An agreement between an\nOSID Consumer and an OSID Provider means they support the same ``Type``.\n\nTypes\n\nA ``Type`` is similar to an Id but includes other data for display and\norganization. The identification portion of the Type is globally unique\nand contains:\n\n  * authority: the name of the entity or organization responsible for\n    the type. Using a domain name is a reasonable convention.\n  * identifier: a string serving as an id. The identifier may be a urn,\n    guid, oid or some other means of identification. Since all of the\n    identification elements including the domain and authority create an\n    overall unique Type, the identifier may even be a sequence number\n    defined within a particular domain.\n  * namespace: a string identifying the namespace of the identifier,\n    such as \"urn\" or \"oid\".\n\n\nExample\n  Type type = lookupSession.getType(\"asset\", \"uri\",         \n                                    \"http://harvestroad.com/osidTypes/image\",\n                                    \"harvestroad.com\");\n  print type.getDisplayName();\n\n\n\nThe sessions in this OSID offer the capabilities of a ``Type`` registry\nto centrally manage definitions and localized display strings and\ndescriptions. Applications may opt to construct their own ``Types``\ndirectly and bypass this service.\n\nType Hierarchies\n\nTypes are part of an internal hierarchy. A ``Type`` in a hierarchy\nincludes the ``Types`` of its children. For example, an ``Asset`` may\nhave a \"photograph\" ``Type`` included as part of an \"image\" base\n``Type``.\n\nUnless an application will display a type, it can simply construct a\ntype based on the identification components. OSID Providers may benefit\nby using this service to manage the type hierarchy, to provide a place\nto perform mappings across different type definitions, and to provide\ndisplayable metadata to its consumers.\n\nType Type Relations\n\n``Types`` may relate to other ``Types`` to describe constraints or\ncompositions. The relationship is expressed as another Type. For\nexample, a ``Position`` of type \"researcher\" may be appropriately\nassociated with an ``Organization`` of type \"laboratory\" using a\nrelation Type of \"allowed.\" Or, a root ``Event`` type depends on a root\n``TimePeriod`` type using a relationship type of \"depends on.\"\n\nTypes for Constraints and Side Effects\n\nAn OSID Provider may link a ``Type,`` such as a genus, to a set of\nconstraints that are made known to the application as ``Metadata``\nthrough an ``OsidForm``. Types of an ``OsidObject`` may also be used by\nan OSID Provider to constrain the possible relationship ``Types`` that\nmay be possible to that ``OsidObject``. In these uses of ``Types,``\nthere is a semantic accompanying the ``Type`` definition managed within\nan OSID Provider. The Type OSID manages the metadata of the ``Type``\nitself. Logic implementing the meaning of the ``Type`` is managed\ncompletely within an OSID Provider.\n\nOSIDs emphasize relationships over data typing since type agreements are\noften an impediment to interoperability. Generally, the rule of thumb\nfor record ``Types`` is to first explore other ``OsidObjects,`` even\nthose in other OSIDs for a place for extra data. Often, what is hiding\nbehind a list of data elements is a separate service that can be\nprovided as a separate module and serves to keep the principal\n``OsidObject`` lighter and more flexible.\n\nGenus ``Types`` primarily serve as a quick and dirty way to unclutter\nthe record ``Types`` with \"is kind of like\" tags. ``OsidCatalogs`` can\nbe used for a richer solution. For example, a genus ``Type`` may be used\nto identify all ``Events`` on a ``Calendar`` which are classes at a\nschool and is accompanied by constraint logic such that the ``Events``\noccur at a ``Location`` on campus.\n\nAnother pathway to explore is to create a smart ``Calendar`` from an\n``EventQuery`` that specifies constrraints on the ``Event`` sponsor,\n``Location,`` or other data required for classes. Creates and updates\nfor Events in that smart ``Calendar`` will be similarly constrained and\nsurfaced to the OSID Consumer through the ``Metadata`` in the\nEventForms. While this path is certainly more difficult than simply\nnailing up some logic indexed by a genus Type, it can be considered if\nthere is a need to expose the logic and authoring capabilities.\n\nOsidPrimitives\n\nMost OSID interfaces are used to encapsulate implementation-specific\nobjects from provider to consumer. ``Type`` is an ``OsidPrimitive`` and\nas such cannot be used to encapsulate implementation-specific data other\nthan what is defined explicitly in the ``Type``. An OSID Provider must\nrespect any ``Type`` constructed by an OSID Consumer.", 
+   "interfaces": [
+      {
+         "fullname": "osid.type.TypeProfile", 
+         "shortname": "TypeProfile", 
+         "category": "managers", 
+         "doc": {
+            "headline": "The ``TypeProfile`` describes the interoperability among type services.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidProfile"
+         ], 
+         "inherit_shortnames": [
+            "OsidProfile"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidProfile"
+            }
+         ], 
+         "method_names": [
+            "supports_type_lookup", 
+            "supports_type_admin"
+         ], 
+         "methods": [
+            {
+               "name": "supports_type_lookup", 
+               "doc": {
+                  "headline": "Tests if ``Type`` lookup is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if ``Type`` lookup is supported,\n                ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if ``Type`` lookup is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_type_admin", 
+               "doc": {
+                  "headline": "Tests if a ``Type`` administrative service is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if ``Type`` administration is\n                supported, ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if ``Type`` administration is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.type.TypeManager", 
+         "shortname": "TypeManager", 
+         "category": "managers", 
+         "doc": {
+            "headline": "This manager provides access to the available sessions of the type service.", 
+            "body": "    The ``TypeLookupSession`` is used for looking up ``Types`` and the\n    ``TypeAdminSession`` is used for managing and registering new Types."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidManager", 
+            "osid.type.TypeProfile"
+         ], 
+         "inherit_shortnames": [
+            "OsidManager", 
+            "TypeProfile"
+         ], 
+         "inherit_pkg_names": [
+            "osid", 
+            "type"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidManager"
+            }, 
+            {
+               "pkg_name": "type", 
+               "name": "TypeProfile"
+            }
+         ], 
+         "method_names": [
+            "get_type_lookup_session", 
+            "get_type_admin_session"
+         ], 
+         "methods": [
+            {
+               "name": "get_type_lookup_session", 
+               "doc": {
+                  "headline": "Gets the ``OsidSession`` associated with the type lookup service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.type.TypeLookupSession) - a ``TypeLookupSession``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_type_lookup()`` is ``false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: a ``TypeLookupSession``\n        :rtype: ``osid.type.TypeLookupSession``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_type_lookup()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_type_lookup()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.type.TypeLookupSession", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_type_admin_session", 
+               "doc": {
+                  "headline": "Gets the ``OsidSession`` associated with the type admin service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.type.TypeAdminSession) - a ``TypeAdminSession``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_type_admin()`` is ``false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: a ``TypeAdminSession``\n        :rtype: ``osid.type.TypeAdminSession``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_type_admin()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_type_admin()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.type.TypeAdminSession", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.type.TypeProxyManager", 
+         "shortname": "TypeProxyManager", 
+         "category": "managers", 
+         "doc": {
+            "headline": "This manager provides access to the available sessions of the type service.", 
+            "body": "    Methods in this manager support the passing of a ``Proxy`` object\n    for the purpose of passing information from a server environment.\n    The ``TypeLookupSession`` is used for looking up ``Types`` and the\n    ``TypeAdminSession`` is used for managing and registering new Types."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidProxyManager", 
+            "osid.type.TypeProfile"
+         ], 
+         "inherit_shortnames": [
+            "OsidProxyManager", 
+            "TypeProfile"
+         ], 
+         "inherit_pkg_names": [
+            "osid", 
+            "type"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidProxyManager"
+            }, 
+            {
+               "pkg_name": "type", 
+               "name": "TypeProfile"
+            }
+         ], 
+         "method_names": [
+            "get_type_lookup_session", 
+            "get_type_admin_session"
+         ], 
+         "methods": [
+            {
+               "name": "get_type_lookup_session", 
+               "doc": {
+                  "headline": "Gets the ``OsidSession`` associated with the type lookup service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.type.TypeLookupSession) - a ``TypeLookupSession``", 
+               "error_doc": "        raise:  NullArgument - ``proxy`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_type_lookup()`` is ``false``", 
+               "sphinx_param_doc": "        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: a ``TypeLookupSession``\n        :rtype: ``osid.type.TypeLookupSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_type_lookup()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_type_lookup()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.type.TypeLookupSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_type_admin_session", 
+               "doc": {
+                  "headline": "Gets the ``OsidSession`` associated with the ``TypeAdmin`` service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.type.TypeAdminSession) - the new\n                ``TypeAdminSession``", 
+               "error_doc": "        raise:  NullArgument - ``proxy`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_type_admin()`` is ``false``", 
+               "sphinx_param_doc": "        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: the new ``TypeAdminSession``\n        :rtype: ``osid.type.TypeAdminSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_type_admin()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_type_admin()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.type.TypeAdminSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.type.TypeLookupSession", 
+         "shortname": "TypeLookupSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "This session retrieves Types.", 
+            "body": "    A single Type can be retrieved using ``get_type()`` and all types\n    known to this service can be accessed via ``get_types()`` ."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "can_lookup_types", 
+            "get_type", 
+            "has_type", 
+            "get_types_by_domain", 
+            "get_types_by_authority", 
+            "get_types_by_domain_and_authority", 
+            "get_types", 
+            "is_equivalent", 
+            "implies_support", 
+            "has_base_type", 
+            "get_base_types", 
+            "get_relation_types", 
+            "get_source_types_by_relation_type", 
+            "get_destination_types_by_source", 
+            "get_destination_types_by_source_and_relation_type", 
+            "get_destination_types_by_relation_type", 
+            "get_source_types_by_destination", 
+            "get_source_types_by_destination_and_relation_type"
+         ], 
+         "methods": [
+            {
+               "name": "can_lookup_types", 
+               "doc": {
+                  "headline": "Tests if this user can perform ``Type`` lookups.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known all methods in this\n        session will result in a ``PermissionDenied``. This is intended\n        as a hint to an application that may opt not to offer lookup\n        operations."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``false`` if lookup methods are not\n                authorized, ``true`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``false`` if lookup methods are not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_type", 
+               "doc": {
+                  "headline": "Gets a ``Type`` by its string representation which is a combination of the authority and identifier.", 
+                  "body": "        This method only returns the ``Type`` if it is known by the\n        given identification components."
+               }, 
+               "arg_doc": "        arg:    namespace (string): the identifier namespace\n        arg:    identifier (string): the identifier\n        arg:    authority (string): the authority\n", 
+               "return_doc": "        return: (osid.type.Type) - the ``Type``", 
+               "error_doc": "        raise:  NotFound - the type is not found\n        raise:  NullArgument - ``null`` argument provided\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param namespace: the identifier namespace\n        :type namespace: ``string``\n        :param identifier: the identifier\n        :type identifier: ``string``\n        :param authority: the authority\n        :type authority: ``string``\n", 
+               "sphinx_return_doc": "        :return: the ``Type``\n        :rtype: ``osid.type.Type``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- the type is not found\n        :raise: ``NullArgument`` -- ``null`` argument provided\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "namespace", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "string", 
+                     "var_name": "identifier", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "string", 
+                     "var_name": "authority", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string", 
+                  "string", 
+                  "string"
+               ], 
+               "return_type": "osid.type.Type", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "has_type", 
+               "doc": {
+                  "headline": "Tests if the given ``Type`` is known.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): the ``Type`` to look for\n", 
+               "return_doc": "        return: (boolean) - ``true`` if the given ``Type`` is known,\n                ``false`` otherwise", 
+               "error_doc": "        raise:  NullArgument - ``type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: the ``Type`` to look for\n        :type type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: ``true`` if the given ``Type`` is known, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "boolean", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_types_by_domain", 
+               "doc": {
+                  "headline": "Gets all the known Types by domain.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    domain (string): the domain\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the list of ``Types`` with the\n                given domain", 
+               "error_doc": "        raise:  NullArgument - ``domain`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param domain: the domain\n        :type domain: ``string``\n", 
+               "sphinx_return_doc": "        :return: the list of ``Types`` with the given domain\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``domain`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "domain", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_types_by_authority", 
+               "doc": {
+                  "headline": "Gets all the known Types by authority.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    authority (string): the authority\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the list of ``Types`` with the\n                given authority", 
+               "error_doc": "        raise:  NullArgument - ``authority`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - respect my authoritay", 
+               "sphinx_param_doc": "        :param authority: the authority\n        :type authority: ``string``\n", 
+               "sphinx_return_doc": "        :return: the list of ``Types`` with the given authority\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``authority`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- respect my authoritay", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "authority", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_types_by_domain_and_authority", 
+               "doc": {
+                  "headline": "Gets all the known Types by domain and authority.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    domain (string): the domain\n        arg:    authority (string): the authority\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the list of ``Types`` with the\n                given domain and authority", 
+               "error_doc": "        raise:  NullArgument - ``domain`` or ``authority`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param domain: the domain\n        :type domain: ``string``\n        :param authority: the authority\n        :type authority: ``string``\n", 
+               "sphinx_return_doc": "        :return: the list of ``Types`` with the given domain and authority\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``domain`` or ``authority`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "domain", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "string", 
+                     "var_name": "authority", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string", 
+                  "string"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_types", 
+               "doc": {
+                  "headline": "Gets all the known Types.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.type.TypeList) - the list of all known ``Types``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the list of all known ``Types``\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "is_equivalent", 
+               "doc": {
+                  "headline": "Tests if the given types are equivalent.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): a type\n        arg:    equivalent_type (osid.type.Type): another type\n", 
+               "return_doc": "        return: (boolean) - ``true`` if both types are equivalent,\n                ``false`` otherwise", 
+               "error_doc": "        raise:  NullArgument - ``type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: a type\n        :type type: ``osid.type.Type``\n        :param equivalent_type: another type\n        :type equivalent_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: ``true`` if both types are equivalent, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "equivalent_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type", 
+                  "osid.type.Type"
+               ], 
+               "return_type": "boolean", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "implies_support", 
+               "doc": {
+                  "headline": "Tests if the given type is implies support of a base type.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): a type\n        arg:    base_type (osid.type.Type): another type\n", 
+               "return_doc": "        return: (boolean) - ``true`` if ``base_type`` if supported by\n                ``type,``  ``false`` otherwise", 
+               "error_doc": "        raise:  NullArgument - ``type`` or ``base_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: a type\n        :type type: ``osid.type.Type``\n        :param base_type: another type\n        :type base_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: ``true`` if ``base_type`` if supported by ``type,``  ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``type`` or ``base_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "base_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type", 
+                  "osid.type.Type"
+               ], 
+               "return_type": "boolean", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "has_base_type", 
+               "doc": {
+                  "headline": "Tests if the given type is derived from a base type.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): a type\n", 
+               "return_doc": "        return: (boolean) - ``true`` is the given type is derived from a\n                base type, ``false`` otherwise", 
+               "error_doc": "        raise:  NullArgument - ``type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: a type\n        :type type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: ``true`` is the given type is derived from a base type, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "boolean", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_base_types", 
+               "doc": {
+                  "headline": "Gets the immediate base types of this type.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): a type\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the base types", 
+               "error_doc": "        raise:  NullArgument - ``type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: a type\n        :type type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the base types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_relation_types", 
+               "doc": {
+                  "headline": "Gets all known relation ``Types``.", 
+                  "body": "        A relation Types relates two ``Types``."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.type.TypeList) - known relation types", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: known relation types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_source_types_by_relation_type", 
+               "doc": {
+                  "headline": "Gets all source ``Types`` related by the given type.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    relation_type (osid.type.Type): a relation type\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the source types", 
+               "error_doc": "        raise:  NullArgument - ``relation_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param relation_type: a relation type\n        :type relation_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the source types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``relation_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "relation_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_destination_types_by_source", 
+               "doc": {
+                  "headline": "Gets all destination Types related to the given source ``Type``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    source_type (osid.type.Type): a source type\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the related types", 
+               "error_doc": "        raise:  NullArgument - ``source_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param source_type: a source type\n        :type source_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the related types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``source_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "source_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_destination_types_by_source_and_relation_type", 
+               "doc": {
+                  "headline": "Gets all destination Types related to the given source ``Type`` and relation ``Type``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    source_type (osid.type.Type): a source type\n        arg:    relation_type (osid.type.Type): a relation type\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the related types", 
+               "error_doc": "        raise:  NullArgument - ``source_type`` or ``relation_type`` is\n                ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param source_type: a source type\n        :type source_type: ``osid.type.Type``\n        :param relation_type: a relation type\n        :type relation_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the related types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``source_type`` or ``relation_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "source_type", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "relation_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type", 
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_destination_types_by_relation_type", 
+               "doc": {
+                  "headline": "Gets all destination ``Types`` related by the given type.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    relation_type (osid.type.Type): a relation type\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the destination types", 
+               "error_doc": "        raise:  NullArgument - ``relation_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param relation_type: a relation type\n        :type relation_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the destination types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``relation_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "relation_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_source_types_by_destination", 
+               "doc": {
+                  "headline": "Gets all source Types related to the given destination ``Type``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    destination_type (osid.type.Type): a destination type\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the source types", 
+               "error_doc": "        raise:  NullArgument - ``destination_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param destination_type: a destination type\n        :type destination_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the source types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``destination_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "destination_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_source_types_by_destination_and_relation_type", 
+               "doc": {
+                  "headline": "Gets all source Types related to the given destination ``Type`` and relation ``Type``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    destination_type (osid.type.Type): a destination type\n        arg:    relation_type (osid.type.Type): a relation type\n", 
+               "return_doc": "        return: (osid.type.TypeList) - the related types", 
+               "error_doc": "        raise:  NullArgument - ``destination_type`` or ``relation_type``\n                is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param destination_type: a destination type\n        :type destination_type: ``osid.type.Type``\n        :param relation_type: a relation type\n        :type relation_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the related types\n        :rtype: ``osid.type.TypeList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``destination_type`` or ``relation_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "destination_type", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "relation_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type", 
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.type.TypeList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.type.TypeAdminSession", 
+         "shortname": "TypeAdminSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "This session is used to create, update and delete ``Types`` in the registry.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "can_create_types", 
+            "get_type_form_for_create", 
+            "create_type", 
+            "can_update_types", 
+            "get_type_form_for_update", 
+            "update_type", 
+            "can_delete_types", 
+            "can_delete_type", 
+            "delete_type", 
+            "make_equivalent", 
+            "add_base_type", 
+            "remove_base_type", 
+            "add_type_relation", 
+            "remove_type_relation"
+         ], 
+         "methods": [
+            {
+               "name": "can_create_types", 
+               "doc": {
+                  "headline": "Tests if this user can create ``Types``.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known creating a ``Type``\n        will result in a ``PermissionDenied``. This is intended as a\n        hint to an application that may opt not to offer create\n        operations to an unauthorized user."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``false`` if ``Type`` creation is not\n                authorized, ``true`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``false`` if ``Type`` creation is not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_type_form_for_create", 
+               "doc": {
+                  "headline": "Gets the type form for creating new types.", 
+                  "body": "        A new form should be requested for each create transaction."
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): the ``Type`` to be created\n", 
+               "return_doc": "        return: (osid.type.TypeForm) - the type form", 
+               "error_doc": "        raise:  NullArgument - ``type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: the ``Type`` to be created\n        :type type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the type form\n        :rtype: ``osid.type.TypeForm``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.type.TypeForm", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "create_type", 
+               "doc": {
+                  "headline": "Creates a new ``Type``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    type_form (osid.type.TypeForm): the type form\n", 
+               "return_doc": "        return: (osid.type.Type) - the created ``Type``", 
+               "error_doc": "        raise:  IllegalState - ``type_form`` already used in a create\n                transaction\n        raise:  InvalidArgument - one or more of the arguments is\n                invalid\n        raise:  NullArgument - ``type_form`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure\n        raise:  Unsupported - ``type_form`` did not originate from\n                ``get_type_form_for_create()``", 
+               "sphinx_param_doc": "        :param type_form: the type form\n        :type type_form: ``osid.type.TypeForm``\n", 
+               "sphinx_return_doc": "        :return: the created ``Type``\n        :rtype: ``osid.type.Type``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- ``type_form`` already used in a create transaction\n        :raise: ``InvalidArgument`` -- one or more of the arguments is invalid\n        :raise: ``NullArgument`` -- ``type_form`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure\n        :raise: ``Unsupported`` -- ``type_form`` did not originate from ``get_type_form_for_create()``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.TypeForm", 
+                     "var_name": "type_form", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.TypeForm"
+               ], 
+               "return_type": "osid.type.Type", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User", 
+                  "UNSUPPORTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "can_update_types", 
+               "doc": {
+                  "headline": "Tests if this user can update types.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known updating a ``Type``\n        will result in a ``PermissionDenied``. This is intended as a\n        hint to an application that may opt not to offer update\n        operations to an unauthorized user."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``false`` if type modification is not\n                authorized, ``true`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``false`` if type modification is not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_type_form_for_update", 
+               "doc": {
+                  "headline": "Gets the type form for creating new types.", 
+                  "body": "        A new form should be requested for each create transaction."
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): the ``Type`` to be updated\n", 
+               "return_doc": "        return: (osid.type.TypeForm) - the type form", 
+               "error_doc": "        raise:  NotFound - ``type`` not found\n        raise:  NullArgument - ``type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: the ``Type`` to be updated\n        :type type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: the type form\n        :rtype: ``osid.type.TypeForm``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``type`` not found\n        :raise: ``NullArgument`` -- ``type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "osid.type.TypeForm", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "update_type", 
+               "doc": {
+                  "headline": "Updates a type.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    type_form (osid.type.TypeForm): the type form\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  IllegalState - ``type_form`` already used in an update\n                transaction\n        raise:  InvalidArgument - the form contains an invalid value\n        raise:  NullArgument - ``type_form`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure\n        raise:  Unsupported - ``type_form`` did not originate from\n                ``get_type_form_for_update()``", 
+               "sphinx_param_doc": "        :param type_form: the type form\n        :type type_form: ``osid.type.TypeForm``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- ``type_form`` already used in an update transaction\n        :raise: ``InvalidArgument`` -- the form contains an invalid value\n        :raise: ``NullArgument`` -- ``type_form`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure\n        :raise: ``Unsupported`` -- ``type_form`` did not originate from ``get_type_form_for_update()``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.TypeForm", 
+                     "var_name": "type_form", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.TypeForm"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User", 
+                  "UNSUPPORTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "can_delete_types", 
+               "doc": {
+                  "headline": "Tests if this user can delete ``Types`` from this ``ItemBank``.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known deleting a ``Type``\n        will result in a ``PermissionDenied``. This is intended as a\n        hint to an application that may opt not to offer delete\n        operations to an unauthorized user."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``false`` if ``Item`` deletion is not\n                authorized, ``true`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``false`` if ``Item`` deletion is not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "can_delete_type", 
+               "doc": {
+                  "headline": "Tests if this user can delete the specified type.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known deleteing the\n        ``Type`` will result in a ``PermissionDenied``. This is intended\n        as a hint to an application that may opt not to offer update\n        operations to an unauthorized user."
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): the ``Type`` to be deleted\n", 
+               "return_doc": "        return: (boolean) - ``false`` if type deletion is not\n                authorized, ``true`` otherwise", 
+               "error_doc": "        raise:  NullArgument - ``type`` is ``null``", 
+               "sphinx_param_doc": "        :param type: the ``Type`` to be deleted\n        :type type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "        :return: ``false`` if type deletion is not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``type`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "boolean", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "delete_type", 
+               "doc": {
+                  "headline": "Removes a ``Type``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): the ``Type`` to remove\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NotFound - ``type`` is not found\n        raise:  NullArgument - ``type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: the ``Type`` to remove\n        :type type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``type`` is not found\n        :raise: ``NullArgument`` -- ``type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "make_equivalent", 
+               "doc": {
+                  "headline": "Makes two ``Types`` equivalent.", 
+                  "body": "        Calls to ``TypeLookupSession.getType(equivalentType)`` return\n        the ``primaryType``."
+               }, 
+               "arg_doc": "        arg:    primary_type (osid.type.Type): the primary ``Type``\n        arg:    equivalent_type (osid.type.Type): a ``Type`` to be made\n                equivalent\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NotFound - ``primary_type`` or ``equivalent_type`` is\n                not found\n        raise:  NullArgument - ``primary_type`` or ``equivalent_type``\n                is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param primary_type: the primary ``Type``\n        :type primary_type: ``osid.type.Type``\n        :param equivalent_type: a ``Type`` to be made equivalent\n        :type equivalent_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``primary_type`` or ``equivalent_type`` is not found\n        :raise: ``NullArgument`` -- ``primary_type`` or ``equivalent_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "primary_type", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "equivalent_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type", 
+                  "osid.type.Type"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "add_base_type", 
+               "doc": {
+                  "headline": "Adds a base type to a type.", 
+                  "body": "        A base type is a parent of the type where the type implies\n        support of the base type."
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): a ``Type``\n        arg:    base_type (osid.type.Type): a base type\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NotFound - ``type`` or ``base_type`` is not found\n        raise:  NullArgument - ``type`` or ``base_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: a ``Type``\n        :type type: ``osid.type.Type``\n        :param base_type: a base type\n        :type base_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``type`` or ``base_type`` is not found\n        :raise: ``NullArgument`` -- ``type`` or ``base_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "base_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type", 
+                  "osid.type.Type"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "remove_base_type", 
+               "doc": {
+                  "headline": "Removes a base type from a type.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    type (osid.type.Type): a ``Type``\n        arg:    base_type (osid.type.Type): a base type\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NotFound - ``type`` or ``base_type`` is not found or\n                ``base_type`` is not a base of ``type``\n        raise:  NullArgument - ``type`` or ``base_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param type: a ``Type``\n        :type type: ``osid.type.Type``\n        :param base_type: a base type\n        :type base_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``type`` or ``base_type`` is not found or ``base_type`` is not a base of ``type``\n        :raise: ``NullArgument`` -- ``type`` or ``base_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "type_", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "base_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type", 
+                  "osid.type.Type"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "add_type_relation", 
+               "doc": {
+                  "headline": "Adds a relation between two types.", 
+                  "body": "        The relationship is a ``Type`` in itself."
+               }, 
+               "arg_doc": "        arg:    source_type (osid.type.Type): the source type\n        arg:    destination_type (osid.type.Type): the destination type\n        arg:    relation_type (osid.type.Type): the relation type\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NotFound - ``source_type, destination_type,`` or\n                ``relation_type`` is not found\n        raise:  NullArgument - ``source_type, destination_type,`` or\n                ``relation_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param source_type: the source type\n        :type source_type: ``osid.type.Type``\n        :param destination_type: the destination type\n        :type destination_type: ``osid.type.Type``\n        :param relation_type: the relation type\n        :type relation_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``source_type, destination_type,`` or ``relation_type`` is not found\n        :raise: ``NullArgument`` -- ``source_type, destination_type,`` or ``relation_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "source_type", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "destination_type", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "relation_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type", 
+                  "osid.type.Type", 
+                  "osid.type.Type"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "remove_type_relation", 
+               "doc": {
+                  "headline": "Renoves a relation between two types.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    source_type (osid.type.Type): the source type\n        arg:    destination_type (osid.type.Type): the destination type\n        arg:    relation_type (osid.type.Type): the relation type\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NotFound - ``source_type, destination_type,`` or\n                ``relation_type`` is not found, or the relationship does\n                not exist\n        raise:  NullArgument - ``source_type, destination_type,`` or\n                ``relation_type`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param source_type: the source type\n        :type source_type: ``osid.type.Type``\n        :param destination_type: the destination type\n        :type destination_type: ``osid.type.Type``\n        :param relation_type: the relation type\n        :type relation_type: ``osid.type.Type``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``source_type, destination_type,`` or ``relation_type`` is not found, or the relationship does not exist\n        :raise: ``NullArgument`` -- ``source_type, destination_type,`` or ``relation_type`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "source_type", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "destination_type", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.type.Type", 
+                     "var_name": "relation_type", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.type.Type", 
+                  "osid.type.Type", 
+                  "osid.type.Type"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.type.Type", 
+         "shortname": "Type", 
+         "category": "primitives", 
+         "doc": {
+            "headline": "The Type is a form of identifier that is primarily used to identify interface specifications.", 
+            "body": "    The ``Type`` differs from ``Id`` in that it offers display\n    information and ``Types`` may be arranged in hierarchies to indicate\n    an extended interface. Semantically, an ``Id`` identifies any OSID\n    object while the ``Type`` identifies a specification.\n\n    The components of the Type that make up its identification are:\n    \n      * identifier: a unique key or guid\n      * namespace: the namespace of the identifier\n      * authority: the isuer of the identifier\n\n    \n    Persisting a type reference means to persist the above\n    identification elements. In addition to these identifier components,\n    A ``Type`` mai also provide some additional metadata such as a name,\n    description and domain."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidPrimitive"
+         ], 
+         "inherit_shortnames": [
+            "OsidPrimitive"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidPrimitive"
+            }
+         ], 
+         "method_names": [
+            "get_display_name", 
+            "get_display_label", 
+            "get_description", 
+            "get_domain", 
+            "get_authority", 
+            "get_identifier_namespace", 
+            "get_identifier"
+         ], 
+         "methods": [
+            {
+               "name": "get_display_name", 
+               "doc": {
+                  "headline": "Gets the full display name of this ``Type``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.locale.DisplayText) - the display name of this\n                ``Type``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the display name of this ``Type``\n        :rtype: ``osid.locale.DisplayText``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.locale.DisplayText", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_display_label", 
+               "doc": {
+                  "headline": "Gets the shorter display label for this ``Type``.", 
+                  "body": "        Where a display name of a ``Type`` might be ``\"`` Critical\n        Logging Priority Type\", the display label could be \"critical\"."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.locale.DisplayText) - the display label for this\n                ``Type``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the display label for this ``Type``\n        :rtype: ``osid.locale.DisplayText``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.locale.DisplayText", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_description", 
+               "doc": {
+                  "headline": "Gets a description of this ``Type``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.locale.DisplayText) - the description of this\n                ``Type``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the description of this ``Type``\n        :rtype: ``osid.locale.DisplayText``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.locale.DisplayText", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_domain", 
+               "doc": {
+                  "headline": "Gets the domain.", 
+                  "body": "        The domain can provide an information label about ths\n        application space of this Type."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.locale.DisplayText) - the domain of this ``Type``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the domain of this ``Type``\n        :rtype: ``osid.locale.DisplayText``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.locale.DisplayText", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_authority", 
+               "doc": {
+                  "headline": "Gets the authority of this ``Type``.", 
+                  "body": "        The authority is a string used to ensure the uniqueness of this\n        ``Type`` when using a non- federated identifier space.\n        Generally, it is a domain name identifying the party responsible\n        for this ``Type``. This method is used to compare one ``Type``\n        to another."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (string) - the authority of this ``Type``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the authority of this ``Type``\n        :rtype: ``string``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "string", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_identifier_namespace", 
+               "doc": {
+                  "headline": "Gets the namespace of the identifier.", 
+                  "body": "        This method is used to compare one ``Type`` to another."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (string) - the authority of this ``Type``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the authority of this ``Type``\n        :rtype: ``string``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "string", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_identifier", 
+               "doc": {
+                  "headline": "Gets the identifier of this ``Type``.", 
+                  "body": "        This method is used to compare one ``Type`` to another."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (string) - the identifier of this ``Type``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the identifier of this ``Type``\n        :rtype: ``string``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "string", 
+               "errors": {}
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.type.TypeForm", 
+         "shortname": "TypeForm", 
+         "category": "objects", 
+         "doc": {
+            "headline": "This form provides a means of updating various fields in the ``Type``.", 
+            "body": "    Note that the domain, authority and identifier are part of the\n    ``Type`` identification, and as such not modifiable."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidForm"
+         ], 
+         "inherit_shortnames": [
+            "OsidForm"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidForm"
+            }
+         ], 
+         "method_names": [
+            "get_display_name_metadata", 
+            "set_display_name", 
+            "clear_display_name", 
+            "get_display_label_metadata", 
+            "set_display_label", 
+            "clear_display_label", 
+            "get_description_metadata", 
+            "set_description", 
+            "clear_description", 
+            "get_domain_metadata", 
+            "set_domain", 
+            "clear_domain"
+         ], 
+         "methods": [
+            {
+               "name": "get_display_name_metadata", 
+               "doc": {
+                  "headline": "Gets the metadata for the display name.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.Metadata) - metadata for the display name", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: metadata for the display name\n        :rtype: ``osid.Metadata``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.Metadata", 
+               "errors": {}
+            }, 
+            {
+               "name": "set_display_name", 
+               "doc": {
+                  "headline": "Sets a display name.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    display_name (string): the new display name\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  InvalidArgument - ``display_name`` is invalid\n        raise:  NoAccess - ``display_name`` cannot be modified\n        raise:  NullArgument - ``display_name`` is ``null``", 
+               "sphinx_param_doc": "        :param display_name: the new display name\n        :type display_name: ``string``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``InvalidArgument`` -- ``display_name`` is invalid\n        :raise: ``NoAccess`` -- ``display_name`` cannot be modified\n        :raise: ``NullArgument`` -- ``display_name`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "display_name", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NO_ACCESS": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "clear_display_name", 
+               "doc": {
+                  "headline": "Clears the display name.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NoAccess - ``display_name`` cannot be modified", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NoAccess`` -- ``display_name`` cannot be modified", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "NO_ACCESS": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_display_label_metadata", 
+               "doc": {
+                  "headline": "Gets the metadata for the display label.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.Metadata) - metadata for the display label", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: metadata for the display label\n        :rtype: ``osid.Metadata``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.Metadata", 
+               "errors": {}
+            }, 
+            {
+               "name": "set_display_label", 
+               "doc": {
+                  "headline": "Seta a display label.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    display_label (string): the new display label\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  InvalidArgument - ``display_label`` is invalid\n        raise:  NoAccess - ``display_label`` cannot be modified\n        raise:  NullArgument - ``display_label`` is ``null``", 
+               "sphinx_param_doc": "        :param display_label: the new display label\n        :type display_label: ``string``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``InvalidArgument`` -- ``display_label`` is invalid\n        :raise: ``NoAccess`` -- ``display_label`` cannot be modified\n        :raise: ``NullArgument`` -- ``display_label`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "display_label", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NO_ACCESS": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "clear_display_label", 
+               "doc": {
+                  "headline": "Clears the display label.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NoAccess - ``display_label`` cannot be modified", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NoAccess`` -- ``display_label`` cannot be modified", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "NO_ACCESS": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_description_metadata", 
+               "doc": {
+                  "headline": "Gets the metadata for the description.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.Metadata) - metadata for the description", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: metadata for the description\n        :rtype: ``osid.Metadata``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.Metadata", 
+               "errors": {}
+            }, 
+            {
+               "name": "set_description", 
+               "doc": {
+                  "headline": "Sets a description.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    description (string): the new description\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  InvalidArgument - ``description`` is invalid\n        raise:  NoAccess - ``description`` cannot be modified\n        raise:  NullArgument - ``description`` is ``null``", 
+               "sphinx_param_doc": "        :param description: the new description\n        :type description: ``string``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``InvalidArgument`` -- ``description`` is invalid\n        :raise: ``NoAccess`` -- ``description`` cannot be modified\n        :raise: ``NullArgument`` -- ``description`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "description", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NO_ACCESS": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "clear_description", 
+               "doc": {
+                  "headline": "Clears the description.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NoAccess - ``description`` cannot be modified", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NoAccess`` -- ``description`` cannot be modified", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "NO_ACCESS": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_domain_metadata", 
+               "doc": {
+                  "headline": "Gets the metadata for the domain.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.Metadata) - metadata for the domain", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: metadata for the domain\n        :rtype: ``osid.Metadata``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.Metadata", 
+               "errors": {}
+            }, 
+            {
+               "name": "set_domain", 
+               "doc": {
+                  "headline": "Sets a domain.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    domain (string): the new domain\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  InvalidArgument - ``domain`` is invalid\n        raise:  NoAccess - ``domain`` cannot be modified\n        raise:  NullArgument - ``domain`` is ``null``", 
+               "sphinx_param_doc": "        :param domain: the new domain\n        :type domain: ``string``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``InvalidArgument`` -- ``domain`` is invalid\n        :raise: ``NoAccess`` -- ``domain`` cannot be modified\n        :raise: ``NullArgument`` -- ``domain`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "domain", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NO_ACCESS": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "clear_domain", 
+               "doc": {
+                  "headline": "Clears the domain.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NoAccess - ``domain`` cannot be modified", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NoAccess`` -- ``domain`` cannot be modified", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "NO_ACCESS": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.type.TypeList", 
+         "shortname": "TypeList", 
+         "category": "objects", 
+         "doc": {
+            "headline": "Like all ``OsidLists,``  ``TypeList`` provides a means for accessing ``Type`` elements sequentially either one at a time or many at a time.", 
+            "body": "    Examples: while (tl.hasNext()) { Type type = tl.getNextType(); }\n\n    or\n      while (tl.hasNext()) {\n           Type[] types = tl.getNextTypes(tl.available());\n      }\n    \n"
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidList"
+         ], 
+         "inherit_shortnames": [
+            "OsidList"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidList"
+            }
+         ], 
+         "method_names": [
+            "get_next_type", 
+            "get_next_types"
+         ], 
+         "methods": [
+            {
+               "name": "get_next_type", 
+               "doc": {
+                  "headline": "Gets the next ``Type`` in this list.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.type.Type) - the next ``Type`` in this list. The\n                ``has_next()`` method should be used to test that a next\n                ``Type`` is available before calling this method.", 
+               "error_doc": "        raise:  IllegalState - no more elements available in this list\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the next ``Type`` in this list. The ``has_next()`` method should be used to test that a next ``Type`` is available before calling this method.\n        :rtype: ``osid.type.Type``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- no more elements available in this list\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.type.Type", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }, 
+            {
+               "name": "get_next_types", 
+               "doc": {
+                  "headline": "Gets the next set of ``Types`` in this list.", 
+                  "body": "        The specified amount must be less than or equal to the return\n        from ``available()``."
+               }, 
+               "arg_doc": "        arg:    n (cardinal): the number of ``Type`` elements requested\n                which must be less than or equal to ``available()``\n", 
+               "return_doc": "        return: (osid.type.Type) - an array of ``Type`` elements.The\n                length of the array is less than or equal to the number\n                specified.", 
+               "error_doc": "        raise:  IllegalState - no more elements available in this list\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "        :param n: the number of ``Type`` elements requested which must be less than or equal to ``available()``\n        :type n: ``cardinal``\n", 
+               "sphinx_return_doc": "        :return: an array of ``Type`` elements.The length of the array is less than or equal to the number specified.\n        :rtype: ``osid.type.Type``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- no more elements available in this list\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "cardinal", 
+                     "var_name": "n", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "cardinal"
+               ], 
+               "return_type": "osid.type.Type", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }
+         ]
+      }
+   ], 
+   "full_name": "osid.type"
+}

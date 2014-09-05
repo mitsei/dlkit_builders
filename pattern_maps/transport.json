@@ -1,0 +1,999 @@
+{
+   "impl_log": {
+      "managers": {
+         "TransportProfile": {
+            "get_endpoint_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_request_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_endpoint_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_outbound_message": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_inbound_stream": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_endpoint_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_response_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_inbound_message": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_outbound_stream": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_request_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_response_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_visible_federation": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "TransportManager": {
+            "get_inbound_message_session_for_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_inbound_message_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_outbound_stream_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_outbound_message_session_for_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_outbound_stream_session_for_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_outbound_message_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_inbound_stream_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_inbound_stream_session_for_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_endpoint_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "TransportProxyManager": {
+            "get_inbound_message_session_for_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_inbound_message_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_outbound_stream_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_outbound_message_session_for_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_outbound_stream_session_for_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_outbound_message_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_inbound_stream_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_inbound_stream_session_for_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_endpoint_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }, 
+      "sessions": {
+         "OutboundStreamSession": {
+            "send_data": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "has_data_available": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "receive_data": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_endpoint_id": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "InboundStreamSession": {
+            "get_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_callback": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_endpoint_id": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "OutboundMessageSession": {
+            "send_request": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_request": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "make_request": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_endpoint_id": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "InboundMessageSession": {
+            "get_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_callback": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_endpoint_id": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "EndpointLookupSession": {
+            "get_endpoints_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_endpoints": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_endpoint_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_endpoint": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_endpoints_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_endpoints_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_endpoint_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_endpoints_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_endpoints_by_provider": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_endpoints": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }
+   }, 
+   "package_objects_caps": [
+      "Response"
+   ], 
+   "package_objects_under": [
+      "response"
+   ], 
+   "package_cataloged_objects_caps": [], 
+   "package_cataloged_objects_under": [], 
+   "package_objects_under_to_caps": {
+      "response": "Response"
+   }, 
+   "package_relationships_caps": [], 
+   "package_relationships_under": [], 
+   "package_rules_caps": [], 
+   "package_rules_under": [], 
+   "package_catalog_caps": "Endpoint", 
+   "package_catalog_under": "endpoint", 
+   "package_relationships_detail": {}, 
+   "Response.instance_data": {
+      "ok": "boolean", 
+      "status_message": "osid.locale.DisplayText", 
+      "response_record": "osid.transport.records.ResponseRecord"
+   }, 
+   "Response.persisted_data": {}, 
+   "Response.initialized_data": {}, 
+   "Response.aggregate_data": {}, 
+   "Response.arg_detail": {}, 
+   "Response.return_types": {
+      "status_message": "osid.locale.DisplayText", 
+      "response_record": "osid.transport.records.ResponseRecord"
+   }, 
+   "TransportProfile.init_pattern": "resource.ResourceProfile", 
+   "TransportProfile.supports_visible_federation": {
+      "pattern": "resource.ResourceProfile.supports_visible_federation", 
+      "kwargs": {
+         "method_name": "supports_visible_federation", 
+         "module_name": "managers", 
+         "var_name": "supports_visible_federation", 
+         "interface_name": "TransportProfile", 
+         "package_name": "transport"
+      }
+   }, 
+   "TransportProfile.supports_outbound_stream": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_outbound_stream", 
+         "module_name": "managers", 
+         "var_name": "supports_outbound_stream", 
+         "interface_name": "TransportProfile", 
+         "package_name": "transport"
+      }
+   }, 
+   "TransportProfile.supports_inbound_stream": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_inbound_stream", 
+         "module_name": "managers", 
+         "var_name": "supports_inbound_stream", 
+         "interface_name": "TransportProfile", 
+         "package_name": "transport"
+      }
+   }, 
+   "TransportProfile.supports_outbound_message": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_outbound_message", 
+         "module_name": "managers", 
+         "var_name": "supports_outbound_message", 
+         "interface_name": "TransportProfile", 
+         "package_name": "transport"
+      }
+   }, 
+   "TransportProfile.supports_inbound_message": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_inbound_message", 
+         "module_name": "managers", 
+         "var_name": "supports_inbound_message", 
+         "interface_name": "TransportProfile", 
+         "package_name": "transport"
+      }
+   }, 
+   "TransportProfile.supports_endpoint_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_endpoint_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_endpoint_lookup", 
+         "interface_name": "TransportProfile", 
+         "package_name": "transport"
+      }
+   }, 
+   "TransportProfile.get_endpoint_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_endpoint_record_types", 
+         "var_name": "endpoint_record_types", 
+         "package_name": "transport", 
+         "module_name": "managers", 
+         "interface_name": "TransportProfile", 
+         "object_name_under": "endpoint"
+      }
+   }, 
+   "TransportProfile.supports_endpoint_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_endpoint_record_type", 
+         "var_name": "endpoint_record_type", 
+         "package_name": "transport", 
+         "arg0_name": "endpoint_record_type", 
+         "module_name": "managers", 
+         "interface_name": "TransportProfile", 
+         "object_name_under": "endpoint"
+      }
+   }, 
+   "TransportProfile.get_request_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_request_record_types", 
+         "var_name": "request_record_types", 
+         "package_name": "transport", 
+         "module_name": "managers", 
+         "interface_name": "TransportProfile", 
+         "object_name_under": "request"
+      }
+   }, 
+   "TransportProfile.supports_request_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_request_record_type", 
+         "var_name": "request_record_type", 
+         "package_name": "transport", 
+         "arg0_name": "request_record_type", 
+         "module_name": "managers", 
+         "interface_name": "TransportProfile", 
+         "object_name_under": "request"
+      }
+   }, 
+   "TransportProfile.get_response_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_response_record_types", 
+         "var_name": "response_record_types", 
+         "package_name": "transport", 
+         "module_name": "managers", 
+         "interface_name": "TransportProfile", 
+         "object_name_under": "response"
+      }
+   }, 
+   "TransportProfile.supports_response_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_response_record_type", 
+         "var_name": "response_record_type", 
+         "package_name": "transport", 
+         "arg0_name": "response_record_type", 
+         "module_name": "managers", 
+         "interface_name": "TransportProfile", 
+         "object_name_under": "response"
+      }
+   }, 
+   "TransportManager.init_pattern": "resource.ResourceManager", 
+   "TransportManager.get_outbound_stream_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.OutboundStreamSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "support_check": "outbound_stream", 
+         "method_name": "get_outbound_stream_session", 
+         "var_name": "outbound_stream_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportManager"
+      }
+   }, 
+   "TransportManager.get_outbound_stream_session_for_endpoint": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.transport.OutboundStreamSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "endpoint_id", 
+         "support_check": "outbound_stream", 
+         "method_name": "get_outbound_stream_session_for_endpoint", 
+         "var_name": "outbound_stream_session_for_endpoint", 
+         "module_name": "managers", 
+         "interface_name": "TransportManager"
+      }
+   }, 
+   "TransportManager.get_inbound_stream_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.InboundStreamSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "support_check": "inbound_stream", 
+         "method_name": "get_inbound_stream_session", 
+         "var_name": "inbound_stream_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportManager"
+      }
+   }, 
+   "TransportManager.get_inbound_stream_session_for_endpoint": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.transport.InboundStreamSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "stream_receiver", 
+         "support_check": "inbound_stream", 
+         "method_name": "get_inbound_stream_session_for_endpoint", 
+         "var_name": "inbound_stream_session_for_endpoint", 
+         "module_name": "managers", 
+         "interface_name": "TransportManager"
+      }
+   }, 
+   "TransportManager.get_outbound_message_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.OutboundMessageSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "support_check": "outbound_message", 
+         "method_name": "get_outbound_message_session", 
+         "var_name": "outbound_message_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportManager"
+      }
+   }, 
+   "TransportManager.get_outbound_message_session_for_endpoint": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.transport.OutboundMessageSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "endpoint_id", 
+         "support_check": "outbound_message", 
+         "method_name": "get_outbound_message_session_for_endpoint", 
+         "var_name": "outbound_message_session_for_endpoint", 
+         "module_name": "managers", 
+         "interface_name": "TransportManager"
+      }
+   }, 
+   "TransportManager.get_inbound_message_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.InboundMessageSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "support_check": "inbound_message", 
+         "method_name": "get_inbound_message_session", 
+         "var_name": "inbound_message_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportManager"
+      }
+   }, 
+   "TransportManager.get_inbound_message_session_for_endpoint": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.transport.InboundMessageSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "message_receiver", 
+         "support_check": "inbound_message", 
+         "method_name": "get_inbound_message_session_for_endpoint", 
+         "var_name": "inbound_message_session_for_endpoint", 
+         "module_name": "managers", 
+         "interface_name": "TransportManager"
+      }
+   }, 
+   "TransportManager.get_endpoint_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.EndpointLookupSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "support_check": "endpoint_lookup", 
+         "method_name": "get_endpoint_lookup_session", 
+         "var_name": "endpoint_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportManager"
+      }
+   }, 
+   "TransportProxyManager.init_pattern": "resource.ResourceProxyManager", 
+   "TransportProxyManager.get_outbound_stream_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.OutboundStreamSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "proxy", 
+         "support_check": "outbound_stream", 
+         "method_name": "get_outbound_stream_session", 
+         "var_name": "outbound_stream_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportProxyManager"
+      }
+   }, 
+   "TransportProxyManager.get_outbound_stream_session_for_endpoint": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.transport.OutboundStreamSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "endpoint_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "outbound_stream", 
+         "method_name": "get_outbound_stream_session_for_endpoint", 
+         "var_name": "outbound_stream_session_for_endpoint", 
+         "module_name": "managers", 
+         "interface_name": "TransportProxyManager"
+      }
+   }, 
+   "TransportProxyManager.get_inbound_stream_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.InboundStreamSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "stream_receiver", 
+         "support_check": "inbound_stream", 
+         "method_name": "get_inbound_stream_session", 
+         "var_name": "inbound_stream_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportProxyManager"
+      }
+   }, 
+   "TransportProxyManager.get_inbound_stream_session_for_endpoint": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.transport.InboundStreamSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "stream_receiver", 
+         "arg0_type_full": "osid.transport.StreamReceiver", 
+         "support_check": "inbound_stream", 
+         "method_name": "get_inbound_stream_session_for_endpoint", 
+         "var_name": "inbound_stream_session_for_endpoint", 
+         "module_name": "managers", 
+         "interface_name": "TransportProxyManager"
+      }
+   }, 
+   "TransportProxyManager.get_outbound_message_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.OutboundMessageSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "proxy", 
+         "support_check": "outbound_message", 
+         "method_name": "get_outbound_message_session", 
+         "var_name": "outbound_message_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportProxyManager"
+      }
+   }, 
+   "TransportProxyManager.get_outbound_message_session_for_endpoint": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.transport.OutboundMessageSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "endpoint_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "outbound_message", 
+         "method_name": "get_outbound_message_session_for_endpoint", 
+         "var_name": "outbound_message_session_for_endpoint", 
+         "module_name": "managers", 
+         "interface_name": "TransportProxyManager"
+      }
+   }, 
+   "TransportProxyManager.get_inbound_message_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.InboundMessageSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "message_receiver", 
+         "support_check": "inbound_message", 
+         "method_name": "get_inbound_message_session", 
+         "var_name": "inbound_message_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportProxyManager"
+      }
+   }, 
+   "TransportProxyManager.get_inbound_message_session_for_endpoint": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.transport.InboundMessageSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "message_receiver", 
+         "arg0_type_full": "osid.transport.MessageReceiver", 
+         "support_check": "inbound_message", 
+         "method_name": "get_inbound_message_session_for_endpoint", 
+         "var_name": "inbound_message_session_for_endpoint", 
+         "module_name": "managers", 
+         "interface_name": "TransportProxyManager"
+      }
+   }, 
+   "TransportProxyManager.get_endpoint_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.transport.EndpointLookupSession", 
+         "cat_name": "Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "proxy", 
+         "support_check": "endpoint_lookup", 
+         "method_name": "get_endpoint_lookup_session", 
+         "var_name": "endpoint_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "TransportProxyManager"
+      }
+   }, 
+   "OutboundStreamSession.get_endpoint_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_endpoint_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "transport", 
+         "module_name": "sessions", 
+         "var_name": "endpoint_id", 
+         "interface_name": "OutboundStreamSession"
+      }
+   }, 
+   "OutboundStreamSession.get_endpoint": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_endpoint", 
+         "return_type_full": "osid.transport.Endpoint", 
+         "package_name": "transport", 
+         "module_name": "sessions", 
+         "var_name": "endpoint", 
+         "interface_name": "OutboundStreamSession"
+      }
+   }, 
+   "OutboundStreamSession.send_data": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "send_data", 
+         "module_name": "sessions", 
+         "interface_name": "OutboundStreamSession", 
+         "package_name": "transport"
+      }
+   }, 
+   "OutboundStreamSession.has_data_available": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_data_available", 
+         "module_name": "sessions", 
+         "interface_name": "OutboundStreamSession", 
+         "package_name": "transport"
+      }
+   }, 
+   "OutboundStreamSession.receive_data": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "receive_data", 
+         "module_name": "sessions", 
+         "interface_name": "OutboundStreamSession", 
+         "package_name": "transport"
+      }
+   }, 
+   "InboundStreamSession.get_endpoint_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_endpoint_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "transport", 
+         "module_name": "sessions", 
+         "var_name": "endpoint_id", 
+         "interface_name": "InboundStreamSession"
+      }
+   }, 
+   "InboundStreamSession.get_endpoint": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_endpoint", 
+         "return_type_full": "osid.transport.Endpoint", 
+         "package_name": "transport", 
+         "module_name": "sessions", 
+         "var_name": "endpoint", 
+         "interface_name": "InboundStreamSession"
+      }
+   }, 
+   "InboundStreamSession.register_callback": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_callback", 
+         "module_name": "sessions", 
+         "interface_name": "InboundStreamSession", 
+         "package_name": "transport"
+      }
+   }, 
+   "OutboundMessageSession.get_endpoint_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_endpoint_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "transport", 
+         "module_name": "sessions", 
+         "var_name": "endpoint_id", 
+         "interface_name": "OutboundMessageSession"
+      }
+   }, 
+   "OutboundMessageSession.get_endpoint": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_endpoint", 
+         "return_type_full": "osid.transport.Endpoint", 
+         "package_name": "transport", 
+         "module_name": "sessions", 
+         "var_name": "endpoint", 
+         "interface_name": "OutboundMessageSession"
+      }
+   }, 
+   "OutboundMessageSession.get_request": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_request", 
+         "module_name": "sessions", 
+         "interface_name": "OutboundMessageSession", 
+         "package_name": "transport"
+      }
+   }, 
+   "OutboundMessageSession.make_request": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "make_request", 
+         "module_name": "sessions", 
+         "interface_name": "OutboundMessageSession", 
+         "package_name": "transport"
+      }
+   }, 
+   "OutboundMessageSession.send_request": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "send_request", 
+         "module_name": "sessions", 
+         "interface_name": "OutboundMessageSession", 
+         "package_name": "transport"
+      }
+   }, 
+   "InboundMessageSession.get_endpoint_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_endpoint_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "transport", 
+         "module_name": "sessions", 
+         "var_name": "endpoint_id", 
+         "interface_name": "InboundMessageSession"
+      }
+   }, 
+   "InboundMessageSession.get_endpoint": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_endpoint", 
+         "return_type_full": "osid.transport.Endpoint", 
+         "package_name": "transport", 
+         "module_name": "sessions", 
+         "var_name": "endpoint", 
+         "interface_name": "InboundMessageSession"
+      }
+   }, 
+   "InboundMessageSession.register_callback": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_callback", 
+         "module_name": "sessions", 
+         "interface_name": "InboundMessageSession", 
+         "package_name": "transport"
+      }
+   }, 
+   "EndpointLookupSession.init_pattern": "resource.BinLookupSession", 
+   "EndpointLookupSession.can_lookup_endpoints": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_endpoints", 
+         "object_name": "Endpoint", 
+         "var_name": "can_lookup_endpoints", 
+         "package_name": "transport", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "EndpointLookupSession.use_comparative_endpoint_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_endpoint_view", 
+         "var_name": "comparative_view", 
+         "package_name": "transport", 
+         "cat_name": "endpoint", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "EndpointLookupSession.use_plenary_endpoint_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_endpoint_view", 
+         "var_name": "plenary_view", 
+         "package_name": "transport", 
+         "cat_name": "endpoint", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "EndpointLookupSession.get_endpoint": {
+      "pattern": "resource.BinLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_endpoint", 
+         "return_type_full": "osid.transport.Endpoint", 
+         "package_name": "transport", 
+         "cat_name": "Endpoint", 
+         "arg0_name": "endpoint_id", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "EndpointLookupSession.get_endpoints_by_ids": {
+      "pattern": "resource.BinLookupSession.get_bins_by_ids", 
+      "kwargs": {
+         "method_name": "get_endpoints_by_ids", 
+         "return_type_full": "osid.transport.EndpointList", 
+         "package_name": "transport", 
+         "cat_name": "Endpoint", 
+         "arg0_name": "endpoint_ids", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "EndpointLookupSession.get_endpoints_by_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_genus_type", 
+      "kwargs": {
+         "method_name": "get_endpoints_by_genus_type", 
+         "return_type_full": "osid.transport.EndpointList", 
+         "package_name": "transport", 
+         "cat_name": "Endpoint", 
+         "arg0_name": "endpoint_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "EndpointLookupSession.get_endpoints_by_parent_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_parent_genus_type", 
+      "kwargs": {
+         "method_name": "get_endpoints_by_parent_genus_type", 
+         "return_type_full": "osid.transport.EndpointList", 
+         "package_name": "transport", 
+         "cat_name": "Endpoint", 
+         "arg0_name": "endpoints_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "EndpointLookupSession.get_endpoints_by_record_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_record_type", 
+      "kwargs": {
+         "method_name": "get_endpoints_by_record_type", 
+         "return_type_full": "osid.transport.EndpointList", 
+         "package_name": "transport", 
+         "cat_name": "Endpoint", 
+         "arg0_name": "endpoints_record_type", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "EndpointLookupSession.get_endpoints_by_provider": {
+      "pattern": "resource.BinLookupSession.get_bins_by_provider", 
+      "kwargs": {
+         "method_name": "get_endpoints_by_provider", 
+         "return_type_full": "osid.transport.EndpointList", 
+         "package_name": "transport", 
+         "cat_name": "Endpoint", 
+         "arg0_name": "resource_id", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "EndpointLookupSession.get_endpoints": {
+      "pattern": "resource.BinLookupSession.get_bins", 
+      "kwargs": {
+         "method_name": "get_endpoints", 
+         "return_type_full": "osid.transport.EndpointList", 
+         "package_name": "transport", 
+         "cat_name": "Endpoint", 
+         "module_name": "sessions", 
+         "interface_name": "EndpointLookupSession"
+      }
+   }, 
+   "Endpoint.init_pattern": "resource.Bin", 
+   "EndpointForm.init_pattern": "resource.BinForm", 
+   "EndpointList.get_next_endpoint": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_endpoint", 
+         "return_type_full": "osid.transport.Endpoint", 
+         "package_name": "transport", 
+         "module_name": "objects", 
+         "var_name": "endpoint", 
+         "interface_name": "EndpointList"
+      }
+   }, 
+   "EndpointList.get_next_endpoints": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_endpoints", 
+         "return_type_full": "osid.transport.Endpoint", 
+         "package_name": "transport", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "endpoints", 
+         "interface_name": "EndpointList"
+      }
+   }, 
+   "Response.init_pattern": "resource.Resource", 
+   "Response.ok": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "ok", 
+         "module_name": "objects", 
+         "interface_name": "Response", 
+         "package_name": "transport"
+      }
+   }, 
+   "Response.get_status_message": {
+      "pattern": "repository.Asset.get_title", 
+      "kwargs": {
+         "method_name": "get_status_message", 
+         "object_name": "Response", 
+         "return_type_full": "osid.locale.DisplayText", 
+         "package_name": "transport", 
+         "module_name": "objects", 
+         "var_name": "status_message", 
+         "interface_name": "Response"
+      }
+   }, 
+   "Response.get_response_record": {
+      "pattern": "resource.Resource.get_resource_record", 
+      "kwargs": {
+         "return_type_full": "osid.transport.records.ResponseRecord", 
+         "package_name": "transport", 
+         "arg0_name": "response_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_response_record", 
+         "var_name": "response_record", 
+         "module_name": "objects", 
+         "interface_name": "Response"
+      }
+   }
+}

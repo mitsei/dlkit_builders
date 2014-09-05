@@ -1,0 +1,1603 @@
+{
+   "name": "id", 
+   "version": "3.0.0", 
+   "title": "Id Open Service Interface Definitions", 
+   "copyright": "Copyright (c) 2002, 2006 Massachusetts Institute of Technology. All\nRights Reserved.", 
+   "license": "This Work is being provided by the copyright holder(s) subject to the\nfollowing license. By obtaining, using and/or copying this Work, you\nagree that you have read, understand, and will comply with the following\nterms and conditions.\n\nPermission to use, copy and distribute unmodified versions of this Work,\nfor any purpose, without fee or royalty is hereby granted, provided that\nyou include the above copyright notices and the terms of this license on\nALL copies of the Work or portions thereof.\n\nYou may modify or create Derivatives of this Work only for your internal\npurposes. You shall not distribute or transfer any such Derivative of\nthis Work to any location or to any third party. For the purposes of\nthis license, \"Derivative\" shall mean any derivative of the Work as\ndefined in the United States Copyright Act of 1976, such as a\ntranslation or modification.\n\nThis Work and the information contained herein is provided on an \"AS IS\"\nbasis WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT\nNOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR\nPURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT\nHOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN\nAN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN\nCONNECTION WITH THE WORK OR THE USE OR OTHER DEALINGS IN THE WORK.\n\nThe export of software employing encryption technology may require a\nspecific license from the United States Government. It is the\nresponsibility of any person or organization contemplating export to\nobtain such a license before exporting this Work.", 
+   "summary": "The Id OSID provides the means for creating and mapping identifiers. All\nOSID objects are identified by a unique and immutable ``Id``. The ``Id``\nOSID can be used to generate new ``Ids`` when creating new objects.\n\nConsumers wishing to persist an OSID object should instead persist the\nreference to the object by serializing the ``Id``.\n\nMost OSID interfaces are used to encapsulate implementation-specific\nobjects from provider to consumer. ``Id`` is an ``OsidPrimitive`` and as\nsuch cannot be used to encapsulate implementation-specific data other\nthan what is defined explicitly in the ``Id``. An OSID Provider must\nrespect any ``Id`` based on its interface alone.\n\nThe Id service can be used to assign Ids for an OSID Provider or be used\nto manage Id translations for system to system compatibility.\n\nThe ``Id`` service can also be used as a means to map one identifier to\nanother when an object is known by multiple identifiers. Mapping\nidentifier spaces is often a critical part of interoperability and the\nId service can be used as a shim to bridge different systems.\n\nId Mapping Example\n  public Asset getAsset(assetId) {\n      Id id = idSession.getId(assetId);\n      return (other_impl.getAsset(assetId));\n  }\n\n", 
+   "interfaces": [
+      {
+         "fullname": "osid.id.IdProfile", 
+         "shortname": "IdProfile", 
+         "category": "managers", 
+         "doc": {
+            "headline": "The ``IdProfile`` describes the interoperability among id services.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidProfile"
+         ], 
+         "inherit_shortnames": [
+            "OsidProfile"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidProfile"
+            }
+         ], 
+         "method_names": [
+            "supports_id_lookup", 
+            "supports_id_issue", 
+            "supports_id_admin", 
+            "supports_id_batch"
+         ], 
+         "methods": [
+            {
+               "name": "supports_id_lookup", 
+               "doc": {
+                  "headline": "Tests if ``Id`` lookup is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if ``Id`` lookup is supported,\n                ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if ``Id`` lookup is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_id_issue", 
+               "doc": {
+                  "headline": "Tests if an ``Id`` issue service is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if ``Id`` issuing is supported,\n                ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if ``Id`` issuing is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_id_admin", 
+               "doc": {
+                  "headline": "Tests if an ``Id`` administrative service is supported.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if ``Id`` administration is\n                supported, ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if ``Id`` administration is supported, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "supports_id_batch", 
+               "doc": {
+                  "headline": "Tests for the availability of an Id batch service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``true`` if an Id batch service is\n                available, ``false`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``true`` if an Id batch service is available, ``false`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.id.IdManager", 
+         "shortname": "IdManager", 
+         "category": "managers", 
+         "doc": {
+            "headline": "This manager provides access to the available sessions of the Id service.", 
+            "body": "    ``Ids`` are created through the ``IdAdminSession`` which provides\n    the means for creating a unique identifier.\n\n    The ``IdLookupSession`` can be used for mapping one ``Id`` to\n    another in addition to getting a list of the assigned identifiers."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidManager", 
+            "osid.id.IdProfile"
+         ], 
+         "inherit_shortnames": [
+            "OsidManager", 
+            "IdProfile"
+         ], 
+         "inherit_pkg_names": [
+            "osid", 
+            "id"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidManager"
+            }, 
+            {
+               "pkg_name": "id", 
+               "name": "IdProfile"
+            }
+         ], 
+         "method_names": [
+            "get_id_lookup_session", 
+            "get_id_issue_session", 
+            "get_id_admin_session", 
+            "get_id_batch_manager"
+         ], 
+         "methods": [
+            {
+               "name": "get_id_lookup_session", 
+               "doc": {
+                  "headline": "Gets the session associated with the id lookup service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.IdLookupSession) - an ``IdLookupSession``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_id_lookup()`` is ``false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: an ``IdLookupSession``\n        :rtype: ``osid.id.IdLookupSession``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_id_lookup()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_id_lookup()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.IdLookupSession", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_id_issue_session", 
+               "doc": {
+                  "headline": "Gets the session associated with the id issue service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.IdIssueSession) - an ``IdIssueSession``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_id_issue()`` is ``false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: an ``IdIssueSession``\n        :rtype: ``osid.id.IdIssueSession``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_id_issue()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_id_issue()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.IdIssueSession", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_id_admin_session", 
+               "doc": {
+                  "headline": "Gets the session associated with the id admin service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.IdAdminSession) - an ``IdAdminSession``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_id_admin()`` is ``false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: an ``IdAdminSession``\n        :rtype: ``osid.id.IdAdminSession``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_id_admin()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_id_admin()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.IdAdminSession", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_id_batch_manager", 
+               "doc": {
+                  "headline": "Gets an ``IdBatchManager``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.batch.IdBatchManager) - an ``IdBatchManager``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_id_batch()`` is ``false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: an ``IdBatchManager``\n        :rtype: ``osid.id.batch.IdBatchManager``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_id_batch()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_id_batch()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.batch.IdBatchManager", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.id.IdProxyManager", 
+         "shortname": "IdProxyManager", 
+         "category": "managers", 
+         "doc": {
+            "headline": "This manager provides access to the available sessions of the Id service.", 
+            "body": "    Methods in this manager support the passing of a ``Proxy`` object\n    for the purpose of pasisng information from a server envrionment.\n\n    ``Ids`` are created through the ``IdAdminSession`` which provides\n    the means for creating a unique identifier. The ``IdBrowserSession``\n    can be used for mapping one ``Id`` to another in addition to getting\n    a list of the assigned identifiers."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidProxyManager", 
+            "osid.id.IdProfile"
+         ], 
+         "inherit_shortnames": [
+            "OsidProxyManager", 
+            "IdProfile"
+         ], 
+         "inherit_pkg_names": [
+            "osid", 
+            "id"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidProxyManager"
+            }, 
+            {
+               "pkg_name": "id", 
+               "name": "IdProfile"
+            }
+         ], 
+         "method_names": [
+            "get_id_lookup_session", 
+            "get_id_issue_session", 
+            "get_id_admin_session", 
+            "get_id_batch_proxy_manager"
+         ], 
+         "methods": [
+            {
+               "name": "get_id_lookup_session", 
+               "doc": {
+                  "headline": "Gets the session associated with the id lookup service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.id.IdLookupSession) - an ``IdLookupSession``", 
+               "error_doc": "        raise:  NullArgument - ``proxy`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_id_lookup()`` is ``false``", 
+               "sphinx_param_doc": "        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``IdLookupSession``\n        :rtype: ``osid.id.IdLookupSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_id_lookup()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_id_lookup()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.id.IdLookupSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_id_issue_session", 
+               "doc": {
+                  "headline": "Gets the session associated with the id issue service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.id.IdIssueSession) - an ``IdIssueSession``", 
+               "error_doc": "        raise:  NullArgument - ``proxy`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_id_issue()`` is ``false``", 
+               "sphinx_param_doc": "        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``IdIssueSession``\n        :rtype: ``osid.id.IdIssueSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_id_issue()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_id_issue()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.id.IdIssueSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_id_admin_session", 
+               "doc": {
+                  "headline": "Gets the session associated with the id administrative service.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    proxy (osid.proxy.Proxy): a proxy\n", 
+               "return_doc": "        return: (osid.id.IdAdminSession) - an ``IdAdminSession``", 
+               "error_doc": "        raise:  NullArgument - ``proxy`` is ``null``\n        raise:  OperationFailed - ``unable to complete request``\n        raise:  Unimplemented - ``supports_id_admin()`` is ``false``", 
+               "sphinx_param_doc": "        :param proxy: a proxy\n        :type proxy: ``osid.proxy.Proxy``\n", 
+               "sphinx_return_doc": "        :return: an ``IdAdminSession``\n        :rtype: ``osid.id.IdAdminSession``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``proxy`` is ``null``\n        :raise: ``OperationFailed`` -- ``unable to complete request``\n        :raise: ``Unimplemented`` -- ``supports_id_admin()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_id_admin()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.proxy.Proxy", 
+                     "var_name": "proxy", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.proxy.Proxy"
+               ], 
+               "return_type": "osid.id.IdAdminSession", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_id_batch_proxy_manager", 
+               "doc": {
+                  "headline": "Gets an ``IdnProxyManager``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.batch.IdBatchProxyManager) - an\n                ``IdBatchProxyManager``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  Unimplemented - ``supports_id_batch()`` is ``false``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: an ``IdBatchProxyManager``\n        :rtype: ``osid.id.batch.IdBatchProxyManager``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``Unimplemented`` -- ``supports_id_batch()`` is ``false``", 
+               "compliance_doc": "        *compliance: optional -- This method must be implemented if ``supports_id_batch()`` is ``true``.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.batch.IdBatchProxyManager", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "UNIMPLEMENTED": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.id.IdLookupSession", 
+         "shortname": "IdLookupSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "This session is for retrieving ``Id`` objects.", 
+            "body": "    ``get_ids()`` retrieves all known ``Ids``. The existence of a single\n    identifier can be confirmed through the ``get_id()`` method, or it\n    can be used as a means of ``Id`` translation."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "can_lookup_ids", 
+            "get_id", 
+            "get_ids_by_ids", 
+            "get_ids_by_authority", 
+            "get_ids_by_authority_and_namespace", 
+            "get_ids", 
+            "is_equivalent", 
+            "get_id_aliases", 
+            "get_id_aliases_by_authority", 
+            "get_id_aliases_by_authority_and_namespace"
+         ], 
+         "methods": [
+            {
+               "name": "can_lookup_ids", 
+               "doc": {
+                  "headline": "Tests if this user can perform ``Id`` lookups.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known all methods in this\n        session will result in a ``PermissionDenied``. This is intended\n        as a hint to an application that may opt not to offer lookup\n        operations."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``false`` if lookup methods are not\n                authorized, ``true`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``false`` if lookup methods are not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_id", 
+               "doc": {
+                  "headline": "Gets an ``Id``.", 
+                  "body": "        This method serves to get the principal ``Id`` if the given\n        ``Id`` Is an alias."
+               }, 
+               "arg_doc": "        arg:    id (osid.id.Id): an ``Id``\n", 
+               "return_doc": "        return: (osid.id.Id) - the ``Id``", 
+               "error_doc": "        raise:  NotFound - ``id`` is not found\n        raise:  NullArgument - ``id`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param id: an ``Id``\n        :type id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "        :return: the ``Id``\n        :rtype: ``osid.id.Id``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``id`` is not found\n        :raise: ``NullArgument`` -- ``id`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "id_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id"
+               ], 
+               "return_type": "osid.id.Id", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_ids_by_ids", 
+               "doc": {
+                  "headline": "Gets a list of ``Ids``.", 
+                  "body": "        This method serves to get the principal ``Ids`` if different\n        from the given ``Ids``."
+               }, 
+               "arg_doc": "        arg:    ids (osid.id.IdList): a list of ``Ids``\n", 
+               "return_doc": "        return: (osid.id.IdList) - a list of ``Ids``", 
+               "error_doc": "        raise:  NotFound - an ``id`` is not found\n        raise:  NullArgument - ``ids`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param ids: a list of ``Ids``\n        :type ids: ``osid.id.IdList``\n", 
+               "sphinx_return_doc": "        :return: a list of ``Ids``\n        :rtype: ``osid.id.IdList``", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- an ``id`` is not found\n        :raise: ``NullArgument`` -- ``ids`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.IdList", 
+                     "var_name": "ids", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.IdList"
+               ], 
+               "return_type": "osid.id.IdList", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_ids_by_authority", 
+               "doc": {
+                  "headline": "Gets ``Ids`` by the given authority.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    authority (string): an authority\n", 
+               "return_doc": "        return: (osid.id.IdList) - a list of ``Ids``", 
+               "error_doc": "        raise:  NullArgument - ``authority`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param authority: an authority\n        :type authority: ``string``\n", 
+               "sphinx_return_doc": "        :return: a list of ``Ids``\n        :rtype: ``osid.id.IdList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``authority`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "authority", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "osid.id.IdList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_ids_by_authority_and_namespace", 
+               "doc": {
+                  "headline": "Gets ``Ids`` by the given authority and namespace.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    authority (string): an authority\n        arg:    namespace (string): a namespace\n", 
+               "return_doc": "        return: (osid.id.IdList) - a list of ``Ids``", 
+               "error_doc": "        raise:  NullArgument - ``authority`` or ``namespace`` is\n                ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param authority: an authority\n        :type authority: ``string``\n        :param namespace: a namespace\n        :type namespace: ``string``\n", 
+               "sphinx_return_doc": "        :return: a list of ``Ids``\n        :rtype: ``osid.id.IdList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``authority`` or ``namespace`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "authority", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "string", 
+                     "var_name": "namespace", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string", 
+                  "string"
+               ], 
+               "return_type": "osid.id.IdList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_ids", 
+               "doc": {
+                  "headline": "Gets all ``Ids``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.IdList) - the list of all ``Ids``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the list of all ``Ids``\n        :rtype: ``osid.id.IdList``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.IdList", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "is_equivalent", 
+               "doc": {
+                  "headline": "Tests if the two ``Ids`` are equivalent.", 
+                  "body": "        Two ``Ids`` are equivalent if they identify the same object. If\n        one of the ``Ids`` is not known, they are not equivalent."
+               }, 
+               "arg_doc": "        arg:    id (osid.id.Id): an ``Id``\n        arg:    equivalent_id (osid.id.Id): an ``Id``\n", 
+               "return_doc": "        return: (boolean) - ``true`` if the ``Ids`` are equivalent,\n                false otherwise", 
+               "error_doc": "        raise:  NullArgument - ``null`` argument provided\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param id: an ``Id``\n        :type id: ``osid.id.Id``\n        :param equivalent_id: an ``Id``\n        :type equivalent_id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "        :return: ``true`` if the ``Ids`` are equivalent, false otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``null`` argument provided\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "id_", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "equivalent_id", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id", 
+                  "osid.id.Id"
+               ], 
+               "return_type": "boolean", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_id_aliases", 
+               "doc": {
+                  "headline": "Gets a list of ``Id`` aliases of an ``Id``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    id (osid.id.Id): an ``Id``\n", 
+               "return_doc": "        return: (osid.id.IdList) - a list of alias ``Ids``", 
+               "error_doc": "        raise:  NullArgument - ``id`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param id: an ``Id``\n        :type id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "        :return: a list of alias ``Ids``\n        :rtype: ``osid.id.IdList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``id`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "id_", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id"
+               ], 
+               "return_type": "osid.id.IdList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_id_aliases_by_authority", 
+               "doc": {
+                  "headline": "Gets a list of ``Id`` aliases in a authority for an ``Id``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    id (osid.id.Id): an ``Id``\n        arg:    authority (string): an authority\n", 
+               "return_doc": "        return: (osid.id.IdList) - a list of alias ``Ids``", 
+               "error_doc": "        raise:  NullArgument - ``id`` or ``authority`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param id: an ``Id``\n        :type id: ``osid.id.Id``\n        :param authority: an authority\n        :type authority: ``string``\n", 
+               "sphinx_return_doc": "        :return: a list of alias ``Ids``\n        :rtype: ``osid.id.IdList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``id`` or ``authority`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "id_", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "string", 
+                     "var_name": "authority", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id", 
+                  "string"
+               ], 
+               "return_type": "osid.id.IdList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "get_id_aliases_by_authority_and_namespace", 
+               "doc": {
+                  "headline": "Gets a list of ``Id`` aliases in a namespace for an ``Id``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    id (osid.id.Id): an ``Id``\n        arg:    authority (string): an authority\n        arg:    namespace (string): a namespace\n", 
+               "return_doc": "        return: (osid.id.IdList) - a list of alias ``Ids``", 
+               "error_doc": "        raise:  NullArgument - ``id, authority,`` or ``namespace`` is\n                ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param id: an ``Id``\n        :type id: ``osid.id.Id``\n        :param authority: an authority\n        :type authority: ``string``\n        :param namespace: a namespace\n        :type namespace: ``string``\n", 
+               "sphinx_return_doc": "        :return: a list of alias ``Ids``\n        :rtype: ``osid.id.IdList``", 
+               "sphinx_error_doc": "        :raise: ``NullArgument`` -- ``id, authority,`` or ``namespace`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "id_", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "string", 
+                     "var_name": "authority", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "string", 
+                     "var_name": "namespace", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id", 
+                  "string", 
+                  "string"
+               ], 
+               "return_type": "osid.id.IdList", 
+               "errors": {
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.id.IdIssueSession", 
+         "shortname": "IdIssueSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "This is a simple session used to create new ``Ids``.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "can_issue_ids", 
+            "issue_id"
+         ], 
+         "methods": [
+            {
+               "name": "can_issue_ids", 
+               "doc": {
+                  "headline": "Tests if this user can issue ``Ids``.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known create methods in\n        this session will result in a ``PermissionDenied``. This is\n        intended as a hint to an application that may opt not to offer\n        create operations."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``false`` if create methods are not\n                authorized, ``true`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``false`` if create methods are not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "issue_id", 
+               "doc": {
+                  "headline": "Issues a new ``Id``.", 
+                  "body": "        This method creates a new Id for a predetermined authority and\n        namespace."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.Id) - the new ``Id``", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the new ``Id``\n        :rtype: ``osid.id.Id``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.Id", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.id.IdAdminSession", 
+         "shortname": "IdAdminSession", 
+         "category": "sessions", 
+         "doc": {
+            "headline": "This session is used to manually create new ``Ids``.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidSession"
+         ], 
+         "inherit_shortnames": [
+            "OsidSession"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidSession"
+            }
+         ], 
+         "method_names": [
+            "can_create_ids", 
+            "get_id_form_for_create", 
+            "create_id", 
+            "can_alias_ids", 
+            "alias_id", 
+            "remove_alias"
+         ], 
+         "methods": [
+            {
+               "name": "can_create_ids", 
+               "doc": {
+                  "headline": "Tests if this user can create ``Ids``.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known create methods in\n        this session will result in a ``PermissionDenied``. This is\n        intended as a hint to an application that may opt not to offer\n        create operations."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``false`` if create methods are not\n                authorized, ``true`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``false`` if create methods are not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_id_form_for_create", 
+               "doc": {
+                  "headline": "Gets the ``Id`` form for creating new Ids.", 
+                  "body": "        A new form should be requested for each create transaction."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.IdForm) - the ``Id`` form", 
+               "error_doc": "        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the ``Id`` form\n        :rtype: ``osid.id.IdForm``", 
+               "sphinx_error_doc": "        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.IdForm", 
+               "errors": {
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "create_id", 
+               "doc": {
+                  "headline": "Creates a new ``Id``.", 
+                  "body": "        A new ``IdForm`` should be requested for each create\n        transaction."
+               }, 
+               "arg_doc": "        arg:    id_form (osid.id.IdForm): the ``Id`` form\n", 
+               "return_doc": "        return: (osid.id.Id) - the created ``Id``", 
+               "error_doc": "        raise:  AlreadyExists - an ``Id`` for the authority, namespace,\n                and identifier already exists\n        raise:  IllegalState - ``id_form`` already used in a create\n                transaction\n        raise:  InvalidArgument - one or more of the form elements is\n                invalid\n        raise:  NullArgument - ``id_form`` is ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure\n        raise:  Unsupported - ``id_form`` did not originate from\n                ``get_id_form_for_create()``", 
+               "sphinx_param_doc": "        :param id_form: the ``Id`` form\n        :type id_form: ``osid.id.IdForm``\n", 
+               "sphinx_return_doc": "        :return: the created ``Id``\n        :rtype: ``osid.id.Id``", 
+               "sphinx_error_doc": "        :raise: ``AlreadyExists`` -- an ``Id`` for the authority, namespace, and identifier already exists\n        :raise: ``IllegalState`` -- ``id_form`` already used in a create transaction\n        :raise: ``InvalidArgument`` -- one or more of the form elements is invalid\n        :raise: ``NullArgument`` -- ``id_form`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure\n        :raise: ``Unsupported`` -- ``id_form`` did not originate from ``get_id_form_for_create()``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.IdForm", 
+                     "var_name": "id_form", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.IdForm"
+               ], 
+               "return_type": "osid.id.Id", 
+               "errors": {
+                  "ALREADY_EXISTS": "User", 
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User", 
+                  "UNSUPPORTED": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "can_alias_ids", 
+               "doc": {
+                  "headline": "Tests if this user can alias ``Ids``.", 
+                  "body": "        A return of true does not guarantee successful authorization. A\n        return of false indicates that it is known add methods in this\n        session will result in a ``PermissionDenied``. This is intended\n        as a hint to an application that may opt not to offer alias\n        operations."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (boolean) - ``false`` if alias methods are not\n                authorized, ``true`` otherwise", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: ``false`` if alias methods are not authorized, ``true`` otherwise\n        :rtype: ``boolean``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "boolean", 
+               "errors": {}
+            }, 
+            {
+               "name": "alias_id", 
+               "doc": {
+                  "headline": "Makes two ``Ids`` equivalent.", 
+                  "body": "        The primary and equivalent ``Ids`` are already known to this\n        service ````. If the external ``Id`` is already mapped to\n        another ``Id,`` it is changed to map to the given primary\n        ``Id``. Calls to ``IdLookupSession.getId(equivalentId)`` return\n        the ``primaryId``."
+               }, 
+               "arg_doc": "        arg:    primary_id (osid.id.Id): the primary ``Id``\n        arg:    equivalent_id (osid.id.Id): an ``Id`` to be made\n                equivalent\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NotFound - ``primary_id`` or ``equivalent_id`` is not\n                found\n        raise:  NullArgument - ``primary_id`` or ``equivalent_id`` is\n                ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param primary_id: the primary ``Id``\n        :type primary_id: ``osid.id.Id``\n        :param equivalent_id: an ``Id`` to be made equivalent\n        :type equivalent_id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``primary_id`` or ``equivalent_id`` is not found\n        :raise: ``NullArgument`` -- ``primary_id`` or ``equivalent_id`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "primary_id", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "equivalent_id", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id", 
+                  "osid.id.Id"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }, 
+            {
+               "name": "remove_alias", 
+               "doc": {
+                  "headline": "Removes equivalence from two ``Ids``.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    primary_id (osid.id.Id): the primary ``Id``\n        arg:    equivalent_id (osid.id.Id): the equivalent ``Id``\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NotFound - ``primary_id`` or ``equivalent_id`` is not\n                found or ``equivalent_id`` not mapped to ``primary_id``\n        raise:  NullArgument - ``primary_id`` or ``equivalent_id`` is\n                ``null``\n        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure", 
+               "sphinx_param_doc": "        :param primary_id: the primary ``Id``\n        :type primary_id: ``osid.id.Id``\n        :param equivalent_id: the equivalent ``Id``\n        :type equivalent_id: ``osid.id.Id``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NotFound`` -- ``primary_id`` or ``equivalent_id`` is not found or ``equivalent_id`` not mapped to ``primary_id``\n        :raise: ``NullArgument`` -- ``primary_id`` or ``equivalent_id`` is ``null``\n        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "primary_id", 
+                     "array": false
+                  }, 
+                  {
+                     "arg_type": "osid.id.Id", 
+                     "var_name": "equivalent_id", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "osid.id.Id", 
+                  "osid.id.Id"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "NOT_FOUND": "User", 
+                  "NULL_ARGUMENT": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational", 
+                  "PERMISSION_DENIED": "User"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.id.Id", 
+         "shortname": "Id", 
+         "category": "primitives", 
+         "doc": {
+            "headline": "``Id`` represents an identifier object.", 
+            "body": "    Ids are designated by the following elements:\n\n      * ``identifier:`` a unique key or guid\n      * ``namespace:`` the namespace of the identifier\n      * ``authority:`` the issuer of the identifier\n\n    \n    Two Ids are equal if their namespace, identifier and authority\n    strings are equal. Only the identifier is case-sensitive. Persisting\n    an ``Id`` means persisting the above components."
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidPrimitive"
+         ], 
+         "inherit_shortnames": [
+            "OsidPrimitive"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidPrimitive"
+            }
+         ], 
+         "method_names": [
+            "get_authority", 
+            "get_identifier_namespace", 
+            "get_identifier"
+         ], 
+         "methods": [
+            {
+               "name": "get_authority", 
+               "doc": {
+                  "headline": "Gets the authority of this ``Id``.", 
+                  "body": "        The authority is a string used to ensure the uniqueness of this\n        ``Id`` when using a non- federated identifier space. Generally,\n        it is a service name identifying the provider of this ``Id``.\n        This method is used to compare one ``Id`` to another."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (string) - the authority of this ``Id``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the authority of this ``Id``\n        :rtype: ``string``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "string", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_identifier_namespace", 
+               "doc": {
+                  "headline": "Gets the namespace of the identifier.", 
+                  "body": "        The namespace reflects the domain in which the identifier is\n        unique. When using a global identifier schema, the namespace may\n        indicate the name of the scheme. When using a local\n        identification scheme, the namespace may be more specific, such\n        as the name of a database or file in which the identifiers\n        exist. Federating adapters may use a custom namespace to include\n        information for routing. This method is used to compare one\n        ``Id`` to another."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (string) - the authority of this ``Id``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the authority of this ``Id``\n        :rtype: ``string``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "string", 
+               "errors": {}
+            }, 
+            {
+               "name": "get_identifier", 
+               "doc": {
+                  "headline": "Gets the identifier of this ``Id``.", 
+                  "body": "        This method is used to compare one ``Id`` to another."
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (string) - the identifier of this ``Id``", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the identifier of this ``Id``\n        :rtype: ``string``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "string", 
+               "errors": {}
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.id.IdForm", 
+         "shortname": "IdForm", 
+         "category": "objects", 
+         "doc": {
+            "headline": "This form provides a means of creating an ``Id``.", 
+            "body": ""
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidForm"
+         ], 
+         "inherit_shortnames": [
+            "OsidForm"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidForm"
+            }
+         ], 
+         "method_names": [
+            "get_authority_metadata", 
+            "set_authority", 
+            "clear_authority", 
+            "get_identifier_namespace_metadata", 
+            "set_identifier_namespace", 
+            "clear_identifier_namespace", 
+            "get_identifier_prefix_metadata", 
+            "set_identifier_prefix", 
+            "clear_identifier_prefix", 
+            "get_identifier_suffix_metadata", 
+            "set_identifier_suffix", 
+            "clear_identifier_suffix", 
+            "get_identifier_metadata", 
+            "set_identifier", 
+            "clear_identifier"
+         ], 
+         "methods": [
+            {
+               "name": "get_authority_metadata", 
+               "doc": {
+                  "headline": "Gets the metadata for the authority.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.Metadata) - metadata for the authority", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: metadata for the authority\n        :rtype: ``osid.Metadata``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.Metadata", 
+               "errors": {}
+            }, 
+            {
+               "name": "set_authority", 
+               "doc": {
+                  "headline": "Sets the authority.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    authority (string): the authority\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  InvalidArgument - ``authority`` is invalid\n        raise:  NoAccess - ``authority`` cannot be modified\n        raise:  NullArgument - ``authority`` is ``null``", 
+               "sphinx_param_doc": "        :param authority: the authority\n        :type authority: ``string``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``InvalidArgument`` -- ``authority`` is invalid\n        :raise: ``NoAccess`` -- ``authority`` cannot be modified\n        :raise: ``NullArgument`` -- ``authority`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "authority", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NO_ACCESS": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "clear_authority", 
+               "doc": {
+                  "headline": "Clears the authority.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NoAccess - ``Metadata.isRequired()`` is ``true`` or\n                ``Metadata.isReadOnly()`` is ``true``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NoAccess`` -- ``Metadata.isRequired()`` is ``true`` or ``Metadata.isReadOnly()`` is ``true``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "NO_ACCESS": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_identifier_namespace_metadata", 
+               "doc": {
+                  "headline": "Gets the metadata for the identifier namespace.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.Metadata) - metadata for the namespace", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: metadata for the namespace\n        :rtype: ``osid.Metadata``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.Metadata", 
+               "errors": {}
+            }, 
+            {
+               "name": "set_identifier_namespace", 
+               "doc": {
+                  "headline": "Seta the identifier namespace.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    namespace (string): the namespace\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  InvalidArgument - ``namespace`` is invalid\n        raise:  NoAccess - ``namespace`` cannot be modified\n        raise:  NullArgument - ``namespace`` is ``null``", 
+               "sphinx_param_doc": "        :param namespace: the namespace\n        :type namespace: ``string``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``InvalidArgument`` -- ``namespace`` is invalid\n        :raise: ``NoAccess`` -- ``namespace`` cannot be modified\n        :raise: ``NullArgument`` -- ``namespace`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "namespace", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NO_ACCESS": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "clear_identifier_namespace", 
+               "doc": {
+                  "headline": "Clears the identifier namespace.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NoAccess - ``Metadata.isRequired()`` is ``true`` or\n                ``Metadata.isReadOnly()`` is ``true``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NoAccess`` -- ``Metadata.isRequired()`` is ``true`` or ``Metadata.isReadOnly()`` is ``true``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "NO_ACCESS": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_identifier_prefix_metadata", 
+               "doc": {
+                  "headline": "Gets the metadata for the identifier prefix.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.Metadata) - metadata for the prefix", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: metadata for the prefix\n        :rtype: ``osid.Metadata``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.Metadata", 
+               "errors": {}
+            }, 
+            {
+               "name": "set_identifier_prefix", 
+               "doc": {
+                  "headline": "Seta the identifier prefix.", 
+                  "body": "        An identifier will be generated with this prefix."
+               }, 
+               "arg_doc": "        arg:    prefix (string): the prefix\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  InvalidArgument - ``prefix`` is invalid\n        raise:  NoAccess - ``prefix`` cannot be modified\n        raise:  NullArgument - ``prefix`` is ``null``", 
+               "sphinx_param_doc": "        :param prefix: the prefix\n        :type prefix: ``string``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``InvalidArgument`` -- ``prefix`` is invalid\n        :raise: ``NoAccess`` -- ``prefix`` cannot be modified\n        :raise: ``NullArgument`` -- ``prefix`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "prefix", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NO_ACCESS": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "clear_identifier_prefix", 
+               "doc": {
+                  "headline": "Clears the identifier prefix.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NoAccess - ``Metadata.isRequired()`` is ``true`` or\n                ``Metadata.isReadOnly()`` is ``true``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NoAccess`` -- ``Metadata.isRequired()`` is ``true`` or ``Metadata.isReadOnly()`` is ``true``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "NO_ACCESS": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_identifier_suffix_metadata", 
+               "doc": {
+                  "headline": "Gets the metadata for the identifier suffix.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.Metadata) - metadata for the suffix", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: metadata for the suffix\n        :rtype: ``osid.Metadata``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.Metadata", 
+               "errors": {}
+            }, 
+            {
+               "name": "set_identifier_suffix", 
+               "doc": {
+                  "headline": "Seta the identifier prefix.", 
+                  "body": "        An identifier will be generated with this suffix."
+               }, 
+               "arg_doc": "        arg:    suffix (string): the suffix\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  InvalidArgument - ``suffix`` is invalid\n        raise:  NoAccess - ``suffix`` cannot be modified\n        raise:  NullArgument - ``suffix`` is ``null``", 
+               "sphinx_param_doc": "        :param suffix: the suffix\n        :type suffix: ``string``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``InvalidArgument`` -- ``suffix`` is invalid\n        :raise: ``NoAccess`` -- ``suffix`` cannot be modified\n        :raise: ``NullArgument`` -- ``suffix`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "suffix", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NO_ACCESS": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "clear_identifier_suffix", 
+               "doc": {
+                  "headline": "Clears the identifier suffix.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NoAccess - ``Metadata.isRequired()`` is ``true`` or\n                ``Metadata.isReadOnly()`` is ``true``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NoAccess`` -- ``Metadata.isRequired()`` is ``true`` or ``Metadata.isReadOnly()`` is ``true``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "NO_ACCESS": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "get_identifier_metadata", 
+               "doc": {
+                  "headline": "Gets the metadata for the identifier.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.Metadata) - metadata for the identifier", 
+               "error_doc": "", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: metadata for the identifier\n        :rtype: ``osid.Metadata``", 
+               "sphinx_error_doc": "", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.Metadata", 
+               "errors": {}
+            }, 
+            {
+               "name": "set_identifier", 
+               "doc": {
+                  "headline": "Seta the identifier.", 
+                  "body": ""
+               }, 
+               "arg_doc": "        arg:    identifier (string): the identifier\n", 
+               "return_doc": "", 
+               "error_doc": "        raise:  InvalidArgument - ``identifier`` is invalid\n        raise:  NoAccess - ``identifier`` cannot be modified\n        raise:  NullArgument - ``identifier`` is ``null``", 
+               "sphinx_param_doc": "        :param identifier: the identifier\n        :type identifier: ``string``\n", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``InvalidArgument`` -- ``identifier`` is invalid\n        :raise: ``NoAccess`` -- ``identifier`` cannot be modified\n        :raise: ``NullArgument`` -- ``identifier`` is ``null``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "string", 
+                     "var_name": "identifier", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "string"
+               ], 
+               "return_type": "", 
+               "errors": {
+                  "INVALID_ARGUMENT": "ConsumerContract", 
+                  "NO_ACCESS": "ConsumerContract", 
+                  "NULL_ARGUMENT": "ConsumerContract"
+               }
+            }, 
+            {
+               "name": "clear_identifier", 
+               "doc": {
+                  "headline": "Clears the identifier.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "", 
+               "error_doc": "        raise:  NoAccess - ``Metadata.isRequired()`` is ``true`` or\n                ``Metadata.isReadOnly()`` is ``true``", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "", 
+               "sphinx_error_doc": "        :raise: ``NoAccess`` -- ``Metadata.isRequired()`` is ``true`` or ``Metadata.isReadOnly()`` is ``true``", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "", 
+               "errors": {
+                  "NO_ACCESS": "ConsumerContract"
+               }
+            }
+         ]
+      }, 
+      {
+         "fullname": "osid.id.IdList", 
+         "shortname": "IdList", 
+         "category": "objects", 
+         "doc": {
+            "headline": "Like all ``OsidLists,``  ``IdList`` provides a means for accessing ``Id`` elements sequentially either one at a time or many at a time.", 
+            "body": "    Examples: while (il.hasNext()) { Id id = il.getNextId(); }\n\n    or\n      while (il.hasNext()) {\n           Id[] ids = il.getNextIds(il.available());\n      }\n    \n"
+         }, 
+         "inherit_fullnames": [
+            "osid.OsidList"
+         ], 
+         "inherit_shortnames": [
+            "OsidList"
+         ], 
+         "inherit_pkg_names": [
+            "osid"
+         ], 
+         "inheritance": [
+            {
+               "pkg_name": "osid", 
+               "name": "OsidList"
+            }
+         ], 
+         "method_names": [
+            "get_next_id", 
+            "get_next_ids"
+         ], 
+         "methods": [
+            {
+               "name": "get_next_id", 
+               "doc": {
+                  "headline": "Gets the next ``Id`` in this list.", 
+                  "body": ""
+               }, 
+               "arg_doc": "", 
+               "return_doc": "        return: (osid.id.Id) - the next ``Id`` in this list. The\n                ``has_next()`` method should be used to test that a next\n                ``Id`` is available before calling this method.", 
+               "error_doc": "        raise:  IllegalState - no more elements available in this list\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "", 
+               "sphinx_return_doc": "        :return: the next ``Id`` in this list. The ``has_next()`` method should be used to test that a next ``Id`` is available before calling this method.\n        :rtype: ``osid.id.Id``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- no more elements available in this list\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [], 
+               "arg_types": [], 
+               "return_type": "osid.id.Id", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }, 
+            {
+               "name": "get_next_ids", 
+               "doc": {
+                  "headline": "Gets the next set of ``Ids`` in this list.", 
+                  "body": "        The specified amount must be less than or equal to the return\n        from ``available()``."
+               }, 
+               "arg_doc": "        arg:    n (cardinal): the number of ``Id`` elements requested\n                which must be less than or equal to ``available()``\n", 
+               "return_doc": "        return: (osid.id.Id) - an array of ``Id`` elements.The length of\n                the array is less than or equal to the number specified.", 
+               "error_doc": "        raise:  IllegalState - no more elements available in this list\n        raise:  OperationFailed - unable to complete request", 
+               "sphinx_param_doc": "        :param n: the number of ``Id`` elements requested which must be less than or equal to ``available()``\n        :type n: ``cardinal``\n", 
+               "sphinx_return_doc": "        :return: an array of ``Id`` elements.The length of the array is less than or equal to the number specified.\n        :rtype: ``osid.id.Id``", 
+               "sphinx_error_doc": "        :raise: ``IllegalState`` -- no more elements available in this list\n        :raise: ``OperationFailed`` -- unable to complete request", 
+               "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n", 
+               "impl_notes_doc": "", 
+               "args": [
+                  {
+                     "arg_type": "cardinal", 
+                     "var_name": "n", 
+                     "array": false
+                  }
+               ], 
+               "arg_types": [
+                  "cardinal"
+               ], 
+               "return_type": "osid.id.Id", 
+               "errors": {
+                  "ILLEGAL_STATE": "ConsumerContract", 
+                  "OPERATION_FAILED": "Operational"
+               }
+            }
+         ]
+      }
+   ], 
+   "full_name": "osid.id"
+}

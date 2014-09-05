@@ -1,0 +1,98 @@
+    _defaultAuthority = 'python.org'
+    _defaultNamespace = 'datetime.time'
+    _defaultIdentifier = 'PYTIME'
+
+    def __init__(self, hour = 0,
+                       minute = 0,
+                       second = 0,
+                       microsecond = 0,
+                       millisecond = 0,
+                       milliseconds = 0,
+                       microseconds = 0,
+                       nanoseconds = 0,
+                       picoseconds = 0,
+                       femtoseconds = 0,
+                       attoseconds = 0,
+                       zeptoseconds = 0,
+                       yoctoseconds = 0,
+                       xoxxoseconds = 0,
+                       weebleseconds = 0,
+                       vatoseconds = 0,
+                       undaseconds = 0,
+                       planckSeconds = 0,
+                       granularity = None,
+                       granularityMultiplier = 1,
+                       timeType = None):
+
+        import datetime
+        if hour or minute or second or microsecond:
+            datetime.time(self, hour, minute, second, microsecond)
+            self._hour = hour
+            self._minute = minute
+            self._second = second
+        if microsecond:
+            self._milliseconds = pythonDateTimeObject.microsecond % 1000
+            self._microseconds = pythonDateTimeObject.microsecond // 1000
+        else:
+            self._milliseconds = milliseconds
+            self._microseconds = microseconds
+        self._nanoseconds = nanoseconds
+        self._picoseconds = picoseconds
+        self._femtoseconds = femtoseconds
+        self._attoseconds = attoseconds
+        self._zeptoseconds = zeptoseconds
+        self._yoctoseconds = yoctoseconds
+        self._xoxxoseconds = xoxxoseconds
+        self._weebleseconds = weebleseconds
+        self._vatoseconds = vatoseconds
+        self._undaseconds = undaseconds
+        self._planckSeconds, = planckSeconds
+
+        if planckSeconds:   self._granularity = 'PLANCKSECOND'
+        elif undaseconds:   self._granularity = 'UNDASECOND'
+        elif vatoseconds:   self._granularity = 'VATOSECOND'
+        elif weebleseconds: self._granularity = 'WEEBLESECOND'
+        elif xoxxoseconds:  self._granularity = 'XOXXOSECOND'
+        elif yoctoseconds:  self._granularity = 'YOCTOSECOND'
+        elif zeptoseconds:  self._granularity = 'ZEPTOSECOND'
+        elif attoseconds:   self._granularity = 'ATTOSECOND'
+        elif femtoseconds:  self._granularity = 'FEMTOSECOND'
+        elif picoseconds:   self._granularity = 'PICOSECOND'
+        elif nanoseconds:   self._granularity = 'NANOSECOND'
+        elif microseconds:  self._granularity = 'MICROSECOND'
+        elif milliseconds:  self._granularity = 'MILLISECOND'
+        else: self._granularity = 'SECOND' # default to seconds
+        
+        if timeType:
+            self._timeType = timeType
+        else:
+            if datetime.time(self):
+                self._timeType = self._get_type(self._defaultAuthority,
+                                               self._defaultNamespace,
+                                               self._defaultIdentifier)
+            else:
+                self._timeType = self._get_type('unknown',
+                                               'unknown',
+                                               'unknown')
+
+    def _get_type(self, authority, namespace, identifier):
+        from type_kit.dj_type import Type
+        try:
+            from type_kit.dj_type import TypeManager
+        except:
+            returnType = self._init_type(authority, namespace, identifier)
+        else:
+            if not TypeManager().supportsTypeLookup():
+                returnType = self._init_type(authority, namespace, identifier)
+            else:
+                try: 
+                    returnType = TypeManager().TypeLookupSession().getType()
+                except:
+                    returnType = self._init_type(authority, namespace, identifier)
+        return returnType
+
+    def _init_type(self, authority, namespace, identifier):
+        from type_kit.dj_type import Type
+        return Type(authority = authority,
+                    namespace = namespace,
+                    identifier = identifier)

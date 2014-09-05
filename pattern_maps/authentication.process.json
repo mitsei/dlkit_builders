@@ -1,0 +1,1047 @@
+{
+   "impl_log": {
+      "managers": {
+         "AuthenticationProcessProfile": {
+            "supports_authentication_acquisition": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_authentication_input_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_authentication_validation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_circle_of_trust": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_authentication_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_credential_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_trust_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_credential_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_trust_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_challenge_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_credential_export": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_challenge": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_input_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trust_types": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "supports_challenge_record_type": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AuthenticationProcessManager": {
+            "get_circle_of_trust_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_acquisition_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trust_lookup_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_validation_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_circle_of_trust_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trust_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AuthenticationProcessProxyManager": {
+            "get_circle_of_trust_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_acquisition_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trust_lookup_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_validation_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_circle_of_trust_session_for_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trust_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }, 
+      "sessions": {
+         "AuthenticationAcquisitionSession": {
+            "get_authentication": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "AuthenticationValidationSession": {
+            "authenticate": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_authentication_input": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_challenge_data": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "TrustLookupSession": {
+            "get_trusts": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trusts_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trusts_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_trusts": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_circle_of_trust": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_trusts_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_trust_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trust": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trusts_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_trust_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "CircleOfTrustSession": {
+            "get_agency_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_agency": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_trust_circles": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "is_in_circle": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_federated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_trust": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_agency_view": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }
+   }, 
+   "package_objects_caps": [
+      "Agent", 
+      "Authentication", 
+      "Challenge", 
+      "Trust"
+   ], 
+   "package_objects_under": [
+      "agent", 
+      "authentication", 
+      "challenge", 
+      "trust"
+   ], 
+   "package_cataloged_objects_caps": [
+      "Agent", 
+      "Trust"
+   ], 
+   "package_cataloged_objects_under": [
+      "agent", 
+      "trust"
+   ], 
+   "package_objects_under_to_caps": {
+      "authentication": "Authentication", 
+      "trust": "Trust", 
+      "challenge": "Challenge", 
+      "agent": "Agent"
+   }, 
+   "package_relationships_caps": [], 
+   "package_relationships_under": [], 
+   "package_rules_caps": [], 
+   "package_rules_under": [], 
+   "package_catalog_caps": "Agency", 
+   "package_catalog_under": "agency", 
+   "package_relationships_detail": {}, 
+   "Authentication.instance_data": {
+      "valid": "boolean", 
+      "expiration": "boolean", 
+      "credential": "boolean", 
+      "authentication_record": "osid.authentication.process.records.AuthenticationRecord"
+   }, 
+   "Authentication.persisted_data": {
+      "agent": "osid.id.Id"
+   }, 
+   "Authentication.initialized_data": {}, 
+   "Authentication.aggregate_data": {}, 
+   "Authentication.arg_detail": {}, 
+   "Authentication.return_types": {
+      "agent": "osid.authentication.Agent", 
+      "expiration": "timestamp", 
+      "credential": "object", 
+      "authentication_record": "osid.authentication.process.records.AuthenticationRecord"
+   }, 
+   "Challenge.instance_data": {
+      "challenge_record": "osid.authentication.process.records.ChallengeRecord"
+   }, 
+   "Challenge.persisted_data": {}, 
+   "Challenge.initialized_data": {}, 
+   "Challenge.aggregate_data": {}, 
+   "Challenge.arg_detail": {}, 
+   "Challenge.return_types": {
+      "challenge_record": "osid.authentication.process.records.ChallengeRecord"
+   }, 
+   "Trust.instance_data": {
+      "trust_record": "osid.authentication.process.records.TrustRecord"
+   }, 
+   "Trust.persisted_data": {}, 
+   "Trust.initialized_data": {}, 
+   "Trust.aggregate_data": {}, 
+   "Trust.arg_detail": {}, 
+   "Trust.return_types": {
+      "trust_record": "osid.authentication.process.records.TrustRecord"
+   }, 
+   "AuthenticationProcessProfile.init_pattern": "resource.ResourceProfile", 
+   "AuthenticationProcessProfile.supports_authentication_acquisition": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_authentication_acquisition", 
+         "module_name": "managers", 
+         "var_name": "supports_authentication_acquisition", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_authentication_validation": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_authentication_validation", 
+         "module_name": "managers", 
+         "var_name": "supports_authentication_validation", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_trust_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_trust_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_trust_lookup", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_circle_of_trust": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_circle_of_trust", 
+         "module_name": "managers", 
+         "var_name": "supports_circle_of_trust", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_challenge": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_challenge", 
+         "module_name": "managers", 
+         "var_name": "supports_challenge", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessProfile.get_authentication_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_authentication_record_types", 
+         "var_name": "authentication_record_types", 
+         "package_name": "authentication.process", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "object_name_under": "authentication"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_authentication_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_authentication_record_type", 
+         "var_name": "authentication_record_type", 
+         "package_name": "authentication.process", 
+         "arg0_name": "authentication_record_type", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "object_name_under": "authentication"
+      }
+   }, 
+   "AuthenticationProcessProfile.get_authentication_input_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_authentication_input_record_types", 
+         "var_name": "authentication_input_record_types", 
+         "package_name": "authentication.process", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "object_name_under": "authentication_input"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_authentication_input_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_authentication_input_record_type", 
+         "var_name": "authentication_input_record_type", 
+         "package_name": "authentication.process", 
+         "arg0_name": "authentication_input_record_type", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "object_name_under": "authentication_input"
+      }
+   }, 
+   "AuthenticationProcessProfile.get_challenge_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_challenge_record_types", 
+         "var_name": "challenge_record_types", 
+         "package_name": "authentication.process", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "object_name_under": "challenge"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_challenge_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_challenge_record_type", 
+         "var_name": "challenge_record_type", 
+         "package_name": "authentication.process", 
+         "arg0_name": "challenge_record_type", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "object_name_under": "challenge"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_credential_export": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_credential_export", 
+         "module_name": "managers", 
+         "var_name": "supports_credential_export", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessProfile.get_credential_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_credential_types", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_credential_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_credential_type", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessProfile.get_trust_types": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_trust_types", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessProfile.supports_trust_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supports_trust_type", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProfile", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationProcessManager.init_pattern": "resource.ResourceManager", 
+   "AuthenticationProcessManager.get_authentication_acquisition_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.AuthenticationAcquisitionSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "support_check": "authentication_acquisition", 
+         "method_name": "get_authentication_acquisition_session", 
+         "var_name": "authentication_acquisition_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessManager"
+      }
+   }, 
+   "AuthenticationProcessManager.get_authentication_validation_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.AuthenticationValidationSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "support_check": "authentication_validation", 
+         "method_name": "get_authentication_validation_session", 
+         "var_name": "authentication_validation_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessManager"
+      }
+   }, 
+   "AuthenticationProcessManager.get_trust_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.TrustLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "support_check": "trust_lookup", 
+         "method_name": "get_trust_lookup_session", 
+         "var_name": "trust_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessManager"
+      }
+   }, 
+   "AuthenticationProcessManager.get_trust_lookup_session_for_agency": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.TrustLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "agency_id", 
+         "support_check": "trust_lookup", 
+         "method_name": "get_trust_lookup_session_for_agency", 
+         "var_name": "trust_lookup_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessManager"
+      }
+   }, 
+   "AuthenticationProcessManager.get_circle_of_trust_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.CircleOfTrustSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "support_check": "circle_of_trust", 
+         "method_name": "get_circle_of_trust_session", 
+         "var_name": "circle_of_trust_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessManager"
+      }
+   }, 
+   "AuthenticationProcessManager.get_circle_of_trust_session_for_agency": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.CircleOfTrustSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "agency_id", 
+         "support_check": "circle_of_trust", 
+         "method_name": "get_circle_of_trust_session_for_agency", 
+         "var_name": "circle_of_trust_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessManager"
+      }
+   }, 
+   "AuthenticationProcessProxyManager.init_pattern": "resource.ResourceProxyManager", 
+   "AuthenticationProcessProxyManager.get_authentication_acquisition_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.AuthenticationAcquisitionSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "proxy", 
+         "support_check": "authentication_acquisition", 
+         "method_name": "get_authentication_acquisition_session", 
+         "var_name": "authentication_acquisition_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProxyManager"
+      }
+   }, 
+   "AuthenticationProcessProxyManager.get_authentication_validation_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.AuthenticationValidationSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "proxy", 
+         "support_check": "authentication_validation", 
+         "method_name": "get_authentication_validation_session", 
+         "var_name": "authentication_validation_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProxyManager"
+      }
+   }, 
+   "AuthenticationProcessProxyManager.get_trust_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.TrustLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "proxy", 
+         "support_check": "trust_lookup", 
+         "method_name": "get_trust_lookup_session", 
+         "var_name": "trust_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProxyManager"
+      }
+   }, 
+   "AuthenticationProcessProxyManager.get_trust_lookup_session_for_agency": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.TrustLookupSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "agency_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "trust_lookup", 
+         "method_name": "get_trust_lookup_session_for_agency", 
+         "var_name": "trust_lookup_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProxyManager"
+      }
+   }, 
+   "AuthenticationProcessProxyManager.get_circle_of_trust_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.CircleOfTrustSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "proxy", 
+         "support_check": "circle_of_trust", 
+         "method_name": "get_circle_of_trust_session", 
+         "var_name": "circle_of_trust_session", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProxyManager"
+      }
+   }, 
+   "AuthenticationProcessProxyManager.get_circle_of_trust_session_for_agency": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.CircleOfTrustSession", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "agency_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "circle_of_trust", 
+         "method_name": "get_circle_of_trust_session_for_agency", 
+         "var_name": "circle_of_trust_session_for_agency", 
+         "module_name": "managers", 
+         "interface_name": "AuthenticationProcessProxyManager"
+      }
+   }, 
+   "AuthenticationAcquisitionSession.get_authentication": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_authentication", 
+         "module_name": "sessions", 
+         "interface_name": "AuthenticationAcquisitionSession", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationValidationSession.get_authentication_input": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_authentication_input", 
+         "module_name": "sessions", 
+         "interface_name": "AuthenticationValidationSession", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationValidationSession.authenticate": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "authenticate", 
+         "module_name": "sessions", 
+         "interface_name": "AuthenticationValidationSession", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "AuthenticationValidationSession.get_challenge_data": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_challenge_data", 
+         "module_name": "sessions", 
+         "interface_name": "AuthenticationValidationSession", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "TrustLookupSession.init_pattern": "resource.ResourceLookupSession", 
+   "TrustLookupSession.get_agency_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_agency_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication.process", 
+         "module_name": "sessions", 
+         "var_name": "agency_id", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.get_agency": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_agency", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication.process", 
+         "module_name": "sessions", 
+         "var_name": "agency", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.can_lookup_trusts": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_trusts", 
+         "object_name": "Trust", 
+         "var_name": "can_lookup_trusts", 
+         "package_name": "authentication.process", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.use_comparative_trust_view": {
+      "pattern": "resource.ResourceLookupSession.use_comparative_resource_view", 
+      "kwargs": {
+         "method_name": "use_comparative_trust_view", 
+         "var_name": "comparative_view", 
+         "package_name": "authentication.process", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession", 
+         "object_name_under": "trust"
+      }
+   }, 
+   "TrustLookupSession.use_plenary_trust_view": {
+      "pattern": "resource.ResourceLookupSession.use_plenary_resource_view", 
+      "kwargs": {
+         "method_name": "use_plenary_trust_view", 
+         "var_name": "plenary_view", 
+         "package_name": "authentication.process", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession", 
+         "object_name_under": "trust"
+      }
+   }, 
+   "TrustLookupSession.use_federated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_agency_view", 
+         "var_name": "federated_vew", 
+         "package_name": "authentication.process", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.use_isolated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_agency_view", 
+         "var_name": "isolated_view", 
+         "package_name": "authentication.process", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.get_trust": {
+      "pattern": "resource.ResourceLookupSession.get_resource", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.Trust", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "trust_id", 
+         "method_name": "get_trust", 
+         "object_name": "Trust", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.get_trusts_by_ids": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_ids", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.TrustList", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "trust_ids", 
+         "method_name": "get_trusts_by_ids", 
+         "object_name": "Trust", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.get_trusts_by_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.TrustList", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "trust_genus_type", 
+         "method_name": "get_trusts_by_genus_type", 
+         "object_name": "Trust", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.get_trusts_by_parent_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_parent_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.TrustList", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "trust_genus_type", 
+         "method_name": "get_trusts_by_parent_genus_type", 
+         "object_name": "Trust", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.get_trusts_by_record_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_record_type", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.TrustList", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "arg0_name": "trust_record_type", 
+         "method_name": "get_trusts_by_record_type", 
+         "object_name": "Trust", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "TrustLookupSession.get_circle_of_trust": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_circle_of_trust", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "TrustLookupSession.get_trusts": {
+      "pattern": "resource.ResourceLookupSession.get_resources", 
+      "kwargs": {
+         "method_name": "get_trusts", 
+         "object_name": "Trust", 
+         "return_type_full": "osid.authentication.process.TrustList", 
+         "package_name": "authentication.process", 
+         "cat_name": "Agency", 
+         "module_name": "sessions", 
+         "interface_name": "TrustLookupSession"
+      }
+   }, 
+   "CircleOfTrustSession.get_agency_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_agency_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication.process", 
+         "module_name": "sessions", 
+         "var_name": "agency_id", 
+         "interface_name": "CircleOfTrustSession"
+      }
+   }, 
+   "CircleOfTrustSession.get_agency": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_agency", 
+         "return_type_full": "osid.authentication.Agency", 
+         "package_name": "authentication.process", 
+         "module_name": "sessions", 
+         "var_name": "agency", 
+         "interface_name": "CircleOfTrustSession"
+      }
+   }, 
+   "CircleOfTrustSession.can_lookup_trust_circles": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_lookup_trust_circles", 
+         "module_name": "sessions", 
+         "interface_name": "CircleOfTrustSession", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "CircleOfTrustSession.use_federated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_agency_view", 
+         "var_name": "federated_vew", 
+         "package_name": "authentication.process", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "CircleOfTrustSession"
+      }
+   }, 
+   "CircleOfTrustSession.use_isolated_agency_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_agency_view", 
+         "var_name": "isolated_view", 
+         "package_name": "authentication.process", 
+         "cat_name": "agency", 
+         "module_name": "sessions", 
+         "interface_name": "CircleOfTrustSession"
+      }
+   }, 
+   "CircleOfTrustSession.get_trust": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_trust", 
+         "module_name": "sessions", 
+         "interface_name": "CircleOfTrustSession", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "CircleOfTrustSession.is_in_circle": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "is_in_circle", 
+         "module_name": "sessions", 
+         "interface_name": "CircleOfTrustSession", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "Authentication.init_pattern": "resource.Resource", 
+   "Authentication.get_agent_id": {
+      "pattern": "learning.Activity.get_objective_id", 
+      "kwargs": {
+         "method_name": "get_agent_id", 
+         "object_name": "Authentication", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "authentication.process", 
+         "module_name": "objects", 
+         "var_name": "agent", 
+         "interface_name": "Authentication"
+      }
+   }, 
+   "Authentication.get_agent": {
+      "pattern": "learning.Activity.get_objective", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.Agent", 
+         "cat_name": "Agency", 
+         "package_name": "authentication.process", 
+         "method_name": "get_agent", 
+         "object_name": "Authentication", 
+         "var_name": "agent", 
+         "module_name": "objects", 
+         "interface_name": "Authentication"
+      }
+   }, 
+   "Authentication.is_valid": {
+      "pattern": "resource.Resource.is_group", 
+      "kwargs": {
+         "method_name": "is_valid", 
+         "return_type_full": "boolean", 
+         "package_name": "authentication.process", 
+         "module_name": "objects", 
+         "var_name": "valid", 
+         "interface_name": "Authentication"
+      }
+   }, 
+   "Authentication.has_expiration": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_expiration", 
+         "module_name": "objects", 
+         "interface_name": "Authentication", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "Authentication.get_expiration": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_expiration", 
+         "module_name": "objects", 
+         "interface_name": "Authentication", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "Authentication.has_credential": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "has_credential", 
+         "module_name": "objects", 
+         "interface_name": "Authentication", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "Authentication.get_credential": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_credential", 
+         "module_name": "objects", 
+         "interface_name": "Authentication", 
+         "package_name": "authentication.process"
+      }
+   }, 
+   "Authentication.get_authentication_record": {
+      "pattern": "resource.Resource.get_resource_record", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.records.AuthenticationRecord", 
+         "package_name": "authentication.process", 
+         "arg0_name": "authentication_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_authentication_record", 
+         "var_name": "authentication_record", 
+         "module_name": "objects", 
+         "interface_name": "Authentication"
+      }
+   }, 
+   "Challenge.init_pattern": "resource.Resource", 
+   "Challenge.get_challenge_record": {
+      "pattern": "resource.Resource.get_resource_record", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.records.ChallengeRecord", 
+         "package_name": "authentication.process", 
+         "arg0_name": "challenge_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_challenge_record", 
+         "var_name": "challenge_record", 
+         "module_name": "objects", 
+         "interface_name": "Challenge"
+      }
+   }, 
+   "Trust.init_pattern": "resource.Resource", 
+   "Trust.get_trust_record": {
+      "pattern": "resource.Resource.get_resource_record", 
+      "kwargs": {
+         "return_type_full": "osid.authentication.process.records.TrustRecord", 
+         "package_name": "authentication.process", 
+         "arg0_name": "trust_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_trust_record", 
+         "var_name": "trust_record", 
+         "module_name": "objects", 
+         "interface_name": "Trust"
+      }
+   }, 
+   "TrustList.get_next_trust": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_trust", 
+         "return_type_full": "osid.authentication.process.Trust", 
+         "package_name": "authentication.process", 
+         "module_name": "objects", 
+         "var_name": "trust", 
+         "interface_name": "TrustList"
+      }
+   }, 
+   "TrustList.get_next_trusts": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_trusts", 
+         "return_type_full": "osid.authentication.process.Trust", 
+         "package_name": "authentication.process", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "trusts", 
+         "interface_name": "TrustList"
+      }
+   }
+}

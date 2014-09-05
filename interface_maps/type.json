@@ -1,0 +1,10 @@
+{
+   "type.TypeProfile": "managers", 
+   "type.TypeManager": "managers", 
+   "type.TypeProxyManager": "managers", 
+   "type.TypeLookupSession": "sessions", 
+   "type.TypeAdminSession": "sessions", 
+   "type.Type": "primitives", 
+   "type.TypeForm": "objects", 
+   "type.TypeList": "objects"
+}

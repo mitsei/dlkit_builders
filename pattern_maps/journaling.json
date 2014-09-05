@@ -1,0 +1,4900 @@
+{
+   "impl_log": {
+      "managers": {
+         "JournalingProfile": {
+            "supports_journal_entry_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_hierarchy_design": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_entry_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_branch_smart_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_branch_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_visible_federation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_entry_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_entry_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_branch_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_branch_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_entry_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journalng_batch": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_branch_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_branch_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_branch_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_branch_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_entry_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_entry_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_journal_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_record_types": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalingManager": {
+            "get_journal_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_lookup_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_admin_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_smart_journal_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_admin_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_query_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_hierarchy_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_search_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_search_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_notification_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_notification_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_query_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_lookup_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journaling_batch_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_search_session": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalingProxyManager": {
+            "get_journal_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_lookup_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_admin_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_smart_journal_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_admin_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_query_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_hierarchy_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_search_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_search_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_notification_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_notification_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_query_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_lookup_session_for_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journaling_batch_proxy_manager": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }, 
+      "sessions": {
+         "JournalEntryLookupSession": {
+            "use_plenary_journal_entry_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_for_branch_and_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_date_range_for_branch_and_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_for_branch": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_date_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_date_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_date_for_branch_and_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_journal_entry_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_date_range_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_federated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_date_for_branch": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_date_range_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_read_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_date_range_for_branch": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalEntryQuerySession": {
+            "get_journal_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entries_by_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_search_journal_entries": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalEntrySearchSession": {
+            "get_journal_entries_by_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_search_order": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalEntryAdminSession": {
+            "get_journal_entry_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_journal_entry": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_journal_entry_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "alias_journal_entry": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_entry_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_journal_entry_aliases": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_journal_entries": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_journal_entries": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "create_journal_entry": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_journal_entries": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "update_journal_entry": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalEntryNotificationSession": {
+            "register_for_deleted_journal_entries": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_journal_entries_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_journal_entries_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_journal_entries_for_branch": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_journal_entries": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_journal_entries_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_journal_entry": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_federated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_journal_entries": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_journal_entries_for_resource": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_journal_entries_for_branch": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_journal_entries_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_register_for_journal_entry_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_journal_entries_for_branch": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_journal_entries_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_journal_entry": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "BranchLookupSession": {
+            "get_branch": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branches_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branches_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_branch_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branches": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_branches": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_branch_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_any_status_branch_view": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_active_branch_view": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_branches_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branches_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "BranchQuerySession": {
+            "get_branch_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branches_by_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_search_branches": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "BranchSearchSession": {
+            "get_branch_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branches_by_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_search_order": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_search": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "BranchAdminSession": {
+            "can_create_branch": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supersede_branch": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_delete_branches": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_branch_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "merge_branches": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_manage_branch_aliases": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_supersede_branches": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_branch_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_branch": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_branches": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "alias_branch": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_merge_branches": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_branch_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "update_branch": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "create_branch": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_branches": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "BranchNotificationSession": {
+            "get_journal_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_branches": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_register_for_branch_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_federated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_branch": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_branch": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_branches": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_branches": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "BranchSmartJournalSession": {
+            "get_journal_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_branch_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "inspect_branch_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "apply_branch_sequencing": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_branch_search_order": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_branch_query_from_inspector": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "apply_branch_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_manage_smart_journals": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalLookupSession": {
+            "get_journals_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journals_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journals_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journals_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journals_by_provider": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalQuerySession": {
+            "get_journals_by_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_search_journals": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalSearchSession": {
+            "get_journal_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_search_order": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journals_by_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_search": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalAdminSession": {
+            "alias_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "create_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_journal_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_journal_aliases": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "update_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalNotificationSession": {
+            "can_register_for_journal_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_journal_ancestors": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_journal_ancestors": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_journal_descendants": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_journal_descendants": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_journals": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalHierarchySession": {
+            "has_parent_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_child_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_ancestor_of_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_parent_journal_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_parent_of_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_access_journal_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_root_journal_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_root_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "has_child_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_parent_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_child_of_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_node_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_nodes": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_journal_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_descendant_of_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_child_journal_ids": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "JournalHierarchyDesignSession": {
+            "remove_root_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_modify_journal_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_child_journals": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "add_child_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "add_root_journal": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_journal_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_child_journal": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }
+   }, 
+   "package_objects_caps": [
+      "JournalEntry", 
+      "Branch"
+   ], 
+   "package_objects_under": [
+      "journal_entry", 
+      "branch"
+   ], 
+   "package_cataloged_objects_caps": [
+      "JournalEntry", 
+      "Branch"
+   ], 
+   "package_cataloged_objects_under": [
+      "journal_entry", 
+      "branch"
+   ], 
+   "package_objects_under_to_caps": {
+      "journal_entry": "JournalEntry", 
+      "branch": "Branch"
+   }, 
+   "package_relationships_caps": [], 
+   "package_relationships_under": [], 
+   "package_rules_caps": [], 
+   "package_rules_under": [], 
+   "package_catalog_caps": "Journal", 
+   "package_catalog_under": "journal", 
+   "package_relationships_detail": {}, 
+   "JournalEntry.arg_detail": {
+      "branch": [], 
+      "source": []
+   }, 
+   "JournalEntry.persisted_data": {
+      "journal": "OsidCatalog", 
+      "branch": "osid.id.Id", 
+      "source": "osid.id.Id"
+   }, 
+   "JournalEntry.initialized_data": {
+      "journal": "OsidCatalog", 
+      "branch": "osid.id.Id", 
+      "source": "osid.id.Id"
+   }, 
+   "Branch.arg_detail": {}, 
+   "Branch.persisted_data": {
+      "journal": "OsidCatalog"
+   }, 
+   "Branch.initialized_data": {
+      "journal": "OsidCatalog"
+   }, 
+   "JournalEntry.instance_data": {
+      "version": "osid.id.Id", 
+      "timestamp": "osid.calendaring.DateTime", 
+      "resource": "osid.id.Id", 
+      "agent": "osid.id.Id", 
+      "journal_entry_record": "osid.journaling.records.JournalEntryRecord"
+   }, 
+   "JournalEntry.aggregate_data": {}, 
+   "JournalEntry.return_types": {
+      "branch": "osid.journaling.Branch", 
+      "source": "osid.id.Id", 
+      "version": "osid.id.Id", 
+      "timestamp": "osid.calendaring.DateTime", 
+      "resource": "osid.resource.Resource", 
+      "agent": "osid.authentication.Agent", 
+      "journal_entry_record": "osid.journaling.records.JournalEntryRecord"
+   }, 
+   "Branch.instance_data": {
+      "origin_journal_entry": "osid.id.Id", 
+      "latest_journal_entry": "osid.id.Id", 
+      "branch_record": "osid.journaling.records.BranchRecord"
+   }, 
+   "Branch.aggregate_data": {}, 
+   "Branch.return_types": {
+      "origin_journal_entry": "osid.journaling.JournalEntry", 
+      "latest_journal_entry": "osid.journaling.JournalEntry", 
+      "branch_record": "osid.journaling.records.BranchRecord"
+   }, 
+   "JournalEntryAdminSession.instance_data": {}, 
+   "BranchAdminSession.instance_data": {}, 
+   "JournalAdminSession.instance_data": {}, 
+   "JournalingProfile.init_pattern": "resource.ResourceProfile", 
+   "JournalingProfile.supports_visible_federation": {
+      "pattern": "resource.ResourceProfile.supports_visible_federation", 
+      "kwargs": {
+         "method_name": "supports_visible_federation", 
+         "module_name": "managers", 
+         "var_name": "supports_visible_federation", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_entry_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_entry_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_entry_lookup", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_entry_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_entry_query", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_entry_query", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_entry_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_entry_search", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_entry_search", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_entry_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_entry_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_entry_admin", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_entry_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_entry_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_entry_notification", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_branch_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_branch_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_branch_lookup", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_branch_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_branch_query", 
+         "module_name": "managers", 
+         "var_name": "supports_branch_query", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_branch_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_branch_search", 
+         "module_name": "managers", 
+         "var_name": "supports_branch_search", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_branch_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_branch_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_branch_admin", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_branch_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_branch_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_branch_notification", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_branch_smart_journal": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_branch_smart_journal", 
+         "module_name": "managers", 
+         "var_name": "supports_branch_smart_journal", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_lookup", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_query", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_query", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_search", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_search", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_admin", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_notification", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_hierarchy": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_hierarchy", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_hierarchy", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journal_hierarchy_design": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journal_hierarchy_design", 
+         "module_name": "managers", 
+         "var_name": "supports_journal_hierarchy_design", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.supports_journalng_batch": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_journalng_batch", 
+         "module_name": "managers", 
+         "var_name": "supports_journalng_batch", 
+         "interface_name": "JournalingProfile", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalingProfile.get_journal_entry_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_journal_entry_record_types", 
+         "var_name": "journal_entry_record_types", 
+         "package_name": "journaling", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "journal_entry"
+      }
+   }, 
+   "JournalingProfile.supports_journal_entry_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_journal_entry_record_type", 
+         "var_name": "journal_entry_record_type", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_record_type", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "journal_entry"
+      }
+   }, 
+   "JournalingProfile.get_journal_entry_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_journal_entry_search_record_types", 
+         "var_name": "journal_entry_search_record_types", 
+         "package_name": "journaling", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "journal_entry_search"
+      }
+   }, 
+   "JournalingProfile.supports_journal_entry_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_journal_entry_search_record_type", 
+         "var_name": "journal_entry_search_record_type", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "journal_entry_search"
+      }
+   }, 
+   "JournalingProfile.get_branch_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_branch_record_types", 
+         "var_name": "branch_record_types", 
+         "package_name": "journaling", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "branch"
+      }
+   }, 
+   "JournalingProfile.supports_branch_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_branch_record_type", 
+         "var_name": "branch_record_type", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_record_type", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "branch"
+      }
+   }, 
+   "JournalingProfile.get_branch_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_branch_search_record_types", 
+         "var_name": "branch_search_record_types", 
+         "package_name": "journaling", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "branch_search"
+      }
+   }, 
+   "JournalingProfile.supports_branch_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_branch_search_record_type", 
+         "var_name": "branch_search_record_type", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "branch_search"
+      }
+   }, 
+   "JournalingProfile.get_journal_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_journal_record_types", 
+         "var_name": "journal_record_types", 
+         "package_name": "journaling", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "journal"
+      }
+   }, 
+   "JournalingProfile.supports_journal_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_journal_record_type", 
+         "var_name": "journal_record_type", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_record_type", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "journal"
+      }
+   }, 
+   "JournalingProfile.get_journal_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_journal_search_record_types", 
+         "var_name": "journal_search_record_types", 
+         "package_name": "journaling", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "journal_search"
+      }
+   }, 
+   "JournalingProfile.supports_journal_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_journal_search_record_type", 
+         "var_name": "journal_search_record_type", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProfile", 
+         "object_name_under": "journal_search"
+      }
+   }, 
+   "JournalingManager.init_pattern": "resource.ResourceManager", 
+   "JournalingManager.get_journal_entry_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_entry_lookup", 
+         "method_name": "get_journal_entry_lookup_session", 
+         "var_name": "journal_entry_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_entry_lookup_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "journal_entry_lookup", 
+         "method_name": "get_journal_entry_lookup_session_for_journal", 
+         "var_name": "journal_entry_lookup_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_entry_query_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_entry_query", 
+         "method_name": "get_journal_entry_query_session", 
+         "var_name": "journal_entry_query_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_entry_query_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "journal_entry_query", 
+         "method_name": "get_journal_entry_query_session_for_journal", 
+         "var_name": "journal_entry_query_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_entry_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntrySearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_entry_search", 
+         "method_name": "get_journal_entry_search_session", 
+         "var_name": "journal_entry_search_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_entry_search_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntrySearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "journal_entry_search", 
+         "method_name": "get_journal_entry_search_session_for_journal", 
+         "var_name": "journal_entry_search_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_entry_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_entry_admin", 
+         "method_name": "get_journal_entry_admin_session", 
+         "var_name": "journal_entry_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_entry_admin_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "journal_entry_admin", 
+         "method_name": "get_journal_entry_admin_session_for_journal", 
+         "var_name": "journal_entry_admin_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_entry_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_receiver", 
+         "support_check": "journal_entry_notification", 
+         "method_name": "get_journal_entry_notification_session", 
+         "var_name": "journal_entry_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_entry_notification_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session_for_bin", 
+      "kwargs": {
+         "arg1_name": "journal_id", 
+         "return_type_full": "osid.journaling.JournalEntryNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_receiver", 
+         "support_check": "journal_entry_notification", 
+         "method_name": "get_journal_entry_notification_session_for_journal", 
+         "var_name": "journal_entry_notification_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "branch_lookup", 
+         "method_name": "get_branch_lookup_session", 
+         "var_name": "branch_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_lookup_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "branch_lookup", 
+         "method_name": "get_branch_lookup_session_for_journal", 
+         "var_name": "branch_lookup_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_query_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "branch_query", 
+         "method_name": "get_branch_query_session", 
+         "var_name": "branch_query_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_query_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "branch_query", 
+         "method_name": "get_branch_query_session_for_journal", 
+         "var_name": "branch_query_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchSearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "branch_search", 
+         "method_name": "get_branch_search_session", 
+         "var_name": "branch_search_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_search_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchSearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "branch_search", 
+         "method_name": "get_branch_search_session_for_journal", 
+         "var_name": "branch_search_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "branch_admin", 
+         "method_name": "get_branch_admin_session", 
+         "var_name": "branch_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_admin_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "branch_admin", 
+         "method_name": "get_branch_admin_session_for_journal", 
+         "var_name": "branch_admin_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_receiver", 
+         "support_check": "branch_notification", 
+         "method_name": "get_branch_notification_session", 
+         "var_name": "branch_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_notification_session_for_journal": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session_for_bin", 
+      "kwargs": {
+         "arg1_name": "journal_id", 
+         "return_type_full": "osid.journaling.BranchNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_receiver", 
+         "support_check": "branch_notification", 
+         "method_name": "get_branch_notification_session_for_journal", 
+         "var_name": "branch_notification_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_branch_smart_journal_session": {
+      "pattern": "resource.ResourceManager.get_resource_smart_bin_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchSmartJournalSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "branch_smart_journal", 
+         "method_name": "get_branch_smart_journal_session", 
+         "var_name": "branch_smart_journal_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_lookup", 
+         "method_name": "get_journal_lookup_session", 
+         "var_name": "journal_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_query_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_query", 
+         "method_name": "get_journal_query_session", 
+         "var_name": "journal_query_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalSearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_search", 
+         "method_name": "get_journal_search_session", 
+         "var_name": "journal_search_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_admin", 
+         "method_name": "get_journal_admin_session", 
+         "var_name": "journal_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_receiver", 
+         "support_check": "journal_notification", 
+         "method_name": "get_journal_notification_session", 
+         "var_name": "journal_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_hierarchy_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalHierarchySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_hierarchy", 
+         "method_name": "get_journal_hierarchy_session", 
+         "var_name": "journal_hierarchy_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journal_hierarchy_design_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalHierarchyDesignSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "support_check": "journal_hierarchy_design", 
+         "method_name": "get_journal_hierarchy_design_session", 
+         "var_name": "journal_hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingManager.get_journaling_batch_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_journaling_batch_manager", 
+         "return_type_full": "osid.journaling.batch.JournalingBatchManager", 
+         "package_name": "journaling", 
+         "module_name": "managers", 
+         "var_name": "journaling_batch_manager", 
+         "interface_name": "JournalingManager"
+      }
+   }, 
+   "JournalingProxyManager.init_pattern": "resource.ResourceProxyManager", 
+   "JournalingProxyManager.get_journal_entry_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_entry_lookup", 
+         "method_name": "get_journal_entry_lookup_session", 
+         "var_name": "journal_entry_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_entry_lookup_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "journal_entry_lookup", 
+         "method_name": "get_journal_entry_lookup_session_for_journal", 
+         "var_name": "journal_entry_lookup_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_entry_query_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_entry_query", 
+         "method_name": "get_journal_entry_query_session", 
+         "var_name": "journal_entry_query_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_entry_query_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "journal_entry_query", 
+         "method_name": "get_journal_entry_query_session_for_journal", 
+         "var_name": "journal_entry_query_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_entry_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntrySearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_entry_search", 
+         "method_name": "get_journal_entry_search_session", 
+         "var_name": "journal_entry_search_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_entry_search_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntrySearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "journal_entry_search", 
+         "method_name": "get_journal_entry_search_session_for_journal", 
+         "var_name": "journal_entry_search_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_entry_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_entry_admin", 
+         "method_name": "get_journal_entry_admin_session", 
+         "var_name": "journal_entry_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_entry_admin_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "journal_entry_admin", 
+         "method_name": "get_journal_entry_admin_session_for_journal", 
+         "var_name": "journal_entry_admin_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_entry_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_receiver", 
+         "support_check": "journal_entry_notification", 
+         "method_name": "get_journal_entry_notification_session", 
+         "var_name": "journal_entry_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_entry_notification_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_receiver", 
+         "arg0_type_full": "osid.journaling.JournalEntryReceiver", 
+         "support_check": "journal_entry_notification", 
+         "method_name": "get_journal_entry_notification_session_for_journal", 
+         "var_name": "journal_entry_notification_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "branch_lookup", 
+         "method_name": "get_branch_lookup_session", 
+         "var_name": "branch_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_lookup_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "branch_lookup", 
+         "method_name": "get_branch_lookup_session_for_journal", 
+         "var_name": "branch_lookup_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_query_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "branch_query", 
+         "method_name": "get_branch_query_session", 
+         "var_name": "branch_query_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_query_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "branch_query", 
+         "method_name": "get_branch_query_session_for_journal", 
+         "var_name": "branch_query_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchSearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "branch_search", 
+         "method_name": "get_branch_search_session", 
+         "var_name": "branch_search_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_search_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchSearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "branch_search", 
+         "method_name": "get_branch_search_session_for_journal", 
+         "var_name": "branch_search_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "branch_admin", 
+         "method_name": "get_branch_admin_session", 
+         "var_name": "branch_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_admin_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "branch_admin", 
+         "method_name": "get_branch_admin_session_for_journal", 
+         "var_name": "branch_admin_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_receiver", 
+         "support_check": "branch_notification", 
+         "method_name": "get_branch_notification_session", 
+         "var_name": "branch_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_notification_session_for_journal": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_receiver", 
+         "arg0_type_full": "osid.journaling.BranchReceiver", 
+         "support_check": "branch_notification", 
+         "method_name": "get_branch_notification_session_for_journal", 
+         "var_name": "branch_notification_session_for_journal", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_branch_smart_journal_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchSmartJournalSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "support_check": "branch_smart_journal", 
+         "method_name": "get_branch_smart_journal_session", 
+         "var_name": "branch_smart_journal_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalLookupSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_lookup", 
+         "method_name": "get_journal_lookup_session", 
+         "var_name": "journal_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_query_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalQuerySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_query", 
+         "method_name": "get_journal_query_session", 
+         "var_name": "journal_query_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalSearchSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_search", 
+         "method_name": "get_journal_search_session", 
+         "var_name": "journal_search_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalAdminSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_admin", 
+         "method_name": "get_journal_admin_session", 
+         "var_name": "journal_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalNotificationSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_receiver", 
+         "support_check": "journal_notification", 
+         "method_name": "get_journal_notification_session", 
+         "var_name": "journal_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_hierarchy_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalHierarchySession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_hierarchy", 
+         "method_name": "get_journal_hierarchy_session", 
+         "var_name": "journal_hierarchy_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journal_hierarchy_design_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalHierarchyDesignSession", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "proxy", 
+         "support_check": "journal_hierarchy_design", 
+         "method_name": "get_journal_hierarchy_design_session", 
+         "var_name": "journal_hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalingProxyManager.get_journaling_batch_proxy_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_journaling_batch_proxy_manager", 
+         "return_type_full": "osid.journaling.batch.JournalingBatchProxyManager", 
+         "package_name": "journaling", 
+         "module_name": "managers", 
+         "var_name": "journaling_batch_proxy_manager", 
+         "interface_name": "JournalingProxyManager"
+      }
+   }, 
+   "JournalEntryLookupSession.init_pattern": "resource.ResourceLookupSession", 
+   "JournalEntryLookupSession.get_journal_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_journal_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_id", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.can_read_journal": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_read_journal", 
+         "object_name": "JournalEntry", 
+         "var_name": "can_read_journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.use_comparative_journal_entry_view": {
+      "pattern": "resource.ResourceLookupSession.use_comparative_resource_view", 
+      "kwargs": {
+         "method_name": "use_comparative_journal_entry_view", 
+         "var_name": "comparative_view", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "object_name_under": "journal_entry"
+      }
+   }, 
+   "JournalEntryLookupSession.use_plenary_journal_entry_view": {
+      "pattern": "resource.ResourceLookupSession.use_plenary_resource_view", 
+      "kwargs": {
+         "method_name": "use_plenary_journal_entry_view", 
+         "var_name": "plenary_view", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "object_name_under": "journal_entry"
+      }
+   }, 
+   "JournalEntryLookupSession.use_federated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_journal_view", 
+         "var_name": "federated_vew", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.use_isolated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_journal_view", 
+         "var_name": "isolated_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entry": {
+      "pattern": "resource.ResourceLookupSession.get_resource", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntry", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_id", 
+         "method_name": "get_journal_entry", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_ids": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_ids", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryList", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_ids", 
+         "method_name": "get_journal_entries_by_ids", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryList", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_genus_type", 
+         "method_name": "get_journal_entries_by_genus_type", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_parent_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_parent_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryList", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_genus_type", 
+         "method_name": "get_journal_entries_by_parent_genus_type", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_record_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_record_type", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryList", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_record_type", 
+         "method_name": "get_journal_entries_by_record_type", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_for_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_for_branch", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_date_for_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_by_date_for_branch", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_date_range_for_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_by_date_range_for_branch", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_date_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_by_date_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_date_range_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_by_date_range_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_for_branch_and_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_for_branch_and_source", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_date_for_branch_and_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_by_date_for_branch_and_source", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_date_range_for_branch_and_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_by_date_range_for_branch_and_source", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_date_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_by_date_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries_by_date_range_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries_by_date_range_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryLookupSession.get_journal_entries": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_journal_entries", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryQuerySession.get_journal_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_journal_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_id", 
+         "interface_name": "JournalEntryQuerySession"
+      }
+   }, 
+   "JournalEntryQuerySession.get_journal": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal", 
+         "interface_name": "JournalEntryQuerySession"
+      }
+   }, 
+   "JournalEntryQuerySession.can_search_journal_entries": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_journal_entries", 
+         "object_name": "JournalEntry", 
+         "var_name": "can_search_journal_entries", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryQuerySession"
+      }
+   }, 
+   "JournalEntryQuerySession.use_federated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_journal_view", 
+         "var_name": "federated_vew", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryQuerySession"
+      }
+   }, 
+   "JournalEntryQuerySession.use_isolated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_journal_view", 
+         "var_name": "isolated_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryQuerySession"
+      }
+   }, 
+   "JournalEntryQuerySession.get_journal_entry_query": {
+      "pattern": "resource.ResourceQuerySession.get_resource_query", 
+      "kwargs": {
+         "method_name": "get_journal_entry_query", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.journaling.JournalEntryQuery", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryQuerySession"
+      }
+   }, 
+   "JournalEntryQuerySession.get_journal_entries_by_query": {
+      "pattern": "resource.ResourceQuerySession.get_resources_by_query", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryList", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_query", 
+         "arg0_type_full": "osid.journaling.JournalEntryQuery", 
+         "method_name": "get_journal_entries_by_query", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryQuerySession"
+      }
+   }, 
+   "JournalEntrySearchSession.get_journal_entry_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search", 
+      "kwargs": {
+         "method_name": "get_journal_entry_search", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.journaling.JournalEntrySearch", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntrySearchSession"
+      }
+   }, 
+   "JournalEntrySearchSession.get_journal_entry_search_order": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search_order", 
+      "kwargs": {
+         "method_name": "get_journal_entry_search_order", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.journaling.JournalEntrySearchOrder", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntrySearchSession"
+      }
+   }, 
+   "JournalEntrySearchSession.get_journal_entries_by_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_by_search", 
+      "kwargs": {
+         "arg1_name": "journal_entry_search", 
+         "return_type_full": "osid.journaling.JournalEntrySearchResults", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_query", 
+         "arg1_type": "osid.journaling.JournalEntrySearch", 
+         "arg0_type_full": "osid.journaling.JournalEntryQuery", 
+         "method_name": "get_journal_entries_by_search", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntrySearchSession"
+      }
+   }, 
+   "JournalEntrySearchSession.get_journal_entry_query_from_inspector": {
+      "pattern": "resource.ResourceSearchSession.get_resource_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryQuery", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_query_inspector", 
+         "arg0_type_full": "osid.journaling.JournalEntryQueryInspector", 
+         "method_name": "get_journal_entry_query_from_inspector", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntrySearchSession"
+      }
+   }, 
+   "JournalEntryAdminSession.init_pattern": "resource.ResourceAdminSession", 
+   "JournalEntryAdminSession.get_journal_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_journal_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_id", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.get_journal": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.can_create_journal_entries": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_journal_entries", 
+         "object_name": "JournalEntry", 
+         "var_name": "can_create_journal_entries", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.can_create_journal_entry_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_journal_entry_with_record_types", 
+         "object_name": "JournalEntry", 
+         "var_name": "can_create_journal_entry_with_record_types", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.get_journal_entry_form_for_create": {
+      "pattern": "relationship.RelationshipAdminSession.get_relationship_form_for_create", 
+      "kwargs": {
+         "arg1_name": "source_id", 
+         "arg1_type_full": "osid.id.Id", 
+         "return_type_full": "osid.journaling.JournalEntryForm", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_journal_entry_form_for_create", 
+         "arg2_type_full": "osid.type.Type[]", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession", 
+         "arg2_name": "journal_entry_record_types"
+      }
+   }, 
+   "JournalEntryAdminSession.create_journal_entry": {
+      "pattern": "resource.ResourceAdminSession.create_resource", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntry", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_form", 
+         "arg0_type_full": "osid.journaling.JournalEntryForm", 
+         "method_name": "create_journal_entry", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.can_update_journal_entries": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_journal_entries", 
+         "object_name": "JournalEntry", 
+         "var_name": "can_update_journal_entries", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.get_journal_entry_form_for_update": {
+      "pattern": "resource.ResourceAdminSession.get_resource_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntryForm", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_journal_entry_form_for_update", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.update_journal_entry": {
+      "pattern": "resource.ResourceAdminSession.update_resource", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalEntry", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_form", 
+         "arg0_type_full": "osid.journaling.JournalEntryForm", 
+         "method_name": "update_journal_entry", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.can_delete_journal_entries": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_journal_entries", 
+         "object_name": "JournalEntry", 
+         "var_name": "can_delete_journal_entries", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.delete_journal_entry": {
+      "pattern": "resource.ResourceAdminSession.delete_resource", 
+      "kwargs": {
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_journal_entry", 
+         "object_name": "JournalEntry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.can_manage_journal_entry_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_journal_entry_aliases", 
+         "object_name": "JournalEntry", 
+         "var_name": "can_manage_journal_entry_aliases", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryAdminSession.alias_journal_entry": {
+      "pattern": "resource.ResourceAdminSession.alias_resource", 
+      "kwargs": {
+         "method_name": "alias_journal_entry", 
+         "arg1_name": "alias_id", 
+         "object_name": "JournalEntry", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_id", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryAdminSession"
+      }
+   }, 
+   "JournalEntryNotificationSession.get_journal_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_journal_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_id", 
+         "interface_name": "JournalEntryNotificationSession"
+      }
+   }, 
+   "JournalEntryNotificationSession.get_journal": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal", 
+         "interface_name": "JournalEntryNotificationSession"
+      }
+   }, 
+   "JournalEntryNotificationSession.can_register_for_journal_entry_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_journal_entry_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.use_federated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_journal_view", 
+         "var_name": "federated_vew", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession"
+      }
+   }, 
+   "JournalEntryNotificationSession.use_isolated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_journal_view", 
+         "var_name": "isolated_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_new_journal_entries": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_journal_entries", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_new_journal_entries_for_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_journal_entries_for_branch", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_new_journal_entries_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_journal_entries_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_new_journal_entries_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_journal_entries_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_changed_journal_entries": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_journal_entries", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_changed_journal_entries_for_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_journal_entries_for_branch", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_changed_journal_entries_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_journal_entries_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_changed_journal_entries_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_journal_entries_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_changed_journal_entry": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_journal_entry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_deleted_journal_entries": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_journal_entries", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_deleted_journal_entries_for_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_journal_entries_for_branch", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_deleted_journal_entries_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_journal_entries_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_deleted_journal_entries_for_resource": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_journal_entries_for_resource", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntryNotificationSession.register_for_deleted_journal_entry": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_journal_entry", 
+         "module_name": "sessions", 
+         "interface_name": "JournalEntryNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchLookupSession.init_pattern": "resource.ResourceLookupSession", 
+   "BranchLookupSession.get_journal_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_journal_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_id", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.get_journal": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.can_lookup_branches": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_branches", 
+         "object_name": "Branch", 
+         "var_name": "can_lookup_branches", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.use_comparative_branch_view": {
+      "pattern": "resource.ResourceLookupSession.use_comparative_resource_view", 
+      "kwargs": {
+         "method_name": "use_comparative_branch_view", 
+         "var_name": "comparative_view", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession", 
+         "object_name_under": "branch"
+      }
+   }, 
+   "BranchLookupSession.use_plenary_branch_view": {
+      "pattern": "resource.ResourceLookupSession.use_plenary_resource_view", 
+      "kwargs": {
+         "method_name": "use_plenary_branch_view", 
+         "var_name": "plenary_view", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession", 
+         "object_name_under": "branch"
+      }
+   }, 
+   "BranchLookupSession.use_federated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_journal_view", 
+         "var_name": "federated_vew", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.use_isolated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_journal_view", 
+         "var_name": "isolated_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.use_active_branch_view": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "use_active_branch_view", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchLookupSession.use_any_status_branch_view": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "use_any_status_branch_view", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchLookupSession.get_branch": {
+      "pattern": "resource.ResourceLookupSession.get_resource", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.Branch", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_id", 
+         "method_name": "get_branch", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.get_branches_by_ids": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_ids", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchList", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_ids", 
+         "method_name": "get_branches_by_ids", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.get_branches_by_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchList", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_genus_type", 
+         "method_name": "get_branches_by_genus_type", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.get_branches_by_parent_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_parent_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchList", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_genus_type", 
+         "method_name": "get_branches_by_parent_genus_type", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.get_branches_by_record_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_record_type", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchList", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_record_type", 
+         "method_name": "get_branches_by_record_type", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession"
+      }
+   }, 
+   "BranchLookupSession.get_branches": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branches", 
+         "module_name": "sessions", 
+         "interface_name": "BranchLookupSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchQuerySession.get_journal_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_journal_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_id", 
+         "interface_name": "BranchQuerySession"
+      }
+   }, 
+   "BranchQuerySession.get_journal": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal", 
+         "interface_name": "BranchQuerySession"
+      }
+   }, 
+   "BranchQuerySession.can_search_branches": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_branches", 
+         "object_name": "Branch", 
+         "var_name": "can_search_branches", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchQuerySession"
+      }
+   }, 
+   "BranchQuerySession.use_federated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_journal_view", 
+         "var_name": "federated_vew", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "BranchQuerySession"
+      }
+   }, 
+   "BranchQuerySession.use_isolated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_journal_view", 
+         "var_name": "isolated_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "BranchQuerySession"
+      }
+   }, 
+   "BranchQuerySession.get_branch_query": {
+      "pattern": "resource.ResourceQuerySession.get_resource_query", 
+      "kwargs": {
+         "method_name": "get_branch_query", 
+         "object_name": "Branch", 
+         "return_type_full": "osid.journaling.BranchQuery", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchQuerySession"
+      }
+   }, 
+   "BranchQuerySession.get_branches_by_query": {
+      "pattern": "resource.ResourceQuerySession.get_resources_by_query", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchList", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_query", 
+         "arg0_type_full": "osid.journaling.BranchQuery", 
+         "method_name": "get_branches_by_query", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchQuerySession"
+      }
+   }, 
+   "BranchSearchSession.get_branch_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search", 
+      "kwargs": {
+         "method_name": "get_branch_search", 
+         "object_name": "Branch", 
+         "return_type_full": "osid.journaling.BranchSearch", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSearchSession"
+      }
+   }, 
+   "BranchSearchSession.get_branch_search_order": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search_order", 
+      "kwargs": {
+         "method_name": "get_branch_search_order", 
+         "object_name": "Branch", 
+         "return_type_full": "osid.journaling.BranchSearchOrder", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSearchSession"
+      }
+   }, 
+   "BranchSearchSession.get_branches_by_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_by_search", 
+      "kwargs": {
+         "arg1_name": "branch_search", 
+         "return_type_full": "osid.journaling.BranchSearchResults", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_query", 
+         "arg1_type": "osid.journaling.BranchSearch", 
+         "arg0_type_full": "osid.journaling.BranchQuery", 
+         "method_name": "get_branches_by_search", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSearchSession"
+      }
+   }, 
+   "BranchSearchSession.get_branch_query_from_inspector": {
+      "pattern": "resource.ResourceSearchSession.get_resource_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchQuery", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_query_inspector", 
+         "arg0_type_full": "osid.journaling.BranchQueryInspector", 
+         "method_name": "get_branch_query_from_inspector", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSearchSession"
+      }
+   }, 
+   "BranchAdminSession.init_pattern": "resource.ResourceAdminSession", 
+   "BranchAdminSession.get_journal_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_journal_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_id", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.get_journal": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.can_create_branches": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_branches", 
+         "object_name": "Branch", 
+         "var_name": "can_create_branches", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.can_create_branch": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_branch", 
+         "object_name": "Branch", 
+         "var_name": "can_create_branch", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.can_create_branch_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_branch_with_record_types", 
+         "object_name": "Branch", 
+         "var_name": "can_create_branch_with_record_types", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.get_branch_form_for_create": {
+      "pattern": "resource.ResourceAdminSession.get_resource_form_for_create", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchForm", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_branch_form_for_create", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.create_branch": {
+      "pattern": "resource.ResourceAdminSession.create_resource", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.Branch", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_form", 
+         "arg0_type_full": "osid.journaling.BranchForm", 
+         "method_name": "create_branch", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.can_update_branches": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_branches", 
+         "object_name": "Branch", 
+         "var_name": "can_update_branches", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.get_branch_form_for_update": {
+      "pattern": "resource.ResourceAdminSession.get_resource_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.BranchForm", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_branch_form_for_update", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.update_branch": {
+      "pattern": "resource.ResourceAdminSession.update_resource", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.Branch", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_form", 
+         "arg0_type_full": "osid.journaling.BranchForm", 
+         "method_name": "update_branch", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.can_merge_branches": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_merge_branches", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchAdminSession.merge_branches": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "merge_branches", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchAdminSession.can_supersede_branches": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_supersede_branches", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchAdminSession.supersede_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "supersede_branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchAdminSession.can_delete_branches": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_branches", 
+         "object_name": "Branch", 
+         "var_name": "can_delete_branches", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.delete_branch": {
+      "pattern": "resource.ResourceAdminSession.delete_resource", 
+      "kwargs": {
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_branch", 
+         "object_name": "Branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.can_manage_branch_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_branch_aliases", 
+         "object_name": "Branch", 
+         "var_name": "can_manage_branch_aliases", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchAdminSession.alias_branch": {
+      "pattern": "resource.ResourceAdminSession.alias_resource", 
+      "kwargs": {
+         "method_name": "alias_branch", 
+         "arg1_name": "alias_id", 
+         "object_name": "Branch", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_id", 
+         "module_name": "sessions", 
+         "interface_name": "BranchAdminSession"
+      }
+   }, 
+   "BranchNotificationSession.get_journal_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_journal_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_id", 
+         "interface_name": "BranchNotificationSession"
+      }
+   }, 
+   "BranchNotificationSession.get_journal": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal", 
+         "interface_name": "BranchNotificationSession"
+      }
+   }, 
+   "BranchNotificationSession.can_register_for_branch_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_branch_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "BranchNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchNotificationSession.use_federated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_journal_view", 
+         "var_name": "federated_vew", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "BranchNotificationSession"
+      }
+   }, 
+   "BranchNotificationSession.use_isolated_journal_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_journal_view", 
+         "var_name": "isolated_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "BranchNotificationSession"
+      }
+   }, 
+   "BranchNotificationSession.register_for_new_branches": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_branches", 
+         "module_name": "sessions", 
+         "interface_name": "BranchNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchNotificationSession.register_for_changed_branches": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_branches", 
+         "module_name": "sessions", 
+         "interface_name": "BranchNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchNotificationSession.register_for_changed_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchNotificationSession.register_for_deleted_branches": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_branches", 
+         "module_name": "sessions", 
+         "interface_name": "BranchNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchNotificationSession.register_for_deleted_branch": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_branch", 
+         "module_name": "sessions", 
+         "interface_name": "BranchNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchSmartJournalSession.get_journal_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_journal_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_id", 
+         "interface_name": "BranchSmartJournalSession"
+      }
+   }, 
+   "BranchSmartJournalSession.get_journal": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal", 
+         "interface_name": "BranchSmartJournalSession"
+      }
+   }, 
+   "BranchSmartJournalSession.can_manage_smart_journals": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_manage_smart_journals", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSmartJournalSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchSmartJournalSession.get_branch_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branch_query", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSmartJournalSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchSmartJournalSession.get_branch_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branch_search_order", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSmartJournalSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchSmartJournalSession.apply_branch_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "apply_branch_query", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSmartJournalSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchSmartJournalSession.inspect_branch_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "inspect_branch_query", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSmartJournalSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchSmartJournalSession.apply_branch_sequencing": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "apply_branch_sequencing", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSmartJournalSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "BranchSmartJournalSession.get_branch_query_from_inspector": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_branch_query_from_inspector", 
+         "module_name": "sessions", 
+         "interface_name": "BranchSmartJournalSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalLookupSession.init_pattern": "resource.BinLookupSession", 
+   "JournalLookupSession.can_lookup_journals": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_journals", 
+         "object_name": "Journal", 
+         "var_name": "can_lookup_journals", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalLookupSession.use_comparative_journal_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_journal_view", 
+         "var_name": "comparative_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalLookupSession.use_plenary_journal_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_journal_view", 
+         "var_name": "plenary_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalLookupSession.get_journal": {
+      "pattern": "resource.BinLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "arg0_name": "journal_id", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalLookupSession.get_journals_by_ids": {
+      "pattern": "resource.BinLookupSession.get_bins_by_ids", 
+      "kwargs": {
+         "method_name": "get_journals_by_ids", 
+         "return_type_full": "osid.journaling.JournalList", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "arg0_name": "journal_ids", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalLookupSession.get_journals_by_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_genus_type", 
+      "kwargs": {
+         "method_name": "get_journals_by_genus_type", 
+         "return_type_full": "osid.journaling.JournalList", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "arg0_name": "journal_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalLookupSession.get_journals_by_parent_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_parent_genus_type", 
+      "kwargs": {
+         "method_name": "get_journals_by_parent_genus_type", 
+         "return_type_full": "osid.journaling.JournalList", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "arg0_name": "journal_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalLookupSession.get_journals_by_record_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_record_type", 
+      "kwargs": {
+         "method_name": "get_journals_by_record_type", 
+         "return_type_full": "osid.journaling.JournalList", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "arg0_name": "journal_record_type", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalLookupSession.get_journals_by_provider": {
+      "pattern": "resource.BinLookupSession.get_bins_by_provider", 
+      "kwargs": {
+         "method_name": "get_journals_by_provider", 
+         "return_type_full": "osid.journaling.JournalList", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "arg0_name": "resource_id", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalLookupSession.get_journals": {
+      "pattern": "resource.BinLookupSession.get_bins", 
+      "kwargs": {
+         "method_name": "get_journals", 
+         "return_type_full": "osid.journaling.JournalList", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalLookupSession"
+      }
+   }, 
+   "JournalQuerySession.can_search_journals": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_journals", 
+         "object_name": "Journal", 
+         "var_name": "can_search_journals", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalQuerySession"
+      }
+   }, 
+   "JournalQuerySession.get_journal_query": {
+      "pattern": "resource.BinQuerySession.get_bin_query", 
+      "kwargs": {
+         "method_name": "get_journal_query", 
+         "return_type_full": "osid.journaling.JournalQuery", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalQuerySession"
+      }
+   }, 
+   "JournalQuerySession.get_journals_by_query": {
+      "pattern": "resource.BinQuerySession.get_bins", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalList", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_query", 
+         "arg0_type_full": "osid.journaling.JournalQuery", 
+         "method_name": "get_journals_by_query", 
+         "module_name": "sessions", 
+         "interface_name": "JournalQuerySession"
+      }
+   }, 
+   "JournalSearchSession.get_journal_search": {
+      "pattern": "resource.BinSearchSession.get_bin_search", 
+      "kwargs": {
+         "method_name": "get_journal_search", 
+         "return_type_full": "osid.journaling.JournalSearch", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalSearchSession"
+      }
+   }, 
+   "JournalSearchSession.get_journal_search_order": {
+      "pattern": "resource.BinSearchSession.get_bin_search_order", 
+      "kwargs": {
+         "method_name": "get_journal_search_order", 
+         "return_type_full": "osid.journaling.JournalSearchOrder", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalSearchSession"
+      }
+   }, 
+   "JournalSearchSession.get_journals_by_search": {
+      "pattern": "resource.BinSearchSession.get_bins_by_search", 
+      "kwargs": {
+         "arg1_name": "journal_search", 
+         "return_type_full": "osid.journaling.JournalSearchResults", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_query", 
+         "arg1_type": "osid.journaling.JournalSearch", 
+         "arg0_type_full": "osid.journaling.JournalQuery", 
+         "method_name": "get_journals_by_search", 
+         "module_name": "sessions", 
+         "interface_name": "JournalSearchSession"
+      }
+   }, 
+   "JournalSearchSession.get_journal_query_from_inspector": {
+      "pattern": "resource.BinSearchSession.get_bin_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalQuery", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_query_inspector", 
+         "arg0_type_full": "osid.journaling.JournalQueryInspector", 
+         "method_name": "get_journal_query_from_inspector", 
+         "module_name": "sessions", 
+         "interface_name": "JournalSearchSession"
+      }
+   }, 
+   "JournalAdminSession.init_pattern": "resource.BinAdminSession", 
+   "JournalAdminSession.can_create_journals": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_journals", 
+         "object_name": "Journal", 
+         "var_name": "can_create_journals", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.can_create_journal_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_journal_with_record_types", 
+         "object_name": "Journal", 
+         "var_name": "can_create_journal_with_record_types", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.get_journal_form_for_create": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_create", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalForm", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_record_types", 
+         "arg0_type_full": "osid.type.Type[]", 
+         "method_name": "get_journal_form_for_create", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.create_journal": {
+      "pattern": "resource.BinAdminSession.create_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.Journal", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_form", 
+         "arg0_type_full": "osid.journaling.JournalForm", 
+         "method_name": "create_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.can_update_journals": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_journals", 
+         "object_name": "Journal", 
+         "var_name": "can_update_journals", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.get_journal_form_for_update": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.JournalForm", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_journal_form_for_update", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.update_journal": {
+      "pattern": "resource.BinAdminSession.update_bin", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.Journal", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_form", 
+         "arg0_type_full": "osid.journaling.JournalForm", 
+         "method_name": "update_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.can_delete_journals": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_journals", 
+         "object_name": "Journal", 
+         "var_name": "can_delete_journals", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.delete_journal": {
+      "pattern": "resource.BinAdminSession.delete_bin", 
+      "kwargs": {
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_journal", 
+         "cataloged_object_caps_list": "['JournalEntry', 'Branch']", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.can_manage_journal_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_journal_aliases", 
+         "object_name": "Journal", 
+         "var_name": "can_manage_journal_aliases", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalAdminSession.alias_journal": {
+      "pattern": "resource.BinAdminSession.alias_bin", 
+      "kwargs": {
+         "method_name": "alias_journal", 
+         "arg1_name": "osid.id.Id", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "arg0_name": "journal_id", 
+         "module_name": "sessions", 
+         "interface_name": "JournalAdminSession"
+      }
+   }, 
+   "JournalNotificationSession.can_register_for_journal_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_journal_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalNotificationSession.register_for_new_journals": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bins", 
+      "kwargs": {
+         "method_name": "register_for_new_journals", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalNotificationSession.register_for_new_journal_ancestors": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bin_ancestors", 
+      "kwargs": {
+         "method_name": "register_for_new_journal_ancestors", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id"
+      }
+   }, 
+   "JournalNotificationSession.register_for_new_journal_descendants": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bin_descendants", 
+      "kwargs": {
+         "method_name": "register_for_new_journal_descendants", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id"
+      }
+   }, 
+   "JournalNotificationSession.register_for_changed_journals": {
+      "pattern": "resource.BinNotificationSession.register_for_changed_bins", 
+      "kwargs": {
+         "method_name": "register_for_changed_journals", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalNotificationSession.register_for_changed_journal": {
+      "pattern": "resource.BinNotificationSession.register_for_changed_bin", 
+      "kwargs": {
+         "method_name": "register_for_changed_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id"
+      }
+   }, 
+   "JournalNotificationSession.register_for_deleted_journals": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bins", 
+      "kwargs": {
+         "method_name": "register_for_deleted_journals", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalNotificationSession.register_for_deleted_journal": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bin", 
+      "kwargs": {
+         "method_name": "register_for_deleted_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id"
+      }
+   }, 
+   "JournalNotificationSession.register_for_deleted_journal_ancestors": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bin_ancestors", 
+      "kwargs": {
+         "method_name": "register_for_deleted_journal_ancestors", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id"
+      }
+   }, 
+   "JournalNotificationSession.register_for_deleted_journal_descendants": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_journal_descendants", 
+         "module_name": "sessions", 
+         "interface_name": "JournalNotificationSession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalHierarchySession.get_journal_hierarchy_id": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy_id", 
+      "kwargs": {
+         "method_name": "get_journal_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_hierarchy_id", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.get_journal_hierarchy": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "get_journal_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_hierarchy", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.can_access_journal_hierarchy": {
+      "pattern": "resource.BinHierarchySession.can_access_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "can_access_journal_hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "access_journal_hierarchy", 
+         "interface_name": "JournalHierarchySession", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalHierarchySession.use_comparative_journal_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_journal_view", 
+         "var_name": "comparative_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.use_plenary_journal_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_journal_view", 
+         "var_name": "plenary_view", 
+         "package_name": "journaling", 
+         "cat_name": "journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.get_root_journal_ids": {
+      "pattern": "resource.BinHierarchySession.get_root_bin_ids", 
+      "kwargs": {
+         "method_name": "get_root_journal_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "root_journal_ids", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.get_root_journals": {
+      "pattern": "resource.BinHierarchySession.get_root_bins", 
+      "kwargs": {
+         "method_name": "get_root_journals", 
+         "return_type_full": "osid.journaling.JournalList", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "root_journals", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.has_parent_journals": {
+      "pattern": "resource.BinHierarchySession.has_parent_bins", 
+      "kwargs": {
+         "method_name": "has_parent_journals", 
+         "var_name": "parent_journals", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.is_parent_of_journal": {
+      "pattern": "resource.BinHierarchySession.is_parent_of_bin", 
+      "kwargs": {
+         "arg1_name": "journal_id", 
+         "return_type_full": "boolean", 
+         "package_name": "journaling", 
+         "arg0_name": "id_", 
+         "method_name": "is_parent_of_journal", 
+         "var_name": "arent_of_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.get_parent_journal_ids": {
+      "pattern": "resource.BinHierarchySession.get_parent_bin_ids", 
+      "kwargs": {
+         "method_name": "get_parent_journal_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "module_name": "sessions", 
+         "var_name": "parent_journal_ids", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.get_parent_journals": {
+      "pattern": "resource.BinHierarchySession.get_parent_bins", 
+      "kwargs": {
+         "method_name": "get_parent_journals", 
+         "return_type_full": "osid.journaling.JournalList", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "module_name": "sessions", 
+         "var_name": "parent_journals", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.is_ancestor_of_journal": {
+      "pattern": "resource.BinHierarchySession.is_ancestor_of_bin", 
+      "kwargs": {
+         "arg1_name": "journal_id", 
+         "return_type_full": "boolean", 
+         "package_name": "journaling", 
+         "arg0_name": "id_", 
+         "method_name": "is_ancestor_of_journal", 
+         "var_name": "ncestor_of_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.has_child_journals": {
+      "pattern": "resource.BinHierarchySession.has_child_bins", 
+      "kwargs": {
+         "method_name": "has_child_journals", 
+         "var_name": "child_journals", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.is_child_of_journal": {
+      "pattern": "resource.BinHierarchySession.is_child_of_bin", 
+      "kwargs": {
+         "arg1_name": "journal_id", 
+         "return_type_full": "boolean", 
+         "package_name": "journaling", 
+         "arg0_name": "id_", 
+         "method_name": "is_child_of_journal", 
+         "var_name": "hild_of_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.get_child_journal_ids": {
+      "pattern": "resource.BinHierarchySession.get_child_bin_ids", 
+      "kwargs": {
+         "method_name": "get_child_journal_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "module_name": "sessions", 
+         "var_name": "child_journal_ids", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.get_child_journals": {
+      "pattern": "resource.BinHierarchySession.get_child_bins", 
+      "kwargs": {
+         "method_name": "get_child_journals", 
+         "return_type_full": "osid.journaling.JournalList", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "module_name": "sessions", 
+         "var_name": "child_journals", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.is_descendant_of_journal": {
+      "pattern": "resource.BinHierarchySession.is_descendant_of_bin", 
+      "kwargs": {
+         "arg1_name": "journal_id", 
+         "return_type_full": "boolean", 
+         "package_name": "journaling", 
+         "arg0_name": "id_", 
+         "method_name": "is_descendant_of_journal", 
+         "var_name": "escendant_of_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession"
+      }
+   }, 
+   "JournalHierarchySession.get_journal_node_ids": {
+      "pattern": "resource.BinHierarchySession.get_bin_node_ids", 
+      "kwargs": {
+         "arg1_name": "ancestor_levels", 
+         "return_type_full": "osid.hierarchy.Node", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg3_name": "include_siblings", 
+         "method_name": "get_journal_node_ids", 
+         "var_name": "journal_node_ids", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession", 
+         "arg2_name": "descendant_levels"
+      }
+   }, 
+   "JournalHierarchySession.get_journal_nodes": {
+      "pattern": "resource.BinHierarchySession.get_bin_nodes", 
+      "kwargs": {
+         "arg1_name": "ancestor_levels", 
+         "return_type_full": "osid.journaling.JournalNode", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "arg3_name": "include_siblings", 
+         "method_name": "get_journal_nodes", 
+         "var_name": "journal_nodes", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchySession", 
+         "arg2_name": "descendant_levels"
+      }
+   }, 
+   "JournalHierarchyDesignSession.get_journal_hierarchy_id": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy_id", 
+      "kwargs": {
+         "method_name": "get_journal_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_hierarchy_id", 
+         "interface_name": "JournalHierarchyDesignSession"
+      }
+   }, 
+   "JournalHierarchyDesignSession.get_journal_hierarchy": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "get_journal_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "journaling", 
+         "module_name": "sessions", 
+         "var_name": "journal_hierarchy", 
+         "interface_name": "JournalHierarchyDesignSession"
+      }
+   }, 
+   "JournalHierarchyDesignSession.can_modify_journal_hierarchy": {
+      "pattern": "resource.BinHierarchyDesignSession.can_modify_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "can_modify_journal_hierarchy", 
+         "var_name": "modify_journal_hierarchy", 
+         "package_name": "journaling", 
+         "cat_name": "Journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchyDesignSession"
+      }
+   }, 
+   "JournalHierarchyDesignSession.add_root_journal": {
+      "pattern": "resource.BinHierarchyDesignSession.add_root_bin", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "method_name": "add_root_journal", 
+         "var_name": "root_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchyDesignSession"
+      }
+   }, 
+   "JournalHierarchyDesignSession.remove_root_journal": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_root_bin", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "method_name": "remove_root_journal", 
+         "var_name": "root_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchyDesignSession"
+      }
+   }, 
+   "JournalHierarchyDesignSession.add_child_journal": {
+      "pattern": "resource.BinHierarchyDesignSession.add_child_bin", 
+      "kwargs": {
+         "arg1_name": "child_id", 
+         "return_type_full": "", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "method_name": "add_child_journal", 
+         "var_name": "child_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchyDesignSession"
+      }
+   }, 
+   "JournalHierarchyDesignSession.remove_child_journal": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_child_bin", 
+      "kwargs": {
+         "arg1_name": "child_id", 
+         "return_type_full": "", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "method_name": "remove_child_journal", 
+         "var_name": "child_journal", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchyDesignSession"
+      }
+   }, 
+   "JournalHierarchyDesignSession.remove_child_journals": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_child_bins", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_id", 
+         "method_name": "remove_child_journals", 
+         "var_name": "child_journals", 
+         "module_name": "sessions", 
+         "interface_name": "JournalHierarchyDesignSession"
+      }
+   }, 
+   "JournalEntry.init_pattern": "resource.Resource", 
+   "JournalEntry.get_branch_id": {
+      "pattern": "learning.Activity.get_objective_id", 
+      "kwargs": {
+         "method_name": "get_branch_id", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "branch", 
+         "interface_name": "JournalEntry"
+      }
+   }, 
+   "JournalEntry.get_branch": {
+      "pattern": "learning.Activity.get_objective", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.Branch", 
+         "cat_name": "Journal", 
+         "package_name": "journaling", 
+         "method_name": "get_branch", 
+         "object_name": "JournalEntry", 
+         "var_name": "branch", 
+         "module_name": "objects", 
+         "interface_name": "JournalEntry"
+      }
+   }, 
+   "JournalEntry.get_source_id": {
+      "pattern": "relationship.Relationship.get_source_id", 
+      "kwargs": {
+         "method_name": "get_source_id", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "source", 
+         "interface_name": "JournalEntry"
+      }
+   }, 
+   "JournalEntry.get_version_id": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_version_id", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "version", 
+         "interface_name": "JournalEntry"
+      }
+   }, 
+   "JournalEntry.get_timestamp": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_timestamp", 
+         "module_name": "objects", 
+         "interface_name": "JournalEntry", 
+         "package_name": "journaling"
+      }
+   }, 
+   "JournalEntry.get_resource_id": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_resource_id", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "resource", 
+         "interface_name": "JournalEntry"
+      }
+   }, 
+   "JournalEntry.get_resource": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_resource", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.resource.Resource", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "resource", 
+         "interface_name": "JournalEntry"
+      }
+   }, 
+   "JournalEntry.get_agent_id": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_agent_id", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "agent", 
+         "interface_name": "JournalEntry"
+      }
+   }, 
+   "JournalEntry.get_agent": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_agent", 
+         "object_name": "JournalEntry", 
+         "return_type_full": "osid.authentication.Agent", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "agent", 
+         "interface_name": "JournalEntry"
+      }
+   }, 
+   "JournalEntry.get_journal_entry_record": {
+      "pattern": "resource.Resource.get_resource_record", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.records.JournalEntryRecord", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_journal_entry_record", 
+         "var_name": "journal_entry_record", 
+         "module_name": "objects", 
+         "interface_name": "JournalEntry"
+      }
+   }, 
+   "JournalEntryForm.init_pattern": "resource.ResourceForm", 
+   "JournalEntryForm.get_journal_entry_form_record": {
+      "pattern": "resource.ResourceForm.get_resource_form_record", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.records.JournalEntryFormRecord", 
+         "package_name": "journaling", 
+         "arg0_name": "journal_entry_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_journal_entry_form_record", 
+         "var_name": "journal_entry_form_record", 
+         "module_name": "objects", 
+         "interface_name": "JournalEntryForm"
+      }
+   }, 
+   "JournalEntryList.get_next_journal_entry": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_journal_entry", 
+         "return_type_full": "osid.journaling.JournalEntry", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "journal_entry", 
+         "interface_name": "JournalEntryList"
+      }
+   }, 
+   "JournalEntryList.get_next_journal_entries": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_journal_entries", 
+         "return_type_full": "osid.journaling.JournalEntry", 
+         "package_name": "journaling", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "journal_entries", 
+         "interface_name": "JournalEntryList"
+      }
+   }, 
+   "Branch.init_pattern": "resource.Resource", 
+   "Branch.get_origin_journal_entry_id": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_origin_journal_entry_id", 
+         "object_name": "Branch", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "origin_journal_entry", 
+         "interface_name": "Branch"
+      }
+   }, 
+   "Branch.get_origin_journal_entry": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_origin_journal_entry", 
+         "object_name": "Branch", 
+         "return_type_full": "osid.journaling.JournalEntry", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "origin_journal_entry", 
+         "interface_name": "Branch"
+      }
+   }, 
+   "Branch.get_latest_journal_entry_id": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_latest_journal_entry_id", 
+         "object_name": "Branch", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "latest_journal_entry", 
+         "interface_name": "Branch"
+      }
+   }, 
+   "Branch.get_latest_journal_entry": {
+      "pattern": "resource.Resource.get_avatar", 
+      "kwargs": {
+         "method_name": "get_latest_journal_entry", 
+         "object_name": "Branch", 
+         "return_type_full": "osid.journaling.JournalEntry", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "latest_journal_entry", 
+         "interface_name": "Branch"
+      }
+   }, 
+   "Branch.get_branch_record": {
+      "pattern": "resource.Resource.get_resource_record", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.records.BranchRecord", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_branch_record", 
+         "var_name": "branch_record", 
+         "module_name": "objects", 
+         "interface_name": "Branch"
+      }
+   }, 
+   "BranchForm.init_pattern": "resource.ResourceForm", 
+   "BranchForm.get_branch_form_record": {
+      "pattern": "resource.ResourceForm.get_resource_form_record", 
+      "kwargs": {
+         "return_type_full": "osid.journaling.records.BranchFormRecord", 
+         "package_name": "journaling", 
+         "arg0_name": "branch_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_branch_form_record", 
+         "var_name": "branch_form_record", 
+         "module_name": "objects", 
+         "interface_name": "BranchForm"
+      }
+   }, 
+   "BranchList.get_next_branch": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_branch", 
+         "return_type_full": "osid.journaling.Branch", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "branch", 
+         "interface_name": "BranchList"
+      }
+   }, 
+   "BranchList.get_next_branches": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_branches", 
+         "return_type_full": "osid.journaling.Branch", 
+         "package_name": "journaling", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "branches", 
+         "interface_name": "BranchList"
+      }
+   }, 
+   "Journal.init_pattern": "resource.Bin", 
+   "JournalForm.init_pattern": "resource.BinForm", 
+   "JournalList.get_next_journal": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_journal", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "journal", 
+         "interface_name": "JournalList"
+      }
+   }, 
+   "JournalList.get_next_journals": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_journals", 
+         "return_type_full": "osid.journaling.Journal", 
+         "package_name": "journaling", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "journals", 
+         "interface_name": "JournalList"
+      }
+   }, 
+   "JournalNodeList.get_next_journal_node": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_journal_node", 
+         "return_type_full": "osid.journaling.JournalNode", 
+         "package_name": "journaling", 
+         "module_name": "objects", 
+         "var_name": "journal_node", 
+         "interface_name": "JournalNodeList"
+      }
+   }, 
+   "JournalNodeList.get_next_journal_nodes": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_journal_nodes", 
+         "return_type_full": "osid.journaling.JournalNode", 
+         "package_name": "journaling", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "journal_nodes", 
+         "interface_name": "JournalNodeList"
+      }
+   }
+}

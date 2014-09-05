@@ -1,0 +1,3777 @@
+{
+   "impl_log": {
+      "managers": {
+         "RelationshipProfile": {
+            "supports_relationship_smart_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_family_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_family_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_family_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_rules": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_visible_federation": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_family_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_batch": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_admin": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_family_lookup": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_family_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_family_notification": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_family_hierarchy_design": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_search_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_family_assignment": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_family_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_search_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "supports_relationship_notification": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "RelationshipManager": {
+            "get_relationship_family_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_search_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_family_assignment_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_smart_family_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_hierarchy_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_notification_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_lookup_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_rules_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_admin_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_batch_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_query_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "RelationshipProxyManager": {
+            "get_relationship_family_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_search_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_hierarchy_design_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_search_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_family_assignment_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_smart_family_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_hierarchy_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_batch_proxy_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_notification_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_lookup_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_lookup_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_admin_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_query_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_rules_proxy_manager": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_notification_session": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_admin_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_query_session_for_family": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }, 
+      "sessions": {
+         "RelationshipLookupSession": {
+            "use_any_effective_relationship_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_for_source_on_date": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_effective_relationship_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_relationship_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_relationships": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_genus_type_for_destination": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_family_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_for_peers_on_date": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_genus_type_for_peers_on_date": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_for_destination_on_date": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationships": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_relationship_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_for_destination": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_genus_type_for_source_on_date": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_on_date": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_genus_type_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_genus_type_for_peers": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_for_peers": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_genus_type_for_destination_on_date": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "RelationshipQuerySession": {
+            "get_relationship_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_federated_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_search_relationships": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_query": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "RelationshipSearchSession": {
+            "get_relationships_by_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_search_order": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "RelationshipAdminSession": {
+            "update_relationship": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_relationships": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_relationship": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "create_relationship": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_relationship_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "alias_relationship": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_relationships": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_relationships": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_relationship_aliases": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "RelationshipNotificationSession": {
+            "register_for_changed_relationships": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_relationships_by_genus_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_relationships_by_genus_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_relationships_for_destination": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_federated_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_relationships": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_isolated_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_relationships_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_relationships_for_destination": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_relationships": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_relationships_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_relationships_by_genus_type": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_relationship": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_relationship": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_register_for_relationship_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_relationships_for_destination": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_relationships_for_source": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "RelationshipFamilySession": {
+            "get_family_ids_by_relationship": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_family": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationships_by_families": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_ids_by_family": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_ids_by_families": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_lookup_relationship_family_mappings": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_families_by_relationship": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "RelationshipFamilyAssignmentSession": {
+            "assign_relationship_to_family": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_assign_relationships_to_family": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_assignable_family_ids": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "unassign_relationship_from_family": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "can_assign_relationships": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_assignable_family_ids_for_relationship": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "RelationshipSmartFamilySession": {
+            "get_relationship_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_query_from_inspector": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "inspect_relationship_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_family_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_smart_families": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "apply_relationship_query": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "get_relationship_search_order": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "apply_relationship_sequencing": [
+               "unmapped", 
+               "unimplemented"
+            ]
+         }, 
+         "FamilyLookupSession": {
+            "can_lookup_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_families_by_provider": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_families_by_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_families_by_parent_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_families_by_genus_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_families_by_record_type": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_families": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "FamilyQuerySession": {
+            "get_families_by_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_query": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_search_families": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "FamilySearchSession": {
+            "get_family_search_order": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_query_from_inspector": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_search": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_families_by_search": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "FamilyAdminSession": {
+            "create_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "update_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_update_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_manage_family_aliases": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "delete_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_delete_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_family_with_record_types": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "alias_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_form_for_create": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_form_for_update": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_create_families": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "FamilyNotificationSession": {
+            "register_for_new_family_ancestors": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_family_ancestors": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_register_for_family_notifications": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_new_family_descendants": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_family_descendants": [
+               "unmapped", 
+               "unimplemented"
+            ], 
+            "register_for_changed_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "register_for_deleted_family": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "FamilyHierarchySession": {
+            "get_parent_family_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "has_parent_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_plenary_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_child_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_nodes": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_parent_of_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "use_comparative_family_view": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_child_family_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_node_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_root_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "has_child_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_ancestor_of_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_descendant_of_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_parent_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_access_family_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_root_family_ids": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "is_child_of_family": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }, 
+         "FamilyHierarchyDesignSession": {
+            "add_root_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_child_families": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "can_modify_family_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_hierarchy": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "add_child_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "get_family_hierarchy_id": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_root_family": [
+               "mapped", 
+               "unimplemented"
+            ], 
+            "remove_child_family": [
+               "mapped", 
+               "unimplemented"
+            ]
+         }
+      }
+   }, 
+   "package_objects_caps": [], 
+   "package_objects_under": [], 
+   "package_cataloged_objects_caps": [
+      "Relationship"
+   ], 
+   "package_cataloged_objects_under": [
+      "relationship"
+   ], 
+   "package_objects_under_to_caps": {
+      "relationship": "Relationship"
+   }, 
+   "package_relationships_caps": [
+      "Relationship"
+   ], 
+   "package_relationships_under": [
+      "relationship"
+   ], 
+   "package_rules_caps": [], 
+   "package_rules_under": [], 
+   "package_catalog_caps": "Family", 
+   "package_catalog_under": "family", 
+   "package_relationships_detail": {
+      "relationship": {
+         "source_type": "UNKNOWN", 
+         "destination_name": "UNKNOWN", 
+         "source_name": "UNKNOWN", 
+         "destination_type": "UNKNOWN"
+      }
+   }, 
+   "Relationship.arg_detail": {
+      "source": [], 
+      "destination": []
+   }, 
+   "Relationship.persisted_data": {
+      "family": "OsidCatalog", 
+      "source": "osid.id.Id", 
+      "destination": "osid.id.Id"
+   }, 
+   "Relationship.initialized_data": {
+      "family": "OsidCatalog", 
+      "source": "osid.id.Id", 
+      "destination": "osid.id.Id"
+   }, 
+   "Relationship.instance_data": {
+      "relationship_record": "osid.relationship.records.RelationshipRecord"
+   }, 
+   "Relationship.aggregate_data": {}, 
+   "Relationship.return_types": {
+      "source": "osid.id.Id", 
+      "destination": "osid.id.Id", 
+      "relationship_record": "osid.relationship.records.RelationshipRecord"
+   }, 
+   "RelationshipAdminSession.instance_data": {}, 
+   "FamilyAdminSession.instance_data": {}, 
+   "RelationshipProfile.init_pattern": "resource.ResourceProfile", 
+   "RelationshipProfile.supports_visible_federation": {
+      "pattern": "resource.ResourceProfile.supports_visible_federation", 
+      "kwargs": {
+         "method_name": "supports_visible_federation", 
+         "module_name": "managers", 
+         "var_name": "supports_visible_federation", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_lookup", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_query", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_query", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_search", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_search", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_admin", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_notification", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_family": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_family", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_family", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_family_assignment": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_family_assignment", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_family_assignment", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_smart_family": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_smart_family", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_smart_family", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_family_lookup": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_family_lookup", 
+         "module_name": "managers", 
+         "var_name": "supports_family_lookup", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_family_query": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_family_query", 
+         "module_name": "managers", 
+         "var_name": "supports_family_query", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_family_search": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_family_search", 
+         "module_name": "managers", 
+         "var_name": "supports_family_search", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_family_admin": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_family_admin", 
+         "module_name": "managers", 
+         "var_name": "supports_family_admin", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_family_notification": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_family_notification", 
+         "module_name": "managers", 
+         "var_name": "supports_family_notification", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_family_hierarchy": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_family_hierarchy", 
+         "module_name": "managers", 
+         "var_name": "supports_family_hierarchy", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_family_hierarchy_design": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_family_hierarchy_design", 
+         "module_name": "managers", 
+         "var_name": "supports_family_hierarchy_design", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_batch": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_batch", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_batch", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_rules": {
+      "pattern": "resource.ResourceProfile.supports_resource_lookup", 
+      "kwargs": {
+         "method_name": "supports_relationship_rules", 
+         "module_name": "managers", 
+         "var_name": "supports_relationship_rules", 
+         "interface_name": "RelationshipProfile", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipProfile.get_relationship_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_relationship_record_types", 
+         "var_name": "relationship_record_types", 
+         "package_name": "relationship", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProfile", 
+         "object_name_under": "relationship"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_relationship_record_type", 
+         "var_name": "relationship_record_type", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_record_type", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProfile", 
+         "object_name_under": "relationship"
+      }
+   }, 
+   "RelationshipProfile.get_relationship_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_relationship_search_record_types", 
+         "var_name": "relationship_search_record_types", 
+         "package_name": "relationship", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProfile", 
+         "object_name_under": "relationship_search"
+      }
+   }, 
+   "RelationshipProfile.supports_relationship_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_relationship_search_record_type", 
+         "var_name": "relationship_search_record_type", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProfile", 
+         "object_name_under": "relationship_search"
+      }
+   }, 
+   "RelationshipProfile.get_family_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_family_record_types", 
+         "var_name": "family_record_types", 
+         "package_name": "relationship", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProfile", 
+         "object_name_under": "family"
+      }
+   }, 
+   "RelationshipProfile.supports_family_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_family_record_type", 
+         "var_name": "family_record_type", 
+         "package_name": "relationship", 
+         "arg0_name": "family_record_type", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProfile", 
+         "object_name_under": "family"
+      }
+   }, 
+   "RelationshipProfile.get_family_search_record_types": {
+      "pattern": "resource.ResourceProfile.get_resource_record_types", 
+      "kwargs": {
+         "method_name": "get_family_search_record_types", 
+         "var_name": "family_search_record_types", 
+         "package_name": "relationship", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProfile", 
+         "object_name_under": "family_search"
+      }
+   }, 
+   "RelationshipProfile.supports_family_search_record_type": {
+      "pattern": "resource.ResourceProfile.supports_resource_record_type", 
+      "kwargs": {
+         "method_name": "supports_family_search_record_type", 
+         "var_name": "family_search_record_type", 
+         "package_name": "relationship", 
+         "arg0_name": "family_search_record_type", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProfile", 
+         "object_name_under": "family_search"
+      }
+   }, 
+   "RelationshipManager.init_pattern": "resource.ResourceManager", 
+   "RelationshipManager.get_relationship_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipLookupSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "relationship_lookup", 
+         "method_name": "get_relationship_lookup_session", 
+         "var_name": "relationship_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_lookup_session_for_family": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipLookupSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "support_check": "relationship_lookup", 
+         "method_name": "get_relationship_lookup_session_for_family", 
+         "var_name": "relationship_lookup_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_query_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipQuerySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "relationship_query", 
+         "method_name": "get_relationship_query_session", 
+         "var_name": "relationship_query_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_query_session_for_family": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipQuerySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "support_check": "relationship_query", 
+         "method_name": "get_relationship_query_session_for_family", 
+         "var_name": "relationship_query_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipSearchSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "relationship_search", 
+         "method_name": "get_relationship_search_session", 
+         "var_name": "relationship_search_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_search_session_for_family": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipSearchSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "support_check": "relationship_search", 
+         "method_name": "get_relationship_search_session_for_family", 
+         "var_name": "relationship_search_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipAdminSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "relationship_admin", 
+         "method_name": "get_relationship_admin_session", 
+         "var_name": "relationship_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_admin_session_for_family": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipAdminSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "support_check": "relationship_admin", 
+         "method_name": "get_relationship_admin_session_for_family", 
+         "var_name": "relationship_admin_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipNotificationSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_receiver", 
+         "support_check": "relationship_notification", 
+         "method_name": "get_relationship_notification_session", 
+         "var_name": "relationship_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_notification_session_for_family": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session_for_bin", 
+      "kwargs": {
+         "arg1_name": "family_id", 
+         "return_type_full": "osid.relationship.RelationshipNotificationSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_receiver", 
+         "support_check": "relationship_notification", 
+         "method_name": "get_relationship_notification_session_for_family", 
+         "var_name": "relationship_notification_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_family_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipFamilySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "relationship_family", 
+         "method_name": "get_relationship_family_session", 
+         "var_name": "relationship_family_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_family_assignment_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipFamilyAssignmentSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "relationship_family_assignment", 
+         "method_name": "get_relationship_family_assignment_session", 
+         "var_name": "relationship_family_assignment_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_smart_family_session": {
+      "pattern": "resource.ResourceManager.get_resource_smart_bin_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipSmartFamilySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "support_check": "relationship_smart_family", 
+         "method_name": "get_relationship_smart_family_session", 
+         "var_name": "relationship_smart_family_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_family_lookup_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyLookupSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "family_lookup", 
+         "method_name": "get_family_lookup_session", 
+         "var_name": "family_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_family_query_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyQuerySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "family_query", 
+         "method_name": "get_family_query_session", 
+         "var_name": "family_query_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_family_search_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilySearchSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "family_search", 
+         "method_name": "get_family_search_session", 
+         "var_name": "family_search_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_family_admin_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyAdminSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "family_admin", 
+         "method_name": "get_family_admin_session", 
+         "var_name": "family_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_family_notification_session": {
+      "pattern": "resource.ResourceManager.get_resource_notification_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyNotificationSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_receiver", 
+         "support_check": "family_notification", 
+         "method_name": "get_family_notification_session", 
+         "var_name": "family_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_family_hierarchy_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyHierarchySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "family_hierarchy", 
+         "method_name": "get_family_hierarchy_session", 
+         "var_name": "family_hierarchy_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_family_hierarchy_design_session": {
+      "pattern": "resource.ResourceManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyHierarchyDesignSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "support_check": "family_hierarchy_design", 
+         "method_name": "get_family_hierarchy_design_session", 
+         "var_name": "family_hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_batch_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_relationship_batch_manager", 
+         "return_type_full": "osid.relationship.batch.RelationshipBatchManager", 
+         "package_name": "relationship", 
+         "module_name": "managers", 
+         "var_name": "relationship_batch_manager", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipManager.get_relationship_rules_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_relationship_rules_manager", 
+         "return_type_full": "osid.relationship.rules.RelationshipRulesManager", 
+         "package_name": "relationship", 
+         "module_name": "managers", 
+         "var_name": "relationship_rules_manager", 
+         "interface_name": "RelationshipManager"
+      }
+   }, 
+   "RelationshipProxyManager.init_pattern": "resource.ResourceProxyManager", 
+   "RelationshipProxyManager.get_relationship_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipLookupSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "relationship_lookup", 
+         "method_name": "get_relationship_lookup_session", 
+         "var_name": "relationship_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_lookup_session_for_family": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipLookupSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "relationship_lookup", 
+         "method_name": "get_relationship_lookup_session_for_family", 
+         "var_name": "relationship_lookup_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_query_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipQuerySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "relationship_query", 
+         "method_name": "get_relationship_query_session", 
+         "var_name": "relationship_query_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_query_session_for_family": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipQuerySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "relationship_query", 
+         "method_name": "get_relationship_query_session_for_family", 
+         "var_name": "relationship_query_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipSearchSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "relationship_search", 
+         "method_name": "get_relationship_search_session", 
+         "var_name": "relationship_search_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_search_session_for_family": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipSearchSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "relationship_search", 
+         "method_name": "get_relationship_search_session_for_family", 
+         "var_name": "relationship_search_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipAdminSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "relationship_admin", 
+         "method_name": "get_relationship_admin_session", 
+         "var_name": "relationship_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_admin_session_for_family": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipAdminSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "support_check": "relationship_admin", 
+         "method_name": "get_relationship_admin_session_for_family", 
+         "var_name": "relationship_admin_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipNotificationSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_receiver", 
+         "support_check": "relationship_notification", 
+         "method_name": "get_relationship_notification_session", 
+         "var_name": "relationship_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_notification_session_for_family": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session_for_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipNotificationSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_receiver", 
+         "arg0_type_full": "osid.relationship.RelationshipReceiver", 
+         "support_check": "relationship_notification", 
+         "method_name": "get_relationship_notification_session_for_family", 
+         "var_name": "relationship_notification_session_for_family", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_family_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipFamilySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "relationship_family", 
+         "method_name": "get_relationship_family_session", 
+         "var_name": "relationship_family_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_family_assignment_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipFamilyAssignmentSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "relationship_family_assignment", 
+         "method_name": "get_relationship_family_assignment_session", 
+         "var_name": "relationship_family_assignment_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_smart_family_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipSmartFamilySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "support_check": "relationship_smart_family", 
+         "method_name": "get_relationship_smart_family_session", 
+         "var_name": "relationship_smart_family_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_family_lookup_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyLookupSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "family_lookup", 
+         "method_name": "get_family_lookup_session", 
+         "var_name": "family_lookup_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_family_query_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyQuerySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "family_query", 
+         "method_name": "get_family_query_session", 
+         "var_name": "family_query_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_family_search_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilySearchSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "family_search", 
+         "method_name": "get_family_search_session", 
+         "var_name": "family_search_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_family_admin_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyAdminSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "family_admin", 
+         "method_name": "get_family_admin_session", 
+         "var_name": "family_admin_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_family_notification_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyNotificationSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_receiver", 
+         "support_check": "family_notification", 
+         "method_name": "get_family_notification_session", 
+         "var_name": "family_notification_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_family_hierarchy_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyHierarchySession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "family_hierarchy", 
+         "method_name": "get_family_hierarchy_session", 
+         "var_name": "family_hierarchy_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_family_hierarchy_design_session": {
+      "pattern": "resource.ResourceProxyManager.get_resource_lookup_session", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyHierarchyDesignSession", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "proxy", 
+         "support_check": "family_hierarchy_design", 
+         "method_name": "get_family_hierarchy_design_session", 
+         "var_name": "family_hierarchy_design_session", 
+         "module_name": "managers", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_batch_proxy_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_relationship_batch_proxy_manager", 
+         "return_type_full": "osid.relationship.batch.RelationshipBatchProxyManager", 
+         "package_name": "relationship", 
+         "module_name": "managers", 
+         "var_name": "relationship_batch_proxy_manager", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipProxyManager.get_relationship_rules_proxy_manager": {
+      "pattern": "resource.ResourceManager.get_resource_batch_manager", 
+      "kwargs": {
+         "method_name": "get_relationship_rules_proxy_manager", 
+         "return_type_full": "osid.relationship.rules.RelationshipRulesProxyManager", 
+         "package_name": "relationship", 
+         "module_name": "managers", 
+         "var_name": "relationship_rules_proxy_manager", 
+         "interface_name": "RelationshipProxyManager"
+      }
+   }, 
+   "RelationshipLookupSession.get_family_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_family_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family_id", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.get_family": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_family", 
+         "return_type_full": "osid.relationship.Family", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.can_lookup_relationships": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_relationships", 
+         "object_name": "Relationship", 
+         "var_name": "can_lookup_relationships", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.use_comparative_relationship_view": {
+      "pattern": "resource.ResourceLookupSession.use_comparative_resource_view", 
+      "kwargs": {
+         "method_name": "use_comparative_relationship_view", 
+         "var_name": "comparative_view", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "object_name_under": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.use_plenary_relationship_view": {
+      "pattern": "resource.ResourceLookupSession.use_plenary_resource_view", 
+      "kwargs": {
+         "method_name": "use_plenary_relationship_view", 
+         "var_name": "plenary_view", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "object_name_under": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.use_federated_family_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_family_view", 
+         "var_name": "federated_vew", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.use_isolated_family_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_family_view", 
+         "var_name": "isolated_view", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.use_effective_relationship_view": {
+      "pattern": "relationship.RelationshipLookupSession.use_effective_relationship_view", 
+      "kwargs": {
+         "method_name": "use_effective_relationship_view", 
+         "module_name": "sessions", 
+         "object_name": "Relationship", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.use_any_effective_relationship_view": {
+      "pattern": "relationship.RelationshipLookupSession.use_any_effective_relationship_view", 
+      "kwargs": {
+         "method_name": "use_any_effective_relationship_view", 
+         "module_name": "sessions", 
+         "object_name": "Relationship", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationship": {
+      "pattern": "resource.ResourceLookupSession.get_resource", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.Relationship", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_id", 
+         "method_name": "get_relationship", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_ids": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_ids", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipList", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_ids", 
+         "method_name": "get_relationships_by_ids", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipList", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_genus_type", 
+         "method_name": "get_relationships_by_genus_type", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_parent_genus_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_parent_genus_type", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipList", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_genus_type", 
+         "method_name": "get_relationships_by_parent_genus_type", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_record_type": {
+      "pattern": "resource.ResourceLookupSession.get_resources_by_record_type", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipList", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_record_type", 
+         "method_name": "get_relationships_by_record_type", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_on_date": {
+      "pattern": "relationship.RelationshipLookupSession.get_relationship_on_date", 
+      "kwargs": {
+         "arg1_name": "to", 
+         "return_type_full": "osid.relationship.RelationshipList", 
+         "package_name": "relationship", 
+         "arg0_name": "from_", 
+         "method_name": "get_relationships_on_date", 
+         "object_name": "Relationship", 
+         "var_name": "relationships_on_date", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_for_source_on_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_for_source_on_date", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_genus_type_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_by_genus_type_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_genus_type_for_source_on_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_by_genus_type_for_source_on_date", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_for_destination": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_for_destination", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_for_destination_on_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_for_destination_on_date", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_genus_type_for_destination": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_by_genus_type_for_destination", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_genus_type_for_destination_on_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_by_genus_type_for_destination_on_date", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_for_peers": {
+      "pattern": "relationship.RelationshipLookupSession.get_relationships_for_peers", 
+      "kwargs": {
+         "arg1_name": "destination_id", 
+         "obj_type": "resource", 
+         "return_type_full": "osid.relationship.RelationshipList", 
+         "package_name": "relationship", 
+         "arg0_name": "source_id", 
+         "method_name": "get_relationships_for_peers", 
+         "object_name": "Relationship", 
+         "var_name": "relationships_for_peers", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_for_peers_on_date": {
+      "pattern": "relationship.RelationshipLookupSession.get_relationships_for_peers_on_date", 
+      "kwargs": {
+         "arg1_name": "destination_id", 
+         "obj_type": "resource", 
+         "return_type_full": "osid.relationship.RelationshipList", 
+         "package_name": "relationship", 
+         "arg0_name": "source_id", 
+         "arg3_name": "to", 
+         "method_name": "get_relationships_for_peers_on_date", 
+         "object_name": "Relationship", 
+         "var_name": "relationships_for_peers_on_date", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "arg2_name": "from_"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_genus_type_for_peers": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_by_genus_type_for_peers", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships_by_genus_type_for_peers_on_date": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_by_genus_type_for_peers_on_date", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipLookupSession.get_relationships": {
+      "pattern": "resource.ResourceLookupSession.get_resources", 
+      "kwargs": {
+         "method_name": "get_relationships", 
+         "object_name": "Relationship", 
+         "return_type_full": "osid.relationship.RelationshipList", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipLookupSession"
+      }
+   }, 
+   "RelationshipQuerySession.get_family_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_family_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family_id", 
+         "interface_name": "RelationshipQuerySession"
+      }
+   }, 
+   "RelationshipQuerySession.get_family": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_family", 
+         "return_type_full": "osid.relationship.Family", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family", 
+         "interface_name": "RelationshipQuerySession"
+      }
+   }, 
+   "RelationshipQuerySession.use_federated_family_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_family_view", 
+         "var_name": "federated_vew", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipQuerySession"
+      }
+   }, 
+   "RelationshipQuerySession.use_isolated_family_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_family_view", 
+         "var_name": "isolated_view", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipQuerySession"
+      }
+   }, 
+   "RelationshipQuerySession.can_search_relationships": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_relationships", 
+         "object_name": "Relationship", 
+         "var_name": "can_search_relationships", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipQuerySession"
+      }
+   }, 
+   "RelationshipQuerySession.get_relationship_query": {
+      "pattern": "resource.ResourceQuerySession.get_resource_query", 
+      "kwargs": {
+         "method_name": "get_relationship_query", 
+         "object_name": "Relationship", 
+         "return_type_full": "osid.relationship.RelationshipQuery", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipQuerySession"
+      }
+   }, 
+   "RelationshipQuerySession.get_relationships_by_query": {
+      "pattern": "resource.ResourceQuerySession.get_resources_by_query", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipList", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_query", 
+         "arg0_type_full": "osid.relationship.RelationshipQuery", 
+         "method_name": "get_relationships_by_query", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipQuerySession"
+      }
+   }, 
+   "RelationshipSearchSession.get_relationship_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search", 
+      "kwargs": {
+         "method_name": "get_relationship_search", 
+         "object_name": "Relationship", 
+         "return_type_full": "osid.relationship.RelationshipSearch", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSearchSession"
+      }
+   }, 
+   "RelationshipSearchSession.get_relationship_search_order": {
+      "pattern": "resource.ResourceSearchSession.get_resource_search_order", 
+      "kwargs": {
+         "method_name": "get_relationship_search_order", 
+         "object_name": "Relationship", 
+         "return_type_full": "osid.relationship.RelationshipSearchOrder", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSearchSession"
+      }
+   }, 
+   "RelationshipSearchSession.get_relationships_by_search": {
+      "pattern": "resource.ResourceSearchSession.get_resource_by_search", 
+      "kwargs": {
+         "arg1_name": "relationship_search", 
+         "return_type_full": "osid.relationship.RelationshipSearchResults", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_query", 
+         "arg1_type": "osid.relationship.RelationshipSearch", 
+         "arg0_type_full": "osid.relationship.RelationshipQuery", 
+         "method_name": "get_relationships_by_search", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSearchSession"
+      }
+   }, 
+   "RelationshipSearchSession.get_relationship_query_from_inspector": {
+      "pattern": "resource.ResourceSearchSession.get_resource_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipQuery", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_query_inspector", 
+         "arg0_type_full": "osid.relationship.RelationshipQueryInspector", 
+         "method_name": "get_relationship_query_from_inspector", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSearchSession"
+      }
+   }, 
+   "RelationshipAdminSession.get_family_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_family_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family_id", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.get_family": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_family", 
+         "return_type_full": "osid.relationship.Family", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.can_create_relationships": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_relationships", 
+         "object_name": "Relationship", 
+         "var_name": "can_create_relationships", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.can_create_relationship_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_relationship_with_record_types", 
+         "object_name": "Relationship", 
+         "var_name": "can_create_relationship_with_record_types", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.get_relationship_form_for_create": {
+      "pattern": "relationship.RelationshipAdminSession.get_relationship_form_for_create", 
+      "kwargs": {
+         "arg1_name": "destination_id", 
+         "arg1_type_full": "osid.id.Id", 
+         "return_type_full": "osid.relationship.RelationshipForm", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "source_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_relationship_form_for_create", 
+         "arg2_type_full": "osid.type.Type[]", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession", 
+         "arg2_name": "relationship_record_types"
+      }
+   }, 
+   "RelationshipAdminSession.create_relationship": {
+      "pattern": "resource.ResourceAdminSession.create_resource", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.Relationship", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_form", 
+         "arg0_type_full": "osid.relationship.RelationshipForm", 
+         "method_name": "create_relationship", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.can_update_relationships": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_relationships", 
+         "object_name": "Relationship", 
+         "var_name": "can_update_relationships", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.get_relationship_form_for_update": {
+      "pattern": "resource.ResourceAdminSession.get_resource_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.RelationshipForm", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_relationship_form_for_update", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.update_relationship": {
+      "pattern": "resource.ResourceAdminSession.update_resource", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.Relationship", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_form", 
+         "arg0_type_full": "osid.relationship.RelationshipForm", 
+         "method_name": "update_relationship", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.can_delete_relationships": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_relationships", 
+         "object_name": "Relationship", 
+         "var_name": "can_delete_relationships", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.delete_relationship": {
+      "pattern": "resource.ResourceAdminSession.delete_resource", 
+      "kwargs": {
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_relationship", 
+         "object_name": "Relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.can_manage_relationship_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_relationship_aliases", 
+         "object_name": "Relationship", 
+         "var_name": "can_manage_relationship_aliases", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipAdminSession.alias_relationship": {
+      "pattern": "resource.ResourceAdminSession.alias_resource", 
+      "kwargs": {
+         "method_name": "alias_relationship", 
+         "arg1_name": "alias_id", 
+         "object_name": "Relationship", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_id", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipAdminSession"
+      }
+   }, 
+   "RelationshipNotificationSession.get_family_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_family_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family_id", 
+         "interface_name": "RelationshipNotificationSession"
+      }
+   }, 
+   "RelationshipNotificationSession.get_family": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_family", 
+         "return_type_full": "osid.relationship.Family", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family", 
+         "interface_name": "RelationshipNotificationSession"
+      }
+   }, 
+   "RelationshipNotificationSession.can_register_for_relationship_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_relationship_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.use_federated_family_view": {
+      "pattern": "resource.ResourceLookupSession.use_federated_bin_view", 
+      "kwargs": {
+         "method_name": "use_federated_family_view", 
+         "var_name": "federated_vew", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession"
+      }
+   }, 
+   "RelationshipNotificationSession.use_isolated_family_view": {
+      "pattern": "resource.ResourceLookupSession.use_isolated_bin_view", 
+      "kwargs": {
+         "method_name": "use_isolated_family_view", 
+         "var_name": "isolated_view", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_new_relationships": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_relationships", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_new_relationships_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_relationships_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_new_relationships_for_destination": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_relationships_for_destination", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_new_relationships_by_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_new_relationships_by_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_changed_relationships": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_relationships", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_changed_relationships_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_relationships_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_changed_relationships_for_destination": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_relationships_for_destination", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_changed_relationships_by_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_relationships_by_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_changed_relationship": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_changed_relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_deleted_relationships": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_relationships", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_deleted_relationships_for_source": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_relationships_for_source", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_deleted_relationships_for_destination": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_relationships_for_destination", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_deleted_relationships_by_genus_type": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_relationships_by_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipNotificationSession.register_for_deleted_relationship": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilySession.can_lookup_relationship_family_mappings": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_lookup_relationship_family_mappings", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilySession.use_comparative_family_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_family_view", 
+         "var_name": "comparative_view", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilySession"
+      }
+   }, 
+   "RelationshipFamilySession.use_plenary_family_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_family_view", 
+         "var_name": "plenary_view", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilySession"
+      }
+   }, 
+   "RelationshipFamilySession.get_relationship_ids_by_family": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationship_ids_by_family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilySession.get_relationships_by_family": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_by_family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilySession.get_relationship_ids_by_families": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationship_ids_by_families", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilySession.get_relationships_by_families": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationships_by_families", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilySession.get_family_ids_by_relationship": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_family_ids_by_relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilySession.get_families_by_relationship": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_families_by_relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilyAssignmentSession.can_assign_relationships": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_assign_relationships", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilyAssignmentSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilyAssignmentSession.can_assign_relationships_to_family": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_assign_relationships_to_family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilyAssignmentSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilyAssignmentSession.get_assignable_family_ids": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_assignable_family_ids", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilyAssignmentSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilyAssignmentSession.get_assignable_family_ids_for_relationship": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_assignable_family_ids_for_relationship", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilyAssignmentSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilyAssignmentSession.assign_relationship_to_family": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "assign_relationship_to_family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilyAssignmentSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipFamilyAssignmentSession.unassign_relationship_from_family": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "unassign_relationship_from_family", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipFamilyAssignmentSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipSmartFamilySession.get_family_id": {
+      "pattern": "resource.ResourceLookupSession.get_bin_id", 
+      "kwargs": {
+         "method_name": "get_family_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family_id", 
+         "interface_name": "RelationshipSmartFamilySession"
+      }
+   }, 
+   "RelationshipSmartFamilySession.get_family": {
+      "pattern": "resource.ResourceLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_family", 
+         "return_type_full": "osid.relationship.Family", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family", 
+         "interface_name": "RelationshipSmartFamilySession"
+      }
+   }, 
+   "RelationshipSmartFamilySession.can_manage_smart_families": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_manage_smart_families", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSmartFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipSmartFamilySession.get_relationship_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationship_query", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSmartFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipSmartFamilySession.get_relationship_search_order": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationship_search_order", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSmartFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipSmartFamilySession.apply_relationship_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "apply_relationship_query", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSmartFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipSmartFamilySession.inspect_relationship_query": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "inspect_relationship_query", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSmartFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipSmartFamilySession.apply_relationship_sequencing": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "apply_relationship_sequencing", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSmartFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "RelationshipSmartFamilySession.get_relationship_query_from_inspector": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "get_relationship_query_from_inspector", 
+         "module_name": "sessions", 
+         "interface_name": "RelationshipSmartFamilySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "FamilyLookupSession.init_pattern": "resource.BinLookupSession", 
+   "FamilyLookupSession.can_lookup_families": {
+      "pattern": "resource.ResourceLookupSession.can_lookup_resources", 
+      "kwargs": {
+         "method_name": "can_lookup_families", 
+         "object_name": "Family", 
+         "var_name": "can_lookup_families", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyLookupSession.use_comparative_family_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_family_view", 
+         "var_name": "comparative_view", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyLookupSession.use_plenary_family_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_family_view", 
+         "var_name": "plenary_view", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyLookupSession.get_family": {
+      "pattern": "resource.BinLookupSession.get_bin", 
+      "kwargs": {
+         "method_name": "get_family", 
+         "return_type_full": "osid.relationship.Family", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "arg0_name": "family_id", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyLookupSession.get_families_by_ids": {
+      "pattern": "resource.BinLookupSession.get_bins_by_ids", 
+      "kwargs": {
+         "method_name": "get_families_by_ids", 
+         "return_type_full": "osid.relationship.FamilyList", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "arg0_name": "family_ids", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyLookupSession.get_families_by_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_genus_type", 
+      "kwargs": {
+         "method_name": "get_families_by_genus_type", 
+         "return_type_full": "osid.relationship.FamilyList", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "arg0_name": "family_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyLookupSession.get_families_by_parent_genus_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_parent_genus_type", 
+      "kwargs": {
+         "method_name": "get_families_by_parent_genus_type", 
+         "return_type_full": "osid.relationship.FamilyList", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "arg0_name": "family_genus_type", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyLookupSession.get_families_by_record_type": {
+      "pattern": "resource.BinLookupSession.get_bins_by_record_type", 
+      "kwargs": {
+         "method_name": "get_families_by_record_type", 
+         "return_type_full": "osid.relationship.FamilyList", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "arg0_name": "family_record_type", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyLookupSession.get_families_by_provider": {
+      "pattern": "resource.BinLookupSession.get_bins_by_provider", 
+      "kwargs": {
+         "method_name": "get_families_by_provider", 
+         "return_type_full": "osid.relationship.FamilyList", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "arg0_name": "resource_id", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyLookupSession.get_families": {
+      "pattern": "resource.BinLookupSession.get_bins", 
+      "kwargs": {
+         "method_name": "get_families", 
+         "return_type_full": "osid.relationship.FamilyList", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyLookupSession"
+      }
+   }, 
+   "FamilyQuerySession.can_search_families": {
+      "pattern": "resource.ResourceQuerySession.can_search_resources", 
+      "kwargs": {
+         "method_name": "can_search_families", 
+         "object_name": "Family", 
+         "var_name": "can_search_families", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyQuerySession"
+      }
+   }, 
+   "FamilyQuerySession.get_family_query": {
+      "pattern": "resource.BinQuerySession.get_bin_query", 
+      "kwargs": {
+         "method_name": "get_family_query", 
+         "return_type_full": "osid.relationship.FamilyQuery", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyQuerySession"
+      }
+   }, 
+   "FamilyQuerySession.get_families_by_query": {
+      "pattern": "resource.BinQuerySession.get_bins", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyList", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_query", 
+         "arg0_type_full": "osid.relationship.FamilyQuery", 
+         "method_name": "get_families_by_query", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyQuerySession"
+      }
+   }, 
+   "FamilySearchSession.get_family_search": {
+      "pattern": "resource.BinSearchSession.get_bin_search", 
+      "kwargs": {
+         "method_name": "get_family_search", 
+         "return_type_full": "osid.relationship.FamilySearch", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilySearchSession"
+      }
+   }, 
+   "FamilySearchSession.get_family_search_order": {
+      "pattern": "resource.BinSearchSession.get_bin_search_order", 
+      "kwargs": {
+         "method_name": "get_family_search_order", 
+         "return_type_full": "osid.relationship.FamilySearchOrder", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilySearchSession"
+      }
+   }, 
+   "FamilySearchSession.get_families_by_search": {
+      "pattern": "resource.BinSearchSession.get_bins_by_search", 
+      "kwargs": {
+         "arg1_name": "family_search", 
+         "return_type_full": "osid.relationship.FamilySearchResults", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_query", 
+         "arg1_type": "osid.relationship.FamilySearch", 
+         "arg0_type_full": "osid.relationship.FamilyQuery", 
+         "method_name": "get_families_by_search", 
+         "module_name": "sessions", 
+         "interface_name": "FamilySearchSession"
+      }
+   }, 
+   "FamilySearchSession.get_family_query_from_inspector": {
+      "pattern": "resource.BinSearchSession.get_bin_query_from_inspector", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyQuery", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_query_inspector", 
+         "arg0_type_full": "osid.relationship.FamilyQueryInspector", 
+         "method_name": "get_family_query_from_inspector", 
+         "module_name": "sessions", 
+         "interface_name": "FamilySearchSession"
+      }
+   }, 
+   "FamilyAdminSession.init_pattern": "resource.BinAdminSession", 
+   "FamilyAdminSession.can_create_families": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_create_families", 
+         "object_name": "Family", 
+         "var_name": "can_create_families", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.can_create_family_with_record_types": {
+      "pattern": "resource.ResourceAdminSession.can_create_resource_with_record_types", 
+      "kwargs": {
+         "method_name": "can_create_family_with_record_types", 
+         "object_name": "Family", 
+         "var_name": "can_create_family_with_record_types", 
+         "package_name": "relationship", 
+         "arg0_name": "family_record_types", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.get_family_form_for_create": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_create", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyForm", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_record_types", 
+         "arg0_type_full": "osid.type.Type[]", 
+         "method_name": "get_family_form_for_create", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.create_family": {
+      "pattern": "resource.BinAdminSession.create_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.Family", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_form", 
+         "arg0_type_full": "osid.relationship.FamilyForm", 
+         "method_name": "create_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.can_update_families": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_update_families", 
+         "object_name": "Family", 
+         "var_name": "can_update_families", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.get_family_form_for_update": {
+      "pattern": "resource.BinAdminSession.get_bin_form_for_update", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.FamilyForm", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "get_family_form_for_update", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.update_family": {
+      "pattern": "resource.BinAdminSession.update_bin", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.Family", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_form", 
+         "arg0_type_full": "osid.relationship.FamilyForm", 
+         "method_name": "update_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.can_delete_families": {
+      "pattern": "resource.ResourceAdminSession.can_create_resources", 
+      "kwargs": {
+         "method_name": "can_delete_families", 
+         "object_name": "Family", 
+         "var_name": "can_delete_families", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.delete_family": {
+      "pattern": "resource.BinAdminSession.delete_bin", 
+      "kwargs": {
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "arg0_type_full": "osid.id.Id", 
+         "method_name": "delete_family", 
+         "cataloged_object_caps_list": "['Relationship']", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.can_manage_family_aliases": {
+      "pattern": "resource.ResourceAdminSession.can_manage_resource_aliases", 
+      "kwargs": {
+         "method_name": "can_manage_family_aliases", 
+         "object_name": "Family", 
+         "var_name": "can_manage_family_aliases", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyAdminSession.alias_family": {
+      "pattern": "resource.BinAdminSession.alias_bin", 
+      "kwargs": {
+         "method_name": "alias_family", 
+         "arg1_name": "osid.id.Id", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "arg0_name": "family_id", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyAdminSession"
+      }
+   }, 
+   "FamilyNotificationSession.can_register_for_family_notifications": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "can_register_for_family_notifications", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "FamilyNotificationSession.register_for_new_families": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bins", 
+      "kwargs": {
+         "method_name": "register_for_new_families", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "FamilyNotificationSession.register_for_new_family_ancestors": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bin_ancestors", 
+      "kwargs": {
+         "method_name": "register_for_new_family_ancestors", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id"
+      }
+   }, 
+   "FamilyNotificationSession.register_for_new_family_descendants": {
+      "pattern": "resource.BinNotificationSession.register_for_new_bin_descendants", 
+      "kwargs": {
+         "method_name": "register_for_new_family_descendants", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id"
+      }
+   }, 
+   "FamilyNotificationSession.register_for_changed_families": {
+      "pattern": "resource.BinNotificationSession.register_for_changed_bins", 
+      "kwargs": {
+         "method_name": "register_for_changed_families", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "FamilyNotificationSession.register_for_changed_family": {
+      "pattern": "resource.BinNotificationSession.register_for_changed_bin", 
+      "kwargs": {
+         "method_name": "register_for_changed_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id"
+      }
+   }, 
+   "FamilyNotificationSession.register_for_deleted_families": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bins", 
+      "kwargs": {
+         "method_name": "register_for_deleted_families", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "FamilyNotificationSession.register_for_deleted_family": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bin", 
+      "kwargs": {
+         "method_name": "register_for_deleted_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id"
+      }
+   }, 
+   "FamilyNotificationSession.register_for_deleted_family_ancestors": {
+      "pattern": "resource.BinNotificationSession.register_for_deleted_bin_ancestors", 
+      "kwargs": {
+         "method_name": "register_for_deleted_family_ancestors", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id"
+      }
+   }, 
+   "FamilyNotificationSession.register_for_deleted_family_descendants": {
+      "pattern": "", 
+      "kwargs": {
+         "method_name": "register_for_deleted_family_descendants", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyNotificationSession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "FamilyHierarchySession.get_family_hierarchy_id": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy_id", 
+      "kwargs": {
+         "method_name": "get_family_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family_hierarchy_id", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.get_family_hierarchy": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "get_family_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family_hierarchy", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.can_access_family_hierarchy": {
+      "pattern": "resource.BinHierarchySession.can_access_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "can_access_family_hierarchy", 
+         "module_name": "sessions", 
+         "var_name": "access_family_hierarchy", 
+         "interface_name": "FamilyHierarchySession", 
+         "package_name": "relationship"
+      }
+   }, 
+   "FamilyHierarchySession.use_comparative_family_view": {
+      "pattern": "resource.BinLookupSession.use_comparative_bin_view", 
+      "kwargs": {
+         "method_name": "use_comparative_family_view", 
+         "var_name": "comparative_view", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.use_plenary_family_view": {
+      "pattern": "resource.BinLookupSession.use_plenary_bin_view", 
+      "kwargs": {
+         "method_name": "use_plenary_family_view", 
+         "var_name": "plenary_view", 
+         "package_name": "relationship", 
+         "cat_name": "family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.get_root_family_ids": {
+      "pattern": "resource.BinHierarchySession.get_root_bin_ids", 
+      "kwargs": {
+         "method_name": "get_root_family_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "root_family_ids", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.get_root_families": {
+      "pattern": "resource.BinHierarchySession.get_root_bins", 
+      "kwargs": {
+         "method_name": "get_root_families", 
+         "return_type_full": "osid.relationship.FamilyList", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "root_families", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.has_parent_families": {
+      "pattern": "resource.BinHierarchySession.has_parent_bins", 
+      "kwargs": {
+         "method_name": "has_parent_families", 
+         "var_name": "parent_families", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.is_parent_of_family": {
+      "pattern": "resource.BinHierarchySession.is_parent_of_bin", 
+      "kwargs": {
+         "arg1_name": "family_id", 
+         "return_type_full": "boolean", 
+         "package_name": "relationship", 
+         "arg0_name": "id_", 
+         "method_name": "is_parent_of_family", 
+         "var_name": "arent_of_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.get_parent_family_ids": {
+      "pattern": "resource.BinHierarchySession.get_parent_bin_ids", 
+      "kwargs": {
+         "method_name": "get_parent_family_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "module_name": "sessions", 
+         "var_name": "parent_family_ids", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.get_parent_families": {
+      "pattern": "resource.BinHierarchySession.get_parent_bins", 
+      "kwargs": {
+         "method_name": "get_parent_families", 
+         "return_type_full": "osid.relationship.FamilyList", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "module_name": "sessions", 
+         "var_name": "parent_families", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.is_ancestor_of_family": {
+      "pattern": "resource.BinHierarchySession.is_ancestor_of_bin", 
+      "kwargs": {
+         "arg1_name": "family_id", 
+         "return_type_full": "boolean", 
+         "package_name": "relationship", 
+         "arg0_name": "id_", 
+         "method_name": "is_ancestor_of_family", 
+         "var_name": "ncestor_of_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.has_child_families": {
+      "pattern": "resource.BinHierarchySession.has_child_bins", 
+      "kwargs": {
+         "method_name": "has_child_families", 
+         "var_name": "child_families", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.is_child_of_family": {
+      "pattern": "resource.BinHierarchySession.is_child_of_bin", 
+      "kwargs": {
+         "arg1_name": "family_id", 
+         "return_type_full": "boolean", 
+         "package_name": "relationship", 
+         "arg0_name": "id_", 
+         "method_name": "is_child_of_family", 
+         "var_name": "hild_of_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.get_child_family_ids": {
+      "pattern": "resource.BinHierarchySession.get_child_bin_ids", 
+      "kwargs": {
+         "method_name": "get_child_family_ids", 
+         "return_type_full": "osid.id.IdList", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "module_name": "sessions", 
+         "var_name": "child_family_ids", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.get_child_families": {
+      "pattern": "resource.BinHierarchySession.get_child_bins", 
+      "kwargs": {
+         "method_name": "get_child_families", 
+         "return_type_full": "osid.relationship.FamilyList", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "module_name": "sessions", 
+         "var_name": "child_families", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.is_descendant_of_family": {
+      "pattern": "resource.BinHierarchySession.is_descendant_of_bin", 
+      "kwargs": {
+         "arg1_name": "family_id", 
+         "return_type_full": "boolean", 
+         "package_name": "relationship", 
+         "arg0_name": "id_", 
+         "method_name": "is_descendant_of_family", 
+         "var_name": "escendant_of_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession"
+      }
+   }, 
+   "FamilyHierarchySession.get_family_node_ids": {
+      "pattern": "resource.BinHierarchySession.get_bin_node_ids", 
+      "kwargs": {
+         "arg1_name": "ancestor_levels", 
+         "return_type_full": "osid.hierarchy.Node", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "arg3_name": "include_siblings", 
+         "method_name": "get_family_node_ids", 
+         "var_name": "family_node_ids", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession", 
+         "arg2_name": "descendant_levels"
+      }
+   }, 
+   "FamilyHierarchySession.get_family_nodes": {
+      "pattern": "resource.BinHierarchySession.get_bin_nodes", 
+      "kwargs": {
+         "arg1_name": "ancestor_levels", 
+         "return_type_full": "osid.relationship.FamilyNode", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "arg3_name": "include_siblings", 
+         "method_name": "get_family_nodes", 
+         "var_name": "family_nodes", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchySession", 
+         "arg2_name": "descendant_levels"
+      }
+   }, 
+   "FamilyHierarchyDesignSession.get_family_hierarchy_id": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy_id", 
+      "kwargs": {
+         "method_name": "get_family_hierarchy_id", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family_hierarchy_id", 
+         "interface_name": "FamilyHierarchyDesignSession"
+      }
+   }, 
+   "FamilyHierarchyDesignSession.get_family_hierarchy": {
+      "pattern": "resource.BinHierarchySession.get_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "get_family_hierarchy", 
+         "return_type_full": "osid.hierarchy.Hierarchy", 
+         "package_name": "relationship", 
+         "module_name": "sessions", 
+         "var_name": "family_hierarchy", 
+         "interface_name": "FamilyHierarchyDesignSession"
+      }
+   }, 
+   "FamilyHierarchyDesignSession.can_modify_family_hierarchy": {
+      "pattern": "resource.BinHierarchyDesignSession.can_modify_bin_hierarchy", 
+      "kwargs": {
+         "method_name": "can_modify_family_hierarchy", 
+         "var_name": "modify_family_hierarchy", 
+         "package_name": "relationship", 
+         "cat_name": "Family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchyDesignSession"
+      }
+   }, 
+   "FamilyHierarchyDesignSession.add_root_family": {
+      "pattern": "resource.BinHierarchyDesignSession.add_root_bin", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "method_name": "add_root_family", 
+         "var_name": "root_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchyDesignSession"
+      }
+   }, 
+   "FamilyHierarchyDesignSession.remove_root_family": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_root_bin", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "method_name": "remove_root_family", 
+         "var_name": "root_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchyDesignSession"
+      }
+   }, 
+   "FamilyHierarchyDesignSession.add_child_family": {
+      "pattern": "resource.BinHierarchyDesignSession.add_child_bin", 
+      "kwargs": {
+         "arg1_name": "child_id", 
+         "return_type_full": "", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "method_name": "add_child_family", 
+         "var_name": "child_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchyDesignSession"
+      }
+   }, 
+   "FamilyHierarchyDesignSession.remove_child_family": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_child_bin", 
+      "kwargs": {
+         "arg1_name": "child_id", 
+         "return_type_full": "", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "method_name": "remove_child_family", 
+         "var_name": "child_family", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchyDesignSession"
+      }
+   }, 
+   "FamilyHierarchyDesignSession.remove_child_families": {
+      "pattern": "resource.BinHierarchyDesignSession.remove_child_bins", 
+      "kwargs": {
+         "return_type_full": "", 
+         "cat_name": "Family", 
+         "package_name": "relationship", 
+         "arg0_name": "family_id", 
+         "method_name": "remove_child_families", 
+         "var_name": "child_families", 
+         "module_name": "sessions", 
+         "interface_name": "FamilyHierarchyDesignSession"
+      }
+   }, 
+   "Relationship.init_pattern": "resource.Resource", 
+   "Relationship.get_source_id": {
+      "pattern": "relationship.Relationship.get_source_id", 
+      "kwargs": {
+         "method_name": "get_source_id", 
+         "object_name": "Relationship", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "relationship", 
+         "module_name": "objects", 
+         "var_name": "source", 
+         "interface_name": "Relationship"
+      }
+   }, 
+   "Relationship.get_destination_id": {
+      "pattern": "relationship.Relationship.get_source_id", 
+      "kwargs": {
+         "method_name": "get_destination_id", 
+         "object_name": "Relationship", 
+         "return_type_full": "osid.id.Id", 
+         "package_name": "relationship", 
+         "module_name": "objects", 
+         "var_name": "destination", 
+         "interface_name": "Relationship"
+      }
+   }, 
+   "Relationship.get_relationship_record": {
+      "pattern": "resource.Resource.get_resource_record", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.records.RelationshipRecord", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_relationship_record", 
+         "var_name": "relationship_record", 
+         "module_name": "objects", 
+         "interface_name": "Relationship"
+      }
+   }, 
+   "RelationshipForm.init_pattern": "resource.ResourceForm", 
+   "RelationshipForm.get_relationship_form_record": {
+      "pattern": "resource.ResourceForm.get_resource_form_record", 
+      "kwargs": {
+         "return_type_full": "osid.relationship.records.RelationshipFormRecord", 
+         "package_name": "relationship", 
+         "arg0_name": "relationship_record_type", 
+         "arg0_type_full": "osid.type.Type", 
+         "method_name": "get_relationship_form_record", 
+         "var_name": "relationship_form_record", 
+         "module_name": "objects", 
+         "interface_name": "RelationshipForm"
+      }
+   }, 
+   "RelationshipList.get_next_relationship": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_relationship", 
+         "return_type_full": "osid.relationship.Relationship", 
+         "package_name": "relationship", 
+         "module_name": "objects", 
+         "var_name": "relationship", 
+         "interface_name": "RelationshipList"
+      }
+   }, 
+   "RelationshipList.get_next_relationships": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_relationships", 
+         "return_type_full": "osid.relationship.Relationship", 
+         "package_name": "relationship", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "relationships", 
+         "interface_name": "RelationshipList"
+      }
+   }, 
+   "Family.init_pattern": "resource.Bin", 
+   "FamilyForm.init_pattern": "resource.BinForm", 
+   "FamilyList.get_next_family": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_family", 
+         "return_type_full": "osid.relationship.Family", 
+         "package_name": "relationship", 
+         "module_name": "objects", 
+         "var_name": "family", 
+         "interface_name": "FamilyList"
+      }
+   }, 
+   "FamilyList.get_next_families": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_families", 
+         "return_type_full": "osid.relationship.Family", 
+         "package_name": "relationship", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "families", 
+         "interface_name": "FamilyList"
+      }
+   }, 
+   "FamilyNodeList.get_next_family_node": {
+      "pattern": "resource.ResourceList.get_next_resource", 
+      "kwargs": {
+         "method_name": "get_next_family_node", 
+         "return_type_full": "osid.relationship.FamilyNode", 
+         "package_name": "relationship", 
+         "module_name": "objects", 
+         "var_name": "family_node", 
+         "interface_name": "FamilyNodeList"
+      }
+   }, 
+   "FamilyNodeList.get_next_family_nodes": {
+      "pattern": "resource.ResourceList.get_next_resources", 
+      "kwargs": {
+         "method_name": "get_next_family_nodes", 
+         "return_type_full": "osid.relationship.FamilyNode", 
+         "package_name": "relationship", 
+         "arg0_name": "n", 
+         "module_name": "objects", 
+         "var_name": "family_nodes", 
+         "interface_name": "FamilyNodeList"
+      }
+   }
+}
