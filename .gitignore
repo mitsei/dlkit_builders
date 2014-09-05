@@ -29,6 +29,6 @@ pip-log.txt
 #IDE cruft
 .idea
 
-# Files in directories where maps are built
-package_maps/*
-pattern_maps/*
+# Directories where maps are built
+package_maps
+pattern_maps
