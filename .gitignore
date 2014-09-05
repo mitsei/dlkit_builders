@@ -30,5 +30,5 @@ pip-log.txt
 .idea
 
 # Files in directories where maps are built
-.package_maps/*
-.pattern_maps/*
+package_maps/*
+pattern_maps/*
