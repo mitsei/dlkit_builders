@@ -31,15 +31,15 @@ User errors are only permitted where specified in method signatures and
 should be handled directly by a consumer application.
 
 """
-class AlreadyExists(errors.AlreadyExists, Exception):
+class AlreadyExists(errors.AlreadyExists):
     pass
 
 
-class NotFound(errors.NotFound, Exception):
+class NotFound(errors.NotFound):
     pass
 
 
-class PermissionDenied(errors.PermissionDenied, Exception):
+class PermissionDenied(errors.PermissionDenied):
     pass
 
 """ Operational Errors:	
@@ -50,15 +50,15 @@ consumer application.
 
 """
 
-class ConfigurationError(errors.ConfigurationError, Exception):
+class ConfigurationError(errors.ConfigurationError):
     pass
 
 
-class OperationFailed(errors.OperationFailed, Exception):
+class OperationFailed(errors.OperationFailed):
     pass
 
 
-class TransactionFailure(errors.TransactionFailure, Exception):
+class TransactionFailure(errors.TransactionFailure):
     pass
 
 """ ConsumerContract:
@@ -69,29 +69,29 @@ avoided by using the defined interoperability and flow control tests.
 
 """
 
-class IllegalState(errors.IllegalState, Exception):
+class IllegalState(errors.IllegalState):
     pass
 
 
-class InvalidArgument(errors.InvalidArgument, Exception):
+class InvalidArgument(errors.InvalidArgument):
     pass
 
 
-class InvalidMethod(errors.InvalidMethod, Exception):
+class InvalidMethod(errors.InvalidMethod):
     pass
 
 
-class NoAccess(errors.NoAccess, Exception):
+class NoAccess(errors.NoAccess):
     pass
 
 
-class NullArgument(errors.NullArgument, Exception):
+class NullArgument(errors.NullArgument):
     pass
 
 
-class Unimplemented(errors.Unimplemented, Exception):
+class Unimplemented(errors.Unimplemented):
     pass
 
 
-class Unsupported(errors.Unsupported, Exception):
+class Unsupported(errors.Unsupported):
     pass

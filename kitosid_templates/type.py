@@ -7,10 +7,11 @@ class TypeProfile:
         # osid.resource.ResourceProfile.supports_visible_federation
         return self._provider_manager.supports_visible_federation()"""
 
-    supports_resource_lookup = """
-        # Implemented from kitosid template for -
-        # osid.resource.ResourceProfile.supports_resource_lookup
-        return self._provider_manager.supports_resource_lookup()"""
+    supports_type_lookup = """
+        return self._provider_manager.supports_type_lookup()"""
+
+    supports_type_admin = """
+        return self._provider_manager.supports_type_admin()"""
 
 
 class TypeManager:

@@ -206,32 +206,30 @@ class OsidSession:
                     self._my_catalog_map = {
                         '_id': ObjectId(catalog_id.get_identifier()),
                         'displayName': {'text': catalog_id.get_identifier_namespace() + ' ' + cat_name,
-                                        'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                        'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                        'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+                                        'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                                        'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                                        'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
                         'description': {'text': cat_name + ' for ' + catalog_id.get_identifier_namespace() + ' objects',
-                                        'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                        'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                        'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+                                        'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                                        'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                                        'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
                         'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
                     }
                     collection.insert(self._my_catalog_map)
                 else:
                     raise NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
         else:
-#            from ..primitives import Id, Type
-#            from .. import types
             self._catalog_identifier = '000000000000000000000000'
             self._my_catalog_map = {
                 '_id': ObjectId(self._catalog_identifier),
                 'displayName': {'text': 'Default ' + cat_name,
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+                                'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                                'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                                'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
                 'description': {'text': 'The Default ' + cat_name,
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+                                'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                                'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                                'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
                 'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
             }
         self._catalog = cat_class(self._my_catalog_map)

@@ -31,15 +31,15 @@ User errors are only permitted where specified in method signatures and
 should be handled directly by a consumer application.
 
 """
-class AlreadyExists(abc_errors.AlreadyExists, Exception):
+class AlreadyExists(abc_errors.AlreadyExists):
     pass
 
 
-class NotFound(abc_errors.NotFound, Exception):
+class NotFound(abc_errors.NotFound):
     pass
 
 
-class PermissionDenied(abc_errors.PermissionDenied, Exception):
+class PermissionDenied(abc_errors.PermissionDenied):
     pass
 
 """ Operational Errors:	
@@ -50,15 +50,15 @@ consumer application.
 
 """
 
-class ConfigurationError(abc_errors.ConfigurationError, Exception):
+class ConfigurationError(abc_errors.ConfigurationError):
     pass
 
 
-class OperationFailed(abc_errors.OperationFailed, Exception):
+class OperationFailed(abc_errors.OperationFailed):
     pass
 
 
-class TransactionFailure(abc_errors.TransactionFailure, Exception):
+class TransactionFailure(abc_errors.TransactionFailure):
     pass
 
 """ ConsumerContract:
@@ -69,29 +69,29 @@ avoided by using the defined interoperability and flow control tests.
 
 """
 
-class IllegalState(abc_errors.IllegalState, Exception):
+class IllegalState(abc_errors.IllegalState):
     pass
 
 
-class InvalidArgument(abc_errors.InvalidArgument, Exception):
+class InvalidArgument(abc_errors.InvalidArgument):
     pass
 
 
-class InvalidMethod(abc_errors.InvalidMethod, Exception):
+class InvalidMethod(abc_errors.InvalidMethod):
     pass
 
 
-class NoAccess(abc_errors.NoAccess, Exception):
+class NoAccess(abc_errors.NoAccess):
     pass
 
 
-class NullArgument(abc_errors.NullArgument, Exception):
+class NullArgument(abc_errors.NullArgument):
     pass
 
 
-class Unimplemented(abc_errors.Unimplemented, Exception):
+class Unimplemented(abc_errors.Unimplemented):
     pass
 
 
-class Unsupported(abc_errors.Unsupported, Exception):
+class Unsupported(abc_errors.Unsupported):
     pass

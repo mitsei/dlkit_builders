@@ -98,13 +98,13 @@ class ResourceManager:
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_catalog_template
         session = self._provider_manager.${method_name}(*args, **kwargs)
-        return ${cat_name}(self._provider_manager, session.get_${cat_name_under}(), self._proxy, ${return_type_under} = session)"""
+        return ${cat_name}(self._provider_manager, self.get_${cat_name_under}(*args, **kwargs), self._proxy, ${return_type_under} = session)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_catalog_template
         session = self._provider_manager.${method_name}(*args, **kwargs)
-        return ${cat_name}(self._provider_manager, session.get_${cat_name_under}(), self._proxy, ${return_type_under} = session)"""
+        return ${cat_name}(self._provider_manager, self.get_${cat_name_under}(*args, **kwargs), self._proxy, ${return_type_under} = session)"""
 
 
 class ResourceLookupSession:
@@ -217,14 +217,14 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
         return self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)
 
-    def get_${object_name_under}_form(self, ${object_name_under}_id=None, *args, **kwargs):
+    def get_${object_name_under}_form(self, *args, **kwargs):
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
-        if ${object_name_under}_id is None:
+        # This method might be a bit sketchy. Time will tell.
+        if isinstance(args[-1], list) or '${object_name_under}_record_types' in kwargs:
             return self.get_${object_name_under}_form_for_create(*args, **kwargs)
         else:
-            return self.${method_name}(${object_name_under}_id, *args, **kwargs)"""
-
+            return self.${method_name}(*args, **kwargs)"""
 
     update_resource_template = """
         # Implemented from kitosid template for -
@@ -351,13 +351,14 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.get_bin_form_for_update
         return self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)
 
-    def get_${cat_name_under}_form(self, ${cat_name_under}_id=None, *args, **kwargs):
+    def get_${cat_name_under}_form(self, *args, **kwargs):
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
-        if ${cat_name_under}_id is None:
+        # This method might be a bit sketchy. Time will tell.
+        if isinstance(args[-1], list) or '${cat_name_under}_record_types' in kwargs:
             return self.get_${cat_name_under}_form_for_create(*args, **kwargs)
         else:
-            return self.${method_name}(${cat_name_under}_id, *args, **kwargs)"""
+            return self.${method_name}(*args, **kwargs)"""
 
     update_bin_template = """
         # Implemented from kitosid template for -
