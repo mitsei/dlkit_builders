@@ -32,3 +32,6 @@ pip-log.txt
 # Directories where maps are built
 package_maps
 pattern_maps
+
+# Mac Stuff
+.DS_Store
