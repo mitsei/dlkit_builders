@@ -2,16 +2,22 @@
 
 ANCHOR_PATH = 'dlkit.services'
 
+#LEARNING_PROVIDER_MANAGER_PATH = '..mongo.learning.managers'
 LEARNING_PROVIDER_MANAGER_PATH = '..handcar.learning.managers'
 
+#REPOSITORY_PROVIDER_MANAGER_PATH = '..mongo.repository.managers'
 REPOSITORY_PROVIDER_MANAGER_PATH = '..handcar.repository.managers'
 
+#TYPE_PROVIDER_MANAGER_PATH = '..mongo.type.managers'
 TYPE_PROVIDER_MANAGER_PATH = '..handcar.type.managers'
 
+#ID_PROVIDER_MANAGER_PATH = '..mongo.id.managers'
 ID_PROVIDER_MANAGER_PATH = '..handcar.id.managers'
 
+#GRADING_PROVIDER_MANAGER_PATH = '..mongo.grading.managers'
 GRADING_PROVIDER_MANAGER_PATH = '..handcar.grading.managers'
 
+#RELATIONSHIP_PROVIDER_MANAGER_PATH = '..mongo.relationship.managers'
 RELATIONSHIP_PROVIDER_MANAGER_PATH = '..handcar.relationship.managers'
 
 PROXY_PROVIDER_MANAGER_PATH = '..services_impls.proxy.managers'
