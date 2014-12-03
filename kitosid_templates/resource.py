@@ -85,25 +85,37 @@ class ResourceManager:
     get_resource_lookup_session_managertemplate = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_manager_template
-        self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(*args, **kwargs)
+        if self._proxy:
+            self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
+        else:
+            self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(*args, **kwargs)
         return self"""
 
     get_resource_lookup_session_for_bin_managertemplate = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_manager_template
-        self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(*args, **kwargs)
+        if self._proxy:
+            self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
+        else:
+            self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(*args, **kwargs)
         return self"""
 
     get_resource_lookup_session_catalogtemplate = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_catalog_template
-        session = self._provider_manager.${method_name}(*args, **kwargs)
+        if self._proxy:
+            session = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
+        else:
+            session = self._provider_manager.${method_name}(*args, **kwargs)
         return ${cat_name}(self._provider_manager, self.get_${cat_name_under}(*args, **kwargs), self._proxy, ${return_type_under} = session)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_catalog_template
-        session = self._provider_manager.${method_name}(*args, **kwargs)
+        if self._proxy:
+            session = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
+        else:
+            session = self._provider_manager.${method_name}(*args, **kwargs)
         return ${cat_name}(self._provider_manager, self.get_${cat_name_under}(*args, **kwargs), self._proxy, ${return_type_under} = session)"""
 
 
@@ -127,7 +139,7 @@ class ResourceLookupSession:
         self._views['${object_name_under}_view'] = self.COMPARATIVE
         for session in self._provider_sessions:
             try:
-                session.use_comparative_${object_name_under}_view()
+                self._provider_sessions[session].use_comparative_${object_name_under}_view()
             except AttributeError():
                 pass"""
 
@@ -135,7 +147,7 @@ class ResourceLookupSession:
         self._views[\'${object_name_under}_view\'] = self.PLENARY
         for session in self._provider_sessions:
             try:
-                session.use_comparative_${object_name_under}_view()
+                self._provider_sessions[session].use_plenary_${object_name_under}_view()
             except AttributeError():
                 pass"""
 
@@ -143,7 +155,7 @@ class ResourceLookupSession:
         self._views[\'${cat_name_under}_view\'] = self.FEDERATED
         for session in self._provider_sessions:
             try:
-                session.use_comparative_${cat_name_under}_view()
+                self._provider_sessions[session].use_federated_${cat_name_under}_view()
             except AttributeError():
                 pass"""
 
@@ -151,7 +163,7 @@ class ResourceLookupSession:
         self._views[\'${cat_name_under}_view\'] = self.ISOLATED
         for session in self._provider_sessions:
             try:
-                session.use_comparative_${cat_name_under}_view()
+                self._provider_sessions[session].use_isolated_${cat_name_under}_view()
             except AttributeError():
                 pass"""
 
@@ -184,6 +196,24 @@ class ResourceLookupSession:
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.get_resources_template
         return self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)"""
+
+class ResourceQuerySession:
+
+    can_search_resources_template = """
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceQuerySession.can_search_resources_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)"""
+
+    get_resource_query_template = """
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceQuerySession.get_item_query_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)"""
+
+    get_resources_by_query_template = """
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceQuerySession.get_items_by_query_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)"""
+
 
 class ResourceAdminSession:
 
@@ -230,7 +260,15 @@ class ResourceAdminSession:
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.update_resource_template
         # Note: The OSID spec does not require returning updated object
-        return self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)"""
+        return self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)
+
+    def save_${object_name_under}(self, ${object_name_under}_form, *args, **kwargs):
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceAdminSession.update_resource_template
+        if ${object_name_under}_form.is_for_update():
+            return self.update_${object_name_under}(${object_name_under}_form, *args, **kwargs)
+        else:
+            return self.create_${object_name_under}(${object_name_under}_form, *args, **kwargs)"""
 
     delete_resource_template = """
         # Implemented from kitosid template for -
@@ -250,7 +288,7 @@ class BinLookupSession:
         self._views[\'${cat_name_under}_view\'] = self.COMPARATIVE
         for session in self._provider_sessions:
             try:
-                session.use_comparative_${cat_name_under}_view()
+                self._provider_sessions[session].use_comparative_${cat_name_under}_view()
             except AttributeError():
                 pass"""
 
@@ -258,7 +296,7 @@ class BinLookupSession:
         self._views[\'${cat_name_under}_view\'] = self.PLENARY
         for session in self._provider_sessions:
             try:
-                session.use_plenary_${cat_name_under}_view()
+                self._provider_sessions[session].use_plenary_${cat_name_under}_view()
             except AttributeError():
                 pass"""
 
@@ -343,7 +381,6 @@ class BinAdminSession:
     create_bin_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.create_bin
-#        from .objects import ${cat_name}
         return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs), self._proxy)"""
 
     get_bin_form_for_update_template = """
@@ -363,9 +400,16 @@ class BinAdminSession:
     update_bin_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.update_bin
-#        from .objects import ${cat_name}
         # OSID spec does not require returning updated catalog
-        return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs), self._proxy)"""
+        return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs), self._proxy)
+
+    def save_${cat_name_under}(self, ${cat_name_under}_form, *args, **kwargs):
+        # Implemented from kitosid template for -
+        # osid.resource.BinAdminSession.update_bin
+        if ${cat_name_under}_form.is_for_update():
+            return self.update_${cat_name_under}(${cat_name_under}_form, *args, **kwargs)
+        else:
+            return self.create_${cat_name_under}(${cat_name_under}_form, *args, **kwargs)"""
 
     delete_bin_template = """
         # Implemented from kitosid template for -
@@ -594,7 +638,12 @@ class Bin:
                 if self._proxy is None:
                     self._provider_sessions[session] = get_session_class(self._catalog.get_id())
                 else:
-                    self._provider_sessions[session] = get_session_class(self._catalog.get_id(), self._proxy)                    
+                    self._provider_sessions[session] = get_session_class(self._catalog.get_id(), self._proxy)
+            if '${cat_name_under}_view' in self._views:
+                if self._views['${cat_name_under}_view'] == self.FEDERATED:
+                    self._provider_sessions[session].use_federated_${cat_name_under}_view()
+                else:
+                    self._provider_sessions[session].use_isoloated_${cat_name_under}_view()
             return self._provider_sessions[session]
 
     def get_${cat_name_under}_id(self):

@@ -2313,7 +2313,7 @@ class Heading:
 
     def get_type_data(self, name):
         
-        if name not in heading_types:
+        if name not in self.heading_types:
             raise NotFound('Heading Type: ' + name)
         
         return {
@@ -2349,7 +2349,7 @@ class String:
 
     def get_type_data(self, name):
         
-        if name not in string_match_types:
+        if name not in self.string_match_types:
             raise NotFound('String Type: ' + name)
         
         return {
@@ -2357,10 +2357,10 @@ class String:
             'namespace': 'string match types',
             'identifier': name,
             'domain': 'String Match Types',
-            'display_name': self.heading_types[name] + ' String Match Type',
-            'display_label': self.heading_types[name],
+            'display_name': self.string_match_types[name] + ' String Match Type',
+            'display_label': self.string_match_types[name],
             'description': ('The string match type for the ' +  
-                                    self.heading_types[name])
+                                    self.string_match_types[name])
             }
 
 class UnitSystem:
@@ -2376,7 +2376,7 @@ class UnitSystem:
 
     def get_type_data(self, name):
         
-        if name not in jeffs_unit_system_types:
+        if name not in self.jeffs_unit_system_types:
             raise NotFound('UnitSystem Type: ' + name)
         
         return {
@@ -2402,7 +2402,7 @@ class CalendarFormat:
 
     def get_type_data(self, name):
 
-        if name not in jeffs_calendar_format_types:
+        if name not in self.jeffs_calendar_format_types:
             raise NotFound('CalendarFormat Type: ' + name)
         
         return {
@@ -2429,7 +2429,7 @@ class TimeFormat:
 
     def get_type_data(self, name):
         
-        if name not in jeffs_time_format_types:
+        if name not in self.jeffs_time_format_types:
             raise NotFound('TimeFormat Type: ' + name)
         
         return {
@@ -2456,7 +2456,7 @@ class CurrencyFormat:
 
     def get_type_data(self, name):
         
-        if name not in jeffs_currency_format_types:
+        if name not in self.jeffs_currency_format_types:
             raise NotFound('CurrencyFormat Type: ' + name)
         
         return {
@@ -2482,7 +2482,7 @@ class CoordinateFormat:
 
     def get_type_data(self, name):
         
-        if name not in jeffs_coordinate_format_types:
+        if name not in self.jeffs_coordinate_format_types:
             raise NotFound('CoordinateFormat Type: ' + name)
 
         return {

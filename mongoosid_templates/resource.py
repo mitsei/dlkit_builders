@@ -226,6 +226,7 @@ class ResourceLookupSession:
             result = collection.find_one({'$$and': [{'_id': ObjectId(${arg0_name}.get_identifier())},
                                           {'${cat_name_mixed}Id': str(self._catalog_id)}]})
         else:
+            # This should really look in the underlying hierarchy (when hierarchy is implemented)
             result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
             raise NotFound()
@@ -303,6 +304,52 @@ class ResourceLookupSession:
             count = collection.count()
         return ${return_type}(result, count)"""
 
+class ResourceQuerySession:
+
+    import_statements_pattern = [
+        'from ..osid.osid_errors import *',
+        'from pymongo import MongoClient'
+    ]
+
+    init_template = """
+    def __init__(self, catalog_id = None, proxy = None):
+        from .objects import ${cat_name}
+        self._catalog_class = ${cat_name}
+        from ..osid.sessions import OsidSession
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
+        OsidSession._init_object(self, catalog_id, proxy, db_name='${pkg_name}', cat_name='${cat_name}', cat_class=${cat_name})
+        self._catalog_view = self.ISOLATED
+"""
+
+    can_query_resources_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceQuerySession.can_query_resources
+        # NOTE: It is expected that real authentication hints will be 
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
+    get_resource_query_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceQuerySession.get_resource_query_template
+        from .${return_module} import ${return_type}
+        return ${return_type}()"""
+
+    get_resources_by_query_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceQuerySession.get_resources_by_query
+        from .${return_module} import ${return_type}
+        if not ${arg0_name}:
+            raise NullArgument()
+        query_terms = dict(${arg0_name}._query_terms)
+        collection = MongoClient()['${package_name}']['${object_name}']
+        if self._catalog_view == self.ISOLATED:
+            query_terms['${cat_name_mixed}Id'] = str(self._catalog_id)
+        result = collection.find(query_terms)
+        count = collection.find(query_terms).count()
+        return ${return_type}(result, count)"""
+
+
 class ResourceAdminSession:
 
     init_template = """
@@ -316,7 +363,7 @@ class ResourceAdminSession:
         self._forms = dict()
 """
 
-    pld_init_template = """
+    old_init_template = """
     _session_name = '${interface_name}'
 
     def __init__(self, catalog_id = None, *args, **kwargs):
@@ -555,6 +602,9 @@ class BinLookupSession:
         collection = MongoClient()['${package_name}']['${cat_name}']
         if not ${arg0_name}:
             raise NullArgument()
+        # Need to consider how to best deal with the "phantom root catalog issue
+        if ${arg0_name}.get_identifier() == '000000000000000000000000':
+            return self._get_phantom_root_catalog(cat_class = ${cat_name}, cat_name = '${cat_name}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
             raise NotFound()
@@ -822,6 +872,8 @@ ${instance_initers}
             return osidObject"""
 
     get_resource_record_template = """
+        # This is now in Extensible and can be replaces with:
+        # return self._get_record(${arg0_name}):
         if ${arg0_name} is None:
             raise NullArgument()
         if not self.has_record_type(${arg0_name}):
@@ -829,6 +881,26 @@ ${instance_initers}
         if str(${arg0_name}) not in self._records:
             raise Unimplemented()
         return self._records[str(${arg0_name})]"""
+
+class ResourceQuery:
+
+    import_statements_pattern = [
+        'from ..osid.osid_errors import *',
+        'from ..primitives import Id, Type, DisplayText',
+    ]
+
+    init_template = """
+    def __init__(self):
+        try:
+            from .records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
+        except ImportError, AttributeError:
+            record_type_data_sets = {}
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidQuery.__init__(self)
+"""
 
 class ResourceForm:
 
@@ -934,6 +1006,8 @@ ${persisted_initers}
         self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
 
     get_resource_form_record_template = """
+        # This is now in OsidExtensibleForm and can be replaces with:
+        # return self._get_record(${arg0_name}):
         if ${arg0_name} is None:
             raise NullArgument()
         if not self.has_record_type(${arg0_name}):
@@ -943,6 +1017,7 @@ ${persisted_initers}
             if str(${arg0_name}) not in self._my_map['recordTypeIds']: # nor this
                 self._my_map['recordTypeIds'].append(str(${arg0_name}))
         return self._records[str(${arg0_name})]"""
+
 
 
 class ResourceList:

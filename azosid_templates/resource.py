@@ -164,6 +164,29 @@ class ResourceLookupSession:
         else:
             return self._provider_session.${method_name}()"""
 
+class ResourceQuerySession:
+
+    can_search_resources_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceQuerySession.can_search_resources_template
+        return self._can('${func_name}')"""
+
+    get_resource_query_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceQuerySession.get_resource_query_template
+        if not self._can('search'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}()"""
+
+    get_resources_by_query_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceQuerySession.get_resources_by_query_template
+        if not self._can('search'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}()"""
+
 class ResourceAdminSession:
 
     init_template = """

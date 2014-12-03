@@ -125,6 +125,25 @@ class Extensible:
                     pass
         raise AttributeError(name)
 
+    def _get_record(self, recordType):
+        if recordType is None:
+            raise NullArgument()
+        if not self.has_record_type(recordType):
+            raise Unsupported()
+        if str(recordType) not in self._records:
+            raise Unimplemented()
+        return self._records[str(recordType)]
+
+    def _load_records(self, record_type_idstrs):
+        for record_type_idstr in record_type_idstrs:
+            self._init_record(record_type_idstr)
+
+    def _init_record(self, record_type_idstr):
+        import importlib
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['object_record_class_name'])
+        self._records[record_type_idstr] = record(self)
 
     def _delete(self):
         # Override this method in inheriting objects to perform special clearing operations
@@ -154,7 +173,7 @@ class Operable:
 
     is_active = """
         # THIS MAY NOT BE RIGHT. REVIEW LOGIC FROM OSID DOC
-        return self.is_operational() and (not self.is_disabled() or is_enabled())"""
+        return self.is_operational() and (not self.is_disabled() or self.is_enabled())"""
 
     is_enabled = """
         # Someday I'll have a real implementation, but for now I just: 
@@ -236,6 +255,23 @@ class OsidSession:
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
 
+    def _get_phantom_root_catalog(self, cat_name, cat_class):
+        catalog_map = {
+            '_id': ObjectId('000000000000000000000000'),
+            'displayName': {'text': 'Default ' + cat_name,
+                            'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                            'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                            'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+            'description': {'text': 'The Default ' + cat_name,
+                            'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                            'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                            'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+            'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
+        }
+        return cat_class(catalog_map)
+
+
+    ## Is this method being used anywhere???
     def _get_orchestrated_catalog_identifier(self, service_name):
         from pymongo import MongoClient
         from bson.objectid import ObjectId
@@ -694,6 +730,22 @@ class OsidForm:
         # See notes above
         return []"""
 
+class OsidExtensibleForm:
+
+    init = """
+    # This overrides _get_record in osid.Extensible. Perhaps we should leverage it somehow?
+    def _get_record(self, recordType):
+        if recordType is None:
+            raise NullArgument()
+        if not self.has_record_type(recordType):
+            raise Unsupported()
+        if str(recordType) not in self._records: # Currently this should never be True
+            self._init_record(str(recordType))
+            if str(recordType) not in self._my_map['recordTypeIds']: # nor this
+                self._my_map['recordTypeIds'].append(str(recordType))
+        return self._records[str(recordType)]
+"""
+
 class OsidObjectForm:
 
     #inheritance = ['OsidObject']
@@ -863,7 +915,191 @@ class OsidList:
         ### STILL NEED TO IMPLEMENT THIS ###
         pass"""
 
+class OsidQuery:
 
+    import_statements = [
+        'import re',
+        'from ..primitives import *',
+        'from ..osid.osid_errors import *',
+        'from ..locale.types import String',
+        'EXACT_STRING_MATCH_TYPE = Type(**String().get_type_data(\'EXACT\'))',
+        'IGNORECASE_STRING_MATCH_TYPE = Type(**String().get_type_data(\'IGNORECASE\'))',
+        'WORD_STRING_MATCH_TYPE = Type(**String().get_type_data(\'WORD\'))',
+        'WORDIGNORECASE_STRING_MATCH_TYPE = Type(**String().get_type_data(\'WORDIGNORECASE\'))',
+        'WILDCARD_STRING_MATCH_TYPE = Type(**String().get_type_data(\'WILDCARD\'))',
+        'REGEX_STRING_MATCH_TYPE = Type(**String().get_type_data(\'REGEX\'))',
+        'SOUND_STRING_MATCH_TYPE = Type(**String().get_type_data(\'SOUND\'))',
+        'SOUNDEX_STRING_MATCH_TYPE = Type(**String().get_type_data(\'SOUNDEX\'))',
+        'METAPHONE_STRING_MATCH_TYPE = Type(**String().get_type_data(\'METAPHONE\'))',
+        'SOUNDEX_STRING_MATCH_TYPE = Type(**String().get_type_data(\'SOUNDEX\'))',
+        'DMETAPHONE_STRING_MATCH_TYPE = Type(**String().get_type_data(\'DMETAPHONE\'))',
+        'LEVENSHTEIN_STRING_MATCH_TYPE = Type(**String().get_type_data(\'LEVENSHTEIN\'))',
+    ]
+
+    init = """
+    def __init__(self):
+        self._records = dict()
+        self._load_records(self._all_supported_record_type_ids)
+        self._query_terms = {}
+
+    def _get_string_match_value(self, string, string_match_type):
+        if string_match_type == EXACT_STRING_MATCH_TYPE:
+            return string
+        elif string_match_type == IGNORECASE_STRING_MATCH_TYPE:
+            return re.compile('^' + string, re.I)
+        elif string_match_type == WORD_STRING_MATCH_TYPE:
+            return re.compile('.*' + string + '.*')
+        elif string_match_type == WORDIGNORECASE_STRING_MATCH_TYPE:
+            return re.compile('.*' + string + '.*', re.I)
+
+    def _add_match(self, match_key, match_value, match):
+        if match_key is None:
+            raise NullArgument()
+        if match is None:
+            match = True
+        if match:
+            inin = '$in'
+        else:
+            inin = '$nin'
+        if match_key in self._query_terms:
+            if inin in self._query_terms[match_key]:
+                self._query_terms[match_key][inin].append(match_value)
+            else:
+                self._query_terms[match_key][inin] = [match_value]
+        else:
+            self._query_terms[match_key] = {inin: [match_value]}
+
+    def _match_display_text(self, element_key, string, string_match_type, match):
+        if string is None or string_match_type is None:
+            raise NullArgument()
+        match_value = self._get_string_match_value(string, string_match_type)
+        self._add_match(element_key + '.text', match_value, match)
+
+    def _match_minimum_decimal(self, match_key, decimal_value, match):
+        if decimal_value is None:
+            raise NullArgument()
+        if match is None:
+            match = True
+        if match:
+            gtelt = '$gte'
+        else:
+            gtelt = '$lt'
+        if match_key in self._query_terms:
+            self._query_terms[match_key][gtelt] = decimal_value
+        else:
+            self._query_terms[match_key] = {gtelt: decimal_value}
+        
+    def _match_maximum_decimal(self, match_key, decimal_value, match):
+        if decimal_value is None:
+            raise NullArgument()
+        if match is None:
+            match = True
+        if match:
+            ltegt = '$lte'
+        else:
+            ltegt = '$gt'
+        if match_key in self._query_terms:
+            self._query_terms[match_key][ltegt] = decimal_value
+        else:
+            self._query_terms[match_key] = {ltegt: decimal_value}
+        
+
+    def _clear_terms(self, match_key):
+        try:
+            del self._query_terms[match_key]
+        except KeyError:
+            pass
+
+    def _clear_minimum_terms(self, match_key):
+        try: # clear match = True case
+            del self._query_terms[match_key]['$gte']
+        except KeyError:
+            pass
+        try: # clear match = False case
+            del self._query_terms[match_key]['$lt']
+        except KeyError:
+            pass
+        try:
+            if self._query_terms[match_key] == {}:
+                del self._query_terms[match_key]
+        except KeyError:
+            pass
+
+    def _clear_maximum_terms(self, match_key):
+        try: # clear match = True case
+            del self._query_terms[match_key]['$lte']
+        except KeyError:
+            pass
+        try: # clear match = False case
+            del self._query_terms[match_key]['$gt']
+        except KeyError:
+            pass
+        try:
+            if self._query_terms[match_key] == {}:
+                del self._query_terms[match_key]
+        except KeyError:
+            pass
+"""
+
+class OsidIdentifiableQuery:
+
+    import_statements = [
+        'from ..osid.osid_errors import *',
+        'from ..primitives import *'
+    ]
+
+    match_id = """
+        self._add_match('id_', id_.get_identifier(), match)"""
+    
+    clear_id_terms = """
+        self._clear_terms('id_')"""
+
+class OsidExtensibleQuery:
+
+    import_statements = [
+        'import importlib',
+        'from ..primitives import *',
+    ]
+
+    init = """
+    def _load_records(self, record_type_idstrs):
+        for record_type_idstr in record_type_idstrs:
+            try:
+                self._init_record(record_type_idstr)
+            except (ImportError, KeyError):
+                pass
+
+    def _init_record(self, record_type_idstr):
+        record_type_data = self._all_supported_record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['query_record_class_name'])
+        self._records[record_type_idstr] = record(self)
+    """
+
+class OsidObjectQuery:
+
+    import_statements = [
+        'from ..osid.osid_errors import *',
+    ]
+
+    match_display_name = """
+        self._match_display_text('displayName', display_name, string_match_type, match)"""
+
+    match_any_display_name = """
+        raise Unimplemented()"""
+
+    clear_display_name_terms = """
+        self._clear_terms('displayName.text')"""
+    
+    match_description = """
+        self._match_display_text('description', description, string_match_type, match)"""
+
+    match_any_description = """
+        raise Unimplemented()"""
+
+    clear_description_terms = """
+        self._clear_terms('description.text')"""
+    
 class OsidRecord:
 
     init = """

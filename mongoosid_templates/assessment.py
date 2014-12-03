@@ -174,6 +174,7 @@ class AssessmentSession:
             raise IllegalState()
         assessment_taken_map = assessment_taken._my_map
         if assessment_taken_map['actualStartTime'] is None:
+            # perhaps put everything here in a seperate helper method
             collection = MongoClient()['assessment']['Assessment_Items']
             assessment_id = assessment_taken.get_assessment_offered().get_assessment_id()
             assessment_items = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
@@ -1051,6 +1052,20 @@ class Item:
         return Question(self._my_map['question'])"""
 
     additional_methods = """
+
+    def get_configuration(self):
+        config = dict()
+        try:
+            dict.update(self.get_question().get_configuration())
+        except AttributeError:
+            pass
+        for record in self._records:
+            try:
+                dict.update(record.get_configuration())
+            except AttributeError:
+                pass
+        return config # SHould this method build a real OSID configuration instead?
+
     def _delete(self):
         try:
             self.get_question()._delete()
@@ -1205,6 +1220,49 @@ class AssessmentTaken:
     get_score_template = """
         # Implemented from template for osid.assessment.AssessmentTaken.get_score_template
         return float(self._my_map['${var_name_mixed}'])"""
+
+    ### These methods are under consideration:
+    additional_methods_under_consideration = """
+    def _start_assessment(self)
+        collection = MongoClient()['assessment']['Assessment_Items']
+        assessment_id = self.get_assessment_offered().get_assessment_id()
+        assessment_items = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
+        if assessment_items is None:
+            item_ids = [] # But will this EVER be the case?
+        else:
+            item_ids = assessment_items['itemIds']
+        collection = MongoClient()['assessment']['Items']
+        item_identifier_list = []
+        for item_id in item_ids:
+            item_identifier_list.append(item_id.get_identifier())
+        items = ItemList(collection.find({'_id': {'$$in': item_identifier_list}}))
+        item_configs = dict()
+        for item in items:
+            try:
+                item_configs['item.get_id().get_identifier()'] = item.get_configuration()
+            except:
+                item_configs['item.get_id().get_identifier()'] = dict()
+        self._my_map['itemConfigs'] = item_parameters
+        self._my_map['synchronousResponses'] = bool(assessment_taken.get_assessment_offered().are_items_sequential())
+        self._my_map['actualStartTime'] = DateTime.now()
+        # This is where we could check for randomization
+        self._my_map['itemIds'] = item_ids
+        self._my_map['responses'] = dict()
+        for item_idstr in item_ids:
+            self._my_map['responses'][Id(item_idstr).get_identifier()] = None
+        collection = MongoClient()['assessment']['AssessmentTaken']
+        collection.save(self._my_map)
+
+    def _get_question(self, item_id):
+        collection = MongoClient()['assessment']['Item']
+        item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
+        if item_map is None:
+            raise NotFound()
+        question = Item(item_map).get_question()
+        if self._my_map['itemConfigs][str(item_id)]:
+            question.config(self._my_map['itemConfigs][str(item_id)])
+        return question"""
+
 
 class AssessmentTakenForm:
 

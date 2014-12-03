@@ -1099,3 +1099,27 @@ def map_catalog_patterns(interface, package, index):
     index[object_name + '.init_pattern'] = 'resource.Bin'
     index[object_name + 'Form.init_pattern'] = 'resource.BinForm'
     return index
+
+def map_query_patterns(interface, package, index):
+
+    object_name = interface['shortname'][:-5]
+    index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceQuery'
+
+    for method in interface['methods']:
+        var_name = method['name'].split('_', 1)[-1]
+#        if var_name.endswith('_id') or var_name.endswith('_ids'):
+#            var_name = '_'.join(var_name.split('_')[:-1])
+            
+        if True == False:
+            pass
+
+        else:
+            # uncomment the following line to print all unknown object patterns
+#            print 'unknown object pattern:', interface['fullname'], method['name']
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = '',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name']))  
+    return index

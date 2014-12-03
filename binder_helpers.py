@@ -63,6 +63,8 @@ def wrap_and_indent(text, iIndent = '', sIndent = None, width = 72):
 # osid things that are reserved word they can be dealt with here.
 def fix_reserved_word(word):
     import keyword
+    if word == 'logging':
+        word = 'logbook'
     if keyword.iskeyword(word):
         word = word + '_'
     elif word in ['id', 'type']:

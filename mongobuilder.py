@@ -454,6 +454,8 @@ def make_init_methods(interface_name, package, patterns):
                 patterns[interface_name[:-4] + '.initialized_data'])
         except KeyError:
             pass
+    elif init_pattern == 'resource.ResourceQuery':
+        object_name = interface_name[:-5]
 
     if hasattr(templates, init_pattern.split('.')[-1]):
         template_class = getattr(templates, init_pattern.split('.')[-1])

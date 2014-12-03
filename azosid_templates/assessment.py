@@ -25,11 +25,11 @@ class AssessmentProxyManager:
         from sessions import AssessmentTakenQuerySession
         return AssessmentTakenQuerySession(self._provider_manager.get_assessment_taken_query_session_for_bank(bank_id, proxy), self._authz_session, proxy)
 
-    def get_assessment_taken_admin_session(self, proxy=None)
+    def get_assessment_taken_admin_session(self, proxy=None):
         from sessions import AssessmentTakenAdminSession
         return AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session(proxy), self._authz_session, proxy)
 
-    def get_assessment_taken_admin_session_for_bank(self, bank_id=None, proxy=None)
+    def get_assessment_taken_admin_session_for_bank(self, bank_id=None, proxy=None):
         from sessions import AssessmentTakenAdminSession
         return AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id, proxy), self._authz_session, proxy)
 """

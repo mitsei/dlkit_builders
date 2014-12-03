@@ -206,3 +206,31 @@ for ob in obls.objective_banks:
 
 ols =  lpm.get_objective_lookup_session_for_objective_bank(bank.ident, p)
 
+
+from dlkit.services.assessment import AssessmentManager
+import datetime
+for b in AssessmentManager().banks:
+    bank = b
+
+for n in [1]:
+    c = 0
+    t = datetime.datetime.now()
+    for i in bank.items:
+        c += 1
+        print i.get_edxml()
+    print datetime.datetime.now() - t
+    print "number of items = ", c
+
+
+from dlkit.services.assessment import AssessmentManager
+am = AssessmentManager()
+for b in am.banks:
+    bank = b
+
+iq = bank.get_item_query()
+from dlkit.mongo.locale.types import String
+from dlkit.mongo.primitives import Type
+EXACT_STRING_MATCH_TYPE = Type(**String().get_type_data('EXACT'))
+IGNORECASE_STRING_MATCH_TYPE = Type(**String().get_type_data('IGNORECASE'))
+iq.match_display_name('edx: Problem rerequisites', EXACT_STRING_MATCH_TYPE, True)
+iq._query_terms

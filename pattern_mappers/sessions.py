@@ -15,6 +15,9 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'
+    elif (interface['shortname'].endswith('QuerySession') and
+        interface['shortname'][:-12] in index['package_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceQuerySession'
     elif (interface['shortname'].endswith('LookupSession') and
         interface['shortname'][:-13] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinLookupSession'
@@ -1374,6 +1377,7 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
+                              cat_name = index['package_catalog_caps'],
                               return_type_full = method['return_type'],
                               arg0_name = method['args'][0]['var_name'],
                               arg0_type_full = method['args'][0]['arg_type']))
@@ -1390,6 +1394,7 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
+                              cat_name = index['package_catalog_caps'],
                               return_type_full = method['return_type']))
 
 
@@ -1410,6 +1415,7 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
+                              cat_name = index['package_catalog_caps'],
                               return_type_full = method['return_type'],
                               arg0_name = method['args'][0]['var_name'],
                               arg0_type_full = method['args'][0]['arg_type'],
@@ -1428,6 +1434,7 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
+                              cat_name = index['package_catalog_caps'],
                               return_type_full = method['return_type']))
 
         ##
@@ -1442,6 +1449,7 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
+                              cat_name = index['package_catalog_caps'],
                               return_type_full = method['return_type']))
 
         ##
@@ -1456,6 +1464,7 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
+                              cat_name = index['package_catalog_caps'],
                               return_type_full = method['return_type'],
                               arg0_name = method['args'][0]['var_name'],
                               arg0_type_full = method['args'][0]['arg_type']))
