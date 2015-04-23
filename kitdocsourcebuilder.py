@@ -55,6 +55,7 @@ def make_kitdoc(file_name):
     # for the modules that the module's classes may inherit.
     modules = dict(manager = dict(imports = [], body = ''),
                    services = dict(imports = [], body = ''),
+                   service_managers = dict(imports = [], body = ''),
                    catalog = dict(imports = [], body = ''),
                    properties = dict(imports = [], body = ''),
                    objects = dict(imports = [], body = ''),
@@ -188,8 +189,10 @@ def make_kitdoc(file_name):
             if ('OsidManager' in interface['inherit_shortnames'] or
                 'OsidProfile' in interface['inherit_shortnames'] or
                 'OsidProxyManager' in interface['inherit_shortnames']):
-                module_name = 'services'
-                currentmodule_str = '.. currentmodule:: dlkit.services.' + package['name']
+                module_name = 'service_managers'
+                currentmodule_str = 'Summary\n=======\n'
+                currentmodule_str = currentmodule_str + '.. currentmodule:: dlkit.services.' + package['name']
+                #currentmodule_str = '.. currentmodule:: dlkit.services.' + package['name']
                 automodule_str = '.. automodule:: dlkit.services.' + package['name']
             elif interface['shortname'] == patterns['package_catalog_caps']:
                 module_name = patterns['package_catalog_under']
@@ -211,8 +214,8 @@ def make_kitdoc(file_name):
 #            module_title = package['name'].title() + '\n'
 #            for char in package['name'].title():
 #                module_title = module_title + '='
-            module_title = '\n' + ' '.join(module_name.split('-')).title() + '\n'
-            for char in ' '.join(module_name.split('-')).title():
+            module_title = '\n' + ' '.join(module_name.split('_')).title() + '\n'
+            for char in ' '.join(module_name.split('_')).title():
                 module_title = module_title + '='
             if module_title not in modules[module_name]['imports']:
                 modules[module_name]['imports'].append(module_title)
@@ -439,10 +442,10 @@ def make_kitdoc(file_name):
     for char in package['name'].title():
         toc_str = toc_str + '='
     toc_str = toc_str + '\n\n.. toctree::\n   :maxdepth: 2\n\n'
-    toc_str = toc_str + '   services\n'
+    toc_str = toc_str + '   service_managers\n'
     toc_str = toc_str + '   ' + patterns['package_catalog_under'] + '\n'
     for module in modules:
-        if ('_'.join(module.split('.')) not in ['services', patterns['package_catalog_under']] and
+        if ('_'.join(module.split('.')) not in ['service_managers', patterns['package_catalog_under']] and
             modules[module]['body'].strip() != ''):
                 toc_str = toc_str + '   ' + '_'.join(module.split('.')) + '\n'
     

@@ -220,8 +220,8 @@ def make_azosid(file_name):
                         modules[interface['category']]['imports'].append(import_str)
 
                     ##
-                    # Add the PermissionDenied class import
-                    import_str = 'from ..osid.osid_errors import PermissionDenied'
+                    # Add the osid_error imports
+                    import_str = 'from ..osid.osid_errors import *'
                     if (import_str not in modules[interface['category']]['imports'] and
                         inherit_category != 'UNKNOWN_MODULE'):
                         modules[interface['category']]['imports'].append(import_str)
@@ -328,6 +328,9 @@ def make_init_methods(interface_name, package, patterns):
     elif init_pattern == 'resource.ResourceLookupSession':
         initers = ''
         object_name = interface_name[:-13]
+    elif init_pattern == 'resource.ResourceQuerySession':
+        initers = ''
+        object_name = interface_name[:-12]
     elif init_pattern == 'resource.ResourceAdminSession':
         initers = ''
         object_name = interface_name[:-12]
@@ -344,6 +347,7 @@ def make_init_methods(interface_name, package, patterns):
             return template.substitute({'app_name': app_name(package['name']),
                                         'djpkg_name': pkg_name(package['name']),
                                         'pkg_name': package['name'],
+                                        'pkg_name_upper': package['name'].upper(),
                                         'interface_name': interface_name,
                                         'interface_name_title': interface_name.title(),
                                         'initers': initers,

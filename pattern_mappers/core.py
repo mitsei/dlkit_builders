@@ -66,6 +66,23 @@ def map_osid_patterns(interface, package, index):
                               return_type_full = method['return_type'],
                               arg0_name = method['args'][0]['var_name']))
 
+        elif (interface['shortname'] == 'Metadata' and
+              method['name'].startswith('get_existing_')):
+            error_string_list = method['error_doc'].split()
+            syntax_list = []
+            for s in error_string_list:
+                if s.isupper() and not s in ['ILLEGAL_STATE', 'NULL_ARGUMENT']:
+                    syntax_list.append(s)
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'osid.Metadata.get_existing_cardinal_values',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = make_plural(var_name),
+                              syntax_list = '[\'' + '\', \''.join(syntax_list) + '\']',
+                              return_type_full = method['return_type'],
+                              arg0_name = method['args'][0]['var_name']))
 
         else: 
             index[interface['shortname'] + '.' + method['name']] = dict(

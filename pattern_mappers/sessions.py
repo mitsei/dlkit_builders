@@ -15,6 +15,12 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'
+    elif (interface['shortname'].endswith('LookupSession') and
+        interface['shortname'][:-13] in index['package_relationships_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceLookupSession'
+    elif (interface['shortname'].endswith('AdminSession') and
+        interface['shortname'][:-12] in index['package_relationships_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'
     elif (interface['shortname'].endswith('QuerySession') and
         interface['shortname'][:-12] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceQuerySession'
@@ -24,6 +30,13 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinAdminSession'
+    elif (interface['shortname'].endswith('HierarchySession') and
+        interface['shortname'][:-16] in index['package_catalog_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.BinHierarchySession'
+    elif (interface['shortname'].endswith('HierarchyDesignSession') and
+        interface['shortname'] != 'HierarchyDesignSession' and
+        interface['shortname'][:-22] in index['package_catalog_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.BinHierarchyDesignSession'
 
     for method in interface['methods']:
         # Uncomment the following line to see which session raised an error.
@@ -337,8 +350,10 @@ def map_session_patterns(interface, package, index):
                               arg0_type_full = method['args'][0]['arg_type']))
 
         ##
-        # CatalogAdminSession methods that delete catalogs.
+        # CatalogAdminSession methods that delete catalogs in packages where there are managed objects.
+        # So this will not identify HierarchyAdminSession.delete_hierarchy for instance
         elif (interface['shortname'] == index['package_catalog_caps'] + 'AdminSession' and
+            (index['package_objects_caps'] != [] or index['package_relationships_caps'] != []) and
             method['name'] == 'delete_' + index['package_catalog_under']):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.BinAdminSession.delete_bin',
@@ -549,7 +564,8 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               var_name = method['name'][4:],
-                              return_type_full = method['return_type']))
+                              return_type_full = method['return_type'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # CatalogHierarchySession methods that tests for parent catalogs.
@@ -605,7 +621,8 @@ def map_session_patterns(interface, package, index):
                               method_name = method['name'],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
-                              arg0_name = method['args'][0]['var_name']))
+                              arg0_name = method['args'][0]['var_name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # CatalogHierarchySession methods that tests if an Id is an ancestor of a catalog.
@@ -676,7 +693,8 @@ def map_session_patterns(interface, package, index):
                               method_name = method['name'],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
-                              arg0_name = method['args'][0]['var_name']))
+                              arg0_name = method['args'][0]['var_name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # CatalogHierarchySession methods that tests if an Id is an descendant of a catalog.
@@ -895,10 +913,11 @@ def map_session_patterns(interface, package, index):
               len(method['args']) == 2 and
               remove_plural(method['name'][4:-8]) in index['package_relationships_under']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'relationship.RelationshipLookupSession.get_relationship_on_date',
+                pattern = 'relationship.RelationshipLookupSession.get_relationships_on_date',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
@@ -920,10 +939,12 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              source_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['source_name'],
                               arg0_name = method['args'][0]['var_name'],
                               obj_type = (method['name'].split('_for_')[-1]).split('source_', 1)[-1]))
 
@@ -941,10 +962,12 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               var_name = method['name'][4:],
                               object_name = interface['shortname'][:-13],
                               return_type_full = method['return_type'],
+                              source_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['source_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               arg2_name = method['args'][2]['var_name'],
@@ -964,10 +987,12 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              source_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['source_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               obj_type = (method['name'].split('_for_')[-1]).split('source_', 1)[-1]))
@@ -986,10 +1011,12 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              source_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['source_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               arg2_name = method['args'][2]['var_name'],
@@ -1010,10 +1037,12 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              destination_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['destination_name'],
                               arg0_name = method['args'][0]['var_name'],
                               obj_type = 'resource'))
 
@@ -1031,10 +1060,12 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              destination_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['destination_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               arg2_name = method['args'][2]['var_name'],
@@ -1054,10 +1085,12 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              destination_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['destination_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               obj_type = 'resource'))
@@ -1076,10 +1109,12 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              destination_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['destination_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               arg2_name = method['args'][2]['var_name'],
@@ -1100,10 +1135,13 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              source_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['source_name'],
+                              destination_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['destination_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               obj_type = 'resource'))
@@ -1122,15 +1160,19 @@ def map_session_patterns(interface, package, index):
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              source_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['source_name'],
+                              destination_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['destination_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               arg2_name = method['args'][2]['var_name'],
                               arg3_name = method['args'][3]['var_name'],
                               obj_type = 'resource'))
+
 
         ##
         # Session methods that get the Relationships for two objects by genus type.
@@ -1140,16 +1182,19 @@ def map_session_patterns(interface, package, index):
               not method['name'].endswith('_on_date') and
               '_by_genus_type_' in method['name'] and
               len(method['args']) == 3 and
-              remove_plural(method['name'].split('_for_')[0][4:]) in index['package_relationships_under']):
+              remove_plural(method['name'].split('_by_genus_type_for_')[0][4:]) in index['package_relationships_under']):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              source_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['source_name'],
+                              destination_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['destination_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               arg2_name = method['args'][2]['var_name'],
@@ -1163,16 +1208,19 @@ def map_session_patterns(interface, package, index):
               method['name'].endswith('_on_date') and
               '_by_genus_type_' in method['name'] and
               len(method['args']) == 5 and
-              remove_plural(method['name'].split('_for_')[0][4:]) in index['package_relationships_under']):
+              remove_plural(method['name'].split('_by_genus_type_for_')[0][4:]) in index['package_relationships_under']):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers_on_date',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
+                              cat_name = index['package_catalog_caps'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
                               var_name = method['name'][4:],
                               return_type_full = method['return_type'],
+                              source_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['source_name'],
+                              destination_name = index['package_relationships_detail'][camel_to_under(interface['shortname'][:-13])]['destination_name'],
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               arg2_name = method['args'][2]['var_name'],
@@ -1204,10 +1252,27 @@ def map_session_patterns(interface, package, index):
                               var_name = method['name']))
 
         ##
-        # ObjectLookupSession methods that returns an object.
+        # ObjectLookupSession methods that returns an object (without id, where there appears to be one and only one).
         elif (interface['shortname'].endswith('LookupSession') and
               method['name'].startswith('get_') and
-              method['name'][4:] == camel_to_under((method['return_type']).split('.')[-1])):
+              method['name'][4:] == camel_to_under((method['return_type']).split('.')[-1]) and
+              len(method['args']) == 0):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'installation.InstallationLookupSession.get_site',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              object_name = interface['shortname'][:-13],
+                              cat_name = index['package_catalog_caps'],
+                              return_type_full = method['return_type']))
+
+        ##
+        # ObjectLookupSession methods that returns an object by an id.
+        elif (interface['shortname'].endswith('LookupSession') and
+              method['name'].startswith('get_') and
+              method['name'][4:] == camel_to_under((method['return_type']).split('.')[-1]) and
+              len(method['args']) == 1):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceLookupSession.get_resource',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1564,7 +1629,7 @@ def map_session_patterns(interface, package, index):
             method['args'][0]['arg_type'] == 'osid.id.Id' and
             method['args'][0]['var_name'].split('_')[0] in index['package_objects_under']):
             object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
-            print 'ActivityAdminSession.get_activity_form_for_create', [method['args'][0]['var_name'][:-3]]
+            #print 'ActivityAdminSession.get_activity_form_for_create', [method['args'][0]['var_name'][:-3]]
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'learning.ActivityAdminSession.get_activity_form_for_create',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1593,15 +1658,16 @@ def map_session_patterns(interface, package, index):
             #print 'FOUND INITIALIZED DATA in', interface['shortname'], method['name']
 
         ##
-        # ObjectAdminSession get_x_form_for_create methods that draw relatioships between to 
+        # ObjectAdminSession get_x_form_for_create methods that draw relatioships between two 
         # osid objects where two object ids are included as the first two parameters.
         elif (interface['shortname'].endswith('AdminSession') and
+            method['name'][4:-16] in index['package_relationships_under'] and
             method['name'].startswith('get_') and
             method['name'].endswith('_form_for_create') and
             len(method['args']) == 3 and 
             method['args'][0]['arg_type'] == 'osid.id.Id' and
             method['args'][1]['arg_type'] == 'osid.id.Id'):
-            print interface['shortname'], method['name']
+            #print interface['shortname'], method['name']
             object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'relationship.RelationshipAdminSession.get_relationship_form_for_create',
@@ -1618,6 +1684,32 @@ def map_session_patterns(interface, package, index):
                               arg1_type_full = method['args'][1]['arg_type'],
                               arg2_name = method['args'][2]['var_name'],
                               arg2_type_full = method['args'][2]['arg_type']))
+
+        ##
+        # ObjectAdminSession get_x_form_for_create methods that draw relatioships between two 
+        # osid objects where one object ids is included as the first parameter.
+        elif (interface['shortname'].endswith('AdminSession') and
+            method['name'][4:-16] in index['package_relationships_under'] and
+            method['name'].startswith('get_') and
+            method['name'].endswith('_form_for_create') and
+            len(method['args']) == 2 and 
+            method['args'][0]['arg_type'] == 'osid.id.Id'):
+            #print interface['shortname'], method['name']
+            object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'commenting.CommentAdminSession.get_comment_form_for_create',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              object_name = interface['shortname'][:-12],
+                              cat_name = index['package_catalog_caps'],
+                              return_type_full = method['return_type'],
+                              arg0_name = method['args'][0]['var_name'],
+                              arg0_type_full = method['args'][0]['arg_type'],
+                              arg1_name = method['args'][1]['var_name'],
+                              arg1_type_full = method['args'][1]['arg_type']))
+
             ##
             # And record that we have found two initialized data elements which are also persisted:
 #            index[object_name + '.initialized_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']
@@ -1675,7 +1767,7 @@ def map_session_patterns(interface, package, index):
             method['name'] == 'create_answer' or
             method['name'] == 'create_question') and
             len(method['args']) > 0):
-            print 'FOUND CREATE', interface['shortname'], method['name'], method['name'][7:]
+            #print 'FOUND CREATE', interface['shortname'], method['name'], method['name'][7:]
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetAdminSession.create_asset_content',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1733,7 +1825,7 @@ def map_session_patterns(interface, package, index):
             make_plural(method['name'][4:-16]) in index[interface['shortname'][:-12] + '.aggregate_data'] or
             method['name'] == 'get_answer_form_for_update' or
             method['name'] == 'get_question_form_for_update')):
-            print 'FOUND FORM FOR UPDATE', interface['shortname'], method['name']
+            #print 'FOUND FORM FOR UPDATE', interface['shortname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetAdminSession.get_asset_content_form_for_update',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1783,7 +1875,7 @@ def map_session_patterns(interface, package, index):
             make_plural(method['name'][7:]) in index[interface['shortname'][:-12] + '.aggregate_data'] or
             method['name'] == 'update_answer' or
             method['name'] == 'update_question')):
-            print 'FOUND UPDATE', interface['shortname'], method['name']
+            #print 'FOUND UPDATE', interface['shortname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetAdminSession.update_asset_content',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1827,7 +1919,7 @@ def map_session_patterns(interface, package, index):
             method['name'].startswith('delete_') and
             camel_to_under(interface['shortname'][:-12]) == method['name'][7:] and
             'osid.id.Id' in method['arg_types']):
-            print 'DEPENDENT', camel_to_under(index[interface['shortname'][:-12] + '.dependent_objects'][0]), index[interface['shortname'][:-12] + '.aggregate_data']
+            #print 'DEPENDENT', camel_to_under(index[interface['shortname'][:-12] + '.dependent_objects'][0]), index[interface['shortname'][:-12] + '.aggregate_data']
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'learning.ObjectiveAdminSession.delete_objective',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1852,7 +1944,7 @@ def map_session_patterns(interface, package, index):
             'osid.id.Id' in method['arg_types'] and
             (method['name'][7:] in index[interface['shortname'][:-12] + '.aggregate_data'] or
             make_plural(method['name'][7:]) in index[interface['shortname'][:-12] + '.aggregate_data'])):
-            print 'FOUND DELETE', interface['shortname'], method['name']
+            #print 'FOUND DELETE', interface['shortname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetAdminSession.delete_asset_content',
                 kwargs = dict(interface_name = interface['shortname'],

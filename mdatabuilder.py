@@ -257,9 +257,20 @@ def make_mdata_map(data_name, data_type, options):
             'max_length': 256,
             'array': 'False'
             })
-    elif data_type in ['osid.id.Id', 'osid.type.Type']:
+    elif data_type in ['osid.id.Id']:
         template = string.Template(options.COMMON_MDATA +
                                    options.ID_MDATA)
+        mdata = template.substitute({
+            'element_identifier': data_name,
+            'element_label': ' '.join(data_name.split('_')),
+            'instructions': 'accepts an ' + data_type + ' object',
+            'syntax': data_type.split('.')[-1].upper(),
+            'id_type': data_type.split('.')[-1].lower(),
+            'array': 'False'
+            })
+    elif data_type in ['osid.type.Type']:
+        template = string.Template(options.COMMON_MDATA +
+                                   options.TYPE_MDATA)
         mdata = template.substitute({
             'element_identifier': data_name,
             'element_label': ' '.join(data_name.split('_')),

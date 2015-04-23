@@ -43,6 +43,9 @@ class OsidProfile:
     supports_proxy_record_type = """
         return self._provider_manager.supports_proxy_record_type()"""
 
+class OsidManager:
+    pass
+
 class Identifiable:
 
     init = """
@@ -72,7 +75,7 @@ class Extensible:
         return self._osid_object.get_record_types()"""
 
     has_record_type = """
-        return self._osid_object.has_record_type(record_type)"""
+        return self._osid_object.has_record_type(*args, **kwargs)"""
 
 
 class Browsable:
@@ -165,6 +168,7 @@ class OsidSession:
                       authority = 'MIT-OEIT')"""
 
     get_effective_agent = """
+        from dlkit.services_impls.authentication.objects import Agent # This may want to be in Primordium?
         effective_agent_id = self.get_effective_agent_id()
         # This may want to be extended to get the Agent directly from the Authentication
         # if available and if not effective agent is available in the proxy
@@ -187,22 +191,16 @@ class OsidObject:
 """
 
     get_display_name = """
-        return self._osid_object.get_display_name()
-
-    display_name = property(get_display_name)"""
+        return self._osid_object.get_display_name(*args, **kwargs)"""
 
     get_description = """
-        return self._osid_object.get_description()
-
-    description = property(get_description)"""
+        return self._osid_object.get_description(*args, **kwargs)"""
 
     get_genus_type = """
-        return self._osid_object.get_genus_type()
-
-    genus_type = property(get_genus_type)"""
+        return self._osid_object.get_genus_type(*args, **kwargs)"""
 
     is_of_genus_type = """
-        return self._osid_object.is_of_genus_type(genus_type)"""
+        return self._osid_object.is_of_genus_type(*args, **kwargs)"""
 
 
 class OsidList:
@@ -237,7 +235,7 @@ class OsidList:
             return bool(self._count)
         else:
             # otherwise we have no idea
-            return true"""
+            return True"""
 
     available = """
         if self._count != None:

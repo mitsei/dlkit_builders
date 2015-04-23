@@ -142,12 +142,6 @@ class AssessmentSession:
         else:
             return self._provider_session.is_assessment_section_over(assessment_section_id)"""
 
-    finished_assessment_section = """
-        if not self._can('take'):
-            raise PermissionDenied()
-        else:
-            self._provider_session.finished_assessment_section(assessment_section_id)"""
-
     requires_synchronous_responses = """
         if not self._can('take'):
             raise PermissionDenied()
@@ -206,7 +200,7 @@ class AssessmentSession:
         if not self._can('take'):
             raise PermissionDenied()
         else:
-            return self._provider_session.submit_response(assessment_section_id, item_id, answer)"""
+            return self._provider_session.submit_response(assessment_section_id, item_id, answer_form)"""
 
     skip_item = """
         if not self._can('take'):
@@ -280,11 +274,11 @@ class AssessmentSession:
         else:
             return self._provider_session.clear_response(assessment_section_id, item_id)"""
 
-    finish = """
+    finish_assessment_section = """
         if not self._can('take'):
             raise PermissionDenied()
         else:
-            return self._provider_session.finish(assessment_section_id)"""
+            self._provider_session.finish_assessment_section(assessment_section_id)"""
 
     is_answer_available = """
         if not self._can('take'):
@@ -297,7 +291,12 @@ class AssessmentSession:
             raise PermissionDenied()
         else:
             return self._provider_session.get_answers(assessment_section_id, item_id)"""
-    
+
+    finish_assessment = """
+        if not self._can('take'):
+            raise PermissionDenied()
+        else:
+            self._provider_session.finish_assessment(assessment_taken_id)"""
 
 
 class AssessmentBasicAuthoringSession:
@@ -310,7 +309,7 @@ class AssessmentBasicAuthoringSession:
         self._id_namespace = 'assessment.Assessment'
 """
 
-    can_author_assessment = """
+    can_author_assessments = """
         return self._can('author')"""
 
     get_items = """

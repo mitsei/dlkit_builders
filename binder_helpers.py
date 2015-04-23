@@ -1,6 +1,7 @@
 
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
+from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
 import json
 
 ##
@@ -64,7 +65,7 @@ def wrap_and_indent(text, iIndent = '', sIndent = None, width = 72):
 def fix_reserved_word(word):
     import keyword
     if word == 'logging':
-        word = 'logbook'
+        word = 'logging' # Still deciding this
     if keyword.iskeyword(word):
         word = word + '_'
     elif word in ['id', 'type']:
@@ -133,7 +134,9 @@ _singular_to_plural = {
     'assessment_offered': 'assessments_offered',
     'AssessmentOffered': 'AssessmentsOffered',
     'assessment_taken': 'assessments_taken',
-    'AssessmentTaken': 'AssessmentsTaken'
+    'AssessmentTaken': 'AssessmentsTaken',
+    'Hierarchy': 'Hierarchies',
+    'hierarchy': 'hierarchies',
 }
 _plural_to_singular = {v: k for k, v in _singular_to_plural.items()}
 
@@ -270,4 +273,20 @@ def make_twargs(index, package, interface, method, rtype=True, object_name=None,
         twargs['arg' + str(n) +'_type_full'] = method['args'][n]['arg_type']
         n += 1
     return twargs
-                              
+
+def get_cat_name_for_pkg(return_pkg):
+    try:
+        read_file = open(pkg_maps_dir + '/' + return_pkg + '.json', 'r')
+        package = json.load(read_file)
+        read_file.close()
+    except IOError:
+        print 'No package map found for return package \'' + return_pkg + '\''
+        return 'NoCatalog'
+    for interface in package['interfaces']:
+        if (interface['category'] == 'objects' and
+            'OsidCatalog' in interface['inherit_shortnames']):
+            return interface['shortname']
+    return 'NoCatalog'
+
+
+                    

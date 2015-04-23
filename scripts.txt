@@ -16,6 +16,9 @@ make_mongoosids()
 from builders.azbuilder import make_azosids
 make_azosids()
 
+from builders.awsadapterbuilder import make_awsosids
+make_awsosids()
+
 from builders.fedbuilder import make_fedosids
 make_fedosids()
 
@@ -217,6 +220,7 @@ for n in [1]:
     t = datetime.datetime.now()
     for i in bank.items:
         c += 1
+        id = i.ident
         print i.get_edxml()
     print datetime.datetime.now() - t
     print "number of items = ", c
@@ -234,3 +238,22 @@ EXACT_STRING_MATCH_TYPE = Type(**String().get_type_data('EXACT'))
 IGNORECASE_STRING_MATCH_TYPE = Type(**String().get_type_data('IGNORECASE'))
 iq.match_display_name('edx: Problem rerequisites', EXACT_STRING_MATCH_TYPE, True)
 iq._query_terms
+
+import datetime
+from dlkit.mongo.repository.managers import RepositoryManager
+t = datetime.datetime.now()
+n = 0
+for n in [1]:
+    while n < 10000:
+        rm = RepositoryManager()
+        als = rm.get_asset_lookup_session()
+        n += 1
+    print datetime.datetime.now() - t
+
+
+from dlkit_django import runtime, proxy_session, proxy_example
+request = proxy_example.TestRequest(username='birdland')
+condition = proxy_session.get_proxy_condition()
+condition.set_http_request(request)
+proxy = proxy_session.get_proxy(condition)
+am = runtime.get_service_manager('ASSESSMENT', proxy)

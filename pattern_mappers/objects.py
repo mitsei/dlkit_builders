@@ -17,6 +17,7 @@ def map_object_form_patterns(interface, package, index):
         #print interface['fullname'], method['name']
 
         var_name = method['name'].split('_', 1)[-1]
+        
         ##
         # ObjectForm methods that set a persisted boolean value.
         if (method['name'].startswith('set_') and
@@ -84,7 +85,7 @@ def map_object_form_patterns(interface, package, index):
               method['arg_types'][0] == 'osid.id.Id[]' and
               method['args'][0]['array'] == True):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'learning.Activity.set_assets',
+                pattern = 'learning.ActivityForm.set_assets',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -101,7 +102,7 @@ def map_object_form_patterns(interface, package, index):
               index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.id.Id[]' and
               index[object_name + '.arg_detail'][var_name][0]['array'] == True):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'learning.Activity.clear_assets',
+                pattern = 'learning.ActivityForm.clear_assets',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -109,8 +110,37 @@ def map_object_form_patterns(interface, package, index):
                               var_name = var_name))
 
         ##
-        # ObjectForm methods that return a metadata object. Do we need one of 
-        # these per data type?  No. Not as implemented.
+        # ObjectForm methods that return a metadata object for an Id element
+        elif (method['name'].startswith('get_') and
+              method['name'].endswith('_metadata') and
+              var_name[:-9] in index[object_name + '.persisted_data'] and
+              index[object_name + '.persisted_data'][var_name[:-9]] == 'osid.id.Id'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceForm.get_avatar_metadata',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name[:-9],
+                              return_type_full = method['return_type']))
+
+        ##
+        # ObjectForm methods that return a metadata object for an Id element
+        elif (method['name'].startswith('get_') and
+              method['name'].endswith('_metadata') and
+              var_name[:-9] in index[object_name + '.persisted_data'] and
+              index[object_name + '.persisted_data'][var_name[:-9]] == 'osid.id.Id[]'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'learning.ActivityForm.get_assets_metadata',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name[:-9],
+                              return_type_full = method['return_type']))
+
+        ##
+        # ObjectForm methods that return a metadata object for a primitive element
         elif (method['name'].startswith('get_') and
               method['name'].endswith('_metadata')):
             index[interface['shortname'] + '.' + method['name']] = dict(
@@ -145,7 +175,6 @@ def map_object_form_patterns(interface, package, index):
         elif (method['name'].startswith('set_') and
               len(method['arg_types']) == 1 and
               method['arg_types'][0] == 'string'):
-            print "FOUND STRING", var_name
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetContentForm.set_url',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -155,6 +184,21 @@ def map_object_form_patterns(interface, package, index):
                               var_name = var_name,
                               arg0_name = method['args'][0]['var_name'],
                               arg0_type_full = method['args'][0]['arg_type']))
+        ##
+        # ObjectForm methods that set a persisted decimal value.
+        elif (method['name'].startswith('set_') and
+              len(method['arg_types']) == 1 and
+              method['arg_types'][0] == 'decimal'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'grading.GradeEntry.set_score',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              arg0_name = method['args'][0]['var_name'],
+                              arg0_type_full = method['args'][0]['arg_type']))
+
 
         ##
         # ObjectForm methods that set a persisted DateTime. Also looks for timestamps
@@ -369,14 +413,19 @@ def map_object_patterns(interface, package, index):
 
     object_name = interface['shortname']
     index[object_name + '.init_pattern'] = 'resource.Resource'
+    from ..binder_helpers import get_cat_name_for_pkg
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
+
+        # Uncomment the following line to see which object raised an error.
+        #print interface['fullname'], method['name']
+        
         if var_name.endswith('_id') or var_name.endswith('_ids'):
             var_name = '_'.join(var_name.split('_')[:-1])
         ##
         # Object methods that get a persisted boolean value with an 
-        # 'is_something_base_otherthing' question.  Perhaps only found
+        # 'is_something_based_otherthing' question.  Perhaps only found
         # in learning Activities
         if (var_name in index[object_name + '.persisted_data'] and
               method['name'].startswith('is_') and
@@ -604,7 +653,7 @@ def map_object_patterns(interface, package, index):
               method['name'].startswith('get_') and
               index[object_name + '.persisted_data'][var_name] == 'decimal'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = '????????????????',
+                pattern = 'grading.GradeEntry.get_score',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -679,6 +728,23 @@ def map_object_patterns(interface, package, index):
                               var_name = var_name,
                               object_name = object_name,
                               return_type_full = method['return_type']))
+
+        ##
+        # Object methods that get the a persisted Type
+        # This does not look for a has_thing method
+        elif (var_name in index[object_name + '.persisted_data'] and
+              method['name'].startswith('get_') and
+              index[object_name + '.persisted_data'][var_name] == 'osid.type.Type'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'logging.LogEntry.get_priority',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              object_name = object_name,
+                              return_type_full = method['return_type']))
+
         ##
         # Object methods that get the osid.id.Id of an instance object from this
         # osid package. this investigates whether a 'has_thing' method also exists.
@@ -791,6 +857,59 @@ def map_object_patterns(interface, package, index):
                               return_type_full = method['return_type']))
 
         ##
+        # Object methods that get an osid.id.IdList for a list of objects not
+        # from this package:
+        elif (method['name'].startswith('get_') and
+              method['name'].endswith('_ids') and
+              var_name not in index['package_objects_under']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'learning.Activity.get_asset_ids',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              object_name = object_name,
+                              return_type_full = method['return_type']))
+
+        ##
+        # Object methods that get the osid.id.Id of a persisted object that
+        # appears to be an initialized relationship source. 
+        elif (object_name in index['package_relationships_caps'] and
+              object_name.lower() in index['package_relationships_detail'] and
+              var_name in index['package_relationships_detail'][object_name.lower()]['source_name'] and
+              method['name'].startswith('get_') and
+              method['name'].endswith('_id')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'relationship.Relationship.get_source_id',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              object_name = object_name,
+                              return_type_full = method['return_type']))
+
+        ##
+        # Object methods that get the osid.id.Id of a persisted object that
+        # appears to be an initialized relationship destination. 
+        # uses same pattern as for sources (above)
+        elif (object_name in index['package_relationships_caps'] and
+              object_name.lower() in index['package_relationships_detail'] and
+              var_name in index['package_relationships_detail'][object_name.lower()]['destination_name'] and
+              method['name'].startswith('get_') and
+              method['name'].endswith('_id')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'relationship.Relationship.get_source_id',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              object_name = object_name,
+                              return_type_full = method['return_type']))
+                              
+        ##
         # Object methods that get the osid.id.Id of a persisted and 
         # required object from this osid package. 
         elif (var_name in index[object_name + '.persisted_data'] and
@@ -847,7 +966,7 @@ def map_object_patterns(interface, package, index):
                               object_name = object_name,
                               return_type_full = method['return_type']))
         ##
-        # Object methods that get the osid.id.Id of an instance object from
+        # Object methods that get the osid.id.Id of an object from
         # another osid package.  NOTE that at this time these are patterned as above
         elif (var_name in index[object_name + '.instance_data'] and
               method['name'].startswith('get_') and
@@ -865,11 +984,10 @@ def map_object_patterns(interface, package, index):
                               object_name = object_name,
                               return_type_full = method['return_type']))
 
-
-        ##
+        ## THIS ONE SHOULD NEVER GET CALLED.  SHOULD BE CAUGHT IN THE RELATIOSHIP ONES ABOVE
         # Object methods that get the osid.id.Id of a persisted object that
         # appears to be an initialized data element like a relationship source 
-        # or destination.  For now classify as a get_avatar_id. This may change.
+        # or destination. 
         elif (var_name in index[object_name + '.initialized_data'] and
               method['name'].startswith('get_') and
               method['name'].endswith('_id')):
@@ -882,7 +1000,6 @@ def map_object_patterns(interface, package, index):
                               var_name = var_name,
                               object_name = object_name,
                               return_type_full = method['return_type']))
-
 
         ##
         # Object methods that get an aggregated object from this package.  
@@ -1023,6 +1140,23 @@ def map_object_patterns(interface, package, index):
                               return_type_full = method['return_type']))
 
         ##
+        # Object methods that get a persisted object list from another
+        # package for which an osid.id.IdList is persisted .
+        elif (var_name in index[object_name + '.persisted_data'] and
+              method['name'].startswith('get_') and
+              index[object_name + '.persisted_data'][var_name] == 'osid.id.Id[]'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'learning.Activity.get_assets',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              object_name = object_name,
+                              return_type_full = method['return_type'],
+                              return_cat_name = get_cat_name_for_pkg(method['return_type'].split('.')[1])))
+
+        ##
         # Object methods that get an extension record.
         elif (method['name'].startswith('get_') and
               method['name'].endswith('_record')):
@@ -1112,6 +1246,41 @@ def map_query_patterns(interface, package, index):
             
         if True == False:
             pass
+
+        ##
+        # Query methods that clear all terms (do we need one for each element type?)
+        elif (method['name'].endswith('_terms') and
+              var_name[:-6] in index[object_name + '.persisted_data'] and
+              method['name'].startswith('clear_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceQuery.clear_group_terms',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name[:-6],
+                              object_name = object_name,
+                              return_type_full = method['return_type']))
+
+        ##
+        # Query methods that query on a DateTime range
+        elif (var_name in index[object_name + '.persisted_data'] and
+              method['name'].startswith('match_') and
+              index[object_name + '.persisted_data'][var_name] in ['osid.calendaring.DateTime', 'timestamp'] and
+              len(method['args']) == 3):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'assessment.AssessmentOfferedQuery.match_start_time',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              arg0_name = method['args'][0]['var_name'],
+                              arg0_type_full = method['args'][0]['arg_type'],
+                              arg1_name = method['args'][1]['var_name'],
+                              arg1_type_full = method['args'][1]['arg_type'],
+                              object_name = object_name,
+                              return_type_full = method['return_type']))
 
         else:
             # uncomment the following line to print all unknown object patterns

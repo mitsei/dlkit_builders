@@ -24,6 +24,10 @@ PROXY_PROVIDER_MANAGER_PATH = '..services_impls.proxy.managers'
 
 ASSESSMENT_PROVIDER_MANAGER_PATH = '..mongo.assessment.managers'
 
+COMMENTING_PROVIDER_MANAGER_PATH = '..mongo.commenting.managers'
+
+HIERARCHY_PROVIDER_MANAGER_PATH = '..mongo.hierarchy.managers'
+
 LANGUAGETYPE = {
     'identifier': 'ENG',
     'namespace': '639-2',

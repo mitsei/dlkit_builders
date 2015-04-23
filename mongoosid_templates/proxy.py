@@ -8,6 +8,11 @@ class ProxySession:
         'from ..authentication_process.objects import Authentication'
     ]
 
+    init = """
+    def __init__(self, proxy=None, runtime=None):
+        self._proxy = proxy
+        self._runtime = runtime"""
+
     get_proxy_condition = """
         return ProxyCondition()"""
 

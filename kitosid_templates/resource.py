@@ -30,6 +30,9 @@ class ResourceManager:
     PLENARY = 1
     FEDERATED = 0
     ISOLATED = 1
+    AUTOMATIC = 0
+    MANDATORY = 1
+    DISABLED = -1
 
     def __init__(self, proxy=None):
         import settings
@@ -41,8 +44,10 @@ class ResourceManager:
             provider_manager_class = getattr(provider_module, '${proxy_interface_name}')
         self._provider_manager = provider_manager_class()
         self._provider_sessions = dict()
+        self._session_management = self.AUTOMATIC
         self._proxy = proxy
         self._views = dict()
+        self._runtime = None
 
     def _get_view(self, view):
         if view in self._views:
@@ -52,62 +57,102 @@ class ResourceManager:
             return DEFAULT
 
     def _get_provider_session(self, session):
-#        from osid_kit.osid_errors import Unimplemented
         if session in self._provider_sessions:
             return self._provider_sessions[session]
         else:
-            try:
-                get_session = getattr(self._provider_manager, 'get_' + session)
-            except:
-                raise # Unimplemented???
+            session_instance = self._instantiate_session('get_' + session, self._proxy)
+            ## DO WE NEED THESE VIEW INITERS???
+            if '${cat_name_under}_view' not in self._views:
+                self._views['${cat_name_under}_view'] = self.DEFAULT
+            if self._views['${cat_name_under}_view'] == self.COMPARATIVE:
+                try:
+                    session_instance.use_comparative_${cat_name_under}_view()
+                except AttributeError:
+                    pass
             else:
-                if self._proxy is None:
-                    self._provider_sessions[session] = get_session()
-                else:
-                    self._provider_sessions[session] = get_session(self._proxy)                    
-                ## DO WE NEED THESE VIEW INITERS???
-                if '${cat_name_under}_view' not in self._views:
-                    self._views['${cat_name_under}_view'] = self.DEFAULT
-                if self._views['${cat_name_under}_view'] == self.COMPARATIVE:
-                    try:
-                        self._provider_sessions[session].use_comparative_${cat_name_under}_view()
-                    except AttributeError:
-                        pass
-                else:
-                    try:
-                        self._provider_sessions[session].use_plenary_${cat_name_under}_view()
-                    except AttributeError:
-                        pass
-            return self._provider_sessions[session]
+                try:
+                    session_instance.use_plenary_${cat_name_under}_view()
+                except AttributeError:
+                    pass
+            if self._session_management != self.DISABLED:
+                self._provider_sessions[session] = session_instance
+            return session_instance
 
+    def _instantiate_session(self, method_name, proxy=None, *args, **kwargs):
+        get_session = getattr(self._provider_manager, method_name)
+        if proxy is None:
+            return get_session(*args, **kwargs)
+        else:
+            return get_session(proxy=proxy, *args, **kwargs)
+
+    def initialize(self, runtime):
+        from .primitives import Id
+        if self._runtime is not None:
+            raise IllegalState()
+        self._runtime = runtime
+        config = runtime.get_configuration()
+        parameter_id = Id('parameter:${pkg_name}ProviderImpl@dlkit_service')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        if self._proxy is None:
+            self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl) # need to add version argument
+        else:
+            self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl) # need to add version argument
+
+    def close_sessions(self):
+        if self._session_management != self.MANDATORY:
+            self._provider_sessions = dict()
+
+    def use_automatic_session_management():
+        # Session state will be saved unless closed by consumers
+        self._session_management = self.AUTOMATIC
+
+    def use_mandatory_session_management(self):
+        # Session state will be saved and can not be closed by consumers 
+        self._session_management = self.MANDATORY
+
+    def disable_session_management(self):
+        # Session state will never be saved
+        self._session_management = self.DISABLED
+        self.close_sessions()
 """
 
     get_resource_lookup_session_managertemplate = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_manager_template
-        if self._proxy:
-            self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
-        else:
-            self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(*args, **kwargs)
-        return self"""
+        if self._session_management != self.DISABLED:
+            load_it = self._get_provider_session(\'${return_type_under}\')
+        return self
+        # OLD:
+        #if self._proxy:
+        #    self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
+        #else:
+        #    self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(*args, **kwargs)
+        #return self"""
 
     get_resource_lookup_session_for_bin_managertemplate = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_manager_template
-        if self._proxy:
-            self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
-        else:
-            self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(*args, **kwargs)
-        return self"""
+        if self._session_management != self.DISABLED:
+            load_it = self._get_provider_session(\'${return_type_under}\')
+        return self
+        # OLD:
+        #if self._proxy:
+        #    self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
+        #else:
+        #    self._provider_sessions[\'${return_type}\'] = self._provider_manager.${method_name}(*args, **kwargs)
+        #return self"""
 
     get_resource_lookup_session_catalogtemplate = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_catalog_template
-        if self._proxy:
-            session = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
-        else:
-            session = self._provider_manager.${method_name}(*args, **kwargs)
-        return ${cat_name}(self._provider_manager, self.get_${cat_name_under}(*args, **kwargs), self._proxy, ${return_type_under} = session)"""
+        session_instance = self._instantiate_session(*args, **kwargs)
+        return ${cat_name}(self._provider_manager, self.get_${cat_name_under}(*args, **kwargs), self._proxy, ${return_type_under} = session_instance)
+        # OLD:
+        #if self._proxy:
+        #    session = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
+        #else:
+        #    session = self._provider_manager.${method_name}(*args, **kwargs)
+        #return ${cat_name}(self._provider_manager, self.get_${cat_name_under}(*args, **kwargs), self._proxy, ${return_type_under} = session)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
         # Implemented from kitosid template for -
@@ -605,6 +650,9 @@ class Bin:
     PLENARY = 1
     FEDERATED = 0
     ISOLATED = 1
+    AUTOMATIC = 0
+    MANDATORY = 1
+    DISABLED = -1
 
                         ## THINK. WILL THIS EVER BE CALLED DIRECTLY
                         ## OUTSIDE OF A MANAGER?
@@ -621,30 +669,28 @@ class Bin:
         self._proxy = proxy
         self._catalog_id = catalog.get_id()
         self._provider_sessions = kwargs
+        self._session_management = self.AUTOMATIC
         self._osid_object = self._catalog # This so that the inherited osid 
                                           # methods work.  Don't ask.
         self._views = dict()
 
     def _get_provider_session(self, session):
-#        from osid_kit.osid_errors import Unimplemented
         if session in self._provider_sessions:
             return self._provider_sessions[session]
         else:
-            try:
-                get_session_class = getattr(self._provider_manager, 'get_' + session + '_for_${cat_name_under}')
-            except:
-                raise # Unimplemented???
+            session_class = getattr(self._provider_manager, 'get_' + session + '_for_${cat_name_under}')
+            if self._proxy is None:
+                session_instance = session_class(self._catalog.get_id())
             else:
-                if self._proxy is None:
-                    self._provider_sessions[session] = get_session_class(self._catalog.get_id())
-                else:
-                    self._provider_sessions[session] = get_session_class(self._catalog.get_id(), self._proxy)
+                session_instance = session_class(self._catalog.get_id(), self._proxy)
             if '${cat_name_under}_view' in self._views:
                 if self._views['${cat_name_under}_view'] == self.FEDERATED:
-                    self._provider_sessions[session].use_federated_${cat_name_under}_view()
+                    session_instance.use_federated_${cat_name_under}_view()
                 else:
-                    self._provider_sessions[session].use_isoloated_${cat_name_under}_view()
-            return self._provider_sessions[session]
+                    session_instance.use_isoloated_${cat_name_under}_view()
+            if self._session_management != self.DISABLED:
+                self._provider_sessions[session] = session_instance
+            return session_instance
 
     def get_${cat_name_under}_id(self):
         return self._catalog_id
@@ -662,5 +708,21 @@ class Bin:
         if '_catalog' in self.__dict__ and name in self._catalog:
             return self._catalog[name]
         raise AttributeError
+
+    def close_sessions(self):
+        self._provider_sessions = dict()
+
+    def use_automatic_session_management(self):
+        # Session state will be saved unless closed by consumers
+        self._session_management = self.AUTOMATIC
+
+    def use_mandatory_session_management(self):
+        # Session state will be saved and can not be closed by consumers 
+        self._session_management = self.MANDATORY
+
+    def disable_session_management(self):
+        # Session state will never be saved
+        self._session_management = self.DISABLED
+        self.close_sessions()
 """
 

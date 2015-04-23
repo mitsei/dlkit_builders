@@ -20,4 +20,25 @@ class Id:
 class IdList:
 
     import_statements = [
-    'from ..osid.objects import OsidList']
+    'from ..primitives import Id',
+    'from ..osid.objects import OsidList'
+    ]
+
+    get_next_id = """
+        try:
+            next_item = self.next()
+        except StopIteration:
+            raise IllegalState('no more elements available in this list')
+        except: #Need to specify exceptions here
+            raise OperationFailed()
+        else:
+            return next_item
+            
+    def next(self):
+        try:
+            next_item = osid_objects.OsidList.next(self)
+        except:
+            raise
+        if isinstance(next_item, str) or isinstance(next_item, unicode):
+            next_item = Id(next_item)
+        return next_item"""

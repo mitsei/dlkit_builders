@@ -1,6 +1,11 @@
 
 class Locale:
 
+    import_statements = [
+        'from ..osid.osid_errors import *',
+        'from ..primitives import *'
+    ]
+
     init = """
     ##
     # This constructor should probably be referencing a locale settings 
@@ -33,57 +38,46 @@ class Locale:
 
     get_language_type = """
         from ..locale.types import Language
-        from ..type.primitives import Type
         return Type(**Language().get_type_data(self._language_type_identifier))"""
 
     get_script_type = """
         from ..locale.types import Script
-        from ..type.primitives import Type
         return Type(**Script().get_type_data(self._script_type_identifier))"""
 
     get_calendar_type = """
         from ..locale.types import Calendar
-        from ..type.primitives import Type
         return Type(**Calendar().get_type_data(self._calendar_type_identifier))"""
 
     get_time_type = """
         from ..locale.types import Time
-        from ..type.primitives import Type
         return Type(**Time().get_type_data(self._time_type_identifier))"""
 
     get_currency_type = """
         from ..locale.types import Currency
-        from ..type.primitives import Type
         return Type(**Currency().get_type_data(self._currency_type_identifier))"""
 
     get_unit_system_type = """
         from ..locale.types import UnitSystem
-        from ..type.primitives import Type
         return Type(**UnitSystem().get_type_data(self._system_type_identifier))"""
 
     get_numeric_format_type = """
         from ..locale.types import NumericFormat
-        from ..type.primitives import Type
         return Type(**NumericFormat().get_type_data(self._numeric_format_type_identifier))"""
 
     get_calendar_format_type = """
         from ..locale.types import CalendarFormat
-        from ..type.primitives import Type
         return Type(**CalendarFormat().get_type_data(self._calendar_format_type_identifier))"""
 
     get_time_format_type = """
         from ..locale.types import TimeFormat
-        from ..type.primitives import Type
         return Type(**TimeFormat().get_type_data(self._time_format_type_identifier))"""
 
     get_currency_format_type = """
         from ..locale.types import CurrencyFormat
-        from ..type.primitives import Type
         return Type(**CurrencyFormat().get_type_data(self._currency_format_type_identifier))"""
 
     get_coordinate_format_type = """
         from ..locale.types import CoordinateFormat
-        from ..type.primitives import Type
         return Type(**CoordinateFormat().get_type_data(self._coordinate_format_type_identifier))"""
 
 

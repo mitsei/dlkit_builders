@@ -80,21 +80,45 @@ def map_object_data_patterns(interface, package, index):
         # Log all getter return types for this object:
         if method['name'].startswith('get_'):
             index[object_name + '.return_types'][var_name] = method['return_type']
-            
+
+        ##
+        # Here is where we can list by hand any persisted data that we know won't be caught.
+        # For instance, some of the AssessmentTaken data is set in the AssessmentSession
+        # So it wouldn't have been found 
+        if (interface['shortname'] == 'AssessmentTaken' and
+              method['name'] in ['get_actual_start_time', 'get_completion_time',
+                                 'get_score', 'get_grade_id']):
+            index[interface['shortname'] + '.initialized_data'][var_name] = method['return_type']
+            index[object_name + '.arg_detail'][var_name] = []
+
+        ##
+        # Check for relationship source and destinations:
+        if (object_name in index['package_relationships_caps'] and
+            object_name.lower() in index['package_relationships_detail'] and
+            var_name == index['package_relationships_detail'][object_name.lower()]['source_name']):
+            index[interface['shortname'] + '.persisted_data'][var_name] = index['package_relationships_detail'][object_name.lower()]['source_type']
+            index[interface['shortname'] + '.initialized_data'][var_name] = index['package_relationships_detail'][object_name.lower()]['source_type']
+            index[object_name + '.arg_detail'][var_name] = []
+        elif (object_name in index['package_relationships_caps'] and
+            object_name.lower() in index['package_relationships_detail'] and
+            var_name == index['package_relationships_detail'][object_name.lower()]['destination_name']):
+            index[interface['shortname'] + '.persisted_data'][var_name] = index['package_relationships_detail'][object_name.lower()]['destination_type']
+            index[interface['shortname'] + '.initialized_data'][var_name] = index['package_relationships_detail'][object_name.lower()]['destination_type']
+            index[object_name + '.arg_detail'][var_name] = []
         
         ##
         # Check for any other methods that appear to want to persist data
         # but dont show up in object forms.
         # NOTE this specifically checks for item for assessment
-        # question because which is special.
-        """
-        if (interface['fullname'] == 'osid.learning.Activity' and 
-            '_based_' in method['name'] and 
-            not var_name in index[interface['shortname'] + '.persisted_data']):
-            index[interface['shortname'] + '.persisted_data'][var_name] = method['return_type']"""
-        if (method['name'].startswith('get_') and
+        # question because it is special.
+        #"""
+        #if (interface['fullname'] == 'osid.learning.Activity' and 
+        #    '_based_' in method['name'] and 
+        #    not var_name in index[interface['shortname'] + '.persisted_data']):
+        #    index[interface['shortname'] + '.persisted_data'][var_name] = method['return_type']"""
+        elif (method['name'].startswith('get_') and
               method['name'].endswith('_id') and
-              var_name in index['package_objects_under'] and
+              (var_name in index['package_objects_under'] or var_name in index['package_relationships_under']) and
               var_name != 'question' and
               not var_name in index[interface['shortname'] + '.persisted_data']):
             index[interface['shortname'] + '.persisted_data'][var_name] = method['return_type']
@@ -118,7 +142,7 @@ def map_object_data_patterns(interface, package, index):
              var_name == 'answers' or
              var_name == 'question') and
             not var_name in index[object_name + '.persisted_data']):
-            print 'VARNAME =', var_name
+            #print 'VARNAME =', var_name
             #if interface['shortname'] == 'Asset':
             #    print 'FOUND AGGREGATEABLE OBJECT', var_name
             index[interface['shortname'] + '.aggregate_data'][var_name] = method['return_type']
@@ -147,8 +171,8 @@ def map_object_data_patterns(interface, package, index):
             method['return_type'] == 'osid.id.IdList') and
             not var_name in index[object_name + '.instance_data'] and
             var_name not in ['answers', 'question']):
-            if interface['shortname'] == 'Item':
-                print 'FOUND INSTANCE ID', var_name
+            #if interface['shortname'] == 'Item':
+            #    print 'FOUND INSTANCE ID', var_name
             index[interface['shortname'] + '.instance_data'][var_name] = method['return_type']
         ##
         # Find methods in OsidObject that return Ids where the data name
@@ -158,8 +182,8 @@ def map_object_data_patterns(interface, package, index):
             method['return_type'] == 'osid.id.IdList') and
             var_name in index[object_name + '.instance_data'] and
             index[object_name + '.instance_data'][var_name] == 'boolean'):
-            if interface['shortname'] == 'Item':
-                print 'OVERWROTE INSTANCE ID', var_name
+            #if interface['shortname'] == 'Item':
+            #    print 'OVERWROTE INSTANCE ID', var_name
             index[interface['shortname'] + '.instance_data'][var_name] = method['return_type']
         ##
         # Find methods in OsidObject that return Ids where the data name
@@ -167,8 +191,8 @@ def map_object_data_patterns(interface, package, index):
         elif ((method['return_type'] == 'osid.id.Id' or
             method['return_type'] == 'osid.id.IdList') and
             var_name in index[object_name + '.instance_data']):
-            if interface['shortname'] == 'Item':
-                print 'OVERWROTE INSTANCE ID', var_name
+            #if interface['shortname'] == 'Item':
+            #    print 'OVERWROTE INSTANCE ID', var_name
             index[interface['shortname'] + '.instance_data'][var_name] = method['return_type']
         ##
         # Find methods in OsidObject that return other non-boolean/Id things 
@@ -177,8 +201,8 @@ def map_object_data_patterns(interface, package, index):
               method['return_type'] != 'osid.id.IdList' and
               method['return_type'] != 'boolean' and
               not var_name in index[object_name + '.instance_data']):
-            if interface['shortname'] == 'Item':
-                print 'FOUND NON-BOOL/ID', var_name
+            #if interface['shortname'] == 'Item':
+            #    print 'FOUND NON-BOOL/ID', var_name
             index[interface['shortname'] + '.instance_data'][var_name] = method['return_type']
         ##
         # Find methods in OsidObject that return other non-boolean/Id things 
@@ -188,8 +212,8 @@ def map_object_data_patterns(interface, package, index):
               method['return_type'] != 'osid.id.IdList' and
               method['return_type'] != 'boolean' and
               var_name in index[object_name + '.instance_data']):
-            if interface['shortname'] == 'Item':
-                print 'FOUND NON-BOOL/ID', var_name
+            #if interface['shortname'] == 'Item':
+            #    print 'FOUND NON-BOOL/ID', var_name
             pass
         ##
         # Find methods in OsidObject that return other non-boolean/Id things 
@@ -199,10 +223,9 @@ def map_object_data_patterns(interface, package, index):
               method['return_type'] != 'boolean' and
               (index[object_name + '.instance_data'][var_name] != 'osid.id.Id' or
               index[object_name + '.instance_data'][var_name] != 'osid.id.IdList')):
-            if interface['shortname'] == 'Item':
-                print 'OVERWROTE NON-BOOL/ID', var_name
+            #if interface['shortname'] == 'Item':
+            #    print 'OVERWROTE NON-BOOL/ID', var_name
             index[interface['shortname'] + '.instance_data'][var_name] = method['return_type']
-
         ##
         # Check to see whether this method has miraculously been discovered
         # already.
@@ -254,7 +277,36 @@ def map_admin_session_data_patterns(interface, package, index):
             #print 'FOUND INITIALIZED DATA in', interface['shortname'], method['name']
 
         ##
-        # ObjectAdminSession get_x_form_for_create methods that draw relatioships between to 
+        # ObjectAdminSession methods that gets object form for create where the
+        # id of one foreign object is included as the first parameter.
+        # NOTE: This is for the case where a getter for the foreign object is not included
+        # So we might need to check for the case where such a getter is included.
+        elif (interface['shortname'].endswith('AdminSession') and
+            method['name'].startswith('get_') and
+            method['name'].endswith('_form_for_create') and
+            len(method['args']) == 2 and 
+            method['args'][0]['arg_type'] == 'osid.id.Id'):
+            #object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
+            ##
+            # Record that we have found initialized and persisted data
+            index[object_name + '.initialized_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']
+            index[object_name + '.arg_detail'][method['args'][0]['var_name'][:-3]] = []
+            index[object_name + '.persisted_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']            
+            ##
+            # Delete from instance data if they exist:
+            #if method['args'][0]['var_name'][:-3] in index[object_name + '.instance_data']:
+                #if interface['shortname'] == 'AssetAdminSession':
+                    #print 'DELETED INSTANCE', index[object_name + '.instance_data'][method['args'][0]['var_name'][:-3]]
+            #    del index[object_name + '.instance_data'][method['args'][0]['var_name'][:-3]]
+            ##
+            # Flag dependent oobjects that will need to be checked before deletion:
+            #index[index['package_objects_under_to_caps'][method['args'][0]['var_name'][:-3]] + '.dependent_objects'] = [object_name]
+            ## Uncomment following line to see where this initilization pattern is found:
+            #print 'FOUND INITIALIZED DATA in', interface['shortname'], method['name']
+
+
+        ##
+        # ObjectAdminSession get_x_form_for_create methods that draw relatioships between two 
         # osid objects where two object ids are included as the first two parameters.
         elif (interface['shortname'].endswith('AdminSession') and
             method['name'].startswith('get_') and
@@ -265,12 +317,21 @@ def map_admin_session_data_patterns(interface, package, index):
             object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
             ##
             # Record that we have found two initialized data elements which are also persisted:
-            index[object_name + '.initialized_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']
-            index[object_name + '.persisted_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']
-            index[object_name + '.arg_detail'][method['args'][0]['var_name'][:-3]] = []
-            index[object_name + '.initialized_data'][method['args'][1]['var_name'][:-3]] = method['args'][1]['arg_type']
-            index[object_name + '.persisted_data'][method['args'][1]['var_name'][:-3]] = method['args'][1]['arg_type']
-            index[object_name + '.arg_detail'][method['args'][1]['var_name'][:-3]] = []
+            # But first look for the pesky 'id_' args
+            if method['args'][0]['var_name'] == 'id_':
+                arg0_name = 'id_'
+            else:
+                arg0_name = method['args'][0]['var_name'][:-3]
+            if method['args'][1]['var_name'] == 'id_':
+                arg1_name = 'id_'
+            else:
+                arg1_name = method['args'][1]['var_name'][:-3]
+            index[object_name + '.initialized_data'][arg0_name] = method['args'][0]['arg_type']
+            index[object_name + '.persisted_data'][arg0_name] = method['args'][0]['arg_type']
+            index[object_name + '.arg_detail'][arg0_name] = []
+            index[object_name + '.initialized_data'][arg1_name] = method['args'][1]['arg_type']
+            index[object_name + '.persisted_data'][arg1_name] = method['args'][1]['arg_type']
+            index[object_name + '.arg_detail'][arg1_name] = []
             ##
             # And delete from instance data if they exist:
             if method['args'][0]['var_name'][:-3] in index[object_name + '.instance_data']:

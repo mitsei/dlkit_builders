@@ -68,9 +68,6 @@ class AssessmentSession:
     is_assessment_section_over = """
         return self._get_provider_session('assessment_session').is_assessment_section_over(*args, **kwargs)"""
 
-    finished_assessment_section = """
-        self._get_provider_session('assessment_session').finished_assessment_section(*args, **kwargs)"""
-
     requires_synchronous_responses = """
         return self._get_provider_session('assessment_session').requires_synchronous_responses(*args, **kwargs)"""
 
@@ -137,21 +134,24 @@ class AssessmentSession:
     clear_response = """
         self._get_provider_session('assessment_session').clear_response(*args, **kwargs)"""
 
-    finish = """
-        self._get_provider_session('assessment_session').finish(*args, **kwargs)"""
+    finish_assessment_section = """
+        self._get_provider_session('assessment_session').finish_assessment_section(*args, **kwargs)"""
 
     is_answer_available = """
         return self._get_provider_session('assessment_session').is_answer_available(*args, **kwargs)"""
 
     get_answers = """
         return self._get_provider_session('assessment_session').get_answers(*args, **kwargs)"""
-    
+ 
+    finish_assessment = """
+        self._get_provider_session('assessment_session').finish_assessment(*args, **kwargs)"""
+ 
 
 
 class AssessmentBasicAuthoringSession:
 
-    can_author_assessment = """
-        return self._get_provider_session('assessment_basic_authoring_session').can_author_assessment(*args, **kwargs)"""
+    can_author_assessments = """
+        return self._get_provider_session('assessment_basic_authoring_session').can_author_assessments(*args, **kwargs)"""
 
     get_assessment_items = """
         # Note: this method is differenct from the underlying signature

@@ -21,7 +21,7 @@ class Coordinate:
     def __init__(self, coordinate_type,
                        values,
                        uncertainty_minus = None,
-                       uncertainty_plus = None)
+                       uncertainty_plus = None):
 
         self._coordinate_type = coordinate_type
         self._values = values

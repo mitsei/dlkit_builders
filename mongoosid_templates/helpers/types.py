@@ -1,6 +1,33 @@
 # -*- coding: utf-8 -*-
 from .osid.osid_errors import NotFound
 
+class NoneType:
+
+    none_types = {
+        'NONE': 'None',
+        'NULL': 'Null',
+        }
+
+    def __init__(self):
+        self.type_set = {
+            'None': self.none_types
+            }
+
+    def get_type_data(self, name):
+        try:
+            return {
+                'authority': 'dlkit.mit.edu',
+                'namespace': 'NoneType',
+                'identifier': name,
+                'domain': 'Generic Types',
+                'display_name': self.none_types[name] + ' Type',
+                'display_label': self.none_types[name],
+                'description': ('The ' +  self.none_types[name] + 
+                                    ' Type. This type indicates that no type is specified.')
+                }
+        except IndexError:
+            raise NotFound ('NoneType: ' + none)
+
 class Genus:
 
     generic_types = {

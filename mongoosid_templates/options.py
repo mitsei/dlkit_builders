@@ -62,7 +62,7 @@ ID_LIST_MDATA = """
     '${id_type}_set': [],"""
 
 TYPE_MDATA = """
-    'default_${id_type}_values': [''],
+    'default_${id_type}_values': ['NoneType%3ANONE%40dlkit.mit.edu'],
     'syntax': '${syntax}',
     '${id_type}_set': [],"""
 

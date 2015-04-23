@@ -1,23 +1,23 @@
 
 class OsidProfile:
 
+    import_statements = [
+        'from . import profile',
+        'from .osid_errors import *',
+        'from ..primitives import *'
+    ]
+
     get_id = """
-        from . import profile
-        from ..id.primitives import Id
         return Id(**profile.ID)
         """
 
     get_display_name = """
-        from . import profile
-        from ..primitives import Type, DisplayText
         return DisplayText(text = profile.DISPLAYNAME,
                            language_type = Type(**profile.LANGUAGETYPE),
                            script_type = Type(**profile.SCRIPTTYPE),
                            format_type = Type(**profile.FORMATTYPE))"""
 
     get_description = """
-        from . import profile
-        from ..primitives import Type, DisplayText
         return DisplayText(text = profile.DESCRIPTION,
                            language_type = Type(**profile.LANGUAGETYPE),
                            script_type = Type(**profile.SCRIPTTYPE),
@@ -25,7 +25,6 @@ class OsidProfile:
 
     get_version = """
         ## THIS ALL NEEDS TO BE FIXED:
-        from . import profile
         try:
             from ..installation.primitives import Version
         except:
@@ -43,7 +42,6 @@ class OsidProfile:
 
     supports_osid_version = """
         ## THIS ALL NEEDS TO BE FIXED:
-        from . import profile
         try:
             from ..installation.primitives import Version
         except:
@@ -69,13 +67,10 @@ class OsidProfile:
 
     get_branch_id = """
         # Perhaps someday I will support journaling
-        from .osid_errors import Unimplemented
         raise Unimplemented()"""
 
     get_branch = """
         # Perhaps someday I will support journaling
-        # Perhaps someday I will support journaling
-        from .osid_errors import Unimplemented
         raise Unimplemented()"""
 
     get_proxy_record_types = """
@@ -86,16 +81,73 @@ class OsidProfile:
         # NEED TO IMPLEMENT
         pass"""
 
+class OsidManager:
+
+    import_statements = [
+        'from .osid_errors import *'
+    ]  
+
+    init = """
+    def __init__(self):
+        self._runtime = None
+        self._config = None
+"""
+    
+    initialize = """
+        if runtime is None:
+            raise NullArgument()
+        if self._runtime is not None:
+            raise IllegalState('this manager has already been initialized.')
+        self._runtime = runtime
+        self._config = runtime.get_configuration()"""
+
+class OsidProxyManager:
+
+    import_statements = [
+        'from .osid_errors import *'
+    ]  
+
+    init = """
+    def __init__(self):
+        self._runtime = None
+        self._config = None
+"""
+    
+    initialize = """
+        if runtime is None:
+            raise NullArgument()
+        if self._runtime is not None:
+            raise IllegalState('this manager has already been initialized.')
+        self._runtime = runtime
+        self._config = runtime.get_configuration()"""
+
+
+class OsidRuntimeManager:
+
+    import_statements = [
+        'from .osid_errors import *'
+    ]  
+
+    init = """
+    def __init__(self, configuration_key = None):
+        self._configuration_key = configuration_key"""
+
+
 class Identifiable:
+
+    import_statements = [
+        'from ..primitives import *'
+    ]  
 
     init = """
     import socket
-    _authority = socket.gethostname()
-    #_authority = 'birdland.mit.edu'
+    if 'macbook' in socket.gethostname().lower():
+        _authority = socket.gethostname().lower().split('.')[0]
+    else:
+        _authority = socket.gethostname()
 """
 
     get_id = """
-        from ..primitives import Id
         return Id(identifier = str(self._my_map['_id']),
                    namespace = self._namespace,
                    authority = self._authority)"""
@@ -168,6 +220,29 @@ class Extensible:
             type_list.append(Type(**self._record_type_data_sets[Id(type_idstr).get_identifier()]))
         return TypeList(type_list)"""
 
+class Temporal:
+
+    import_statements = [
+        'from ..primitives import *',
+        'import datetime'
+    ]
+
+    is_effective = """
+        now = DateTime.now()
+        return (self.get_start_date() <= now and self.get_end_date() >= now)"""
+
+    get_start_date = """
+        sd = self._my_map['startDate']
+        return DateTime(sd['year'], sd['month'], sd['day'], sd['hour'], sd['minute'], sd['second'], sd['microsecond'])"""
+
+    get_end_date = """
+        ed = self._my_map['endDate']
+        return DateTime(ed['year'], ed['month'], ed['day'], ed['hour'], ed['minute'], ed['second'], ed['microsecond'])"""
+
+class Containable:
+
+    is_sequestered = """
+        return self._my_map['sequestered']"""
 
 class Operable:
 
@@ -191,50 +266,67 @@ class Operable:
 class OsidSession:
 
     import_statements = [
+    'import socket',
     'from ..primitives import *',
     'from .osid_errors import *',
     'from bson.objectid import ObjectId',
-    'from pymongo import MongoClient',
+    'from importlib import import_module',
+    'from .. import mongo_client',
     'from .. import types',
+    'from . import profile',
+    'COMPARATIVE = 0',
+    'PLENARY = 1',
+    'FEDERATED = 0',
+    'ISOLATED = 1',
+    'CREATED = True',
+    'UPDATED = True'
     ]
 
     init = """
+    if 'macbook' in socket.gethostname().lower():
+        _authority = socket.gethostname().lower().split('.')[0]
+    else:
+        _authority = socket.gethostname()
 
-    COMPARATIVE = 0
-    PLENARY = 1
-    FEDERATED = 0
-    ISOLATED = 1
-    CREATED = True
-    UPDATED = True
-
-    def _init_catalog(self, proxy = None):
+    def _init_catalog(self, proxy = None, runtime = None):
         self._proxy = proxy        
+        self._runtime = runtime
+        if runtime is not None:
+            prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
+            self._db_prefix = runtime.get_configuration().get_value_by_parameter(prefix_param_id).get_string_value()
+        else:
+            self._db_prefix = ''
 
-    def _init_object(self, catalog_id, proxy, db_name, cat_name, cat_class):
-        from . import profile
+    def _init_object(self, catalog_id, proxy, runtime, db_name, cat_name, cat_class):
         self._catalog_identifier = None
         self._proxy = proxy
-        from pymongo import MongoClient
-        collection = MongoClient()[db_name][cat_name]
+        self._runtime = runtime
+        if runtime is not None:
+            prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
+            self._db_prefix = runtime.get_configuration().get_value_by_parameter(prefix_param_id).get_string_value()
+        else:
+            self._db_prefix = ''
+        collection = mongo_client[self._db_prefix + db_name][cat_name]
         if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
             self._catalog_identifier = catalog_id.get_identifier()
             self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
             if self._my_catalog_map is None:
                 # Should also check for the authority here:
                 if catalog_id.get_identifier_namespace() != db_name + '.' + cat_name:
-                    self._my_catalog_map = {
-                        '_id': ObjectId(catalog_id.get_identifier()),
-                        'displayName': {'text': catalog_id.get_identifier_namespace() + ' ' + cat_name,
-                                        'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                        'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                        'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                        'description': {'text': cat_name + ' for ' + catalog_id.get_identifier_namespace() + ' objects',
-                                        'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                        'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                        'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                        'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
-                    }
-                    collection.insert(self._my_catalog_map)
+                    self._my_catalog_map = self._create_orchestrated_catalog_map(catalog_id, db_name, cat_name)
+                    #self._my_catalog_map = {
+                    #    '_id': ObjectId(catalog_id.get_identifier()),
+                    #    'displayName': {'text': catalog_id.get_identifier_namespace() + ' ' + cat_name,
+                    #                    'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                    #                    'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                    #                    'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+                    #    'description': {'text': cat_name + ' for ' + catalog_id.get_identifier_namespace() + ' objects',
+                    #                    'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                    #                    'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                    #                    'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+                    #    'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
+                    #}
+                    #collection.insert(self._my_catalog_map)
                 else:
                     raise NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
         else:
@@ -249,11 +341,13 @@ class OsidSession:
                                 'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
                                 'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
                                 'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
+                'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
+                'recordTypeIds': [] # Could this somehow inherit source catalog records?
             }
         self._catalog = cat_class(self._my_catalog_map)
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
+        mongo_client.close()
 
     def _get_phantom_root_catalog(self, cat_name, cat_class):
         catalog_map = {
@@ -266,34 +360,59 @@ class OsidSession:
                             'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
                             'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
                             'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-            'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
+            'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
+            'recordTypeIds': [] # Could this somehow inherit source catalog records?
         }
         return cat_class(catalog_map)
 
-
-    ## Is this method being used anywhere???
-    def _get_orchestrated_catalog_identifier(self, service_name):
-        from pymongo import MongoClient
-        from bson.objectid import ObjectId
-        client = MongoClient()
-        from .osid_errors import NotFound
-        catalogs = {'learning': 'ObjectiveBank',
-                    'relationship': 'Family',
-                    'repository': 'Repository'}
-        if self._catalog_identifier is None:
+    def _create_orchestrated_catalog_map(self, foreign_catalog_id, db_name, cat_name):
+        # Need to test if the catalog_id exists for the foreign catalog
+        try:
+            foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
+            foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
+            collection = mongo_client[self._db_prefix + foreign_db_name][foreign_cat_name]
+            if not collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())}):
+                mongo_client.close()
+                raise NotFound()
+        except KeyError:
+            mongo_client.close()
             raise NotFound()
-        elif self._catalog_identifier == '000000000000000000000000':
-            return self._catalog_identifier
-        else:
-            db = client[service_name]
-            collection = db[catalogs[service_name]]
-            if collection.find_one({'_id': ObjectId(self._catalog_identifier)}) is None:
-                catalog_map = self._my_catalog_map
-                catalog_map['description']['text'] = ('Orchestrated ' + 
-                    catalogs[service_name] + ' for ' + catalog_map['description']['text'])
-                collection.insert(catalog_map)
-            return self._catalog_identifier
-    """
+        collection = mongo_client[self._db_prefix + db_name][cat_name]
+        catalog_map = {
+            '_id': ObjectId(foreign_catalog_id.get_identifier()),
+            'displayName': {'text': 'Orchestrated ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' ' + cat_name,
+                            'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                            'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                            'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+            'description': {'text': 'Orchestrated ' + cat_name + ' for the ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' service',
+                            'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                            'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                            'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
+            'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
+            'recordTypeIds': [] # Could this somehow inherit source catalog records?
+
+        }
+        collection.insert(catalog_map)
+        mongo_client.close()
+        return catalog_map
+
+    def _get_provider_manager(self, osid):
+        try:
+            # Try to get the Manager from the runtime, if available:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
+            impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
+            manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
+        except:
+            # Just return a Manager from this implementation:
+            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+            manager = getattr(module, osid.title() + 'Manager')()
+            try:
+                manager.initialize(self._runtime)
+            except:
+                pass
+        return manager
+"""
 
     get_locale = """
         from ..locale.objects import Locale
@@ -352,44 +471,54 @@ class OsidSession:
 
 class OsidObject:
 
+    import_statements = [
+        'from ..primitives import *',
+        'from ..osid.osid_errors import *',
+        'from .. import types',
+        'from importlib import import_module'
+        ]
+
     init = """
     _namespace = 'mongo.OsidObject'
 
-    def __init__(self, osid_object_map):
+    def __init__(self, osid_object_map, runtime=None):
         self._my_map = osid_object_map
+        self._runtime = runtime
+    
+    def _get_provider_manager(self, osid):
+        try:
+            # Try to get the Manager from the runtime, if available:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
+            impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
+            manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
+        except:
+            # Just return a Manager from this implementation:
+            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+            manager = getattr(module, osid.title() + 'Manager')()
+            try:
+                manager.initialize(self._runtime)
+            except:
+                pass
+        return manager
 
-#    def __getattr__(self, name): # moved this method to osid.markers.Extensible
-#        if '_records' in self.__dict__:
-#            for record in self._records:
-#                try:
-#                    return self._records[record][name]
-#                except AttributeError:
-#                    pass
-#        raise AttributeError(name)
-#
-#    def _delete(self):
-#        # Override this method in inheriting objects to perform special clearing operations
-#        try: # Need to implement records for catalogs one of these days
-#            for record in self._records:
-#                try:
-#                    self._records[record]._delete()
-#                except AttributeError:
-#                    pass
-#        except AttributeError:
-#            pass
-        
     def get_object_map(self, obj_map=None):
         if obj_map is None:
             obj_map = dict(self._my_map)
         del obj_map['_id']
         my_idstr = str(self.get_id())
 
-        # The following is crap. Should be over-ridden in the corresponding
-        # aggregated object instead:
+        # The following is crappy. Should be over-ridden in the corresponding
+        # object's get_object_map() methods instead:
         if self._namespace == 'repository.Asset':
-            obj_map['assetContent'] = []
-            for asset_content in self.get_asset_content():
+            obj_map['assetContents'] = []
+            obj_map['assetContent'] = [] # This is deprecated, switch to assetContents
+            for asset_content in self.get_asset_contents():
+                obj_map['assetContents'].append(asset_content.get_object_map())
                 obj_map['assetContent'].append(asset_content.get_object_map())
+        if self._namespace == 'repository.AssetContent':
+            if 'dbPrefix' in obj_map:
+                del obj_map['dbPrefix']
         if self._namespace == 'assessment.Item':
             if obj_map['question']:
                 obj_map['question'] = self.get_question().get_object_map()
@@ -399,8 +528,15 @@ class OsidObject:
         if self._namespace == 'assessment.Question':
             my_idstr = obj_map['itemId']
             del obj_map['itemId']
+            lo_ids = self.get_learning_objective_ids()
+            obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
         if self._namespace == 'assessment.Answer':
             del obj_map['itemId']
+        if self._namespace == 'commenting.Comment':
+            obj_map['commentingAgentId'] = str(self.get_commenting_agent_id())
+        if self._namespace == 'assessment.Assessment':
+            if 'itemIds' in obj_map:
+                del obj_map['itemIds']
         if self._namespace == 'assessment.AssessmentOffered':
             if obj_map['startTime'] is not None:
                 start_time = obj_map['startTime']
@@ -422,6 +558,10 @@ class OsidObject:
                 obj_map['startTime']['minute'] = deadline.minute
                 obj_map['startTime']['second'] = deadline.second
                 obj_map['startTime']['microsecond'] = deadline.microsecond
+            if obj_map['displayName']['text'] == '':
+                obj_map['displayName']['text'] = self.get_display_name().get_text()
+            if obj_map['description']['text'] == '':
+                obj_map['description']['text'] = self.get_description().get_text()
         if self._namespace == 'assessment.AssessmentTaken':
             if obj_map['actualStartTime'] is not None:
                 actualStartTime = obj_map['actualStartTime']
@@ -443,6 +583,10 @@ class OsidObject:
                 obj_map['completionTime']['minute'] = completionTime.minute
                 obj_map['completionTime']['second'] = completionTime.second
                 obj_map['completionTime']['microsecond'] = completionTime.microsecond
+            if obj_map['displayName']['text'] == '':
+                obj_map['displayName']['text'] = self.get_display_name().get_text()
+            if obj_map['description']['text'] == '':
+                obj_map['description']['text'] = self.get_description().get_text()
             if 'itemIds' in obj_map:
                 del obj_map['itemIds']
             if 'responses' in obj_map:
@@ -456,6 +600,7 @@ class OsidObject:
                     pass
         except AttributeError:
             pass
+        
         obj_map.update(
             {'type': self._namespace.split('.')[-1],
              'id': my_idstr})
@@ -465,23 +610,23 @@ class OsidObject:
 """
 
     get_display_name = """
-        from ..primitives import DisplayText
         return DisplayText(self._my_map['displayName'])"""
 
     get_description = """
-        from ..primitives import DisplayText
         return DisplayText(self._my_map['description'])"""
 
     get_genus_type = """
-        from .. import types
-        from ..primitives import Id, Type
-        ### Also LOOK FOR THE TYPE IN types or through type lookup
-        genus_type_identifier = Id(self._my_map['genusTypeId']).get_identifier()
-        return Type(**types.Genus().get_type_data(genus_type_identifier))"""
+        try:
+            # Try to stand up full Type objects if they can be found
+            # (Also need to LOOK FOR THE TYPE IN types or through type lookup)
+            genus_type_identifier = Id(self._my_map['genusTypeId']).get_identifier()
+            return Type(**types.Genus().get_type_data(genus_type_identifier))
+        except:
+            # If that doesn't work, return the id only type, still useful for comparison.
+            return Type(idstr=self._my_map['genusTypeId'])"""
 
     is_of_genus_type = """
-        from ..primitives import Type
-        return genus_type == self.get_genus_type()"""
+        return genus_type == Type(idstr=self._my_map['genusTypeId'])"""
 
 class OsidRule:
 
@@ -501,6 +646,13 @@ class OsidRule:
 
 class OsidForm:
 
+    import_statements = [
+        'from ..primitives import *',
+        'from ..osid.osid_errors import *',
+        'from . import mdata_conf',
+        'from .metadata import Metadata',
+        ]
+
     init = """
     _namespace = 'mongo.OsidForm'
 
@@ -510,9 +662,6 @@ class OsidForm:
         self._for_update = None
 
     def _init_metadata(self):
-        from . import mdata_conf
-        from ..primitives import Id
-        from ..primitives import DisplayText
         self._journal_comment_metadata = {
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace,
@@ -556,8 +705,8 @@ class OsidForm:
                 valid = False
             else:
                 for element in array:
-                    validation['valid'] = (validation['valid'] and 
-                        self._is_valid_input(element, metadata, False, validation))
+                    valid = (valid and 
+                        self._is_valid_input(element, metadata, False))
         ##
         # Run through all the possible syntax types
         elif syntax == 'ID':
@@ -693,20 +842,18 @@ class OsidForm:
     get_locales = """
         # Someday I might have a real implementation
         # For now only default Locale is supported
+        from ..locale.objects import LocaleList
         return LocaleList([])"""
 
     set_locale = """
         # Someday I might have a real implementation
         # For now only default Locale is supported
-        from .osid_errors import Unsupported
         raise Unsupported()"""
 
     get_journal_comment_metadata = """
-        from .metadata import Metadata
         return Metadata(**self._journal_comment_metadata)"""
 
     set_journal_comment = """
-        from .osid_errors import InvalidArgument, NullArgument, NoAccess
         if comment is None:
             raise NullArgument()
         if self.get_comment_metadata().is_read_only():
@@ -746,9 +893,101 @@ class OsidExtensibleForm:
         return self._records[str(recordType)]
 """
 
+class OsidTemporalForm:
+
+    import_statements = [
+        'from ..primitives import *',
+        'from ..osid.osid_errors import *',
+        'import datetime',
+        'from . import mdata_conf',
+        'from .metadata import Metadata',
+        #'from . import profile'
+        ]
+
+    init = """
+    _namespace = "mongo.OsidTemporalForm"
+
+    def _init_metadata(self, **kwargs):
+        self._start_date_metadata = {
+            'element_id': Id(authority = self._authority,
+                             namespace = self._namespace, 
+                             identifier = 'start_date')}
+        self._start_date_metadata.update(mdata_conf.start_date)
+        self._start_date_metadata.update({'default_date_time_values': [self._get_date_map(datetime.datetime.now())]})
+        self._end_date_metadata = {
+            'element_id': Id(authority = self._authority,
+                             namespace = self._namespace, 
+                             identifier = 'end_date')}
+        self._end_date_metadata.update(mdata_conf.end_date)
+
+    def _init_map(self):
+        self._my_map['startDate'] = self._start_date_metadata['default_date_time_values'][0]
+        self._my_map['endDate'] = self._end_date_metadata['default_date_time_values'][0]
+"""
+
+    get_start_date_metadata = """
+        metadata = dict(self._start_date_metadata)
+        metadata.update({'existing_date_time_values': self._my_map['startDate']})
+        return Metadata(**metadata)"""
+
+    set_start_date = """
+        if date is None:
+            raise NullArgument()
+        if self.get_start_date_metadata().is_read_only():
+            raise NoAccess()
+        if not self._is_valid_date_time(date):
+            raise InvalidArgument()
+        self._my_map['startDate'] = self._get_date_map(date)"""
+
+    clear_start_date = """
+        if (self.get_start_date_metadata().is_read_only() or
+            self.get_start_date_metadata().is_required()):
+            raise NoAccess()
+        self._my_map['startDate'] = self.get_start_date_metadata['default_date_time_values'][0]"""
+
+    get_end_date_metadata = """
+        metadata = dict(self._end_date_metadata)
+        metadata.update({'existing_date_time_values': self._my_map['endDate']})
+        return Metadata(**metadata)"""
+
+    set_end_date = """
+        if date is None:
+            raise NullArgument()
+        if self.get_end_date_metadata().is_read_only():
+            raise NoAccess()
+        if not self._is_valid_date_time(date):
+            raise InvalidArgument()
+        self._my_map['endDate'] = self._get_date_map(date)"""
+
+    clear_end_date = """
+        if (self.get_end_date_metadata().is_read_only() or
+            self.get_end_date_metadata().is_required()):
+            raise NoAccess()
+        self._my_map['endDate'] = self.get_end_date_metadata['default_date_time_values'][0]"""
+
+    additional_methods = """
+    def _get_date_map(self, date):
+        return {
+            'year': date.year,
+            'month': date.month,
+            'day': date.day,
+            'hour': date.hour,
+            'minute': date.minute,
+            'second': date.second,
+            'microsecond': date.microsecond,
+        }"""
+
 class OsidObjectForm:
 
     #inheritance = ['OsidObject']
+
+    import_statements = [
+        'from ..primitives import *',
+        'from ..osid.osid_errors import *',
+        'from . import mdata_conf',
+        'from .metadata import Metadata',
+        'from . import profile'
+        ]
 
     init = """
     _namespace = "mongo.OsidObjectForm"
@@ -765,16 +1004,15 @@ class OsidObjectForm:
             self._for_update = False
             self._init_map()
 
-    def _init_metadata(self):
-        from . import mdata_conf
-        from ..primitives import Id
-        from ..primitives import DisplayText ## WHY?
+    def _init_metadata(self, **kwargs):
         OsidForm._init_metadata(self)
         self._display_name_metadata = {
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace,
                              identifier = 'display_name')}
         self._display_name_metadata.update(mdata_conf.display_name)
+        if 'default_display_name' in kwargs:
+            self._display_name_metadata['default_string_values'][0]['text'] = kwargs['default_display_name']
         self._description_metadata = {
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace, 
@@ -784,31 +1022,57 @@ class OsidObjectForm:
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace, 
                              identifier = 'description')}
+        if 'default_description' in kwargs:
+            self._description_metadata['default_string_values'][0]['text'] = kwargs['default_description']
         self._genus_type_metadata.update(mdata_conf.genus_type)
 
     def _init_map(self):
-        from . import profile
         self._my_map['displayName'] = dict(self._display_name_metadata['default_string_values'][0])
         self._my_map['description'] = dict(self._description_metadata['default_string_values'][0])
         self._my_map['genusTypeId'] = self._genus_type_metadata['default_type_values'][0]
         self._my_map['recordTypeIds'] = []
 
-    def __getattr__(self, name):
-        if '_records' in self.__dict__:
-            for record in self._records:
-                try:
-                    return self._records[record][name]
-                except AttributeError:
-                    pass
-        raise AttributeError()
+    # Deprecate this:
+    def _old_get_provider_manager(self, osid):
+        if self._runtime is None:
+            # Return a Manager from this implementation:
+            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+            manager = getattr(module, osid.title() + 'Manager')()
+        else:
+            # Get the Manager from the runtime:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
+            impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
+            manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
+        return manager
+
+    def _get_provider_manager(self, osid):
+        try:
+            # Try to get the Manager from the runtime, if available:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
+            impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
+            manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
+        except:
+            # Just return a Manager from this implementation:
+            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+            manager = getattr(module, osid.title() + 'Manager')()
+        return manager
+
+    #def __getattr__(self, name):
+    #    if '_records' in self.__dict__:
+    #        for record in self._records:
+    #            try:
+    #                return self._records[record][name]
+    #            except AttributeError:
+    #                pass
+    #    raise AttributeError()
 """
 
     get_display_name_metadata = """
-        from .metadata import Metadata
         return Metadata(**self._display_name_metadata)"""
 
     set_display_name = """
-        from .osid_errors import InvalidArgument, NullArgument, NoAccess
         if display_name is None:
             raise NullArgument()
         if self.get_display_name_metadata().is_read_only():
@@ -819,18 +1083,15 @@ class OsidObjectForm:
         self._my_map['displayName']['text'] = display_name"""
 
     clear_display_name = """
-        from .osid_errors import NoAccess
         if (self.get_display_name_metadata().is_read_only() or
             self.get_display_name_metadata().is_required()):
             raise NoAccess()
         self._my_map['displayName'] = dict(self._display_name_metadata['default_object_values'][0])"""
 
     get_description_metadata = """
-        from .metadata import Metadata
         return Metadata(**self._description_metadata)"""
 
     set_description = """
-        from .osid_errors import InvalidArgument, NullArgument, NoAccess
         if description is None:
             raise NullArgument()
         if self.get_description_metadata().is_read_only():
@@ -841,18 +1102,15 @@ class OsidObjectForm:
         self._my_map['description']['text'] = description"""
 
     clear_description = """
-        from .osid_errors import NoAccess
         if (self.get_description_metadata().is_read_only() or
             self.get_description_metadata().is_required()):
             raise NoAccess()
         self._my_map['description'] = dict(self._description_metadata['default_object_values'][0])"""
 
     get_genus_type_metadata = """
-        from .metadata import Metadata
         return Metadata(**self._genus_type_metadata)"""
 
     set_genus_type = """
-        from .osid_errors import InvalidArgument, NullArgument, NoAccess
         if genus_type is None:
             raise NullArgument()
         if self.get_genus_type_metadata().is_read_only():
@@ -862,21 +1120,35 @@ class OsidObjectForm:
         self._my_map['genusTypeId'] = str(genus_type)"""
 
     clear_genus_type = """
-        from .osid_errors import NoAccess
         if (self.get_genus_type_metadata().is_read_only() or
             self.get_genus_type_metadata().is_required()):
             raise NoAccess()
         self._my_map['genusType'] = self._genus_type_metadata['default_type_values'][0]"""
-        
+
+class OsidRelationshipForm:
+
+    init = """
+    def _init_metadata(self, **kwargs):
+        OsidObjectForm._init_metadata(self, **kwargs)
+        OsidTemporalForm._init_metadata(self, **kwargs)
+
+    def _init_map(self, **kwargs):
+        OsidObjectForm._init_map(self, **kwargs)
+        OsidTemporalForm._init_map(self, **kwargs)
+"""
 
 class OsidList:
 
     init = """
-    def __init__(self, iter_object = [], count = None):
+    def __init__(self, iter_object=[], count=None, db_prefix='', runtime=None):
         if count != None:
             self._count = count
         elif isinstance(iter_object, dict) or isinstance(iter_object, list):
             self._count = len(iter_object)
+        else:
+            self._count = None
+        self._runtime = runtime
+        self._db_prefix = db_prefix
         self._iter_object = iter(iter_object)
 
     def __iter__(self):
@@ -901,7 +1173,7 @@ class OsidList:
             return bool(self._count)
         else:
             # otherwise we have no idea
-            return true"""
+            return True"""
 
     available = """
         if self._count != None:
@@ -1002,8 +1274,35 @@ class OsidQuery:
             self._query_terms[match_key][ltegt] = decimal_value
         else:
             self._query_terms[match_key] = {ltegt: decimal_value}
-        
 
+    def _match_minimum_date_time(self, match_key, date_time_value, match):
+        if date_time_value is None:
+            raise NullArgument()
+        if match is None:
+            match = True
+        if match:
+            gtelt = '$gte'
+        else:
+            gtelt = '$lt'
+        if match_key in self._query_terms:
+            self._query_terms[match_key][gtelt] = date_time_value
+        else:
+            self._query_terms[match_key] = {gtelt: date_time_value}
+        
+    def _match_maximum_date_time(self, match_key, date_time_value, match):
+        if date_time_value is None:
+            raise NullArgument()
+        if match is None:
+            match = True
+        if match:
+            gtelt = '$lte'
+        else:
+            gtelt = '$gt'
+        if match_key in self._query_terms:
+            self._query_terms[match_key][gtelt] = date_time_value
+        else:
+            self._query_terms[match_key] = {gtelt: date_time_value}
+        
     def _clear_terms(self, match_key):
         try:
             del self._query_terms[match_key]
@@ -1118,6 +1417,10 @@ class OsidRecord:
 
 class Metadata:
 
+    import_statements = [
+        'from .osid_errors import *'
+    ]
+
     init = """
     def __init__(self, **kwargs):
         self._kwargs = kwargs
@@ -1129,17 +1432,68 @@ class Metadata:
 
     get_minimum_cardinal_template = """
         # Implemented from template for osid.Metadata.get_minimum_cardinal
-        from .osid_errors import IllegalState
         if self._kwargs['syntax'] not in ${syntax_list}:
             raise IllegalState()
-        else:
-            return self._kwargs['${var_name}']"""
+        return self._kwargs['${var_name}']"""
 
     supports_coordinate_type_template = """
         # Implemented from template for osid.Metadata.supports_coordinate_type
-        from .osid_errors import IllegalState, NullArgument
         if not ${arg0_name}:
             raise NullArgument('no input Type provided')
         if self._kwargs['syntax'] not in ${syntax_list}:
-            raise IllegalState('put more meaninful message here')
+            raise IllegalState()
         return ${arg0_name} in self.get_${var_name}"""
+
+    get_existing_cardinal_values_template = """
+        # Implemented from template for osid.Metadata.get_existing_cardinal_values_template
+        # This template may only work well for very primitive return types, like string or cardinal.
+        # Need to update it to support DisplayName, or Id etc.
+        if self._kwargs['syntax'] not in ${syntax_list}:
+            raise IllegalState()
+        return self._kwargs['${var_name}']"""
+
+
+class OsidNode:
+
+    init = """
+    def __init__(self, node_map):
+        self._my_map = node_map
+"""
+
+    is_root = """
+        return self._my_map['root']"""
+
+    has_parents = """
+        return bool(self._my_map[parentdNodes])"""
+
+    get_parent_ids = """
+        id_list = []
+        for child_node in self._my_map['parentdNodes']:
+            id_list.append(parent_node['id'])
+        return IdList(id_list)"""
+
+    is_leaf = """
+        return self._my_map['leaf']"""
+
+    has_children = """
+        return bool(self._my_map[childNodes])"""
+
+    get_child_ids = """
+        id_list = []
+        for child_node in self._my_map['childNodes']:
+            id_list.append(child_node['id'])
+        return IdList(id_list)"""
+
+    additional_methods = """
+    def get_node_map(self):
+        node_map = dict(self._my_map)
+        node_map['parentNodes'] = []
+        node_map['childNodes'] = []
+        for node in self._my_map['parentNodes']:
+            node_map['parentNodes'].append(node.get_node_map())
+        for node in self._my_map['childNodes']:
+            node_map['childNodes'].append(node.get_node_map())
+        return node_map
+"""
+        
+

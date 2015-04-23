@@ -43,6 +43,47 @@ class OsidProfile:
     supports_proxy_record_type = """
         pass"""
 
+class OsidManager:
+
+    init = """
+    def __init__(self):
+        self._my_runtime = None
+"""
+    
+    initialize = """
+        from .. primitives import Id
+        if runtime is None:
+            raise NullArgument()
+        if self._my_runtime is not None:
+            raise IllegalState('this manager has already been initialized.')
+        self._my_runtime = runtime
+        config = runtime.get_configuration()
+        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        authz_manager = runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
+        self._authz_session = authz_manager().get_authorization_session()"""
+
+class OsidProxyManager:
+
+    init = """
+    def __init__(self):
+        self._my_runtime = None
+"""
+    
+    initialize = """
+        from .. primitives import Id
+        if runtime is None:
+            raise NullArgument()
+        if self._my_runtime is not None:
+            raise IllegalState('this manager has already been initialized.')
+        self._my_runtime = runtime
+        config = runtime.get_configuration()
+        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        authz_manager = runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
+        self._authz_session = authz_manager.get_authorization_session()"""
+
+
 class Identifiable:
 
 #    init = """  """

@@ -178,7 +178,7 @@ def make_kitosid(file_name):
             interface['shortname'] in ['OsidSession', 'OsidObject', 'OsidCatalog', 'OsidList'] or
             interface['category'] == 'markers') and
             package['name'] in ['resource', 'learning', 'repository', 'type', 'relationship', 'osid',
-                                'id', 'proxy', 'assessment', 'journaling']):
+                                'id', 'proxy', 'assessment', 'journaling', 'hierarchy', 'commenting']):
 
             """
             if ('OsidManager' in interface['inherit_shortnames'] or
@@ -238,7 +238,7 @@ def make_kitosid(file_name):
             ##
             # If this is the catalog interface then include all the
             # abc osids and imports for the catalog related Sessions:
-            if interface['shortname'] == patterns['package_catalog_caps']:
+            elif interface['shortname'] == patterns['package_catalog_caps']:
                 for inf in package['interfaces']:
                     if is_catalog_session(inf, patterns, package['name']):
                         if inf['shortname'].endswith('SearchSession'):
@@ -337,7 +337,7 @@ def make_kitosid(file_name):
 
             ##
             # Add all the appropriate catalog related session methods to the catalog interface
-            if interface['shortname'] == patterns['package_catalog_caps']:
+            elif interface['shortname'] == patterns['package_catalog_caps']:
                 patterns['implemented_view_methods'] = []
                 for inf in package['interfaces']:
                     if is_catalog_session(inf, patterns, package['name']):
@@ -356,6 +356,7 @@ def make_kitosid(file_name):
                               #class_doc + '\n' +
                               init_methods + '\n' +
                               methods + '\n\n')
+    """
     ##
     # Add catalogs class
     if patterns['package_catalog_caps'] != 'NoCatalog':
@@ -363,6 +364,37 @@ def make_kitosid(file_name):
         modules[package['name']]['body'] = modules[package['name']]['body'] + (
 'class ' + catalogs_plural + '(' + package['name'].title() + 'Manager):\n' +
 '    pass\n\n\n')
+
+    ##
+    # Add CatalogHierarchy class
+    if patterns['package_catalog_caps'] != 'NoCatalog':
+        inheritance = ['osid.OsidSession']
+        import_str = 'from . import osid'
+        if import_str not in modules[module_name]['imports']: 
+            modules[module_name]['imports'].append(import_str)
+
+        ##
+        # Include all the abc osids and imports for the CatalogHierarchy related Sessions:
+        for inf in package['interfaces']:
+            if is_catalog_hierarchy_session(inf, patterns, package['name']):
+                inheritance.append('abc_' + package['name'] + '_' +
+                                    inf['category'] + '.' +
+                                    inf['shortname'])
+                import_str = ('from ' + abc_app_name(package['name']) + '.' +
+                              abc_pkg_name(package['name']) + ' import ' +
+                              inf['category'] + ' as ' + 
+                              'abc_' + package['name'] + '_' + inf['category'])
+                if not import_str in modules[module_name]['imports']:
+                    modules[module_name]['imports'].append(import_str)
+
+        ##
+        # Add all the appropriate catalog hierarchy related session methods
+        #patterns['implemented_view_methods'] = []
+        for inf in package['interfaces']:
+            if is_catalog_hierarchy_session(inf, patterns, package['name']):
+                    methods = methods + '\n##\n# The following methods are from ' + inf['fullname'] + '\n\n'
+                    methods = methods + make_methods(package['name'], inf, patterns) + '\n\n'"""
+
 
     ##
     # Add Id class implementation
@@ -495,6 +527,9 @@ def make_init_methods(interface_name, package, patterns):
     elif init_pattern == 'resource.ResourceLookupSession':
         initers = ''
         object_name = interface_name[:-13]
+    elif init_pattern == 'resource.ResourceQuerySession':
+        initers = ''
+        object_name = interface_name[:-12]
     elif init_pattern == 'resource.ResourceAdminSession':
         initers = ''
         object_name = interface_name[:-12]

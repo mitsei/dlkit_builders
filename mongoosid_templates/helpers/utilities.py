@@ -98,7 +98,7 @@ def create_sandbox_repository(display_name, description=None):
         if r.display_name.text == display_name:
             print 'A sandbox repository named', display_name, 'already exists.'
             return None
-    rfc = ras.get_repository_form_for_create()
+    rfc = ras.get_repository_form_for_create([])
     rfc.display_name = display_name
     rfc.description = description
     rfc.genus_type = DEFAULT_TYPE

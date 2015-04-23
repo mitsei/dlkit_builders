@@ -1,18 +1,22 @@
 class ResourceProfile:
 
+    import_statements_pattern = [
+        'from ..primitives import Type',
+        'from ..type.objects import TypeList',
+        'from ..osid.osid_errors import *',
+        'from . import profile',
+        'from . import sessions',
+    ]
+
     supports_visible_federation_template = """
         # Implemented from template for osid.resource.ResourceProfile.supports_visible_federation
-        from . import profile
         return '${method_name}' in profile.SUPPORTS"""
 
     supports_resource_lookup_template = """
         # Implemented from template for osid.resource.ResourceProfile.supports_resource_lookup
-        from . import profile
         return '${method_name}' in profile.SUPPORTS"""
 
     get_resource_record_types_template = """
-        from ..primitives import Type
-        from ..type.objects import TypeList
         try:
             from .records import types
             ${object_name_under}_record_types = types.${object_name_upper}_RECORD_TYPES
@@ -24,8 +28,6 @@ class ResourceProfile:
         return TypeList(record_types, count=len(record_types))"""
 
     supports_resource_record_type_template = """
-        from ..primitives import Type
-        from ..osid.osid_errors import NullArgument
         if ${arg0_name} is None:
             raise NullArgument()
         try:
@@ -50,17 +52,33 @@ class ResourceManager:
     get_resource_lookup_session_template = """
         if not self.supports_${support_check}():
             raise Unimplemented()
+        return ${return_module}.${return_type}(runtime=self._runtime)"""
+
+    get_resource_lookup_session_for_bin_template = """
+        if not ${arg0_name}:
+            raise NullArgument
+        if not self.supports_${support_check}():
+            raise Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise NotFound
+        ##
+        return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)
+        """
+
+    old_get_resource_lookup_session_template = """
+        if not self.supports_${support_check}():
+            raise Unimplemented()
         try:
             from . import ${return_module}
         except ImportError:
             raise #OperationFailed()
         try:
-            session = ${return_module}.${return_type}()
+            session = ${return_module}.${return_type}(runtime=self._runtime)
         except AttributeError:
             raise #OperationFailed()
         return session"""
 
-    get_resource_lookup_session_for_bin_template = """
+    old_get_resource_lookup_session_for_bin_template = """
         if not ${arg0_name}:
             raise NullArgument
         if not self.supports_${support_check}():
@@ -73,7 +91,7 @@ class ResourceManager:
         except ImportError:
             raise #OperationFailed()
         try:
-            session = ${return_module}.${return_type}(${arg0_name})
+            session = ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)
 #            session = ${return_module}.${return_type}(${arg0_name}.get_identifier())
         except AttributeError:
             raise #OperationFailed()
@@ -86,18 +104,35 @@ class ResourceProxyManager:
             raise NullArgument()
         if not self.supports_${support_check}():
             raise Unimplemented()
+        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime)"""
+
+    get_resource_lookup_session_for_bin_template = """
+        if ${arg0_name} is None or proxy is None:
+            raise NullArgument
+        if not self.supports_${support_check}():
+            raise Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise NotFound
+        ##
+        return ${return_module}.${return_type}(${arg0_name}, proxy=proxy, runtime=self._runtime)"""
+
+    get_resource_lookup_session_template = """
+        if proxy is None:
+            raise NullArgument()
+        if not self.supports_${support_check}():
+            raise Unimplemented()
         try:
             from . import ${return_module}
         except ImportError:
             raise OperationFailed()
         try:
-            session = ${return_module}.${return_type}(proxy)
+            session = ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime)
         except AttributeError:
             raise OperationFailed()
         return session"""
 
     get_resource_lookup_session_for_bin_template = """
-        if not ${arg0_name} or proxy is None:
+        if ${arg0_name} is None or proxy is None:
             raise NullArgument
         if not self.supports_${support_check}():
             raise Unimplemented()
@@ -109,70 +144,53 @@ class ResourceProxyManager:
         except ImportError:
             raise OperationFailed()
         try:
-            session = ${return_module}.${return_type}(${arg0_name}, proxy)
+            session = ${return_module}.${return_type}(${arg0_name}, proxy=proxy, runtime=self._runtime)
 #            session = ${return_module}.${return_type}(${arg0_name}.get_identifier())
         except AttributeError:
             raise #OperationFailed()
         return session"""
 
-    old_get_resource_lookup_session_template = """
-        return ${non_proxy_interface_name}().${method_name}()"""
-
-    old_get_resource_lookup_session_for_bin_template = """
-        return ${non_proxy_interface_name}().${method_name}(${arg0_name})"""
 
 class ResourceLookupSession:
 
+    import_statements_pattern = [
+        'from ..osid.osid_errors import *',
+        'from ..osid.sessions import OsidSession',
+        'from ..primitives import *',
+        'from .. import mongo_client',
+        'from .objects import *',
+        'from bson.objectid import ObjectId',
+        'DESCENDING = -1',
+        'ASCENDING = 1',
+        'COMPARATIVE = 0',
+        'PLENARY = 1',
+        'FEDERATED = 0',
+        'ISOLATED = 1',
+        'CREATED = True',
+        'UPDATED = True'
+    ]
+
     init_template = """
-    def __init__(self, catalog_id = None, proxy = None):
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         from .objects import ${cat_name}
         self._catalog_class = ${cat_name}
-        from ..osid.sessions import OsidSession
+        #from ..osid.sessions import OsidSession
         self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
-        OsidSession._init_object(self, catalog_id, proxy, db_name='${pkg_name}', cat_name='${cat_name}', cat_class=${cat_name})
-        self._object_view = self.COMPARATIVE
-        self._catalog_view = self.ISOLATED
-"""
+        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='${pkg_name}', cat_name='${cat_name}', cat_class=${cat_name})
+        self._object_view = COMPARATIVE
+        self._catalog_view = ISOLATED
+        self._kwargs = kwargs
 
-    old_init_template = """
-    from bson.objectid import ObjectId
-    _session_name = '${interface_name}'
-
-    def __init__(self, catalog_id = None, *args, **kwargs):
-        from pymongo import MongoClient
-        from bson.objectid import ObjectId
-        from .objects import ${cat_name}
-        from ..osid.sessions import OsidSession
-        from ..osid.osid_errors import NotFound
-        from . import profile
-        OsidSession.__init__(self, *args, **kwargs)
-        collection = MongoClient()['${pkg_name}']['${cat_name}']
-        if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
-            self._catalog_identifier = catalog_id.get_identifier()
-            self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
-            if self._my_catalog_map is None:
-                raise NotFound('could not find catalog identifier ' + catalog_id.get_identifier())
-        else:
-            from ..primitives import Id, Type
-            from .. import types
-            self._catalog_identifier = '000000000000000000000000'
-            self._my_catalog_map = {
-                '_id': ObjectId(self._catalog_identifier),
-                'displayName': {'text': 'Default Catalog',
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'description': {'text': 'The Default Catalog, a Phantom Root Level Catalog',
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
-            }
-        self._catalog = ${cat_name}(self._my_catalog_map) # This may have gone in a circle
-        self._catalog_id = self._catalog.get_id()
-        self._object_view = self.COMPARATIVE
-        self._catalog_view = self.ISOLATED
+    def _catalog_view_idstrs(self):
+        if self._catalog_view == ISOLATED:
+            return [str(self._catalog_id)]
+        try:
+            ${pkg_name}_manager = self._get_provider_manager('pkg_name_upper')
+            hs = ${pkg_name}_manager.get_${cat_name_under}_hierarchy_session() # What about proxy?
+        except:
+            return [str(self._catalog_id)]
+        
 """
 
     get_bin_id_template = """
@@ -181,7 +199,6 @@ class ResourceLookupSession:
 
     get_bin_template = """
         # Implemented from template for osid.resource.ResourceLookupSession.get_bin
-        from ..osid.osid_errors import OperationFailed, PermissionDenied
         return self._catalog"""
 
     can_lookup_resources_template = """
@@ -194,132 +211,123 @@ class ResourceLookupSession:
     use_comparative_resource_view_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.use_comparative_resource_view
-        self._object_view = self.COMPARATIVE"""
+        self._object_view = COMPARATIVE"""
 
     use_plenary_resource_view_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.use_plenary_resource_view
-        self._object_view = self.PLENARY"""
+        self._object_view = PLENARY"""
 
     use_federated_bin_view_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.use_federated_bin_view
-        self._catalog_view = self.FEDERATED"""
+        self._catalog_view = FEDERATED"""
 
     use_isolated_bin_view_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.use_isolated_bin_view
-        self._catalog_view = self.ISOLATED"""
+        self._catalog_view = ISOLATED"""
 
     get_resource_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.get_resource
         # NOTE: This implementation currently ignores plenary view
-        from bson.objectid import ObjectId
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${object_name}']
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied
+        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if not ${arg0_name}:
             raise NullArgument()
-        if self._catalog_view == self.ISOLATED:
-            result = collection.find_one({'$$and': [{'_id': ObjectId(${arg0_name}.get_identifier())},
-                                          {'${cat_name_mixed}Id': str(self._catalog_id)}]})
+        if self._catalog_view == ISOLATED:
+            result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier()),
+                                          '${cat_name_mixed}Id': str(self._catalog_id)})
         else:
             # This should really look in the underlying hierarchy (when hierarchy is implemented)
             result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
             raise NotFound()
-        return ${return_type}(result)"""
+        mongo_client.close()
+        return ${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_resources_by_ids_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.get_resources_by_ids
         # NOTE: This implementation currently ignores plenary view
-        from bson.objectid import ObjectId
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${object_name}']
+        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if not ${arg0_name}:
             raise NullArgument()
         object_id_list = []
         for i in ${arg0_name}:
             object_id_list.append(ObjectId(i.get_identifier()))
-        if self._catalog_view == self.ISOLATED:
+        if self._catalog_view == ISOLATED:
             result = collection.find({'_id': {'$$in': object_id_list},
-                                     '${cat_name_mixed}Id': str(self._catalog_id)})
+                                     '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
             count = collection.find({'_id': {'$$in': object_id_list},
                                      '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
-            result = collection.find({'_id': {'$$in': object_id_list}})
+            result = collection.find({'_id': {'$$in': object_id_list}}).sort('_id', DESCENDING)
             count = collection.find({'_id': {'$$in': object_id_list}}).count()
-        return ${return_type}(result, count)"""
+        mongo_client.close()
+        return ${return_type}(result, count=count, runtime=self._runtime)"""
 
     get_resources_by_genus_type_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type
         # NOTE: This implementation currently ignores plenary view
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import OperationFailed, PermissionDenied
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${object_name}']
-        if self._catalog_view == self.ISOLATED:
+        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        if self._catalog_view == ISOLATED:
             result = collection.find({'genusTypeId': str(${arg0_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)})
+                                     '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
             count = collection.find({'genusTypeId': str(${arg0_name}),
                                      '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
-            result = collection.find({'genusTypeId': str(${arg0_name})})
+            result = collection.find({'genusTypeId': str(${arg0_name})}).sort('_id', DESCENDING)
             count = collection.find({'genusTypeId': str(${arg0_name})}).count()
-        return ${return_type}(result, count)"""
+        mongo_client.close()
+        return ${return_type}(result, count=count, runtime=self._runtime)"""
 
     get_resources_by_parent_genus_type_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.get_resources_by_parent_genus_type
-        # WILL THIS DEPEND ON A TYPE HIERARCHY SERVICE???
-        from .${return_module} import ${return_type}
         return ${return_type}([])"""
 
     get_resources_by_record_type_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.get_resources_by_record_type
-        # STILL NEED TO FIGURE OUT HOW TO DO RECORDS!!!
-        from .${return_module} import ${return_type}
+        # STILL NEED TO IMPLEMENT!!!
         return ${return_type}([])"""
 
     get_resources_template = """
         # Implemented from template for 
         # osid.resource.ResourceLookupSession.get_resources
         # NOTE: This implementation currently ignores plenary view
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import OperationFailed, PermissionDenied
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${object_name}']
-        if self._catalog_view == self.ISOLATED:
-            result = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)})
+        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        if self._catalog_view == ISOLATED:
+            result = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
             count = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
-            result = collection.find()
+            result = collection.find().sort('_id', DESCENDING)
             count = collection.count()
-        return ${return_type}(result, count)"""
+        mongo_client.close()
+        return ${return_type}(result, count=count, runtime=self._runtime)"""
 
 class ResourceQuerySession:
 
     import_statements_pattern = [
         'from ..osid.osid_errors import *',
-        'from pymongo import MongoClient'
+        'from ..osid.sessions import OsidSession',
+        'from .. import mongo_client',
+        'from .objects import *',
+        'from .queries import *',
+        'DESCENDING = -1',
+        'ASCENDING = 1'
     ]
 
     init_template = """
-    def __init__(self, catalog_id = None, proxy = None):
-        from .objects import ${cat_name}
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         self._catalog_class = ${cat_name}
-        from ..osid.sessions import OsidSession
         self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
-        OsidSession._init_object(self, catalog_id, proxy, db_name='${pkg_name}', cat_name='${cat_name}', cat_class=${cat_name})
-        self._catalog_view = self.ISOLATED
+        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='${pkg_name}', cat_name='${cat_name}', cat_class=${cat_name})
+        self._catalog_view = ISOLATED
+        self._kwargs = kwargs
 """
 
     can_query_resources_template = """
@@ -332,90 +340,42 @@ class ResourceQuerySession:
     get_resource_query_template = """
         # Implemented from template for 
         # osid.resource.ResourceQuerySession.get_resource_query_template
-        from .${return_module} import ${return_type}
         return ${return_type}()"""
 
     get_resources_by_query_template = """
         # Implemented from template for 
         # osid.resource.ResourceQuerySession.get_resources_by_query
-        from .${return_module} import ${return_type}
         if not ${arg0_name}:
             raise NullArgument()
         query_terms = dict(${arg0_name}._query_terms)
-        collection = MongoClient()['${package_name}']['${object_name}']
-        if self._catalog_view == self.ISOLATED:
+        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        if self._catalog_view == ISOLATED:
             query_terms['${cat_name_mixed}Id'] = str(self._catalog_id)
-        result = collection.find(query_terms)
+        result = collection.find(query_terms).sort('_id', DESCENDING)
         count = collection.find(query_terms).count()
-        return ${return_type}(result, count)"""
+        mongo_client.close()
+        return ${return_type}(result, count=count, runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
 
+    import_statements_pattern = [
+        'from ..osid.osid_errors import *',
+        'from ..osid.sessions import OsidSession',
+        'from ..primitives import *',
+        'from .. import mongo_client',
+        'from .objects import *',
+        'from bson.objectid import ObjectId'
+    ]
+
     init_template = """
-    def __init__(self, catalog_id = None, proxy = None):
-        from .objects import ${cat_name}
-        from ..osid.sessions import OsidSession
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         self._catalog_class = ${cat_name}
         self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
-        OsidSession._init_object(self, catalog_id, proxy, db_name='${pkg_name}', cat_name='${cat_name}', cat_class=${cat_name})
+        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='${pkg_name}', cat_name='${cat_name}', cat_class=${cat_name})
         self._forms = dict()
-"""
-
-    old_init_template = """
-    _session_name = '${interface_name}'
-
-    def __init__(self, catalog_id = None, *args, **kwargs):
-        from pymongo import MongoClient
-        from bson.objectid import ObjectId
-        from .objects import ${cat_name}
-        from ..primitives import Id, Type
-        from .. import types
-        from ..osid.sessions import OsidSession
-        from ..osid.osid_errors import NotFound
-        from . import profile
-        OsidSession.__init__(self, *args, **kwargs)
-        from pymongo import MongoClient
-        collection = MongoClient()['${pkg_name}']['${cat_name}']
-        if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
-            self._catalog_identifier = catalog_id.get_identifier()
-            self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
-            if self._my_catalog_map is None:
-                # Should also check for the authority here:
-                if catalog_id.get_identifier_namespace() != '${pkg_name}.${cat_name}':
-                    self._my_catalog_map = {
-                        '_id': ObjectId(catalog_id.get_identifier()),
-                        'displayName': {'text': catalog_id.get_identifier_namespace() + ' ${cat_name}',
-                                        'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                        'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                        'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                        'description': {'text': '${cat_name} for ' + catalog_id.get_identifier_namespace() + ' objects',
-                                        'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                        'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                        'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                        'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
-                    }
-                    collection.insert(self._my_catalog_map)
-                else:
-                    raise NotFound('could not find catalog identifier ' + catalog_id.get_identifier())
-        else:
-            self._catalog_identifier = '000000000000000000000000'
-            self._my_catalog_map = {
-                '_id': ObjectId(self._catalog_identifier),
-                'displayName': {'text': 'Default ${cat_name}',
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'description': {'text': 'The Default ${cat_name}',
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
-            }
-        self._catalog = ${cat_name}(self._my_catalog_map)
-        self._catalog_id = self._catalog.get_id()
-        self._forms = dict()
+        self._kwargs = kwargs
 """
 
     can_create_resources_template = """
@@ -436,8 +396,6 @@ class ResourceAdminSession:
         # Implemented from template for 
         # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
         CREATED = True
         if ${arg0_name} is None:
             raise NullArgument()
@@ -445,10 +403,9 @@ class ResourceAdminSession:
             if not isinstance(arg, ABC${arg0_type}):
                 raise InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
         if ${arg0_name} == []:
-            obj_form = ${return_type}(${cat_name_under}_id = self._catalog_id)
+            obj_form = ${return_type}(${cat_name_under}_id = self._catalog_id, db_prefix=self._db_prefix, runtime=self._runtime, effective_agent_id=self.get_effective_agent_id())
         else:
-            obj_form = ${return_type}(${cat_name_under}_id = self._catalog_id, record_types = ${arg0_name})
-        #obj_form._for_update = False # This seems redundant
+            obj_form = ${return_type}(${cat_name_under}_id = self._catalog_id, record_types = ${arg0_name}, db_prefix=self._db_prefix, runtime=self._runtime, effective_agent_id=self.get_effective_agent_id())
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
@@ -456,9 +413,7 @@ class ResourceAdminSession:
         # Implemented from template for 
         # osid.resource.ResourceAdminSession.create_resource_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from ..osid.osid_errors import IllegalState, InvalidArgument, NullArgument, OperationFailed, PermissionDenied, Unsupported
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${object_name}']
+        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         CREATED = True
         if ${arg0_name} is None:
             raise NullArgument()
@@ -477,19 +432,16 @@ class ResourceAdminSession:
             id_ = collection.insert(${arg0_name}._my_map)
         except: # what exceptions does mongodb insert raise?
             raise OperationFailed()
-        from .${return_module} import ${return_type}
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
-        return ${return_type}(collection.find_one({'_id': id_}))"""
+        result = ${return_type}(collection.find_one({'_id': id_}), db_prefix=self._db_prefix, runtime=self._runtime)
+        mongo_client.close()
+        return result"""
 
     get_resource_form_for_update_template = """
         # Implemented from template for 
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import NotFound, NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
-        from bson.objectid import ObjectId
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${object_name}']
+        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         UPDATED = True
         if ${arg0_name} is None:
             raise NullArgument()
@@ -498,18 +450,16 @@ class ResourceAdminSession:
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result == '':
             raise NotFound()
-        obj_form = ${return_type}(result)
-        #obj_form._for_update = True # This seems redundant
+        obj_form = ${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
+        mongo_client.close()
         return obj_form"""
 
     update_resource_template = """
         # Implemented from template for 
         # osid.resource.ResourceAdminSession.update_resource_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from ..osid.osid_errors import IllegalState, InvalidArgument, NullArgument, OperationFailed, PermissionDenied, Unsupported
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${object_name}']
+        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         UPDATED = True
         if ${arg0_name} is None:
             raise NullArgument()
@@ -529,20 +479,16 @@ class ResourceAdminSession:
         except: # what exceptions does mongodb save raise?
             raise OperationFailed()
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
+        mongo_client.close()
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
-        from .${return_module} import ${return_type}
-        return ${return_type}(${arg0_name}._my_map)
+        return ${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)
         """
 
     delete_resource_template = """
         # Implemented from template for 
         # osid.resource.ResourceAdminSession.delete_resource_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from ..osid.osid_errors import NotFound, NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
-        from .objects import ${object_name}
-        from bson.objectid import ObjectId
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${object_name}']
+        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         UPDATED = True
         if ${arg0_name} is None:
             raise NullArgument()
@@ -555,6 +501,7 @@ class ResourceAdminSession:
         result = collection.remove({'_id': ObjectId(${arg0_name}.get_identifier())}, justOne=True)
         if 'err' in result and result['err'] is not None:
             raise OperationFailed()
+        mongo_client.close()
 #        if result['n'] == 0: This is probably redundant
 #            raise NotFound()"""
 
@@ -562,94 +509,107 @@ class ResourceAdminSession:
     alias_resources_template = """
         # Implemented from template for 
         # osid.resource.ResourceAdminSession.alias_resources_template
-        from ..osid.osid_errors import Unimplemented
-        # NEED TO FIGURE OUT HOW TO IMPLEMENT THIS SOMEDAY
         raise Unimplemented()"""
 
 
 class BinLookupSession:
-    
+
+    import_statements_pattern = [
+        'from ..osid.osid_errors import *',
+        'from ..primitives import *',
+        'from ..osid.sessions import OsidSession',
+        'from . import profile',
+        'from .objects import *',
+        'from .. import mongo_client',
+        'from bson.objectid import ObjectId',
+        'DESCENDING = -1',
+        'ASCENDING = 1',
+        'COMPARATIVE = 0',
+        'PLENARY = 1',
+        'CREATED = True',
+        'UPDATED = True'
+    ]
+
     init_template = """
     _session_name = '${interface_name}'
 
-    def __init__(self, catalog_identifier = None, *args, **kwargs):
-        from pymongo import MongoClient
-        from .objects import ${cat_name}
-        from ..osid.sessions import OsidSession
-        from ..osid.osid_errors import NotFound
-        from . import profile
-        OsidSession._init_catalog(self, *args, **kwargs)
-        self._catalog_view = self.COMPARATIVE
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._catalog_view = COMPARATIVE
+        self._kwargs = kwargs
 """
 
     use_comparative_bin_view_template = """
         # Implemented from template for 
         # osid.resource.BinLookupSession.use_comparative_bin_view
-        self._catalog_view = self.COMPARATIVE"""
+        self._catalog_view = COMPARATIVE"""
 
     use_plenary_bin_view_template = """
         # Implemented from template for 
         # osid.resource.BinLookupSession.use_plenary_bin_view
-        self._catalog_view = self.PLENARY"""
+        self._catalog_view = PLENARY"""
 
     get_bin_template = """
         # Implemented from template for 
         # osid.resource.BinLookupSession.get_bin
-        from bson.objectid import ObjectId
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${cat_name}']
+        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         if not ${arg0_name}:
             raise NullArgument()
-        # Need to consider how to best deal with the "phantom root catalog issue
+        # Need to consider how to best deal with the "phantom root" catalog issue
         if ${arg0_name}.get_identifier() == '000000000000000000000000':
             return self._get_phantom_root_catalog(cat_class = ${cat_name}, cat_name = '${cat_name}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
-            raise NotFound()
-        return ${return_type}(result)"""
+            # Try creating an orchestrated ${cat_name}.  Let it raise NotFound()
+            result = self._create_orchestrated_catalog_map(${arg0_name}, '${package_name}', '${cat_name}')
+        mongo_client.close()
+        return ${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_bins_by_ids_template = """
         # Implemented from template for 
         # osid.resource.BinLookupSession.get_bins_by_ids_template
         # NOTE: This implementation currently ignores plenary view
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import OperationFailed, PermissionDenied
-        from bson.objectid import ObjectId
+        # Also, this should be implemeted to use get_${cat_name}() instead of direct to database
         catalog_id_list = []
         for i in ${arg0_name}:
             catalog_id_list.append(ObjectId(i.get_identifier()))
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${cat_name}']
-        result = collection.find({'_id': {'$$in': catalog_id_list}})
+        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
+        result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
         count = collection.find({'_id': {'$$in': catalog_id_list}}).count()
-        return ${return_type}(result, count)"""
+        mongo_client.close()
+        return ${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
     get_bins_template = """
         # Implemented from template for 
         # osid.resource.BinLookupSession.get_bins_template
         # NOTE: This implementation currently ignores plenary view
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import OperationFailed, PermissionDenied
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${cat_name}']
-        result = collection.find()
+        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
+        result = collection.find().sort('_id', DESCENDING)
         count = collection.count()
-        return ${return_type}(result, count)"""
+        mongo_client.close()
+        return ${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class BinAdminSession:
+
+    import_statements_pattern = [
+        'from ..osid.osid_errors import *',
+        'from ..primitives import *',
+        'from ..osid.sessions import OsidSession',
+        'from .. import mongo_client',
+        'from .objects import *',
+        'from bson.objectid import ObjectId',
+        'CREATED = True',
+        'UPDATED = True'
+    ]
 
     init_template = """
     _session_name = '${interface_name}'
 
-    def __init__(self, catalog_identifier = None, *args, **kwargs):
-        from .objects import ${cat_name}
-        from ..osid.sessions import OsidSession
-        from ..osid.osid_errors import NotFound
-        OsidSession._init_catalog(self, *args, **kwargs)
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
         self._forms = dict()
+        self._kwargs = kwargs
 """
 
     can_create_bins_template = """
@@ -670,8 +630,6 @@ class BinAdminSession:
         # Implemented from template for 
         # osid.resource.BinAdminSession.get_bin_form_for_create_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
         CREATED = True
         if ${arg0_name} is None:
             raise NullArgument()
@@ -679,10 +637,9 @@ class BinAdminSession:
             if not isinstance(arg, ABC${arg0_type}):
                 raise InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
         if ${arg0_name} == []:
-            result = ${return_type}()
+            result = ${return_type}(db_prefix=self._db_prefix, runtime=self._runtime)
         else:
-            result = ${return_type}(record_types = ${arg0_name})
-        result._for_update = False
+            result = ${return_type}(record_types = ${arg0_name}, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[result.get_id().get_identifier()] = not CREATED
         return result"""
 
@@ -690,9 +647,7 @@ class BinAdminSession:
         # Implemented from template for 
         # osid.resource.BinAdminSession.create_bin_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from ..osid.osid_errors import IllegalState, InvalidArgument, NullArgument, OperationFailed, PermissionDenied, Unsupported
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${cat_name}']
+        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         CREATED = True
         if ${arg0_name} is None:
             raise NullArgument()
@@ -711,20 +666,16 @@ class BinAdminSession:
             id_ = collection.insert(${arg0_name}._my_map)
         except: # what exceptions does mongodb insert raise?
             raise OperationFailed()
-        from .${return_module} import ${return_type}
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
-        return ${return_type}(collection.find_one({'_id': id_}))"""
+        result = ${return_type}(collection.find_one({'_id': id_}), db_prefix=self._db_prefix, runtime=self._runtime)
+        mongo_client.close()
+        return result"""
 
     get_bin_form_for_update_template = """
         # Implemented from template for 
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from .${return_module} import ${return_type}
-        from ..osid.osid_errors import NotFound, NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
-        from bson.objectid import ObjectId
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${cat_name}']
-        UPDATED = True
+        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         if ${arg0_name} is None:
             raise NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -732,18 +683,16 @@ class BinAdminSession:
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
             raise NotFound()
-        cat_form = ${return_type}(result)
-        cat_form._for_update = True
+        cat_form = ${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
+        mongo_client.close()
         return cat_form"""
 
     update_bin_template = """
         # Implemented from template for 
         # osid.resource.BinAdminSession.update_bin_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from ..osid.osid_errors import IllegalState, InvalidArgument, NullArgument, OperationFailed, PermissionDenied, Unsupported
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${cat_name}']
+        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         UPDATED = True
         if ${arg0_name} is None:
             raise NullArgument()
@@ -763,25 +712,22 @@ class BinAdminSession:
         except: # what exceptions does mongodb save raise?
             raise OperationFailed()
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
+        mongo_client.close()
         # Note: this is out of spec. The OSIDs don't require an object to be returned
-        from .${return_module} import ${return_type}
-        return ${return_type}(${arg0_name}._my_map)"""
+        return ${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     delete_bin_template = """
         # Implemented from template for 
         # osid.resource.BinAdminSession.delete_bin_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from ..osid.osid_errors import NotFound, NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported, IllegalState
-        from bson.objectid import ObjectId
-        from pymongo import MongoClient
-        collection = MongoClient()['${package_name}']['${cat_name}']
+        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         UPDATED = True
         if ${arg0_name} is None:
             raise NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         for object_catalog in ${cataloged_object_caps_list}:
-            obj_collection = MongoClient()['${package_name}'][object_catalog]
+            obj_collection = mongo_client[self._db_prefix + '${package_name}'][object_catalog]
             if obj_collection.find({'${cat_name_mixed}Id': str(${arg0_name})}).count() != 0:
                 raise IllegalState('catalog is not empty')
         result = collection.remove({'_id': ObjectId(${arg0_name}.get_identifier())})
@@ -789,23 +735,192 @@ class BinAdminSession:
         if 'err' in result and result['err'] is not None:
             raise OperationFailed()
         if result['n'] == 0:
-            raise NotFound()"""
+            raise NotFound()
+        mongo_client.close()"""
 
     alias_bin_template = """
         # Implemented from template for 
         # osid.resource.BinLookupSession.alias_bin_template
-        from ..osid.osid_errors import Unimplemented
         # NEED TO FIGURE OUT HOW TO IMPLEMENT THIS SOMEDAY
         raise Unimplemented()"""
+
+class BinHierarchySession:
+    
+    import_statements_pattern = [
+        'from ..osid.osid_errors import *',
+        'from ..primitives import *',
+        'from ..osid.sessions import OsidSession',
+        'from .objects import *',
+        'COMPARATIVE = 0',
+        'PLENARY = 1',
+    ]
+
+    init_template = """
+    _session_name = '${interface_name}'
+
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._forms = dict()
+        self._kwargs = kwargs
+        hm = self._get_provider_manager('HIERARCHY')
+        self._hierarchy_session = hm.get_hierarchy_traversal_session_for_hierarchy(
+            Id(authority = '${pkg_name_upper}',
+               namespace = 'CATALOG',
+               identifier = '${cat_name_upper}')
+        )
+"""
+
+    can_access_objective_bank_hierarchy_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.can_access_objective_bank_hierarchy
+        # NOTE: It is expected that real authentication hints will be 
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""        
+
+    get_bin_hierarchy_id_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_bin_hierarchy_id
+        return self._hierarchy_session.get_hierarchy_id()"""
+
+    get_bin_hierarchy_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_bin_hierarchy
+        return self._hierarchy_session.get_hierarchy()"""
+
+    get_root_bin_ids_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_root_bin_ids
+        return self._hierarchy_session.get_roots()"""
+
+    get_root_bins_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_root_bins
+        return ${cat_name}LookupSession(self._proxy, self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_root_${cat_name_under}_ids()))"""
+
+    has_parent_bins_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.has_parent_bins
+        return self._hierarchy_session.has_parents(id_=${arg0_name})"""
+
+    is_parent_of_bin_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.is_parent_of_bin
+        return self._hierarchy_session.is_parent(id_=${arg0_name}, parent_id=${arg1_name})"""
+
+    get_parent_bin_ids_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_parent_bin_ids
+        return self._hierarchy_session.get_parents(id_=${arg0_name})"""
+
+    get_parent_bins_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_parent_bins
+        return ${cat_name}LookupSession(self._proxy, self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_parent_${cat_name_under}_ids(${arg0_name})))"""
+
+    is_ancestor_of_bin_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.is_ancestor_of_bin
+        return self._hierarchy_session.is_ancestor(id_=${arg0_name}, ancestor_id=${arg1_name})"""
+
+    has_child_bins_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.has_child_bins
+        return self._hierarchy_session.has_children(id_=${arg0_name})"""
+
+    is_child_of_bin_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.is_child_of_bin
+        return self._hierarchy_session.is_child(id_=${arg0_name}, child_id=${arg1_name})"""
+
+    get_child_bin_ids_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_child_bin_ids
+        return self._hierarchy_session.get_children(id_=${arg0_name})"""
+
+    get_child_bins_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_child_bins
+        return ${cat_name}LookupSession(self._proxy, self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_child_${cat_name_under}_ids(${arg0_name})))"""
+
+    is_descendant_of_bin_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.is_descendant_of_bin
+        return self._hierarchy_session.is_descendant(id_=${arg0_name}, descendant_id=${arg1_name})"""
+
+    get_bin_node_ids_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_bin_node_ids
+        return self._hierarchy_session.get_nodes(id_=${arg0_name}, ancestor_levels=${arg1_name}, descendant_levels=${arg2_name}, include_siblings=${arg3_name})"""
+
+    get_bin_nodes_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchySession.get_bin_nodes
+        raise Unimplemented()"""
+
+class BinHierarchyDesignSession:
+
+    import_statements_pattern = [
+        'from ..osid.osid_errors import *',
+        'from ..primitives import *',
+        'from ..osid.sessions import OsidSession',
+        'from .objects import *',
+        'COMPARATIVE = 0',
+        'PLENARY = 1',
+    ]
+
+    init_template = """
+    _session_name = '${interface_name}'
+
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._forms = dict()
+        self._kwargs = kwargs
+        hm = self._get_provider_manager('HIERARCHY')
+        self._hierarchy_session = hm.get_hierarchy_design_session_for_hierarchy(
+            Id(authority = '${pkg_name_upper}',
+               namespace = 'CATALOG',
+               identifier = '${cat_name_upper}')
+        )
+"""
+
+    can_modify_bin_hierarchy_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchyDesignSession.can_modify_objective_bank_hierarchy
+        # NOTE: It is expected that real authentication hints will be 
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""        
+
+    add_root_bin_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchyDesignSession.add_root_bin_template
+        return self._hierarchy_session.add_root(id_=${arg0_name})"""
+
+    remove_root_bin_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchyDesignSession.remove_root_bin_template
+        return self._hierarchy_session.remove_root(id_=${arg0_name})"""
+
+    add_child_bin_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchyDesignSession.add_child_bin_template
+        return self._hierarchy_session.add_child(id_=${arg0_name}, child_id=${arg1_name})"""
+
+    remove_child_bin_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchyDesignSession.remove_child_bin_template
+        return self._hierarchy_session.remove_child(id_=${arg0_name}, child_id=${arg1_name})"""
+
+    remove_child_bins_template = """
+        # Implemented from template for 
+        # osid.resource.ResourceHierarchyDesignSession.remove_child_bin_template
+        return self._hierarchy_session.remove_children(id_=${arg0_name})"""
 
 
 class Resource:
     
-    import_statements = [] # this is where you might insert one-off import statements
-
     import_statements_pattern = [
         'from ..osid.osid_errors import *',
-        'from ..primitives import Id, Type, DisplayText',
+        'from ..primitives import *',
     ]
 
     init_template = """
@@ -815,11 +930,14 @@ class Resource:
         _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __init__(self, osid_object_map, **kwargs):
+    def __init__(self, osid_object_map, db_prefix='', runtime=None, **kwargs):
         self._my_map = osid_object_map
+        self._db_prefix = db_prefix
+        self._runtime = runtime
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
 ${instance_initers}
+    # These next two private methods should be moved to osid.Extensible??? (I thought they were already)
     def _load_records(self, record_type_idstrs):
         for record_type_idstr in record_type_idstrs:
             self._init_record(record_type_idstr)
@@ -859,17 +977,18 @@ ${instance_initers}
         except ImportError:
             raise OperationFailed('failed to import ${return_app_name}.${return_implpkg_name}.managers')
         try:
-            mgr = managers.${return_pkg_title}Manager()
+            mgr = self._get_provider_manager('${return_pkg_caps}')
+            #mgr = managers.${return_pkg_title}Manager() # this is the old one. delete it!
         except:
             raise OperationFailed('failed to instantiate ${return_pkg_title}Manager')
         if not mgr.supports_${return_type_under}_lookup():
             raise OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
         try:
-            osidObject = mgr.get_${return_type_under}_lookup_session().get${return_type_under}(self.get_${var_name}_id())
+            osid_object = mgr.get_${return_type_under}_lookup_session().get_${return_type_under}(self.get_${var_name}_id())
         except:
             raise OperationFailed()
         else:
-            return osidObject"""
+            return osid_object"""
 
     get_resource_record_template = """
         # This is now in Extensible and can be replaces with:
@@ -886,7 +1005,7 @@ class ResourceQuery:
 
     import_statements_pattern = [
         'from ..osid.osid_errors import *',
-        'from ..primitives import Id, Type, DisplayText',
+        'from ..primitives import *'
     ]
 
     init_template = """
@@ -902,6 +1021,9 @@ class ResourceQuery:
         osid_queries.OsidQuery.__init__(self)
 """
 
+    clear_group_terms_template = """
+        self._clear_terms('${var_name_mixed}')"""
+
 class ResourceForm:
 
     import_statements_pattern = [
@@ -911,6 +1033,7 @@ class ResourceForm:
         'from ..osid.objects import OsidForm',
         'from ..osid.objects import OsidObjectForm',
         'from ..osid.objects import OsidList',
+        'from ..osid.objects import OsidRelationshipForm',
         'from ..osid.metadata import Metadata',
         'from . import mdata_conf'
     ]
@@ -919,11 +1042,14 @@ class ResourceForm:
     try:
         from .records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
     except ImportError, AttributeError:
-        _record_type_data_sets = {}
+        _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'
 
-    def __init__(self, osid_object_map=None, **kwargs):
+    def __init__(self, osid_object_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
         OsidForm.__init__(self)
+        self._runtime = runtime
+        self._db_prefix = db_prefix
+        self._kwargs = kwargs
         if 'catalog_id' in kwargs:
             self._catalog_id = kwargs['catalog_id']
         self._init_metadata(**kwargs)
@@ -937,17 +1063,17 @@ class ResourceForm:
             self._my_map = {}
             self._for_update = False
             self._init_map(**kwargs)
-            if 'record_types' in kwargs:
-                self._init_records(kwargs['record_types'])
+            if record_types is not None:
+                self._init_records(record_types)
         self._supported_record_type_ids = self._my_map['recordTypeIds']
-        self._kwargs = kwargs
 
     def _init_metadata(self, **kwargs):
-        OsidObjectForm._init_metadata(self)
+        ${init_object}._init_metadata(self, **kwargs)
 ${metadata_initers}
     def _init_map(self, **kwargs):
-        OsidObjectForm._init_map(self)
+        ${init_object}._init_map(self)
 ${persisted_initers}
+    # These next three private methods should be moved to osid.Extensible??? (I thought they were already)
     def _load_records(self, record_type_idstrs):
         for record_type_idstr in record_type_idstrs:
             self._init_record(record_type_idstr)
@@ -968,7 +1094,15 @@ ${persisted_initers}
 
     get_group_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
-        return Metadata(**self._${var_name}_metadata)"""
+        metadata = dict(self._${var_name}_metadata)
+        metadata.update({'existing_${var_name}_values': self._my_map['${var_name_mixed}']})
+        return Metadata(**metadata)"""
+
+    get_avatar_metadata_template = """
+        # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
+        metadata = dict(self._${var_name}_metadata)
+        metadata.update({'existing_${var_name}_values': self._my_map['${var_name_mixed}Id']})
+        return Metadata(**metadata)"""
 
     set_group_template = """
         # Implemented from template for osid.resource.ResourceForm.set_group_template
@@ -993,7 +1127,7 @@ ${persisted_initers}
             raise NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_${arg0_type}(${arg0_name}, 
+        if not self._is_valid_id(${arg0_name}, 
                                 self.get_${var_name}_metadata()):
             raise InvalidArgument()
         self._my_map['${var_name_mixed}Id'] = str(${arg0_name})"""
@@ -1003,7 +1137,7 @@ ${persisted_initers}
         if (self.get_${var_name}_metadata().is_read_only() or
             self.get_${var_name}_metadata().is_required()):
             raise NoAccess()
-        self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
+        self._my_map['${var_name_mixed}Id'] = self._${var_name}_default"""
 
     get_resource_form_record_template = """
         # This is now in OsidExtensibleForm and can be replaces with:
@@ -1025,7 +1159,6 @@ class ResourceList:
     import_statements_pattern = [
         'from ..osid.osid_errors import *',
         'from ..primitives import *',
-        'from ..osid.objects import OsidList'
     ]
 
     get_next_resource_template = """
@@ -1042,11 +1175,11 @@ class ResourceList:
     def next(self):
         from .${return_module} import ${return_type} 
         try:
-            next_item = OsidList.next(self)
+            next_item = osid_objects.OsidList.next(self)
         except:
             raise
         if isinstance(next_item, dict):
-            next_item = ${return_type}(next_item)
+            next_item = ${return_type}(next_item, db_prefix=self._db_prefix, runtime=self._runtime)
         return next_item"""
             
     get_next_resources_template = """
@@ -1068,34 +1201,95 @@ class ResourceList:
 class Bin:
 
     init_template = """
+    try:
+        from .records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
+    except ImportError, AttributeError:
+        _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __init__(self, osid_catalog_map):
+    def __init__(self, osid_catalog_map, db_prefix='', runtime=None, **kwargs):
         self._my_map = osid_catalog_map
+        self._runtime = runtime
+        self._db_prefix = db_prefix
+        self._records = dict()
+        # This check is here for transition purposes:
+        try:
+            self._load_records(osid_catalog_map['recordTypeIds'])
+        except KeyError:
+            print 'KeyError: recordTypeIds key not found in ', self._my_map['displayName']['text']
+            self._load_records([]) # In place for transition purposes:
+
+    # These next two private methods should be moved to osid.Extensible??? (I thought they were already)
+    def _load_records(self, record_type_idstrs):
+        for record_type_idstr in record_type_idstrs:
+            self._init_record(record_type_idstr)
+
+    def _init_record(self, record_type_idstr):
+        import importlib
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['object_record_class_name'])
+        self._records[record_type_idstr] = record(self)
 """
 
 class BinForm:
 
+    import_statements_pattern = [
+        'from ..osid.objects import OsidForm',
+        'from ..osid.objects import OsidObjectForm',
+    ]
+
     init_template = """
+    try:
+        from .records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
+    except ImportError, AttributeError:
+        _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'
 
-    def __init__(self, osid_catalog_map = None, **kwargs):
-        from ..osid.objects import OsidForm
+    def __init__(self, osid_catalog_map = None, record_types=None, db_prefix='', runtime=None, **kwargs):
+        #from ..osid.objects import OsidForm
         OsidForm.__init__(self)
-        self._init_metadata()
+        self._runtime = runtime
+        self._db_prefix = db_prefix
+        self._kwargs = kwargs
+        self._init_metadata(**kwargs)
+        self._records = dict()
         if osid_catalog_map is not None:
-            self._my_map = osid_catalog_map
             self._for_update = True
+            self._my_map = osid_catalog_map
+            self._load_records(osid_catalog_map['recordTypeIds'])
         else:
             self._my_map = {}
             self._for_update = False
             self._init_map(**kwargs)
+            if record_types is not None:
+                self._init_records(record_types)
+        self._supported_record_type_ids = self._my_map['recordTypeIds']
 
-    def _init_metadata(self):
-        from ..osid.objects import OsidObjectForm
+    def _init_metadata(self, **kwargs):
+        #from ..osid.objects import OsidObjectForm
         OsidObjectForm._init_metadata(self)
 
     def _init_map(self, **kwargs):
-        from ..osid.objects import OsidObjectForm
+        #from ..osid.objects import OsidObjectForm
         OsidObjectForm._init_map(self)
+
+    # These next three private methods should be moved to osid.Extensible??? (I thought they were already)
+    def _load_records(self, record_type_idstrs):
+        for record_type_idstr in record_type_idstrs:
+            self._init_record(record_type_idstr)
+
+    def _init_records(self, record_types):
+        for record_type in record_types:
+            # This conditional was inserted on 7/11/14. It may prove problematic:
+            if str(record_type) not in self._my_map['recordTypeIds']:
+                self._init_record(str(record_type))
+                self._my_map['recordTypeIds'].append(str(record_type))
+  
+    def _init_record(self, record_type_idstr):
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['form_record_class_name'])
+        self._records[record_type_idstr] = record(self)
+
 """

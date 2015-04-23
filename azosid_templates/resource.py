@@ -26,10 +26,19 @@ class ResourceManager:
         provider_module = importlib.import_module(settings.PROVIDER_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
         authz_module = importlib.import_module(settings.AUTHZ_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
         Provider${interface_name} = getattr(provider_module, '${interface_name}')
-        MyAuthorizationManager = getattr(authz_module, 'AuthorizationManager')
+        authz_manager = getattr(authz_module, 'AuthorizationManager')
         self._provider_manager = Provider${interface_name}()
-        self._authz_session = MyAuthorizationManager().get_authorization_session()
-"""
+        self._authz_session = authz_manager().get_authorization_session()
+        self._my_runtime = None
+
+    def initialize(self, runtime):
+        from ..primitives import Id
+        osid_managers.OsidManager.initialize(self, runtime)
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl) # need to add version argument
+"""    
 
     get_resource_lookup_session_template = """
         # Implemented from azosid template for -
@@ -53,9 +62,18 @@ class ResourceProxyManager:
         provider_module = importlib.import_module(settings.PROVIDER_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
         authz_module = importlib.import_module(settings.AUTHZ_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
         Provider${interface_name} = getattr(provider_module, '${interface_name}')
-        MyAuthorizationManager = getattr(authz_module, 'AuthorizationManager')
+        authz_manager = getattr(authz_module, 'AuthorizationManager')
         self._provider_manager = Provider${interface_name}()
-        self._authz_session = MyAuthorizationManager().get_authorization_session()
+        self._authz_session = authz_manager().get_authorization_session()
+        self._my_runtime = None
+
+    def initialize(self, runtime):
+        from ..primitives import Id
+        osid_managers.OsidProxyManager.initialize(self, runtime)
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl) # need to add version argument
 """
 
     get_resource_lookup_session_template = """
@@ -89,7 +107,10 @@ class ResourceLookupSession:
     get_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_bin_template
-        return self._provider_session.${method_name}()"""
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}()"""
 
     can_lookup_resources_template = """
         # Implemented from azosid template for -
@@ -166,6 +187,14 @@ class ResourceLookupSession:
 
 class ResourceQuerySession:
 
+    init_template = """
+    def __init__(self, provider_session, authz_session, proxy = None):
+        from ..osid import sessions as osid_sessions
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name}.${object_name}'
+"""
+
     can_search_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceQuerySession.can_search_resources_template
@@ -185,7 +214,7 @@ class ResourceQuerySession:
         if not self._can('search'):
             raise PermissionDenied()
         else:
-            return self._provider_session.${method_name}()"""
+            return self._provider_session.${method_name}(${arg0_name})"""
 
 class ResourceAdminSession:
 
@@ -210,7 +239,7 @@ class ResourceAdminSession:
         if ${arg0_name} == None:
             raise NullArgument() # Just 'cause the spec says to :)
         else:
-            return self._can('admin')"""
+            return self._can('${func_name}')"""
 
     get_resource_form_for_create_template = """
         # Implemented from azosid template for -
@@ -375,6 +404,196 @@ class BinAdminSession:
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.alias_bin_template
         if not self._can('alias'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+class BinHierarchySession:
+
+    init_template = """
+    def __init__(self, provider_session, authz_session, proxy = None):
+        from ..osid import sessions as osid_sessions
+        from ..primitives import Id
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._id_namespace = '${pkg_name}.${cat_name}'
+"""
+
+    can_access_objective_bank_hierarchy_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.can_access_objective_bank_hierarchy
+        return self._can('${func_name}')"""
+
+    get_bin_hierarchy_id_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_bin_hierarchy_id
+        return self._provider_session.${method_name}()"""
+
+    get_bin_hierarchy_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_bin_hierarchy
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}()"""
+
+    get_root_bin_ids_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_root_bin_ids
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}()"""
+
+    get_root_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_root_bins
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}()"""
+
+    has_parent_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.has_parent_bins
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+    is_parent_of_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.is_parent_of_bin
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
+    get_parent_bin_ids_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_parent_bin_ids
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+    get_parent_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_parent_bins
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+    is_ancestor_of_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.is_ancestor_of_bin
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
+    has_child_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.has_child_bins
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+    is_child_of_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.is_child_of_bin
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
+    get_child_bin_ids_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_child_bin_ids
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+    get_child_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_bin_hierarchy_id
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+    is_descendant_of_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.is_descendant_of_bin
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
+    get_bin_node_ids_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_bin_node_ids
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name}, ${arg2_name}, ${arg3_name})"""
+
+    get_bin_nodes_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchySession.get_bin_nodes
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name}, ${arg2_name}, ${arg3_name})"""
+
+
+class BinHierarchyDesignSession:
+
+    init_template = """
+    def __init__(self, provider_session, authz_session, proxy = None):
+        from ..osid import sessions as osid_sessions
+        from ..primitives import Id
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._id_namespace = '${pkg_name}.${cat_name}'
+"""
+
+    can_modify_bin_hierarchy_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchyDesignSession.can_modify_bin_hierarchy
+        return self._can('${func_name}')"""
+
+    add_root_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinHierarchyDesignSession.add_root_bin_template
+        if not self._can('modify'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+    remove_root_bin_template = """
+        if not self._can('modify'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+    add_child_bin_template = """
+        if not self._can('modify'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
+    remove_child_bin_template = """
+        if not self._can('modify'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
+    remove_child_bins_template = """
+        if not self._can('modify'):
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name})"""

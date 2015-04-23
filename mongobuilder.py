@@ -402,13 +402,14 @@ def make_additional_methods(interface_name, package, patterns):
 
 def make_init_methods(interface_name, package, patterns):
     import importlib
-    from binder_helpers import camel_to_under, camel_to_mixed
+    from binder_helpers import camel_to_under, camel_to_mixed, make_plural
     templates = None
     init_pattern = ''
     instance_initers = ''
     persisted_initers = ''
     metadata_initers = ''
     object_name = ''
+    init_object = ''
     cat_name = patterns['package_catalog_caps']
     impl_class = load_impl_class(pkg_name(package['name']), interface_name)
     if hasattr(impl_class, 'init'):
@@ -441,17 +442,26 @@ def make_init_methods(interface_name, package, patterns):
             pass
     elif init_pattern == 'resource.ResourceForm':
         object_name = interface_name[:-4]
+        if object_name in patterns['package_relationships_caps']:
+            init_object = 'OsidRelationshipForm'
+        else:
+            init_object = 'OsidObjectForm'
         try:
             persisted_initers = make_persistance_initers(
                 patterns[interface_name[:-4] + '.persisted_data'],
-                dict(patterns[interface_name[:-4] + '.initialized_data'], **patterns[interface_name[:-4] + '.instance_data']),
+                patterns[interface_name[:-4] + '.initialized_data'],
                 patterns[interface_name[:-4] + '.aggregate_data'])
+            #persisted_initers = make_persistance_initers(
+            #    patterns[interface_name[:-4] + '.persisted_data'],
+            #    dict(patterns[interface_name[:-4] + '.initialized_data'], **patterns[interface_name[:-4] + '.instance_data']),
+            #    patterns[interface_name[:-4] + '.aggregate_data'])
         except KeyError:
             pass
         try:
             metadata_initers = make_metadata_initers(
                 patterns[interface_name[:-4] + '.persisted_data'],
-                patterns[interface_name[:-4] + '.initialized_data'])
+                patterns[interface_name[:-4] + '.initialized_data'],
+                patterns[interface_name[:-4] + '.return_types'])
         except KeyError:
             pass
     elif init_pattern == 'resource.ResourceQuery':
@@ -464,13 +474,19 @@ def make_init_methods(interface_name, package, patterns):
             return template.substitute({'app_name': app_name(package['name']),
                                         'implpkg_name': pkg_name(package['name']),
                                         'pkg_name': package['name'],
+                                        'pkg_name_upper': package['name'].upper(),
                                         'interface_name': interface_name,
                                         'instance_initers': instance_initers,
                                         'persisted_initers': persisted_initers,
                                         'metadata_initers': metadata_initers,
                                         'object_name': object_name,
                                         'object_name_upper': camel_to_under(object_name).upper(),
-                                        'cat_name': cat_name})
+                                        'cat_name': cat_name,
+                                        'cat_name_plural': make_plural(cat_name),
+                                        'cat_name_under': cat_name.lower(),
+                                        'cat_name_under_plural': make_plural(cat_name).lower(),
+                                        'cat_name_upper': cat_name.upper(),
+                                        'init_object': init_object})
         else:
             return ''
     else:
@@ -503,6 +519,10 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
             data_name in initialized_data):
             initers = initers + (
     '        self._my_map[\'' + under_to_mixed(data_name) + 'Id\'] = str(kwargs[\'' + data_name + '_id\'])\n')
+        elif (persisted_data[data_name] == 'osid.resource.Resource' and
+            data_name in initialized_data):
+            initers = initers + (
+    '        self._my_map[\'' + under_to_mixed(data_name) + 'Id\'] = str(kwargs[\'effective_agent_id\'])\n')
         elif persisted_data[data_name] == 'osid.id.Id':
             initers = initers + (
             '        self._my_map[\'' + under_to_mixed(data_name) + 'Id\'] = self._' + 
@@ -518,6 +538,14 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
         elif persisted_data[data_name] == 'osid.type.Type[]':
             initers = initers + (
             '        self._my_map[\'' + under_to_mixed(remove_plural(data_name)) + 'Ids\'] = self._' + 
+                data_name + '_default\n')
+        elif persisted_data[data_name] == 'string':
+            initers = initers + (
+            '        self._my_map[\'' + under_to_mixed(data_name) + '\'] = self._' + 
+                data_name + '_default\n')
+        elif persisted_data[data_name] == 'boolean':
+            initers = initers + (
+            '        self._my_map[\'' + under_to_mixed(data_name) + '\'] = self._' + 
                 data_name + '_default\n')
         elif persisted_data[data_name] == 'OsidCatalog':
             initers = initers + (
@@ -584,7 +612,7 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 
 ##
 # Assemble the initializers for metadata managed by Osid Object Forms
-def make_metadata_initers(persisted_data, initialized_data):
+def make_metadata_initers(persisted_data, initialized_data, return_types):
     from builders.mongoosid_templates import options
     imports = ''
     initer = ''
@@ -597,10 +625,14 @@ def make_metadata_initers(persisted_data, initialized_data):
                 template = string.Template(options.METADATA_INITER)
                 default = default + ('        self._' + data_name + 
                     '_default = None\n')
-            elif persisted_data[data_name] == 'string':
+            elif persisted_data[data_name] == 'string' and return_types[data_name] == 'osid.locale.DisplayText':
                 template = string.Template(options.METADATA_INITER)
                 default = default + ('        self._' + data_name + 
                     '_default = dict(self._' + data_name + '_metadata[\'default_string_values\'][0])\n')
+            elif persisted_data[data_name] == 'string':
+                template = string.Template(options.METADATA_INITER)
+                default = default + ('        self._' + data_name + 
+                    '_default = self._' + data_name + '_metadata[\'default_string_values\'][0]\n')
             elif (persisted_data[data_name] == 'osid.id.Id' and
                   not data_name in initialized_data):
                 template = string.Template(options.METADATA_INITER)
@@ -633,6 +665,10 @@ def make_metadata_initers(persisted_data, initialized_data):
                     '_default = self._' + data_name + '_metadata[\'default_object_values\'][0]\n')
             elif persisted_data[data_name] == 'osid.mapping.SpatialUnit':
                 pass # Put SpatialUnit initters here
+            elif persisted_data[data_name] == 'decimal':
+                template = string.Template(options.METADATA_INITER)
+                default = default + ('        self._' + data_name + 
+                    '_default = self._' + data_name + '_metadata[\'default_decimal_values\'][0]\n')
 
         if template:
             initer = (initer + template.substitute({'data_name': data_name}))
@@ -715,7 +751,7 @@ def make_method_impl(package_name, method, interface, patterns):
     from binder_helpers import camel_to_under, camel_to_mixed, under_to_mixed
     from binder_helpers import get_interface_module
     from binder_helpers import get_pkg_name
-    from binder_helpers import make_plural
+    from binder_helpers import make_plural, remove_plural
     impl = ''
     pattern = ''
     kwargs = {}
@@ -762,7 +798,11 @@ def make_method_impl(package_name, method, interface, patterns):
         kwargs['abcapp_name'] = abc_app_name(kwargs['package_name'])
         kwargs['abcpkg_name'] = abc_pkg_name(kwargs['package_name'])
         kwargs['interface_name_under'] = camel_to_under(kwargs['interface_name'])
+        kwargs['interface_name_dot'] = '.'.join(kwargs['interface_name_under'].split('_')[:-1])
         kwargs['package_name_caps'] = package_name.title()
+ 
+        if kwargs['interface_name_under'].endswith('_session'):
+            kwargs['session_shortname_dot'] = '.'.join(kwargs['interface_name_under'].split('_')[:-1])
         
         if 'arg0_type_full' in kwargs:
             kwargs['arg0_type'] = kwargs['arg0_type_full'].split('.')[-1].strip('[]')
@@ -813,6 +853,7 @@ def make_method_impl(package_name, method, interface, patterns):
             kwargs['return_app_name'] = app_name(kwargs['return_pkg'])
             kwargs['return_implpkg_name'] = pkg_name(kwargs['return_pkg'])
             kwargs['return_pkg_title'] = kwargs['return_pkg'].title()
+            kwargs['return_pkg_caps'] = kwargs['return_pkg'].upper()
         if 'object_name_under' in kwargs:
             kwargs['object_name_upper'] = kwargs['object_name_under'].upper()
             # Might want to add creating kwargs['object_name' from this as well]
@@ -825,8 +866,14 @@ def make_method_impl(package_name, method, interface, patterns):
             kwargs['var_name_mixed'] = under_to_mixed(kwargs['var_name'])
             kwargs['var_name_plural'] = make_plural(kwargs['var_name'])
             kwargs['var_name_plural_mixed'] = under_to_mixed(kwargs['var_name_plural'])
+            kwargs['var_name_singular'] = remove_plural(kwargs['var_name'])
+            kwargs['var_name_singular_mixed'] = under_to_mixed(kwargs['var_name_singular'])
         if 'return_type' in kwargs:
             kwargs['return_type_under'] = camel_to_under(kwargs['return_type'])
+        if 'return_type' in kwargs and kwargs['return_type'].endswith('List'):
+            kwargs['return_type_list_object'] = kwargs['return_type'][:-4]
+            kwargs['return_type_list_object_under'] = camel_to_under(kwargs['return_type_list_object'])
+            kwargs['return_type_list_object_plural_under'] = make_plural(kwargs['return_type_list_object_under'])
         if 'object_name' in kwargs and not 'object_name_under' in kwargs and not 'object_name_upper' in kwargs:
             kwargs['object_name_under'] = camel_to_under(kwargs['object_name'])
             kwargs['object_name_mixed'] = camel_to_mixed(kwargs['object_name'])
@@ -836,10 +883,22 @@ def make_method_impl(package_name, method, interface, patterns):
             kwargs['aggregated_object_name_mixed'] = camel_to_mixed(kwargs['aggregated_object_name'])
             kwargs['aggregated_objects_name_under'] = camel_to_under(make_plural(kwargs['aggregated_object_name']))
             kwargs['aggregated_objects_name_mixed'] = camel_to_mixed(make_plural(kwargs['aggregated_object_name']))
+        if 'source_name' in kwargs:
+            kwargs['source_name_mixed'] = under_to_mixed(kwargs['source_name'])
+        if 'destination_name' in kwargs:
+            kwargs['destination_name_mixed'] = under_to_mixed(kwargs['destination_name'])
         if 'cat_name' in kwargs:
             kwargs['cat_name_under'] = camel_to_under(kwargs['cat_name'])
             kwargs['cat_name_lower'] = kwargs['cat_name'].lower()
             kwargs['cat_name_mixed'] = camel_to_mixed(kwargs['cat_name'])
+            kwargs['cat_name_plural'] = make_plural(kwargs['cat_name'])
+            kwargs['cat_name_plural_under'] = camel_to_under(kwargs['cat_name_plural'])
+            kwargs['cat_name_plural_lower'] = kwargs['cat_name_plural'].lower()
+            kwargs['cat_name_plural_mixed'] = camel_to_mixed(kwargs['cat_name_plural'])
+        if 'return_cat_name' in kwargs:
+            kwargs['return_cat_name_under'] = camel_to_under(kwargs['return_cat_name'])
+            kwargs['return_cat_name_lower'] = kwargs['return_cat_name'].lower()
+            kwargs['return_cat_name_mixed'] = camel_to_mixed(kwargs['return_cat_name'])
         if 'Proxy' in kwargs['interface_name']:
             kwargs['non_proxy_interface_name'] = ''.join(kwargs['interface_name'].split('Proxy'))
         if ('return_pkg' in kwargs and 'return_module' in kwargs and
@@ -848,8 +907,7 @@ def make_method_impl(package_name, method, interface, patterns):
             kwargs['import_str'] = ''
         elif ('package_name' in kwargs and 'return_pkg' in kwargs and
               'return_type' in kwargs and 'return_module' in kwargs):
-            kwargs['import_str'] = ('        from ' +
-                                    kwargs['return_app_name'] + '.' +
+            kwargs['import_str'] = ('        from ..' +
                                     kwargs['return_implpkg_name'] + '.' +
                                     kwargs['return_module'] + ' import ' +
                                     kwargs['return_type'] + '\n')  ### WHY DO WE NEED import_str???

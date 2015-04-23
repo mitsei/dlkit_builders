@@ -9,6 +9,7 @@ from .osid import profile
 from ..abstract_osid.id.primitives import Id as abc_id
 from ..abstract_osid.osid import markers as abc_osid_markers
 from ..abstract_osid.calendaring import primitives as abc_calendaring_primitives
+from ..abstract_osid.mapping import primitives as abc_mapping_primitives
 from ..abstract_osid.type.primitives import Type as abc_type
 from ..abstract_osid.locale.primitives import DisplayText as abc_displaytext
 from ..abstract_osid.transport import objects as abc_transport_objects
@@ -219,7 +220,21 @@ class DataInputStream(abc_transport_objects.DataInputStream):
 
     def __init__(self, input_data):
         self._my_data = input_data
-        self._open = True
+
+    def __iter__(self):
+        for attr in dir(self):
+            if not attr.startswith('__'):
+                yield attr
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def __getattr__(self, name):
+        if not name.startswith('__'):
+            try:
+                return getattr(self._my_data, name)
+            except:
+                raise
 
     def at_end_of_stream(self):
         """Tests if the end of this stream has been reached.
@@ -259,7 +274,7 @@ class DataInputStream(abc_transport_objects.DataInputStream):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        if not self._open or self.at_end_of_stream():
+        if self._my_data.closed or self.at_end_of_stream():
             raise IllegalState()
         if n is not None:
             self._my_data.seek(n)
@@ -283,7 +298,7 @@ class DataInputStream(abc_transport_objects.DataInputStream):
         """
         if buf is None:
             raise NullArgument()
-        if not self._open or self.at_end_of_stream():
+        if self._my_data.closed or self.at_end_of_stream():
             raise IllegalState()
         initial_buf_len = len(buf)
         buf.append(self._my_data.read(size = n))
@@ -313,10 +328,10 @@ class DataInputStream(abc_transport_objects.DataInputStream):
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        if not self._open:
+        if self._my_data.closed:
             raise IllegalState()
         self._my_data.close()
-        self._open = False
+
 
 class DateTime(datetime.datetime, abc_calendaring_primitives.DateTime, OsidPrimitive):
     """The DateTime interface defines a date and/or time.
@@ -1210,6 +1225,72 @@ class Duration(datetime.timedelta, abc_calendaring_primitives.Duration, OsidPrim
 
         """
         raise Unimplemented()
+
+    uncertainty_plus = property(fget=get_uncertainty_plus)
+
+
+class RGBColorCoordinate(abc_mapping_primitives.Coordinate, OsidPrimitive):
+    """A coordinate represents a position."""
+
+    def __init__(self, hexstr=None, values=None,
+                       uncertainty_minus=None,
+                       uncertainty_plus=None):
+        if values is not None:
+            if not isinstance(values, list) or len(values) != 3:
+                raise InvalidArgument()
+            self._values = values
+        elif hexstr is not None:
+            if not isinstance(hexstr, str) or len(hexstr) != 6:
+                raise InvalidArgument()
+            try:
+                self._values = [int(hexstr[:-4], 16), int(hexstr[2:-2], 16), int(hexstr[4:], 16)]
+            except:
+                raise InvalidArgument(hexstr)
+        else:
+            raise NullArgument()
+        self._uncertainty_minus = uncertainty_minus
+        self._uncertainty_plus = uncertainty_plus
+
+    def __str__(self):
+        hexlist = []
+        for value in self._values:
+            hexstr = hex(value)[2:]
+            if len(hexstr) == 1:
+                hexstr = '0' + hexstr
+            hexlist.append(hexstr)
+        return ''.join(hexlist)
+
+    def get_coordinate_type(self):
+        return Type(identifier = 'rgb_color',
+                    authority = 'ODL.MIT.EDU',
+                    namespace = 'mapping.Coordinate',
+                    display_name = 'RGB Color Coordinate',
+                    display_label = 'RGB Color',
+                    description = 'Coordinate Type for an RGB Color',
+                    domain = 'mapping.Coordinate')
+
+    coordinate_type = property(fget=get_coordinate_type)
+
+    def get_dimensions(self):
+        return len(self._values)
+
+    dimensions = property(fget=get_dimensions)
+
+    def get_values(self):
+        return self._values
+
+    values = property(fget=get_values)
+
+    def defines_uncertainty(self):
+        return self._uncertainty_minus or self._uncertainty_plus
+
+    def get_uncertainty_minus(self):
+        return bool(self._uncertainty_minus)
+
+    uncertainty_minus = property(fget=get_uncertainty_minus)
+
+    def get_uncertainty_plus(self):
+        return bool(self._uncertainty_plus)
 
     uncertainty_plus = property(fget=get_uncertainty_plus)
 
