@@ -3,6 +3,8 @@ import time
 import os
 import json
 import string
+from .binder_helpers import *
+from .config import *
 from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
 from abcbinder_settings import MAINDOCINDENTSTR as main_doc_indent
 from abcbinder_settings import ENCODING as utf_code
@@ -33,6 +35,9 @@ def make_mdatum(file_name):
     read_file = open(file_name, 'r')
     package = json.load(read_file)
     read_file.close()
+
+    if package['name'] not in packages_to_implement:
+        return
     
     ##
     # Get the pattern map for this osid package.
@@ -88,6 +93,16 @@ default_genus_type = Type(**types.Genus().get_type_data('DEFAULT'))"""
     # The real work starts here.  Iterate through all interfaces to build 
     # all the model classes for this osid package.
     for interface in package['interfaces']:
+
+        ##
+        # Check to see if this interface is meant to be implemented.
+        if package['name'] != 'osid':
+            if flagged_for_implementation(interface, 
+                    sessions_to_implement, objects_to_implement, variants_to_implement):
+                pass
+            else:
+                continue
+
         if (interface['shortname'] in patterns['package_objects_caps'] or
             interface['shortname'] in patterns['package_relationships_caps'] or
             interface['shortname'] == 'OsidObject' or

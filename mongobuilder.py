@@ -1,8 +1,13 @@
-
 import time
 import os
 import json
 import string
+import datetime
+import importlib
+from importlib import import_module
+from .binder_helpers import *
+from .config import *
+from builders.mongoosid_templates import options
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
 from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
@@ -24,11 +29,13 @@ from mongobuilder_settings import PATTERN_DIR as pattern_dir
 from mongobuilder_settings import TEMPLATE_DIR as template_dir
 template_pkg = '.'.join(template_dir.split('/'))
 
-##
-# This is the entry point for making mongo-based python classes for
-# the osids. It processes all of the osid maps in the package maps
-# directory.
 def make_mongoosids(build_abc = False, re_index = False, re_map = False):
+    """
+    This is the entry point for making mongo-based osid impls.
+
+    It processes all of the osid maps in the package maps directory.
+    
+    """
     from abcbinder import make_abcosids
     if build_abc:
         make_abcosids(re_index, re_map)
@@ -45,18 +52,22 @@ def make_mongoosids(build_abc = False, re_index = False, re_map = False):
                           root_pkg + '/' + helper_file)
 
 
-##
-# This function expects a file containing a json representation of an
-# osid package that was prepared by the mapper.
 def make_mongoosid(file_name):
-    from binder_helpers import get_interface_module
+    """
+    make all the mongo osid impls for a particular package.
+    
+    Expects a file containing a json representation of an osid package that 
+    was prepared by the mapper.
+    """
 
     read_file = open(file_name, 'r')
     package = json.load(read_file)
     read_file.close()
+    
+    if package['name'] not in packages_to_implement:
+        return
+    print "--> Mongo Implement Package:", package['name']
 
-    importStr = ''
-    bodyStr = ''
     ##
     # The map structure for the modules to be created by this function.
     # Each module will get a body string that holds the class and method
@@ -119,7 +130,8 @@ def make_mongoosid(file_name):
                       package['name'] + ' version ' +
                       package['version'] + '\n\n'+
                       package['copyright'] + '\n\n' +
-                      package['license'] + '\n\n\"\"\"').encode('utf-8'))
+                      package['license'] + '\n\n\"\"\"').encode('utf-8') +
+                      '\n')
     write_file.close
     
     ##
@@ -130,9 +142,16 @@ def make_mongoosid(file_name):
                       package['title'] + '\n' +
                       package['name'] + ' version ' +
                       package['version'] + '\n\n'+
-                      package['summary'] + '\n\n\"\"\"').encode('utf-8'))
+                      package['summary'] + '\n\n\"\"\"').encode('utf-8') +
+                      '\n')
     write_file.close
-    
+
+    ##
+    # Initialize the module doc
+    for module in modules:
+        docstr = '\"\"\"Mongodb implementations of ' + package['name'] + ' ' + module + '.\"\"\"\n'
+        modules[module]['imports'].append(docstr)
+
     ##
     # Copy settings and types and other files from the tamplates into the
     # appropriate implementation directories
@@ -165,6 +184,16 @@ def make_mongoosid(file_name):
     # The real work starts here.  Iterate through all interfaces to build 
     # all the django classes for this osid package.
     for interface in package['interfaces']:
+
+        ##
+        # Check to see if this interface is meant to be implemented.
+        if package['name'] != 'osid':
+            if flagged_for_implementation(interface, 
+                    sessions_to_implement, objects_to_implement, variants_to_implement):
+                pass
+            else:
+                continue
+        
         ##
         # Seed the inheritance list with this interface's abc_osid
         inheritance = ['abc_' + abc_pkg_name(package['name']) + '_' +
@@ -251,7 +280,7 @@ def make_mongoosid(file_name):
         # attribute name 'additional_methods'
         if hasattr(impl_class, 'additional_methods'):
             additional_methods = additional_methods + getattr(impl_class, 'additional_methods')
-            print additional_methods
+            #print additional_methods
 
         ##
         # Note that the following re-assigns the inheritance variable from a 
@@ -313,7 +342,6 @@ def make_mongoosid(file_name):
 ##
 # Try loading hand-built implementations class for this interface
 def load_impl_class(package_name, interface_name):
-    import importlib
     impl_class = None
     try:
         impls = importlib.import_module(template_pkg + '.' + package_name)
@@ -325,7 +353,6 @@ def load_impl_class(package_name, interface_name):
     return impl_class
 
 def make_module_imports(interface_name, package, patterns):
-    import importlib
     if interface_name + '.init_pattern' in patterns:
         init_pattern = patterns[interface_name + '.init_pattern']
         try:
@@ -350,7 +377,6 @@ def make_module_imports(interface_name, package, patterns):
         return []
 
 def make_class_attributes(interface_name, package, patterns):
-    import importlib
     if interface_name + '.init_pattern' in patterns:
         init_pattern = patterns[interface_name + '.init_pattern']
         try:
@@ -375,7 +401,6 @@ def make_class_attributes(interface_name, package, patterns):
         return ''
 
 def make_additional_methods(interface_name, package, patterns):
-    import importlib
     if interface_name + '.init_pattern' in patterns:
         init_pattern = patterns[interface_name + '.init_pattern']
         try:
@@ -401,8 +426,6 @@ def make_additional_methods(interface_name, package, patterns):
 
 
 def make_init_methods(interface_name, package, patterns):
-    import importlib
-    from binder_helpers import camel_to_under, camel_to_mixed, make_plural
     templates = None
     init_pattern = ''
     instance_initers = ''
@@ -466,6 +489,11 @@ def make_init_methods(interface_name, package, patterns):
             pass
     elif init_pattern == 'resource.ResourceQuery':
         object_name = interface_name[:-5]
+    
+    #object_imports = []
+    #abject_import.append(patterns['package_objects_caps'])
+    #abject_import.append(patterns['package_relationships_caps'])
+    #for 
 
     if hasattr(templates, init_pattern.split('.')[-1]):
         template_class = getattr(templates, init_pattern.split('.')[-1])
@@ -511,7 +539,6 @@ def make_instance_initers(instance_data):
 # Assemble the initializers for persistance data managed by Osid Object Forms
 # initialized with the form.
 def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
-    from builders.binder_helpers import under_to_mixed, remove_plural
     initers = ''
     for data_name in persisted_data:
         if ((persisted_data[data_name] == 'osid.id.Id' or
@@ -613,7 +640,6 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 ##
 # Assemble the initializers for metadata managed by Osid Object Forms
 def make_metadata_initers(persisted_data, initialized_data, return_types):
-    from builders.mongoosid_templates import options
     imports = ''
     initer = ''
     default = ''
@@ -676,7 +702,6 @@ def make_metadata_initers(persisted_data, initialized_data, return_types):
 
 
 def make_methods(package_name, interface, patterns):
-    from .binder_helpers import fix_reserved_word
     body = []
     for method in interface['methods']:
         if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
@@ -747,11 +772,6 @@ def make_method(package_name, method, interface, patterns):
     return (method_sig + '\n' + method_doc + '\n' + method_impl)
     
 def make_method_impl(package_name, method, interface, patterns):
-    import importlib
-    from binder_helpers import camel_to_under, camel_to_mixed, under_to_mixed
-    from binder_helpers import get_interface_module
-    from binder_helpers import get_pkg_name
-    from binder_helpers import make_plural, remove_plural
     impl = ''
     pattern = ''
     kwargs = {}
@@ -917,7 +937,7 @@ def make_method_impl(package_name, method, interface, patterns):
 
         impl = template.substitute(kwargs).strip('\n')
     if impl == '':
-        impl = '        pass'
+        impl = '        raise Unimplemented()'
     else:
         if (interface['category'] in patterns['impl_log'] and
             interface['shortname'] in patterns['impl_log'][interface['category']]):
@@ -925,11 +945,7 @@ def make_method_impl(package_name, method, interface, patterns):
     return impl
         
 
-def make_profile_py(package):
-    import string
-    import datetime
-    from importlib import import_module
-    
+def make_profile_py(package):    
     osid_package = package['name']
 #    print ('.'.join(app_name(package['name']).split('/')[1:]) + '.' +
 #                                    pkg_name(package['name']) + '.profile', 'dlkit_project.builders')
@@ -970,16 +986,20 @@ SUPPORTS = [ # Uncomment the following lines when implementations exist:
     if not profile_interface:
         return ''
 
-    for m in profile_interface['methods']:
-        if (len(m['args']) == 0 and
-            m['name'].startswith('supports_')):
+    for method in profile_interface['methods']:
+        if (len(method['args']) == 0 and
+            method['name'].startswith('supports_')):
             ##
-            # Check to see if someone already activited support
-            if m['name'] in old_supports:
+            # Check to see if support flagged in builder config
+            if under_to_caps(method['name'])[8:] + 'Session' in sessions_to_implement:
                 comment = ''
-            else:
+            ##
+            # Check to see if someone activited support by hand
+            elif method['name'] in old_supports:
+                comment = ''
+            else: # Add check for session implementation flags here
                 comment = '#'
-            supports_str = supports_str + ',\n' + comment + '\'' + m['name'] +'\''
+            supports_str = supports_str + ',\n' + comment + '\'' + method['name'] +'\''
     supports_str = supports_str + '\n]'
 
     try:

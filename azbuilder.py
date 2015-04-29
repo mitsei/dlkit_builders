@@ -3,6 +3,7 @@ import time
 import os
 import json
 import string
+from .impl_list import packages_to_implement
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
 from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
@@ -34,6 +35,15 @@ def make_azosids(build_abc = False, re_index = False, re_map = False):
         if json_file.endswith('.json'):
             make_azosid(pkg_maps_dir + '/' + json_file)
 
+    ##
+    # Copy general config and primitive files, etc into the
+    # implementation root directory:
+    if os.path.exists('./' + template_dir + '/helpers'):
+        for helper_file in os.listdir('./' + template_dir + '/helpers'):
+            if helper_file.endswith('.py'):
+                os.system('cp ./' + template_dir + '/helpers/' + helper_file + ' ' +
+                          root_pkg + '/' + helper_file)
+
 ##
 # This function expects a file containing a json representation of an
 # osid package that was prepared by the mapper.
@@ -43,6 +53,9 @@ def make_azosid(file_name):
     read_file = open(file_name, 'r')
     package = json.load(read_file)
     read_file.close()
+    
+    if package['name'] not in packages_to_implement:
+        return
 
     importStr = ''
     bodyStr = ''
@@ -134,7 +147,16 @@ def make_azosid(file_name):
     write_file.close
     
     """
-    
+
+    ##
+    # Initialize the module doc
+    for module in modules:
+        docstr = '\"\"\"AuthZ Adapter implementations of ' + package['name'] + ' ' + module + '.\"\"\"\n'
+        modules[module]['imports'].append(docstr)
+        if package['name'] == 'osid':
+            pylintstr = '# pylint: disable=no-init\n# Numerous placeholder classes don\'t require __init__.'
+            modules[module]['imports'].append(pylintstr)
+
     ##
     # Copy settings and types and other files from the authz tamplates into the
     # appropriate implementation directories
@@ -219,12 +241,39 @@ def make_azosid(file_name):
                         inherit_category != 'UNKNOWN_MODULE'):
                         modules[interface['category']]['imports'].append(import_str)
 
-                    ##
-                    # Add the osid_error imports
-                    import_str = 'from ..osid.osid_errors import *'
-                    if (import_str not in modules[interface['category']]['imports'] and
-                        inherit_category != 'UNKNOWN_MODULE'):
-                        modules[interface['category']]['imports'].append(import_str)
+            if package['name'] == 'osid':
+                ##
+                # Add the osid_error import
+                import_str = 'from ..osid.osid_errors import Unimplemented'
+                if import_str not in modules[interface['category']]['imports']:
+                    modules[interface['category']]['imports'].append(import_str)
+            if interface['category'] == 'managers':
+                ##
+                # Add the osid_error import
+                import_str = 'from ..osid.osid_errors import Unimplemented'
+                if (import_str not in modules[interface['category']]['imports'] and
+                    inherit_category != 'UNKNOWN_MODULE'):
+                    modules[interface['category']]['imports'].append(import_str)
+                ##
+                # Add the session import
+                import_str = 'from . import sessions'
+                if (import_str not in modules[interface['category']]['imports'] and
+                    inherit_category != 'UNKNOWN_MODULE'):
+                    modules[interface['category']]['imports'].append(import_str)
+            if interface['category'] == 'sessions':
+                ##
+                # Add the primitive import
+                import_str = 'from ..primitives import Id'
+                if (import_str not in modules[interface['category']]['imports'] and
+                    inherit_category != 'UNKNOWN_MODULE'):
+                    modules[interface['category']]['imports'].append(import_str)
+                ##
+                # Add the osid_error import
+                import_str = 'from ..osid.osid_errors import PermissionDenied, NullArgument, Unimplemented'
+                if (import_str not in modules[interface['category']]['imports'] and
+                    inherit_category != 'UNKNOWN_MODULE'):
+                    modules[interface['category']]['imports'].append(import_str)
+
             ##
             # Note that the following re-assigns the inheritance variable from a 
             # list to a string.
@@ -245,6 +294,8 @@ def make_azosid(file_name):
                                         interface['doc']['body'] + '\n\n    \"\"\"')
             """
             
+            class_doc = '    \"\"\"Adapts underlying ' + interface['shortname'] + ' methods with authorization checks.\"\"\"'
+            
             class_sig = 'class ' + interface['shortname'] + inheritance + ':'
         
             init_methods = make_init_methods(interface['shortname'], package, patterns) 
@@ -257,7 +308,7 @@ def make_azosid(file_name):
             modules[interface['category']]['body'] = (
                               modules[interface['category']]['body'] + 
                               class_sig + '\n' +
-                              #class_doc + '\n' +
+                              class_doc + '\n' +
                               init_methods + '\n' +
                               methods + '\n\n\n')
     ##
@@ -525,7 +576,7 @@ def make_method_impl(package_name, method, interface_name, patterns):
         #print interface_name, method['name']
         impl = template.substitute(kwargs).strip('\n')
     if impl == '':
-        impl = '        pass'
+        impl = '        raise Unimplemented()'
     return impl
         
 

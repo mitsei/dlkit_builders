@@ -150,6 +150,9 @@ def interface_iterator(root):
 #                                                 'pkg_name': child.get(ns + 'interface').split('.')[-2]})
         if child.tag == (ns + 'description'):
             interface['doc'] = parse_docstring(process_text(child, '    '), '    ')
+            # Clean trailing whitespace issues:
+            body = interface['doc']['body']
+            interface['doc']['body'] = '\n\n'.join(body.split('\n    \n'))
         if child.tag == (ns + 'method'):
             interface['method_names'].append(camel_to_under(child.get(ns + 'name')))
             interface['methods'].append(method_iterator(child))
@@ -364,7 +367,7 @@ def make_compliance_doc(root):
             compStr = compStr + process_text(child, '', '', width = 200) + '*'
     return wrap_and_indent(compStr.strip(),
                            '        ',
-                           '        ', width = 200) + '\n'
+                           '        ', width = 72) + '\n'
 
 ##
 # Iterate through the method tree and return the documentation string

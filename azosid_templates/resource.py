@@ -2,6 +2,12 @@
 
 class ResourceProfile:
 
+    init_template = """
+    def __init__(self, provider_manager, authz_session):
+        self._provider_manager = provider_manager
+        self._authz_session = authz_session
+"""    
+
     supports_visible_federation_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceProfile.supports_visible_federation
@@ -27,30 +33,34 @@ class ResourceManager:
         authz_module = importlib.import_module(settings.AUTHZ_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
         Provider${interface_name} = getattr(provider_module, '${interface_name}')
         authz_manager = getattr(authz_module, 'AuthorizationManager')
-        self._provider_manager = Provider${interface_name}()
-        self._authz_session = authz_manager().get_authorization_session()
+        #self._provider_manager = Provider${interface_name}()
+        #self._authz_session = authz_manager().get_authorization_session()
+        ${object_name}Profile.__init__(Provider${interface_name}(), authz_manager().get_authorization_session())
         self._my_runtime = None
 
     def initialize(self, runtime):
-        from ..primitives import Id
         osid_managers.OsidManager.initialize(self, runtime)
         config = self._my_runtime.get_configuration()
         parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl) # need to add version argument
+        self._provider_manager = runtime.get_manager(
+            '${pkg_name_upper}',
+            provider_impl) # need to add version argument
 """    
 
     get_resource_lookup_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_template
-        from ${return_module} import ${return_type}
-        return ${return_type}(self._provider_manager.${method_name}(), self._authz_session)"""
+        return sessions.${return_type}(
+            self._provider_manager.${method_name}(),
+            self._authz_session)"""
 
     get_resource_lookup_session_for_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
-        from ${return_module} import ${return_type}
-        return ${return_type}(self._provider_manager.${method_name}(${arg0_name}), self._authz_session)"""
+        return sessions.${return_type}(
+            self._provider_manager.${method_name}(${arg0_name}),
+            self._authz_session)"""
 
 
 class ResourceProxyManager:
@@ -63,37 +73,42 @@ class ResourceProxyManager:
         authz_module = importlib.import_module(settings.AUTHZ_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
         Provider${interface_name} = getattr(provider_module, '${interface_name}')
         authz_manager = getattr(authz_module, 'AuthorizationManager')
-        self._provider_manager = Provider${interface_name}()
-        self._authz_session = authz_manager().get_authorization_session()
+        #self._provider_manager = Provider${interface_name}()
+        #self._authz_session = authz_manager().get_authorization_session()
+        ${object_name}Profile.__init__(Provider${interface_name}(), authz_manager().get_authorization_session())
         self._my_runtime = None
 
     def initialize(self, runtime):
-        from ..primitives import Id
         osid_managers.OsidProxyManager.initialize(self, runtime)
         config = self._my_runtime.get_configuration()
         parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl) # need to add version argument
+        self._provider_manager = runtime.get_proxy_manager(
+            '${pkg_name_upper}',
+            provider_impl) # need to add version argument
 """
 
     get_resource_lookup_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_template
-        from ${return_module} import ${return_type}
-        return ${return_type}(self._provider_manager.${method_name}(proxy), self._authz_session, proxy)"""
+        return sessions.${return_type}(
+            self._provider_manager.${method_name}(proxy),
+            self._authz_session,
+            proxy)"""
 
     get_resource_lookup_session_for_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
-        from ${return_module} import ${return_type}
-        return ${return_type}(self._provider_manager.${method_name}(${arg0_name}, proxy), self._authz_session, proxy)"""
+        return sessions.${return_type}(
+            self._provider_manager.${method_name}(${arg0_name}, proxy),
+            self._authz_session,
+            proxy)"""
 
 
 class ResourceLookupSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy = None):
-        from ..osid import sessions as osid_sessions
+    def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name}.${object_name}'
@@ -188,8 +203,7 @@ class ResourceLookupSession:
 class ResourceQuerySession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy = None):
-        from ..osid import sessions as osid_sessions
+    def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name}.${object_name}'
@@ -219,8 +233,7 @@ class ResourceQuerySession:
 class ResourceAdminSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy = None):
-        from ..osid import sessions as osid_sessions
+    def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name}.${object_name}'
@@ -235,7 +248,6 @@ class ResourceAdminSession:
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.can_create_resource_with_record_types_template
         # This would like to be a real implementation someday:
-        from ..osid.osid_errors import NullArgument, PermissionDenied
         if ${arg0_name} == None:
             raise NullArgument() # Just 'cause the spec says to :)
         else:
@@ -292,9 +304,7 @@ class ResourceAdminSession:
 class BinLookupSession:
     
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy = None):
-        from ..osid import sessions as osid_sessions
-        from ..primitives import Id
+    def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
         self._id_namespace = '${pkg_name}.${cat_name}'
@@ -337,9 +347,7 @@ class BinLookupSession:
 class BinAdminSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy = None):
-        from ..osid import sessions as osid_sessions
-        from ..primitives import Id
+    def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
         self._id_namespace = '${pkg_name}.${cat_name}'
@@ -354,7 +362,6 @@ class BinAdminSession:
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.can_create_bin_with_record_types_template
         # This would like to be a real implementation someday:
-        from ..osid.osid_errors import NullArgument, PermissionDenied
         if ${arg0_name} == None:
             raise NullArgument() # Just 'cause the spec says to :)
         else:
@@ -411,9 +418,7 @@ class BinAdminSession:
 class BinHierarchySession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy = None):
-        from ..osid import sessions as osid_sessions
-        from ..primitives import Id
+    def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
         self._id_namespace = '${pkg_name}.${cat_name}'
@@ -539,7 +544,11 @@ class BinHierarchySession:
         if not self._can('access'):
             raise PermissionDenied()
         else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name}, ${arg2_name}, ${arg3_name})"""
+            return self._provider_session.${method_name}(
+                ${arg0_name},
+                ${arg1_name},
+                ${arg2_name},
+                ${arg3_name})"""
 
     get_bin_nodes_template = """
         # Implemented from azosid template for -
@@ -547,15 +556,17 @@ class BinHierarchySession:
         if not self._can('access'):
             raise PermissionDenied()
         else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name}, ${arg2_name}, ${arg3_name})"""
+            return self._provider_session.${method_name}(
+                ${arg0_name},
+                ${arg1_name},
+                ${arg2_name},
+                ${arg3_name})"""
 
 
 class BinHierarchyDesignSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy = None):
-        from ..osid import sessions as osid_sessions
-        from ..primitives import Id
+    def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
         self._id_namespace = '${pkg_name}.${cat_name}'

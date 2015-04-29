@@ -1,18 +1,21 @@
 
+from .error_lists import session_errors
+
 class LoggingSession:
 
     import_statements = [
         'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import ' + session_errors,
+        'from . import objects'
         'from ..osid.sessions import OsidSession'
         ]
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
-        self._catalog_class = LogBook
+        self._catalog_class = objects.LogBook
         self._session_name = 'LoggingSession'
         self._catalog_name = 'LogBook'
-        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='logging', cat_name='LogBook', cat_class=LogBook)
+        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='logging', cat_name='LogBook', cat_class=objects.LogBook)
         self._forms = dict()
         lm = self._get_provider_manager('LOGGING')
         self._leas = lm.get_log_entry_admin_session_for_log_book(self._catalog_id)

@@ -19,6 +19,8 @@ from abcbinder_settings import ENCODING as utf_code
 from djbuilder_settings import APPNAMEPREFIX as app_prefix
 from djbuilder_settings import APPNAMESUFFIX as app_suffix
 
+include_inheritance = False
+
 ##
 # This is the entry point for making the Python abstact base classes for
 # the osids. It processes all of the osids in the xosid directory, making
@@ -51,7 +53,7 @@ def make_abcosid(file_name):
     read_file = open(file_name, 'r')
     package = json.load(read_file)
     read_file.close()
-
+    
     importStr = 'import abc\n'
     bodyStr = ''
     ##
@@ -112,7 +114,8 @@ def make_abcosid(file_name):
                       package['name'] + ' version ' +
                       package['version'] + '\n\n'+
                       package['copyright'] + '\n\n' +
-                      package['license'] + '\n\n\"\"\"').encode('utf-8'))
+                      package['license'] + '\n\n\"\"\"').encode('utf-8') +
+                      '\n')
     write_file.close
 
     ##
@@ -123,12 +126,19 @@ def make_abcosid(file_name):
                       package['title'] + '\n' +
                       package['name'] + ' version ' +
                       package['version'] + '\n\n'+
-                      package['summary'] + '\n\n\"\"\"').encode('utf-8'))
+                      package['summary'] + '\n\n\"\"\"').encode('utf-8') +
+                      '\n')
     write_file.close
 
     ##
-    # Initialize the abc import string for each module
+    # Initialize the module doc and abc import string for each module
     for module in modules:
+        docstr = ('\"\"\"Implementations of ' + package['name'] + 
+            ' abstract base class ' + module + '.\"\"\"\n' +
+            '# pylint: disable=invalid-name,no-init\n' + 
+            '# Method names comply to OSID specification.\n' +
+            '# Abstract classes do not define __init__.')
+        modules[module]['imports'].append(docstr)
         modules[module]['imports'].append('import abc')
 
     ##
@@ -149,6 +159,8 @@ def make_abcosid(file_name):
         # list for this interface. Also, check if an import statement is
         # required and append to the appropriate module's import list.
         for i in interface['inheritance']:
+            if not include_inheritance:
+                break
             unknown_module_protection = ''
             inherit_category = get_interface_module(i['pkg_name'], i['name'], True)
             if inherit_category == 'UNKNOWN_MODULE':
@@ -366,15 +378,18 @@ def eq_methods(interface_name):
 def str_methods():
     return (
 """    def __str__(self):
+        \"\"\"Provides serialized version of Id\"\"\"
         return self._escape(self._escape(self.get_identifier_namespace()) + ':' +
                             self._escape(self.get_identifier()) + '@' +
                             self._escape(self.get_authority()))
 
-    def _escape(self, s):
-        return (s.replace("%", "%25").replace(":", "%3A").replace("@", "%40"))
+    def _escape(self, string):
+        \"\"\"Private method for escaping : and @\"\"\"
+        return string.replace("%", "%25").replace(":", "%3A").replace("@", "%40")
 
-    def _unescape(self, s):
-        return (s.replace("%40", "@").replace("%3A", ":").replace("%25", "%"))
+    def _unescape(self, string):
+        \"\"\"Private method for un-escaping : and @\"\"\"
+        return string.replace("%40", "@").replace("%3A", ":").replace("%25", "%")
 
 """)
 

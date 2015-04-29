@@ -1,8 +1,9 @@
 METADATA_INITER = """
         self._${data_name}_metadata = {
-        'element_id': Id(self._authority,
-                         self._namespace,
-                        '${data_name}')}
+            'element_id': Id(
+                self._authority,
+                self._namespace,
+                '${data_name}')}
         self._${data_name}_metadata.update(mdata_conf.${data_name})"""
              
 ID_METADATA ="""

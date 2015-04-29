@@ -18,13 +18,17 @@ def get_return_type(root):
                     returnType = grandChild.get(ns + 'type')           
     return returnType
 
-##
-# This function takes an element tree method root and iterates through any 
-# parameter names that are defined, beginning with the ubiquitous 'self', and 
-# returns a list.  It may want to be extended in the future to return a list
-# of dicts that also include the osid type of the parameter, but so far that
-# has not been necessary.  In fact so far I haven't even used this.
 def get_param_list(root):
+    """
+    Gets parameters from method roots.
+    
+    This function takes an element tree method root and iterates through any 
+    parameter names that are defined, beginning with the ubiquitous 'self', and 
+    returns a list.  It may want to be extended in the future to return a list
+    of dicts that also include the osid type of the parameter, but so far that
+    has not been necessary.  In fact so far I haven't even used this.
+    
+    """
     paramList = ['self']
     for child in root:
         if child.tag == (ns + 'parameter'):
@@ -33,20 +37,23 @@ def get_param_list(root):
             paramList.append(param)
     return paramList
 
-##
-# reindents a block of text to the new without re-wrapping
 def reindent(text, iIndent):
+    """ Reindents a block of text to the new without re-wrapping"""
     text = text.split('\n')
     retStr = ''
     for line in text:
         retStr = retStr + iIndent + line + '\n'
     return retStr
 
-##
-# Wraps and indents a block of text given initial and subsequent indent
-# strings and a max width.  Will also strip any leading or trailing spaces
-# and lines (I believe, need to check this)
 def wrap_and_indent(text, iIndent = '', sIndent = None, width = 72):
+    """
+    Wraps and indents with initial, subsequent strings and max width.
+    
+    Wraps and indents a block of text given initial and subsequent indent
+    strings and a max width.  Will also strip any leading or trailing spaces
+    and lines (I believe, need to check this)
+    
+    """
     import textwrap
     if not sIndent:
         sIndent = iIndent
@@ -57,12 +64,16 @@ def wrap_and_indent(text, iIndent = '', sIndent = None, width = 72):
     wrapper.drop_whitespace = True
     return wrapper.fill(textwrap.dedent(text.strip()))
 
-##
-# In particular the term 'type' is used in the osid spec, primarily as an argument
-# parameter where a type is provided to a method.  'type' is a reserved word
-# in python, so we give ours a trailing underscore. If we come across any other 
-# osid things that are reserved word they can be dealt with here.
 def fix_reserved_word(word):
+    """
+    Replaces words that may be problematic
+    
+    In particular the term 'type' is used in the osid spec, primarily as an argument
+    parameter where a type is provided to a method.  'type' is a reserved word
+    in python, so we give ours a trailing underscore. If we come across any other 
+    osid things that are reserved word they can be dealt with here.
+    
+    """
     import keyword
     if word == 'logging':
         word = 'logging' # Still deciding this
@@ -82,13 +93,20 @@ def camel_to_list(string):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', string).split('_')
 
 def camel_to_mixed(string):
+    """ CamelCase to mixedCase. """
     words = camel_to_list(string)
     words[0] = words[0].lower()
     return ''.join(words)
 
 def under_to_mixed(string):
+    """ underscore_delimited to mixedCase. """
     words = string.title().split('_')
     words[0] = words[0].lower()
+    return ''.join(words)
+
+def under_to_caps(string):
+    """ underscore_delimited to CapsCase. """
+    words = string.title().split('_')
     return ''.join(words)
 
 ##
@@ -137,7 +155,10 @@ _singular_to_plural = {
     'AssessmentTaken': 'AssessmentsTaken',
     'Hierarchy': 'Hierarchies',
     'hierarchy': 'hierarchies',
+    'Query': 'Queries',
+    'query': 'queries',
 }
+
 _plural_to_singular = {v: k for k, v in _singular_to_plural.items()}
 
 def make_plural(string):
@@ -288,5 +309,27 @@ def get_cat_name_for_pkg(return_pkg):
             return interface['shortname']
     return 'NoCatalog'
 
-
-                    
+def flagged_for_implementation(interface,
+        sessions_to_implement, objects_to_implement, variants_to_implement):
+    """
+    Check if this interface is meant to be implemented.
+    
+    """
+    #print "    Checking:", interface['shortname']
+    test = False
+    if interface['category'] == 'managers':
+        test = True
+    elif (interface['category'] == 'sessions' and 
+            interface['shortname'] in sessions_to_implement):
+        #print "        Implement session:", interface['shortname']
+        test = True
+    elif interface['shortname'] in objects_to_implement:
+        #print "        Implement", interface['category'] + ":", interface['shortname']
+        test = True
+    else:
+        for variant in variants_to_implement:
+            if (interface['shortname'].endswith(variant) and
+                    interface['shortname'][:-len(variant)] in objects_to_implement):
+                #print "        Implement", interface['category'] + ":", interface['shortname']
+                test = True
+    return test

@@ -1,10 +1,12 @@
 
+from error_lists import session_errors
+
 class ObjectiveRequisiteSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import *',
-        'from ..primitives import *',
-        'from .objects import *'
+        'from ..osid.osid_errors import ' + session_errors,
+        'from ..primitives import Id',
+        'from . import objects',
         'from .. import mongo_client',
         'from . import types',
         'from bson.objectid import ObjectId',
@@ -13,7 +15,7 @@ class ObjectiveRequisiteSession:
     ]
 
     get_requisite_objectives_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.learning.ObjectiveRequisiteSession.get_requisite_objectives_template
         # NOTE: This implementation currently ignores plenary view
         pass
@@ -21,7 +23,6 @@ class ObjectiveRequisiteSession:
         requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
         result = collection.find({'$$and': {'sourceId': str(objective_id)}, 'genusType': str(requisite_type)},
                                   {'destinationId': 1, '_id': 0})
-
         catalog_id_list = []
         for i in ${arg0_name}:
             catalog_id_list.append(ObjectId(i.get_identifier()))
@@ -30,14 +31,14 @@ class ObjectiveRequisiteSession:
         result = collection.find({'_id': {'$$in': catalog_id_list}})
         count = collection.find({'_id': {'$$in': catalog_id_list}}).count()
         mongo_client.close()
-        return ${return_type}(result, count)"""
+        return objects.${return_type}(result, count)"""
 
 
 class ObjectiveRequisiteAssignmentSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import *',
-        'from ..primitives import *',
+        'from ..osid.osid_errors import ' + session_errors,
+        'from ..primitives import Id',
         'from .. import mongo_client',
     ]
 
@@ -72,13 +73,13 @@ class ObjectiveRequisiteAssignmentSession:
 class ObjectiveAdminSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import *',
-        'from ..primitives import *',
+        'from ..osid.osid_errors import ' + session_errors,
+        'from ..primitives import Id',
         'from .. import mongo_client',
     ]
 
     delete_objective_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.learning.ObjectiveAdminSession.delete_activity_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         if ${arg0_name} is None:
@@ -100,37 +101,40 @@ class ObjectiveAdminSession:
 class ActivityLookupSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import *',
-        'from ..primitives import *',
-        'from .objects import *',
-        'from .. import mongo_client'
+        'from ..osid.osid_errors import ' + session_errors,
+        'from ..primitives import Id',
+        'from . import objects',
+        'from .. import mongo_client',
     ]
 
     get_activities_for_objective_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.learning.ActivityLookupSession.get_activities_for_objective_template
         # NOTE: This implementation currently ignores plenary view
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if self._catalog_view == ISOLATED:
             result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)})
+                                      '${cat_name_mixed}Id': str(self._catalog_id)})
             count = collection.find({'${arg0_object_mixed}Id': str(${arg0_name}),
                                      '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})})
             count = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})}).count()
         mongo_client.close()
-        return ${return_type}(result, count=count, runtime=self._runtime)"""
+        return objects.${return_type}(result, count=count, runtime=self._runtime)"""
 
 
 class ActivityAdminSession:
 
     import_statements_pattern = [
-        'from .objects import *'
+        'from ..osid.osid_errors import ' + session_errors,
+        'from ..primitives import Id',
+        'from . import objects',
+        'from .. import mongo_client',
     ]
 
     get_activity_form_for_create_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.learning.ActivityAdminSession.get_activity_form_for_create_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
@@ -143,9 +147,20 @@ class ActivityAdminSession:
                 raise InvalidArgument('one or more argument array elements is not a valid OSID ${arg1_type}')
         if ${arg1_name} == []:
             ## WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
-            obj_form = ${return_type}(${cat_name_under}_id = self._catalog_id, ${arg0_name} = ${arg0_name}, catalog_id = self._catalog_id, db_prefix=self._db_prefix, runtime=self._runtime)
+            obj_form = objects.${return_type}(
+                ${cat_name_under}_id=self._catalog_id,
+                ${arg0_name}=${arg0_name},
+                catalog_id=self._catalog_id,
+                db_prefix=self._db_prefix,
+                runtime=self._runtime)
         else:
-            obj_form = ${return_type}(${cat_name_under}_id = self._catalog_id, record_types = ${arg1_name}, ${arg0_name} = ${arg0_name}, catalog_id = self._catalog_id, db_prefix=self._db_prefix, runtime=self._runtime)
+            obj_form = objects.${return_type}(
+                ${cat_name_under}_id=self._catalog_id,
+                record_types=${arg1_name},
+                ${arg0_name}=${arg0_name},
+                catalog_id=self._catalog_id,
+                db_prefix=self._db_prefix,
+                runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
@@ -154,8 +169,9 @@ class ActivityAdminSession:
 class Activity:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import *',
-        'from ..primitives import *',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import Id',
+        'from ..id.objects import IdList',
     ]
 
     get_objective_id_template = """
@@ -231,7 +247,7 @@ class ActivityForm:
     clear_assets_template = """
         # Implemented from template for osid.learning.ActivityForm.clear_assets_template
         if (self.get_${var_name}_metadata().is_read_only() or
-            self.get_${var_name}_metadata().is_required()):
+                self.get_${var_name}_metadata().is_required()):
             raise NoAccess()
         self._my_map['${var_name_singular_mixed}Ids'] = self._${var_name}_default"""
 

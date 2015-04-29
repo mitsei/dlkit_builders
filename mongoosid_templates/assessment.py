@@ -1,4 +1,6 @@
 
+from .error_lists import session_errors
+
 class AssessmentManager:
 
     import_statements = [
@@ -56,10 +58,10 @@ class AssessmentSession:
 
     import_statements = [
         'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import ' + session_errors,
         'from bson.objectid import ObjectId',
         'from .. import mongo_client',
-        'from .objects import *',
+        'from . import objects',
         'from .rules import Response',
         'from ..osid.sessions import OsidSession'
         ]
@@ -67,10 +69,10 @@ class AssessmentSession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         #from ..osid.sessions import OsidSession
-        self._catalog_class = Bank
+        self._catalog_class = objects.Bank
         self._session_name = 'AssessmentSession'
         self._catalog_name = 'Bank'
-        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='assessment', cat_name='Bank', cat_class=Bank)
+        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='assessment', cat_name='Bank', cat_class=objects.Bank)
         self._forms = dict()
 """
 
@@ -172,7 +174,7 @@ class AssessmentSession:
             'assessmentTakenId': str(assessment_taken_id)
             }
         mongo_client.close()
-        return AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     has_next_assessment_section = """
         # For now we are only working only with 'sectionless' assessments
@@ -214,11 +216,11 @@ class AssessmentSession:
             'bankId': str(self.get_bank_id()),
             'assessmentTakenId': str(assessment_taken.get_id())
             }
-        return AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_assessment_sections = """
         # This currently assumes that there is only one section:
-        return AssessmentSectionList([self.get_first_assessment_section(assessment_taken_id)], db_prefix=self._db_prefix, runtime=self._runtime)
+        return objects.AssessmentSectionList([self.get_first_assessment_section(assessment_taken_id)], db_prefix=self._db_prefix, runtime=self._runtime)
 
     def _get_assessment_taken(self, assessment_taken_id):
         ##
@@ -238,9 +240,9 @@ class AssessmentSession:
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         # Is this right?  How do we define complete?
         if assessment_taken.has_ended():
-            return AssessmentSectionList([], db_prefix=self._db_prefix, runtime=self._runtime)
+            return objects.AssessmentSectionList([], db_prefix=self._db_prefix, runtime=self._runtime)
         else:
-            return AssessmentSectionList([self.get_assessment_section(assessment_taken_id)], db_prefix=self._db_prefix, runtime=self._runtime)"""
+            return objects.AssessmentSectionList([self.get_assessment_section(assessment_taken_id)], db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     has_assessment_section_begun = """
         return self._get_assessment_taken(assessment_section_id).has_started()"""
@@ -319,7 +321,7 @@ class AssessmentSession:
         if item_map is None:
             raise NotFound()
         mongo_client.close()
-        return Question(item_map['question'], db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.Question(item_map['question'], db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or 
@@ -331,7 +333,7 @@ class AssessmentSession:
         questions = []
         for item_idstr in item_ids:
             questions.append(self._get_question(item_idstr))
-        return QuestionList(questions, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.QuestionList(questions, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_response_form = """
         from ...abstract_osid.id.primitives import Id as ABCId
@@ -361,7 +363,7 @@ class AssessmentSession:
                 answer_record_types.append(Type(**record_type_data_sets[identifier]))
         # Thus endith the hack.
         ##
-        obj_form = AnswerForm(bank_id = self._catalog_id, record_types = answer_record_types, item_id = item_id, catalog_id = self._catalog_id, assessment_section_id = assessment_section_id, db_prefix=self._db_prefix, runtime=self._runtime)
+        obj_form = objects.AnswerForm(bank_id = self._catalog_id, record_types = answer_record_types, item_id = item_id, catalog_id = self._catalog_id, assessment_section_id = assessment_section_id, db_prefix=self._db_prefix, runtime=self._runtime)
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         mongo_client.close()
@@ -431,7 +433,7 @@ class AssessmentSession:
         for item_idstr in item_ids:
             if responses[Id(item_idstr).get_identifier()] is None:
                 question_list.append(self._get_question(item_idstr))
-        return QuestionList(question_list, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.QuestionList(question_list, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     has_unanswered_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or 
@@ -524,7 +526,7 @@ class AssessmentSession:
             raise IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         if item_id.get_identifier() in responses and responses[item_id.get_identifier()] is not None:
-            return Response(Answer(responses[item_id.get_identifier()], db_prefix=self._db_prefix, runtime=self._runtime))
+            return Response(objects.Answer(responses[item_id.get_identifier()], db_prefix=self._db_prefix, runtime=self._runtime))
         else:
             raise NotFound()"""
 
@@ -536,7 +538,7 @@ class AssessmentSession:
         answer_list = []
         for item_idstr in responses:
             if responses[item_idstr] is not None:
-                answer_list.append(Answer(responses[Id(item_idstr).get_identifier()], db_prefix=self._db_prefix, runtime=self._runtime))
+                answer_list.append(objects.Answer(responses[Id(item_idstr).get_identifier()], db_prefix=self._db_prefix, runtime=self._runtime))
         return ResponseList(answer_list)"""
 
     clear_response = """
@@ -598,7 +600,7 @@ class AssessmentSession:
             item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
             if item_map is None:
                 raise NotFound()
-            return AnswerList(item_map['answers'], db_prefix=self._db_prefix, runtime=self._runtime)
+            return objects.AnswerList(item_map['answers'], db_prefix=self._db_prefix, runtime=self._runtime)
         else:
             raise IllegalState()
         mongo_client.close()"""
@@ -608,7 +610,7 @@ class ItemAdminSession:
 
     import_statements = [
         'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import ' + session_errors,
         'from .. import mongo_client',
         'from bson.objectid import ObjectId',
         'UPDATED = True',
@@ -632,7 +634,7 @@ class ItemAdminSession:
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         if item_map is None:
             raise NotFound()
-        Item(item_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        objects.Item(item_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
         result = collection.remove({'_id': ObjectId(item_id.get_identifier())}, justOne=True)
         if 'err' in result and result['err'] is not None:
             raise OperationFailed()
@@ -679,7 +681,7 @@ class ItemAdminSession:
         self._forms[question_form.get_id().get_identifier()] = CREATED
         from .objects import Question
         mongo_client.close()
-        return Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_question_form_for_update = """
         from ...abstract_osid.id.primitives import Id as ABCId
@@ -692,7 +694,7 @@ class ItemAdminSession:
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
         if document is None:
             raise NotFound()
-        obj_form = QuestionForm(document['question'], self._db_prefix, runtime=self._runtime)
+        obj_form = objects.QuestionForm(document['question'], self._db_prefix, runtime=self._runtime)
         #obj_form._for_update = True # This seems redundant
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         mongo_client.close()
@@ -727,14 +729,14 @@ class ItemAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         from .objects import Question
         mongo_client.close()
-        return Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
 class AssessmentAdminSession:
 
     import_statements = [
         'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import ' + session_errors,
         'from .. import mongo_client',
         'from bson.objectid import ObjectId',
         'UPDATED = True',
@@ -763,15 +765,15 @@ class AssessmentTakenLookupSession:
 
     import_statements = [
         'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import ' + session_errors,
         'from .. import mongo_client',
+        'from . import objects',
         ]
 
     # This is hand built, but there may be a pattern to try to map, specifically
     # getting objects for another package object and a persisted id thingy
     get_assessments_taken_for_taker_and_assessment_offered = """
         # NOTE: This implementation currently ignores plenary view
-        from .objects import AssessmentTakenList
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
         if self._catalog_view == ISOLATED:
             result = collection.find({'assessmentOfferedId': str(assessment_offered_id),
@@ -786,10 +788,9 @@ class AssessmentTakenLookupSession:
             count = collection.find({'assessmentOfferedId': str(assessment_offered_id),
                                      'takingAgentId': str(resource_id)}).count()
         mongo_client.close()
-        return AssessmentTakenList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.AssessmentTakenList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_assessments_taken_for_assessment = """
-        from .objects import AssessmentOfferedList, AssessmentTakenList
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentOffered']
         if self._catalog_view == ISOLATED:
             result = collection.find({'assessmentId': str(assessment_id),
@@ -799,7 +800,7 @@ class AssessmentTakenLookupSession:
         else:
             result = collection.find({'assessmentId': str(assessment_id)}).sort('_id', DESCENDING)
             count = collection.find({'assessmentId': str(assessment_id)}).count()
-        assessments_offered = AssessmentOfferedList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)
+        assessments_offered = objects.AssessmentOfferedList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)
 
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
         ao_ids = []
@@ -815,12 +816,12 @@ class AssessmentTakenLookupSession:
             result = collection.find({'assessmentOfferedId': {"$in":[ao_ids]}}).sort('_id', DESCENDING)
             count = collection.find({'assessmentOfferedId': {"$in":[ao_ids]}}).count()
         mongo_client.close()
-        return AssessmentTakenList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.AssessmentTakenList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class AssessmentOfferedAdminSession:
 
     deprecated_import_statements = [
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import ' + session_errors,
         'from .. import mongo_client',
         'UPDATED = True',
         'CREATED = True',
@@ -848,13 +849,13 @@ class AssessmentOfferedAdminSession:
         ##
         if assessment_offered_record_types == []:
             ## WHY are we passing bank_id = self._catalog_id below, seems redundant:
-            obj_form = AssessmentOfferedForm(
+            obj_form = objects.AssessmentOfferedForm(
                 bank_id = self._catalog_id, 
                 assessment_id = assessment_id, 
                 catalog_id = self._catalog_id,
                 default_display_name = assessment_map['displayName']['text'], db_prefix=self._db_prefix, runtime=self._runtime)
         else:
-            obj_form = AssessmentOfferedForm(
+            obj_form = objects.AssessmentOfferedForm(
                 bank_id = self._catalog_id, 
                 record_types = assessment_offered_record_types, 
                 assessment_id = assessment_id, 
@@ -868,7 +869,7 @@ class AssessmentOfferedAdminSession:
 class AssessmentTakenAdminSession:
 
     deprecated_import_statements = [
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import ' + session_errors,
         'from .. import mongo_client',
         'UPDATED = True',
         'CREATED = True',
@@ -920,27 +921,26 @@ class AssessmentTakenAdminSession:
             raise OperationFailed()
         self._forms[assessment_taken_form.get_id().get_identifier()] = CREATED
         mongo_client.close()
-        return AssessmentTaken(collection.find_one({'_id': id_}), db_prefix=self._db_prefix, runtime=self._runtime)
+        return objects.AssessmentTaken(collection.find_one({'_id': id_}), db_prefix=self._db_prefix, runtime=self._runtime)
 """
 
 class AssessmentBasicAuthoringSession:
 
     import_statements = [
         'from bson.objectid import ObjectId',
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import ' + session_errors,
         'from ..primitives import *',
-        'from .objects import ItemList',
+        'from . import objects',
         'from .. import mongo_client',
+        'from ..osid.sessions import OsidSession',
     ]
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
-        from .objects import Bank
-        from ..osid.sessions import OsidSession
-        self._catalog_class = Bank
+        self._catalog_class = objects.Bank
         self._session_name = 'AssessmentSession'
         self._catalog_name = 'Bank'
-        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='assessment', cat_name='Bank', cat_class=Bank)
+        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='assessment', cat_name='Bank', cat_class=objects.Bank)
         self._forms = dict()
 """
 
@@ -998,7 +998,7 @@ class AssessmentBasicAuthoringSession:
         for i in assessment['itemIds']:
             item_list.append(collection.find_one({'_id': ObjectId(Id(i).get_identifier())}))
         mongo_client.close()
-        return ItemList(item_list, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.ItemList(item_list, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     add_item = """
         if assessment_id is None or item_id is None:

@@ -130,13 +130,14 @@ class OsidSession:
 
     def _can(self, func_name):
         from ..primitives import Id
-        function_id = Id(identifier = func_name,
-                         namespace = self._id_namespace,
-                         authority = 'birdland.mit.edu')
+        function_id = Id(
+            identifier=func_name,
+            namespace=self._id_namespace,
+            authority='birdland.mit.edu')
         return self._authz_session.is_authorized(
-            agent_id = self.get_effective_agent_id(),
-            function_id = function_id,
-            qualifier_id = self._qualifier_id)
+            agent_id=self.get_effective_agent_id(),
+            function_id=function_id,
+            qualifier_id=self._qualifier_id)
 """
 
     get_locale = """
@@ -170,17 +171,19 @@ class OsidSession:
             else:
                 return self._proxy.get_authentication().get_agent_id()
         else:
-            return Id(identifier = 'MC3GUE$T@MIT.EDU',
-                      namespace = 'agent.Agent',
-                      authority = 'MIT-OEIT')"""
+            return Id(
+                identifier='MC3GUE$T@MIT.EDU',
+                namespace='agent.Agent',
+                authority='MIT-OEIT')"""
 
     get_effective_agent = """
         effective_agent_id = self.get_effective_agent_id()
         # This may want to be extended to get the Agent directly from the Authentication
         # if available and if not effective agent is available in the proxy
-        return Agent(identifier = effective_agent_id.get_identifier(),
-                  namespace = effective_agent_id.get_namespace(),
-                  authority = effective_agent_id.get_authority())"""
+        return Agent(
+            identifier=effective_agent_id.get_identifier(),
+            namespace=effective_agent_id.get_namespace(),
+            authority=effective_agent_id.get_authority())"""
 
     supports_transactions = """
         pass"""

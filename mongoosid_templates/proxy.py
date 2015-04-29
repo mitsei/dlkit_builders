@@ -1,10 +1,12 @@
 
+from .error_lists import session_errors
+
 class ProxySession:
 
     import_statements = [
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import ' + session_errors,
         'from ..primitives import *',
-        'from .rules import *',
+        'from . import rules',
         'from ..authentication_process.objects import Authentication'
     ]
 
@@ -14,7 +16,7 @@ class ProxySession:
         self._runtime = runtime"""
 
     get_proxy_condition = """
-        return ProxyCondition()"""
+        return rules.ProxyCondition()"""
 
     get_proxy = """
         if input._http_request is not None:
@@ -24,7 +26,7 @@ class ProxySession:
             authentication = None
         effective_agent_id = input._effective_agent_id
         # Also need to deal with effective dates and Local
-        return Proxy(authentication = authentication,
+        return rules.Proxy(authentication = authentication,
                      effective_agent_id = effective_agent_id)"""
 
 class Proxy:
