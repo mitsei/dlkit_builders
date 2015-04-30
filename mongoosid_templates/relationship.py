@@ -125,7 +125,7 @@ class RelationshipAdminSession:
 
     
     import_statements_pattern = [
-        'from . import objects'
+        'from . import objects',
     ]
     
     get_relationship_form_for_create_template = """

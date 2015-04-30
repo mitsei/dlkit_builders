@@ -340,8 +340,6 @@ class ResourceQuerySession:
         'from ..osid.osid_errors import ' + session_errors,
         'from ..osid.sessions import OsidSession',
         'from .. import mongo_client',
-        #'from .objects import *',
-        #'from .queries import *',
         'from . import queries',
         'DESCENDING = -1',
         'ASCENDING = 1'
@@ -349,7 +347,7 @@ class ResourceQuerySession:
 
     init_template = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        self._catalog_class = objecs.${cat_name}
+        self._catalog_class = objects.${cat_name}
         self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         OsidSession._init_object(
@@ -388,7 +386,7 @@ class ResourceQuerySession:
         result = collection.find(query_terms).sort('_id', DESCENDING)
         count = collection.find(query_terms).count()
         mongo_client.close()
-        return queries.${return_type}(result, count=count, runtime=self._runtime)"""
+        return objects.${return_type}(result, count=count, runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
@@ -546,7 +544,7 @@ class ResourceAdminSession:
         ${object_name_under}_map = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if ${object_name_under}_map is None:
             raise NotFound()
-        objects.${object_name}(${object_name_under}_map)._delete()
+        objects.${object_name}(${object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
         result = collection.remove({'_id': ObjectId(${arg0_name}.get_identifier())}, justOne=True)
         if 'err' in result and result['err'] is not None:
             raise OperationFailed()
@@ -812,6 +810,7 @@ class BinHierarchySession:
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
         self._forms = dict()
+        self._catalog_view = ISOLATED
         self._kwargs = kwargs
         hierarchy_mgr = self._get_provider_manager('HIERARCHY')
         self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
@@ -846,7 +845,9 @@ class BinHierarchySession:
     get_root_bins_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_root_bins
-        return ${cat_name}LookupSession(self._proxy, self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_root_${cat_name_under}_ids()))"""
+        return ${cat_name}LookupSession(
+            self._proxy,
+            self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_root_${cat_name_under}_ids()))"""
 
     has_parent_bins_template = """
         # Implemented from template for
@@ -866,7 +867,10 @@ class BinHierarchySession:
     get_parent_bins_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_parent_bins
-        return ${cat_name}LookupSession(self._proxy, self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_parent_${cat_name_under}_ids(${arg0_name})))"""
+        return ${cat_name}LookupSession(
+            self._proxy,
+            self._runtime).get_${cat_name_plural_under}_by_ids(
+                list(self.get_parent_${cat_name_under}_ids(${arg0_name})))"""
 
     is_ancestor_of_bin_template = """
         # Implemented from template for
@@ -891,7 +895,10 @@ class BinHierarchySession:
     get_child_bins_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_child_bins
-        return ${cat_name}LookupSession(self._proxy, self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_child_${cat_name_under}_ids(${arg0_name})))"""
+        return ${cat_name}LookupSession(
+            self._proxy,
+            self._runtime).get_${cat_name_plural_under}_by_ids(
+                list(self.get_child_${cat_name_under}_ids(${arg0_name})))"""
 
     is_descendant_of_bin_template = """
         # Implemented from template for
@@ -901,7 +908,11 @@ class BinHierarchySession:
     get_bin_node_ids_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_bin_node_ids
-        return self._hierarchy_session.get_nodes(id_=${arg0_name}, ancestor_levels=${arg1_name}, descendant_levels=${arg2_name}, include_siblings=${arg3_name})"""
+        return self._hierarchy_session.get_nodes(
+            id_=${arg0_name},
+            ancestor_levels=${arg1_name},
+            descendant_levels=${arg2_name},
+            include_siblings=${arg3_name})"""
 
     get_bin_nodes_template = """
         # Implemented from template for
@@ -1080,10 +1091,6 @@ class ResourceForm:
         'import importlib',
         'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..primitives import Id',
-        'from ..osid.objects import OsidForm',
-        'from ..osid.objects import OsidObjectForm',
-        '#from ..osid.objects import OsidList',
-        '#from ..osid.objects import OsidRelationshipForm',
         'from ..osid.metadata import Metadata',
         'from . import mdata_conf'
     ]
@@ -1096,7 +1103,7 @@ class ResourceForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_object_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
-        OsidForm.__init__(self)
+        osid_objects.OsidForm.__init__(self)
         self._runtime = runtime
         self._db_prefix = db_prefix
         self._kwargs = kwargs
@@ -1289,8 +1296,8 @@ class Bin:
 class BinForm:
 
     import_statements_pattern = [
-        'from ..osid.objects import OsidForm',
-        'from ..osid.objects import OsidObjectForm',
+        '#from ..osid.objects import OsidForm',
+        '#from ..osid.objects import OsidObjectForm',
     ]
 
     init_template = """
@@ -1302,7 +1309,7 @@ class BinForm:
 
     def __init__(self, osid_catalog_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
         #from ..osid.objects import OsidForm
-        OsidForm.__init__(self)
+        osid_objects.OsidForm.__init__(self)
         self._runtime = runtime
         self._db_prefix = db_prefix
         self._kwargs = kwargs
@@ -1321,12 +1328,11 @@ class BinForm:
         self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_metadata(self, **kwargs):
-        #from ..osid.objects import OsidObjectForm
-        OsidObjectForm._init_metadata(self)
+        osid_objects.OsidObjectForm._init_metadata(self)
 
     def _init_map(self):
         #from ..osid.objects import OsidObjectForm
-        OsidObjectForm._init_map(self)
+        osid_objects.OsidObjectForm._init_map(self)
 
     # These next three private methods should be moved to osid.Extensible??? (I thought they were already)
     def _load_records(self, record_type_idstrs):

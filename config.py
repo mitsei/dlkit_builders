@@ -84,6 +84,7 @@ objects_to_implement = [
     'Question',
     'Answer',
     'Assessment',
+    'AssessmentSection',
     'AssessmentOffered',
     'AssessmentTaken',
     'Response',

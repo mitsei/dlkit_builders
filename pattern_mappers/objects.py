@@ -6,6 +6,7 @@ from builders.binder_helpers import make_plural
 from builders.binder_helpers import remove_plural
 from builders.binder_helpers import get_pkg_name
 from builders.osid_meta import OSID_Language_Primitives
+OSID_Calendaring_Primitives = ['osid.calendaring.Time', 'osid.calendaring.DateTime', 'osid.calendaring.Duration']
 
 def map_object_form_patterns(interface, package, index):
 
@@ -458,6 +459,22 @@ def map_object_patterns(interface, package, index):
                               return_type_full = method['return_type']))
 
         ##
+        # Object methods that get a persisted boolean value with an 
+        # 'is' question. NOTE This is currently patterned as above
+        elif (var_name in index[object_name + '.persisted_data'] and
+              method['name'].startswith('are_') and
+              len(index[object_name + '.arg_detail'][var_name]) == 1 and
+              index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'boolean'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.Resource.is_group',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              return_type_full = method['return_type']))
+
+        ##
         # Object methods that get an instance boolean value with an 
         # 'is' question.  NOTE This is currently patterned as above
         elif (var_name in index[object_name + '.instance_data'] and
@@ -480,7 +497,6 @@ def map_object_patterns(interface, package, index):
               method['name'].startswith('can_') and
               len(index[object_name + '.arg_detail'][var_name]) == 1 and
               index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'boolean'):
-#            print 'FOUND:', interface['shortname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.Asset.can_distribute_verbatim',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -590,6 +606,22 @@ def map_object_patterns(interface, package, index):
               method['name'].startswith('has_') and
               len(index[object_name + '.arg_detail'][var_name]) == 1 and
               index[object_name + '.arg_detail'][var_name][0]['arg_type'] in OSID_Language_Primitives):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetContent.has_url',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              return_type_full = method['return_type']))
+
+        # Object methods that get a boolean value with a 'has' question
+        # to check for the existence of a DateTime or Duration, etc.
+        # NOTE: Patterned same as for primitive above
+        elif (var_name in index[object_name + '.persisted_data'] and
+              method['name'].startswith('has_') and
+              len(index[object_name + '.arg_detail'][var_name]) == 1 and
+              index[object_name + '.arg_detail'][var_name][0]['arg_type'] in OSID_Calendaring_Primitives):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetContent.has_url',
                 kwargs = dict(interface_name = interface['shortname'],

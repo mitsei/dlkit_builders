@@ -466,9 +466,9 @@ def make_init_methods(interface_name, package, patterns):
     elif init_pattern == 'resource.ResourceForm':
         object_name = interface_name[:-4]
         if object_name in patterns['package_relationships_caps']:
-            init_object = 'OsidRelationshipForm'
+            init_object = 'osid_objects.OsidRelationshipForm'
         else:
-            init_object = 'OsidObjectForm'
+            init_object = 'osid_objects.OsidObjectForm'
         try:
             persisted_initers = make_persistance_initers(
                 patterns[interface_name[:-4] + '.persisted_data'],

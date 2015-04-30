@@ -1,20 +1,20 @@
 
-
 class AssetAdminSession:
 
     import_statements_pattern = [
     'from ..osid.osid_errors import *',
     'from ..primitives import *',
     'from bson.objectid import ObjectId',
-    'from .. import mongo_client'
+    'from .. import mongo_client',
+    'CREATED = True'
+    'UPDATED = True',
     ]
 
     create_asset_content_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.repository.AssetAdminSession.create_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        CREATED = True
         if ${arg0_name} is None:
             raise NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -30,25 +30,23 @@ class AssetAdminSession:
             raise InvalidArgument('one or more of the form elements is invalid')
         ${arg0_name}._my_map['_id'] = ObjectId()
         ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_under}Id']).get_identifier()
-        ${object_name_under} = collection.find_one({'$$and': [{'_id': ObjectId(${object_name_under}_id)},
-                                      {'${cat_name_mixed}Id': str(self._catalog_id)}]})
+        ${object_name_under} = collection.find_one(
+            {'$$and': [{'_id': ObjectId(${object_name_under}_id)}, {'${cat_name_mixed}Id': str(self._catalog_id)}]})
         ${object_name_under}['${aggregated_objects_name_mixed}'].append(${arg0_name}._my_map)
-        try:
-            id_ = collection.save(${object_name_under})
-        except: # what exceptions does mongodb insert raise?
-            raise OperationFailed()
+        result = collection.save(${object_name_under})
+        if result == "What to look for here???":
+            pass # Need to figure out what writeConcernErrors to catch and deal with?
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         from .${return_module} import ${aggregated_object_name}
         mongo_client.close()
         return ${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_asset_content_form_for_update_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.repository.AssetAdminSession.get_asset_content_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .${return_module} import ${return_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        UPDATED = True
         if ${arg0_name} is None:
             raise NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -66,11 +64,10 @@ class AssetAdminSession:
         return obj_form"""
 
     update_asset_content_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.repository.AssetAdminSession.update_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        UPDATED = True
         if ${arg0_name} is None:
             raise NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -85,8 +82,8 @@ class AssetAdminSession:
         if not ${arg0_name}.is_valid():
             raise InvalidArgument('one or more of the form elements is invalid')
         ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_under}Id']).get_identifier()
-        ${object_name_under} = collection.find_one({'$$and': [{'_id': ObjectId(${object_name_under}_id)},
-                                      {'${cat_name_mixed}Id': str(self._catalog_id)}]})
+        ${object_name_under} = collection.find_one(
+            {'$$and': [{'_id': ObjectId(${object_name_under}_id)}, {'${cat_name_mixed}Id': str(self._catalog_id)}]})
         index = 0
         found = False
         for i in ${object_name_under}['${aggregated_objects_name_mixed}']:
@@ -109,12 +106,11 @@ class AssetAdminSession:
         return ${aggregated_object_name}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     delete_asset_content_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.repository.AssetAdminSession.delete_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .objects import ${aggregated_object_name}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        UPDATED = True
         if ${arg0_name} is None:
             raise NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -131,7 +127,7 @@ class AssetAdminSession:
             found = True
         if not found:
             raise OperationFailed()
-        ${aggregated_object_name}(${aggregated_object_name_under}_map)._delete()
+        ${aggregated_object_name}(${aggregated_object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
         try:
             collection.save(${object_name_under})
         except: # what exceptions does mongodb save raise?
@@ -141,10 +137,9 @@ class AssetAdminSession:
 
 class Asset:
 
-    import_statements_pattern = [
-        'from ..osid.errors import *'
-        'from ..primitives import *'
-        ]
+    import_statements = [
+        'from ..primitives import DisplayText',
+    ]
 
     get_title_template = """
         # Implemented from template for osid.repository.Asset.get_title_template
@@ -152,7 +147,6 @@ class Asset:
 
     can_distribute_verbatim_template = """
         # Implemented from template for osid.repository.AssetForm.can_distribute_verbatim
-        #from .osid_errors import IllegalState
         if self._my_map['${var_name_mixed}'] is None:
             raise IllegalState()
         else:
@@ -175,10 +169,6 @@ class Asset:
         osid_objects.OsidObject._delete(self)"""
 
 class AssetForm:
-
-    import_statements_pattern = [
-        'from ..osid.errors import *'
-        ]
 
     set_title_template = """
         # Implemented from template for osid.repository.AssetForm.set_title_template
@@ -203,10 +193,8 @@ class AssetForm:
 class AssetContent:
 
     import_statements = [
-        #'from pymongo import MongoClient',
         'import gridfs',
         'from ..primitives import DataInputStream',
-        'from ..osid.osid_errors import *',
         'from .. import mongo_client'
     ]
 

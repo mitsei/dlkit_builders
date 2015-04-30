@@ -192,7 +192,7 @@ def make_azosid(file_name):
     # all the django classes for this osid package.
     for interface in package['interfaces']:
         if (interface['category'] in ['sessions', 'managers'] or
-           package['name'] in ['osid']):
+           interface['shortname'] in ['Sourceable']):
             ##
             # Seed the inheritance list with this interface's abc_osid
             inheritance = [abc_pkg_name(package['name']) + '_' +

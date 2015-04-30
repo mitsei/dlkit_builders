@@ -25,6 +25,10 @@ class CommentAdminSession:
 
 class Comment:
 
+    import_statements = [
+        'from ..primitives import DisplayText',
+    ]
+
     get_commenting_agent_id = """
         return self.get_commentor_id()"""
 
