@@ -3,7 +3,8 @@ import time
 import os
 import json
 import string
-from .impl_list import packages_to_implement
+from .config import *
+from .binder_helpers import *
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
 from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
@@ -153,9 +154,14 @@ def make_azosid(file_name):
     for module in modules:
         docstr = '\"\"\"AuthZ Adapter implementations of ' + package['name'] + ' ' + module + '.\"\"\"\n'
         modules[module]['imports'].append(docstr)
-        if package['name'] == 'osid':
-            pylintstr = '# pylint: disable=no-init\n# Numerous placeholder classes don\'t require __init__.'
-            modules[module]['imports'].append(pylintstr)
+        pylintstr = (
+            '# pylint: disable=no-init\n' +
+            '#     Numerous classes don\'t require __init__.\n' +
+            '# pylint: disable=too-many-public-methods\n' + 
+            '#     Number of methods are defined in specification\n' +
+            '# pylint: disable=too-many-ancestors\n' + 
+            '#     Inheritance defined in specification\n')
+        modules[module]['imports'].append(pylintstr)
 
     ##
     # Copy settings and types and other files from the authz tamplates into the
@@ -191,6 +197,16 @@ def make_azosid(file_name):
     # The real work starts here.  Iterate through all interfaces to build 
     # all the django classes for this osid package.
     for interface in package['interfaces']:
+
+        ##
+        # Check to see if this interface is meant to be implemented.
+        if package['name'] != 'osid':
+            if flagged_for_implementation(interface, 
+                    sessions_to_implement, objects_to_implement, variants_to_implement):
+                pass
+            else:
+                continue
+
         if (interface['category'] in ['sessions', 'managers'] or
            interface['shortname'] in ['Sourceable']):
             ##
@@ -241,13 +257,35 @@ def make_azosid(file_name):
                         inherit_category != 'UNKNOWN_MODULE'):
                         modules[interface['category']]['imports'].append(import_str)
 
-            if package['name'] == 'osid':
+            if package['name'] == 'osid' and interface['category'] not in ['markers', 'sessions']:
+                ##
+                # Add the osid_error import
+                import_str = 'from ..osid.osid_errors import Unimplemented, IllegalState, NullArgument'
+                if import_str not in modules[interface['category']]['imports']:
+                    modules[interface['category']]['imports'].append(import_str)
+                ##
+                # Add the primitive import
+                import_str = 'from ..primitives import Id'
+                if import_str not in modules[interface['category']]['imports']:
+                    modules[interface['category']]['imports'].append(import_str)
+            elif package['name'] == 'osid' and interface['category'] == 'markers':
                 ##
                 # Add the osid_error import
                 import_str = 'from ..osid.osid_errors import Unimplemented'
                 if import_str not in modules[interface['category']]['imports']:
                     modules[interface['category']]['imports'].append(import_str)
-            if interface['category'] == 'managers':
+            elif package['name'] == 'osid' and interface['category'] == 'sessions':
+                ##
+                # Add the osid_error import
+                import_str = 'from ..osid.osid_errors import IllegalState, Unimplemented'
+                if import_str not in modules[interface['category']]['imports']:
+                    modules[interface['category']]['imports'].append(import_str)
+                ##
+                # Add the primitive import
+                import_str = 'from ..primitives import Id'
+                if import_str not in modules[interface['category']]['imports']:
+                    modules[interface['category']]['imports'].append(import_str)
+            elif interface['category'] == 'managers':
                 ##
                 # Add the osid_error import
                 import_str = 'from ..osid.osid_errors import Unimplemented'
@@ -260,7 +298,13 @@ def make_azosid(file_name):
                 if (import_str not in modules[interface['category']]['imports'] and
                     inherit_category != 'UNKNOWN_MODULE'):
                     modules[interface['category']]['imports'].append(import_str)
-            if interface['category'] == 'sessions':
+                ##
+                # Add the primitive import
+                import_str = 'from ..primitives import Id'
+                if (import_str not in modules[interface['category']]['imports'] and
+                    inherit_category != 'UNKNOWN_MODULE'):
+                    modules[interface['category']]['imports'].append(import_str)
+            elif interface['category'] == 'sessions' and not package['name'] == 'osid':
                 ##
                 # Add the primitive import
                 import_str = 'from ..primitives import Id'
@@ -399,6 +443,7 @@ def make_init_methods(interface_name, package, patterns):
                                         'djpkg_name': pkg_name(package['name']),
                                         'pkg_name': package['name'],
                                         'pkg_name_upper': package['name'].upper(),
+                                        'pkg_name_caps': package['name'].title(),
                                         'interface_name': interface_name,
                                         'interface_name_title': interface_name.title(),
                                         'initers': initers,
@@ -422,7 +467,7 @@ def make_method(package_name, method, interface_name, patterns):
     method_impl = make_method_impl(package_name, method, interface_name, patterns)
 
     for arg in method['args']:
-        args.append(arg['var_name'] + '=None')
+        args.append(arg['var_name'])
     method_sig = ('    def ' + method['name'] + '(' +
                 ', '.join(args) + '):')
 

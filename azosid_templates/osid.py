@@ -2,7 +2,19 @@
 
 class OsidProfile:
 
-#    init = """ """
+    init = """
+    def __init__(self, service_name, interface_name):
+        import importlib
+        from .. import settings
+        provider_path = settings.PROVIDER_MANAGER_MODULE_PATHS[service_name]
+        provider_module = importlib.import_module(provider_path, settings.ANCHOR_PATH)
+        authz_module = importlib.import_module(settings.AUTHZ_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
+        provider_manager = getattr(provider_module, interface_name)()
+        authz_manager = getattr(authz_module, 'AuthorizationManager')()
+        self._provider_manager = provider_manager
+        self._authz_session = authz_manager.get_authorization_session()
+        self._my_runtime = None
+"""
 
     get_id = """
         pass"""
@@ -44,14 +56,8 @@ class OsidProfile:
         pass"""
 
 class OsidManager:
-
-    init = """
-    def __init__(self):
-        self._my_runtime = None
-"""
     
     initialize = """
-        from .. primitives import Id
         if runtime is None:
             raise NullArgument()
         if self._my_runtime is not None:
@@ -64,14 +70,8 @@ class OsidManager:
         self._authz_session = authz_manager().get_authorization_session()"""
 
 class OsidProxyManager:
-
-    init = """
-    def __init__(self):
-        self._my_runtime = None
-"""
     
     initialize = """
-        from .. primitives import Id
         if runtime is None:
             raise NullArgument()
         if self._my_runtime is not None:
@@ -122,14 +122,15 @@ class Operable:
 class OsidSession:
 
     init = """
-    def __init__(self, provider_session, authz_session, proxy = None):
+    def __init__(self, provider_session, authz_session, proxy=None):
         self._provider_session = provider_session
         self._authz_session = authz_session
         self._proxy = proxy
+        self._id_namespace = None
+        self._qualifier_id = None
 
 
     def _can(self, func_name):
-        from ..primitives import Id
         function_id = Id(
             identifier=func_name,
             namespace=self._id_namespace,
@@ -164,7 +165,6 @@ class OsidSession:
             raise IllegalState()"""
 
     get_effective_agent_id = """
-        from ..primitives import Id
         if self.is_authenticated():
             if self._proxy.has_effective_agent():
                 return self._proxy.get_effective_agent_id()
@@ -177,19 +177,20 @@ class OsidSession:
                 authority='MIT-OEIT')"""
 
     get_effective_agent = """
-        effective_agent_id = self.get_effective_agent_id()
+        #effective_agent_id = self.get_effective_agent_id()
         # This may want to be extended to get the Agent directly from the Authentication
         # if available and if not effective agent is available in the proxy
-        return Agent(
-            identifier=effective_agent_id.get_identifier(),
-            namespace=effective_agent_id.get_namespace(),
-            authority=effective_agent_id.get_authority())"""
+        #return Agent(
+        #    identifier=effective_agent_id.get_identifier(),
+        #    namespace=effective_agent_id.get_namespace(),
+        #    authority=effective_agent_id.get_authority())
+        raise Unimplemented()"""
 
     supports_transactions = """
-        pass"""
+        raise Unimplemented()"""
 
     startTransaction = """
-        pass"""
+        raise Unimplemented()"""
 
 
 class OsidObject:

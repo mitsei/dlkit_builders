@@ -34,7 +34,7 @@ class ProxySession:
     get_proxy_condition = """
         # Implemented from 
         # osid.proxy.ProxySession.get_proxy_condition
-        return self._get_provider_session('proxy_session').get_proxy_condition(*args, **kwargs)"""
+        return self._get_provider_session('proxy_session').get_proxy_condition()"""
 
     get_proxy = """
         # Implemented from 

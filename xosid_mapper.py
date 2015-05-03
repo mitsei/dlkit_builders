@@ -194,6 +194,8 @@ def method_iterator(root):
         if child.tag == (ns + 'description'):
             method['doc'] = parse_docstring(process_text(child, '        '),
                                                                 '        ')
+            body = method['doc']['body']
+            method['doc']['body'] = '\n\n'.join(body.split('\n        \n'))
         ##
         # Process parameter info into args dictionary and doc:
         if child.tag == (ns + 'parameter'):

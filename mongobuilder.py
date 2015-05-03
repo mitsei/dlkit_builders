@@ -151,6 +151,14 @@ def make_mongoosid(file_name):
     for module in modules:
         docstr = '\"\"\"Mongodb implementations of ' + package['name'] + ' ' + module + '.\"\"\"\n'
         modules[module]['imports'].append(docstr)
+        pylintstr = (
+            '# pylint: disable=no-init\n' +
+            '#     Numerous classes don\'t require __init__.\n' +
+            '# pylint: disable=too-many-public-methods\n' + 
+            '#     Number of methods are defined in specification\n' +
+            '# pylint: disable=too-many-ancestors\n' + 
+            '#     Inheritance defined in specification\n')
+        modules[module]['imports'].append(pylintstr)
 
     ##
     # Copy settings and types and other files from the tamplates into the
@@ -185,12 +193,20 @@ def make_mongoosid(file_name):
     # all the django classes for this osid package.
     for interface in package['interfaces']:
 
+        exceptions = ['ObjectiveHierarchySession',
+                      'ObjectiveHierarchyDesignSession',
+                      'ObjectiveSequencingSession',
+                      'ObjectiveRequisiteSession',
+                      'ObjectiveRequisiteAssignmentSession',]
         ##
         # Check to see if this interface is meant to be implemented.
         if package['name'] != 'osid':
             if flagged_for_implementation(interface, 
                     sessions_to_implement, objects_to_implement, variants_to_implement):
-                pass
+                if interface['shortname'] in exceptions:
+                    continue
+                else:
+                    pass
             else:
                 continue
         

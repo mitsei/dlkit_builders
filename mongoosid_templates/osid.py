@@ -3,8 +3,9 @@ class OsidProfile:
 
     import_statements = [
         'from . import profile',
-        'from .osid_errors import *',
-        'from ..primitives import *'
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import Id',
+        'from ..primitives import Type',
     ]
 
     get_id = """
@@ -12,50 +13,56 @@ class OsidProfile:
         """
 
     get_display_name = """
-        return DisplayText(text = profile.DISPLAYNAME,
-                           language_type = Type(**profile.LANGUAGETYPE),
-                           script_type = Type(**profile.SCRIPTTYPE),
-                           format_type = Type(**profile.FORMATTYPE))"""
+        return DisplayText(
+            text = profile.DISPLAYNAME,
+            language_type=Type(**profile.LANGUAGETYPE),
+            script_type=Type(**profile.SCRIPTTYPE),
+            format_type=Type(**profile.FORMATTYPE))"""
 
     get_description = """
-        return DisplayText(text = profile.DESCRIPTION,
-                           language_type = Type(**profile.LANGUAGETYPE),
-                           script_type = Type(**profile.SCRIPTTYPE),
-                           format_type = Type(**profile.FORMATTYPE))"""
+        return DisplayText(
+            text=profile.DESCRIPTION,
+            language_type=Type(**profile.LANGUAGETYPE),
+            script_type=Type(**profile.SCRIPTTYPE),
+            format_type=Type(**profile.FORMATTYPE))"""
 
     get_version = """
         ## THIS ALL NEEDS TO BE FIXED:
-        try:
-            from ..installation.primitives import Version
-        except:
-            from .common import Version
-        try:
-            from ..type.primitives import Type
-        except:
-            from .common import Type
-        return Version(components = profile.VERSIONCOMPONENTS,
-                       scheme = Type(**profile.VERSIONSCHEME))"""
+        #try:
+        #    from ..installation.primitives import Version
+        #except:
+        #    from .common import Version
+        #try:
+        #    from ..type.primitives import Type
+        #except:
+        #    from .common import Type
+        #return Version(
+        #    components=profile.VERSIONCOMPONENTS,
+        #    scheme=Type(**profile.VERSIONSCHEME))
+        raise Unimplemented()"""
 
     get_release_date = """
         # NEED TO IMPLEMENT
-        pass"""
+        raise Unimplemented()"""
 
     supports_osid_version = """
         ## THIS ALL NEEDS TO BE FIXED:
-        try:
-            from ..installation.primitives import Version
-        except:
-            from .common import Version
-        try:
-            from ..type.primitives import Type
-        except:
-            from .common import Type
-        return Version(components = profile.OSIDVERSION,
-                       scheme = Type(**profile.VERSIONSCHEME))"""
+        #try:
+        #    from ..installation.primitives import Version
+        #except:
+        #    from .common import Version
+        #try:
+        #    from ..type.primitives import Type
+        #except:
+        #    from .common import Type
+        #return Version(
+        #    components=profile.OSIDVERSION,
+        #    scheme=Type(**profile.VERSIONSCHEME))
+        raise Unimplemented()"""
 
     get_locales = """
         # NEED TO IMPLEMENT
-        pass"""
+        raise Unimplemented()"""
 
     supports_journal_rollback = """
         # Perhaps someday I will support journaling
@@ -75,16 +82,17 @@ class OsidProfile:
 
     get_proxy_record_types = """
         # NEED TO IMPLEMENT
-        pass"""
+        raise Unimplemented()"""
 
     supports_proxy_record_type = """
         # NEED TO IMPLEMENT
-        pass"""
+        raise Unimplemented()"""
 
 class OsidManager:
 
     import_statements = [
-        'from .osid_errors import *'
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import DisplayText',
     ]  
 
     init = """
@@ -104,7 +112,7 @@ class OsidManager:
 class OsidProxyManager:
 
     import_statements = [
-        'from .osid_errors import *'
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
     ]  
 
     init = """
@@ -125,7 +133,7 @@ class OsidProxyManager:
 class OsidRuntimeManager:
 
     import_statements = [
-        'from .osid_errors import *'
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
     ]  
 
     init = """
@@ -148,12 +156,13 @@ class Identifiable:
 """
 
     get_id = """
-        return Id(identifier = str(self._my_map['_id']),
-                   namespace = self._namespace,
-                   authority = self._authority)"""
+        return Id(
+            identifier=str(self._my_map['_id']),
+            namespace=self._namespace,
+            authority=self._authority)"""
 
     is_current = """
-        # Osid Objects in this implementation will quickly become stale
+        # Osid Objects in this implementation will immediately become stale.
         return False"""
 
 
@@ -178,6 +187,7 @@ class Extensible:
         raise AttributeError(name)
 
     def _get_record(self, recordType):
+        \"\"\"Get the record string type value given the recordType.\"\"\"
         if recordType is None:
             raise NullArgument()
         if not self.has_record_type(recordType):
@@ -187,10 +197,12 @@ class Extensible:
         return self._records[str(recordType)]
 
     def _load_records(self, record_type_idstrs):
+        \"\"\"Load all records from given record_type_idstrs.\"\"\"
         for record_type_idstr in record_type_idstrs:
             self._init_record(record_type_idstr)
 
     def _init_record(self, record_type_idstr):
+        \"\"\"Initialize the record identified by the record_type_idstr.\"\"\"
         import importlib
         record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
         module = importlib.import_module(record_type_data['module_path'])
@@ -198,7 +210,7 @@ class Extensible:
         self._records[record_type_idstr] = record(self)
 
     def _delete(self):
-        # Override this method in inheriting objects to perform special clearing operations
+        \"\"\"Override this method in inheriting objects to perform special clearing operations.\"\"\"
         try: # Need to implement records for catalogs one of these days
             for record in self._records:
                 try:
@@ -213,7 +225,8 @@ class Extensible:
         return str(record_type) in self._supported_record_type_ids"""
 
     get_record_types = """
-        from ..primitives import Type, Id
+        from ..primitives import Id
+        from ..primitives import Type
         from ..type.objects import TypeList
         type_list = []
         for type_idstr in self._supported_record_type_ids:
@@ -223,7 +236,7 @@ class Extensible:
 class Temporal:
 
     import_statements = [
-        'from ..primitives import *',
+        'from ..primitives import DateTime',
         'import datetime'
     ]
 
@@ -266,20 +279,21 @@ class Operable:
 class OsidSession:
 
     import_statements = [
-    'import socket',
-    'from ..primitives import *',
-    'from .osid_errors import *',
-    'from bson.objectid import ObjectId',
-    'from importlib import import_module',
-    'from .. import mongo_client',
-    'from .. import types',
-    'from . import profile',
-    'COMPARATIVE = 0',
-    'PLENARY = 1',
-    'FEDERATED = 0',
-    'ISOLATED = 1',
-    'CREATED = True',
-    'UPDATED = True'
+        'import socket',
+        'from ..primitives import Id',
+        'from ..primitives import Type',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from bson.objectid import ObjectId',
+        'from importlib import import_module',
+        'from .. import mongo_client',
+        'from .. import types',
+        '#from . import profile',
+        'COMPARATIVE = 0',
+        'PLENARY = 1',
+        'FEDERATED = 0',
+        'ISOLATED = 1',
+        'CREATED = True',
+        'UPDATED = True'
     ]
 
     init = """
@@ -288,8 +302,19 @@ class OsidSession:
     else:
         _authority = socket.gethostname()
 
-    def _init_catalog(self, proxy = None, runtime = None):
-        self._proxy = proxy        
+    def __init__(self):
+        self._proxy = None
+        self._runtime = None
+        self._db_prefix = None
+        self._catalog_identifier = None
+        self._my_catalog_map = None
+        self._catalog_id = None
+        self._catalog = None
+        self._forms = None
+
+    def _init_catalog(self, proxy=None, runtime=None):
+        \"\"\"Initialize this object as an OsidCatalog.\"\"\"
+        self._proxy = proxy
         self._runtime = runtime
         if runtime is not None:
             prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
@@ -298,6 +323,7 @@ class OsidSession:
             self._db_prefix = ''
 
     def _init_object(self, catalog_id, proxy, runtime, db_name, cat_name, cat_class):
+        \"\"\"Initialize this object as an OsidObject.\"\"\"
         self._catalog_identifier = None
         self._proxy = proxy
         self._runtime = runtime
@@ -313,20 +339,7 @@ class OsidSession:
             if self._my_catalog_map is None:
                 # Should also check for the authority here:
                 if catalog_id.get_identifier_namespace() != db_name + '.' + cat_name:
-                    self._my_catalog_map = self._create_orchestrated_catalog_map(catalog_id, db_name, cat_name)
-                    #self._my_catalog_map = {
-                    #    '_id': ObjectId(catalog_id.get_identifier()),
-                    #    'displayName': {'text': catalog_id.get_identifier_namespace() + ' ' + cat_name,
-                    #                    'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                    #                    'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                    #                    'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                    #    'description': {'text': cat_name + ' for ' + catalog_id.get_identifier_namespace() + ' objects',
-                    #                    'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                    #                    'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                    #                    'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                    #    'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
-                    #}
-                    #collection.insert(self._my_catalog_map)
+                    self._my_catalog_map = self._create_orchestrated_cat(catalog_id, db_name, cat_name)
                 else:
                     raise NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
         else:
@@ -350,6 +363,7 @@ class OsidSession:
         mongo_client.close()
 
     def _get_phantom_root_catalog(self, cat_name, cat_class):
+        \"\"\"Get's the catalog id corresponding to the root of all implementation catalogs.\"\"\"
         catalog_map = {
             '_id': ObjectId('000000000000000000000000'),
             'displayName': {'text': 'Default ' + cat_name,
@@ -365,7 +379,8 @@ class OsidSession:
         }
         return cat_class(catalog_map)
 
-    def _create_orchestrated_catalog_map(self, foreign_catalog_id, db_name, cat_name):
+    def _create_orchestrated_cat(self, foreign_catalog_id, db_name, cat_name):
+        \"\"\"Creates a catalog in the current service orchestrated with a foreign service Id.\"\"\"
         # Need to test if the catalog_id exists for the foreign catalog
         try:
             foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
@@ -380,11 +395,11 @@ class OsidSession:
         collection = mongo_client[self._db_prefix + db_name][cat_name]
         catalog_map = {
             '_id': ObjectId(foreign_catalog_id.get_identifier()),
-            'displayName': {'text': 'Orchestrated ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' ' + cat_name,
+            'displayName': {'text': ('Orchestrated ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' ' + cat_name),
                             'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
                             'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
                             'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-            'description': {'text': 'Orchestrated ' + cat_name + ' for the ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' service',
+            'description': {'text': ('Orchestrated ' + cat_name + ' for the ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' service'),
                             'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
                             'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
                             'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
@@ -397,25 +412,24 @@ class OsidSession:
         return catalog_map
 
     def _get_provider_manager(self, osid):
+        \"\"\"Gets the most appropriate provider manager depending on config\"\"\"
         try:
             # Try to get the Manager from the runtime, if available:
             config = self._runtime.get_configuration()
             parameter_id = Id('parameter:repositoryProviderImpl@mongo')
             impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
             manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        except:
+        except (AttributeError, KeyError, NotFound):
             # Just return a Manager from this implementation:
             module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
             manager = getattr(module, osid.title() + 'Manager')()
-            try:
+            if self._runtime is not None:
                 manager.initialize(self._runtime)
-            except:
-                pass
         return manager
 """
 
     get_locale = """
-        from ..locale.objects import Locale
+        #from ..locale.objects import Locale
         ##
         # This implementation could assume that instantiating a new Locale
         # without constructor arguments wlll return the default Locale.
@@ -449,17 +463,20 @@ class OsidSession:
             else:
                 return self._proxy.get_authentication().get_agent_id()
         else:
-            return Id(identifier = 'MC3GUE$T@MIT.EDU',
-                      namespace = 'agent.Agent',
-                      authority = 'MIT-OEIT')"""
+            return Id(
+                identifier='MC3GUE$T@MIT.EDU',
+                namespace='agent.Agent',
+                authority='MIT-OEIT')"""
 
     get_effective_agent = """
-        effective_agent_id = self.get_effective_agent_id()
+        #effective_agent_id = self.get_effective_agent_id()
         # This may want to be extended to get the Agent directly from the Authentication
         # if available and if not effective agent is available in the proxy
-        return Agent(identifier = effective_agent_id.get_identifier(),
-                  namespace = effective_agent_id.get_namespace(),
-                  authority = effective_agent_id.get_authority())"""
+        #return Agent(
+        #    identifier=effective_agent_id.get_identifier(),
+        #    namespace=effective_agent_id.get_namespace(),
+        #    authority=effective_agent_id.get_authority())
+        raise Unimplemented()"""
 
     supports_transactions = """
         return False"""
@@ -492,14 +509,12 @@ class OsidObject:
             parameter_id = Id('parameter:repositoryProviderImpl@mongo')
             impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
             manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        except:
+        except (AttributeError, KeyError, NotFound):
             # Just return a Manager from this implementation:
             module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
             manager = getattr(module, osid.title() + 'Manager')()
-            try:
+            if self._runtime is not None:
                 manager.initialize(self._runtime)
-            except:
-                pass
         return manager
 
     def get_object_map(self, obj_map=None):

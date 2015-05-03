@@ -21,7 +21,7 @@ class AssessmentManager:
 class AssessmentSession:
 
     can_take_assessments = """
-        return self._get_provider_session('assessment_session').can_take_assessments(*args, **kwargs)"""
+        return self._get_provider_session('assessment_session').can_take_assessments()"""
 
     has_assessment_begun = """
         return self._get_provider_session('assessment_session').has_assessment_begun(*args, **kwargs)"""

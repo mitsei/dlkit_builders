@@ -2,36 +2,30 @@
 
 class AssessmentManager:
 
-    get_assessment_taken_query_session_for_bank = """
+    old_get_assessment_taken_query_session_for_bank_to_delete = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
-        from sessions import AssessmentTakenQuerySession
-        return AssessmentTakenQuerySession(self._provider_manager.get_assessment_taken_query_session_for_bank(bank_id), self._authz_session)
+        return sessions.AssessmentTakenQuerySession(self._provider_manager.get_assessment_taken_query_session_for_bank(bank_id), self._authz_session)
 
     def get_assessment_taken_admin_session(self):
-        from sessions import AssessmentTakenAdminSession
-        return AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session(), self._authz_session)
+        return sessions.AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session(), self._authz_session)
 
     def get_assessment_taken_admin_session_for_bank(self, bank_id=None):
-        from sessions import AssessmentTakenAdminSession
-        return AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id), self._authz_session)
+        return sessions.AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id), self._authz_session)
 """
 
 class AssessmentProxyManager:
 
-    get_assessment_taken_query_session_for_bank = """
+    old_get_assessment_taken_query_session_for_bank_to_delete = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
-        from sessions import AssessmentTakenQuerySession
-        return AssessmentTakenQuerySession(self._provider_manager.get_assessment_taken_query_session_for_bank(bank_id, proxy), self._authz_session, proxy)
+        return sessions.AssessmentTakenQuerySession(self._provider_manager.get_assessment_taken_query_session_for_bank(bank_id, proxy), self._authz_session, proxy)
 
     def get_assessment_taken_admin_session(self, proxy=None):
-        from sessions import AssessmentTakenAdminSession
-        return AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session(proxy), self._authz_session, proxy)
+        return sessions.AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session(proxy), self._authz_session, proxy)
 
     def get_assessment_taken_admin_session_for_bank(self, bank_id=None, proxy=None):
-        from sessions import AssessmentTakenAdminSession
-        return AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id, proxy), self._authz_session, proxy)
+        return sessions.AssessmentTakenAdminSession(self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id, proxy), self._authz_session, proxy)
 """
 
 
@@ -43,7 +37,6 @@ class AssessmentSession:
 
     init = """
     def __init__(self, provider_session, authz_session, proxy = None):
-        from ..osid import sessions as osid_sessions
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_bank_id()
         self._id_namespace = 'assessment.Assessment'
@@ -303,7 +296,6 @@ class AssessmentBasicAuthoringSession:
 
     init = """
     def __init__(self, provider_session, authz_session, proxy = None):
-        from ..osid import sessions as osid_sessions
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_bank_id()
         self._id_namespace = 'assessment.Assessment'

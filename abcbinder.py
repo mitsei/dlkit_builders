@@ -135,9 +135,20 @@ def make_abcosid(file_name):
     for module in modules:
         docstr = ('\"\"\"Implementations of ' + package['name'] + 
             ' abstract base class ' + module + '.\"\"\"\n' +
-            '# pylint: disable=invalid-name,no-init\n' + 
-            '# Method names comply to OSID specification.\n' +
-            '# Abstract classes do not define __init__.')
+            '# pylint: disable=invalid-name\n' + 
+            '#     Method names comply with OSID specification.\n' +
+            '# pylint: disable=no-init\n' + 
+            '#     Abstract classes do not define __init__.\n' +
+            '# pylint: disable=too-few-public-methods\n' + 
+            '#     Some interfaces are specified as \'markers\' and include no methods.\n'+
+            '# pylint: disable=too-many-public-methods\n' + 
+            '#     Number of methods are defined in specification\n' +
+            '# pylint: disable=too-many-ancestors\n' + 
+            '#     Inheritance defined in specification\n' +
+            '# pylint: disable=too-many-arguments\n' + 
+            '#     Argument signature defined in specification.\n' +
+            '# pylint: disable=duplicate-code\n' + 
+            '#     All apparent duplicates have been inspected. They aren\'t.\n')
         modules[module]['imports'].append(docstr)
         modules[module]['imports'].append('import abc')
 

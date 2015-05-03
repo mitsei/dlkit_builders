@@ -79,7 +79,7 @@ def fix_reserved_word(word):
         word = 'logging' # Still deciding this
     if keyword.iskeyword(word):
         word = word + '_'
-    elif word in ['id', 'type']:
+    elif word in ['id', 'type', 'str', 'max', 'input']:
         word = word + '_'
     return word
 

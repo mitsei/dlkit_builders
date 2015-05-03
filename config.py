@@ -46,6 +46,9 @@ sessions_to_implement = [
     'BookAdminSession',
     'BookHierarchySession',
     'BookHierarchyDesignSession',
+    ### grading service:
+    'GradebookLookupSession',
+    'GradebookAdminSession',
     ### hierarchy service:
     'HierarchyLookupSession',
     'HierarchyAdminSession',
@@ -54,6 +57,11 @@ sessions_to_implement = [
     ### learning service:
     'ObjectiveLookupSession',
     'ObjectiveAdminSession',
+    'ObjectiveHierarchySession',
+    'ObjectiveHierarchyDesignSession',
+    'ObjectiveSequencingSession',
+    'ObjectiveRequisiteSession',
+    'ObjectiveRequisiteAssignmentSession',
     'ActivityLookupSession',
     'ActivityAdminSession',
     'ObjectiveBankLookupSession',
@@ -74,7 +82,6 @@ sessions_to_implement = [
     'AssetQuerySession',
     'AssetAdminSession',
     'RepositoryLookupSession',
-    'RepositoryQuerySession',
     'RepositoryAdminSession',
     ]
 

@@ -3,8 +3,9 @@ import time
 import os
 import json
 import string
-from binder_helpers import camel_to_under
+from binder_helpers import camel_to_under, flagged_for_implementation
 from binder_helpers import make_plural, fix_reserved_word
+from .config import *
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
 from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
@@ -34,6 +35,15 @@ def make_kitosids(build_abc = False, re_index = False, re_map = False):
         if json_file.endswith('.json'):
             make_kitosid(pkg_maps_dir + '/' + json_file)
 
+    ##
+    # Copy general config and primitive files, etc into the
+    # implementation root directory:
+    if os.path.exists('./' + template_dir + '/helpers'):
+        for helper_file in os.listdir('./' + template_dir + '/helpers'):
+            if helper_file.endswith('.py'):
+                os.system('cp ./' + template_dir + '/helpers/' + helper_file + ' ' +
+                          root_pkg + '/' + helper_file)
+
 ##
 # This function expects a file containing a json representation of an
 # osid package that was prepared by the mapper.
@@ -44,8 +54,11 @@ def make_kitosid(file_name):
     package = json.load(read_file)
     read_file.close()
 
-    importStr = ''
-    bodyStr = ''
+    if package['name'] not in packages_to_implement:
+        return
+    print "--> Services Implement Package:", package['name']
+
+
     module_name = None
     ##
     # The map structure for the modules to be created by this function.
@@ -121,7 +134,15 @@ def make_kitosid(file_name):
     write_file.close
     
     """
-    
+
+    ##
+    # Initialize the module doc
+    for module in modules:
+        docstr = '\"\"\"DLKit Services implementations of ' + package['name'] + ' service.\"\"\"\n'
+        docstr = docstr + '# pylint: disable=no-init,too-few-public-methods,too-many-public-methods,too-many-ancestors\n'
+        docstr = docstr + '# OSID specification includes some \'marker\' interfaces.\n'
+        modules[module]['imports'].append(docstr)
+
     ##
     # Copy settings and types and other files from the kit tamplates into the
     # appropriate implementation directories
@@ -172,13 +193,21 @@ def make_kitosid(file_name):
     # The real work starts here.  Iterate through manager and catalog 
     # interfaces only to build the 'managers' and some 'objects' modules.
     for interface in package['interfaces']:
+
+        ##
+        # Check to see if this interface is meant to be implemented.
+        if package['name'] != 'osid':
+            if flagged_for_implementation(interface, 
+                    sessions_to_implement, objects_to_implement, variants_to_implement):
+                pass
+            else:
+                continue
+
         if ((interface['category'] == 'managers' or
             interface['shortname'] == patterns['package_catalog_caps'] or
             interface['shortname'] == patterns['package_catalog_caps'] + 'List' or
             interface['shortname'] in ['OsidSession', 'OsidObject', 'OsidCatalog', 'OsidList'] or
-            interface['category'] == 'markers') and
-            package['name'] in ['resource', 'learning', 'repository', 'type', 'relationship', 'osid',
-                                'id', 'proxy', 'assessment', 'journaling', 'hierarchy', 'commenting']):
+            interface['category'] == 'markers')):
 
             """
             if ('OsidManager' in interface['inherit_shortnames'] or
@@ -191,7 +220,7 @@ def make_kitosid(file_name):
 #            module_name = interface['category']
 #            module_name = fix_reserved_word(package['name'])
             module_name = package['name']
-
+            
             ##
             # Seed the inheritance list with this interface's abc_osid
             inheritance = ['abc_' + package['name'] + '_' +
@@ -219,6 +248,16 @@ def make_kitosid(file_name):
             # abc osids and imports for the Manager related Sessions:
             if 'OsidManager' in interface['inherit_shortnames']:
                 for inf in package['interfaces']:
+
+                    ##
+                    # Check to see if this interface is meant to be implemented.
+                    if package['name'] != 'osid':
+                        if flagged_for_implementation(inf, 
+                                sessions_to_implement, objects_to_implement, variants_to_implement):
+                            pass
+                        else:
+                            continue
+
                     if is_manager_session(inf, patterns, package['name']):
                         if inf['shortname'].endswith('SearchSession'):
                             inheritance.insert(1, 'abc_' + package['name'] + '_' +
@@ -240,6 +279,16 @@ def make_kitosid(file_name):
             # abc osids and imports for the catalog related Sessions:
             elif interface['shortname'] == patterns['package_catalog_caps']:
                 for inf in package['interfaces']:
+
+                    ##
+                    # Check to see if this interface is meant to be implemented.
+                    if package['name'] != 'osid':
+                        if flagged_for_implementation(inf, 
+                                sessions_to_implement, objects_to_implement, variants_to_implement):
+                            pass
+                        else:
+                            continue
+
                     if is_catalog_session(inf, patterns, package['name']):
                         if inf['shortname'].endswith('SearchSession'):
                             inheritance.insert(1, 'abc_' + package['name'] + '_' +
@@ -296,7 +345,7 @@ def make_kitosid(file_name):
 
             ##
             # And don't forget the osid_error import:
-            import_str = 'from .osid_errors import Unimplemented, IllegalState, OperationFailed'
+            import_str = 'from .osid_errors import Unimplemented, IllegalState'
             if import_str not in modules[module_name]['imports']: 
                 modules[module_name]['imports'].append(import_str)
 
@@ -323,6 +372,7 @@ def make_kitosid(file_name):
             ##
             # Build the interface implementation
             class_sig = 'class ' + interface['shortname'] + inheritance + ':'
+            class_doc = '    \"\"\"' + interface['shortname'] + ' convenience adapter including related Session methods."\"\"'
             init_methods = make_init_methods(interface['shortname'], package, patterns)
             methods = make_methods(package['name'], interface, patterns) + '\n\n'
 
@@ -331,6 +381,16 @@ def make_kitosid(file_name):
             if 'OsidManager' in interface['inherit_shortnames']:
                 patterns['implemented_view_methods'] = []
                 for inf in package['interfaces']:
+
+                    ##
+                    # Check to see if this interface is meant to be implemented.
+                    if package['name'] != 'osid':
+                        if flagged_for_implementation(inf, 
+                                sessions_to_implement, objects_to_implement, variants_to_implement):
+                            pass
+                        else:
+                            continue
+
                     if is_manager_session(inf, patterns, package['name']):
                             methods = methods + '\n##\n# The following methods are from ' + inf['fullname'] + '\n\n'
                             methods = methods + make_methods(package['name'], inf, patterns) + '\n\n'
@@ -340,6 +400,16 @@ def make_kitosid(file_name):
             elif interface['shortname'] == patterns['package_catalog_caps']:
                 patterns['implemented_view_methods'] = []
                 for inf in package['interfaces']:
+                    
+                    ##
+                    # Check to see if this interface is meant to be implemented.
+                    if package['name'] != 'osid':
+                        if flagged_for_implementation(inf, 
+                                sessions_to_implement, objects_to_implement, variants_to_implement):
+                            pass
+                        else:
+                            continue
+                    
                     if is_catalog_session(inf, patterns, package['name']):
                             methods = methods + '\n##\n# The following methods are from ' + inf['fullname'] + '\n\n'
                             methods = methods + make_methods(package['name'], inf, patterns) + '\n\n'
@@ -353,7 +423,7 @@ def make_kitosid(file_name):
             modules[module_name]['body'] = (
                               modules[module_name]['body'] + 
                               class_sig + '\n' +
-                              #class_doc + '\n' +
+                              class_doc + '\n' +
                               init_methods + '\n' +
                               methods + '\n\n')
     """
@@ -401,7 +471,16 @@ def make_kitosid(file_name):
 #    if package['name'] == 'id':
 #        modules[package['name']]['body'] = modules[package['name']]['body'] + id_impl()
 
+    constant_declarations = """
 
+DEFAULT = 0
+COMPARATIVE = 0
+PLENARY = 1
+FEDERATED = 0
+ISOLATED = 1
+AUTOMATIC = 0
+MANDATORY = 1
+DISABLED = -1"""
 
     ##
     # Finally, iterate through the completed package module structure and
@@ -414,7 +493,7 @@ def make_kitosid(file_name):
 #                              module + '.py', 'w')
             write_file = open(app_name(package['name']) + '/' + 
                               '_'.join(module.split('.')) + '.py', 'w')
-            write_file.write(('\n'.join(modules[module]['imports']) + '\n\n\n' +
+            write_file.write(('\n'.join(modules[module]['imports']) + constant_declarations + '\n\n\n' +
                               modules[module]['body']).encode('utf-8'))
             write_file.close
 
@@ -613,17 +692,21 @@ def make_method(package_name, method, interface_name, patterns):
 
 ##
 # The following method sig builder specifically creates the arguments.  It
-# is the one used by most of the builders.
-#
-#    for arg in method['args']:
-#        args.append(arg['var_name'] + '=None')
-#    method_sig = ('    def ' + method['name'] + '(' +
-#                ', '.join(args) + '):')
+# is the one used by most of the other builders.
 
+    if interface_name.endswith('List'):
+        for arg in method['args']:
+            args.append(arg['var_name'])
+        method_sig = ('    def ' + method['name'] + '(' +
+                    ', '.join(args) + '):')
 ##
 # The following method sig builder uses *args, **kwargs for all methods. It is used
 # by the dlkit builder to pass arguments in the blind.
-    method_sig = '    def ' + method['name'] + '(self, *args, **kwargs):'
+
+    elif method['args'] or interface_name.endswith('Manager') and not 'Runtime' in interface_name:
+        method_sig = '    def ' + method['name'] + '(self, *args, **kwargs):'
+    else:
+        method_sig = '    def ' + method['name'] + '(self):'
 
 
     method_doc = ''
@@ -697,7 +780,9 @@ def make_method_impl(package_name, method, interface_name, patterns):
     # appropriate template implementations in cases where there are differing
     # requirements:
     template_flag = '_template'
-    if interface_name.endswith('Manager') and 'session' in method['name']:
+    if interface_name.endswith('ProxyManager'):
+        pass
+    elif interface_name.endswith('Manager') and 'session' in method['name']:
         if patterns[method['name'][4:].split('_for_')[0] + '.is_manager_session']:
             template_flag = '_managertemplate'
         elif patterns[method['name'][4:].split('_for_')[0] + '.is_catalog_session']:
@@ -729,7 +814,11 @@ def make_method_impl(package_name, method, interface_name, patterns):
         kwargs['abcpkg_name'] = abc_pkg_name(kwargs['package_name'])
         kwargs['interface_name_under'] = camel_to_under(kwargs['interface_name'])
         kwargs['package_name_caps'] = package_name.title()
-        
+
+        if method['args']:
+             kwargs['args_kwargs_or_nothing'] = '*args, **kwargs'
+        else:
+             kwargs['args_kwargs_or_nothing'] = ''            
         if 'arg0_type_full' in kwargs:
             kwargs['arg0_type'] = kwargs['arg0_type_full'].split('.')[-1].strip('[]')
             kwargs['arg0_abcapp_name'] = abc_app_name(get_pkg_name(kwargs['arg0_type_full'].strip('[]')))
@@ -795,8 +884,10 @@ def make_method_impl(package_name, method, interface_name, patterns):
         #print interface_name, method['name']
 
         impl = template.substitute(kwargs).strip('\n')
-    if impl == '':
-        impl = '        raise Unimplemented()'
+    if impl == '' and method['args']:
+        impl = '        raise Unimplemented(\'Unimplemented in dlkit.services - args=\' + str(args) + \', kwargs=\' + str(kwargs))'
+    if impl == '' and not method['args']:
+        impl = '        raise Unimplemented(\'Unimplemented in dlkit.services\')'
     return impl
         
 

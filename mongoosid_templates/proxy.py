@@ -5,7 +5,7 @@ class ProxySession:
 
     import_statements = [
         'from ..osid.osid_errors import ' + session_errors,
-        'from ..primitives import *',
+        '#from ..primitives import IllegalState, Unimplemented, Unsupported',
         'from . import rules',
         'from ..authentication_process.objects import Authentication'
     ]
@@ -19,12 +19,12 @@ class ProxySession:
         return rules.ProxyCondition()"""
 
     get_proxy = """
-        if input._http_request is not None:
+        if input_._http_request is not None:
             authentication = Authentication()
-            authentication.set_django_user(input._http_request.user)
+            authentication.set_django_user(input_._http_request.user)
         else:
             authentication = None
-        effective_agent_id = input._effective_agent_id
+        effective_agent_id = input_._effective_agent_id
         # Also need to deal with effective dates and Local
         return rules.Proxy(authentication = authentication,
                      effective_agent_id = effective_agent_id)"""
@@ -32,12 +32,13 @@ class ProxySession:
 class Proxy:
     
     init = """
-    def __init__(self, authentication=None,
-                       effective_agent_id=None,
-                       effective_date=None,
-                       effective_clock_rate=None,
-                       locale=None,
-                       format_type=None):
+    def __init__(self, 
+                 authentication=None,
+                 effective_agent_id=None,
+                 effective_date=None,
+                 effective_clock_rate=None,
+                 locale=None,
+                 format_type=None):
         self._authentication = authentication
         self._effective_agent_id = effective_agent_id
         self._effective_date = effective_date
@@ -96,11 +97,6 @@ class Proxy:
 
 class ProxyCondition:
 
-    import_statements = [
-        'from ..osid.osid_errors import *',
-        'from ..primitives import *'
-    ]
-
     init = """
     def __init__(self):
         self._effective_agent_id = None
@@ -154,7 +150,7 @@ class ProxyCondition:
         if 'HTTP_LTI_USER_ID' in http_request.META:
             try:
                 authority = http_request.META['HTTP_LTI_TOOL_CONSUMER_INSTANCE_GUID']
-            except:
+            except AttributeError, KeyError:
                 authority = 'unknown_lti_consumer_instance'
             self.set_effective_agent_id(Id(
                 authority = authority,

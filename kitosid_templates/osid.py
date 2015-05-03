@@ -2,7 +2,10 @@
 
 class OsidProfile:
 
-#    init = """ """
+    init = """
+    def __init__(self):
+        self._provider_manager = None
+"""
 
     get_id = """
         pass"""
@@ -20,7 +23,7 @@ class OsidProfile:
         return self._provider_manager.get_release_date()"""
 
     supports_osid_version = """
-        return self._provider_manager.supports_osid_version()"""
+        return self._provider_manager.supports_osid_version(*args, **kwargs)"""
 
     get_locales = """
         return self._provider_manager.get_locales()"""
@@ -41,7 +44,7 @@ class OsidProfile:
         return self._provider_manager.get_proxy_record_types()"""
 
     supports_proxy_record_type = """
-        return self._provider_manager.supports_proxy_record_type()"""
+        return self._provider_manager.supports_proxy_record_type(*args, **kwargs)"""
 
 class OsidManager:
     pass
@@ -128,8 +131,8 @@ class OsidSession:
     FEDERATED = 0
     ISOLATED = 1
 
-    def __init__(self, provider_session): # This may never get called
-        self._provider_session = provider_session
+    def __init__(self, proxy):
+        self._proxy = proxy
 """
 
     get_locale = """
@@ -163,41 +166,41 @@ class OsidSession:
             else:
                 return self._proxy.get_authentication().get_agent_id()
         else:
-            return Id(identifier = 'MC3GUE$T@MIT.EDU',
-                      namespace = 'agent.Agent',
-                      authority = 'MIT-OEIT')"""
+            return Id(identifier='MC3GUE$T@MIT.EDU',
+                      namespace='agent.Agent',
+                      authority='MIT-OEIT')"""
 
     get_effective_agent = """
         from dlkit.services_impls.authentication.objects import Agent # This may want to be in Primordium?
         effective_agent_id = self.get_effective_agent_id()
         # This may want to be extended to get the Agent directly from the Authentication
         # if available and if not effective agent is available in the proxy
-        return Agent(identifier = effective_agent_id.get_identifier(),
-                  namespace = effective_agent_id.get_namespace(),
-                  authority = effective_agent_id.get_authority())"""
+        return Agent(identifier=effective_agent_id.get_identifier(),
+                     namespace=effective_agent_id.get_identifier_namespace(),
+                     authority=effective_agent_id.get_authority())"""
 
     supports_transactions = """
-        pass"""
+        raise Unimplemented()"""
 
     startTransaction = """
-        pass"""
+        raise Unimplemented()"""
 
 
 class OsidObject:
 
     init = """
-    def __init__(self, osid_object): # I will never be called :(
+    def __init__(self, osid_object):
         self._osid_object = osid_object
 """
 
     get_display_name = """
-        return self._osid_object.get_display_name(*args, **kwargs)"""
+        return self._osid_object.get_display_name()"""
 
     get_description = """
-        return self._osid_object.get_description(*args, **kwargs)"""
+        return self._osid_object.get_description()"""
 
     get_genus_type = """
-        return self._osid_object.get_genus_type(*args, **kwargs)"""
+        return self._osid_object.get_genus_type()"""
 
     is_of_genus_type = """
         return self._osid_object.is_of_genus_type(*args, **kwargs)"""
@@ -206,7 +209,9 @@ class OsidObject:
 class OsidList:
 
     init = """
-    def __init__(self, iter_object = [], count = None):
+    def __init__(self, iter_object=None, count=None):
+        if iter_object is None:
+            iter_object = []
         if count != None:
             self._count = count
         elif isinstance(iter_object, dict) or isinstance(iter_object, list):

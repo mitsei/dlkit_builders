@@ -4,7 +4,6 @@ from .error_lists import session_errors
 class ResourceProfile:
 
     import_statements_pattern = [
-        '# pylint: disable=no-member',
         'from ..primitives import Type',
         'from ..type.objects import TypeList',
         'from . import sessions',
@@ -26,8 +25,8 @@ class ResourceProfile:
         # Implemented from template for
         # osid.resource.ResourceProfile.get_resource_record_types_template
         try:
-            from .records import types
-            record_type_maps = types.${object_name_upper}_RECORD_TYPES
+            from ..records import types
+            record_type_maps = types.${object_name_upper}_RECORD_TYPES # pylint: disable=no-member
         except (ImportError, AttributeError):
             return TypeList([])
         record_types = []
@@ -41,8 +40,8 @@ class ResourceProfile:
         if ${arg0_name} is None:
             raise NullArgument()
         try:
-            from .records import types
-            record_type_maps = types.${object_name_upper}_RECORD_TYPES
+            from ..records import types
+            record_type_maps = types.${object_name_upper}_RECORD_TYPES # pylint: disable=no-member
         except (ImportError, AttributeError):
             return False
         supports = False
@@ -65,7 +64,7 @@ class ResourceManager:
     get_resource_lookup_session_template = """
         if not self.supports_${support_check}():
             raise Unimplemented()
-        return ${return_module}.${return_type}(runtime=self._runtime)"""
+        return ${return_module}.${return_type}(runtime=self._runtime) # pylint: disable=no-member"""
 
     get_resource_lookup_session_for_bin_template = """
         if not ${arg0_name}:
@@ -75,39 +74,8 @@ class ResourceManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise NotFound
         ##
-        return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)"""
+        return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
 
-    old_get_resource_lookup_session_template = """
-        if not self.supports_${support_check}():
-            raise Unimplemented()
-        try:
-            from . import ${return_module}
-        except ImportError:
-            raise #OperationFailed()
-        try:
-            session = ${return_module}.${return_type}(runtime=self._runtime)
-        except AttributeError:
-            raise #OperationFailed()
-        return session"""
-
-    old_get_resource_lookup_session_for_bin_template = """
-        if not ${arg0_name}:
-            raise NullArgument
-        if not self.supports_${support_check}():
-            raise Unimplemented()
-        ##
-        # Also include check to see if the catalog Id is found otherwise raise NotFound
-        ##
-        try:
-            from . import ${return_module}
-        except ImportError:
-            raise #OperationFailed()
-        try:
-            session = ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)
-#            session = ${return_module}.${return_type}(${arg0_name}.get_identifier())
-        except AttributeError:
-            raise #OperationFailed()
-        return session"""
 
 class ResourceProxyManager:
 
@@ -133,41 +101,7 @@ class ResourceProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise NotFound
         ##
-        return ${return_module}.${return_type}(${arg0_name}, proxy=proxy, runtime=self._runtime) # pylint: disable=no-member"""
-
-    old_get_resource_lookup_session_template = """
-        if proxy is None:
-            raise NullArgument()
-        if not self.supports_${support_check}():
-            raise Unimplemented()
-        try:
-            from . import ${return_module}
-        except ImportError:
-            raise OperationFailed()
-        try:
-            session = ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime)
-        except AttributeError:
-            raise OperationFailed()
-        return session"""
-
-    old_get_resource_lookup_session_for_bin_template = """
-        if ${arg0_name} is None or proxy is None:
-            raise NullArgument
-        if not self.supports_${support_check}():
-            raise Unimplemented()
-        ##
-        # Also include check to see if the catalog Id is found otherwise raise NotFound
-        ##
-        try:
-            from . import ${return_module}
-        except ImportError:
-            raise OperationFailed()
-        try:
-            session = ${return_module}.${return_type}(${arg0_name}, proxy=proxy, runtime=self._runtime)
-#            session = ${return_module}.${return_type}(${arg0_name}.get_identifier())
-        except AttributeError:
-            raise #OperationFailed()
-        return session"""
+        return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime) # pylint: disable=no-member"""
 
 
 class ResourceLookupSession:
@@ -332,7 +266,7 @@ class ResourceLookupSession:
             result = collection.find().sort('_id', DESCENDING)
             count = collection.count()
         mongo_client.close()
-        return objects.${return_type}(result, count=count, runtime=self._runtime)"""
+        return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class ResourceQuerySession:
 
@@ -386,7 +320,7 @@ class ResourceQuerySession:
         result = collection.find(query_terms).sort('_id', DESCENDING)
         count = collection.find(query_terms).count()
         mongo_client.close()
-        return objects.${return_type}(result, count=count, runtime=self._runtime)"""
+        return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
@@ -607,7 +541,7 @@ class BinLookupSession:
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
             # Try creating an orchestrated ${cat_name}.  Let it raise NotFound()
-            result = self._create_orchestrated_catalog_map(${arg0_name}, '${package_name}', '${cat_name}')
+            result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
         mongo_client.close()
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
@@ -990,7 +924,7 @@ class Resource:
 
     init_template = """
     try:
-        from .records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
+        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
     except (ImportError, AttributeError):
         _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${interface_name}'
@@ -1072,7 +1006,7 @@ class ResourceQuery:
     init_template = """
     def __init__(self):
         try:
-            from .records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
+            from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
         except (ImportError, AttributeError):
             record_type_data_sets = {}
         self._all_supported_record_type_data_sets = record_type_data_sets
@@ -1097,7 +1031,7 @@ class ResourceForm:
 
     init_template = """
     try:
-        from .records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
+        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
     except (ImportError, AttributeError):
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'
@@ -1226,16 +1160,13 @@ class ResourceList:
             next_item = self.next()
         except StopIteration:
             raise IllegalState('no more elements available in this list')
-        except: #Need to specify exceptions here
-            raise OperationFailed()
+        #except: #Need to specify exceptions here
+        #    raise OperationFailed()
         else:
             return next_item
 
     def next(self):
-        try:
-            next_item = osid_objects.OsidList.next(self)
-        except:
-            raise
+        next_item = osid_objects.OsidList.next(self)
         if isinstance(next_item, dict):
             next_item = ${return_type}(next_item, db_prefix=self._db_prefix, runtime=self._runtime)
         return next_item"""
@@ -1251,9 +1182,9 @@ class ResourceList:
             while i < ${arg0_name}:
                 try:
                     next_list.append(self.next())
-                except: #Need to specify exceptions here
-                    raise OperationFailed()
-                i = i + 1
+                except StopIteration:
+                    break
+                i += 1
             return next_list"""
 
 class Bin:
@@ -1264,7 +1195,7 @@ class Bin:
 
     init_template = """
     try:
-        from .records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
+        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
     except (ImportError, AttributeError):
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${interface_name}'

@@ -219,7 +219,6 @@ class TypeAdminSession:
             raise NotFound()
 """
 
-
 class TypeForm:
 
     init = """

@@ -3,6 +3,11 @@
 class ResourceProfile:
 
     init_template = """
+    def __init__(self, interface_name):
+        osid_managers.OsidProfile.__init__(self, '${pkg_name}', interface_name)
+"""
+
+    new_idea_for_init_template = """
     def __init__(self, provider_manager, authz_session):
         self._provider_manager = provider_manager
         self._authz_session = authz_session
@@ -27,15 +32,28 @@ class ResourceManager:
 
     init_template = """
     def __init__(self):
+        ${pkg_name_caps}Profile.__init__(self, '${interface_name}')
+
+    def initialize(self, runtime):
+        osid_managers.OsidManager.initialize(self, runtime)
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl) # need to add version argument
+"""    
+
+    new_idea_for_init_template = """
+    def __init__(self):
         from . import settings
         import importlib
         provider_module = importlib.import_module(settings.PROVIDER_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
         authz_module = importlib.import_module(settings.AUTHZ_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
-        Provider${interface_name} = getattr(provider_module, '${interface_name}')
-        authz_manager = getattr(authz_module, 'AuthorizationManager')
+        provider_manager = getattr(provider_module, '${interface_name}')()
+        authz_manager = getattr(authz_module, 'AuthorizationManager')()
+        authz_session = authz_manager.get_authorization_session()
         #self._provider_manager = Provider${interface_name}()
         #self._authz_session = authz_manager().get_authorization_session()
-        ${object_name}Profile.__init__(Provider${interface_name}(), authz_manager().get_authorization_session())
+        ${pkg_name_caps}Profile.__init__(provider_manager, authz_session)
         self._my_runtime = None
 
     def initialize(self, runtime):
@@ -67,15 +85,27 @@ class ResourceProxyManager:
 
     init_template = """
     def __init__(self):
+        ${pkg_name_caps}Profile.__init__(self, '${interface_name}')
+
+    def initialize(self, runtime):
+        osid_managers.OsidProxyManager.initialize(self, runtime)
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl) # need to add version argument
+"""
+    new_idea_for_init_template = """
+    def __init__(self):
         from . import settings
         import importlib
         provider_module = importlib.import_module(settings.PROVIDER_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
         authz_module = importlib.import_module(settings.AUTHZ_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
-        Provider${interface_name} = getattr(provider_module, '${interface_name}')
-        authz_manager = getattr(authz_module, 'AuthorizationManager')
+        provider_manager = getattr(provider_module, '${interface_name}')()
+        authz_manager = getattr(authz_module, 'AuthorizationManager')()
+        authz_session = authz_manager.get_authorization_session()
         #self._provider_manager = Provider${interface_name}()
         #self._authz_session = authz_manager().get_authorization_session()
-        ${object_name}Profile.__init__(Provider${interface_name}(), authz_manager().get_authorization_session())
+        ${pkg_name_caps}Profile.__init__(provider_manager, authz_session)
         self._my_runtime = None
 
     def initialize(self, runtime):
