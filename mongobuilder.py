@@ -123,21 +123,21 @@ def make_mongoosid(file_name):
                      
     ##
     # Write the osid license documentation file.
-    write_file = open(app_name(package['name']) + '/' + 
-                     pkg_name(package['name']) + '/license.py', 'w')
-    write_file.write((utf_code + '\"\"\"' +
-                      package['title'] + '\n' +
-                      package['name'] + ' version ' +
-                      package['version'] + '\n\n'+
-                      package['copyright'] + '\n\n' +
-                      package['license'] + '\n\n\"\"\"').encode('utf-8') +
-                      '\n')
-    write_file.close
+    #write_file = open(app_name(package['name']) + '/' + 
+    #                 pkg_name(package['name']) + '/license.py', 'w')
+    #write_file.write((utf_code + '\"\"\"' +
+    #                  package['title'] + '\n' +
+    #                  package['name'] + ' version ' +
+    #                  package['version'] + '\n\n'+
+    #                  package['copyright'] + '\n\n' +
+    #                  package['license'] + '\n\n\"\"\"').encode('utf-8') +
+    #                  '\n')
+    #write_file.close
     
     ##
     # Write the summary documentation for this package.
     write_file = open(app_name(package['name']) + '/' + 
-                      pkg_name(package['name']) + '/doc.py', 'w')
+                      pkg_name(package['name']) + '/summary_doc.py', 'w')
     write_file.write((utf_code + '\"\"\"' +
                       package['title'] + '\n' +
                       package['name'] + ' version ' +
@@ -175,11 +175,12 @@ def make_mongoosid(file_name):
 
     ##
     # Assemble and write profile.py file for this package.
-    profile_str = make_profile_py(package)
-    writeFile = open(app_name(package['name']) + '/' +
-                     pkg_name(package['name']) + '/profile.py', 'w')
-    writeFile.write(profile_str)
-    writeFile.close() 
+    if package['name'] in managers_to_implement:
+        profile_str = make_profile_py(package)
+        writeFile = open(app_name(package['name']) + '/' +
+                         pkg_name(package['name']) + '/profile.py', 'w')
+        writeFile.write(profile_str)
+        writeFile.close() 
 
     ##
     # Get the pattern map for this osid package.
@@ -192,6 +193,13 @@ def make_mongoosid(file_name):
     # The real work starts here.  Iterate through all interfaces to build 
     # all the django classes for this osid package.
     for interface in package['interfaces']:
+
+        ##
+        # Check to see if manager should be implemented (this should 
+        # probably be moved to binder_helpers.flagged_for_implementation)
+        if (interface['category'] == 'managers' and 
+                      package['name'] not in managers_to_implement):
+            continue
 
         exceptions = ['ObjectiveHierarchySession',
                       'ObjectiveHierarchyDesignSession',
@@ -350,10 +358,10 @@ def make_mongoosid(file_name):
 
     ##
     # Finally,  write out the implementation log for this service package
-    write_file = open(app_name(package['name']) + '/' + 
-                      pkg_name(package['name']) + '/impl_log.txt', 'w')
-    write_file.write(make_impl_log(patterns['impl_log']))
-    write_file.close
+    #write_file = open(app_name(package['name']) + '/' + 
+    #                  pkg_name(package['name']) + '/impl_log.txt', 'w')
+    #write_file.write(make_impl_log(patterns['impl_log']))
+    #write_file.close
 
 ##
 # Try loading hand-built implementations class for this interface

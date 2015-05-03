@@ -55,7 +55,7 @@ def make_azosid(file_name):
     package = json.load(read_file)
     read_file.close()
     
-    if package['name'] not in packages_to_implement:
+    if package['name'] not in managers_to_implement:
         return
 
     importStr = ''

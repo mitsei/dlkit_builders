@@ -54,7 +54,7 @@ def make_kitosid(file_name):
     package = json.load(read_file)
     read_file.close()
 
-    if package['name'] not in packages_to_implement:
+    if package['name'] not in managers_to_implement:
         return
     print "--> Services Implement Package:", package['name']
 
@@ -193,6 +193,13 @@ def make_kitosid(file_name):
     # The real work starts here.  Iterate through manager and catalog 
     # interfaces only to build the 'managers' and some 'objects' modules.
     for interface in package['interfaces']:
+
+        ##
+        # Check to see if manager should be implemented (this should 
+        # probably be moved to binder_helpers.flagged_for_implementation)
+        if (interface['category'] == 'managers' and 
+                      package['name'] not in managers_to_implement):
+            continue
 
         ##
         # Check to see if this interface is meant to be implemented.

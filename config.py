@@ -18,6 +18,19 @@ packages_to_implement = [
     'type',
     ]
 
+managers_to_implement = [
+    'assessment',
+    'commenting',
+    'grading',
+    'hierarchy',
+    'learning',
+    'osid',
+    'proxy',
+    'relationship',
+    'repository',
+    'type',
+    ]
+
 sessions_to_implement = [
     ### assessment service:
     'AssessmentSession',
