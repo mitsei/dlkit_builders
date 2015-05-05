@@ -1,3 +1,5 @@
+"""Not sure why this is here. Seems duplicated with osid.records. use that instead?"""
+
 from ...abstract_osid.osid import records as abc_osid_records
 
 
@@ -10,6 +12,11 @@ class OsidRecord(abc_osid_records.OsidRecord):
     interface specification is identified with a ``Type``.
 
     """
+
+    def __init__(self):
+        # This is set in implemented Records.  Should super __init__
+        #self._implemented_record_type_identifiers = None
+        pass
 
     def __iter__(self):
         for attr in dir(self):

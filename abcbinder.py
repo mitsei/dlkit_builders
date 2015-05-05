@@ -273,33 +273,34 @@ def make_methods(methods):
     body = []
     for method in methods:
         body.append(make_method(method))
+
         ##
         # Here is where we add the Python properties stuff:
         if method['name'].startswith('get_') and method['args'] == []:
             body.append('    ' + fix_reserved_word(method['name'][4:]) + 
-                    ' = property(fget=' + method['name'] + ')')
+                    ' = abc.abstractproperty(fget=' + method['name'] + ')')
         elif method['name'].startswith('set_') and len(method['args']) == 1:
-            if ('    ' + fix_reserved_word(method['name'][4:]) + ' = property(fdel=clear_' + method['name'][4:] + ')') in body:
-                body.remove('    ' + fix_reserved_word(method['name'][4:]) + ' = property(fdel=clear_' + method['name'][4:] + ')')
+            if ('    ' + fix_reserved_word(method['name'][4:]) + ' = abc.abstractproperty(fdel=clear_' + method['name'][4:] + ')') in body:
+                body.remove('    ' + fix_reserved_word(method['name'][4:]) + ' = abc.abstractproperty(fdel=clear_' + method['name'][4:] + ')')
                 body.append('    ' + fix_reserved_word(method['name'][4:]) + 
-                        ' = property(fset=' + method['name'] +
+                        ' = abc.abstractproperty(fset=' + method['name'] +
                         ', fdel=clear_' + method['name'][4:] + ')')
             else:
                 body.append('    ' + fix_reserved_word(method['name'][4:]) + 
-                        ' = property(fset=' + method['name'] + ')')
+                        ' = abc.abstractproperty(fset=' + method['name'] + ')')
         elif method['name'].startswith('clear_') and method['args'] == []:
-            if ('    ' + fix_reserved_word(method['name'][6:]) + ' = property(fset=set_' + method['name'][6:] + ')') in body:
-                body.remove('    ' + fix_reserved_word(method['name'][6:]) + ' = property(fset=set_' + method['name'][6:] + ')')
+            if ('    ' + fix_reserved_word(method['name'][6:]) + ' = abc.abstractproperty(fset=set_' + method['name'][6:] + ')') in body:
+                body.remove('    ' + fix_reserved_word(method['name'][6:]) + ' = abc.abstractproperty(fset=set_' + method['name'][6:] + ')')
                 body.append('    ' + fix_reserved_word(method['name'][6:]) + 
-                        ' = property(fset=set_' + method['name'][6:] +
+                        ' = abc.abstractproperty(fset=set_' + method['name'][6:] +
                         ', fdel=' + method['name'] + ')')
             else:
                 body.append('    ' + method['name'][6:] + 
-                        ' = property(fdel=' + method['name'] + ')')
+                        ' = abc.abstractproperty(fdel=' + method['name'] + ')')
         if method['name'] == 'get_id':
-                body.append('    ident = property(fget=' + method['name'] + ')')
+                body.append('    ident = abc.abstractproperty(fget=' + method['name'] + ')')
         if method['name'] == 'get_identifier_namespace':
-                body.append('    namespace = property(fget=' + method['name'] + ')')
+                body.append('    namespace = abc.abstractproperty(fget=' + method['name'] + ')')
 
     return '\n\n'.join(body)
     

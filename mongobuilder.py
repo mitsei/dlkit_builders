@@ -154,8 +154,10 @@ def make_mongoosid(file_name):
         pylintstr = (
             '# pylint: disable=no-init\n' +
             '#     Numerous classes don\'t require __init__.\n' +
-            '# pylint: disable=too-many-public-methods\n' + 
+            '# pylint: disable=too-many-public-methods,too-few-public-methods\n' + 
             '#     Number of methods are defined in specification\n' +
+            '# pylint: disable=protected-access\n' + 
+            '#     Access to protected methods allowed in package mongo package scope\n' +
             '# pylint: disable=too-many-ancestors\n' + 
             '#     Inheritance defined in specification\n')
         modules[module]['imports'].append(pylintstr)
@@ -189,6 +191,19 @@ def make_mongoosid(file_name):
     patterns = json.load(read_file)
     read_file.close()
 
+    exceptions = ['ObjectiveHierarchySession',
+                  'ObjectiveHierarchyDesignSession',
+                  'ObjectiveSequencingSession',
+                  'ObjectiveRequisiteSession',
+                  'ObjectiveRequisiteAssignmentSession',]
+
+    excepted_osid_categories = ['properties',
+                                'query_inspectors',
+                                'receivers',
+                                'search_orders',
+                                'searches',]
+
+
     ##
     # The real work starts here.  Iterate through all interfaces to build 
     # all the django classes for this osid package.
@@ -201,14 +216,9 @@ def make_mongoosid(file_name):
                       package['name'] not in managers_to_implement):
             continue
 
-        exceptions = ['ObjectiveHierarchySession',
-                      'ObjectiveHierarchyDesignSession',
-                      'ObjectiveSequencingSession',
-                      'ObjectiveRequisiteSession',
-                      'ObjectiveRequisiteAssignmentSession',]
         ##
         # Check to see if this interface is meant to be implemented.
-        if package['name'] != 'osid':
+        if package['name'] != 'osid' and interface['category'] not in excepted_osid_categories:
             if flagged_for_implementation(interface, 
                     sessions_to_implement, objects_to_implement, variants_to_implement):
                 if interface['shortname'] in exceptions:
@@ -668,6 +678,7 @@ def make_metadata_initers(persisted_data, initialized_data, return_types):
     initer = ''
     default = ''
     for data_name in persisted_data:
+        data_name_upper = data_name.upper()
         template = ''
         if (persisted_data[data_name] != 'OsidCatalog' and 
             data_name not in initialized_data):
@@ -721,7 +732,7 @@ def make_metadata_initers(persisted_data, initialized_data, return_types):
                     '_default = self._' + data_name + '_metadata[\'default_decimal_values\'][0]\n')
 
         if template:
-            initer = (initer + template.substitute({'data_name': data_name}))
+            initer = (initer + template.substitute({'data_name': data_name, 'data_name_upper': data_name_upper}))
     return imports + initer + '\n' + default +'\n'
 
 
@@ -971,20 +982,20 @@ def make_method_impl(package_name, method, interface, patterns):
 
 def make_profile_py(package):    
     osid_package = package['name']
-#    print ('.'.join(app_name(package['name']).split('/')[1:]) + '.' +
-#                                    pkg_name(package['name']) + '.profile', 'dlkit_project.builders')
+    #print ('.'.join(app_name(package['name']).split('/')[1:]) + '.' +
+    #                                pkg_name(package['name']) + '.profile', 'dlkit_project.builders')
     try:
         old_profile = import_module('.'.join(app_name(package['name']).split('/')[1:]) + '.' +
                                     pkg_name(package['name']) + '.profile', 'dlkit_project.builders')
     except ImportError:
         print 'Old Profile not found:', pkg_name(package['name'])
-        version_list = [0, 0, 0]
+        version_list = [0, 1, 0]
         old_supports = []
     else:
         if hasattr(old_profile, 'VERSIONCOMPONENTS'):
             version_list = old_profile.VERSIONCOMPONENTS
         else:
-            version_list = [0, 0, 0]
+            version_list = [0, 1, 0]
         if hasattr(old_profile, 'SUPPORTS'):
             old_supports = old_profile.SUPPORTS
         
@@ -997,8 +1008,8 @@ def make_profile_py(package):
 
     supports_str = """
 SUPPORTS = [ # Uncomment the following lines when implementations exist:
-#'supports_journal_rollback',
-#'supports_journal_branching'"""
+    #'supports_journal_rollback',
+    #'supports_journal_branching'"""
 
     ##
     # Find the Profile interface for this package
@@ -1023,7 +1034,7 @@ SUPPORTS = [ # Uncomment the following lines when implementations exist:
                 comment = ''
             else: # Add check for session implementation flags here
                 comment = '#'
-            supports_str = supports_str + ',\n' + comment + '\'' + method['name'] +'\''
+            supports_str = supports_str + ',\n    ' + comment + '\'' + method['name'] +'\''
     supports_str = supports_str + '\n]'
 
     try:

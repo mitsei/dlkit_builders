@@ -47,13 +47,14 @@ def make_mdatum(file_name):
     read_file.close()
 
     mdata = ''
-    import_str = """
+    import_str = '\"\"\"Mongo osid metadata configurations for ' + package['name'] + ' service.\"\"\"\n\n'
+    import_str = import_str + """
 from .. import types
 from ..primitives import Type
-default_language_type = Type(**types.Language().get_type_data('DEFAULT'))
-default_script_type = Type(**types.Script().get_type_data('DEFAULT'))
-default_format_type = Type(**types.Format().get_type_data('DEFAULT'))
-default_genus_type = Type(**types.Genus().get_type_data('DEFAULT'))"""
+DEFAULT_LANGUAGE_TYPE = Type(**types.Language().get_type_data('DEFAULT'))
+DEFAULT_SCRIPT_TYPE = Type(**types.Script().get_type_data('DEFAULT'))
+DEFAULT_FORMAT_TYPE = Type(**types.Format().get_type_data('DEFAULT'))
+DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data('DEFAULT'))"""
 
 
 
@@ -238,7 +239,7 @@ def make_mdata_maps(interface, patterns):
 ##### NEED TO FINISH THIS #####
 def make_mdata_map(data_name, data_type, options):
     mdata = ''
-    lead_in = data_name + ' = {'
+    lead_in = data_name.upper() + ' = {'
     lead_out = '\n    }\n'
 
     if data_type == 'boolean':

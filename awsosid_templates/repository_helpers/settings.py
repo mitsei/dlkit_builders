@@ -1,3 +1,4 @@
+"""Settings for AWS Adapter repository implementation"""
 # -*- coding: utf-8 -*-
 
 ANCHOR_PATH = 'dlkit.aws_adapter'

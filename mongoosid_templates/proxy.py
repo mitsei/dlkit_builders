@@ -1,6 +1,20 @@
 
 from .error_lists import session_errors
 
+class ProxyManager:
+
+    init = """
+    def __init__(self):
+        osid_managers.OsidManager.__init__(self)
+"""
+
+class ProxyProxyManager:
+
+    init = """
+    def __init__(self):
+        osid_managers.OsidProxyManager.__init__(self)
+"""
+
 class ProxySession:
 
     import_statements = [

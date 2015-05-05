@@ -260,7 +260,7 @@ def make_azosid(file_name):
             if package['name'] == 'osid' and interface['category'] not in ['markers', 'sessions']:
                 ##
                 # Add the osid_error import
-                import_str = 'from ..osid.osid_errors import Unimplemented, IllegalState, NullArgument'
+                import_str = 'from ..osid.osid_errors import Unimplemented, IllegalState, NullArgument, OperationFailed'
                 if import_str not in modules[interface['category']]['imports']:
                     modules[interface['category']]['imports'].append(import_str)
                 ##
@@ -288,7 +288,7 @@ def make_azosid(file_name):
             elif interface['category'] == 'managers':
                 ##
                 # Add the osid_error import
-                import_str = 'from ..osid.osid_errors import Unimplemented'
+                import_str = 'from ..osid.osid_errors import Unimplemented, OperationFailed'
                 if (import_str not in modules[interface['category']]['imports'] and
                     inherit_category != 'UNKNOWN_MODULE'):
                     modules[interface['category']]['imports'].append(import_str)

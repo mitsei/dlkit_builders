@@ -1,11 +1,13 @@
+"""Type metadata elements"""
+
 from .. import types
 from ..primitives import Type
-default_language_type = Type(**types.Language().get_type_data('DEFAULT'))
-default_script_type = Type(**types.Script().get_type_data('DEFAULT'))
-default_format_type = Type(**types.Format().get_type_data('DEFAULT'))
-default_genus_type = Type(**types.Genus().get_type_data('DEFAULT'))
+DEFAULT_LANGUAGE_TYPE = Type(**types.Language().get_type_data('DEFAULT'))
+DEFAULT_SCRIPT_TYPE = Type(**types.Script().get_type_data('DEFAULT'))
+DEFAULT_FORMAT_TYPE = Type(**types.Format().get_type_data('DEFAULT'))
+DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data('DEFAULT'))
 
-display_name = {
+DISPLAY_NAME = {
     'element_label': 'Display Name',
     'instructions': 'Required, 255 character maximum',
     'required': False,
@@ -14,9 +16,9 @@ display_name = {
     'array': False,
     'default_string_values': [{
         'text': '',
-        'languageTypeId': str(default_language_type),
-        'scriptTypeId': str(default_script_type),
-        'formatTypeId': str(default_format_type),
+        'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+        'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+        'formatTypeId': str(DEFAULT_FORMAT_TYPE),
         }],
     'syntax': 'STRING',
     'minimum_string_length': 0, 
@@ -24,7 +26,7 @@ display_name = {
     'string_set': []
     }
     
-display_label = {
+DISPLAY_LABEL = {
     'element_label': 'Display Label',
     'instructions': 'Optional',
     'required': False,
@@ -33,9 +35,9 @@ display_label = {
     'array': False,
     'default_string_values': [{
         'text': '',
-        'languageTypeId': str(default_language_type),
-        'scriptTypeId': str(default_script_type),
-        'formatTypeId': str(default_format_type),
+        'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+        'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+        'formatTypeId': str(DEFAULT_FORMAT_TYPE),
         }],
     'syntax': 'STRING',
     'minimum_string_length': 0, 
@@ -43,7 +45,7 @@ display_label = {
     'string_set': []
     }
 
-description = {
+DESCRIPTION = {
     'element_label': 'Description',
     'instructions': 'Optional',
     'required': False,
@@ -52,9 +54,9 @@ description = {
     'array': False,
     'default_string_values': [{
         'text': '',
-        'languageTypeId': str(default_language_type),
-        'scriptTypeId': str(default_script_type),
-        'formatTypeId': str(default_format_type),
+        'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+        'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+        'formatTypeId': str(DEFAULT_FORMAT_TYPE),
         }],
     'syntax': 'STRING',
     'minimum_string_length': 0, 
@@ -62,7 +64,7 @@ description = {
     'string_set': []
     }
     
-domain = {
+DOMAIN = {
     'element_label': 'Domain',
     'instructions': 'Optional',
     'required': False,
@@ -71,9 +73,9 @@ domain = {
     'array': False,
     'default_string_values': [{
         'text': '',
-        'languageTypeId': str(default_language_type),
-        'scriptTypeId': str(default_script_type),
-        'formatTypeId': str(default_format_type),
+        'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+        'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+        'formatTypeId': str(DEFAULT_FORMAT_TYPE),
         }],
     'syntax': 'STRING',
     'minimum_string_length': 0, 

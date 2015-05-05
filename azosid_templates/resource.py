@@ -69,16 +69,22 @@ class ResourceManager:
     get_resource_lookup_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_template
-        return sessions.${return_type}(
-            self._provider_manager.${method_name}(),
-            self._authz_session)"""
+        try:
+            return getattr(sessions, '${return_type}')(
+                self._provider_manager.${method_name}(),
+                self._authz_session)
+        except AttributeError:
+            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
 
     get_resource_lookup_session_for_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
-        return sessions.${return_type}(
-            self._provider_manager.${method_name}(${arg0_name}),
-            self._authz_session)"""
+        try:
+            return getattr(sessions, '${return_type}')(
+                self._provider_manager.${method_name}(${arg0_name}),
+                self._authz_session)
+        except AttributeError:
+            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
 
 
 class ResourceProxyManager:
@@ -121,18 +127,24 @@ class ResourceProxyManager:
     get_resource_lookup_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_template
-        return sessions.${return_type}(
-            self._provider_manager.${method_name}(proxy),
-            self._authz_session,
-            proxy)"""
+        try:
+            return getattr(sessions, '${return_type}')(
+                self._provider_manager.${method_name}(proxy),
+                self._authz_session,
+                proxy)
+        except AttributeError:
+            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
 
     get_resource_lookup_session_for_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
-        return sessions.${return_type}(
-            self._provider_manager.${method_name}(${arg0_name}, proxy),
-            self._authz_session,
-            proxy)"""
+        try:
+            return getattr(sessions, '${return_type}')(
+                self._provider_manager.${method_name}(${arg0_name}, proxy),
+                self._authz_session,
+                proxy)
+        except AttributeError:
+            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
 
 
 class ResourceLookupSession:

@@ -8,6 +8,12 @@ class OsidProfile:
         'from ..primitives import Type',
     ]
 
+    init = """
+    
+    def __init__(self):
+        self._runtime = None
+        self._config = None
+"""
     get_id = """
         return Id(**profile.ID)
         """
@@ -97,8 +103,7 @@ class OsidManager:
 
     init = """
     def __init__(self):
-        self._runtime = None
-        self._config = None
+        OsidProfile.__init__(self)
 """
     
     initialize = """
@@ -117,8 +122,7 @@ class OsidProxyManager:
 
     init = """
     def __init__(self):
-        self._runtime = None
-        self._config = None
+        OsidProfile.__init__(self)
 """
     
     initialize = """
@@ -144,7 +148,8 @@ class OsidRuntimeManager:
 class Identifiable:
 
     import_statements = [
-        'from ..primitives import *'
+        'from ..primitives import Id',
+        'from ..osid.osid_errors import NullArgument, Unimplemented, Unsupported',
     ]  
 
     init = """
@@ -153,6 +158,10 @@ class Identifiable:
         _authority = socket.gethostname().lower().split('.')[0]
     else:
         _authority = socket.gethostname()
+    _namespace = 'osid.Identifiable'
+
+    def __init__(self):
+        self._my_map = {}
 """
 
     get_id = """
@@ -168,7 +177,18 @@ class Identifiable:
 
 class Extensible:
 
+    import_statements = [
+        'from ..primitives import Id',
+        'from ..primitives import Type',
+    ]  
+
     init = """
+
+    def __init__(self):
+        self._records = None
+        self._supported_record_type_ids = None
+        self._record_type_data_sets = None
+
     def __iter__(self):
         for attr in dir(self):
             if not attr.startswith('__'):
@@ -184,17 +204,17 @@ class Extensible:
                     return self._records[record][name]
                 except AttributeError:
                     pass
-        raise AttributeError(name)
+        abc_osid_markers.Extensible.__getattr__(name)
 
-    def _get_record(self, recordType):
-        \"\"\"Get the record string type value given the recordType.\"\"\"
-        if recordType is None:
+    def _get_record(self, record_type):
+        \"\"\"Get the record string type value given the record_type.\"\"\"
+        if record_type is None:
             raise NullArgument()
-        if not self.has_record_type(recordType):
+        if not self.has_record_type(record_type):
             raise Unsupported()
-        if str(recordType) not in self._records:
+        if str(record_type) not in self._records:
             raise Unimplemented()
-        return self._records[str(recordType)]
+        return self._records[str(record_type)]
 
     def _load_records(self, record_type_idstrs):
         \"\"\"Load all records from given record_type_idstrs.\"\"\"
@@ -225,8 +245,6 @@ class Extensible:
         return str(record_type) in self._supported_record_type_ids"""
 
     get_record_types = """
-        from ..primitives import Id
-        from ..primitives import Type
         from ..type.objects import TypeList
         type_list = []
         for type_idstr in self._supported_record_type_ids:
@@ -237,22 +255,45 @@ class Temporal:
 
     import_statements = [
         'from ..primitives import DateTime',
-        'import datetime'
     ]
+
+    init = """
+    def __init__(self):
+        self._my_map = {}
+"""
 
     is_effective = """
         now = DateTime.now()
-        return (self.get_start_date() <= now and self.get_end_date() >= now)"""
+        return self.get_start_date() <= now and self.get_end_date() >= now"""
 
     get_start_date = """
-        sd = self._my_map['startDate']
-        return DateTime(sd['year'], sd['month'], sd['day'], sd['hour'], sd['minute'], sd['second'], sd['microsecond'])"""
+        sdate = self._my_map['startDate']
+        return DateTime(
+            sdate['year'],
+            sdate['month'],
+            sdate['day'],
+            sdate['hour'],
+            sdate['minute'],
+            sdate['second'],
+            sdate['microsecond'])"""
 
     get_end_date = """
-        ed = self._my_map['endDate']
-        return DateTime(ed['year'], ed['month'], ed['day'], ed['hour'], ed['minute'], ed['second'], ed['microsecond'])"""
+        edate = self._my_map['endDate']
+        return DateTime(
+            edate['year'],
+            edate['month'],
+            edate['day'],
+            edate['hour'],
+            edate['minute'],
+            edate['second'],
+            edate['microsecond'])"""
 
 class Containable:
+
+    init = """
+    def __init__(self):
+        self._my_map = {}
+"""
 
     is_sequestered = """
         return self._my_map['sequestered']"""
@@ -264,7 +305,7 @@ class Operable:
         return self.is_operational() and (not self.is_disabled() or self.is_enabled())"""
 
     is_enabled = """
-        # Someday I'll have a real implementation, but for now I just: 
+        # Someday I'll have a real implementation, but for now I just:
         return False"""
 
     is_disabled = """
@@ -681,7 +722,7 @@ class OsidForm:
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace,
                              identifier = 'display_name')}
-        self._journal_comment_metadata.update(mdata_conf.journal_comment)
+        self._journal_comment_metadata.update(mdata_conf.JOURNAL_COMMENT)
         self._journal_comment_default = dict(self._journal_comment_metadata['default_string_values'][0])
         self._journal_comment = self._journal_comment_default
         self._validation_messages = {}
@@ -927,13 +968,13 @@ class OsidTemporalForm:
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace, 
                              identifier = 'start_date')}
-        self._start_date_metadata.update(mdata_conf.start_date)
+        self._start_date_metadata.update(mdata_conf.START_DATE)
         self._start_date_metadata.update({'default_date_time_values': [self._get_date_map(datetime.datetime.now())]})
         self._end_date_metadata = {
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace, 
                              identifier = 'end_date')}
-        self._end_date_metadata.update(mdata_conf.end_date)
+        self._end_date_metadata.update(mdata_conf.END_DATE)
 
     def _init_map(self):
         self._my_map['startDate'] = self._start_date_metadata['default_date_time_values'][0]
@@ -1025,21 +1066,21 @@ class OsidObjectForm:
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace,
                              identifier = 'display_name')}
-        self._display_name_metadata.update(mdata_conf.display_name)
+        self._display_name_metadata.update(mdata_conf.DISPLAY_NAME)
         if 'default_display_name' in kwargs:
             self._display_name_metadata['default_string_values'][0]['text'] = kwargs['default_display_name']
         self._description_metadata = {
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace, 
                              identifier = 'description')}
-        self._description_metadata.update(mdata_conf.description)
+        self._description_metadata.update(mdata_conf.DESCRIPTION)
         self._genus_type_metadata = {
             'element_id': Id(authority = self._authority,
                              namespace = self._namespace, 
                              identifier = 'description')}
         if 'default_description' in kwargs:
             self._description_metadata['default_string_values'][0]['text'] = kwargs['default_description']
-        self._genus_type_metadata.update(mdata_conf.genus_type)
+        self._genus_type_metadata.update(mdata_conf.GENUS_TYPE)
 
     def _init_map(self):
         self._my_map['displayName'] = dict(self._display_name_metadata['default_string_values'][0])
@@ -1206,40 +1247,33 @@ class OsidQuery:
 
     import_statements = [
         'import re',
-        'from ..primitives import *',
-        'from ..osid.osid_errors import *',
-        'from ..locale.types import String',
-        'EXACT_STRING_MATCH_TYPE = Type(**String().get_type_data(\'EXACT\'))',
-        'IGNORECASE_STRING_MATCH_TYPE = Type(**String().get_type_data(\'IGNORECASE\'))',
-        'WORD_STRING_MATCH_TYPE = Type(**String().get_type_data(\'WORD\'))',
-        'WORDIGNORECASE_STRING_MATCH_TYPE = Type(**String().get_type_data(\'WORDIGNORECASE\'))',
-        'WILDCARD_STRING_MATCH_TYPE = Type(**String().get_type_data(\'WILDCARD\'))',
-        'REGEX_STRING_MATCH_TYPE = Type(**String().get_type_data(\'REGEX\'))',
-        'SOUND_STRING_MATCH_TYPE = Type(**String().get_type_data(\'SOUND\'))',
-        'SOUNDEX_STRING_MATCH_TYPE = Type(**String().get_type_data(\'SOUNDEX\'))',
-        'METAPHONE_STRING_MATCH_TYPE = Type(**String().get_type_data(\'METAPHONE\'))',
-        'SOUNDEX_STRING_MATCH_TYPE = Type(**String().get_type_data(\'SOUNDEX\'))',
-        'DMETAPHONE_STRING_MATCH_TYPE = Type(**String().get_type_data(\'DMETAPHONE\'))',
-        'LEVENSHTEIN_STRING_MATCH_TYPE = Type(**String().get_type_data(\'LEVENSHTEIN\'))',
+        'from ..primitives import Type',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.primordium.locale.types.string import get_type_data',
     ]
 
     init = """
     def __init__(self):
         self._records = dict()
+        # _load_records is in OsidExtensibleQuery:
+        # _all_supported_record_type_ids comes from inheriting query object
+        # THIS SHOULD BE RE-DONE:
         self._load_records(self._all_supported_record_type_ids)
         self._query_terms = {}
 
     def _get_string_match_value(self, string, string_match_type):
-        if string_match_type == EXACT_STRING_MATCH_TYPE:
+        \"\"\"Gets the match value\"\"\"
+        if string_match_type == Type(**get_type_data(\'EXACT\')):
             return string
-        elif string_match_type == IGNORECASE_STRING_MATCH_TYPE:
+        elif string_match_type == Type(**get_type_data(\'IGNORECASE\')):
             return re.compile('^' + string, re.I)
-        elif string_match_type == WORD_STRING_MATCH_TYPE:
+        elif string_match_type == Type(**get_type_data(\'WORD\')):
             return re.compile('.*' + string + '.*')
-        elif string_match_type == WORDIGNORECASE_STRING_MATCH_TYPE:
+        elif string_match_type == Type(**get_type_data(\'WORDIGNORECASE\')):
             return re.compile('.*' + string + '.*', re.I)
 
     def _add_match(self, match_key, match_value, match):
+        \"\"\"Adds a match key/value\"\"\"
         if match_key is None:
             raise NullArgument()
         if match is None:
@@ -1257,12 +1291,14 @@ class OsidQuery:
             self._query_terms[match_key] = {inin: [match_value]}
 
     def _match_display_text(self, element_key, string, string_match_type, match):
+        \"\"\"Matches a display text value\"\"\"
         if string is None or string_match_type is None:
             raise NullArgument()
         match_value = self._get_string_match_value(string, string_match_type)
         self._add_match(element_key + '.text', match_value, match)
 
     def _match_minimum_decimal(self, match_key, decimal_value, match):
+        \"\"\"Matches a minimum decimal value\"\"\"
         if decimal_value is None:
             raise NullArgument()
         if match is None:
@@ -1275,8 +1311,9 @@ class OsidQuery:
             self._query_terms[match_key][gtelt] = decimal_value
         else:
             self._query_terms[match_key] = {gtelt: decimal_value}
-        
+
     def _match_maximum_decimal(self, match_key, decimal_value, match):
+        \"\"\"Matches a minimum decimal value\"\"\"
         if decimal_value is None:
             raise NullArgument()
         if match is None:
@@ -1291,6 +1328,7 @@ class OsidQuery:
             self._query_terms[match_key] = {ltegt: decimal_value}
 
     def _match_minimum_date_time(self, match_key, date_time_value, match):
+        \"\"\"Matches a minimum date time value\"\"\"
         if date_time_value is None:
             raise NullArgument()
         if match is None:
@@ -1303,8 +1341,9 @@ class OsidQuery:
             self._query_terms[match_key][gtelt] = date_time_value
         else:
             self._query_terms[match_key] = {gtelt: date_time_value}
-        
+
     def _match_maximum_date_time(self, match_key, date_time_value, match):
+        \"\"\"Matches a maximum date time value\"\"\"
         if date_time_value is None:
             raise NullArgument()
         if match is None:
@@ -1317,14 +1356,16 @@ class OsidQuery:
             self._query_terms[match_key][gtelt] = date_time_value
         else:
             self._query_terms[match_key] = {gtelt: date_time_value}
-        
+
     def _clear_terms(self, match_key):
+        \"\"\"clears all match_key term values\"\"\"
         try:
             del self._query_terms[match_key]
         except KeyError:
             pass
 
     def _clear_minimum_terms(self, match_key):
+        \"\"\"clears minimum match_key term values\"\"\"
         try: # clear match = True case
             del self._query_terms[match_key]['$gte']
         except KeyError:
@@ -1340,6 +1381,7 @@ class OsidQuery:
             pass
 
     def _clear_maximum_terms(self, match_key):
+        \"\"\"clears maximum match_key term values\"\"\"
         try: # clear match = True case
             del self._query_terms[match_key]['$lte']
         except KeyError:
@@ -1358,8 +1400,7 @@ class OsidQuery:
 class OsidIdentifiableQuery:
 
     import_statements = [
-        'from ..osid.osid_errors import *',
-        'from ..primitives import *'
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
     ]
 
     match_id = """
@@ -1371,8 +1412,9 @@ class OsidIdentifiableQuery:
 class OsidExtensibleQuery:
 
     import_statements = [
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'import importlib',
-        'from ..primitives import *',
+        'from ..primitives import Id',
     ]
 
     init = """
@@ -1388,12 +1430,12 @@ class OsidExtensibleQuery:
         module = importlib.import_module(record_type_data['module_path'])
         record = getattr(module, record_type_data['query_record_class_name'])
         self._records[record_type_idstr] = record(self)
-    """
+"""
 
 class OsidObjectQuery:
 
     import_statements = [
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
     ]
 
     match_display_name = """
@@ -1413,10 +1455,20 @@ class OsidObjectQuery:
 
     clear_description_terms = """
         self._clear_terms('description.text')"""
-    
+
+class OsidQueryInspector:
+
+    import_statements = [
+        'from ..osid.osid_errors import Unimplemented',
+    ]
+
 class OsidRecord:
 
-    init = """
+    consider_init = """
+    def __init__(self):
+        # This is set in implemented Records.  Should super __init__
+        self._implemented_record_type_identifiers = None
+
     def __iter__(self):
         for attr in dir(self):
             if not attr.startswith('__'):
@@ -1510,5 +1562,29 @@ class OsidNode:
             node_map['childNodes'].append(node.get_node_map())
         return node_map
 """
-        
 
+class Property:
+
+    import_statements = [
+        'from ..osid.osid_errors import Unimplemented',
+    ]
+
+
+class OsidReceiver:
+
+    import_statements = [
+        'from ..osid.osid_errors import Unimplemented',
+    ]
+
+
+class OsidSearchOrder:
+
+    import_statements = [
+        'from ..osid.osid_errors import Unimplemented',
+    ]
+
+class OsidSearch:
+
+    import_statements = [
+        'from ..osid.osid_errors import Unimplemented',
+    ]

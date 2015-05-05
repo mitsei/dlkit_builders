@@ -61,6 +61,12 @@ class ResourceManager:
     'from ..osid.osid_errors import OperationFailed # pylint: disable=unused-import',
     ]
 
+    init_template = """
+    def __init__(self):
+        osid_managers.OsidManager.__init__(self)
+"""
+
+
     get_resource_lookup_session_template = """
         if not self.supports_${support_check}():
             raise Unimplemented()
@@ -86,6 +92,11 @@ class ResourceProxyManager:
     'from ..osid.osid_errors import OperationFailed # pylint: disable=unused-import',
     ]
 
+    init_template = """
+    def __init__(self):
+        osid_managers.OsidProxyManager.__init__(self)
+"""
+
     get_resource_lookup_session_template = """
         if proxy is None:
             raise NullArgument()
@@ -107,7 +118,6 @@ class ResourceProxyManager:
 class ResourceLookupSession:
 
     import_statements_pattern = [
-        '# pylint: disable=protected-access',
         'from ..osid.osid_errors import ' + session_errors,
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',

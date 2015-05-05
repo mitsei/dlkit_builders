@@ -1,10 +1,13 @@
-
 import time
 import os
 import json
 import string
+import datetime
+import importlib
+from importlib import import_module
+from .binder_helpers import *
 from .config import *
-from binder_helpers import flagged_for_implementation
+from builders.mongoosid_templates import options
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
 from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
@@ -15,32 +18,30 @@ from abcbinder_settings import ABCPREFIX as abc_prefix
 from abcbinder_settings import ABCSUFFIX as abc_suffix
 from abcbinder_settings import MAINDOCINDENTSTR as main_doc_indent
 from abcbinder_settings import ENCODING as utf_code
-from awsbuilder_settings import ABCROOTPACKAGE as abc_root_pkg
-from awsbuilder_settings import ROOTPACKAGE as root_pkg
-from awsbuilder_settings import ROOTPATH as root_path
-from awsbuilder_settings import APPNAMEPREFIX as app_prefix
-from awsbuilder_settings import APPNAMESUFFIX as app_suffix
-from awsbuilder_settings import PACKAGEPREFIX as pkg_prefix
-from awsbuilder_settings import PACKAGESUFFIX as pkg_suffix
-from awsbuilder_settings import PATTERN_DIR as pattern_dir
-from awsbuilder_settings import TEMPLATE_DIR as template_dir
+from managerutilbuilder_settings import ABCROOTPACKAGE as abc_root_pkg
+from managerutilbuilder_settings import ROOTPACKAGE as root_pkg
+from managerutilbuilder_settings import ROOTPATH as root_path
+from managerutilbuilder_settings import APPNAMEPREFIX as app_prefix
+from managerutilbuilder_settings import APPNAMESUFFIX as app_suffix
+from managerutilbuilder_settings import PACKAGEPREFIX as pkg_prefix
+from managerutilbuilder_settings import PACKAGESUFFIX as pkg_suffix
+from managerutilbuilder_settings import PATTERN_DIR as pattern_dir
+from managerutilbuilder_settings import TEMPLATE_DIR as template_dir
 template_pkg = '.'.join(template_dir.split('/'))
 
-package_list = ['osid', 'repository']
+def make_mgr_util_osids(build_abc = False, re_index = False, re_map = False):
+    """
+    This is the entry point for making mongo-based osid impls.
 
-##
-# This is the entry point for making aws-adapter-based python classes for
-# the osids. It processes all of the osid maps in the package maps
-# directory.
-def make_awsosids(build_abc = False, re_index = False, re_map = False):
+    It processes all of the osid maps in the package maps directory.
     
-    return "AWS Adapter is no longer generated!!!"
+    """
     from abcbinder import make_abcosids
     if build_abc:
         make_abcosids(re_index, re_map)
     for json_file in os.listdir(pkg_maps_dir):
         if json_file.endswith('.json'):
-            make_awsosid(pkg_maps_dir + '/' + json_file)
+            make_mgr_util_osid(pkg_maps_dir + '/' + json_file)
     ##
     # Copy general config and primitive files, etc into the
     # implementation root directory:
@@ -51,21 +52,22 @@ def make_awsosids(build_abc = False, re_index = False, re_map = False):
                           root_pkg + '/' + helper_file)
 
 
-##
-# This function expects a file containing a json representation of an
-# osid package that was prepared by the mapper.
-def make_awsosid(file_name):
-    from binder_helpers import get_interface_module
+def make_mgr_util_osid(file_name):
+    """
+    make all the mongo osid impls for a particular package.
+    
+    Expects a file containing a json representation of an osid package that 
+    was prepared by the mapper.
+    """
 
     read_file = open(file_name, 'r')
     package = json.load(read_file)
     read_file.close()
     
-    if package_list and package['name'] not in package_list:
+    if package['name'] not in packages_to_implement:
         return
+    print "--> Manager Util Implement Package:", package['name']
 
-    importStr = ''
-    bodyStr = ''
     ##
     # The map structure for the modules to be created by this function.
     # Each module will get a body string that holds the class and method
@@ -89,7 +91,7 @@ def make_awsosid(file_name):
 
     if not root_pkg:
         ##
-        # Check if an app directory and aws_adapter osid subdirectory already exist.  
+        # Check if an app directory and mongo osid subdirectory already exist.  
         # If not, create them  This code specifically splits out the osid 
         # packages in a Django app environment, one Django app per osid package.
         from django.core.management import call_command
@@ -128,20 +130,36 @@ def make_awsosid(file_name):
     #                  package['name'] + ' version ' +
     #                  package['version'] + '\n\n'+
     #                  package['copyright'] + '\n\n' +
-    #                  package['license'] + '\n\n\"\"\"').encode('utf-8'))
+    #                  package['license'] + '\n\n\"\"\"').encode('utf-8') +
+    #                  '\n')
     #write_file.close
     
     ##
     # Write the summary documentation for this package.
     #write_file = open(app_name(package['name']) + '/' + 
-    #                  pkg_name(package['name']) + '/doc.py', 'w')
+    #                  pkg_name(package['name']) + '/summary_doc.py', 'w')
     #write_file.write((utf_code + '\"\"\"' +
     #                  package['title'] + '\n' +
     #                  package['name'] + ' version ' +
     #                  package['version'] + '\n\n'+
-    #                  package['summary'] + '\n\n\"\"\"').encode('utf-8'))
+    #                  package['summary'] + '\n\n\"\"\"').encode('utf-8') +
+    #                  '\n')
     #write_file.close
-    
+
+    ##
+    # Initialize the module doc
+    for module in modules:
+        docstr = '\"\"\"Mongodb implementations of ' + package['name'] + ' ' + module + '.\"\"\"\n'
+        modules[module]['imports'].append(docstr)
+        pylintstr = (
+            '# pylint: disable=no-init\n' +
+            '#     Numerous classes don\'t require __init__.\n' +
+            '# pylint: disable=too-many-public-methods\n' + 
+            '#     Number of methods are defined in specification\n' +
+            '# pylint: disable=too-many-ancestors\n' + 
+            '#     Inheritance defined in specification\n')
+        modules[module]['imports'].append(pylintstr)
+
     ##
     # Copy settings and types and other files from the tamplates into the
     # appropriate implementation directories
@@ -157,11 +175,12 @@ def make_awsosid(file_name):
 
     ##
     # Assemble and write profile.py file for this package.
-    profile_str = make_profile_py(package)
-    writeFile = open(app_name(package['name']) + '/' +
-                     pkg_name(package['name']) + '/profile.py', 'w')
-    writeFile.write(profile_str)
-    writeFile.close() 
+    #if package['name'] in managers_to_implement:
+    #    profile_str = make_profile_py(package)
+    #    writeFile = open(app_name(package['name']) + '/' +
+    #                     pkg_name(package['name']) + '/profile.py', 'w')
+    #    writeFile.write(profile_str)
+    #    writeFile.close() 
 
     ##
     # Get the pattern map for this osid package.
@@ -170,17 +189,12 @@ def make_awsosid(file_name):
     patterns = json.load(read_file)
     read_file.close()
 
-    exceptions = []
-    
-    excepted_osid_categories = [
-        'metadata',
-        'queries',
-        'query_inspectors',
-        'receivers',
-        'rules',
-        'search_orders',
-        'searches',
-    ]
+    exceptions = ['ObjectiveHierarchySession',
+                  'ObjectiveHierarchyDesignSession',
+                  'ObjectiveSequencingSession',
+                  'ObjectiveRequisiteSession',
+                  'ObjectiveRequisiteAssignmentSession',]
+
 
     ##
     # The real work starts here.  Iterate through all interfaces to build 
@@ -188,19 +202,15 @@ def make_awsosid(file_name):
     for interface in package['interfaces']:
 
         ##
-        # Check to see if this interface is meant to be implemented.
-        if package['name'] != 'osid':
-            if flagged_for_implementation(interface, 
-                    sessions_to_implement, objects_to_implement, variants_to_implement):
-                if interface['shortname'] in exceptions:
-                    continue
-                else:
-                    pass
-            else:
-                continue
-        elif interface['category'] in excepted_osid_categories:
+        # Check to see if interface should be implemented
+        if (interface['category'] == 'managers' and 
+                      package['name'] in managers_to_implement):
+            pass
+        elif interface['shortname'] in ['OsidList', 'TypeList', 'Sourceable']:
+            pass
+        else:
             continue
-
+        
         ##
         # Seed the inheritance list with this interface's abc_osid
         inheritance = ['abc_' + abc_pkg_name(package['name']) + '_' +
@@ -287,7 +297,7 @@ def make_awsosid(file_name):
         # attribute name 'additional_methods'
         if hasattr(impl_class, 'additional_methods'):
             additional_methods = additional_methods + getattr(impl_class, 'additional_methods')
-            print additional_methods
+            #print additional_methods
 
         ##
         # Note that the following re-assigns the inheritance variable from a 
@@ -349,7 +359,6 @@ def make_awsosid(file_name):
 ##
 # Try loading hand-built implementations class for this interface
 def load_impl_class(package_name, interface_name):
-    import importlib
     impl_class = None
     try:
         impls = importlib.import_module(template_pkg + '.' + package_name)
@@ -361,7 +370,6 @@ def load_impl_class(package_name, interface_name):
     return impl_class
 
 def make_module_imports(interface_name, package, patterns):
-    import importlib
     if interface_name + '.init_pattern' in patterns:
         init_pattern = patterns[interface_name + '.init_pattern']
         try:
@@ -386,7 +394,6 @@ def make_module_imports(interface_name, package, patterns):
         return []
 
 def make_class_attributes(interface_name, package, patterns):
-    import importlib
     if interface_name + '.init_pattern' in patterns:
         init_pattern = patterns[interface_name + '.init_pattern']
         try:
@@ -411,7 +418,6 @@ def make_class_attributes(interface_name, package, patterns):
         return ''
 
 def make_additional_methods(interface_name, package, patterns):
-    import importlib
     if interface_name + '.init_pattern' in patterns:
         init_pattern = patterns[interface_name + '.init_pattern']
         try:
@@ -437,14 +443,13 @@ def make_additional_methods(interface_name, package, patterns):
 
 
 def make_init_methods(interface_name, package, patterns):
-    import importlib
-    from binder_helpers import camel_to_under, camel_to_mixed
     templates = None
     init_pattern = ''
     instance_initers = ''
     persisted_initers = ''
     metadata_initers = ''
     object_name = ''
+    init_object = ''
     cat_name = patterns['package_catalog_caps']
     impl_class = load_impl_class(pkg_name(package['name']), interface_name)
     if hasattr(impl_class, 'init'):
@@ -477,21 +482,35 @@ def make_init_methods(interface_name, package, patterns):
             pass
     elif init_pattern == 'resource.ResourceForm':
         object_name = interface_name[:-4]
+        if object_name in patterns['package_relationships_caps']:
+            init_object = 'osid_objects.OsidRelationshipForm'
+        else:
+            init_object = 'osid_objects.OsidObjectForm'
         try:
             persisted_initers = make_persistance_initers(
                 patterns[interface_name[:-4] + '.persisted_data'],
-                dict(patterns[interface_name[:-4] + '.initialized_data'], **patterns[interface_name[:-4] + '.instance_data']),
+                patterns[interface_name[:-4] + '.initialized_data'],
                 patterns[interface_name[:-4] + '.aggregate_data'])
+            #persisted_initers = make_persistance_initers(
+            #    patterns[interface_name[:-4] + '.persisted_data'],
+            #    dict(patterns[interface_name[:-4] + '.initialized_data'], **patterns[interface_name[:-4] + '.instance_data']),
+            #    patterns[interface_name[:-4] + '.aggregate_data'])
         except KeyError:
             pass
         try:
             metadata_initers = make_metadata_initers(
                 patterns[interface_name[:-4] + '.persisted_data'],
-                patterns[interface_name[:-4] + '.initialized_data'])
-        except ImportError, KeyError:
+                patterns[interface_name[:-4] + '.initialized_data'],
+                patterns[interface_name[:-4] + '.return_types'])
+        except KeyError:
             pass
     elif init_pattern == 'resource.ResourceQuery':
         object_name = interface_name[:-5]
+    
+    #object_imports = []
+    #abject_import.append(patterns['package_objects_caps'])
+    #abject_import.append(patterns['package_relationships_caps'])
+    #for 
 
     if hasattr(templates, init_pattern.split('.')[-1]):
         template_class = getattr(templates, init_pattern.split('.')[-1])
@@ -507,7 +526,12 @@ def make_init_methods(interface_name, package, patterns):
                                         'metadata_initers': metadata_initers,
                                         'object_name': object_name,
                                         'object_name_upper': camel_to_under(object_name).upper(),
-                                        'cat_name': cat_name})
+                                        'cat_name': cat_name,
+                                        'cat_name_plural': make_plural(cat_name),
+                                        'cat_name_under': cat_name.lower(),
+                                        'cat_name_under_plural': make_plural(cat_name).lower(),
+                                        'cat_name_upper': cat_name.upper(),
+                                        'init_object': init_object})
         else:
             return ''
     else:
@@ -532,7 +556,6 @@ def make_instance_initers(instance_data):
 # Assemble the initializers for persistance data managed by Osid Object Forms
 # initialized with the form.
 def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
-    from builders.binder_helpers import under_to_mixed, remove_plural
     initers = ''
     for data_name in persisted_data:
         if ((persisted_data[data_name] == 'osid.id.Id' or
@@ -540,6 +563,10 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
             data_name in initialized_data):
             initers = initers + (
     '        self._my_map[\'' + under_to_mixed(data_name) + 'Id\'] = str(kwargs[\'' + data_name + '_id\'])\n')
+        elif (persisted_data[data_name] == 'osid.resource.Resource' and
+            data_name in initialized_data):
+            initers = initers + (
+    '        self._my_map[\'' + under_to_mixed(data_name) + 'Id\'] = str(kwargs[\'effective_agent_id\'])\n')
         elif persisted_data[data_name] == 'osid.id.Id':
             initers = initers + (
             '        self._my_map[\'' + under_to_mixed(data_name) + 'Id\'] = self._' + 
@@ -555,6 +582,14 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
         elif persisted_data[data_name] == 'osid.type.Type[]':
             initers = initers + (
             '        self._my_map[\'' + under_to_mixed(remove_plural(data_name)) + 'Ids\'] = self._' + 
+                data_name + '_default\n')
+        elif persisted_data[data_name] == 'string':
+            initers = initers + (
+            '        self._my_map[\'' + under_to_mixed(data_name) + '\'] = self._' + 
+                data_name + '_default\n')
+        elif persisted_data[data_name] == 'boolean':
+            initers = initers + (
+            '        self._my_map[\'' + under_to_mixed(data_name) + '\'] = self._' + 
                 data_name + '_default\n')
         elif persisted_data[data_name] == 'OsidCatalog':
             initers = initers + (
@@ -621,12 +656,12 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 
 ##
 # Assemble the initializers for metadata managed by Osid Object Forms
-def make_metadata_initers(persisted_data, initialized_data):
-    from builders.awsosid_templates import options
+def make_metadata_initers(persisted_data, initialized_data, return_types):
     imports = ''
     initer = ''
     default = ''
     for data_name in persisted_data:
+        data_name_upper = data_name.upper()
         template = ''
         if (persisted_data[data_name] != 'OsidCatalog' and 
             data_name not in initialized_data):
@@ -634,10 +669,14 @@ def make_metadata_initers(persisted_data, initialized_data):
                 template = string.Template(options.METADATA_INITER)
                 default = default + ('        self._' + data_name + 
                     '_default = None\n')
-            elif persisted_data[data_name] == 'string':
+            elif persisted_data[data_name] == 'string' and return_types[data_name] == 'osid.locale.DisplayText':
                 template = string.Template(options.METADATA_INITER)
                 default = default + ('        self._' + data_name + 
                     '_default = dict(self._' + data_name + '_metadata[\'default_string_values\'][0])\n')
+            elif persisted_data[data_name] == 'string':
+                template = string.Template(options.METADATA_INITER)
+                default = default + ('        self._' + data_name + 
+                    '_default = self._' + data_name + '_metadata[\'default_string_values\'][0]\n')
             elif (persisted_data[data_name] == 'osid.id.Id' and
                   not data_name in initialized_data):
                 template = string.Template(options.METADATA_INITER)
@@ -670,14 +709,17 @@ def make_metadata_initers(persisted_data, initialized_data):
                     '_default = self._' + data_name + '_metadata[\'default_object_values\'][0]\n')
             elif persisted_data[data_name] == 'osid.mapping.SpatialUnit':
                 pass # Put SpatialUnit initters here
+            elif persisted_data[data_name] == 'decimal':
+                template = string.Template(options.METADATA_INITER)
+                default = default + ('        self._' + data_name + 
+                    '_default = self._' + data_name + '_metadata[\'default_decimal_values\'][0]\n')
 
         if template:
-            initer = (initer + template.substitute({'data_name': data_name}))
+            initer = (initer + template.substitute({'data_name': data_name, 'data_name_upper': data_name_upper}))
     return imports + initer + '\n' + default +'\n'
 
 
 def make_methods(package_name, interface, patterns):
-    from .binder_helpers import fix_reserved_word
     body = []
     for method in interface['methods']:
         if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
@@ -748,11 +790,6 @@ def make_method(package_name, method, interface, patterns):
     return (method_sig + '\n' + method_doc + '\n' + method_impl)
     
 def make_method_impl(package_name, method, interface, patterns):
-    import importlib
-    from binder_helpers import camel_to_under, camel_to_mixed, under_to_mixed
-    from binder_helpers import get_interface_module
-    from binder_helpers import get_pkg_name
-    from binder_helpers import make_plural, remove_plural
     impl = ''
     pattern = ''
     kwargs = {}
@@ -793,13 +830,17 @@ def make_method_impl(package_name, method, interface, patterns):
         
         ##
         # Add keyword arguments to template kwargs that are particuler
-        # to the aws_adapter implementation
+        # to the mongo implementation
         kwargs['app_name'] = app_name(kwargs['package_name'])
         kwargs['implpkg_name'] = pkg_name(kwargs['package_name'])
         kwargs['abcapp_name'] = abc_app_name(kwargs['package_name'])
         kwargs['abcpkg_name'] = abc_pkg_name(kwargs['package_name'])
         kwargs['interface_name_under'] = camel_to_under(kwargs['interface_name'])
+        kwargs['interface_name_dot'] = '.'.join(kwargs['interface_name_under'].split('_')[:-1])
         kwargs['package_name_caps'] = package_name.title()
+ 
+        if kwargs['interface_name_under'].endswith('_session'):
+            kwargs['session_shortname_dot'] = '.'.join(kwargs['interface_name_under'].split('_')[:-1])
         
         if 'arg0_type_full' in kwargs:
             kwargs['arg0_type'] = kwargs['arg0_type_full'].split('.')[-1].strip('[]')
@@ -850,6 +891,7 @@ def make_method_impl(package_name, method, interface, patterns):
             kwargs['return_app_name'] = app_name(kwargs['return_pkg'])
             kwargs['return_implpkg_name'] = pkg_name(kwargs['return_pkg'])
             kwargs['return_pkg_title'] = kwargs['return_pkg'].title()
+            kwargs['return_pkg_caps'] = kwargs['return_pkg'].upper()
         if 'object_name_under' in kwargs:
             kwargs['object_name_upper'] = kwargs['object_name_under'].upper()
             # Might want to add creating kwargs['object_name' from this as well]
@@ -879,10 +921,18 @@ def make_method_impl(package_name, method, interface, patterns):
             kwargs['aggregated_object_name_mixed'] = camel_to_mixed(kwargs['aggregated_object_name'])
             kwargs['aggregated_objects_name_under'] = camel_to_under(make_plural(kwargs['aggregated_object_name']))
             kwargs['aggregated_objects_name_mixed'] = camel_to_mixed(make_plural(kwargs['aggregated_object_name']))
+        if 'source_name' in kwargs:
+            kwargs['source_name_mixed'] = under_to_mixed(kwargs['source_name'])
+        if 'destination_name' in kwargs:
+            kwargs['destination_name_mixed'] = under_to_mixed(kwargs['destination_name'])
         if 'cat_name' in kwargs:
             kwargs['cat_name_under'] = camel_to_under(kwargs['cat_name'])
             kwargs['cat_name_lower'] = kwargs['cat_name'].lower()
             kwargs['cat_name_mixed'] = camel_to_mixed(kwargs['cat_name'])
+            kwargs['cat_name_plural'] = make_plural(kwargs['cat_name'])
+            kwargs['cat_name_plural_under'] = camel_to_under(kwargs['cat_name_plural'])
+            kwargs['cat_name_plural_lower'] = kwargs['cat_name_plural'].lower()
+            kwargs['cat_name_plural_mixed'] = camel_to_mixed(kwargs['cat_name_plural'])
         if 'return_cat_name' in kwargs:
             kwargs['return_cat_name_under'] = camel_to_under(kwargs['return_cat_name'])
             kwargs['return_cat_name_lower'] = kwargs['return_cat_name'].lower()
@@ -895,8 +945,7 @@ def make_method_impl(package_name, method, interface, patterns):
             kwargs['import_str'] = ''
         elif ('package_name' in kwargs and 'return_pkg' in kwargs and
               'return_type' in kwargs and 'return_module' in kwargs):
-            kwargs['import_str'] = ('        from ' +
-                                    kwargs['return_app_name'] + '.' +
+            kwargs['import_str'] = ('        from ..' +
                                     kwargs['return_implpkg_name'] + '.' +
                                     kwargs['return_module'] + ' import ' +
                                     kwargs['return_type'] + '\n')  ### WHY DO WE NEED import_str???
@@ -906,7 +955,7 @@ def make_method_impl(package_name, method, interface, patterns):
 
         impl = template.substitute(kwargs).strip('\n')
     if impl == '':
-        impl = '        pass'
+        impl = '        raise Unimplemented()'
     else:
         if (interface['category'] in patterns['impl_log'] and
             interface['shortname'] in patterns['impl_log'][interface['category']]):
@@ -914,11 +963,7 @@ def make_method_impl(package_name, method, interface, patterns):
     return impl
         
 
-def make_profile_py(package):
-    import string
-    import datetime
-    from importlib import import_module
-    
+def make_profile_py(package):    
     osid_package = package['name']
 #    print ('.'.join(app_name(package['name']).split('/')[1:]) + '.' +
 #                                    pkg_name(package['name']) + '.profile', 'dlkit_project.builders')
@@ -959,20 +1004,24 @@ SUPPORTS = [ # Uncomment the following lines when implementations exist:
     if not profile_interface:
         return ''
 
-    for m in profile_interface['methods']:
-        if (len(m['args']) == 0 and
-            m['name'].startswith('supports_')):
+    for method in profile_interface['methods']:
+        if (len(method['args']) == 0 and
+            method['name'].startswith('supports_')):
             ##
-            # Check to see if someone already activited support
-            if m['name'] in old_supports:
+            # Check to see if support flagged in builder config
+            if under_to_caps(method['name'])[8:] + 'Session' in sessions_to_implement:
                 comment = ''
-            else:
+            ##
+            # Check to see if someone activited support by hand
+            elif method['name'] in old_supports:
+                comment = ''
+            else: # Add check for session implementation flags here
                 comment = '#'
-            supports_str = supports_str + ',\n' + comment + '\'' + m['name'] +'\''
+            supports_str = supports_str + ',\n' + comment + '\'' + method['name'] +'\''
     supports_str = supports_str + '\n]'
 
     try:
-        from builders.awsosid_templates import package_profile
+        from builders.mongoosid_templates import package_profile
         template = string.Template(package_profile.PROFILE_TEMPLATE)
     except ImportError, AttributeError:
         return ''

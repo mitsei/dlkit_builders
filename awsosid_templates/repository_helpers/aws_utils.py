@@ -1,3 +1,4 @@
+"""Utilies for dealing with amazon web services"""
 
 import boto
 import time
@@ -10,7 +11,7 @@ def get_aws_s3_handle(config_map):
 
     Added by cjshaw@mit.edu, Jan 9, 2015
     Added to aws_adapter build by birdland@mit.edu, Jan 25, 2015, and added support for Configuration
-    
+
     """
 
     url = 'https://' + config_map['s3_bucket'] + '.s3.amazonaws.com' # https://mitodl-repository.s3.amazonaws.com
@@ -19,10 +20,9 @@ def get_aws_s3_handle(config_map):
     repo = Key(bucket)
     return (repo, url)
 
-
 def get_signed_url(url, config_map):
     """ Convenience function for getting cloudfront signed URL given a saved URL
-    
+
     cjshaw, Jan 7, 2015
 
     Follows:

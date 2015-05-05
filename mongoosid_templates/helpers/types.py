@@ -1,7 +1,13 @@
+"""Default type enumerators"""
 # -*- coding: utf-8 -*-
-from .osid.osid_errors import NotFound
+# pylint: disable=too-few-public-methods,no-self-use
+#    NEED TO RE-IMPLEMENT IN NEW STYLE
 
-class NoneType:
+from .osid.osid_errors import NotFound
+from .profile import LANGUAGETYPE, SCRIPTTYPE, FORMATTYPE
+
+class NoneType(object):
+    """Enumerator for None or Null Types"""
 
     none_types = {
         'NONE': 'None',
@@ -14,6 +20,7 @@ class NoneType:
             }
 
     def get_type_data(self, name):
+        """Return dictionary representation of type."""
         try:
             return {
                 'authority': 'dlkit.mit.edu',
@@ -22,13 +29,14 @@ class NoneType:
                 'domain': 'Generic Types',
                 'display_name': self.none_types[name] + ' Type',
                 'display_label': self.none_types[name],
-                'description': ('The ' +  self.none_types[name] + 
-                                    ' Type. This type indicates that no type is specified.')
+                'description': ('The ' +  self.none_types[name] +
+                                ' Type. This type indicates that no type is specified.')
                 }
         except IndexError:
-            raise NotFound ('NoneType: ' + none)
+            raise NotFound('NoneType: ' + name)
 
-class Genus:
+class Genus(object):
+    """Enumerator for Genus Types"""
 
     generic_types = {
         'DEFAULT': 'Default',
@@ -41,6 +49,7 @@ class Genus:
             }
 
     def get_type_data(self, name):
+        """Return dictionary representation of type."""
         try:
             return {
                 'authority': 'dlkit.mit.edu',
@@ -49,36 +58,39 @@ class Genus:
                 'domain': 'Generic Types',
                 'display_name': self.generic_types[name] + ' Generic Type',
                 'display_label': self.generic_types[name],
-                'description': ('The ' +  self.generic_types[name] + 
-                                    ' Type. This type has no symantic meaning.')
+                'description': ('The ' +  self.generic_types[name] +
+                                ' Type. This type has no symantic meaning.')
                 }
         except IndexError:
-            raise NotFound ('GenusType: ' + none)
+            raise NotFound('GenusType: ' + name)
 
-class Language:
-        
+class Language(object):
+    """Gets default Language Types"""
+
     def get_type_data(self, name):
+        """Return dictionary representation of type."""
         if name == 'DEFAULT':
-            from .osid.profile import LANGUAGETYPE
             return LANGUAGETYPE
         else:
             raise NotFound('DEFAULT Language Type')
 
-class Script:
+class Script(object):
+    """Gets default Script Types"""
 
     def get_type_data(self, name):
+        """Return dictionary representation of type."""
         if name == 'DEFAULT':
-            from .osid.profile import SCRIPTTYPE
             return SCRIPTTYPE
         else:
             raise NotFound('DEFAULT Script Type')
 
 
-class Format:
+class Format(object):
+    """Gets default Format Types"""
 
     def get_type_data(self, name):
+        """Return dictionary representation of type."""
         if name == 'DEFAULT':
-            from .osid.profile import FORMATTYPE
             return FORMATTYPE
         else:
             raise NotFound('DEFAULT Format Type')

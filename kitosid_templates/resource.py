@@ -651,8 +651,8 @@ class Bin:
         osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
         self._catalog_id = catalog.get_id()
         self._provider_sessions = kwargs
-        self._session_management = self.AUTOMATIC
-        osid.OsidObject.__init__(self._catalog) # This is to initialize self._object
+        self._session_management = AUTOMATIC
+        osid.OsidObject.__init__(self, catalog) # This is to initialize self._object
         self._views = dict()
 
     def _get_provider_session(self, session):

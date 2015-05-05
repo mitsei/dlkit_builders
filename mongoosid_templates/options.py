@@ -4,7 +4,7 @@ METADATA_INITER = """
                 self._authority,
                 self._namespace,
                 '${data_name}')}
-        self._${data_name}_metadata.update(mdata_conf.${data_name})"""
+        self._${data_name}_metadata.update(mdata_conf.${data_name_upper})"""
              
 ID_METADATA ="""
             'value': (bool(self.my_model.options['${data_name}_authority']['default']) and
@@ -43,9 +43,9 @@ STRING_MDATA = """
 DISPLAY_TEXT_MDATA = """
     'default_string_values': [{
         'text': '',
-        'languageTypeId': str(default_language_type),
-        'scriptTypeId': str(default_script_type),
-        'formatTypeId': str(default_format_type),
+        'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+        'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+        'formatTypeId': str(DEFAULT_FORMAT_TYPE),
         }],
     'syntax': 'STRING',
     'minimum_string_length': 0,
