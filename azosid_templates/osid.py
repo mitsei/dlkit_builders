@@ -129,8 +129,8 @@ class OsidSession:
         self._id_namespace = None
         self._qualifier_id = None
 
-
     def _can(self, func_name):
+        \"\"\"Tests if the named function is authorized with agent and qualifier.\"\"\"
         function_id = Id(
             identifier=func_name,
             namespace=self._id_namespace,

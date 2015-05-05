@@ -171,13 +171,14 @@ class OsidSession:
                       authority='MIT-OEIT')"""
 
     get_effective_agent = """
-        from dlkit.services_impls.authentication.objects import Agent # This may want to be in Primordium?
-        effective_agent_id = self.get_effective_agent_id()
+        #from dlkit.services_impls.authentication.objects import Agent # This may want to be in Primordium?
+        #effective_agent_id = self.get_effective_agent_id()
         # This may want to be extended to get the Agent directly from the Authentication
         # if available and if not effective agent is available in the proxy
-        return Agent(identifier=effective_agent_id.get_identifier(),
-                     namespace=effective_agent_id.get_identifier_namespace(),
-                     authority=effective_agent_id.get_authority())"""
+        #return Agent(identifier=effective_agent_id.get_identifier(),
+        #             namespace=effective_agent_id.get_identifier_namespace(),
+        #             authority=effective_agent_id.get_authority())
+        raise Unimplemented()"""
 
     supports_transactions = """
         raise Unimplemented()"""

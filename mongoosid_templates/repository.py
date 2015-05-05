@@ -3,7 +3,7 @@ class AssetAdminSession:
 
     import_statements_pattern = [
     'from ..osid.osid_errors import *',
-    'from ..primitives import *',
+    'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
     'from bson.objectid import ObjectId',
     'from .. import mongo_client',
     'CREATED = True'
@@ -185,7 +185,7 @@ class AssetForm:
         # Implemented from template for osid.repository.AssetForm.clear_title_template
         #from ..osid.osid_errors import NoAccess
         if (self.get_${var_name}_metadata().is_read_only() or
-            self.get_${var_name}_metadata().is_required()):
+                self.get_${var_name}_metadata().is_required()):
             raise NoAccess()
         self._my_map['${var_name_mixed}'] = dict(self._${var_name}_default)"""
 
@@ -240,19 +240,19 @@ class AssetContentForm:
         'from pymongo import MongoClient',
         'import gridfs',
         'from ..primitives import DataInputStream',
-        'from ..osid.osid_errors import *',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from .. import mongo_client'
         ]
 
     set_url_template = """
         # Implemented from template for osid.repository.AssetContentForm.set_url_template
-        from ..osid.osid_errors import InvalidArgument, NullArgument, NoAccess
         if ${arg0_name} is None:
             raise NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_${arg0_type}(${arg0_name}, 
-                                     self.get_${var_name}_metadata()):
+        if not self._is_valid_${arg0_type}(
+                ${arg0_name}, 
+                self.get_${var_name}_metadata()):
             raise InvalidArgument()
         self._my_map['${var_name_mixed}'] = ${arg0_name}"""
 

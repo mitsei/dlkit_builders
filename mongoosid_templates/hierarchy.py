@@ -65,13 +65,13 @@ class HierarchyTraversalSession:
             display_label = display_name
         if description is None:
             description = 'Relationship Type for ' + display_name
-        self._relationship_type = Type(authority = 'dlkit',
-                                       namespace = 'relationship.Relationship',
-                                       identifier = type_identifier,
-                                       display_name = display_name,
-                                       display_label = display_label,
-                                       description = description,
-                                       domain = domain)
+        self._relationship_type = Type(authority='dlkit',
+                                       namespace='relationship.Relationship',
+                                       identifier=type_identifier,
+                                       display_name=display_name,
+                                       display_label=display_label,
+                                       description=description,
+                                       domain=domain)
 """
 
     can_access_hierarchy = """
@@ -208,13 +208,13 @@ class HierarchyDesignSession:
             display_label = display_name
         if description is None:
             description = 'Relationship Type for ' + display_name
-        self._relationship_type = Type(authority = 'dlkit',
-                                       namespace = 'relationship.Relationship',
-                                       identifier = type_identifier,
-                                       display_name = display_name,
-                                       display_label = display_label,
-                                       description = description,
-                                       domain = domain)
+        self._relationship_type = Type(authority='dlkit',
+                                       namespace='relationship.Relationship',
+                                       identifier=type_identifier,
+                                       display_name=display_name,
+                                       display_label=display_label,
+                                       description=description,
+                                       domain=domain)
 """
 
     can_modify_hierarchy = """

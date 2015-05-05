@@ -200,7 +200,9 @@ def make_azosid(file_name):
 
         ##
         # Check to see if this interface is meant to be implemented.
-        if package['name'] != 'osid':
+        if package['name'] in ['proxy']:
+            continue
+        elif package['name'] != 'osid':
             if flagged_for_implementation(interface, 
                     sessions_to_implement, objects_to_implement, variants_to_implement):
                 pass
@@ -209,11 +211,19 @@ def make_azosid(file_name):
 
         if (interface['category'] in ['sessions', 'managers'] or
            interface['shortname'] in ['Sourceable']):
+
+            last_inheritance = []
             ##
             # Seed the inheritance list with this interface's abc_osid
-            inheritance = [abc_pkg_name(package['name']) + '_' +
-                           interface['category'] + '.' +
-                           interface['shortname']]
+            if package['name'] != 'osid' and interface['category'] == 'managers':
+                inheritance = []
+                last_inheritance = [abc_pkg_name(package['name']) + '_' +
+                               interface['category'] + '.' +
+                               interface['shortname']]
+            else:
+                inheritance = [abc_pkg_name(package['name']) + '_' +
+                               interface['category'] + '.' +
+                               interface['shortname']]
             ##
             # Check to see if there are any additinal inheritances required
             # by the implementation patterns.
@@ -224,10 +234,16 @@ def make_azosid(file_name):
             ##
             # And make sure there is a corresponding import statement for this
             # interface's abc_osid and associated module/category name.
-            import_str = ('from ' + abc_app_name(package['name']) + '.' +
-                           abc_pkg_name(package['name']) + ' import ' +
-                           interface['category'] + ' as ' + 
-                           abc_pkg_name(package['name'] + '_' + interface['category']))
+            if package['name'] != 'osid' and interface['category'] == 'managers':
+                import_str = ('from dlkit.manager_impls.' +
+                               abc_pkg_name(package['name']) + ' import ' +
+                               interface['category'] + ' as ' + 
+                               abc_pkg_name(package['name'] + '_' + interface['category']))
+            else:
+                import_str = ('from ' + abc_app_name(package['name']) + '.' +
+                               abc_pkg_name(package['name']) + ' import ' +
+                               interface['category'] + ' as ' + 
+                               abc_pkg_name(package['name'] + '_' + interface['category']))
             if not import_str in modules[interface['category']]['imports']:
                 modules[interface['category']]['imports'].append(import_str)
 
@@ -260,7 +276,7 @@ def make_azosid(file_name):
             if package['name'] == 'osid' and interface['category'] not in ['markers', 'sessions']:
                 ##
                 # Add the osid_error import
-                import_str = 'from ..osid.osid_errors import Unimplemented, IllegalState, NullArgument, OperationFailed'
+                import_str = 'from ..osid.osid_errors import Unimplemented, IllegalState, NullArgument'
                 if import_str not in modules[interface['category']]['imports']:
                     modules[interface['category']]['imports'].append(import_str)
                 ##
@@ -321,6 +337,8 @@ def make_azosid(file_name):
             ##
             # Note that the following re-assigns the inheritance variable from a 
             # list to a string.
+            if last_inheritance:
+                inheritance = inheritance + last_inheritance
             if inheritance:
                 inheritance = '(' + ', '.join(inheritance) + ')'
             else:
@@ -458,7 +476,49 @@ def make_init_methods(interface_name, package, patterns):
 def make_methods(package_name, interface, patterns):
     body = []
     for method in interface['methods']:
+
+        if (interface['category'] == 'managers' and
+                interface['shortname'].endswith('Manager')  and
+                method['name'].startswith('get') and
+                'session' in method['name'] and
+                method['return_type'].split('.')[-1] not in sessions_to_implement):
+            continue
+        if (interface['category'] == 'managers' and
+                interface['shortname'].endswith('Profile')  and
+                method['name'].startswith('supports_') and
+                under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
+            continue
+
         body.append(make_method(package_name, method, interface['shortname'], patterns))
+
+        ##
+        # Here is where we add the Python properties stuff:
+        if method['name'].startswith('get_') and method['args'] == []:
+            body.append('    ' + fix_reserved_word(method['name'][4:]) + 
+                    ' = property(fget=' + method['name'] + ')')
+        elif method['name'].startswith('set_') and len(method['args']) == 1:
+            if ('    ' + fix_reserved_word(method['name'][4:]) + ' = property(fdel=clear_' + method['name'][4:] + ')') in body:
+                body.remove('    ' + fix_reserved_word(method['name'][4:]) + ' = property(fdel=clear_' + method['name'][4:] + ')')
+                body.append('    ' + fix_reserved_word(method['name'][4:]) + 
+                        ' = property(fset=' + method['name'] +
+                        ', fdel=clear_' + method['name'][4:] + ')')
+            else:
+                body.append('    ' + fix_reserved_word(method['name'][4:]) + 
+                        ' = property(fset=' + method['name'] + ')')
+        elif method['name'].startswith('clear_') and method['args'] == []:
+            if ('    ' + fix_reserved_word(method['name'][6:]) + ' = property(fset=set_' + method['name'][6:] + ')') in body:
+                body.remove('    ' + fix_reserved_word(method['name'][6:]) + ' = property(fset=set_' + method['name'][6:] + ')')
+                body.append('    ' + fix_reserved_word(method['name'][6:]) + 
+                        ' = property(fset=set_' + method['name'][6:] +
+                        ', fdel=' + method['name'] + ')')
+            else:
+                body.append('    ' + method['name'][6:] + 
+                        ' = property(fdel=' + method['name'] + ')')
+        if method['name'] == 'get_id':
+                body.append('    ident = property(fget=' + method['name'] + ')')
+        if method['name'] == 'get_identifier_namespace':
+                body.append('    namespace = property(fget=' + method['name'] + ')')
+
     return '\n\n'.join(body)
     
 def make_method(package_name, method, interface_name, patterns):

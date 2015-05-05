@@ -1,3 +1,7 @@
+"""Utilities for tests.py"""
+# pylint: skip-file
+#    This is ugly and will all be replaced with generated tests
+
 from .learning.managers import LearningManager
 from .repository.managers import RepositoryManager
 from .assessment.managers import AssessmentManager

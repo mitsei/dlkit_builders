@@ -4,7 +4,7 @@ import os
 import json
 import string
 from binder_helpers import camel_to_under, flagged_for_implementation
-from binder_helpers import make_plural, fix_reserved_word
+from binder_helpers import make_plural, fix_reserved_word, under_to_caps
 from .config import *
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
@@ -139,8 +139,18 @@ def make_kitosid(file_name):
     # Initialize the module doc
     for module in modules:
         docstr = '\"\"\"DLKit Services implementations of ' + package['name'] + ' service.\"\"\"\n'
-        docstr = docstr + '# pylint: disable=no-init,too-few-public-methods,too-many-public-methods,too-many-ancestors\n'
-        docstr = docstr + '# OSID specification includes some \'marker\' interfaces.\n'
+        docstr = docstr + '# pylint: disable=no-init\n'
+        docstr = docstr + '# osid specification includes some \'marker\' interfaces.\n'
+        docstr = docstr + '# pylint: disable=too-many-ancestors\n'
+        docstr = docstr + '# number of ancestors defined in spec.\n'
+        docstr = docstr + '# pylint: disable=too-few-public-methods,too-many-public-methods\n'
+        docstr = docstr + '# number of methods defined in spec. Worse yet, these are aggregates.\n'
+        docstr = docstr + '# pylint: disable=invalid-name\n'
+        docstr = docstr + '# method and class names defined in spec.\n'
+        docstr = docstr + '# pylint: disable=no-self-use,unused-argument\n'
+        docstr = docstr + '# to catch unimplemented methods.\n'
+        docstr = docstr + '# pylint: disable=super-init-not-called\n'
+        docstr = docstr + '# it just isn\'t.\n'
         modules[module]['imports'].append(docstr)
 
     ##
@@ -228,11 +238,19 @@ def make_kitosid(file_name):
 #            module_name = fix_reserved_word(package['name'])
             module_name = package['name']
             
+            last_inheritance = []
             ##
             # Seed the inheritance list with this interface's abc_osid
-            inheritance = ['abc_' + package['name'] + '_' +
-                           interface['category'] + '.' +
-                           interface['shortname']]
+            if package['name'] != 'osid' and interface['category'] == 'managers':
+                inheritance = []
+                last_inheritance = [abc_pkg_name(package['name']) + '_' +
+                                    interface['category'] + '.' +
+                                    interface['shortname']]
+            else:
+                inheritance = ['abc_' + package['name'] + '_' +
+                               interface['category'] + '.' +
+                               interface['shortname']]
+
             ##
             # Check to see if there are any additinal inheritances required
             # by the implementation patterns.
@@ -243,13 +261,21 @@ def make_kitosid(file_name):
             ##
             # And make sure there is a corresponding import statement for this
             # interface's abc_osid and associated module/category name.
-            import_str = ('from ' + abc_app_name(package['name']) + '.' +
-                           abc_pkg_name(package['name']) + ' import ' +
-                           interface['category'] + ' as ' + 
-                           'abc_' + package['name'] + '_' + interface['category'])
+            if package['name'] != 'osid' and interface['category'] == 'managers':
+                import_str = ('from dlkit.manager_impls.' +
+                               abc_pkg_name(package['name']) + ' import ' +
+                               interface['category'] + ' as ' + 
+                               abc_pkg_name(package['name'] + '_' + interface['category']))
+            else:
+                import_str = ('from ' + abc_app_name(package['name']) + '.' +
+                               abc_pkg_name(package['name']) + ' import ' +
+                               interface['category'] + ' as ' + 
+                               'abc_' + package['name'] + '_' + interface['category'])
             if not import_str in modules[module_name]['imports']:
                 modules[module_name]['imports'].append(import_str)
             
+            
+            """
             ##
             # If this is the OsidManager interface then include all the
             # abc osids and imports for the Manager related Sessions:
@@ -311,7 +337,7 @@ def make_kitosid(file_name):
                                       'abc_' + package['name'] + '_' + inf['category'])
                         if not import_str in modules[module_name]['imports']:
                             modules[module_name]['imports'].append(import_str)
-
+"""
             ##
             # Interate through any inherited interfaces and build the inheritance
             # list for this interface. Also, check if an import statement is
@@ -359,6 +385,8 @@ def make_kitosid(file_name):
             ##
             # Note that the following re-assigns the inheritance variable from a 
             # list to a string.
+            if last_inheritance:
+                inheritance = inheritance + last_inheritance
             if inheritance:
                 inheritance = '(' + ', '.join(inheritance) + ')'
             else:
@@ -657,6 +685,21 @@ def make_methods(package_name, interface, patterns):
             method['name'] = 'get_taken_items'
         if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentBasicAuthoringSession':
             method['name'] = 'get_assessment_items'
+
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Manager')  and
+                method['name'].startswith('get') and
+                'session' in method['name'] and
+                method['return_type'].split('.')[-1] not in sessions_to_implement):
+            continue
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Profile')  and
+                method['name'].startswith('supports_') and
+                under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
+            continue
+
         try:
             body.append(make_method(package_name, method, interface['shortname'], patterns))
         except SkipMethod:
@@ -701,7 +744,7 @@ def make_method(package_name, method, interface_name, patterns):
 # The following method sig builder specifically creates the arguments.  It
 # is the one used by most of the other builders.
 
-    if interface_name.endswith('List'):
+    if interface_name.endswith('List') or method['name'] == 'initialize':
         for arg in method['args']:
             args.append(arg['var_name'])
         method_sig = ('    def ' + method['name'] + '(' +
@@ -709,7 +752,6 @@ def make_method(package_name, method, interface_name, patterns):
 ##
 # The following method sig builder uses *args, **kwargs for all methods. It is used
 # by the dlkit builder to pass arguments in the blind.
-
     elif method['args'] or interface_name.endswith('Manager') and not 'Runtime' in interface_name:
         method_sig = '    def ' + method['name'] + '(self, *args, **kwargs):'
     else:
@@ -811,7 +853,8 @@ def make_method_impl(package_name, method, interface_name, patterns):
         template_str = getattr(template_class, pattern.split('.')[-1] + 
                                 template_flag).strip('\n')
         template = string.Template(template_str)
-        
+
+
         ##
         # Add keyword arguments to template kwargs that are particuler
         # to the osid kit implementation
@@ -891,10 +934,13 @@ def make_method_impl(package_name, method, interface_name, patterns):
         #print interface_name, method['name']
 
         impl = template.substitute(kwargs).strip('\n')
+
+    un_impl_doc = '        \"\"\"Pass through to provider unimplemented\"\"\"\n'
+
     if impl == '' and method['args']:
-        impl = '        raise Unimplemented(\'Unimplemented in dlkit.services - args=\' + str(args) + \', kwargs=\' + str(kwargs))'
+        impl = un_impl_doc + '        raise Unimplemented(\'Unimplemented in dlkit.services - args=\' + str(args) + \', kwargs=\' + str(kwargs))'
     if impl == '' and not method['args']:
-        impl = '        raise Unimplemented(\'Unimplemented in dlkit.services\')'
+        impl = un_impl_doc + '        raise Unimplemented(\'Unimplemented in dlkit.services\')'
     return impl
         
 

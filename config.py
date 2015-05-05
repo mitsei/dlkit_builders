@@ -117,7 +117,7 @@ objects_to_implement = [
     ### grading service:
     'Grade',
     'GradeSystem',
-    'GradeBook',
+    'Gradebook',
     ### hierarchy service
     'Hierarchy',
     'HierarchyNode',
@@ -127,6 +127,9 @@ objects_to_implement = [
     'Objective',
     'Activity',
     'ObjectiveBank',
+    ### locale service
+    'Locale',
+    'LocaleList',
     ### proxy service
     'Proxy',
     'ProxyCondition',

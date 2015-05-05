@@ -32,11 +32,13 @@ class ProxySession:
 """
 
     get_proxy_condition = """
+        \"\"\"Pass through to provider method\"\"\"
         # Implemented from 
         # osid.proxy.ProxySession.get_proxy_condition
         return self._get_provider_session('proxy_session').get_proxy_condition()"""
 
     get_proxy = """
+        \"\"\"Pass through to provider method\"\"\"
         # Implemented from 
         # osid.proxy.ProxySession.get_proxy
         return self._get_provider_session('proxy_session').get_proxy(*args, **kwargs)"""

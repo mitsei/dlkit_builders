@@ -8,21 +8,25 @@ class ResourceProfile:
 """
 
     supports_visible_federation_template = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceProfile.supports_visible_federation
         return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
 
     supports_resource_lookup_template = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceProfile.supports_resource_lookup
         return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
 
     get_resource_record_types_template = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceProfile.get_resource_record_types
         return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
 
     supports_resource_record_type_template = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceProfile.supports_resource_record_type_template
         return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
@@ -46,6 +50,7 @@ class ResourceManager:
         self._runtime = None
 
     def _get_view(self, view):
+        \"\"\"Gets the currently set view\"\"\"
         if view in self._views:
             return self._views[view]
         else:
@@ -53,6 +58,7 @@ class ResourceManager:
             return DEFAULT
 
     def _get_provider_session(self, session, proxy=None):
+        \"\"\"Gets the session for the provider\"\"\"
         if self._proxy is None:
             self._proxy = proxy
         if session in self._provider_sessions:
@@ -77,6 +83,7 @@ class ResourceManager:
             return session_instance
 
     def _instantiate_session(self, method_name, proxy=None, *args, **kwargs):
+        \"\"\"Instantiates a provider session\"\"\"
         get_session = getattr(self._provider_manager, method_name)
         if proxy is None:
             return get_session(*args, **kwargs)
@@ -84,6 +91,7 @@ class ResourceManager:
             return get_session(proxy=proxy, *args, **kwargs)
 
     def initialize(self, runtime):
+        \"\"\"OSID Manager initialize\"\"\"
         from .primitives import Id
         if self._runtime is not None:
             raise IllegalState('Manager has already been initialized')
@@ -97,24 +105,26 @@ class ResourceManager:
             self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl) # need to add version argument
 
     def close_sessions(self):
+        \"\"\"Close all sessions, unless session management is set to MANDATORY\"\"\"
         if self._session_management != MANDATORY:
             self._provider_sessions = dict()
 
     def use_automatic_session_management(self):
-        # Session state will be saved unless closed by consumers
+        \"\"\"Session state will be saved unless closed by consumers\"\"\"
         self._session_management = AUTOMATIC
 
     def use_mandatory_session_management(self):
-        # Session state will be saved and can not be closed by consumers 
+        \"\"\"Session state will be saved and can not be closed by consumers\"\"\"
         self._session_management = MANDATORY
 
     def disable_session_management(self):
-        # Session state will never be saved
+        \"\"\"Session state will never be saved\"\"\"
         self._session_management = DISABLED
         self.close_sessions()
 """
 
     get_resource_lookup_session_managertemplate = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_manager_template
         if self._session_management != DISABLED:
@@ -122,6 +132,7 @@ class ResourceManager:
         return self"""
 
     get_resource_lookup_session_for_bin_managertemplate = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_manager_template
         if self._session_management != DISABLED:
@@ -129,6 +140,7 @@ class ResourceManager:
         return self"""
 
     get_resource_lookup_session_catalogtemplate = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_catalog_template
         session_instance = self._instantiate_session(*args, **kwargs)
@@ -138,6 +150,7 @@ class ResourceManager:
             self._proxy, ${return_type_under}=session_instance)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_catalog_template
         if self._proxy:
@@ -154,11 +167,13 @@ class ResourceManager:
 class ResourceProxyManager:
 
     get_resource_lookup_session_template = """
+        \"\"\"Sends control to Manager\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceProxyManager.get_resource_lookup_session_template
         return ${package_name_caps}Manager.${method_name}(${args_kwargs_or_nothing})"""
 
     get_resource_lookup_session_for_bin_template = """
+        \"\"\"Sends control to Manager\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceProxyManager.get_resource_lookup_session_for_bin_template
         return ${package_name_caps}Manager.${method_name}(${args_kwargs_or_nothing})"""
@@ -176,11 +191,13 @@ class ResourceLookupSession:
     get_bin_template = None
 
     can_lookup_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.can_lookup_resources_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     use_comparative_resource_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._views['${object_name_under}_view'] = COMPARATIVE
         for session in self._provider_sessions:
             try:
@@ -189,6 +206,7 @@ class ResourceLookupSession:
                 pass"""
 
     use_plenary_resource_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._views[\'${object_name_under}_view\'] = PLENARY
         for session in self._provider_sessions:
             try:
@@ -197,6 +215,7 @@ class ResourceLookupSession:
                 pass"""
 
     use_federated_bin_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._views[\'${cat_name_under}_view\'] = FEDERATED
         for session in self._provider_sessions:
             try:
@@ -205,6 +224,7 @@ class ResourceLookupSession:
                 pass"""
 
     use_isolated_bin_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._views[\'${cat_name_under}_view\'] = ISOLATED
         for session in self._provider_sessions:
             try:
@@ -213,31 +233,37 @@ class ResourceLookupSession:
                 pass"""
 
     get_resource_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.get_resource_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resources_by_ids_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_ids_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resources_by_genus_type_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resources_by_parent_genus_type_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_parent_genus_type_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resources_by_record_type_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_record_type_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.get_resources_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
@@ -245,16 +271,19 @@ class ResourceLookupSession:
 class ResourceQuerySession:
 
     can_search_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceQuerySession.can_search_resources_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resource_query_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceQuerySession.get_item_query_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resources_by_query_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceQuerySession.get_items_by_query_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
@@ -268,31 +297,37 @@ class ResourceAdminSession:
 """
 
     can_create_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.can_create_resources_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     can_create_resource_with_record_types_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.can_create_resource_with_record_types_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resource_form_for_create_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     create_resource_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.create_resource_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resource_form_for_update_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
 
     def get_${object_name_under}_form(self, *args, **kwargs):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
         # This method might be a bit sketchy. Time will tell.
@@ -302,12 +337,14 @@ class ResourceAdminSession:
             return self.${method_name}(*args, **kwargs)"""
 
     update_resource_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.update_resource_template
         # Note: The OSID spec does not require returning updated object
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
 
     def save_${object_name_under}(self, ${object_name_under}_form, *args, **kwargs):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.update_resource_template
         if ${object_name_under}_form.is_for_update():
@@ -316,11 +353,13 @@ class ResourceAdminSession:
             return self.create_${object_name_under}(${object_name_under}_form, *args, **kwargs)"""
 
     delete_resource_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.delete_resource_template
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     alias_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.alias_resources_template
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
@@ -330,6 +369,7 @@ class BinLookupSession:
 
 
     use_comparative_bin_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._views[\'${cat_name_under}_view\'] = COMPARATIVE
         for session in self._provider_sessions:
             try:
@@ -338,6 +378,7 @@ class BinLookupSession:
                 pass"""
 
     use_plenary_bin_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._views[\'${cat_name_under}_view\'] = PLENARY
         for session in self._provider_sessions:
             try:
@@ -350,15 +391,15 @@ class BinLookupSession:
 #    use_plenary_bin_view_template = None
 
     get_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bin
-#        from .objects import ${cat_name}
         return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}), self._proxy)"""
 
     get_bins_by_ids_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_ids
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
@@ -366,9 +407,9 @@ class BinLookupSession:
         return ${cat_name}List(cat_list)"""
 
     get_bins_by_genus_type_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_genus_type
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
@@ -376,9 +417,9 @@ class BinLookupSession:
         return ${cat_name}List(cat_list)"""
 
     get_bins_by_parent_genus_type_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_parent_genus_type
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
@@ -386,9 +427,9 @@ class BinLookupSession:
         return ${cat_name}List(cat_list)"""
 
     get_bins_by_record_type_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_record_type
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
@@ -396,9 +437,9 @@ class BinLookupSession:
         return ${cat_name}List(cat_list)"""
 
     get_bins_by_provider_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_provider
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
@@ -406,9 +447,9 @@ class BinLookupSession:
         return ${cat_name}List(cat_list)"""
 
     get_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_template
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
@@ -419,21 +460,25 @@ class BinLookupSession:
 class BinAdminSession:
 
     get_bin_form_for_create_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.get_bin_form_for_create
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     create_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.create_bin
         return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}), self._proxy)"""
 
     get_bin_form_for_update_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.get_bin_form_for_update
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
 
     def get_${cat_name_under}_form(self, *args, **kwargs):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
         # This method might be a bit sketchy. Time will tell.
@@ -443,12 +488,14 @@ class BinAdminSession:
             return self.${method_name}(${args_kwargs_or_nothing})"""
 
     update_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.update_bin
         # OSID spec does not require returning updated catalog
         return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}), self._proxy)
 
     def save_${cat_name_under}(self, ${cat_name_under}_form, *args, **kwargs):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.update_bin
         if ${cat_name_under}_form.is_for_update():
@@ -457,6 +504,7 @@ class BinAdminSession:
             return self.create_${cat_name_under}(${cat_name_under}_form, *args, **kwargs)"""
 
     delete_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.delete_bin
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
@@ -464,86 +512,103 @@ class BinAdminSession:
 class BinHierarchySession:
 
     get_bin_hierarchy_id_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_bin_hierarchy_id
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_bin_hierarchy_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_bin_hierarchy
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     can_access_bin_hierarchy_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.can_access_bin_hierarchy
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_root_bin_ids_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_root_bin_ids
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_root_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_root_bins
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     has_parent_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.has_parent_bins
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     is_parent_of_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.is_parent_of_bin
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_parent_bin_ids_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_parent_bin_ids
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_parent_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_parent_bins
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     is_ancestor_of_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.is_ancestor_of_bin
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     has_child_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.has_child_bins
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     is_child_of_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.is_child_of_bin
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_child_bin_ids_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_child_bin_ids
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_child_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_child_bins
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     is_descendant_of_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.is_descendant_of_bin
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_bin_node_ids_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_bin_node_ids
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_bin_nodes_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchySession.get_bin_nodes
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
@@ -551,11 +616,13 @@ class BinHierarchySession:
 class BinHierarchyDesignSession:
 
     can_modify_bin_hierarchy_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchyDesignSession.can_modify_bin_hierarchy
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
 
     def create_${cat_name_under}_hierarchy(self, *args, **kwargs):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Patched in by cjshaw@mit.edu, Jul 23, 2014, added by birdland to template on Aug 8, 2014
         # Is not part of specs for catalog hierarchy design sessions, but may want to be in hierarchy service instead
         # Will not return an actual object, just JSON
@@ -563,6 +630,7 @@ class BinHierarchyDesignSession:
         return self._get_provider_session('${cat_name_under}_hierarchy_design_session').create_${cat_name_under}_hierarchy(*args, **kwargs)
 
     def delete_${cat_name_under}_hierarchy(self, *args, **kwargs):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Patched in by cjshaw@mit.edu, Jul 23, 2014, added by birdland to template on Aug 8, 2014
         # Is not part of specs for catalog hierarchy design sessions, but may want to be in hierarchy service instead
         # Will not return an actual object, just JSON
@@ -570,26 +638,31 @@ class BinHierarchyDesignSession:
         return self._get_provider_session('${cat_name_under}_hierarchy_design_session').delete_${cat_name_under}_hierarchy(*args, **kwargs)"""
 
     add_root_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchyDesignSession.add_root_bin
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     remove_root_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchyDesignSession.remove_root_bin
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     add_child_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchyDesignSession.add_child_bin
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     remove_child_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchyDesignSession.remove_child_bin
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     remove_child_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinHierarchyDesignSession.remove_child_bins
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
@@ -599,6 +672,7 @@ class BinHierarchyDesignSession:
 class ResourceList:
 
     get_next_resource_template = """
+        \"\"\"Gets next object\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resource
         try:
@@ -609,12 +683,14 @@ class ResourceList:
             return next_item
             
     def next(self):
+        \"\"\"next method for enumerator\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resource
         next_item = osid.OsidList.next(self)
         return next_item"""
             
     get_next_resources_template = """
+        \"\"\"gets next n objects from list\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resources
         if ${arg0_name} > self.available():
@@ -683,11 +759,11 @@ class Bin:
         return self
 
     def get_objective_hierarchy_id(self):
-        # WHAT am I doing here?
+        \"\"\"WHAT am I doing here?\"\"\"
         return self._catalog_id
 
     def get_objective_hierarchy(self):
-        # WHAT am I doing here?
+        \"\"\"WHAT am I doing here?\"\"\"
         return self
 
     def __getattr__(self, name):
@@ -706,7 +782,7 @@ class Bin:
         self._session_management = AUTOMATIC
 
     def use_mandatory_session_management(self):
-        \"\"\"Session state will always be saved and can't be closed by consumers."\"\"
+        \"\"\"Session state will always be saved and can not be closed by consumers."\"\"
         # Session state will be saved and can not be closed by consumers 
         self._session_management = MANDATORY
 

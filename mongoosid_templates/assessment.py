@@ -1227,8 +1227,9 @@ class AssessmentOfferedForm:
             raise NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_${arg0_type_under}(${arg0_name},
-                                self.get_${var_name}_metadata()):
+        if not self._is_valid_${arg0_type_under}(
+                ${arg0_name},
+                self.get_${var_name}_metadata()):
             raise InvalidArgument()
         self._my_map['${var_name_mixed}'] = ${arg0_name}
 """
@@ -1236,7 +1237,7 @@ class AssessmentOfferedForm:
     # This looks just like the generic one. Need to find in the pattern?
     clear_start_time_template = """
         if (self.get_${var_name}_metadata().is_read_only() or
-            self.get_${var_name}_metadata().is_required()):
+                self.get_${var_name}_metadata().is_required()):
             raise NoAccess()
         self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
     

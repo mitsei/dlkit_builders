@@ -328,7 +328,6 @@ class OsidSession:
         'from importlib import import_module',
         'from .. import mongo_client',
         'from .. import types',
-        '#from . import profile',
         'COMPARATIVE = 0',
         'PLENARY = 1',
         'FEDERATED = 0',
@@ -530,8 +529,8 @@ class OsidSession:
 class OsidObject:
 
     import_statements = [
-        'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from .. import types',
         'from importlib import import_module'
         ]
@@ -542,8 +541,15 @@ class OsidObject:
     def __init__(self, osid_object_map, runtime=None):
         self._my_map = osid_object_map
         self._runtime = runtime
-    
+
+    ##
+    # DUPLICATE: There is one of these in OsidObjectForm as well.
     def _get_provider_manager(self, osid):
+        \"\"\"Gets provider manager from runtime, if a runtime and config exists
+
+        If not, then gets the mongo implementation manager.
+
+        \"\"\"
         try:
             # Try to get the Manager from the runtime, if available:
             config = self._runtime.get_configuration()
@@ -559,6 +565,7 @@ class OsidObject:
         return manager
 
     def get_object_map(self, obj_map=None):
+        # pylint: disable=too-many-branches
         if obj_map is None:
             obj_map = dict(self._my_map)
         del obj_map['_id']
@@ -620,25 +627,25 @@ class OsidObject:
                 obj_map['description']['text'] = self.get_description().get_text()
         if self._namespace == 'assessment.AssessmentTaken':
             if obj_map['actualStartTime'] is not None:
-                actualStartTime = obj_map['actualStartTime']
+                actual_start_time = obj_map['actualStartTime']
                 obj_map['actualStartTime'] = dict()
-                obj_map['actualStartTime']['year'] = actualStartTime.year
-                obj_map['actualStartTime']['month'] = actualStartTime.month
-                obj_map['actualStartTime']['day'] = actualStartTime.day
-                obj_map['actualStartTime']['hour'] = actualStartTime.hour
-                obj_map['actualStartTime']['minute'] = actualStartTime.minute
-                obj_map['actualStartTime']['second'] = actualStartTime.second
-                obj_map['actualStartTime']['microsecond'] = actualStartTime.microsecond
+                obj_map['actualStartTime']['year'] = actual_start_time.year
+                obj_map['actualStartTime']['month'] = actual_start_time.month
+                obj_map['actualStartTime']['day'] = actual_start_time.day
+                obj_map['actualStartTime']['hour'] = actual_start_time.hour
+                obj_map['actualStartTime']['minute'] = actual_start_time.minute
+                obj_map['actualStartTime']['second'] = actual_start_time.second
+                obj_map['actualStartTime']['microsecond'] = actual_start_time.microsecond
             if obj_map['completionTime'] is not None:
-                completionTime = obj_map['completionTime']
+                completion_time = obj_map['completionTime']
                 obj_map['completionTime'] = dict()
-                obj_map['completionTime']['year'] = completionTime.year
-                obj_map['completionTime']['month'] = completionTime.month
-                obj_map['completionTime']['day'] = completionTime.day
-                obj_map['completionTime']['hour'] = completionTime.hour
-                obj_map['completionTime']['minute'] = completionTime.minute
-                obj_map['completionTime']['second'] = completionTime.second
-                obj_map['completionTime']['microsecond'] = completionTime.microsecond
+                obj_map['completionTime']['year'] = completion_time.year
+                obj_map['completionTime']['month'] = completion_time.month
+                obj_map['completionTime']['day'] = completion_time.day
+                obj_map['completionTime']['hour'] = completion_time.hour
+                obj_map['completionTime']['minute'] = completion_time.minute
+                obj_map['completionTime']['second'] = completion_time.second
+                obj_map['completionTime']['microsecond'] = completion_time.microsecond
             if obj_map['displayName']['text'] == '':
                 obj_map['displayName']['text'] = self.get_display_name().get_text()
             if obj_map['description']['text'] == '':
@@ -656,7 +663,7 @@ class OsidObject:
                     pass
         except AttributeError:
             pass
-        
+
         obj_map.update(
             {'type': self._namespace.split('.')[-1],
              'id': my_idstr})
@@ -691,25 +698,26 @@ class OsidRule:
         return False"""
 
     get_rule_id = """
-        from .osid_errors import IllegalState
         # Someday I'll have a real implementation, but for now I just:
         raise IllegalState()"""
     
     get_rule= """
-        from .osid_errors import IllegalState
         # Someday I'll have a real implementation, but for now I just:
         raise IllegalState()"""
 
 class OsidForm:
 
     import_statements = [
-        'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from . import mdata_conf',
         'from .metadata import Metadata',
         ]
 
     init = """
+    # pylint: disable=no-self-use
+    # MUCH OF THESE SHOULD BE MOVED TO A UTILITY MODULE
+
     _namespace = 'mongo.OsidForm'
 
     def __init__(self):
@@ -718,169 +726,187 @@ class OsidForm:
         self._for_update = None
 
     def _init_metadata(self):
+        \"\"\"Initialize OsidObjectForm metadata.\"\"\"
+
+        # pylint: disable=attribute-defined-outside-init
+        # this method is called from descendent __init__
         self._journal_comment_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace,
-                             identifier = 'display_name')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='display_name')}
         self._journal_comment_metadata.update(mdata_conf.JOURNAL_COMMENT)
         self._journal_comment_default = dict(self._journal_comment_metadata['default_string_values'][0])
         self._journal_comment = self._journal_comment_default
         self._validation_messages = {}
 
-    ##
-    # Override get_id as implemented in Identifiable for the purpose of 
-    # returning an Id unique to this form for submission purposed as 
-    # recommended in the osid documentation. This implementation
-    # substitutes the intialized Python uuid4 identifier, and the 
-    # form namespace from the calling Osid Form thing.
     def get_id(self):
-        from ..primitives import Id
-        return Id(identifier = self._identifier,
-                   namespace = self._namespace,
-                   authority = self._authority)
-                  
-    ##
-    # The _is_valid_input method takes three arguments, the user input to 
-    # be checked, the associated  osid.Metadata object containing validation 
-    # requirements and a boolean value indicating whether this is an array value.
-    def _is_valid_input(self, input, metadata, array):
+        \"\"\" Override get_id as implemented in Identifiable.
+
+        for the purpose of returning an Id unique to this form for
+        submission purposed as recommended in the osid specification.
+        This implementation substitutes the intialized Python uuid4
+        identifier, and the form namespace from the calling Osid Form.
+
+         \"\"\"
+        return Id(identifier=self._identifier,
+                  namespace=self._namespace,
+                  authority=self._authority)
+
+    def _is_valid_input(self, inpt, metadata, array):
+        \"\"\"The _is_valid_input method takes three arguments:
+
+        the user input to be checked, the associated  osid.Metadata object
+        containing validation requirements and a boolean value indicating
+        whether this is an array value.
+
+        \"\"\"
+        # pylint: disable=too-many-branches,no-self-use
+        # Please redesign, and move to utility module
         syntax = metadata.get_syntax
 
         ##
         # First check if this is a required data element
-        if metadata.is_required == True and not input:
+        if metadata.is_required == True and not inpt:
             return False
-            
-        valid = True # Innocent until proven guilty        
+
+        valid = True # Innocent until proven guilty
         ##
         # Recursively run through all the elements of an array
         if array == True:
-            if len(input) < metadata['minimum_elements']:
+            if len(inpt) < metadata['minimum_elements']:
                 valid = False
-            elif len(input) > metadata['maximum_elements']:
+            elif len(inpt) > metadata['maximum_elements']:
                 valid = False
             else:
                 for element in array:
-                    valid = (valid and 
-                        self._is_valid_input(element, metadata, False))
+                    valid = (valid and self._is_valid_input(element, metadata, False))
         ##
         # Run through all the possible syntax types
         elif syntax == 'ID':
-            valid = self._is_valid_id(input)
+            valid = self._is_valid_id(inpt)
         elif syntax == 'TYPE':
-            valid = self._is_valid_type(input)
+            valid = self._is_valid_type(inpt)
         elif syntax == 'BOOLEAN':
-            valid = self._is_valid_boolean(input)
+            valid = self._is_valid_boolean(inpt)
         elif syntax == 'STRING':
-            valid = self._is_valid_string(input, metadata)
+            valid = self._is_valid_string(inpt, metadata)
         elif syntax == 'INTEGER':
-            valid = self._is_valid_integer(input, metadata)
+            valid = self._is_valid_integer(inpt, metadata)
         elif syntax == 'DECIMAL':
-            valid = self._is_valid_decimal(input, metadata)
+            valid = self._is_valid_decimal(inpt, metadata)
         elif syntax == 'DATETIME':
-            valid = self._is_valid_date_time(input, metadata)
+            valid = self._is_valid_date_time(inpt, metadata)
         elif syntax == 'DURATION':
-            valid = self._is_valid_duration(input, metadata)
+            valid = self._is_valid_duration(inpt, metadata)
         elif syntax == 'CARDINAL':
-            valid = self._is_valid_cardinal(input, metadata)
+            valid = self._is_valid_cardinal(inpt, metadata)
         elif syntax == 'INTEGER':
-            valid = self._is_valid_integer(input, metadata)
+            valid = self._is_valid_integer(inpt, metadata)
         elif syntax == 'DECIMAL':
-            valid = self._is_valid_decimal(input, metadata)
+            valid = self._is_valid_decimal(inpt, metadata)
         else:
             raise OperationFailed('no validation function available for ' + syntax)
 
-        return valid 
+        return valid
 
-    def _is_valid_id(self, input):
-        from ...abstract_osid.id.primitives import Id
-        if isinstance(input, Id):
+    def _is_valid_id(self, inpt):
+        \"\"\"Checks if input is a valid Id\"\"\"
+        from ...abstract_osid.id.primitives import Id as abc_id
+        if isinstance(inpt, abc_id):
             return True
         else:
             return False
 
-    def _is_valid_type(self, input):
-        from ...abstract_osid.type.primitives import Type
-        if isinstance(input, Type):
+    def _is_valid_type(self, inpt):
+        \"\"\"Checks if input is a valid Type\"\"\"
+        from ...abstract_osid.type.primitives import Type as abc_type
+        if isinstance(inpt, abc_type):
             return True
         else:
             return False
 
-    def _is_valid_boolean(self, input):
-        if isinstance(input, bool):
+    def _is_valid_boolean(self, inpt):
+        \"\"\"Checks if input is a valid boolean\"\"\"
+        if isinstance(inpt, bool):
             return True
         else:
             return False
 
-    def _is_valid_string(self, input, metadata):
-        if not isinstance(input, basestring):
+    def _is_valid_string(self, inpt, metadata):
+        \"\"\"Checks if input is a valid string\"\"\"
+        if not isinstance(inpt, basestring):
             return False
-        if metadata.get_minimum_string_length() and len(input) < metadata.get_minimum_string_length():
+        if metadata.get_minimum_string_length() and len(inpt) < metadata.get_minimum_string_length():
             return False
-        elif metadata.get_maximum_string_length() and len(input) > metadata.get_maximum_string_length():
+        elif metadata.get_maximum_string_length() and len(inpt) > metadata.get_maximum_string_length():
             return False
-        if (metadata.get_string_set() and
-            input not in metadata.get_string_set()):
-            return False
-        else:
-            return True
-
-    def _is_valid_cardinal(self, input, metadata):
-        if not isinstance(input, int):
-            return False
-        if metadata.get_minimum_cardinal() and input < metadata.get_maximum_cardinal():
-            return False
-        if metadata.get_maximum_cardinal() and input > metadata.get_minimum_cardinal():
-            return False
-        if metadata.get_cardinal_set() and input not in metadata.get_cardinal_set():
+        if metadata.get_string_set() and inpt not in metadata.get_string_set():
             return False
         else:
             return True
 
-    def _is_valid_integer(self, input, metadata):
-        if not isinstance(input, int):
+    def _is_valid_cardinal(self, inpt, metadata):
+        \"\"\"Checks if input is a valid cardinal value\"\"\"
+        if not isinstance(inpt, int):
             return False
-        if metadata.get_minimum_integer() and input < metadata.get_maximum_integer():
+        if metadata.get_minimum_cardinal() and inpt < metadata.get_maximum_cardinal():
             return False
-        if metadata.get_maximum_integer() and input > metadata.get_minimum_integer():
+        if metadata.get_maximum_cardinal() and inpt > metadata.get_minimum_cardinal():
             return False
-        if metadata.get_integer_set() and input not in metadata.get_integer_set():
-            return False
-        else:
-            return True
-
-    def _is_valid_decimal(self, input, metadata):
-        if not isinstance(input, float):
-            return False
-        if metadata.get_minimum_decimal() and input < metadata.get_minimum_decimal():
-            return False
-        if metadata.get_maximum_decimal() and input > metadata.get_maximum_decimal():
-            return False
-        if metadata.get_decimal_set() and input not in metadata.get_decimal_set():
-            return False
-        if metadata.get_decimal_scale() and len(str(input).split('.')[-1]) != metadata.get_decimal_scale():
+        if metadata.get_cardinal_set() and inpt not in metadata.get_cardinal_set():
             return False
         else:
             return True
 
-    def _is_valid_date_time(self, input, metadata):
+    def _is_valid_integer(self, inpt, metadata):
+        \"\"\"Checks if input is a valid integer value\"\"\"
+        if not isinstance(inpt, int):
+            return False
+        if metadata.get_minimum_integer() and inpt < metadata.get_maximum_integer():
+            return False
+        if metadata.get_maximum_integer() and inpt > metadata.get_minimum_integer():
+            return False
+        if metadata.get_integer_set() and inpt not in metadata.get_integer_set():
+            return False
+        else:
+            return True
+
+    def _is_valid_decimal(self, inpt, metadata):
+        \"\"\"Checks if input is a valid decimal value\"\"\"
+        if not isinstance(inpt, float):
+            return False
+        if metadata.get_minimum_decimal() and inpt < metadata.get_minimum_decimal():
+            return False
+        if metadata.get_maximum_decimal() and inpt > metadata.get_maximum_decimal():
+            return False
+        if metadata.get_decimal_set() and inpt not in metadata.get_decimal_set():
+            return False
+        if metadata.get_decimal_scale() and len(str(inpt).split('.')[-1]) != metadata.get_decimal_scale():
+            return False
+        else:
+            return True
+
+    def _is_valid_date_time(self, inpt, metadata):
+        \"\"\"Checks if input is a valid DateTime object\"\"\"
         # NEED TO ADD CHECKS FOR OTHER METADATA, LIKE MINIMUM, MAXIMUM, ETC.
-        from ...abstract_osid.calendaring.primitives import DateTime
-        if isinstance(input, DateTime):
+        from ...abstract_osid.calendaring.primitives import DateTime as abc_datetime
+        if isinstance(inpt, abc_datetime):
             return True
         else:
             return False
 
     def _is_valid_timestamp(self, *args, **kwargs):
+        \"\"\"Checks if input is a valid timestamp\"\"\"
         # This should be temporary to deal with a bug in the OSID RC3 spec
-        # Check assessment.AssessmentOffered.set_deadline to see if this 
+        # Check assessment.AssessmentOffered.set_deadline to see if this
         # is still required.
         return self._is_valid_date_time(*args, **kwargs)
 
-    def _is_valid_duration(self, input, metadata):
+    def _is_valid_duration(self, inpt, metadata):
+        \"\"\"Checks if input is a valid Duration\"\"\"
         # NEED TO ADD CHECKS FOR OTHER METADATA, LIKE MINIMUM, MAXIMUM, ETC.
-        from ...abstract_osid.calendaring.primitives import Duration
-        if isinstance(input, Duration):
+        from ...abstract_osid.calendaring.primitives import Duration as abc_duration
+        if isinstance(inpt, abc_duration):
             return True
         else:
             return False
@@ -891,7 +917,7 @@ class OsidForm:
 
     get_default_locale = """
         from ..locale.objects import Locale
-        # If no constructor arguments are given it is expected that the 
+        # If no constructor arguments are given it is expected that the
         # locale service will return the default Locale.
         return Locale()"""
 
@@ -912,16 +938,15 @@ class OsidForm:
     set_journal_comment = """
         if comment is None:
             raise NullArgument()
-        if self.get_comment_metadata().is_read_only():
+        if self.get_journal_comment_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_string(comment, 
-                                     self.get_journal_comment_metadata()):
+        if not self._is_valid_string(comment, self.get_journal_comment_metadata()):
             raise InvalidArgument()
         self._journal_comment = comment"""
 
     is_valid = """
-        # It is assumed that all setter methods check validity so there 
-        # should never be a state where invalid data exists in the form.  
+        # It is assumed that all setter methods check validity so there
+        # should never be a state where invalid data exists in the form.
         # And if you believe that...
         return True"""
 
@@ -936,8 +961,12 @@ class OsidForm:
 class OsidExtensibleForm:
 
     init = """
-    # This overrides _get_record in osid.Extensible. Perhaps we should leverage it somehow?
     def _get_record(self, recordType):
+        \"\"\"This overrides _get_record in osid.Extensible.
+
+        Perhaps we should leverage it somehow?
+
+        \"\"\"
         if recordType is None:
             raise NullArgument()
         if not self.has_record_type(recordType):
@@ -952,31 +981,34 @@ class OsidExtensibleForm:
 class OsidTemporalForm:
 
     import_statements = [
-        'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'import datetime',
         'from . import mdata_conf',
         'from .metadata import Metadata',
-        #'from . import profile'
         ]
 
     init = """
     _namespace = "mongo.OsidTemporalForm"
 
     def _init_metadata(self, **kwargs):
+        # pylint: disable=attribute-defined-outside-init
+        # this method is called from descendent __init__
         self._start_date_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace, 
-                             identifier = 'start_date')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='start_date')}
         self._start_date_metadata.update(mdata_conf.START_DATE)
         self._start_date_metadata.update({'default_date_time_values': [self._get_date_map(datetime.datetime.now())]})
         self._end_date_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace, 
-                             identifier = 'end_date')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='end_date')}
         self._end_date_metadata.update(mdata_conf.END_DATE)
 
     def _init_map(self):
+        # pylint: disable=attribute-defined-outside-init
+        # this method is called from descendent __init__
         self._my_map['startDate'] = self._start_date_metadata['default_date_time_values'][0]
         self._my_map['endDate'] = self._end_date_metadata['default_date_time_values'][0]
 """
@@ -991,13 +1023,13 @@ class OsidTemporalForm:
             raise NullArgument()
         if self.get_start_date_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_date_time(date):
+        if not self._is_valid_date_time(date, self.get_start_date_metadata()):
             raise InvalidArgument()
         self._my_map['startDate'] = self._get_date_map(date)"""
 
     clear_start_date = """
         if (self.get_start_date_metadata().is_read_only() or
-            self.get_start_date_metadata().is_required()):
+                self.get_start_date_metadata().is_required()):
             raise NoAccess()
         self._my_map['startDate'] = self.get_start_date_metadata['default_date_time_values'][0]"""
 
@@ -1011,13 +1043,13 @@ class OsidTemporalForm:
             raise NullArgument()
         if self.get_end_date_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_date_time(date):
+        if not self._is_valid_date_time(date, self.get_end_date_metadata()):
             raise InvalidArgument()
         self._my_map['endDate'] = self._get_date_map(date)"""
 
     clear_end_date = """
         if (self.get_end_date_metadata().is_read_only() or
-            self.get_end_date_metadata().is_required()):
+                self.get_end_date_metadata().is_required()):
             raise NoAccess()
         self._my_map['endDate'] = self.get_end_date_metadata['default_date_time_values'][0]"""
 
@@ -1038,11 +1070,10 @@ class OsidObjectForm:
     #inheritance = ['OsidObject']
 
     import_statements = [
-        'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from . import mdata_conf',
         'from .metadata import Metadata',
-        'from . import profile'
         ]
 
     init = """
@@ -1061,23 +1092,24 @@ class OsidObjectForm:
             self._init_map()
 
     def _init_metadata(self, **kwargs):
+        \"\"\"Initialize metadata for form\"\"\"
         OsidForm._init_metadata(self)
         self._display_name_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace,
-                             identifier = 'display_name')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='display_name')}
         self._display_name_metadata.update(mdata_conf.DISPLAY_NAME)
         if 'default_display_name' in kwargs:
             self._display_name_metadata['default_string_values'][0]['text'] = kwargs['default_display_name']
         self._description_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace, 
-                             identifier = 'description')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='description')}
         self._description_metadata.update(mdata_conf.DESCRIPTION)
         self._genus_type_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace, 
-                             identifier = 'description')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='description')}
         if 'default_description' in kwargs:
             self._description_metadata['default_string_values'][0]['text'] = kwargs['default_description']
         self._genus_type_metadata.update(mdata_conf.GENUS_TYPE)
@@ -1088,41 +1120,25 @@ class OsidObjectForm:
         self._my_map['genusTypeId'] = self._genus_type_metadata['default_type_values'][0]
         self._my_map['recordTypeIds'] = []
 
-    # Deprecate this:
-    def _old_get_provider_manager(self, osid):
-        if self._runtime is None:
-            # Return a Manager from this implementation:
-            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
-            manager = getattr(module, osid.title() + 'Manager')()
-        else:
-            # Get the Manager from the runtime:
-            config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
-            impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
-            manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        return manager
-
+    ##
+    # DUPLICATE: There is one of these in OsidObjectForm as well.
     def _get_provider_manager(self, osid):
+        \"\"\"Gets provider manager from runtime, if a runtime and config exists
+
+        If not, then gets the mongo implementation manager.
+
+        \"\"\"
         try:
             # Try to get the Manager from the runtime, if available:
             config = self._runtime.get_configuration()
             parameter_id = Id('parameter:repositoryProviderImpl@mongo')
             impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
             manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        except:
+        except (AttributeError, KeyError, NotFound):
             # Just return a Manager from this implementation:
             module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
             manager = getattr(module, osid.title() + 'Manager')()
         return manager
-
-    #def __getattr__(self, name):
-    #    if '_records' in self.__dict__:
-    #        for record in self._records:
-    #            try:
-    #                return self._records[record][name]
-    #            except AttributeError:
-    #                pass
-    #    raise AttributeError()
 """
 
     get_display_name_metadata = """
@@ -1133,14 +1149,14 @@ class OsidObjectForm:
             raise NullArgument()
         if self.get_display_name_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_string(display_name, 
+        if not self._is_valid_string(display_name,
                                      self.get_display_name_metadata()):
             raise InvalidArgument()
         self._my_map['displayName']['text'] = display_name"""
 
     clear_display_name = """
         if (self.get_display_name_metadata().is_read_only() or
-            self.get_display_name_metadata().is_required()):
+                self.get_display_name_metadata().is_required()):
             raise NoAccess()
         self._my_map['displayName'] = dict(self._display_name_metadata['default_object_values'][0])"""
 
@@ -1152,14 +1168,14 @@ class OsidObjectForm:
             raise NullArgument()
         if self.get_description_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_string(description, 
+        if not self._is_valid_string(description,
                                      self.get_description_metadata()):
             raise InvalidArgument()
         self._my_map['description']['text'] = description"""
 
     clear_description = """
         if (self.get_description_metadata().is_read_only() or
-            self.get_description_metadata().is_required()):
+                self.get_description_metadata().is_required()):
             raise NoAccess()
         self._my_map['description'] = dict(self._description_metadata['default_object_values'][0])"""
 
@@ -1177,7 +1193,7 @@ class OsidObjectForm:
 
     clear_genus_type = """
         if (self.get_genus_type_metadata().is_read_only() or
-            self.get_genus_type_metadata().is_required()):
+                self.get_genus_type_metadata().is_required()):
             raise NoAccess()
         self._my_map['genusType'] = self._genus_type_metadata['default_type_values'][0]"""
 
@@ -1196,7 +1212,9 @@ class OsidRelationshipForm:
 class OsidList:
 
     init = """
-    def __init__(self, iter_object=[], count=None, db_prefix='', runtime=None):
+    def __init__(self, iter_object=None, count=None, db_prefix='', runtime=None):
+        if iter_object is None:
+            iter_object = []
         if count != None:
             self._count = count
         elif isinstance(iter_object, dict) or isinstance(iter_object, list):
@@ -1211,15 +1229,14 @@ class OsidList:
         return self
 
     def next(self):
-        try:
-            next_object = self._iter_object.next()
-        except: 
-            raise
+        \"\"\"next method for iterator.\"\"\"
+        next_object = self._iter_object.next()
         if self._count != None:
             self._count -= 1
         return next_object
 
     def len(self):
+        \"\"\"Returns number of available elements\"\"\"
         return self.available()
 """
 
@@ -1419,6 +1436,7 @@ class OsidExtensibleQuery:
 
     init = """
     def _load_records(self, record_type_idstrs):
+        \"\"\"Loads query records\"\"\"
         for record_type_idstr in record_type_idstrs:
             try:
                 self._init_record(record_type_idstr)
@@ -1426,6 +1444,7 @@ class OsidExtensibleQuery:
                 pass
 
     def _init_record(self, record_type_idstr):
+        \"\"\"Initializes a query record\"\"\"
         record_type_data = self._all_supported_record_type_data_sets[Id(record_type_idstr).get_identifier()]
         module = importlib.import_module(record_type_data['module_path'])
         record = getattr(module, record_type_data['query_record_class_name'])
@@ -1506,7 +1525,7 @@ class Metadata:
     supports_coordinate_type_template = """
         # Implemented from template for osid.Metadata.supports_coordinate_type
         if not ${arg0_name}:
-            raise NullArgument('no input Type provided')
+            raise NullArgument('no inpt Type provided')
         if self._kwargs['syntax'] not in ${syntax_list}:
             raise IllegalState()
         return ${arg0_name} in self.get_${var_name}"""
@@ -1531,11 +1550,12 @@ class OsidNode:
         return self._my_map['root']"""
 
     has_parents = """
-        return bool(self._my_map[parentdNodes])"""
+        return bool(self._my_map['parentNodes'])"""
 
     get_parent_ids = """
         id_list = []
-        for child_node in self._my_map['parentdNodes']:
+        from ..id.objects import IdList
+        for parent_node in self._my_map['parentNodes']:
             id_list.append(parent_node['id'])
         return IdList(id_list)"""
 
@@ -1543,10 +1563,11 @@ class OsidNode:
         return self._my_map['leaf']"""
 
     has_children = """
-        return bool(self._my_map[childNodes])"""
+        return bool(self._my_map['childNodes'])"""
 
     get_child_ids = """
         id_list = []
+        from ..id.objects import IdList
         for child_node in self._my_map['childNodes']:
             id_list.append(child_node['id'])
         return IdList(id_list)"""

@@ -227,19 +227,35 @@ def make_mongoosid(file_name):
                     pass
             else:
                 continue
+
+        if interface['category'] in excepted_osid_categories:
+            continue
         
+        last_inheritance = []
         ##
         # Seed the inheritance list with this interface's abc_osid
-        inheritance = ['abc_' + abc_pkg_name(package['name']) + '_' +
-                       interface['category'] + '.' +
-                       interface['shortname']]
+        if package['name'] != 'osid' and interface['category'] == 'managers':
+            inheritance = []
+            last_inheritance = [abc_pkg_name(package['name']) + '_' +
+                                interface['category'] + '.' +
+                                interface['shortname']]
+        else:
+            inheritance = ['abc_' + abc_pkg_name(package['name']) + '_' +
+                           interface['category'] + '.' +
+                           interface['shortname']]
         ##
         # And make sure there is a corresponding import statement for this
         # interface's abc_osid and associated module/category name.
-        import_str = ('from ' + abc_app_name(package['name']) + '.' +
-                       abc_pkg_name(package['name']) + ' import ' +
-                       interface['category'] + ' as abc_' + 
-                       abc_pkg_name(package['name'] + '_' + interface['category']))
+        if package['name'] != 'osid' and interface['category'] == 'managers':
+            import_str = ('from dlkit.manager_impls.' +
+                           abc_pkg_name(package['name']) + ' import ' +
+                           interface['category'] + ' as ' + 
+                           abc_pkg_name(package['name'] + '_' + interface['category']))
+        else:
+            import_str = ('from ' + abc_app_name(package['name']) + '.' +
+                           abc_pkg_name(package['name']) + ' import ' +
+                           interface['category'] + ' as abc_' + 
+                           abc_pkg_name(package['name'] + '_' + interface['category']))
         if not import_str in modules[interface['category']]['imports']:
             modules[interface['category']]['imports'].append(import_str)
 
@@ -319,6 +335,8 @@ def make_mongoosid(file_name):
         ##
         # Note that the following re-assigns the inheritance variable from a 
         # list to a string.
+        if last_inheritance:
+            inheritance = inheritance + last_inheritance
         if inheritance:
             inheritance = '(' + ', '.join(inheritance) + ')'
         else:
@@ -741,6 +759,21 @@ def make_methods(package_name, interface, patterns):
     for method in interface['methods']:
         if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
             method['name'] = 'read_to_buffer'
+
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Manager')  and
+                method['name'].startswith('get') and
+                'session' in method['name'] and
+                method['return_type'].split('.')[-1] not in sessions_to_implement):
+            continue
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Profile')  and
+                method['name'].startswith('supports_') and
+                under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
+            continue
+
         body.append(make_method(package_name, method, interface, patterns))
 
         ##
