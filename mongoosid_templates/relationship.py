@@ -168,10 +168,15 @@ class RelationshipAdminSession:
 class Relationship:
 
     import_statements = [
-        'from ..primitives import *'
+        'from ..primitives import Id'
     ]
 
     get_source_id_template = """
         # Implemented from template for osid.relationship.Relationship.get_source_id
         return Id(self._my_map['${var_name_mixed}Id'])"""
 
+class RelationshipQuery:
+
+    import_statements = [
+        'from ..osid.osid_errors import Unimplemented'
+    ]

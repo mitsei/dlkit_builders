@@ -41,12 +41,6 @@ class Comment:
         'from ..primitives import DisplayText',
     ]
 
-class CommentQuery:
-
-    import_statements = [
-        'from ..osid.osid_errors import Unimplemented',
-    ]
-
     get_commenting_agent_id = """
         return self.get_commentor_id()"""
 
@@ -69,3 +63,9 @@ class CommentQuery:
             raise OperationFailed()
         else:
             return osid_object"""
+
+class CommentQuery:
+
+    import_statements = [
+        'from ..osid.osid_errors import Unimplemented',
+    ]

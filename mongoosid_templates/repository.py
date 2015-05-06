@@ -139,6 +139,7 @@ class Asset:
 
     import_statements = [
         'from ..primitives import DisplayText',
+        'from ..id.objects import IdList',
     ]
 
     get_title_template = """
@@ -162,7 +163,7 @@ class Asset:
     get_asset_contents_template = """
         # Implemented from template for osid.repository.Asset.get_asset_contents_template
         return ${aggregated_object_name}List(self._my_map['${var_name_plural_mixed}'], db_prefix=self._db_prefix, runtime=self._runtime)
-        
+
     def _delete(self):
         for ${aggregated_object_name_under} in self.get_${aggregated_objects_name_under}():
             ${aggregated_object_name_under}._delete()
@@ -240,7 +241,7 @@ class AssetContentForm:
         if self.get_${var_name}_metadata().is_read_only():
             raise NoAccess()
         if not self._is_valid_${arg0_type}(
-                ${arg0_name}, 
+                ${arg0_name},
                 self.get_${var_name}_metadata()):
             raise InvalidArgument()
         self._my_map['${var_name_mixed}'] = ${arg0_name}"""

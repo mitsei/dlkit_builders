@@ -18,8 +18,7 @@ class ProxyProxyManager:
 class ProxySession:
 
     import_statements = [
-        'from ..osid.osid_errors import ' + session_errors,
-        '#from ..primitives import IllegalState, Unimplemented, Unsupported',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from . import rules',
         'from ..authentication_process.objects import Authentication'
     ]
@@ -40,13 +39,18 @@ class ProxySession:
             authentication = None
         effective_agent_id = input_._effective_agent_id
         # Also need to deal with effective dates and Local
-        return rules.Proxy(authentication = authentication,
-                     effective_agent_id = effective_agent_id)"""
+        return rules.Proxy(authentication=authentication,
+                           effective_agent_id=effective_agent_id)"""
 
 class Proxy:
-    
+
+    import_statements = [
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import Id'
+    ]
+
     init = """
-    def __init__(self, 
+    def __init__(self,
                  authentication=None,
                  effective_agent_id=None,
                  effective_date=None,
@@ -157,18 +161,17 @@ class ProxyCondition:
         else:
             raise Unsupported()
 
-    # The following methods support the HTTPRequest ProxyConditionRecordType and
-    # checks for special effective agent ids:
     def set_http_request(self, http_request):
+        \"\"\"Support the HTTPRequest ProxyConditionRecordType and checks for special effective agent ids\"\"\"
         self._http_request = http_request
         if 'HTTP_LTI_USER_ID' in http_request.META:
             try:
                 authority = http_request.META['HTTP_LTI_TOOL_CONSUMER_INSTANCE_GUID']
-            except AttributeError, KeyError:
+            except (AttributeError, KeyError):
                 authority = 'unknown_lti_consumer_instance'
             self.set_effective_agent_id(Id(
-                authority = authority,
-                namespace = 'agent.Agent',
-                identifier = http_request.META['HTTP_LTI_USER_ID']))
-        
+                authority=authority,
+                namespace='agent.Agent',
+                identifier=http_request.META['HTTP_LTI_USER_ID']))
+
     http_request = property(fset=set_http_request)"""

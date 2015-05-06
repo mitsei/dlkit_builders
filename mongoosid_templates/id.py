@@ -35,10 +35,7 @@ class IdList:
             return next_item
 
     def next(self):
-        try:
-            next_item = osid_objects.OsidList.next(self)
-        except:
-            raise
+        next_item = osid_objects.OsidList.next(self)
         if isinstance(next_item, str) or isinstance(next_item, unicode):
             next_item = Id(next_item)
         return next_item"""

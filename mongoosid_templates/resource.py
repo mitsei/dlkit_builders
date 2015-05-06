@@ -118,7 +118,7 @@ class ResourceProxyManager:
 class ResourceLookupSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from .. import mongo_client',
@@ -281,7 +281,7 @@ class ResourceLookupSession:
 class ResourceQuerySession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..osid.sessions import OsidSession',
         'from .. import mongo_client',
         'from . import queries',
@@ -336,7 +336,7 @@ class ResourceQuerySession:
 class ResourceAdminSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..osid.sessions import OsidSession',
         'from ..primitives import Id',
         'from .. import mongo_client',
@@ -506,7 +506,7 @@ class ResourceAdminSession:
 class BinLookupSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from . import objects',
@@ -583,7 +583,7 @@ class BinLookupSession:
 class BinAdminSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from .. import mongo_client',
@@ -740,7 +740,7 @@ class BinAdminSession:
 class BinHierarchySession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from . import objects',
@@ -866,7 +866,7 @@ class BinHierarchySession:
 class BinHierarchyDesignSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from . import objects',

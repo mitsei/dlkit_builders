@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# pylint: skip-file
+# Not sure why this is still here
 """
 ID = 'id_kit.dj_id.primitives.Id'
 
