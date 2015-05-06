@@ -2,26 +2,26 @@
 class Authentication:
 
     import_statements = [
-        'from ..primitives import *',
-        'from ..osid.osid_errors import *',
+        'from ..primitives import Id',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..authentication.objects import Agent'
     ]
 
     init = """
     def __init__(self):
-        _django_user = None
-        _credential = None
+        self._django_user = None
+        self._credential = None
 """
 
     get_agent_id = """
         if self._django_user is not None:
-            return Id(identifier = self._django_user.get_username(),
-                      namespace = 'osid.agent.Agent',
-                      authority = 'MIT-OEIT')
+            return Id(identifier=self._django_user.get_username(),
+                      namespace='osid.agent.Agent',
+                      authority='MIT-OEIT')
         else:
-            return Id(identifier = 'MC3GUE$T@MIT.EDU',
-                      namespace = 'osid.agent.Agent',
-                      authority = 'MIT-OEIT')"""
+            return Id(identifier='MC3GUE$T@MIT.EDU',
+                      namespace='osid.agent.Agent',
+                      authority='MIT-OEIT')"""
 
     get_agent = """
         raise Unimplemented"""
@@ -57,4 +57,5 @@ class Authentication:
         raise Unsupported()
 
     def set_django_user(self, django_user):
+        \"\"\"Special method that excepts a django user. Should be a record.\"\"\"
         self._django_user = django_user"""

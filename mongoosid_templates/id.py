@@ -20,8 +20,8 @@ class Id:
 class IdList:
 
     import_statements = [
+    'from ..osid.osid_errors import Unimplemented, OperationFailed, IllegalState',
     'from ..primitives import Id',
-    'from ..osid.objects import OsidList'
     ]
 
     get_next_id = """
@@ -33,7 +33,7 @@ class IdList:
             raise OperationFailed()
         else:
             return next_item
-            
+
     def next(self):
         try:
             next_item = osid_objects.OsidList.next(self)

@@ -925,11 +925,10 @@ class BinHierarchyDesignSession:
 class Resource:
 
     import_statements_pattern = [
-        '# pylint: disable=protected-access',
         'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..primitives import Id',
-        'from ..id.objects import IdList',
-        'import importlib',
+        '#from ..id.objects import IdList',
+        '#import importlib',
     ]
 
     init_template = """

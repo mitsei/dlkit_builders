@@ -138,7 +138,7 @@ def make_mongoosid(file_name):
     # Write the summary documentation for this package.
     write_file = open(app_name(package['name']) + '/' + 
                       pkg_name(package['name']) + '/summary_doc.py', 'w')
-    write_file.write((utf_code + '\"\"\"' +
+    write_file.write((utf_code + '# pylint: skip-file\n\n' + '\"\"\"\n' +
                       package['title'] + '\n' +
                       package['name'] + ' version ' +
                       package['version'] + '\n\n'+

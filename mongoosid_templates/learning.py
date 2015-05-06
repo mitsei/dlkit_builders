@@ -166,6 +166,7 @@ class ActivityAdminSession:
         return obj_form"""
 
 
+
 class Activity:
 
     import_statements_pattern = [
@@ -173,6 +174,11 @@ class Activity:
         'from ..primitives import Id',
         'from ..id.objects import IdList',
     ]
+
+    import_statements = [
+        'from ..id.objects import IdList',
+    ]
+
 
     get_objective_id_template = """
         # Implemented from template for osid.learning.Activity.get_objective_id

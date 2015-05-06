@@ -209,27 +209,17 @@ class AssetContent:
         return self._my_map['${var_name_mixed}']"""
 
     get_data = """
-        #if 'dbPrefix' in self._my_map:
-        #    db_prefix = self._my_map['dbPrefix']
-        #else:
-        #    db_prefix = ''
-        #db = mongo_client[db_prefix + 'repository']
-        db = mongo_client[self._db_prefix + 'repository']
-        fs = gridfs.GridFS(db)
+        dbase = mongo_client[self._db_prefix + 'repository']
+        filesys = gridfs.GridFS(dbase)
         mongo_client.close()
-        return DataInputStream(fs.get(self._my_map['data']))""" 
+        return DataInputStream(filesys.get(self._my_map['data']))""" 
 
     additional_methods = """
     def _delete(self):
-        #if 'dbPrefix' in self._my_map:
-        #    db_prefix = self._my_map['dbPrefix']
-        #else:
-        #    db_prefix = ''
-        #db = mongo_client[db_prefix + 'repository']
-        db = mongo_client[self._db_prefix + 'repository']
-        fs = gridfs.GridFS(db)
-        if self._my_map['data'] and fs.exists(self._my_map['data']):
-            fs.delete(self._my_map['data'])
+        dbase = mongo_client[self._db_prefix + 'repository']
+        filesys = gridfs.GridFS(dbase)
+        if self._my_map['data'] and filesys.exists(self._my_map['data']):
+            filesys.delete(self._my_map['data'])
         osid_objects.OsidObject._delete(self)
         mongo_client.close()"""
 
@@ -237,7 +227,6 @@ class AssetContentForm:
 
     import_statements = [
         'import base64',
-        'from pymongo import MongoClient',
         'import gridfs',
         'from ..primitives import DataInputStream',
         'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
@@ -259,24 +248,22 @@ class AssetContentForm:
     set_data = """
         if data is None:
             raise NullArgument()
-        db = mongo_client[self._db_prefix + 'repository']
-        fs = gridfs.GridFS(db)
-        self._my_map['data'] = fs.put(data._my_data)
+        dbase = mongo_client[self._db_prefix + 'repository']
+        filesys = gridfs.GridFS(dbase)
+        self._my_map['data'] = filesys.put(data._my_data)
         data._my_data.seek(0)
         self._my_map['base64'] = base64.b64encode(data._my_data.read())
-        #self._my_map['dbPrefix'] = self._db_prefix
         mongo_client.close()"""
 
     clear_data = """
         if (self.get_data_metadata().is_read_only() or
-            self.get_data_metadata().is_required()):
+                self.get_data_metadata().is_required()):
             raise NoAccess()
         if self._my_map['data'] == self._data_default:
             pass
-        db = mongo_client[self._db_prefix + 'repository']
-        fs = gridfs.GridFS(db)
-        fs.delete(self._my_map['data'])
+        dbase = mongo_client[self._db_prefix + 'repository']
+        filesys = gridfs.GridFS(dbase)
+        filesys.delete(self._my_map['data'])
         self._my_map['data'] = self._data_default
         del self._my_map['base64']
-        #del self._my_map['dbPrefix']
         mongo_client.close()"""

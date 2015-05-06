@@ -6,7 +6,7 @@ class RelationshipLookupSession:
     ]
 
     get_relationships_for_source_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_source
         # NOTE: This implementation currently ignores plenary and effective views
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
@@ -22,7 +22,7 @@ class RelationshipLookupSession:
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_source_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source
         # NOTE: This implementation currently ignores plenary and effective views
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
@@ -42,7 +42,7 @@ class RelationshipLookupSession:
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_for_destination_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
@@ -58,7 +58,7 @@ class RelationshipLookupSession:
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_destination_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
@@ -78,7 +78,7 @@ class RelationshipLookupSession:
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_for_peers_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
@@ -98,7 +98,7 @@ class RelationshipLookupSession:
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_peers_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
@@ -129,7 +129,7 @@ class RelationshipAdminSession:
     ]
     
     get_relationship_form_for_create_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.relationship.RelationshipAdminSession.get_relationship_form_for_create
         # These really need to be in module imports:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
@@ -145,9 +145,22 @@ class RelationshipAdminSession:
                 raise InvalidArgument('one or more argument array elements is not a valid OSID ${arg2_type}')
         if ${arg2_name} == []:
             ## WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
-            obj_form = objects.${return_type}(${cat_name_under}_id=self._catalog_id, ${arg0_name}=${arg0_name}, ${arg1_name}=${arg1_name}, catalog_id=self._catalog_id, db_prefix=self._db_prefix, runtime=self._runtime)
+            obj_form = objects.${return_type}(
+                ${cat_name_under}_id=self._catalog_id,
+                ${arg0_name}=${arg0_name},
+                ${arg1_name}=${arg1_name},
+                catalog_id=self._catalog_id,
+                db_prefix=self._db_prefix,
+                runtime=self._runtime)
         else:
-            obj_form = objects.${return_type}(${cat_name_under}_id=self._catalog_id, record_types=${arg2_name}, ${arg0_name}=${arg0_name}, ${arg1_name}=${arg1_name}, catalog_id=self._catalog_id, db_prefix=self._db_prefix, runtime=self._runtime)
+            obj_form = objects.${return_type}(
+                ${cat_name_under}_id=self._catalog_id,
+                record_types=${arg2_name},
+                ${arg0_name}=${arg0_name},
+                ${arg1_name}=${arg1_name},
+                catalog_id=self._catalog_id,
+                db_prefix=self._db_prefix,
+                runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""

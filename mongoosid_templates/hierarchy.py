@@ -2,7 +2,8 @@
 class HierarchyTraversalSession:
 
     import_statements = [
-        'from ..primitives import *',
+        'from ..primitives import Id',
+        'from ..primitives import Type',
         'from ..osid.sessions import OsidSession',
         'from ..osid.objects import OsidNode',
         'from ..id.objects import IdList',
@@ -14,18 +15,17 @@ class HierarchyTraversalSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         from .objects import Hierarchy
         self._catalog_class = Hierarchy
-        from ..osid.sessions import OsidSession
         self._session_name = 'HierarchyTraversalSession'
         self._catalog_name = 'Hierarchy'
         if 'relationship_type' in kwargs:
             self._relationship_type = kwargs['relationship_type']
         if catalog_id.get_identifier_namespace() == 'CATALOG':
             self._set_relationship_type(type_identifier=catalog_id.get_identifier().lower() + '.parent.child',
-                                        display_name = catalog_id.get_identifier() + ' Hierarchy')
+                                        display_name=catalog_id.get_identifier() + ' Hierarchy')
             namespace = catalog_id.get_authority().lower() + '.' + catalog_id.get_identifier().title()
-            self._phantom_root_id = Id(authority = self._authority,
-                                       namespace = namespace,
-                                       identifier = '000000000000000000000000')
+            self._phantom_root_id = Id(authority=self._authority,
+                                       namespace=namespace,
+                                       identifier='000000000000000000000000')
             try:
                 catalog_id = self._get_catalog_hierarchy_id(catalog_id, proxy, runtime)
             except NotFound:
@@ -38,27 +38,32 @@ class HierarchyTraversalSession:
         self._rls = rm.get_relationship_lookup_session_for_family(catalog_id)
 
     def _get_catalog_hierarchy_id(self, catalog_id, proxy, runtime):
+        \"\"\"Gets the catalog hierarchy\"\"\"
         seed_str = catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000'
-        ident = Id(authority = self._authority,
-                   namespace = 'hierarchy.Hierarchy',
-                   identifier = str(ObjectId(seed_str[:12])))
+        ident = Id(authority=self._authority,
+                   namespace='hierarchy.Hierarchy',
+                   identifier=str(ObjectId(seed_str[:12])))
         return HierarchyLookupSession(proxy, runtime).get_hierarchy(ident).get_id() # Return the actual Id
 
     def _create_catalog_hierarchy(self, catalog_id, proxy, runtime):
+        \"\"\"Creates a catalog hierarchy\"\"\"
         seed_str = catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000'
         has = HierarchyAdminSession(proxy, runtime)
         hfc = has.get_hierarchy_form_for_create([])
         hfc.set_display_name(catalog_id.get_identifier().title() + ' Hierarchy')
-        hfc.set_description('Hierarchy for ' + catalog_id.get_authority().title() + ' ' + catalog_id.get_identifier().title())
-        hfc.set_genus_type(Type(authority = 'dlkit',
-                                namespace = 'hierarchy.Hierarchy',
-                                identifier = catalog_id.get_identifier().lower()))
+        hfc.set_description(
+            'Hierarchy for ' + catalog_id.get_authority().title() +
+            ' ' + catalog_id.get_identifier().title())
+        hfc.set_genus_type(Type(authority='dlkit',
+                                namespace='hierarchy.Hierarchy',
+                                identifier=catalog_id.get_identifier().lower()))
         # This next tricks require serious inside knowledge:
         hfc._my_map['_id'] = ObjectId(seed_str[:12])
         hierarchy = has.create_hierarchy(hfc)
         return hierarchy.get_id() # Return the Id of newly created catalog hierarchy
 
     def _set_relationship_type(self, type_identifier, display_name=None, display_label=None, description=None, domain='Relationship'):
+        \"\"\"Sets the relationship type\"\"\"
         if display_name is None:
             display_name = type_identifier
         if display_label is None:
@@ -75,7 +80,7 @@ class HierarchyTraversalSession:
 """
 
     can_access_hierarchy = """
-        # NOTE: It is expected that real authentication hints will be 
+        # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
@@ -108,11 +113,14 @@ class HierarchyTraversalSession:
 
     has_children = """
         if self.get_children(id_).available() == 0:
-                return False
+            return False
         return True"""
 
     is_child = """
-        return self._rls.get_relationships_by_genus_type_for_peers(id_, child_id, self._relationship_type).available()"""
+        return self._rls.get_relationships_by_genus_type_for_peers(
+            id_,
+            child_id,
+            self._relationship_type).available()"""
 
     get_children = """
         if id_ is None:
@@ -150,7 +158,9 @@ class HierarchyTraversalSession:
 class HierarchyDesignSession:
 
     import_statements = [
-        'from ..primitives import *',
+        'from ..primitives import Id',
+        'from ..primitives import Type',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from ..osid.sessions import OsidSession',
         'from ..id.objects import IdList'
     ]
@@ -159,16 +169,15 @@ class HierarchyDesignSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         from .objects import Hierarchy
         self._catalog_class = Hierarchy
-        from ..osid.sessions import OsidSession
         self._session_name = 'HierarchyTraversalSession'
         self._catalog_name = 'Hierarchy'
         if catalog_id.get_identifier_namespace() == 'CATALOG':
             self._set_relationship_type(type_identifier=catalog_id.get_identifier().lower() + '.parent.child',
-                                        display_name = catalog_id.get_identifier() + ' Hierarchy')
+                                        display_name=catalog_id.get_identifier() + ' Hierarchy')
             namespace = catalog_id.get_authority().lower() + '.' + catalog_id.get_identifier().title()
-            self._phantom_root_id = Id(authority = self._authority,
-                                       namespace = namespace,
-                                       identifier = '000000000000000000000000')
+            self._phantom_root_id = Id(authority=self._authority,
+                                       namespace=namespace,
+                                       identifier='000000000000000000000000')
             try:
                 catalog_id = self._get_catalog_hierarchy_id(catalog_id, proxy, runtime)
             except NotFound:
@@ -181,27 +190,30 @@ class HierarchyDesignSession:
         self._hts = HierarchyTraversalSession(self.get_hierarchy_id(), self._proxy, self._runtime, relationship_type=self._relationship_type)
 
     def _get_catalog_hierarchy_id(self, catalog_id, proxy, runtime):
+        \"\"\"Gets the catalog hierarchy\"\"\"
         seed_str = catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000'
-        ident = Id(authority = self._authority,
-                   namespace = 'hierarchy.Hierarchy',
-                   identifier = str(ObjectId(seed_str[:12])))
+        ident = Id(authority=self._authority,
+                   namespace='hierarchy.Hierarchy',
+                   identifier=str(ObjectId(seed_str[:12])))
         return HierarchyLookupSession(proxy, runtime).get_hierarchy(ident).get_id() # Return the actual Id
 
     def _create_catalog_hierarchy(self, catalog_id, proxy, runtime):
+        \"\"\"Creates a catalog hierarchy\"\"\"
         seed_str = catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000'
         has = HierarchyAdminSession(proxy, runtime)
         hfc = has.get_hierarchy_form_for_create([])
         hfc.set_display_name(catalog_id.get_authority() + ' ' + catalog_id.get_identifier() + ' Hierarchy')
         hfc.set_description('Catalog hierarchy for ' + catalog_id.get_authority() + ' ' + catalog_id.get_identifier())
-        hfc.set_genus_type(Type(authority = 'dlkit',
-                                namespace = 'hierarchy.Hierarchy',
-                                identifier = catalog_id.get_identifier()))
+        hfc.set_genus_type(Type(authority='dlkit',
+                                namespace='hierarchy.Hierarchy',
+                                identifier=catalog_id.get_identifier()))
         # This next tricks require serious inside knowledge:
         hfc._my_map['_id'] = ObjectId(seed_str[:12])
         hierarchy = has.create_hierarchy(hfc)
         return hierarchy.get_id() # Return the Id of newly created catalog hierarchy
 
     def _set_relationship_type(self, type_identifier, display_name=None, display_label=None, description=None, domain='Relationship'):
+        \"\"\"Sets the relationship type\"\"\"
         if display_name is None:
             display_name = type_identifier
         if display_label is None:
@@ -218,7 +230,7 @@ class HierarchyDesignSession:
 """
 
     can_modify_hierarchy = """
-        # NOTE: It is expected that real authentication hints will be 
+        # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
@@ -226,7 +238,7 @@ class HierarchyDesignSession:
         if id_ is None:
             raise NullArgument()
         if (bool(self._rls.get_relationships_by_genus_type_for_source(id_, self._relationship_type).available()) or
-            bool(self._rls.get_relationships_by_genus_type_for_destination(id_, self._relationship_type).available())):
+                bool(self._rls.get_relationships_by_genus_type_for_destination(id_, self._relationship_type).available())):
             raise AlreadyExists()
         self._assign_as_root(id_)"""
 
@@ -270,17 +282,19 @@ class HierarchyDesignSession:
 
     additional_methods = """
     def _adopt_orphans(self, negligent_parent_id):
+        \"\"\"Clean up orphaned children\"\"\"
         for child_id in self._hts.get_children(negligent_parent_id):
             self.remove_child(negligent_parent_id, child_id)
             if not self._hts.has_parents(child_id):
                 self._assign_as_root(child_id)
 
     def _assign_as_root(self, id_):
+        \"\"\"Assign an id_ a root object in the hierarchy\"\"\"
         rfc = self._ras.get_relationship_form_for_create(self._phantom_root_id, id_, [])
         rfc.set_display_name('Implicit Root to ' + str(id_) + ' Parent-Child Relationship')
         rfc.set_description(self._relationship_type.get_display_name().get_text() + ' relationship for implicit root and child: ' + str(id_))
         rfc.set_genus_type(self._relationship_type)
-        self._ras.create_relationship(rfc)        
+        self._ras.create_relationship(rfc)
 """
 
 class HierarchyAdminSession:
@@ -288,7 +302,6 @@ class HierarchyAdminSession:
     delete_hierarchy = """
         from ...abstract_osid.id.primitives import Id as ABCId
         collection = mongo_client[self._db_prefix + 'hierarchy']['Hierarchy']
-        UPDATED = True
         if hierarchy_id is None:
             raise NullArgument()
         if not isinstance(hierarchy_id, ABCId):
@@ -303,3 +316,16 @@ class HierarchyAdminSession:
         if result['n'] == 0:
             raise NotFound()
         mongo_client.close()"""
+
+class Hierarchy:
+
+    import_statements = [
+        'from ..primitives import Id',
+        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+    ]
+
+class HierarchyQuery:
+
+    import_statements = [
+        'from ..osid.osid_errors import Unimplemented',
+    ]
