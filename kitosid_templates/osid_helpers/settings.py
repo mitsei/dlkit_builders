@@ -26,6 +26,8 @@ ASSESSMENT_PROVIDER_MANAGER_PATH = '..mongo.assessment.managers'
 
 COMMENTING_PROVIDER_MANAGER_PATH = '..mongo.commenting.managers'
 
+RESOURCE_PROVIDER_MANAGER_PATH = '..mongo.resource.managers'
+
 HIERARCHY_PROVIDER_MANAGER_PATH = '..mongo.hierarchy.managers'
 
 LANGUAGETYPE = {

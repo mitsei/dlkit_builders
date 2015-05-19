@@ -1,0 +1,2 @@
+        # Implemented from template for osid.calendar.Duration.getAeon
+        return self._${varName}

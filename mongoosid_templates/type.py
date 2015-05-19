@@ -12,43 +12,49 @@ class TypeProfile:
 
 class TypeManager:
 
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors'
+    ]
+
     get_type_lookup_session = """
-        from ..osid.osid_errors import OperationFailed, Unimplemented
         if not self.supports_type_lookup():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         try:
             from . import sessions
         except ImportError:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         try:
             session = sessions.TypeLookupSession()
         except AttributeError:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         return session"""
 
     get_type_admin_session = """
-        from ..osid.osid_errors import OperationFailed, Unimplemented
         if not self.supports_type_admin():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         try:
             from . import sessions
         except ImportError:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         try:
             session = sessions.TypeAdminSession()
         except AttributeError:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         return session"""
 
 
 class TypeLookupSession:
 
+    import_statements = [
+        'from .primitives import Type',
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
     init = """
     def __init__(self, *args, **kwargs):
         from pymongo import MongoClient
-        from .primitives import Type
         from ..osid.sessions import OsidSession
-        from ..osid.osid_errors import NotFound
+        from dlkit.abstract_osid.osid import errors
         OsidSession.__init__(self, *args, **kwargs)
         client = MongoClient()
         self._db = client['type']
@@ -59,20 +65,18 @@ class TypeLookupSession:
 
     get_type = """
         from .primitives import Type
-        from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied
         if namespace is None and identifier is None and authority is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         collection = self._db['Type']
         result = collection.find_one({'$and': [{'namespace': namespace},
                                                {'identifier': identifier},
                                                {'authority': authority}]})
         if result is None:
-            raise NotFound()
+            raise errors.NotFound()
         return Type(result)"""
 
     get_types = """
         from .objects import TypeList
-        from ..osid.osid_errors import OperationFailed, PermissionDenied
         collection = self._db['Type']
         result = collection.find()
         count = collection.count()
@@ -85,7 +89,6 @@ class TypeAdminSession:
     def __init__(self, catalog_identifier = None, *args, **kwargs):
         from pymongo import MongoClient
         from ..osid.sessions import OsidSession
-        from ..osid.osid_errors import NotFound
         OsidSession.__init__(self, *args, **kwargs)
         self._forms = dict()
         client = MongoClient()
@@ -98,19 +101,18 @@ class TypeAdminSession:
     get_type_form_for_create = """
         from ...abstract_osid.type.primitives import Type as ABCType
         from .objects import TypeForm
-        from ..osid.osid_errors import NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported, AlreadyExists
 #        from bson.objectid import ObjectId
         collection = self._db['Type']
         CREATED = True
         if type_ is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(type_, ABCType):
-            raise InvalidArgument('argument is not a Type')
+            raise errors.InvalidArgument('argument is not a Type')
         result = collection.find_one({'$and': [{'namespace': type_.get_identifier_namespace()},
                                                 {'identifier': type_.get_identifier()},
                                                 {'authority': type_.get_authority()}]})
         if result is not None:
-            raise AlreadyExists()
+            raise errors.AlreadyExists()
         form = TypeForm(type_=type_, update=False)
         form._for_update = False
         self._forms[form.get_id().get_identifier()] = not CREATED
@@ -118,26 +120,25 @@ class TypeAdminSession:
 
     create_type = """
         from ...abstract_osid.type.objects import TypeForm as ABCTypeForm
-        from ..osid.osid_errors import IllegalState, InvalidArgument, NullArgument, OperationFailed, PermissionDenied, Unsupported
         collection = self._db['Type']
         CREATED = True
         if type_form is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(type_form, ABCTypeForm):
-            raise InvalidArgument('argument type is not a TypeForm')
+            raise errors.InvalidArgument('argument type is not a TypeForm')
         if type_form.is_for_update():
-            raise InvalidArgument('the TypeForm is for update only, not create')
+            raise errors.InvalidArgument('the TypeForm is for update only, not create')
         try:
             if self._forms[type_form.get_id().get_identifier()] == CREATED:
-                raise IllegalState('type_form already used in a create transaction')
+                raise errors.IllegalState('type_form already used in a create transaction')
         except KeyError:
-            raise Unsupported('type_form did not originate from this session')
+            raise errors.Unsupported('type_form did not originate from this session')
         if not type_form.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
         try:
-            id_ = collection.insert(type_form._my_map)
+            id_ = collection.insert_one(type_form._my_map)
         except: # what exceptions does mongodb insert raise?
-            raise OperationFailed()
+            raise errors.OperationFailed()
         from .primitives import Type
         self._forms[type_form.get_id().get_identifier()] = CREATED
         return Type(collection.find_one({'_id': id_}))"""
@@ -152,45 +153,43 @@ class TypeAdminSession:
         from ...abstract_osid.type.primitives import Type as ABCType
         from .objects import TypeForm
         from .primitives import Type
-        from ..osid.osid_errors import NotFound, NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
 #        from bson.objectid import ObjectId
         collection = self._db['Type']
         UPDATED = True
         if type_ is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(type_, ABCType):
             return InvalidArgument('the argument is not a valid OSID Type')
         result = collection.find_one({'$and': [{'namespace': type_.get_identifier_namespace()},
                                                 {'identifier': type_.get_identifier()},
                                                 {'authority': type_.get_authority()}]})
         if result is None:
-            raise NotFound()
+            raise errors.NotFound()
         type_form = TypeForm(type_=Type(result), update=True)
         self._forms[type_form.get_id().get_identifier()] = not UPDATED
         return type_form"""
 
     update_type = """
         from ...abstract_osid.type.objects import TypeForm as ABCTypeForm
-        from ..osid.osid_errors import IllegalState, InvalidArgument, NullArgument, OperationFailed, PermissionDenied, Unsupported
         collection = self._db['Type']
         UPDATED = True
         if type_form is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(type_form, ABCTypeForm):
-            raise InvalidArgument('argument type is not an TypeForm')
+            raise errors.InvalidArgument('argument type is not an TypeForm')
         if not type_form.is_for_update():
-            raise InvalidArgument('the TypeForm is for update only, not create')
+            raise errors.InvalidArgument('the TypeForm is for update only, not create')
         try:
             if self._forms[type_form.get_id().get_identifier()] == UPDATED:
-                raise IllegalState('type_form already used in an update transaction')
+                raise errors.IllegalState('type_form already used in an update transaction')
         except KeyError:
-            raise Unsupported('type_form did not originate from this session')
+            raise errors.Unsupported('type_form did not originate from this session')
         if not type_form.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
         try:
             result = collection.save(type_form._my_map)
         except: # what exceptions does mongodb save raise?
-            raise OperationFailed()
+            raise errors.OperationFailed()
         self._forms[type_form.get_id().get_identifier()] = UPDATED"""
 
     can_delete_types = """
@@ -201,25 +200,27 @@ class TypeAdminSession:
 
     delete_type = """
         from ...abstract_osid.type.primitives import Type as ABCType
-        from ..osid.osid_errors import NotFound, NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
         from bson.objectid import ObjectId
         collection = self._db['Type']
         UPDATED = True
         if type_ is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(type_, ABCType):
             return InvalidArgument('the argument is not a valid OSID Type')
-        result = collection.remove({'$and': [{'namespace': type_.get_identifier_namespace()},
-                                              {'identifier': type_.get_identifier()},
-                                              {'authority': type_.get_authority()}]})
-                                              # Tried using justOne above but pymongo doesn't support it
+        result = collection.delete_one({'$and': [{'namespace': type_.get_identifier_namespace()},
+                                                 {'identifier': type_.get_identifier()},
+                                                 {'authority': type_.get_authority()}]})
         if result['err'] is not None:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         if result['n'] == 0:
-            raise NotFound()
+            raise errors.NotFound()
 """
 
 class TypeForm:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+    ]
 
     init = """
     def __init__(self, type_=None, update=False):
@@ -277,21 +278,19 @@ class TypeForm:
         return Metadata(**self._display_name_metadata)"""
 
     set_display_name = """
-        from ..osid.osid_errors import InvalidArgument, NullArgument, NoAccess
         if display_name is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_display_name_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_string(display_name, 
                                      self.get_display_name_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['displayName']['text'] = display_name"""
 
     clear_display_name = """
-        from ..osid.osid_errors import NoAccess
         if (self.get_display_name_metadata().is_read_only() or
             self.get_display_name_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['displayName'] = self._display_name_metadata['default_string_values'][0]"""
 
     get_display_label_metadata = """
@@ -299,21 +298,19 @@ class TypeForm:
         return Metadata(**self._display_label_metadata)"""
 
     set_display_label = """
-        from ..osid.osid_errors import InvalidArgument, NullArgument, NoAccess
         if display_label is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_display_label_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_string(display_label, 
                                      self.get_display_label_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['displayLabel']['text'] = display_label"""
 
     clear_display_label = """
-        from ..osid.osid_errors import NoAccess
         if (self.get_display_label_metadata().is_read_only() or
             self.get_display_label_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['displayLabel'] = self._display_label_metadata['default_string_values'][0]"""
 
     get_description_metadata = """
@@ -321,21 +318,19 @@ class TypeForm:
         return Metadata(**self._description_metadata)"""
 
     set_description = """
-        from ..osid.osid_errors import InvalidArgument, NullArgument, NoAccess
         if description is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_description_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_string(description, 
                                      self.get_description_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['description']['text'] = description"""
 
     clear_description = """
-        from ..osid.osid_errors import NoAccess
         if (self.get_description_metadata().is_read_only() or
             self.get_description_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['description'] = self._description_metadata['default_string_values'][0]"""
 
     get_domain_metadata = """
@@ -343,35 +338,36 @@ class TypeForm:
         return Metadata(**self._domain_metadata)"""
 
     set_domain = """
-        from ..osid.osid_errors import InvalidArgument, NullArgument, NoAccess
         if domain is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_domain_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_string(domain, 
                                      self.get_domain_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['domain']['text'] = domain"""
 
     clear_description = """
-        from ..osid.osid_errors import NoAccess
         if (self.get_domain_metadata().is_read_only() or
             self.get_domain_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['domain'] = self._domain_metadata['default_string_values'][0]"""
 
 
 class TypeList:
 
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
     get_next_type = """
         import sys
-        from ..osid.osid_errors import IllegalState, OperationFailed
         try:
             next_item = self.next()
         except StopIteration:
-            raise IllegalState('no more elements available in this list')
+            raise errors.IllegalState('no more elements available in this list')
         except: #Need to specify exceptions here
-            raise OperationFailed()
+            raise errors.OperationFailed()
         else:
             return next_item
             
@@ -390,10 +386,9 @@ class TypeList:
 
     get_next_types = """
         import sys
-        from ..osid.osid_errors import IllegalState, OperationFailed
         if n > self.available():
             # !!! This is not quite as specified (see method docs) !!!
-            raise IllegalState('not enough elements available in this list')
+            raise errors.IllegalState('not enough elements available in this list')
         else:
             next_list = []
             x = 0
@@ -401,7 +396,7 @@ class TypeList:
                 try:
                     next_list.append(self.next())
                 except: #Need to specify exceptions here
-                    raise OperationFailed()
+                    raise errors.OperationFailed()
                 x = x + 1
             return next_list"""
 
@@ -429,7 +424,7 @@ class Type:
             self._my_map['description'] = self.display_text_map(description)
             self._my_map['domain'] = self.display_text_map(domain)
         else:
-            raise NullArgument()
+            raise errors.NullArgument()
     
     def display_text_map(self, string):
         from .profile import LANGUAGETYPE, SCRIPTTYPE, FORMATTYPE
@@ -492,7 +487,7 @@ class OldObsoleteTypeCanBeDeleted:
             self._description = description
             self._domain = domain
         else:
-            raise NullArgument()
+            raise errors.NullArgument()
 """
 
     get_authority = """

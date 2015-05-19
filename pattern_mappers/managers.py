@@ -122,14 +122,16 @@ def map_manager_patterns(interface, package, index):
         ##
         # ProxyManager methods to get manager for a related service
         elif (method['name'].startswith('get') and 
-              method['name'].endswith('proxy_manager')):
+              method['name'].endswith('proxy_manager') and
+              'osid.proxy.Proxy' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                  pattern = 'resource.ResourceManager.get_resource_batch_manager',
+                  pattern = 'resource.ResourceProxyManager.get_resource_batch_proxy_manager',
                   kwargs = dict(interface_name = interface['shortname'],
                                 package_name = package['name'],
                                 module_name = interface['category'],
                                 method_name = method['name'],
                                 var_name = method['name'][4:],
+                                support_check = method['name'][4:].split('_proxy_manager')[0],
                                 return_type_full = method['return_type']))
 
 
@@ -234,6 +236,7 @@ def map_manager_patterns(interface, package, index):
                                 module_name = interface['category'],
                                 method_name = method['name'],
                                 var_name = method['name'][4:],
+                                support_check = method['name'][4:].split('_manager')[0],
                                 return_type_full = method['return_type']))
 
         else:

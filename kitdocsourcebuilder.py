@@ -3,7 +3,8 @@ import time
 import os
 import json
 import string
-from binder_helpers import camel_to_under
+from config import *
+from binder_helpers import camel_to_under, flagged_for_implementation
 from binder_helpers import make_plural, fix_reserved_word
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
@@ -22,6 +23,8 @@ from kitdocbuilder_settings import SOURCEDIR as doc_root_pkg
 from kitdocbuilder_settings import PACKAGEPREFIX as pkg_prefix
 from kitdocbuilder_settings import PACKAGESUFFIX as pkg_suffix
 from kitdocbuilder_settings import TEMPLATEDIR as template_dir
+
+excluded_packages = ['grading', 'hierarchy', 'proxy', 'relationship', 'resource', 'type']
 
 ##
 # This is the entry point for making django-based python classes for
@@ -45,8 +48,14 @@ def make_kitdoc(file_name):
     package = json.load(read_file)
     read_file.close()
 
-    importStr = ''
-    bodyStr = ''
+    if package['name'] not in managers_to_implement:
+        return
+    if package['name'] in excluded_packages:
+        return
+    print "--> Writing Kit Doc Source for Package:", package['name']
+
+    #importStr = ''
+    #bodyStr = ''
     module_name = None
     ##
     # The map structure for the modules to be created by this function.
@@ -118,17 +127,15 @@ def make_kitdoc(file_name):
                       package['license'] + '\n\n\"\"\"').encode('utf-8'))
     write_file.close"""
 
-    """
+
     ##
-    # Write the summary documentation for this package.
+    # Write the summary doc source for this package.
     write_file = open(app_name(package['name']) + '/' + 
-                      pkg_name(package['name']) + '/summary.py', 'w')
-    write_file.write((utf_code + '\"\"\"' +
-                      package['title'] + '\n' +
-                      package['name'] + ' version ' +
-                      package['version'] + '\n\n'+
-                      package['summary'] + '\n\n\"\"\"').encode('utf-8'))
-    write_file.close"""
+                      pkg_name(package['name']) + '/summary.rst', 'w')
+    write_file.write(('Summary\n=======\n\n' +
+                      '.. currentmodule:: dlkit.services.' + package['name'] + '\n' +
+                      '.. automodule:: dlkit.services.' + package['name'] + '\n').encode('utf-8'))
+    write_file.close
     
     
 
@@ -176,10 +183,42 @@ def make_kitdoc(file_name):
         patterns[camel_to_under(inf['shortname']) + 
                 '.is_catalog_session'] = is_catalog_session(inf, patterns, package['name'])
 
+    exceptions = []
+
+    excepted_osid_categories = ['properties',
+                                'query_inspectors',
+                                'receivers',
+                                'search_orders',
+                                'searches',]
+
     ##
     # The real work starts here.  Iterate through manager and catalog 
     # interfaces only to build the 'managers' and some 'objects' modules.
     for interface in package['interfaces']:
+
+        ##
+        # Check to see if manager should be implemented (this should 
+        # probably be moved to binder_helpers.flagged_for_implementation)
+        if (interface['category'] == 'managers' and 
+                      package['name'] not in managers_to_implement):
+            continue
+
+        ##
+        # Check to see if this interface is meant to be implemented.
+        if package['name'] != 'osid':
+            if flagged_for_implementation(interface, 
+                    sessions_to_implement, objects_to_implement, variants_to_implement):
+                if interface['shortname'] in exceptions:
+                    continue
+                if interface['shortname'].endswith('ProxyManager'):
+                    continue
+                pass
+            else:
+                continue
+
+        if interface['category'] in excepted_osid_categories:
+            continue
+
         module_name = interface['category']
 #        if (interface['category'] != 'sessions' and
 #            'OsidProfile' not in interface['inherit_shortnames']):
@@ -190,14 +229,14 @@ def make_kitdoc(file_name):
                 'OsidProfile' in interface['inherit_shortnames'] or
                 'OsidProxyManager' in interface['inherit_shortnames']):
                 module_name = 'service_managers'
-                currentmodule_str = 'Summary\n=======\n'
+                currentmodule_str = ''
                 currentmodule_str = currentmodule_str + '.. currentmodule:: dlkit.services.' + package['name']
                 #currentmodule_str = '.. currentmodule:: dlkit.services.' + package['name']
                 automodule_str = '.. automodule:: dlkit.services.' + package['name']
             elif interface['shortname'] == patterns['package_catalog_caps']:
                 module_name = patterns['package_catalog_under']
                 currentmodule_str = '.. currentmodule:: dlkit.services.' + package['name']
-#                automodule_str = '.. automodule:: dlkit.services.' + package['name']
+                #automodule_str = '.. automodule:: dlkit.services.' + package['name']
                 automodule_str = ''
             else:
                 module_name = interface['category']
@@ -381,17 +420,29 @@ def make_kitdoc(file_name):
                 'OsidProxyManager' in interface['inherit_shortnames']):
                 patterns['implemented_view_methods'] = []
                 for inf in package['interfaces']:
+
+                    ##
+                    # Check to see if this interface is meant to be implemented.
+                    if package['name'] != 'osid':
+                        if flagged_for_implementation(inf, 
+                                sessions_to_implement, objects_to_implement, variants_to_implement):
+                            if interface['shortname'] in exceptions:
+                                continue
+                            pass
+                        else:
+                            continue
+
                     if is_manager_session(inf, patterns, package['name']):
 #                        print 'found manager session:', inf['fullname']
-                        methods = methods + '\n\n' + ' '.join(camel_to_list(inf['fullname'])[1:-1]) + '\n'
-                        for char in ' '.join(camel_to_list(inf['fullname'])[1:-1]):
-                            methods = methods + '_'
+                        methods = methods + '\n\n' + ' '.join(camel_to_list(inf['fullname'])[1:-1]) + ' Methods\n'
+                        for char in ' '.join(camel_to_list(inf['fullname'])[1:-1]) + ' Methods':
+                            methods = methods + '-'
                         methods = methods + '\n\n'
                         methods = methods + make_methods(package['name'], inf, patterns, interface['shortname']) + '\n\n'
                     elif 'OsidProfile' in inf['inherit_shortnames']:
                             methods = methods + '\n\n' + ' '.join(camel_to_list(inf['fullname'])[1:]) + ' Methods\n'
-                            for char in ' '.join(camel_to_list(inf['fullname'])[1:]):
-                                methods = methods + '_'
+                            for char in ' '.join(camel_to_list(inf['fullname'])[1:]) + ' Methods':
+                                methods = methods + '-'
                             methods = methods + '\n\n'
                             methods = methods + make_methods(package['name'], inf, patterns, interface['shortname']) + '\n\n'
 
@@ -400,6 +451,18 @@ def make_kitdoc(file_name):
             if interface['shortname'] == patterns['package_catalog_caps']:
                 patterns['implemented_view_methods'] = []
                 for inf in package['interfaces']:
+
+                    ##
+                    # Check to see if this interface is meant to be implemented.
+                    if package['name'] != 'osid':
+                        if flagged_for_implementation(inf, 
+                                sessions_to_implement, objects_to_implement, variants_to_implement):
+                            if interface['shortname'] in exceptions:
+                                continue
+                            pass
+                        else:
+                            continue
+
                     if is_catalog_session(inf, patterns, package['name']):
 #                        print 'found catalog session:', inf['fullname']
                         methods = methods + '\n\n' + ' '.join(camel_to_list(inf['fullname'])[1:-1]) + ' Methods\n'
@@ -442,12 +505,22 @@ def make_kitdoc(file_name):
     for char in package['name'].title():
         toc_str = toc_str + '='
     toc_str = toc_str + '\n\n.. toctree::\n   :maxdepth: 2\n\n'
+    toc_str = toc_str + '   summary\n'
     toc_str = toc_str + '   service_managers\n'
     toc_str = toc_str + '   ' + patterns['package_catalog_under'] + '\n'
     for module in modules:
-        if ('_'.join(module.split('.')) not in ['service_managers', patterns['package_catalog_under']] and
+        if ('_'.join(module.split('.')) not in [
+                'service_managers',
+                patterns['package_catalog_under'],
+                'records',
+                'rules'] and
             modules[module]['body'].strip() != ''):
                 toc_str = toc_str + '   ' + '_'.join(module.split('.')) + '\n'
+    if 'records' in modules and modules['records']['body'].strip() != '':
+        toc_str = toc_str + '   records\n'
+    if 'rules' in modules and modules['records']['body'].strip() != '':
+        toc_str = toc_str + '   rules\n'
+            
     
     write_file = open(app_name(package['name']) + '/' + 
                       pkg_name(package['name']) + '/toc.rst', 'w')

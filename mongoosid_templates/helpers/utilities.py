@@ -7,7 +7,7 @@ from .repository.managers import RepositoryManager
 from .assessment.managers import AssessmentManager
 from .primitives import Id, Type, DisplayText
 from .types import Genus
-from .osid.osid_errors import AlreadyExists, NotFound
+from dlkit.abstract_osid.osid.errors import AlreadyExists, NotFound
 
 DEFAULT_TYPE = Type(**Genus().get_type_data('DEFAULT'))
 

@@ -7,7 +7,7 @@ class ResourceProfile:
         'from ..primitives import Type',
         'from ..type.objects import TypeList',
         'from . import sessions',
-        'from ..osid.osid_errors import NullArgument',
+        'from dlkit.abstract_osid.osid import errors',
         'from . import profile',
     ]
 
@@ -38,7 +38,7 @@ class ResourceProfile:
         # Implemented from template for
         # osid.resource.ResourceProfile.supports_resource_record_type_template
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         try:
             from ..records import types
             record_type_maps = types.${object_name_upper}_RECORD_TYPES # pylint: disable=no-member
@@ -55,10 +55,11 @@ class ResourceProfile:
 class ResourceManager:
 
     import_statements_pattern = [
-    'from ..osid.osid_errors import Unimplemented',
-    'from ..osid.osid_errors import NullArgument',
-    'from ..osid.osid_errors import NotFound # pylint: disable=unused-import',
-    'from ..osid.osid_errors import OperationFailed # pylint: disable=unused-import',
+    'from dlkit.abstract_osid.osid import errors',
+    #'from ..osid.osid_errors import Unimplemented',
+    #'from ..osid.osid_errors import NullArgument',
+    #'from ..osid.osid_errors import NotFound # pylint: disable=unused-import',
+    #'from ..osid.osid_errors import OperationFailed # pylint: disable=unused-import',
     ]
 
     init_template = """
@@ -69,16 +70,16 @@ class ResourceManager:
 
     get_resource_lookup_session_template = """
         if not self.supports_${support_check}():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return ${return_module}.${return_type}(runtime=self._runtime) # pylint: disable=no-member"""
 
     get_resource_lookup_session_for_bin_template = """
         if not ${arg0_name}:
-            raise NullArgument
+            raise errors.NullArgument
         if not self.supports_${support_check}():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         ##
-        # Also include check to see if the catalog Id is found otherwise raise NotFound
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
 
@@ -86,10 +87,11 @@ class ResourceManager:
 class ResourceProxyManager:
 
     import_statements_pattern = [
-    'from ..osid.osid_errors import Unimplemented',
-    'from ..osid.osid_errors import NullArgument',
-    'from ..osid.osid_errors import NotFound # pylint: disable=unused-import',
-    'from ..osid.osid_errors import OperationFailed # pylint: disable=unused-import',
+    'from dlkit.abstract_osid.osid import errors',
+    #'from ..osid.osid_errors import Unimplemented',
+    #'from ..osid.osid_errors import NullArgument',
+    #'from ..osid.osid_errors import NotFound # pylint: disable=unused-import',
+    #'from ..osid.osid_errors import OperationFailed # pylint: disable=unused-import',
     ]
 
     init_template = """
@@ -99,18 +101,18 @@ class ResourceProxyManager:
 
     get_resource_lookup_session_template = """
         if proxy is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not self.supports_${support_check}():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime) # pylint: disable=no-member"""
 
     get_resource_lookup_session_for_bin_template = """
         if ${arg0_name} is None or proxy is None:
-            raise NullArgument
+            raise errors.NullArgument
         if not self.supports_${support_check}():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         ##
-        # Also include check to see if the catalog Id is found otherwise raise NotFound
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
         return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime) # pylint: disable=no-member"""
 
@@ -118,7 +120,7 @@ class ResourceProxyManager:
 class ResourceLookupSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from .. import mongo_client',
@@ -204,7 +206,7 @@ class ResourceLookupSession:
         # NOTE: This implementation currently ignores plenary view
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if not ${arg0_name}:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self._catalog_view == ISOLATED:
             result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier()),
                                           '${cat_name_mixed}Id': str(self._catalog_id)})
@@ -212,7 +214,7 @@ class ResourceLookupSession:
             # This should really look in the underlying hierarchy (when hierarchy is implemented)
             result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
-            raise NotFound()
+            raise errors.NotFound()
         mongo_client.close()
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
@@ -222,7 +224,7 @@ class ResourceLookupSession:
         # NOTE: This implementation currently ignores plenary view
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if not ${arg0_name}:
-            raise NullArgument()
+            raise errors.NullArgument()
         object_id_list = []
         for i in ${arg0_name}:
             object_id_list.append(ObjectId(i.get_identifier()))
@@ -281,7 +283,7 @@ class ResourceLookupSession:
 class ResourceQuerySession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..osid.sessions import OsidSession',
         'from .. import mongo_client',
         'from . import queries',
@@ -322,7 +324,7 @@ class ResourceQuerySession:
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resources_by_query
         if not ${arg0_name}:
-            raise NullArgument()
+            raise errors.NullArgument()
         query_terms = dict(${arg0_name}._query_terms)
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if self._catalog_view == ISOLATED:
@@ -336,7 +338,7 @@ class ResourceQuerySession:
 class ResourceAdminSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..osid.sessions import OsidSession',
         'from ..primitives import Id',
         'from .. import mongo_client',
@@ -380,10 +382,10 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
-                raise InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
         if ${arg0_name} == []:
             obj_form = objects.${return_type}(
                 ${cat_name_under}_id=self._catalog_id,
@@ -406,25 +408,24 @@ class ResourceAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise InvalidArgument('argument type is not an ${arg0_type}')
+            raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
-            raise InvalidArgument('the ${arg0_type} is for update only, not create')
+            raise errors.InvalidArgument('the ${arg0_type} is for update only, not create')
         try:
             if self._forms[${arg0_name}.get_id().get_identifier()] == CREATED:
-                raise IllegalState('${arg0_name} already used in a create transaction')
+                raise errors.IllegalState('${arg0_name} already used in a create transaction')
         except KeyError:
-            raise Unsupported('${arg0_name} did not originate from this session')
+            raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
-        try:
-            id_ = collection.insert(${arg0_name}._my_map)
-        except: # what exceptions does mongodb insert raise?
-            raise OperationFailed()
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        insert_result = collection.insert_one(${arg0_name}._my_map)
+        # what exceptions does mongodb insert raise?
+            #raise errors.OperationFailed()
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
-            collection.find_one({'_id': id_}),
+            collection.find_one({'_id': insert_result.inserted_id}),
             db_prefix=self._db_prefix,
             runtime=self._runtime)
         mongo_client.close()
@@ -436,12 +437,12 @@ class ResourceAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result == '':
-            raise NotFound()
+            raise errors.NotFound()
         obj_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         mongo_client.close()
@@ -453,18 +454,18 @@ class ResourceAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise InvalidArgument('argument type is not an ${arg0_type}')
+            raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
-            raise InvalidArgument('the ${arg0_type} is for update only, not create')
+            raise errors.InvalidArgument('the ${arg0_type} is for update only, not create')
         try:
             if self._forms[${arg0_name}.get_id().get_identifier()] == UPDATED:
-                raise IllegalState('${arg0_name} already used in an update transaction')
+                raise errors.IllegalState('${arg0_name} already used in an update transaction')
         except KeyError:
-            raise Unsupported('${arg0_name} did not originate from this session')
+            raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
         result = collection.save(${arg0_name}._my_map)
         if result == "What to look for here???":
             pass # Need to figure out what writeConcernErrors to catch and deal with?
@@ -482,31 +483,137 @@ class ResourceAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under}_map = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if ${object_name_under}_map is None:
-            raise NotFound()
+            raise errors.NotFound()
         objects.${object_name}(${object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
-        result = collection.remove({'_id': ObjectId(${arg0_name}.get_identifier())}, justOne=True)
-        if 'err' in result and result['err'] is not None:
-            raise OperationFailed()
-        mongo_client.close()
-#        if result['n'] == 0: This is probably redundant
-#            raise NotFound()"""
+        delete_result = collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+        # any reason to raise:
+            #raise errors.OperationFailed()
+        mongo_client.close()"""
 
 
     alias_resources_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.alias_resources_template
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
+
+class ResourceAgentSession:
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        self._catalog_class = objects.Bin
+        self._session_name = 'ResourceAgentSession'
+        self._catalog_name = 'Bin'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='assessment',
+            cat_name='Bin',
+            cat_class=objects.Bin)
+        self._forms = dict()
+"""
+
+    get_resource_id_by_agent = """
+        # NOT DONE YET
+        if agent_id is None:
+            raise errors.NullArgument()
+        collection = mongo_client[self._db_prefix + 'resource']['Resource']
+
+        if self._catalog_view == ISOLATED:
+            result = collection.find_one({'$in': {'agentIds': str(agent_id)},
+                                          '${cat_name_mixed}Id': str(self._catalog_id)})
+        else:
+            # This should really look in the underlying hierarchy (when hierarchy is implemented)
+            result = collection.find_one('SOMETHING HERE')
+        if result is None:
+            raise errors.NotFound()
+        mongo_client.close()"""
+
+    get_resource_by_agent = """
+        # NOT DONE YET
+        if agent_id is None:
+            raise errors.NullArgument()
+        collection = mongo_client[self._db_prefix + 'resource']['Resource']"""
+
+    get_agent_ids_by_resource = """
+        if resource_id is None:
+            raise errors.NullArgument()
+        collection = mongo_client[self._db_prefix + 'resource']['Resource']
+        resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
+        if resource is None:
+            raise errors.NotFound()
+        if 'agentIds' not in resource:
+            result = IdList([])
+        else:
+            result = IdList(resource['agentIds'])
+        mongo_client.close()
+        return result"""
+
+    get_agents_by_resource = """
+        agent_list = []
+        for agent_id in self.get_agent_ids_by_resource(resource_id):
+            agent_list.append(Agent(agent_id))
+        return AgentList(agent_list)"""
+
+
+class ResourceAgentAssignmentSession:
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        self._catalog_class = objects.Bin
+        self._session_name = 'ResourceAgentAssignmentSession'
+        self._catalog_name = 'Bin'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='assessment',
+            cat_name='Bin',
+            cat_class=objects.Bin)
+        self._forms = dict()
+"""
+
+    assign_agent_to_resource = """
+        if agent_id is None or resource_id is None:
+            raise errors.NullArgument()
+        # Should check for existence of Agent? We may mever manage them.
+        collection = mongo_client[self._db_prefix + 'resource']['Resource']
+        resource = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
+        if not resource:
+            raise errors.NotFound()
+        if 'agentIds' not in resource:
+            resource['agentIds'] = [str(agent_id)]
+        else:
+            resource['agentIds'].append(str(agent_id))
+        collection.save(resource)
+        mongo_client.close()"""
+
+    unassign_agent_from_resource = """
+        if agent_id is None or resource_id is None:
+            raise errors.NullArgument()
+        collection = mongo_client[self._db_prefix + 'resource']['Resource']
+        resource = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
+        if not resource:
+            raise errors.NotFound()
+        try:
+            resource['agentIds'].remove(str(agent_id))
+        except (KeyError, ValueError):
+            raise errors.NotFound('agent_id not assigned to resource')
+        collection.save(resource)
+        mongo_client.close()"""
 
 
 class BinLookupSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from . import objects',
@@ -544,13 +651,13 @@ class BinLookupSession:
         # osid.resource.BinLookupSession.get_bin
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         if not ${arg0_name}:
-            raise NullArgument()
+            raise errors.NullArgument()
         # Need to consider how to best deal with the "phantom root" catalog issue
         if ${arg0_name}.get_identifier() == '000000000000000000000000':
             return self._get_phantom_root_catalog(cat_class=objects.${cat_name}, cat_name='${cat_name}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
-            # Try creating an orchestrated ${cat_name}.  Let it raise NotFound()
+            # Try creating an orchestrated ${cat_name}.  Let it raise errors.NotFound()
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
         mongo_client.close()
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
@@ -583,7 +690,7 @@ class BinLookupSession:
 class BinAdminSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from .. import mongo_client',
@@ -621,10 +728,10 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.get_bin_form_for_create_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
-                raise InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
         if ${arg0_name} == []:
             result = objects.${return_type}(
                 db_prefix=self._db_prefix,
@@ -643,25 +750,24 @@ class BinAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise InvalidArgument('argument type is not an ${arg0_type}')
+            raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
-            raise InvalidArgument('the ${arg0_type} is for update only, not create')
+            raise errors.InvalidArgument('the ${arg0_type} is for update only, not create')
         try:
             if self._forms[${arg0_name}.get_id().get_identifier()] == CREATED:
-                raise IllegalState('${arg0_name} already used in a create transaction')
+                raise errors.IllegalState('${arg0_name} already used in a create transaction')
         except KeyError:
-            raise Unsupported('${arg0_name} did not originate from this session')
+            raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
-        try:
-            id_ = collection.insert(${arg0_name}._my_map)
-        except: # what exceptions does mongodb insert raise?
-            raise OperationFailed()
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        insert_result = collection.insert_one(${arg0_name}._my_map)
+        # what errors does mongodb insert_one raise?
+            #raise errors.OperationFailed()
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
-            collection.find_one({'_id': id_}),
+            collection.find_one({'_id': insert_result.inserted_id}),
             db_prefix=self._db_prefix,
             runtime=self._runtime)
         mongo_client.close()
@@ -673,12 +779,12 @@ class BinAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
-            raise NotFound()
+            raise errors.NotFound()
         cat_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
         mongo_client.close()
@@ -690,19 +796,19 @@ class BinAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise InvalidArgument('argument type is not an ${arg0_type}')
+            raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
-            raise InvalidArgument('the ${arg0_type} is for update only, not create')
+            raise errors.InvalidArgument('the ${arg0_type} is for update only, not create')
         try:
             if self._forms[${arg0_name}.get_id().get_identifier()] == UPDATED:
-                raise IllegalState('${arg0_name} already used in an update transaction')
+                raise errors.IllegalState('${arg0_name} already used in an update transaction')
         except KeyError:
-            raise Unsupported('${arg0_name} did not originate from this session')
+            raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
-        result = collection.save(${arg0_name}._my_map)
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        result = collection.save(${arg0_name}._my_map) # save is deprecated - change to replace_one
         if result == "What to look for here???":
             pass # Need to figure out what writeConcernErrors to catch and deal with?
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
@@ -716,31 +822,30 @@ class BinAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         for object_catalog in ${cataloged_object_caps_list}:
             obj_collection = mongo_client[self._db_prefix + '${package_name}'][object_catalog]
             if obj_collection.find({'${cat_name_mixed}Id': str(${arg0_name})}).count() != 0:
-                raise IllegalState('catalog is not empty')
-        result = collection.remove({'_id': ObjectId(${arg0_name}.get_identifier())})
-                                   # Tried using justOne above but pymongo doesn't support it
-        if 'err' in result and result['err'] is not None:
-            raise OperationFailed()
-        if result['n'] == 0:
-            raise NotFound()
+                raise errors.IllegalState('catalog is not empty')
+        delete_result = collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+        # any reason to raise:
+            #raise errors.OperationFailed()
+        if delete_result.deleted_count == 0:
+            raise errors.NotFound()
         mongo_client.close()"""
 
     alias_bin_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.alias_bin_template
         # NEED TO FIGURE OUT HOW TO IMPLEMENT THIS SOMEDAY
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
 class BinHierarchySession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from . import objects',
@@ -801,7 +906,7 @@ class BinHierarchySession:
     is_parent_of_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.is_parent_of_bin
-        return self._hierarchy_session.is_parent(id_=${arg0_name}, parent_id=${arg1_name})"""
+        return self._hierarchy_session.is_parent(id_=${arg1_name}, parent_id=${arg0_name})"""
 
     get_parent_bin_ids_template = """
         # Implemented from template for
@@ -829,7 +934,7 @@ class BinHierarchySession:
     is_child_of_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.is_child_of_bin
-        return self._hierarchy_session.is_child(id_=${arg0_name}, child_id=${arg1_name})"""
+        return self._hierarchy_session.is_child(id_=${arg1_name}, child_id=${arg0_name})"""
 
     get_child_bin_ids_template = """
         # Implemented from template for
@@ -861,12 +966,12 @@ class BinHierarchySession:
     get_bin_nodes_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_bin_nodes
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
 class BinHierarchyDesignSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from . import objects',
@@ -925,7 +1030,7 @@ class BinHierarchyDesignSession:
 class Resource:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         '#from ..id.objects import IdList',
         '#import importlib',
@@ -973,42 +1078,35 @@ ${instance_initers}
     get_avatar_id_template = """
         # Implemented from template for osid.resource.Resource.get_avatar_id_template
         if not self._my_map['${var_name_mixed}Id']:
-            raise IllegalState('this ${object_name} has no ${var_name}')
+            raise errors.IllegalState('this ${object_name} has no ${var_name}')
         else:
             return Id(self._my_map['${var_name_mixed}Id'])"""
 
     get_avatar_template = """
         # Implemented from template for osid.resource.Resource.get_avatar_template
         if not self._my_map['${var_name_mixed}Id']:
-            raise IllegalState('this ${object_name} has no ${var_name}')
-        try:
-            mgr = self._get_provider_manager('${return_pkg_caps}')
-        except:
-            raise OperationFailed('failed to instantiate ${return_pkg_title}Manager')
+            raise errors.IllegalState('this ${object_name} has no ${var_name}')
+        mgr = self._get_provider_manager('${return_pkg_caps}')
         if not mgr.supports_${return_type_under}_lookup():
-            raise OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
-        try:
-            osid_object = mgr.get_${return_type_under}_lookup_session().get_${return_type_under}(self.get_${var_name}_id())
-        except:
-            raise OperationFailed()
-        else:
-            return osid_object"""
+            raise errors.OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
+        osid_object = mgr.get_${return_type_under}_lookup_session().get_${return_type_under}(self.get_${var_name}_id())
+        return osid_object"""
 
     get_resource_record_template = """
         # This is now in Extensible and can be replaces with:
         # return self._get_record(${arg0_name}):
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not self.has_record_type(${arg0_name}):
-            raise Unsupported()
+            raise errors.Unsupported()
         if str(${arg0_name}) not in self._records:
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return self._records[str(${arg0_name})]"""
 
 class ResourceQuery:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id'
     ]
 
@@ -1032,7 +1130,7 @@ class ResourceForm:
 
     import_statements_pattern = [
         'import importlib',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.metadata import Metadata',
         'from . import mdata_conf'
@@ -1110,44 +1208,44 @@ ${persisted_initers}
     set_group_template = """
         # Implemented from template for osid.resource.ResourceForm.set_group_template
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_${arg0_type}(${arg0_name}):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['${var_name_mixed}'] = ${arg0_name}"""
 
     clear_group_template = """
         # Implemented from template for osid.resource.ResourceForm.clear_group_template
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
 
     set_avatar_template = """
         # Implemented from template for osid.resource.ResourceForm.set_avatar_template
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_id(${arg0_name}):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['${var_name_mixed}Id'] = str(${arg0_name})"""
 
     clear_avatar_template = """
         # Implemented from template for osid.resource.ResourceForm.clear_avatar_template
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['${var_name_mixed}Id'] = self._${var_name}_default"""
 
     get_resource_form_record_template = """
         # This is now in OsidExtensibleForm and can be replaces with:
         # return self._get_record(${arg0_name}):
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not self.has_record_type(${arg0_name}):
-            raise Unsupported()
+            raise errors.Unsupported()
         if str(${arg0_name}) not in self._records: # Currently this should never be True
             self._init_record(str(${arg0_name}))
             if str(${arg0_name}) not in self._my_map['recordTypeIds']: # nor this
@@ -1159,7 +1257,7 @@ ${persisted_initers}
 class ResourceList:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
     ]
 
@@ -1168,9 +1266,9 @@ class ResourceList:
         try:
             next_item = self.next()
         except StopIteration:
-            raise IllegalState('no more elements available in this list')
+            raise errors.IllegalState('no more elements available in this list')
         #except: #Need to specify exceptions here
-        #    raise OperationFailed()
+        #    raise errors.OperationFailed()
         else:
             return next_item
 
@@ -1184,7 +1282,7 @@ class ResourceList:
     # Implemented from template for osid.resource.ResourceList.get_next_resources
         if ${arg0_name} > self.available():
             # !!! This is not quite as specified (see method docs) !!!
-            raise IllegalState('not enough elements available in this list')
+            raise errors.IllegalState('not enough elements available in this list')
         else:
             next_list = []
             i = 0
@@ -1242,7 +1340,7 @@ class BinForm:
 
     init_template = """
     try:
-        from .records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
+        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
     except (ImportError, AttributeError):
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'

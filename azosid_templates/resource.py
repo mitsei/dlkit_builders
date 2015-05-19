@@ -23,10 +23,10 @@ class ResourceProfile:
         # osid.resource.ResourceProfile.supports_resource_lookup
         return self._provider_manager.${method_name}()"""
 
-#    get_resource_record_types = """
+    get_resource_record_types_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceProfile.get_resource_record_types
-#        return self._provider_manager.${method_name}()"""
+        return self._provider_manager.${method_name}()"""
 
 class ResourceManager:
 

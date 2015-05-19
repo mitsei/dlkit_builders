@@ -28,7 +28,7 @@ class HierarchyTraversalSession:
                                        identifier='000000000000000000000000')
             try:
                 catalog_id = self._get_catalog_hierarchy_id(catalog_id, proxy, runtime)
-            except NotFound:
+            except errors.NotFound:
                 catalog_id = self._create_catalog_hierarchy(catalog_id, proxy, runtime)
         OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='hierarchy', cat_name='Hierarchy', cat_class=Hierarchy)
         self._object_view = COMPARATIVE
@@ -96,11 +96,14 @@ class HierarchyTraversalSession:
         return True"""
 
     is_parent = """
-        return self._rls.get_relationships_by_genus_type_for_peers(parent_id, id_, self._relationship_type).available()"""
+        return bool(self._rls.get_relationships_by_genus_type_for_peers(
+            parent_id,
+            id_,
+            self._relationship_type).available())"""
 
     get_parents = """
         if id_ is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         id_list = []
         for r in self._rls.get_relationships_by_genus_type_for_destination(id_, self._relationship_type):
             ident = r.get_source_id()
@@ -109,7 +112,7 @@ class HierarchyTraversalSession:
         return IdList(id_list)"""
 
     is_ancestor = """
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     has_children = """
         if self.get_children(id_).available() == 0:
@@ -117,21 +120,21 @@ class HierarchyTraversalSession:
         return True"""
 
     is_child = """
-        return self._rls.get_relationships_by_genus_type_for_peers(
+        return bool(self._rls.get_relationships_by_genus_type_for_peers(
             id_,
             child_id,
-            self._relationship_type).available()"""
+            self._relationship_type).available())"""
 
     get_children = """
         if id_ is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         id_list = []
         for r in self._rls.get_relationships_by_genus_type_for_source(id_, self._relationship_type):
             id_list.append(r.get_destination_id())
         return IdList(id_list)"""
 
     is_descendent = """
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     get_nodes = """
         if ancestor_levels is None:
@@ -160,7 +163,7 @@ class HierarchyDesignSession:
     import_statements = [
         'from ..primitives import Id',
         'from ..primitives import Type',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..osid.sessions import OsidSession',
         'from ..id.objects import IdList'
     ]
@@ -180,7 +183,7 @@ class HierarchyDesignSession:
                                        identifier='000000000000000000000000')
             try:
                 catalog_id = self._get_catalog_hierarchy_id(catalog_id, proxy, runtime)
-            except NotFound:
+            except errors.NotFound:
                 catalog_id = self._create_catalog_hierarchy(catalog_id, proxy, runtime)
         OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='hierarchy', cat_name='Hierarchy', cat_class=Hierarchy)
         self._kwargs = kwargs
@@ -236,17 +239,17 @@ class HierarchyDesignSession:
 
     add_root = """
         if id_ is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if (bool(self._rls.get_relationships_by_genus_type_for_source(id_, self._relationship_type).available()) or
                 bool(self._rls.get_relationships_by_genus_type_for_destination(id_, self._relationship_type).available())):
-            raise AlreadyExists()
+            raise errors.AlreadyExists()
         self._assign_as_root(id_)"""
 
     add_child = """
         if id_ is None or child_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if bool(self._rls.get_relationships_by_genus_type_for_peers(id_, child_id, self._relationship_type).available()):
-            raise AlreadyExists()
+            raise errors.AlreadyExists()
         rfc = self._ras.get_relationship_form_for_create(id_, child_id, [])
         rfc.set_display_name(str(id_) + ' to ' + str(child_id) + ' Parent-Child Relationship')
         rfc.set_description(self._relationship_type.get_display_name().get_text() + ' relationship for parent: ' + str(id_) + ' and child: ' + str(child_id))
@@ -255,27 +258,27 @@ class HierarchyDesignSession:
 
     remove_root = """
         if id_ is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         result = self._rls.get_relationships_by_genus_type_for_peers(self._phantom_root_id, id_, self._relationship_type)
         if not bool(result.available()):
-            raise NotFound()
+            raise errors.NotFound()
         self._ras.delete_relationship(result.get_next_relationship().get_id())
         self._adopt_orphans(id_)"""
 
     remove_child = """
         if id_ is None or child_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         result = self._rls.get_relationships_by_genus_type_for_peers(id_, child_id, self._relationship_type)
         if not bool(result.available()):
-            raise NotFound()
+            raise errors.NotFound()
         self._ras.delete_relationship(result.get_next_relationship().get_id())"""
 
     remove_children = """
         if id_ is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         results = self._rls.get_relationships_by_genus_type_for_source(id_, self._relationship_type)
         if results.available() == 0:
-            raise NotFound()
+            raise errors.NotFound()
         for r in results:
             self._ras.delete_relationship(r.get_id())
         """
@@ -303,25 +306,24 @@ class HierarchyAdminSession:
         from ...abstract_osid.id.primitives import Id as ABCId
         collection = mongo_client[self._db_prefix + 'hierarchy']['Hierarchy']
         if hierarchy_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(hierarchy_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
 
         # Should we delete the underlying Relationship Family here???
 
-        result = collection.remove({'_id': ObjectId(hierarchy_id.get_identifier())})
-                                   # Tried using justOne above but pymongo doesn't support it
+        result = collection.delete_one({'_id': ObjectId(hierarchy_id.get_identifier())})
         if 'err' in result and result['err'] is not None:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         if result['n'] == 0:
-            raise NotFound()
+            raise errors.NotFound()
         mongo_client.close()"""
 
 class Hierarchy:
 
     import_statements = [
         'from ..primitives import Id',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
 class HierarchyQuery:

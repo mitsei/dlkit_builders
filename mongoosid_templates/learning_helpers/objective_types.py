@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 ### THIS STILL NEEDS LOTS OF WORK AND SOUL SEARCNING ###
 
-from ..osid.osid_errors import NotFound
+from dlkit.abstract_osid.osid.errors import NotFound
 
 OBJECTIVE_TYPES = {
     'TOPIC': 'Topic',

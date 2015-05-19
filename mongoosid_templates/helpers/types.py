@@ -3,7 +3,7 @@
 # pylint: disable=too-few-public-methods,no-self-use
 #    NEED TO RE-IMPLEMENT IN NEW STYLE
 
-from .osid.osid_errors import NotFound
+from dlkit.abstract_osid.osid.errors import NotFound
 from .profile import LANGUAGETYPE, SCRIPTTYPE, FORMATTYPE
 
 class NoneType(object):

@@ -3,7 +3,7 @@ class OsidProfile:
 
     import_statements = [
         'from . import profile',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..primitives import Type',
     ]
@@ -45,11 +45,11 @@ class OsidProfile:
         #return Version(
         #    components=profile.VERSIONCOMPONENTS,
         #    scheme=Type(**profile.VERSIONSCHEME))
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     get_release_date = """
         # NEED TO IMPLEMENT
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     supports_osid_version = """
         ## THIS ALL NEEDS TO BE FIXED:
@@ -64,11 +64,11 @@ class OsidProfile:
         #return Version(
         #    components=profile.OSIDVERSION,
         #    scheme=Type(**profile.VERSIONSCHEME))
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     get_locales = """
         # NEED TO IMPLEMENT
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     supports_journal_rollback = """
         # Perhaps someday I will support journaling
@@ -80,24 +80,24 @@ class OsidProfile:
 
     get_branch_id = """
         # Perhaps someday I will support journaling
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     get_branch = """
         # Perhaps someday I will support journaling
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     get_proxy_record_types = """
         # NEED TO IMPLEMENT
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     supports_proxy_record_type = """
         # NEED TO IMPLEMENT
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
 class OsidManager:
 
     import_statements = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import DisplayText',
     ]  
 
@@ -108,16 +108,16 @@ class OsidManager:
     
     initialize = """
         if runtime is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self._runtime is not None:
-            raise IllegalState('this manager has already been initialized.')
+            raise errors.IllegalState('this manager has already been initialized.')
         self._runtime = runtime
         self._config = runtime.get_configuration()"""
 
 class OsidProxyManager:
 
     import_statements = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
     ]  
 
     init = """
@@ -127,9 +127,9 @@ class OsidProxyManager:
     
     initialize = """
         if runtime is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self._runtime is not None:
-            raise IllegalState('this manager has already been initialized.')
+            raise errors.IllegalState('this manager has already been initialized.')
         self._runtime = runtime
         self._config = runtime.get_configuration()"""
 
@@ -137,7 +137,7 @@ class OsidProxyManager:
 class OsidRuntimeManager:
 
     import_statements = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
     ]  
 
     init = """
@@ -149,7 +149,7 @@ class Identifiable:
 
     import_statements = [
         'from ..primitives import Id',
-        'from ..osid.osid_errors import NullArgument, Unimplemented, Unsupported',
+        'from dlkit.abstract_osid.osid import errors',
     ]  
 
     init = """
@@ -204,16 +204,16 @@ class Extensible:
                     return self._records[record][name]
                 except AttributeError:
                     pass
-        abc_osid_markers.Extensible.__getattr__(name)
+        raise errors.AttributeError()
 
     def _get_record(self, record_type):
         \"\"\"Get the record string type value given the record_type.\"\"\"
         if record_type is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not self.has_record_type(record_type):
-            raise Unsupported()
+            raise errors.Unsupported()
         if str(record_type) not in self._records:
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return self._records[str(record_type)]
 
     def _load_records(self, record_type_idstrs):
@@ -323,7 +323,7 @@ class OsidSession:
         'import socket',
         'from ..primitives import Id',
         'from ..primitives import Type',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
         'from importlib import import_module',
         'from .. import mongo_client',
@@ -381,7 +381,7 @@ class OsidSession:
                 if catalog_id.get_identifier_namespace() != db_name + '.' + cat_name:
                     self._my_catalog_map = self._create_orchestrated_cat(catalog_id, db_name, cat_name)
                 else:
-                    raise NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
+                    raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
         else:
             self._catalog_identifier = '000000000000000000000000'
             self._my_catalog_map = {
@@ -428,10 +428,10 @@ class OsidSession:
             collection = mongo_client[self._db_prefix + foreign_db_name][foreign_cat_name]
             if not collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())}):
                 mongo_client.close()
-                raise NotFound()
+                raise errors.NotFound()
         except KeyError:
             mongo_client.close()
-            raise NotFound()
+            raise errors.NotFound()
         collection = mongo_client[self._db_prefix + db_name][cat_name]
         catalog_map = {
             '_id': ObjectId(foreign_catalog_id.get_identifier()),
@@ -447,7 +447,7 @@ class OsidSession:
             'recordTypeIds': [] # Could this somehow inherit source catalog records?
 
         }
-        collection.insert(catalog_map)
+        collection.insert_one(catalog_map)
         mongo_client.close()
         return catalog_map
 
@@ -459,10 +459,13 @@ class OsidSession:
             parameter_id = Id('parameter:repositoryProviderImpl@mongo')
             impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
             manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        except (AttributeError, KeyError, NotFound):
+        except (AttributeError, KeyError, errors.NotFound):
             # Just return a Manager from this implementation:
-            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
-            manager = getattr(module, osid.title() + 'Manager')()
+            try:
+                module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+                manager = getattr(module, osid.title() + 'Manager')()
+            except (ImportError, AttributeError):
+                raise errors.OperationFailed()
             if self._runtime is not None:
                 manager.initialize(self._runtime)
         return manager
@@ -474,7 +477,7 @@ class OsidSession:
         # This implementation could assume that instantiating a new Locale
         # without constructor arguments wlll return the default Locale.
         #return Locale()
-        raise Unimplemented()"""  
+        raise errors.Unimplemented()"""  
 
     is_authenticated = """
         if self._proxy is None:
@@ -488,13 +491,13 @@ class OsidSession:
         if self.is_authenticated():
             return self._proxy.get_authentication().get_agent_id()
         else:
-            raise IllegalState()"""  
+            raise errors.IllegalState()"""  
 
     get_authenticated_agent = """
         if self.is_authenticated():
             return self._proxy.get_authentication().get_agent()
         else:
-            raise IllegalState()"""
+            raise errors.IllegalState()"""
 
     get_effective_agent_id = """
         if self.is_authenticated():
@@ -516,21 +519,21 @@ class OsidSession:
         #    identifier=effective_agent_id.get_identifier(),
         #    namespace=effective_agent_id.get_namespace(),
         #    authority=effective_agent_id.get_authority())
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     supports_transactions = """
         return False"""
 
     startTransaction = """
         if not supports_transactions:
-            raise Unsupported('transactions ore not supported for this session')"""
+            raise errors.Unsupported('transactions ore not supported for this session')"""
 
 
 class OsidObject:
 
     import_statements = [
         'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from .. import types',
         'from importlib import import_module'
         ]
@@ -556,10 +559,13 @@ class OsidObject:
             parameter_id = Id('parameter:repositoryProviderImpl@mongo')
             impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
             manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        except (AttributeError, KeyError, NotFound):
+        except (AttributeError, KeyError, errors.NotFound):
             # Just return a Manager from this implementation:
-            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
-            manager = getattr(module, osid.title() + 'Manager')()
+            try:
+                module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+                manager = getattr(module, osid.title() + 'Manager')()
+            except (ImportError, AttributeError):
+                raise errors.OperationFailed()
             if self._runtime is not None:
                 manager.initialize(self._runtime)
         return manager
@@ -699,17 +705,17 @@ class OsidRule:
 
     get_rule_id = """
         # Someday I'll have a real implementation, but for now I just:
-        raise IllegalState()"""
+        raise errors.IllegalState()"""
     
     get_rule= """
         # Someday I'll have a real implementation, but for now I just:
-        raise IllegalState()"""
+        raise errors.IllegalState()"""
 
 class OsidForm:
 
     import_statements = [
         'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from . import mdata_conf',
         'from .metadata import Metadata',
         ]
@@ -805,7 +811,7 @@ class OsidForm:
         elif syntax == 'DECIMAL':
             valid = self._is_valid_decimal(inpt, metadata)
         else:
-            raise OperationFailed('no validation function available for ' + syntax)
+            raise errors.OperationFailed('no validation function available for ' + syntax)
 
         return valid
 
@@ -930,18 +936,18 @@ class OsidForm:
     set_locale = """
         # Someday I might have a real implementation
         # For now only default Locale is supported
-        raise Unsupported()"""
+        raise errors.Unsupported()"""
 
     get_journal_comment_metadata = """
         return Metadata(**self._journal_comment_metadata)"""
 
     set_journal_comment = """
         if comment is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_journal_comment_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_string(comment, self.get_journal_comment_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._journal_comment = comment"""
 
     is_valid = """
@@ -968,9 +974,9 @@ class OsidExtensibleForm:
 
         \"\"\"
         if recordType is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not self.has_record_type(recordType):
-            raise Unsupported()
+            raise errors.Unsupported()
         if str(recordType) not in self._records: # Currently this should never be True
             self._init_record(str(recordType))
             if str(recordType) not in self._my_map['recordTypeIds']: # nor this
@@ -982,7 +988,7 @@ class OsidTemporalForm:
 
     import_statements = [
         'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'import datetime',
         'from . import mdata_conf',
         'from .metadata import Metadata',
@@ -1020,17 +1026,17 @@ class OsidTemporalForm:
 
     set_start_date = """
         if date is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_start_date_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_start_date_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['startDate'] = self._get_date_map(date)"""
 
     clear_start_date = """
         if (self.get_start_date_metadata().is_read_only() or
                 self.get_start_date_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['startDate'] = self.get_start_date_metadata['default_date_time_values'][0]"""
 
     get_end_date_metadata = """
@@ -1040,17 +1046,17 @@ class OsidTemporalForm:
 
     set_end_date = """
         if date is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_end_date_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_end_date_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['endDate'] = self._get_date_map(date)"""
 
     clear_end_date = """
         if (self.get_end_date_metadata().is_read_only() or
                 self.get_end_date_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['endDate'] = self.get_end_date_metadata['default_date_time_values'][0]"""
 
     additional_methods = """
@@ -1071,7 +1077,7 @@ class OsidObjectForm:
 
     import_statements = [
         'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from . import mdata_conf',
         'from .metadata import Metadata',
         ]
@@ -1134,10 +1140,15 @@ class OsidObjectForm:
             parameter_id = Id('parameter:repositoryProviderImpl@mongo')
             impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
             manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        except (AttributeError, KeyError, NotFound):
+        except (AttributeError, KeyError, errors.NotFound):
             # Just return a Manager from this implementation:
-            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
-            manager = getattr(module, osid.title() + 'Manager')()
+            try:
+                module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+                manager = getattr(module, osid.title() + 'Manager')()
+            except (ImportError, AttributeError):
+                raise errors.OperationFailed()
+            if self._runtime is not None:
+                manager.initialize(self._runtime)
         return manager
 """
 
@@ -1146,18 +1157,18 @@ class OsidObjectForm:
 
     set_display_name = """
         if display_name is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_display_name_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_string(display_name,
                                      self.get_display_name_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['displayName']['text'] = display_name"""
 
     clear_display_name = """
         if (self.get_display_name_metadata().is_read_only() or
                 self.get_display_name_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['displayName'] = dict(self._display_name_metadata['default_object_values'][0])"""
 
     get_description_metadata = """
@@ -1165,18 +1176,18 @@ class OsidObjectForm:
 
     set_description = """
         if description is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_description_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_string(description,
                                      self.get_description_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['description']['text'] = description"""
 
     clear_description = """
         if (self.get_description_metadata().is_read_only() or
                 self.get_description_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['description'] = dict(self._description_metadata['default_object_values'][0])"""
 
     get_genus_type_metadata = """
@@ -1184,17 +1195,17 @@ class OsidObjectForm:
 
     set_genus_type = """
         if genus_type is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_genus_type_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_type(genus_type):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['genusTypeId'] = str(genus_type)"""
 
     clear_genus_type = """
         if (self.get_genus_type_metadata().is_read_only() or
                 self.get_genus_type_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['genusType'] = self._genus_type_metadata['default_type_values'][0]"""
 
 class OsidRelationshipForm:
@@ -1265,7 +1276,7 @@ class OsidQuery:
     import_statements = [
         'import re',
         'from ..primitives import Type',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from dlkit.primordium.locale.types.string import get_type_data',
     ]
 
@@ -1292,7 +1303,7 @@ class OsidQuery:
     def _add_match(self, match_key, match_value, match):
         \"\"\"Adds a match key/value\"\"\"
         if match_key is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if match is None:
             match = True
         if match:
@@ -1310,14 +1321,14 @@ class OsidQuery:
     def _match_display_text(self, element_key, string, string_match_type, match):
         \"\"\"Matches a display text value\"\"\"
         if string is None or string_match_type is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         match_value = self._get_string_match_value(string, string_match_type)
         self._add_match(element_key + '.text', match_value, match)
 
     def _match_minimum_decimal(self, match_key, decimal_value, match):
         \"\"\"Matches a minimum decimal value\"\"\"
         if decimal_value is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if match is None:
             match = True
         if match:
@@ -1332,7 +1343,7 @@ class OsidQuery:
     def _match_maximum_decimal(self, match_key, decimal_value, match):
         \"\"\"Matches a minimum decimal value\"\"\"
         if decimal_value is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if match is None:
             match = True
         if match:
@@ -1347,7 +1358,7 @@ class OsidQuery:
     def _match_minimum_date_time(self, match_key, date_time_value, match):
         \"\"\"Matches a minimum date time value\"\"\"
         if date_time_value is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if match is None:
             match = True
         if match:
@@ -1362,7 +1373,7 @@ class OsidQuery:
     def _match_maximum_date_time(self, match_key, date_time_value, match):
         \"\"\"Matches a maximum date time value\"\"\"
         if date_time_value is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if match is None:
             match = True
         if match:
@@ -1417,7 +1428,7 @@ class OsidQuery:
 class OsidIdentifiableQuery:
 
     import_statements = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
     match_id = """
@@ -1429,7 +1440,7 @@ class OsidIdentifiableQuery:
 class OsidExtensibleQuery:
 
     import_statements = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'import importlib',
         'from ..primitives import Id',
     ]
@@ -1454,14 +1465,14 @@ class OsidExtensibleQuery:
 class OsidObjectQuery:
 
     import_statements = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
     match_display_name = """
         self._match_display_text('displayName', display_name, string_match_type, match)"""
 
     match_any_display_name = """
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     clear_display_name_terms = """
         self._clear_terms('displayName.text')"""
@@ -1470,7 +1481,7 @@ class OsidObjectQuery:
         self._match_display_text('description', description, string_match_type, match)"""
 
     match_any_description = """
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
 
     clear_description_terms = """
         self._clear_terms('description.text')"""
@@ -1478,7 +1489,7 @@ class OsidObjectQuery:
 class OsidQueryInspector:
 
     import_statements = [
-        'from ..osid.osid_errors import Unimplemented',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
 class OsidRecord:
@@ -1504,7 +1515,7 @@ class OsidRecord:
 class Metadata:
 
     import_statements = [
-        'from .osid_errors import *'
+        'from dlkit.abstract_osid.osid import errors'
     ]
 
     init = """
@@ -1519,15 +1530,15 @@ class Metadata:
     get_minimum_cardinal_template = """
         # Implemented from template for osid.Metadata.get_minimum_cardinal
         if self._kwargs['syntax'] not in ${syntax_list}:
-            raise IllegalState()
+            raise errors.IllegalState()
         return self._kwargs['${var_name}']"""
 
     supports_coordinate_type_template = """
         # Implemented from template for osid.Metadata.supports_coordinate_type
         if not ${arg0_name}:
-            raise NullArgument('no inpt Type provided')
+            raise errors.NullArgument('no inpt Type provided')
         if self._kwargs['syntax'] not in ${syntax_list}:
-            raise IllegalState()
+            raise errors.IllegalState()
         return ${arg0_name} in self.get_${var_name}"""
 
     get_existing_cardinal_values_template = """
@@ -1535,7 +1546,7 @@ class Metadata:
         # This template may only work well for very primitive return types, like string or cardinal.
         # Need to update it to support DisplayName, or Id etc.
         if self._kwargs['syntax'] not in ${syntax_list}:
-            raise IllegalState()
+            raise errors.IllegalState()
         return self._kwargs['${var_name}']"""
 
 
@@ -1587,25 +1598,25 @@ class OsidNode:
 class Property:
 
     import_statements = [
-        'from ..osid.osid_errors import Unimplemented',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
 
 class OsidReceiver:
 
     import_statements = [
-        'from ..osid.osid_errors import Unimplemented',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
 
 class OsidSearchOrder:
 
     import_statements = [
-        'from ..osid.osid_errors import Unimplemented',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
 class OsidSearch:
 
     import_statements = [
-        'from ..osid.osid_errors import Unimplemented',
+        'from dlkit.abstract_osid.osid import errors',
     ]

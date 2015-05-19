@@ -548,7 +548,7 @@ def is_manager_session(interface, patterns, package_name):
     return is_manager_session
 
 ##
-# Determine if the interface represents a manager related session
+# Determine if the interface represents a catalog related session
 def is_catalog_session(interface, patterns, package_name):
     is_catalog_session = False
 #    if (interface['category'] == 'sessions' and

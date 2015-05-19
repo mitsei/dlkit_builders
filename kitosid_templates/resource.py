@@ -202,7 +202,7 @@ class ResourceLookupSession:
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_comparative_${object_name_under}_view()
-            except AttributeError():
+            except AttributeError:
                 pass"""
 
     use_plenary_resource_view_template = """
@@ -211,7 +211,7 @@ class ResourceLookupSession:
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_plenary_${object_name_under}_view()
-            except AttributeError():
+            except AttributeError:
                 pass"""
 
     use_federated_bin_view_template = """
@@ -220,7 +220,7 @@ class ResourceLookupSession:
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_federated_${cat_name_under}_view()
-            except AttributeError():
+            except AttributeError:
                 pass"""
 
     use_isolated_bin_view_template = """
@@ -229,7 +229,7 @@ class ResourceLookupSession:
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_isolated_${cat_name_under}_view()
-            except AttributeError():
+            except AttributeError:
                 pass"""
 
     get_resource_template = """
@@ -374,7 +374,7 @@ class BinLookupSession:
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_comparative_${cat_name_under}_view()
-            except AttributeError():
+            except AttributeError:
                 pass"""
 
     use_plenary_bin_view_template = """
@@ -383,7 +383,7 @@ class BinLookupSession:
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_plenary_${cat_name_under}_view()
-            except AttributeError():
+            except AttributeError:
                 pass"""
 
 #    use_comparative_bin_view_template = None
@@ -745,7 +745,7 @@ class Bin:
                 if self._views['${cat_name_under}_view'] == FEDERATED:
                     session_instance.use_federated_${cat_name_under}_view()
                 else:
-                    session_instance.use_isoloated_${cat_name_under}_view()
+                    session_instance.use_isolated_${cat_name_under}_view()
             if self._session_management != DISABLED:
                 self._provider_sessions[session] = session_instance
             return session_instance

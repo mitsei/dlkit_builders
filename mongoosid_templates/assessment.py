@@ -9,21 +9,21 @@ class AssessmentManager:
     
     awkward_get_assessment_taken_query_session_for_bank_to_delete = """
         if not bank_id:
-            raise NullArgument
+            raise errors.NullArgument
         if not self.supports_assessment_taken_query():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return sessions.AssessmentTakenQuerySession(bank_id, runtime=self._runtime)
     
     def get_assessment_taken_admin_session(self):
         if not self.supports_assessment_taken_admin():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(runtime=self._runtime)
     
     def get_assessment_taken_admin_session_for_bank(self, bank_id):
         if not bank_id:
-            raise NullArgument
+            raise errors.NullArgument
         if not self.supports_assessment_taken_admin():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(bank_id, runtime=self._runtime)"""
 
 class AssessmentProxyManager:
@@ -34,23 +34,23 @@ class AssessmentProxyManager:
     
     awkward_get_assessment_taken_query_session_for_bank_to_delete = """
         if not bank_id or proxy is None:
-            raise NullArgument
+            raise errors.NullArgument
         if not self.supports_assessment_taken_query():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return sessions.AssessmentTakenQuerySession(bank_id, proxy, runtime=self._runtime)
     
     def get_assessment_taken_admin_session(self, proxy):
         if proxy is None:
-            raise NullArgument
+            raise errors.NullArgument
         if not self.supports_assessment_taken_admin():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(proxy=proxy, runtime=self._runtime)
     
     def get_assessment_taken_admin_session_for_bank(self, bank_id, proxy):
         if not bank_id or proxy is None:
-            raise NullArgument
+            raise errors.NullArgument
         if not self.supports_assessment_taken_admin():
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(bank_id, proxy=proxy, runtime=self._runtime)"""
 
 
@@ -60,7 +60,7 @@ class AssessmentSession:
         'from ..primitives import Id',
         'from ..primitives import Type',
         'from ..primitives import DateTime',
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
         'from .. import mongo_client',
         'from . import objects',
@@ -95,7 +95,7 @@ class AssessmentSession:
             self._catalog_identifier = catalog_id.get_identifier()
             self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
             if self._my_catalog_map is None:
-                raise NotFound('could not find catalog identifier ' + catalog_id.get_identifier())
+                raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier())
         else:
             from ..primitives import Id, Type
             from .. import types
@@ -140,7 +140,7 @@ class AssessmentSession:
             assessment_taken_map['ended'] = True
             collection.save(assessment_taken_map)
         else:
-            raise IllegalState()
+            raise errors.IllegalState()
         mongo_client.close()"""
     
     requires_synchronous_sections = """
@@ -149,10 +149,10 @@ class AssessmentSession:
     
     get_first_assessment_section = """
         if assessment_taken_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         if not assessment_taken.has_started() or assessment_taken.has_ended():
-            raise IllegalState()
+            raise errors.IllegalState()
         if 'actualStartTime' not in assessment_taken._my_map:
             assessment_taken._my_map['actualStartTime'] = None
         assessment_taken_map = assessment_taken._my_map
@@ -189,32 +189,32 @@ class AssessmentSession:
     has_next_assessment_section = """
         # For now we are only working only with 'sectionless' assessments
         if not self.has_assessment_begun(assessment_section_id):
-            raise IllegalState()
+            raise errors.IllegalState()
         return False"""
     
     get_next_assessment_section = """
         # For now we are only working only with 'sectionless' assessments
         if not self.has_assessment_begun(assessment_section_id):
-            raise IllegalState()
-        raise IllegalState()"""
+            raise errors.IllegalState()
+        raise errors.IllegalState()"""
     
     has_previous_assessment_section = """
         # For now we are only working only with 'sectionless' assessments
         if not self.has_assessment_begun(assessment_section_id):
-            raise IllegalState()
+            raise errors.IllegalState()
         return False"""
     
     get_previous_assessment_section = """
         # For now we are only working only with 'sectionless' assessments
         if not self.has_assessment_begun(assessment_section_id):
-            raise IllegalState()
-        raise IllegalState()"""
+            raise errors.IllegalState()
+        raise errors.IllegalState()"""
     
     get_assessment_section = """
         # currently implemented to take advantage of the 1 to 1 relationship
         # between AssessmentSection and AssessmentTaken
         if not self.has_assessment_begun(assessment_section_id):
-            raise IllegalState()
+            raise errors.IllegalState()
         assessment_taken = self._get_assessment_taken(assessment_section_id)
         assessment_taken_map = assessment_taken._my_map
         assessment_section_map = {
@@ -267,20 +267,20 @@ class AssessmentSession:
     finished_assessment_section = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         self.finished_assessment(assessment_section_id)"""
     
     requires_synchronous_responses = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         return self.get_assessment_section(
             assessment_section_id).get_assessment_taken()._my_map['synchronousResponses']"""
     
     get_first_question = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         ## What if there are no items???
         item_id_str = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds'][0]
         return self._get_question(item_id_str)"""
@@ -288,44 +288,44 @@ class AssessmentSession:
     has_next_question = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         try:
             if len(item_ids) > item_ids.index(str(item_id)) + 1:
                 return True
         except ValueError:
-            raise NotFound('item id not in assessment')"""
+            raise errors.NotFound('item id not in assessment')"""
     
     get_next_question = """
         if not self.has_next_question(assessment_section_id, item_id):
-            raise IllegalState()
+            raise errors.IllegalState()
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         return self._get_question(item_ids[item_ids.index(str(item_id)) + 1])"""
     
     has_previous_question = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         try:
             if item_ids.index(str(item_id)) > 0:
                 return True
         except ValueError:
-            raise NotFound('item id not in assessment')"""
+            raise errors.NotFound('item id not in assessment')"""
     
     get_previous_question = """
         if not self.has_previous_question():
-            raise IllegalState()
+            raise errors.IllegalState()
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         return self._get_question(item_ids[item_ids.index(str(item_id)) - 1])"""
     
     get_question = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         if str(item_id) not in item_ids:
-            raise NotFound()
+            raise errors.NotFound()
         return self._get_question(str(item_id))
 
     def _get_question(self, item_idstr):
@@ -334,16 +334,16 @@ class AssessmentSession:
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         if item_map is None:
-            raise NotFound()
+            raise errors.NotFound()
         mongo_client.close()
         return objects.Question(item_map['question'], db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     get_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         if self.requires_synchronous_responses(assessment_section_id):
-            raise IllegalState() # This may need to actually be implemented
+            raise errors.IllegalState() # This may need to actually be implemented
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         questions = []
         for item_idstr in item_ids:
@@ -354,22 +354,22 @@ class AssessmentSession:
         from ...abstract_osid.id.primitives import Id as ABCId
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         if item_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(item_id, ABCId):
-            raise InvalidArgument('argument is not a valid OSID Id')
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
         ##
         # This is a little hack to get the answer record types from the Item's
         # Question record types. Should really get it from item genus types somehow:
         try:
-            from .records.types import ANSWER_RECORD_TYPES as record_type_data_sets
+            from ..records.types import ANSWER_RECORD_TYPES as record_type_data_sets
         except (ImportError, AttributeError):
             record_type_data_sets = dict()
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         if item_map is None:
-            raise NotFound()
+            raise errors.NotFound()
         answer_record_types = []
         for record_type_idstr in item_map['question']['recordTypeIds']:
             identifier = Id(record_type_idstr).get_identifier()
@@ -395,58 +395,58 @@ class AssessmentSession:
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         if answer_form is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(answer_form, ABCAnswerForm):
-            raise InvalidArgument('argument type is not an AnswerForm')
+            raise errors.InvalidArgument('argument type is not an AnswerForm')
         ##
         # OK, so the following should actually NEVER be true:
         if answer_form.is_for_update():
-            raise InvalidArgument('the AnswerForm is for update only, not submit')
+            raise errors.InvalidArgument('the AnswerForm is for update only, not submit')
         ##
         try:
             if self._forms[answer_form.get_id().get_identifier()] == SUBMITTED:
-                raise IllegalState('answer_form already used in a submit transaction')
+                raise errors.IllegalState('answer_form already used in a submit transaction')
         except KeyError:
-            raise Unsupported('answer_form did not originate from this assessment session')
+            raise errors.Unsupported('answer_form did not originate from this assessment session')
         if not answer_form.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
         answer_form._my_map['_id'] = ObjectId()
         assessment_taken_map = self._get_assessment_taken(assessment_section_id)._my_map
         if Id(answer_form._my_map['itemId']).get_identifier() in assessment_taken_map['responses']:
             assessment_taken_map['responses'][Id(answer_form._my_map['itemId']).get_identifier()] = answer_form._my_map
         else:
-            raise NotFound()
+            raise errors.NotFound()
         try:
             collection.save(assessment_taken_map)
         except: # what exceptions does mongodb insert raise?
-            raise OperationFailed()
+            raise errors.OperationFailed()
         self._forms[answer_form.get_id().get_identifier()] = SUBMITTED
         mongo_client.close()"""
     
     skip_item = """
         #if (not self.has_assessment_section_begun(assessment_section_id) or
         #    self.is_assessment_section_over(assessment_section_id)):
-        #    raise IllegalState()
+        #    raise errors.IllegalState()
         #item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
     
     is_question_answered = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         if item_id.get_identifer() in responses:
             return bool(responses[item_id.get_identifer()])
         else:
-            raise NotFound()"""
+            raise errors.NotFound()"""
     
     get_unanswered_questions = """
         # Note: this implementation returns them in order
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         question_list = []
@@ -458,7 +458,7 @@ class AssessmentSession:
     has_unanswered_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         for item_idstr in responses:
             if responses[Id(item_idstr).get_identifier()] is None:
@@ -468,22 +468,22 @@ class AssessmentSession:
     get_first_unanswered_question = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         if not self.has_unanswered_questions(assessment_section_id):
-            raise IllegalState('No more unanswered questions')
+            raise errors.IllegalState('No more unanswered questions')
         unanswered_questions = self.get_unanswered_questions(assessment_section_id)
         return unanswered_questions.get_next_question()"""
     
     has_next_unanswered_question = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         try:
             item_index = item_ids.index(str(item_id))
         except ValueError:
-            raise NotFound()
+            raise errors.NotFound()
         # could use itertools.islice here?  Don't know if these will ever be large lists
         for item_idstr in item_ids[item_index:]:
             if responses[Id(item_idstr).get_identifier()] is None:
@@ -494,29 +494,29 @@ class AssessmentSession:
         # This seems to share a lot of code with has_next_unanswered_question.  Just sayin'.
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         try:
             item_index = item_ids.index(str(item_id))
         except ValueError:
-            raise NotFound()
+            raise errors.NotFound()
         # could use itertools.islice here?  Don't know if these will ever be large lists
         for item_idstr in item_ids[item_index:]:
             if responses[Id(item_idstr).get_identifier()] is None:
                 return self._get_question(item_idstr)
-        raise IllegalState()"""
+        raise errors.IllegalState()"""
     
     has_previous_unanswered_question = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         try:
             item_index = item_ids.index(str(item_id))
         except ValueError:
-            raise NotFound()
+            raise errors.NotFound()
         # could use itertools.islice here?  Don't know if these will ever be large lists
         for item_idstr in item_ids[:item_index].reverse():
             if responses[Id(item_idstr).get_identifier()] is None:
@@ -527,23 +527,23 @@ class AssessmentSession:
         # This seems to share a lot of code with has_next_unanswered_question.  Just sayin'.
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         try:
             item_index = item_ids.index(str(item_id))
         except ValueError:
-            raise NotFound()
+            raise errors.NotFound()
         # could use itertools.islice here?  Don't know if these will ever be large lists
         for item_idstr in item_ids[:item_index].reverse():
             if responses[Id(item_idstr).get_identifier()] is None:
                 return self._get_question(item_idstr)
-        raise IllegalState()"""
+        raise errors.IllegalState()"""
     
     get_response = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         if item_id.get_identifier() in responses and responses[item_id.get_identifier()] is not None:
             return Response(objects.Answer(
@@ -551,12 +551,12 @@ class AssessmentSession:
                 db_prefix=self._db_prefix,
                 runtime=self._runtime))
         else:
-            raise NotFound()"""
+            raise errors.NotFound()"""
     
     get_responses = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         answer_list = []
         for item_idstr in responses:
@@ -571,19 +571,19 @@ class AssessmentSession:
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         assessment_taken = self.get_assessment_section(assessment_section_id).get_assessment_taken()
         if item_id.get_identifier() in assessment_taken._my_map['responses']:
             assessment_taken._my_map['responses'][item_id.get_identifier()] = None
             collection.save(assessment_taken._my_map)
         else:
-            raise NotFound()
+            raise errors.NotFound()
         mongo_client.close()"""
     
     finish_assessment_section = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
-            raise IllegalState()
+            raise errors.IllegalState()
         self.finish_assessment(assessment_section_id)"""
     
     ## This is no longer needed:
@@ -602,7 +602,7 @@ class AssessmentSession:
             assessment_taken_map['ended'] = True
             collection.save(assessment_taken_map)
         else:
-            raise IllegalState()
+            raise errors.IllegalState()
         mongo_client.close()"""
 
     
@@ -617,17 +617,17 @@ class AssessmentSession:
             else:
                 return True
         else:
-            raise NotFound()"""
+            raise errors.NotFound()"""
     
     get_answers = """
         if self.is_answer_available(assessment_section_id, item_id):
             collection = mongo_client[self._db_prefix + 'assessment']['Item']
             item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
             if item_map is None:
-                raise NotFound()
+                raise errors.NotFound()
             return objects.AnswerList(item_map['answers'], db_prefix=self._db_prefix, runtime=self._runtime)
         else:
-            raise IllegalState()
+            raise errors.IllegalState()
         mongo_client.close()"""
 
 
@@ -635,35 +635,35 @@ class ItemAdminSession:
     
     import_statements = [
         'from ..primitives import Id',
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from .. import mongo_client',
         'from bson.objectid import ObjectId',
         'UPDATED = True',
         'CREATED = True'
         ]
     
-    # This method is hand implemented to raise and error if the item
+    # This method is hand implemented to raise errors.and error if the item
     # is found to be associated with an assessment
     delete_item = """
         from ...abstract_osid.id.primitives import Id as ABCId
         if item_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(item_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         # This needs to be updated to actually check for AssessmentsTaken (and does that find even work?)
         if collection.find({'itemIds': str(item_id)}).count() != 0:
-            raise IllegalState('this Item is being used in one or more Assessments')
+            raise errors.IllegalState('this Item is being used in one or more Assessments')
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         if item_map is None:
-            raise NotFound()
+            raise errors.NotFound()
         objects.Item(item_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
-        result = collection.remove({'_id': ObjectId(item_id.get_identifier())}, justOne=True)
+        result = collection.delete_one({'_id': ObjectId(item_id.get_identifier())})
         if 'err' in result and result['err'] is not None:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         if result['n'] == 0:
-            raise NotFound()
+            raise errors.NotFound()
         mongo_client.close()"""
     
     # These methods overwrite the canonical aggregate object admin methods to
@@ -674,18 +674,18 @@ class ItemAdminSession:
         from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         if question_form is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(question_form, ABCQuestionForm):
-            raise InvalidArgument('argument type is not an QuestionForm')
+            raise errors.InvalidArgument('argument type is not an QuestionForm')
         if question_form.is_for_update():
-            raise InvalidArgument('the QuestionForm is for update only, not create')
+            raise errors.InvalidArgument('the QuestionForm is for update only, not create')
         try:
             if self._forms[question_form.get_id().get_identifier()] == CREATED:
-                raise IllegalState('question_form already used in a create transaction')
+                raise errors.IllegalState('question_form already used in a create transaction')
         except KeyError:
-            raise Unsupported('question_form did not originate from this session')
+            raise errors.Unsupported('question_form did not originate from this session')
         if not question_form.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
         item_id = Id(question_form._my_map['itemId']).get_identifier()
         question_form._my_map['_id'] = ObjectId(item_id)
         item = collection.find_one({'$and': [{'_id': ObjectId(item_id)}, {'bankId': str(self._catalog_id)}]})
@@ -696,7 +696,7 @@ class ItemAdminSession:
             item['question'] = question_form._my_map
         else:
             item['question'] = question_form._my_map # Let's just assume we can overwrite it
-            #raise AlreadyExists()
+            #raise errors.AlreadyExists()
         result = collection.save(item)
         if result == "What to look for here???":
             pass # Need to figure out what writeConcernErrors to catch and deal with?
@@ -708,12 +708,12 @@ class ItemAdminSession:
         from ...abstract_osid.id.primitives import Id as ABCId
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         if question_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(question_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
         if document is None:
-            raise NotFound()
+            raise errors.NotFound()
         obj_form = objects.QuestionForm(document['question'], self._db_prefix, runtime=self._runtime)
         #obj_form._for_update = True # This seems redundant
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
@@ -724,25 +724,25 @@ class ItemAdminSession:
         from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         if question_form is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(question_form, ABCQuestionForm):
-            raise InvalidArgument('argument type is not an QuestionForm')
+            raise errors.InvalidArgument('argument type is not an QuestionForm')
         if not question_form.is_for_update():
-            raise InvalidArgument('the QuestionForm is for update only, not create')
+            raise errors.InvalidArgument('the QuestionForm is for update only, not create')
         try:
             if self._forms[question_form.get_id().get_identifier()] == UPDATED:
-                raise IllegalState('question_form already used in an update transaction')
+                raise errors.IllegalState('question_form already used in an update transaction')
         except KeyError:
-            raise Unsupported('question_form did not originate from this session')
+            raise errors.Unsupported('question_form did not originate from this session')
         if not question_form.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
         item_id = Id(question_form._my_map['itemId']).get_identifier()
         item = collection.find_one({'$and': [{'_id': ObjectId(item_id)}, {'bankId': str(self._catalog_id)}]})
         item['question'] = question_form._my_map
         try:
             collection.save(item)
         except: # what exceptions does mongodb save raise?
-            raise OperationFailed()
+            raise errors.OperationFailed()
         self._forms[question_form.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         mongo_client.close()
@@ -753,7 +753,7 @@ class AssessmentAdminSession:
     
     import_statements = [
         'from ..primitives import Id',
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from .. import mongo_client',
         'from bson.objectid import ObjectId',
         'UPDATED = True',
@@ -764,25 +764,25 @@ class AssessmentAdminSession:
         from ...abstract_osid.id.primitives import Id as ABCId
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         if assessment_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(assessment_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentOffered']
         if collection.find({'assessmentId': str(assessment_id)}).count() != 0:
-            raise IllegalState('there are still AssessmentsOffered associated with this Assessment')
+            raise errors.IllegalState('there are still AssessmentsOffered associated with this Assessment')
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
-        result = collection.remove({'_id': ObjectId(assessment_id.get_identifier())}, justOne=True)
+        result = collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
         if 'err' in result and result['err'] is not None:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         if result['n'] == 0:
-            raise NotFound()
+            raise errors.NotFound()
         mongo_client.close()"""
 
 class AssessmentTakenLookupSession:
     
     import_statements = [
         'from ..primitives import Id',
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from .. import mongo_client',
         'from . import objects',
         ]
@@ -843,7 +843,7 @@ class AssessmentTakenLookupSession:
 class AssessmentOfferedAdminSession:
     
     deprecated_import_statements = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from .. import mongo_client',
         'UPDATED = True',
         'CREATED = True',
@@ -856,12 +856,12 @@ class AssessmentOfferedAdminSession:
         from ...abstract_osid.id.primitives import Id as ABCId
         from ...abstract_osid.type.primitives import Type as ABCType
         if assessment_id is None or assessment_offered_record_types is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(assessment_id, ABCId):
-            raise InvalidArgument('argument is not a valid OSID Id')
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
         for arg in assessment_offered_record_types:
             if not isinstance(arg, ABCType):
-                raise InvalidArgument('one or more argument array elements is not a valid OSID Type')
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         ##
         #...Here:
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
@@ -894,7 +894,7 @@ class AssessmentOfferedAdminSession:
 class AssessmentTakenAdminSession:
     
     deprecated_import_statements = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from .. import mongo_client',
         'UPDATED = True',
         'CREATED = True',
@@ -910,18 +910,18 @@ class AssessmentTakenAdminSession:
         from ..osid.osid_errors import PermissionDenied
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
         if assessment_taken_form is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(assessment_taken_form, ABCAssessmentTakenForm):
-            raise InvalidArgument('argument type is not an AssessmentTakenForm')
+            raise errors.InvalidArgument('argument type is not an AssessmentTakenForm')
         if assessment_taken_form.is_for_update():
-            raise InvalidArgument('the AssessmentForm is for update only, not create')
+            raise errors.InvalidArgument('the AssessmentForm is for update only, not create')
         try:
             if self._forms[assessment_taken_form.get_id().get_identifier()] == CREATED:
-                raise IllegalState('assessment_taken_form already used in a create transaction')
+                raise errors.IllegalState('assessment_taken_form already used in a create transaction')
         except KeyError:
-            raise Unsupported('assessment_taken_form did not originate from this session')
+            raise errors.Unsupported('assessment_taken_form did not originate from this session')
         if not assessment_taken_form.is_valid():
-            raise InvalidArgument('one or more of the form elements is invalid')
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
         ##
         # ...here:
         assessment_offered_id = Id(assessment_taken_form._my_map['assessmentOfferedId'])
@@ -934,25 +934,24 @@ class AssessmentTakenAdminSession:
                                               'takingAgentId': str(self.get_effective_agent_id()),
                                               'bankId': str(self._catalog_id)}).count()
                 if num_takens >= max_attempts:
-                    raise PermissionDenied('exceeded max attempts')
+                    raise errors.PermissionDenied('exceeded max attempts')
         except AttributeError:
             pass
         assessment_taken_form._my_map['takingAgentId'] = str(self.get_effective_agent_id())
         ##
-        try:
-            id_ = collection.insert(assessment_taken_form._my_map)
-        except: # what exceptions does mongodb insert raise?
-            raise OperationFailed()
+        insert_result = collection.insert_one(assessment_taken_form._my_map)
+        # what exceptions does mongodb insert_one raise?
+            #raise errors.OperationFailed()
         self._forms[assessment_taken_form.get_id().get_identifier()] = CREATED
         mongo_client.close()
         return objects.AssessmentTaken(
-            collection.find_one({'_id': id_}), db_prefix=self._db_prefix, runtime=self._runtime)"""
+            collection.find_one({'_id': insert_result.inserted_id}), db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class AssessmentBasicAuthoringSession:
     
     import_statements = [
         'from bson.objectid import ObjectId',
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
         'from .. import mongo_client',
@@ -975,39 +974,6 @@ class AssessmentBasicAuthoringSession:
         self._forms = dict()
 """
     
-    old_init ="""
-    def __init__(self, catalog_id = None, *args, **kwargs):
-        from ..osid.sessions import OsidSession
-        from . import profile
-        OsidSession.__init__(self, *args, **kwargs)
-        collection = mongo_client[self._db_prefix + 'assessment']['Bank']
-        if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
-            self._catalog_identifier = catalog_id.get_identifier()
-            self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
-            if self._my_catalog_map is None:
-                raise NotFound('could not find catalog identifier ' + catalog_id.get_identifier())
-        else:
-            from ..primitives import Id, Type
-            from .. import types
-            self._catalog_identifier = '000000000000000000000000'
-            self._my_catalog_map = {
-                '_id': ObjectId(self._catalog_identifier),
-                'displayName': {'text': 'Default Bank',
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'description': {'text': 'The Default Bank',
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
-            }
-        self._catalog = objects.Bank(self._my_catalog_map)
-        self._catalog_id = self._catalog.get_id()
-        self._forms = dict()
-        mongo_client.close()
-"""
-    
     can_author_assessments = """
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
@@ -1015,11 +981,11 @@ class AssessmentBasicAuthoringSession:
     
     get_items = """
         if assessment_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if assessment is None:
-            raise NotFound()
+            raise errors.NotFound()
         if 'itemIds' not in assessment or assessment['itemIds'] == []:
             return objects.ItemList([], db_prefix=self._db_prefix, runtime=self._runtime)
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
@@ -1032,15 +998,15 @@ class AssessmentBasicAuthoringSession:
     
     add_item = """
         if assessment_id is None or item_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         item = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         if not item:
-            raise NotFound()
+            raise errors.NotFound()
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if not assessment:
-            raise NotFound()
+            raise errors.NotFound()
         if 'itemIds' not in assessment:
             assessment['itemIds'] = [str(item_id)]
         else:
@@ -1050,33 +1016,33 @@ class AssessmentBasicAuthoringSession:
     
     remove_item = """
         if assessment_id is None or item_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if not assessment:
-            raise NotFound('an assessment with assessment_id does not exist')
+            raise errors.NotFound('an assessment with assessment_id does not exist')
         try:
             assessment['itemIds'].remove(str(item_id))
         except (KeyError, ValueError):
-            raise NotFound('item_id not found on assessment')
+            raise errors.NotFound('item_id not found on assessment')
         collection.save(assessment)
         mongo_client.close()"""
     
     move_item = """
         if assessment_id is None or item_id is None or preceeding_item_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if assessment is None:
-            raise NotFound('an assessment with assessment_id does not exist')
+            raise errors.NotFound('an assessment with assessment_id does not exist')
         try:
             p_index = assessment['itemIds'].index(str(preceeding_item_id))
         except (KeyError, ValueError):
-            raise NotFound('preceeding_item_id not associated with assessment')
+            raise errors.NotFound('preceeding_item_id not associated with assessment')
         try:
             assessment['itemIds'].remove(str(item_id))
         except ValueError:
-            raise NotFound('item_id not associated with assessment')
+            raise errors.NotFound('item_id not associated with assessment')
         assessment['itemIds'].insert(str(item_id), p_index + 1)
         collection.save(assessment)
         mongo_client.close()"""
@@ -1088,20 +1054,20 @@ class AssessmentBasicAuthoringSession:
         # will be implemented later, but this covers the primary case
         # that we will see from a RESTful consumer.
         if item_ids is None or assessment_id is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if assessment is None:
-            raise NotFound('an assessment with assessment_id does not exist')
+            raise errors.NotFound('an assessment with assessment_id does not exist')
         try:
             if len(assessment['itemIds']) != len(item_ids):
-                raise OperationFailed('number of items does not match those in assessment')
+                raise errors.OperationFailed('number of items does not match those in assessment')
         except KeyError:
-            raise NotFound('no items were found for this assessment_id')
+            raise errors.NotFound('no items were found for this assessment_id')
         item_id_list = []
         for i in item_ids:
             if str(i) not in assessment['itemIds']:
-                raise OperationFailed('one or more items are not associated with this assessment')
+                raise errors.OperationFailed('one or more items are not associated with this assessment')
             item_id_list.append(str(i))
         assessment['itemIds'] = item_id_list
         collection.save(assessment)
@@ -1133,7 +1099,7 @@ class Question:
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         item_map = collection.find_one({'_id': ObjectId(Id(self._my_map['itemId']).get_identifier())})
         if not item_map:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         return IdList(item_map['learningObjectiveIds'])
 """
 
@@ -1176,7 +1142,7 @@ class AssessmentOffered:
         'from ..primitives import Id',
         'from ..primitives import DateTime',
         'from ..primitives import Duration',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         ]
     
     additional_methods = """
@@ -1205,7 +1171,7 @@ class AssessmentOffered:
     get_start_time_template = """
         # Implemented from template for osid.assessment.AssessmentOffered.get_start_time_template
         if not bool(self._my_map['${var_name_mixed}']):
-            raise IllegalState()
+            raise errors.IllegalState()
         dt = self._my_map['${var_name_mixed}']
         return DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)"""
     
@@ -1216,7 +1182,7 @@ class AssessmentOffered:
     get_duration_template = """
         # Implemented from template for osid.assessment.AssessmentOffered.get_duration_template
         if not bool(self._my_map['${var_name_mixed}']):
-            raise IllegalState()
+            raise errors.IllegalState()
         return Duration(**self._my_map['${var_name_mixed}'])"""
 
 class AssessmentOfferedForm:
@@ -1224,13 +1190,13 @@ class AssessmentOfferedForm:
     set_start_time_template = """
         # Implemented from template for osid.assessment.AssessmentOfferedForm.set_start_time_template
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_${arg0_type_under}(
                 ${arg0_name},
                 self.get_${var_name}_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         self._my_map['${var_name_mixed}'] = ${arg0_name}
 """
     
@@ -1238,18 +1204,18 @@ class AssessmentOfferedForm:
     clear_start_time_template = """
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
     
     set_duration_template = """
         # Implemented from template for osid.assessment.AssessmentOfferedForm.set_duration_template
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         if not self._is_valid_${arg0_type_under}(${arg0_name},
                                 self.get_${arg0_name}_metadata()):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         map = dict()
         map['days'] = ${arg0_name}.days
         map['seconds'] = ${arg0_name}.seconds
@@ -1266,7 +1232,7 @@ class AssessmentTaken:
     
     import_statements = [
         'from ..primitives import Id',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..osid.objects import OsidObject',
         'from .. import mongo_client',
     ]
@@ -1297,13 +1263,13 @@ class AssessmentTaken:
             return Id(self._my_map['takingAgentId'])"""
     
     get_taker = """
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
     
     get_taking_agent_id = """
         return Id(self._my_map['takingAgentId'])"""
     
     get_taking_agent = """
-        raise Unimplemented()"""
+        raise errors.Unimplemented()"""
     
     has_started = """
         # This needs to be updated to only reflect actual start time??
@@ -1320,9 +1286,9 @@ class AssessmentTaken:
     
     get_actual_start_time = """
         if not self.has_started():
-            raise IllegalState('this assessment has not yet started')
+            raise errors.IllegalState('this assessment has not yet started')
         if self._my_map['actualStartTime'] is None:
-            raise IllegalState('this assessment has not yet been started by the taker')
+            raise errors.IllegalState('this assessment has not yet been started by the taker')
         else:
             return self._my_map['actualStartTime']"""
     
@@ -1332,16 +1298,16 @@ class AssessmentTaken:
     
     get_completion_time = """
         if not self.has_ended():
-            raise IllegalState('this assessment has not yet ended')
+            raise errors.IllegalState('this assessment has not yet ended')
         if not self._my_map['completionTime']:
-            raise OperationFailed('someone forgot to set the completion time')
+            raise errors.OperationFailed('someone forgot to set the completion time')
         return self._my_map['completionTime']"""
     
     get_time_spent = """
         if self.has_started() and self.has_ended():
             return self.get_completion_time() - self.get_actual_start_time()
         else:
-            raise IllegalState()"""
+            raise errors.IllegalState()"""
     
     get_completion_template = """
         # Implemented from template for osid.assessment.AssessmentTaken.get_completion_template
@@ -1389,7 +1355,7 @@ class AssessmentTaken:
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         if item_map is None:
-            raise NotFound()
+            raise errors.NotFound()
         question = Item(item_map).get_question()
         if self._my_map['itemConfigs][str(item_id)]:
             question.config(self._my_map['itemConfigs][str(item_id)])
@@ -1428,12 +1394,12 @@ class Response:
     
     import_statements = [
         'from ..primitives import Id',
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
     ]
     
     init = """
     try:
-        from .records.types import RESPONSE_RECORD_TYPES as _record_type_data_sets
+        from ..records.types import RESPONSE_RECORD_TYPES as _record_type_data_sets
     except ImportError, AttributeError:
         _record_type_data_sets = dict()
     _namespace = 'assessment.Response'
@@ -1479,14 +1445,14 @@ class Response:
     
     get_item = """
         # So, why would we ever let an AssessmentSession user get the Item???
-        raise PermissionDenied()"""
+        raise errors.PermissionDenied()"""
     
     get_response_record = """
         if item_record_type is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not self.has_record_type(item_record_type):
-            raise Unsupported()
+            raise errors.Unsupported()
         if str(item_record_type) not in self._records:
-            raise Unimplemented()
+            raise errors.Unimplemented()
         return self._records[str(item_record_type)]"""
 

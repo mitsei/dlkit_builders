@@ -203,7 +203,6 @@ def make_mongoosid(file_name):
                                 'search_orders',
                                 'searches',]
 
-
     ##
     # The real work starts here.  Iterate through all interfaces to build 
     # all the django classes for this osid package.
@@ -560,6 +559,7 @@ def make_init_methods(interface_name, package, patterns):
                                         'persisted_initers': persisted_initers,
                                         'metadata_initers': metadata_initers,
                                         'object_name': object_name,
+                                        'object_name_under': camel_to_under(object_name),
                                         'object_name_upper': camel_to_under(object_name).upper(),
                                         'cat_name': cat_name,
                                         'cat_name_plural': make_plural(cat_name),
@@ -1005,7 +1005,7 @@ def make_method_impl(package_name, method, interface, patterns):
 
         impl = template.substitute(kwargs).strip('\n')
     if impl == '':
-        impl = '        raise Unimplemented()'
+        impl = '        raise errors.Unimplemented()'
     else:
         if (interface['category'] in patterns['impl_log'] and
             interface['shortname'] in patterns['impl_log'][interface['category']]):

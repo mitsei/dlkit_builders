@@ -37,6 +37,9 @@ make_osiddocs()
 from builders.kitdocsourcebuilder import make_kitdocs
 make_kitdocs()
 
+from builders.testbuilder import make_tests
+make_tests()
+
 #from builders.djbuilder import make_djosids
 #make_djosids()
 

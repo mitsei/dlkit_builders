@@ -3,8 +3,9 @@ import time
 import os
 import json
 import string
-from binder_helpers import camel_to_under
-from binder_helpers import make_plural, fix_reserved_word
+from .config import *
+from binder_helpers import camel_to_under, flagged_for_implementation
+from binder_helpers import make_plural, fix_reserved_word, under_to_caps
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
 from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
@@ -22,6 +23,8 @@ from kitdocbuilder_settings import PACKAGENAME as doc_root_pkg
 from kitdocbuilder_settings import PACKAGEPREFIX as pkg_prefix
 from kitdocbuilder_settings import PACKAGESUFFIX as pkg_suffix
 from kitdocbuilder_settings import TEMPLATEDIR as template_dir
+
+excluded_packages = ['grading', 'hierarchy', 'proxy', 'relationship', 'resource']
 
 ##
 # This is the entry point for making django-based python classes for
@@ -44,6 +47,12 @@ def make_kitdoc(file_name):
     read_file = open(file_name, 'r')
     package = json.load(read_file)
     read_file.close()
+
+    if package['name'] not in packages_to_implement:
+        return
+    if package['name'] in excluded_packages:
+        return
+    print "--> Build DLKit Doc Package:", package['name']
 
     importStr = ''
     bodyStr = ''
@@ -164,6 +173,14 @@ def make_kitdoc(file_name):
         patterns[camel_to_under(inf['shortname']) + 
                 '.is_catalog_session'] = is_catalog_session(inf, patterns, package['name'])
 
+    exceptions = []
+
+    excepted_osid_categories = ['properties',
+                                'query_inspectors',
+                                'receivers',
+                                'search_orders',
+                                'searches',]
+
     ##
     # The real work starts here.  Iterate through manager and catalog 
     # interfaces only to build the 'managers' and some 'objects' modules.
@@ -186,6 +203,23 @@ def make_kitdoc(file_name):
 #            module_name = fix_reserved_word(package['name'])
             module_name = package['name']
             
+            ##
+            # Check to see if this interface is meant to be implemented.
+            if package['name'] != 'osid' and interface['category'] not in excepted_osid_categories:
+                if flagged_for_implementation(interface, 
+                        sessions_to_implement, objects_to_implement, variants_to_implement):
+                    if interface['shortname'] in exceptions:
+                        continue
+                    if interface['shortname'].endswith('ProxyManager'):
+                        continue
+                    else:
+                        pass
+                else:
+                    continue
+
+            if interface['category'] in excepted_osid_categories:
+                continue
+
             inheritance = []
 
             """
@@ -296,9 +330,9 @@ def make_kitdoc(file_name):
 
             ##
             # And don't forget the osid_error import:
-            import_str = 'from .osid_errors import Unimplemented, IllegalState, OperationFailed'
-            if import_str not in modules[module_name]['imports']: 
-                modules[module_name]['imports'].append(import_str)
+            #import_str = 'from .osid_errors import Unimplemented, IllegalState, OperationFailed'
+            #if import_str not in modules[module_name]['imports']: 
+            #    modules[module_name]['imports'].append(import_str)
 
             ##
             # Note that the following re-assigns the inheritance variable from a 
@@ -528,6 +562,27 @@ def make_methods(package_name, interface, patterns):
     from binder_helpers import SkipMethod, fix_reserved_word
     body = []
     for method in interface['methods']:
+
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Manager')  and
+                method['name'].startswith('get') and
+                'session' in method['name'] and
+                method['return_type'].split('.')[-1] not in sessions_to_implement):
+            print "excepting:", interface['shortname'], method['name']
+            continue
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Profile')  and
+                method['name'].startswith('supports_') and
+                under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
+            print "excepting:", interface['shortname'], method['name']
+            continue
+        if (interface['category'] == 'sessions' and
+                (method['name'] == 'get_' + patterns['package_catalog_under'] + '_id' or
+                 method['name'] == 'get_' + patterns['package_catalog_under'])):
+            continue
+
         try:
             body.append(make_method(package_name, method, interface['shortname'], patterns))
         except SkipMethod:
@@ -752,8 +807,12 @@ def make_method_impl(package_name, method, interface_name, patterns):
 
         impl = template.substitute(kwargs).strip('\n')
     if impl == '':
-        impl = '        raise UNIMPLEMENTED()'
-    return impl
+        if method['return_type'].strip():
+            return '        return # ' + method['return_type']
+        else:
+            return '        pass'
+    else:
+        return impl
         
 
 def make_profile_py(package):

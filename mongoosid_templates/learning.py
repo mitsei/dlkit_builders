@@ -4,7 +4,7 @@ from error_lists import session_errors
 class ObjectiveRequisiteSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
         'from .. import mongo_client',
@@ -37,7 +37,7 @@ class ObjectiveRequisiteSession:
 class ObjectiveRequisiteAssignmentSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from .. import mongo_client',
     ]
@@ -47,7 +47,7 @@ class ObjectiveRequisiteAssignmentSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
         if ${arg0_name} is None or ${arg1_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
 
 
@@ -64,7 +64,7 @@ class ObjectiveRequisiteAssignmentSession:
         from ..relationship.managers import RelationshipManager
         from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied
         if ${arg0_name} is None or ${arg1_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
         rls = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
         ras = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
@@ -73,7 +73,7 @@ class ObjectiveRequisiteAssignmentSession:
 class ObjectiveAdminSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from .. import mongo_client',
     ]
@@ -83,25 +83,29 @@ class ObjectiveAdminSession:
         # osid.learning.ObjectiveAdminSession.delete_activity_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         collection = mongo_client[self._db_prefix + '${package_name}']['${dependent_object_name}']
         if collection.find({'${object_name_mixed}Id': str(${arg0_name})}).count() != 0:
-            raise IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
+            raise errors.IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        result = collection.remove({'_id': ObjectId(${arg0_name}.get_identifier())}, justOne=True)
-        if 'err' in result and result['err'] is not None:
-            raise OperationFailed()
-        if result['n'] == 0:
-            raise NotFound()
+        delete_result = collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+        if delete_result.delete_count == 0:
+            raise errors.NotFound
+        # any reason to raise:
+            #raise errors.OperationFailed()
+        #if 'err' in result and result['err'] is not None:
+        #    raise errors.OperationFailed()
+        #if result['n'] == 0:
+        #    raise errors.NotFound()
         mongo_client.close()"""
 
 
 class ActivityLookupSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
         'from .. import mongo_client',
@@ -127,7 +131,7 @@ class ActivityLookupSession:
 class ActivityAdminSession:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import ' + session_errors,
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
         'from .. import mongo_client',
@@ -139,12 +143,12 @@ class ActivityAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
         if ${arg0_name} is None or ${arg1_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise InvalidArgument('argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('argument is not a valid OSID ${arg0_type}')
         for arg in ${arg1_name}:
             if not isinstance(arg, ABC${arg1_type}):
-                raise InvalidArgument('one or more argument array elements is not a valid OSID ${arg1_type}')
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg1_type}')
         if ${arg1_name} == []:
             ## WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
             obj_form = objects.${return_type}(
@@ -170,7 +174,7 @@ class ActivityAdminSession:
 class Activity:
 
     import_statements_pattern = [
-        'from ..osid.osid_errors import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..id.objects import IdList',
     ]
@@ -189,15 +193,15 @@ class Activity:
         try:
             mgr = self._get_provider_manager('${return_pkg_caps}')
         except ImportError:
-            raise OperationFailed('failed to instantiate ${return_pkg_title}Manager')
+            raise errors.OperationFailed('failed to instantiate ${return_pkg_title}Manager')
         if not mgr.supports_${return_type_under}_lookup():
-            raise OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
+            raise errors.OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
         try:
             lookup_session = mgr.get_${return_type_under}_lookup_session()
             lookup_session.use_federated_${cat_name_under}_view()
             result = lookup_session.get_${return_type_under}(self.get_${var_name}_id())
         except:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         else:
             return result"""
 
@@ -214,15 +218,15 @@ class Activity:
         try:
             mgr = self._get_provider_manager('${return_pkg_caps}')
         except ImportError:
-            raise OperationFailed('failed to instantiate ${return_pkg_title}Manager')
+            raise errors.OperationFailed('failed to instantiate ${return_pkg_title}Manager')
         if not mgr.supports_${return_type_list_object_under}_lookup():
-            raise OperationFailed('${return_pkg_title} does not support ${return_type_list_object} lookup')
+            raise errors.OperationFailed('${return_pkg_title} does not support ${return_type_list_object} lookup')
         try:
             lookup_session = mgr.get_${return_type_list_object_under}_lookup_session()
             lookup_session.use_federated_${return_cat_name_under}_view()
             result = lookup_session.get_${return_type_list_object_plural_under}_by_ids(self.get_${var_name_singular}_ids())
         except:
-            raise OperationFailed()
+            raise errors.OperationFailed()
         else:
             return result"""
 
@@ -238,15 +242,15 @@ class ActivityForm:
     set_assets_template = """
         # Implemented from template for osid.learning.ActivityForm.set_assets_template
         if ${arg0_name} is None:
-            raise NullArgument()
+            raise errors.NullArgument()
         if not isinstance(${arg0_name}, list):
-            raise InvalidArgument()
+            raise errors.InvalidArgument()
         if self.get_${var_name}_metadata().is_read_only():
-            raise NoAccess()
+            raise errors.NoAccess()
         idstr_list = []
         for object_id in ${arg0_name}:
             if not self._is_valid_id(object_id):
-                raise InvalidArgument()
+                raise errors.InvalidArgument()
             idstr_list.append(str(object_id))
         self._my_map['${var_name_singular_mixed}Ids'] = idstr_list"""
 
@@ -254,6 +258,6 @@ class ActivityForm:
         # Implemented from template for osid.learning.ActivityForm.clear_assets_template
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
-            raise NoAccess()
+            raise errors.NoAccess()
         self._my_map['${var_name_singular_mixed}Ids'] = self._${var_name}_default"""
 

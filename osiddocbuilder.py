@@ -2,6 +2,8 @@
 #import time
 import os
 import json
+from .binder_helpers import flagged_for_implementation, under_to_caps
+from .config import *
 from osiddocbuilder_settings import XOSIDNAMESPACEURI as ns
 from osiddocbuilder_settings import XOSIDDIRECTORY as xosid_dir
 from osiddocbuilder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
@@ -51,6 +53,10 @@ def make_osiddoc(file_name):
     read_file = open(file_name, 'r')
     package = json.load(read_file)
     read_file.close()
+
+    if package['name'] not in managers_to_implement:
+        return
+    print "--> Osid Doc Implement Package:", package['name']
 
     importStr = 'import abc\n'
     bodyStr = ''
@@ -126,6 +132,13 @@ def make_osiddoc(file_name):
                       package['summary'] + '\n\n\"\"\"').encode('utf-8'))
     write_file.close
 
+    exceptions = []
+
+    excepted_osid_categories = ['properties',
+                                'query_inspectors',
+                                'receivers',
+                                'search_orders',
+                                'searches',]
 
     ##
     # The real work starts here.  Iterate through all interfaces to build 
@@ -133,6 +146,25 @@ def make_osiddoc(file_name):
     for interface in package['interfaces']:
         inheritance = []
         additional_methods = ''
+
+        ##
+        # Check to see if manager should be implemented (this should 
+        # probably be moved to binder_helpers.flagged_for_implementation)
+        if (interface['category'] == 'managers' and 
+                      package['name'] not in managers_to_implement):
+            continue
+
+        ##
+        # Check to see if this interface is meant to be implemented.
+        if package['name'] != 'osid' and interface['category'] not in excepted_osid_categories:
+            if flagged_for_implementation(interface, 
+                    sessions_to_implement, objects_to_implement, variants_to_implement):
+                if interface['shortname'] in exceptions:
+                    continue
+                else:
+                    pass
+            else:
+                continue
 
         ##
         # Make certain foundational classes new-style Python objects,
@@ -199,7 +231,7 @@ def make_osiddoc(file_name):
                             class_sig + '\n' +
                             class_doc + '\n' +
                             additional_methods +
-                            make_methods(interface['methods']) + '\n\n\n')
+                            make_methods(package['name'], interface) + '\n\n\n')
     ##
     # Finally, iterate through the completed package module structure and
     # write out both the import statements and class definitions to the
@@ -238,10 +270,27 @@ def get_interface_module(pkg_name, interface_shortname, report_error = False):
     return category
 
 
-def make_methods(methods):
+def make_methods(package_name, interface):
     from binder_helpers import fix_reserved_word
     body = []
-    for method in methods:
+    for method in interface['methods']:
+
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Manager')  and
+                method['name'].startswith('get') and
+                'session' in method['name'] and
+                method['return_type'].split('.')[-1] not in sessions_to_implement):
+            print "excepting:", interface['shortname'], method['name']
+            continue
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Profile')  and
+                method['name'].startswith('supports_') and
+                under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
+            print "excepting:", interface['shortname'], method['name']
+            continue
+
         body.append(make_method(method))
         ##
         # Here is where we add the Python properties stuff:

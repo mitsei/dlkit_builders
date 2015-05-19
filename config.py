@@ -18,6 +18,14 @@ packages_to_implement = [
     'type',
     ]
 
+packages_to_test = [
+    'assessment',
+    'commenting',
+    'learning',
+    'repository',
+    'resource',
+    ]
+
 managers_to_implement = [
     'assessment',
     'commenting',
@@ -28,6 +36,7 @@ managers_to_implement = [
     'proxy',
     'relationship',
     'repository',
+    'resource',
     'type',
     ]
 
@@ -96,6 +105,17 @@ sessions_to_implement = [
     'AssetAdminSession',
     'RepositoryLookupSession',
     'RepositoryAdminSession',
+    'RepositoryHierarchySession',
+    'RepositoryHierarchyDesignSession',
+    ## resource service
+    'ResourceLookupSession',
+    'ResourceAdminSession',
+    'ResourceAgentSession',
+    'ResourceAgentAssignmentSession',
+    'BinLookupSession',
+    'BinAdminSession',
+    'BinHierarchySession',
+    'BinHierarchyDesignSession',
     ]
 
 objects_to_implement = [
@@ -140,6 +160,9 @@ objects_to_implement = [
     'Asset',
     'AssetContent',
     'Repository',
+    ### resource service
+    'Resource',
+    'Bin',
     ### type service
     'Type',
     ]

@@ -67,7 +67,7 @@ class OsidManager:
         parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         authz_manager = runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
-        self._authz_session = authz_manager().get_authorization_session()"""
+        self._authz_session = authz_manager.get_authorization_session()"""
 
 class OsidProxyManager:
     
