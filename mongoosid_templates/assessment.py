@@ -649,7 +649,7 @@ class ItemAdminSession:
         if item_id is None:
             raise errors.NullArgument()
         if not isinstance(item_id, ABCId):
-            return InvalidArgument('the argument is not a valid OSID Id')
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         # This needs to be updated to actually check for AssessmentsTaken (and does that find even work?)
         if collection.find({'itemIds': str(item_id)}).count() != 0:
