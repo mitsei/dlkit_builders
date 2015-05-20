@@ -215,7 +215,7 @@ class ResourceLookupSession:
             result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         if result is None:
             raise errors.NotFound()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_resources_by_ids_template = """
@@ -236,7 +236,7 @@ class ResourceLookupSession:
         else:
             result = collection.find({'_id': {'$$in': object_id_list}}).sort('_id', DESCENDING)
             count = collection.find({'_id': {'$$in': object_id_list}}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, count=count, runtime=self._runtime)"""
 
     get_resources_by_genus_type_template = """
@@ -252,7 +252,7 @@ class ResourceLookupSession:
         else:
             result = collection.find({'genusTypeId': str(${arg0_name})}).sort('_id', DESCENDING)
             count = collection.find({'genusTypeId': str(${arg0_name})}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, count=count, runtime=self._runtime)"""
 
     get_resources_by_parent_genus_type_template = """
@@ -277,7 +277,7 @@ class ResourceLookupSession:
         else:
             result = collection.find().sort('_id', DESCENDING)
             count = collection.count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class ResourceQuerySession:
@@ -331,7 +331,7 @@ class ResourceQuerySession:
             query_terms['${cat_name_mixed}Id'] = str(self._catalog_id)
         result = collection.find(query_terms).sort('_id', DESCENDING)
         count = collection.find(query_terms).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
@@ -428,7 +428,7 @@ class ResourceAdminSession:
             collection.find_one({'_id': insert_result.inserted_id}),
             db_prefix=self._db_prefix,
             runtime=self._runtime)
-        mongo_client.close()
+        #mongo_client.close()
         return result"""
 
     get_resource_form_for_update_template = """
@@ -445,7 +445,7 @@ class ResourceAdminSession:
             raise errors.NotFound()
         obj_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-        mongo_client.close()
+        #mongo_client.close()
         return obj_form"""
 
     update_resource_template = """
@@ -470,7 +470,7 @@ class ResourceAdminSession:
         if result == "What to look for here???":
             pass # Need to figure out what writeConcernErrors to catch and deal with?
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
-        mongo_client.close()
+        #mongo_client.close()
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.${return_type}(
             ${arg0_name}._my_map,
@@ -493,7 +493,7 @@ class ResourceAdminSession:
         delete_result = collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         # any reason to raise:
             #raise errors.OperationFailed()
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
 
     alias_resources_template = """
@@ -533,7 +533,7 @@ class ResourceAgentSession:
             result = collection.find_one('SOMETHING HERE')
         if result is None:
             raise errors.NotFound()
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
     get_resource_by_agent = """
         # NOT DONE YET
@@ -552,7 +552,7 @@ class ResourceAgentSession:
             result = IdList([])
         else:
             result = IdList(resource['agentIds'])
-        mongo_client.close()
+        #mongo_client.close()
         return result"""
 
     get_agents_by_resource = """
@@ -593,7 +593,7 @@ class ResourceAgentAssignmentSession:
         else:
             resource['agentIds'].append(str(agent_id))
         collection.save(resource)
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
     unassign_agent_from_resource = """
         if agent_id is None or resource_id is None:
@@ -607,7 +607,7 @@ class ResourceAgentAssignmentSession:
         except (KeyError, ValueError):
             raise errors.NotFound('agent_id not assigned to resource')
         collection.save(resource)
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
 
 class BinLookupSession:
@@ -659,7 +659,7 @@ class BinLookupSession:
         if result is None:
             # Try creating an orchestrated ${cat_name}.  Let it raise errors.NotFound()
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_bins_by_ids_template = """
@@ -673,7 +673,7 @@ class BinLookupSession:
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
         count = collection.find({'_id': {'$$in': catalog_id_list}}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
@@ -684,7 +684,7 @@ class BinLookupSession:
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
         result = collection.find().sort('_id', DESCENDING)
         count = collection.count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class BinAdminSession:
@@ -770,7 +770,7 @@ class BinAdminSession:
             collection.find_one({'_id': insert_result.inserted_id}),
             db_prefix=self._db_prefix,
             runtime=self._runtime)
-        mongo_client.close()
+        #mongo_client.close()
         return result"""
 
     get_bin_form_for_update_template = """
@@ -787,7 +787,7 @@ class BinAdminSession:
             raise errors.NotFound()
         cat_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
-        mongo_client.close()
+        #mongo_client.close()
         return cat_form"""
 
     update_bin_template = """
@@ -812,7 +812,7 @@ class BinAdminSession:
         if result == "What to look for here???":
             pass # Need to figure out what writeConcernErrors to catch and deal with?
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
-        mongo_client.close()
+        #mongo_client.close()
         # Note: this is out of spec. The OSIDs don't require an object to be returned
         return objects.${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
@@ -834,7 +834,7 @@ class BinAdminSession:
             #raise errors.OperationFailed()
         if delete_result.deleted_count == 0:
             raise errors.NotFound()
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
     alias_bin_template = """
         # Implemented from template for

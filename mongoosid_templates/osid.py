@@ -400,7 +400,7 @@ class OsidSession:
         self._catalog = cat_class(self._my_catalog_map)
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
-        mongo_client.close()
+        #mongo_client.close()
 
     def _get_phantom_root_catalog(self, cat_name, cat_class):
         \"\"\"Get's the catalog id corresponding to the root of all implementation catalogs.\"\"\"
@@ -427,10 +427,10 @@ class OsidSession:
             foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
             collection = mongo_client[self._db_prefix + foreign_db_name][foreign_cat_name]
             if not collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())}):
-                mongo_client.close()
+                #mongo_client.close()
                 raise errors.NotFound()
         except KeyError:
-            mongo_client.close()
+            #mongo_client.close()
             raise errors.NotFound()
         collection = mongo_client[self._db_prefix + db_name][cat_name]
         catalog_map = {
@@ -448,7 +448,7 @@ class OsidSession:
 
         }
         collection.insert_one(catalog_map)
-        mongo_client.close()
+        #mongo_client.close()
         return catalog_map
 
     def _get_provider_manager(self, osid):

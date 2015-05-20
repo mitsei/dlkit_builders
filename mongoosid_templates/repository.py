@@ -37,7 +37,7 @@ class AssetAdminSession:
             pass # Need to figure out what writeConcernErrors to catch and deal with?
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         from .${return_module} import ${aggregated_object_name}
-        mongo_client.close()
+        #mongo_client.close()
         return ${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_asset_content_form_for_update_template = """
@@ -59,7 +59,7 @@ class AssetAdminSession:
         obj_form = ${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-        mongo_client.close()
+        #mongo_client.close()
         return obj_form"""
 
     update_asset_content_template = """
@@ -101,7 +101,7 @@ class AssetAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         from .objects import ${aggregated_object_name}
-        mongo_client.close()
+        #mongo_client.close()
         return ${aggregated_object_name}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     delete_asset_content_template = """
@@ -131,7 +131,7 @@ class AssetAdminSession:
             collection.save(${object_name_under})
         except: # what exceptions does mongodb save raise?
             raise errors.OperationFailed()
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
 
 class Asset:
@@ -211,7 +211,7 @@ class AssetContent:
     get_data = """
         dbase = mongo_client[self._db_prefix + 'repository']
         filesys = gridfs.GridFS(dbase)
-        mongo_client.close()
+        #mongo_client.close()
         return DataInputStream(filesys.get(self._my_map['data']))""" 
 
     additional_methods = """
@@ -221,7 +221,7 @@ class AssetContent:
         if self._my_map['data'] and filesys.exists(self._my_map['data']):
             filesys.delete(self._my_map['data'])
         osid_objects.OsidObject._delete(self)
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
 class AssetContentForm:
 
@@ -253,7 +253,7 @@ class AssetContentForm:
         self._my_map['data'] = filesys.put(data._my_data)
         data._my_data.seek(0)
         self._my_map['base64'] = base64.b64encode(data._my_data.read())
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
     clear_data = """
         if (self.get_data_metadata().is_read_only() or
@@ -266,4 +266,4 @@ class AssetContentForm:
         filesys.delete(self._my_map['data'])
         self._my_map['data'] = self._data_default
         del self._my_map['base64']
-        mongo_client.close()"""
+        #mongo_client.close()"""

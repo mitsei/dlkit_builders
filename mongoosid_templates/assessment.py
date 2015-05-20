@@ -115,7 +115,7 @@ class AssessmentSession:
         self._catalog = Bank(self._my_catalog_map)
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
-        mongo_client.close()
+        #mongo_client.close()
 """
 
     
@@ -141,7 +141,7 @@ class AssessmentSession:
             collection.save(assessment_taken_map)
         else:
             raise errors.IllegalState()
-        mongo_client.close()"""
+        #mongo_client.close()"""
     
     requires_synchronous_sections = """
         # NOTE: For now we are not really dealing with sections. Re-implement when we do.
@@ -183,7 +183,7 @@ class AssessmentSession:
             'bankId': str(self.get_bank_id()),
             'assessmentTakenId': str(assessment_taken_id)
             }
-        mongo_client.close()
+        #mongo_client.close()
         return objects.AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     has_next_assessment_section = """
@@ -335,7 +335,7 @@ class AssessmentSession:
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         if item_map is None:
             raise errors.NotFound()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.Question(item_map['question'], db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     get_questions = """
@@ -387,7 +387,7 @@ class AssessmentSession:
             runtime=self._runtime)
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
-        mongo_client.close()
+        #mongo_client.close()
         return obj_form"""
     
     submit_response = """
@@ -423,7 +423,7 @@ class AssessmentSession:
         except: # what exceptions does mongodb insert raise?
             raise errors.OperationFailed()
         self._forms[answer_form.get_id().get_identifier()] = SUBMITTED
-        mongo_client.close()"""
+        #mongo_client.close()"""
     
     skip_item = """
         #if (not self.has_assessment_section_begun(assessment_section_id) or
@@ -578,7 +578,7 @@ class AssessmentSession:
             collection.save(assessment_taken._my_map)
         else:
             raise errors.NotFound()
-        mongo_client.close()"""
+        #mongo_client.close()"""
     
     finish_assessment_section = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
@@ -603,7 +603,7 @@ class AssessmentSession:
             collection.save(assessment_taken_map)
         else:
             raise errors.IllegalState()
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
     
     is_answer_available = """
@@ -628,7 +628,7 @@ class AssessmentSession:
             return objects.AnswerList(item_map['answers'], db_prefix=self._db_prefix, runtime=self._runtime)
         else:
             raise errors.IllegalState()
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
 
 class ItemAdminSession:
@@ -659,12 +659,10 @@ class ItemAdminSession:
         if item_map is None:
             raise errors.NotFound()
         objects.Item(item_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
-        result = collection.delete_one({'_id': ObjectId(item_id.get_identifier())})
-        if 'err' in result and result['err'] is not None:
-            raise errors.OperationFailed()
-        if result['n'] == 0:
+        delete_result = collection.delete_one({'_id': ObjectId(item_id.get_identifier())})
+        if delete_result.deleted_count == 0:
             raise errors.NotFound()
-        mongo_client.close()"""
+        #mongo_client.close()"""
     
     # These methods overwrite the canonical aggregate object admin methods to
     # deal with authoring Questions with are special: ie. there is only one per
@@ -701,7 +699,7 @@ class ItemAdminSession:
         if result == "What to look for here???":
             pass # Need to figure out what writeConcernErrors to catch and deal with?
         self._forms[question_form.get_id().get_identifier()] = CREATED
-        mongo_client.close()
+        #mongo_client.close()
         return objects.Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     get_question_form_for_update = """
@@ -717,7 +715,7 @@ class ItemAdminSession:
         obj_form = objects.QuestionForm(document['question'], self._db_prefix, runtime=self._runtime)
         #obj_form._for_update = True # This seems redundant
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-        mongo_client.close()
+        #mongo_client.close()
         return obj_form"""
     
     update_question = """
@@ -745,7 +743,7 @@ class ItemAdminSession:
             raise errors.OperationFailed()
         self._forms[question_form.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
-        mongo_client.close()
+        #mongo_client.close()
         return objects.Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
@@ -771,12 +769,10 @@ class AssessmentAdminSession:
         if collection.find({'assessmentId': str(assessment_id)}).count() != 0:
             raise errors.IllegalState('there are still AssessmentsOffered associated with this Assessment')
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
-        result = collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
-        if 'err' in result and result['err'] is not None:
-            raise errors.OperationFailed()
-        if result['n'] == 0:
+        delete_result = collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
+        if delete_result.deleted_count == 0:
             raise errors.NotFound()
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
 class AssessmentTakenLookupSession:
     
@@ -804,7 +800,7 @@ class AssessmentTakenLookupSession:
                                       'takingAgentId': str(resource_id)}).sort('_id', DESCENDING)
             count = collection.find({'assessmentOfferedId': str(assessment_offered_id),
                                      'takingAgentId': str(resource_id)}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.AssessmentTakenList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     get_assessments_taken_for_assessment = """
@@ -836,7 +832,7 @@ class AssessmentTakenLookupSession:
         else:
             result = collection.find({'assessmentOfferedId': {"$in":[ao_ids]}}).sort('_id', DESCENDING)
             count = collection.find({'assessmentOfferedId': {"$in":[ao_ids]}}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.AssessmentTakenList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
@@ -888,7 +884,7 @@ class AssessmentOfferedAdminSession:
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        mongo_client.close()
+        #mongo_client.close()
         return obj_form"""
 
 class AssessmentTakenAdminSession:
@@ -943,7 +939,7 @@ class AssessmentTakenAdminSession:
         # what exceptions does mongodb insert_one raise?
             #raise errors.OperationFailed()
         self._forms[assessment_taken_form.get_id().get_identifier()] = CREATED
-        mongo_client.close()
+        #mongo_client.close()
         return objects.AssessmentTaken(
             collection.find_one({'_id': insert_result.inserted_id}), db_prefix=self._db_prefix, runtime=self._runtime)"""
 
@@ -993,7 +989,7 @@ class AssessmentBasicAuthoringSession:
         # This appears to assume that all the Items exist. Need to consider this further:
         for i in assessment['itemIds']:
             item_list.append(collection.find_one({'_id': ObjectId(Id(i).get_identifier())}))
-        mongo_client.close()
+        #mongo_client.close()
         return objects.ItemList(item_list, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     add_item = """
@@ -1012,7 +1008,7 @@ class AssessmentBasicAuthoringSession:
         else:
             assessment['itemIds'].append(str(item_id))
         collection.save(assessment)
-        mongo_client.close()"""
+        #mongo_client.close()"""
     
     remove_item = """
         if assessment_id is None or item_id is None:
@@ -1026,7 +1022,7 @@ class AssessmentBasicAuthoringSession:
         except (KeyError, ValueError):
             raise errors.NotFound('item_id not found on assessment')
         collection.save(assessment)
-        mongo_client.close()"""
+        #mongo_client.close()"""
     
     move_item = """
         if assessment_id is None or item_id is None or preceeding_item_id is None:
@@ -1045,7 +1041,7 @@ class AssessmentBasicAuthoringSession:
             raise errors.NotFound('item_id not associated with assessment')
         assessment['itemIds'].insert(str(item_id), p_index + 1)
         collection.save(assessment)
-        mongo_client.close()"""
+        #mongo_client.close()"""
     
     order_items = """
     ## STILL NOT DONE???
@@ -1071,7 +1067,7 @@ class AssessmentBasicAuthoringSession:
             item_id_list.append(str(i))
         assessment['itemIds'] = item_id_list
         collection.save(assessment)
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
 
 class Question:
@@ -1348,7 +1344,7 @@ class AssessmentTaken:
             self._my_map['responses'][Id(item_idstr).get_identifier()] = None
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
         collection.save(self._my_map)
-        mongo_client.close()
+        #mongo_client.close()
     
     def _get_question(self, item_id):
         from .. import mongo_client
@@ -1359,7 +1355,7 @@ class AssessmentTaken:
         question = Item(item_map).get_question()
         if self._my_map['itemConfigs][str(item_id)]:
             question.config(self._my_map['itemConfigs][str(item_id)])
-        mongo_client.close()
+        #mongo_client.close()
         return question"""
 
 

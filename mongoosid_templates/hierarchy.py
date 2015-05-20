@@ -317,7 +317,7 @@ class HierarchyAdminSession:
             raise errors.OperationFailed()
         if result['n'] == 0:
             raise errors.NotFound()
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
 class Hierarchy:
 

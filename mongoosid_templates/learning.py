@@ -30,7 +30,7 @@ class ObjectiveRequisiteSession:
         ## I LEFT OFF HERE - THERE'S A WAY TO RETURN ONLY DEST IDS I THINK
         result = collection.find({'_id': {'$$in': catalog_id_list}})
         count = collection.find({'_id': {'$$in': catalog_id_list}}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, count)"""
 
 
@@ -99,7 +99,7 @@ class ObjectiveAdminSession:
         #    raise errors.OperationFailed()
         #if result['n'] == 0:
         #    raise errors.NotFound()
-        mongo_client.close()"""
+        #mongo_client.close()"""
 
 
 class ActivityLookupSession:
@@ -124,7 +124,7 @@ class ActivityLookupSession:
         else:
             result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})})
             count = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${return_type}(result, count=count, runtime=self._runtime)"""
 
 
