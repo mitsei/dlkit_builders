@@ -585,7 +585,7 @@ class ResourceAgentAssignmentSession:
             raise errors.NullArgument()
         # Should check for existence of Agent? We may mever manage them.
         collection = mongo_client[self._db_prefix + 'resource']['Resource']
-        resource = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
+        resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
         if not resource:
             raise errors.NotFound()
         if 'agentIds' not in resource:
@@ -599,7 +599,7 @@ class ResourceAgentAssignmentSession:
         if agent_id is None or resource_id is None:
             raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'resource']['Resource']
-        resource = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
+        resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
         if not resource:
             raise errors.NotFound()
         try:

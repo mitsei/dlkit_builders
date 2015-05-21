@@ -67,7 +67,7 @@ class AssessmentSession:
         'from .rules import Response',
         'from ..osid.sessions import OsidSession',
         'SUBMITTED = True',
-        ]
+    ]
     
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
@@ -182,7 +182,7 @@ class AssessmentSession:
             'recordTypeIds': [],
             'bankId': str(self.get_bank_id()),
             'assessmentTakenId': str(assessment_taken_id)
-            }
+        }
         #mongo_client.close()
         return objects.AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
@@ -225,7 +225,7 @@ class AssessmentSession:
             'recordTypeIds': [],
             'bankId': str(self.get_bank_id()),
             'assessmentTakenId': str(assessment_taken.get_id())
-            }
+        }
         return objects.AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     get_assessment_sections = """
@@ -437,8 +437,8 @@ class AssessmentSession:
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
-        if item_id.get_identifer() in responses:
-            return bool(responses[item_id.get_identifer()])
+        if item_id.get_identifier() in responses:
+            return bool(responses[item_id.get_identifier()])
         else:
             raise errors.NotFound()"""
     
@@ -625,10 +625,10 @@ class AssessmentSession:
             item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
             if item_map is None:
                 raise errors.NotFound()
+            #mongo_client.close()
             return objects.AnswerList(item_map['answers'], db_prefix=self._db_prefix, runtime=self._runtime)
         else:
-            raise errors.IllegalState()
-        #mongo_client.close()"""
+            raise errors.IllegalState()"""
 
 
 class ItemAdminSession:
@@ -649,7 +649,7 @@ class ItemAdminSession:
         if item_id is None:
             raise errors.NullArgument()
         if not isinstance(item_id, ABCId):
-            return InvalidArgument('the argument is not a valid OSID Id')
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         # This needs to be updated to actually check for AssessmentsTaken (and does that find even work?)
         if collection.find({'itemIds': str(item_id)}).count() != 0:
@@ -847,7 +847,7 @@ class AssessmentOfferedAdminSession:
     
     deprecated_get_assessment_offered_form_for_create = """
         ##
-        # This impl differs from the usual get_osid_object_form_for_creat method in that it
+        # This impl differs from the usual get_osid_object_form_for_create method in that it
         # sets a default display name based on the underlying Assessment...
         from ...abstract_osid.id.primitives import Id as ABCId
         from ...abstract_osid.type.primitives import Type as ABCType

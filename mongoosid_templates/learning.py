@@ -80,18 +80,18 @@ class ObjectiveAdminSession:
 
     delete_objective_template = """
         # Implemented from template for
-        # osid.learning.ObjectiveAdminSession.delete_activity_template
+        # osid.learning.ObjectiveAdminSession.delete_objective_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         if ${arg0_name} is None:
             raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         collection = mongo_client[self._db_prefix + '${package_name}']['${dependent_object_name}']
         if collection.find({'${object_name_mixed}Id': str(${arg0_name})}).count() != 0:
             raise errors.IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         delete_result = collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-        if delete_result.delete_count == 0:
+        if delete_result.deleted_count == 0:
             raise errors.NotFound
         # any reason to raise:
             #raise errors.OperationFailed()
