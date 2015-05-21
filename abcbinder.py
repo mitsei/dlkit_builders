@@ -54,6 +54,8 @@ def make_abcosid(file_name):
     package = json.load(read_file)
     read_file.close()
     
+    print "Building ABC osid for " + package['name']
+
     importStr = 'import abc\n'
     bodyStr = ''
     ##
