@@ -763,7 +763,7 @@ def make_method(package_name, method, interface, patterns):
     method_impl = make_method_impl(package_name, method, interface, patterns)
 
     for arg in method['args']:
-        args.append(arg['var_name'] + '=None')
+        args.append(arg['var_name'])
     method_sig = ('    def ' + method['name'] + '(' +
                 ', '.join(args) + '):')
 
@@ -952,7 +952,7 @@ def make_method_impl(package_name, method, interface, patterns):
                                     kwargs['return_type'] + '\n')  ### WHY DO WE NEED import_str???
 
 # Uncomment next line to identify on which method a KeyError is occuring
-        print interface['shortname'], method['name']
+        #print interface['shortname'], method['name']
 
         impl = template.substitute(kwargs).strip('\n')
     if impl == '':

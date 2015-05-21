@@ -35,7 +35,7 @@ class ResourceManager:
         ${pkg_name_caps}Profile.__init__(self)
 
     def _initialize_provider(self, manager):
-        ${pkg_name_caps}Profile._initialize_provider(manager)
+        ${pkg_name_caps}Profile._initialize_provider(self, manager)
 """
 
     get_resource_lookup_session_template = """
@@ -55,7 +55,7 @@ class ResourceProxyManager:
         ${pkg_name_caps}Profile.__init__(self)
 
     def _initialize_provider(self, manager):
-        ${pkg_name_caps}Profile._initialize_provider(manager)
+        ${pkg_name_caps}Profile._initialize_provider(self, manager)
 """
 
     get_resource_lookup_session_template = """
