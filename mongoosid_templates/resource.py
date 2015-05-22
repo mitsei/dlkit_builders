@@ -536,7 +536,7 @@ class ResourceAgentSession:
                                           '${cat_name_mixed}Id': str(self._catalog_id)})
         else:
             # This should really look in the underlying hierarchy (when hierarchy is implemented)
-            result = collection.find_one({'$in': {'agentIds': str(agent_id)})
+            result = collection.find_one({'$in': {'agentIds': str(agent_id)}})
         if result is None:
             raise errors.NotFound()
         return objects.Resource(
