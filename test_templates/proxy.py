@@ -1,147 +1,88 @@
 
-from .error_lists import session_errors
-
 class ProxyManager:
 
     init = """
-    def __init__(self):
-        osid_managers.OsidManager.__init__(self)
 """
 
 class ProxyProxyManager:
 
     init = """
-    def __init__(self):
-        osid_managers.OsidProxyManager.__init__(self)
 """
 
 class ProxySession:
 
     import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import rules',
-        'from ..authentication_process.objects import Authentication'
     ]
 
     init = """
-    def __init__(self, proxy=None, runtime=None):
-        self._proxy = proxy
-        self._runtime = runtime"""
+"""
 
     get_proxy_condition = """
-        return rules.ProxyCondition()"""
+        pass"""
 
     get_proxy = """
-        if input_._http_request is not None:
-            authentication = Authentication()
-            authentication.set_django_user(input_._http_request.user)
-        else:
-            authentication = None
-        effective_agent_id = input_._effective_agent_id
-        # Also need to deal with effective dates and Local
-        return rules.Proxy(authentication=authentication,
-                           effective_agent_id=effective_agent_id)"""
+        pass"""
 
 class Proxy:
 
     import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id'
     ]
 
     init = """
-    def __init__(self,
-                 authentication=None,
-                 effective_agent_id=None,
-                 effective_date=None,
-                 effective_clock_rate=None,
-                 locale=None,
-                 format_type=None):
-        self._authentication = authentication
-        self._effective_agent_id = effective_agent_id
-        self._effective_date = effective_date
-        self._effective_clock_rate = effective_clock_rate
-        self._locale = locale
-        self._format_type = format_type
 """
 
     has_authentication = """
-        return bool(self._authentication)"""
+        pass"""
 
     get_authentication = """
-        if self.has_authentication():
-            return self._authentication
-        else:
-            raise errors.IllegalState()"""
+        pass"""
 
     has_effective_agent = """
-        return bool(self._effective_agent_id)"""
+        pass"""
 
     get_effective_agent_id = """
-        if self.has_effective_agent():
-            return self._effective_agent_id
-        else:
-            raise errors.IllegalState()"""
+        pass"""
 
     get_effective_agent = """
-        raise errors.Unimplemented"""
+        pass"""
 
     has_effective_date = """
-        return bool(self._authentication)"""
+        pass"""
 
     get_effective_date = """
-        if self.has_effective_date():
-            return self._effective_date
-        else:
-            raise errors.IllegalState()"""
+        pass"""
 
     get_effective_clock_rate = """
-        if self.has_effective_date():
-            return self._effective_clock_rate
-        else:
-            raise errors.IllegalState()"""
+        pass"""
 
     get_locale = """
-        return self._locale"""
+        pass"""
 
     has_format_type = """
-        return bool(self._format_type)"""
+        pass"""
 
     get_format_type = """
-        if self.has_format_type():
-            return self._format_type
-        else:
-            raise errors.IllegalState()"""
+        pass"""
 
 class ProxyCondition:
 
     init = """
-    def __init__(self):
-        self._effective_agent_id = None
-        self._language_type = None
-        self._script_type = None
-        self._calendar_type = None
-        self._time_type = None
-        self._currency_type = None
-        self._unit_system_type = None
-        self._format_type = None
-        self._http_request = None
 """
 
     set_effective_agent_id = """
-        self._effective_agent_id = agent_id"""
+        pass"""
 
     set_effective_date = """
-        raise errors.Unimplemented()"""
+        pass"""
 
     set_language_type = """
-        self._language_type = language_type"""
+        pass"""
 
     set_script_type = """
-        self._script_type = script_type"""
+        pass"""
 
     set_calendar_type = """
-        self._calendar_type = calendar_type"""
+        pass"""
 
     set_time_type = """
         self._time_type = time_type"""

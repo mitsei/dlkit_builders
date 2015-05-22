@@ -503,6 +503,10 @@ class ResourceAdminSession:
 
 class ResourceAgentSession:
 
+    import_statements = [
+        'from .simple_agent import Agent'
+    ]
+
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         self._catalog_class = objects.Bin
@@ -520,7 +524,9 @@ class ResourceAgentSession:
 """
 
     get_resource_id_by_agent = """
-        # NOT DONE YET
+        return self.get_resource_by_agent(agent_id).get_id()"""
+
+    get_resource_by_agent = """
         if agent_id is None:
             raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'resource']['Resource']
@@ -530,16 +536,14 @@ class ResourceAgentSession:
                                           '${cat_name_mixed}Id': str(self._catalog_id)})
         else:
             # This should really look in the underlying hierarchy (when hierarchy is implemented)
-            result = collection.find_one('SOMETHING HERE')
+            result = collection.find_one({'$in': {'agentIds': str(agent_id)})
         if result is None:
             raise errors.NotFound()
-        mongo_client.close()"""
-
-    get_resource_by_agent = """
-        # NOT DONE YET
-        if agent_id is None:
-            raise errors.NullArgument()
-        collection = mongo_client[self._db_prefix + 'resource']['Resource']"""
+        return objects.Resource(
+            result,
+            db_prefix=self._db_prefix,
+            runtime=self._runtime)
+        #mongo_client.close()"""
 
     get_agent_ids_by_resource = """
         if resource_id is None:
