@@ -116,6 +116,8 @@ def map_manager_patterns(interface, package, index):
                                 support_check = method['name'][4:].split('_session')[0],
                                 arg0_name = method['args'][0]['var_name'],
                                 arg0_type_full = method['args'][0]['arg_type'],
+                                arg1_name = method['args'][1]['var_name'],
+                                arg1_type_full = method['args'][1]['arg_type'],
                                 return_type_full = method['return_type'],
                                 cat_name = index['package_catalog_caps']))
 

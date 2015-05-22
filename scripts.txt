@@ -22,6 +22,9 @@ make_awsosids()
 from builders.managerutilbuilder import make_mgr_util_osids
 make_mgr_util_osids()
 
+from builders.managerdelbuilder import make_mgr_util_osids
+make_mgr_util_osids()
+
 from builders.fedbuilder import make_fedosids
 make_fedosids()
 

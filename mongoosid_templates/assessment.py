@@ -659,10 +659,8 @@ class ItemAdminSession:
         if item_map is None:
             raise errors.NotFound()
         objects.Item(item_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
-        result = collection.delete_one({'_id': ObjectId(item_id.get_identifier())})
-        if 'err' in result and result['err'] is not None:
-            raise errors.OperationFailed()
-        if result['n'] == 0:
+        delete_result = collection.delete_one({'_id': ObjectId(item_id.get_identifier())})
+        if delete_result.deleted_count == 0:
             raise errors.NotFound()
         #mongo_client.close()"""
     
@@ -771,8 +769,8 @@ class AssessmentAdminSession:
         if collection.find({'assessmentId': str(assessment_id)}).count() != 0:
             raise errors.IllegalState('there are still AssessmentsOffered associated with this Assessment')
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
-        deleted_result = collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
-        if deleted_result.deleted_count == 0:
+        delete_result = collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
+        if delete_result.deleted_count == 0:
             raise errors.NotFound()
         #mongo_client.close()"""
 
