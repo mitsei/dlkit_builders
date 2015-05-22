@@ -659,10 +659,8 @@ class ItemAdminSession:
         if item_map is None:
             raise errors.NotFound()
         objects.Item(item_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
-        result = collection.delete_one({'_id': ObjectId(item_id.get_identifier())})
-        if 'err' in result and result['err'] is not None:
-            raise errors.OperationFailed()
-        if result['n'] == 0:
+        delete_result = collection.delete_one({'_id': ObjectId(item_id.get_identifier())})
+        if delete_result.deleted_count == 0:
             raise errors.NotFound()
         #mongo_client.close()"""
     
