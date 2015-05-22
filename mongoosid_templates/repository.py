@@ -200,7 +200,10 @@ class AssetContent:
 
     has_url_template = """
         # Implemented from template for osid.repository.AssetContent.has_url_template
-        return bool(self._my_map['${var_name_mixed}'])"""
+        try:
+            return bool(self._my_map['${var_name_mixed}'])
+        except KeyError:
+            return False"""
 
     get_url_template = """
         # Implemented from template for osid.repository.AssetContent.get_url_template
