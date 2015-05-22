@@ -53,7 +53,9 @@ def make_abcosid(file_name):
     read_file = open(file_name, 'r')
     package = json.load(read_file)
     read_file.close()
-    
+
+    print 'Building obc_osids for ' + package['name']
+
     importStr = 'import abc\n'
     bodyStr = ''
     ##
