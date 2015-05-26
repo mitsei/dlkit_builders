@@ -1,4 +1,13 @@
 
+class RepositoryProfile:
+
+    get_coordinate_types_template = """
+        self.assertTrue(isinstance(self.mgr.${method_name}(), abc_type_list))"""
+
+    supports_coordinate_type_template = """
+        self.assertTrue(isinstance(self.mgr.${method_name}(DEFAULT_TYPE), bool))"""
+
+
 class AssetAdminSession:
 
     import_statements_pattern = [

@@ -1,3 +1,9 @@
+from .resource import ResourceLookupSession
+
+class CommentLookupSession:
+
+    init_template = ResourceLookupSession.init_template
+
 class CommentAdminSession:
 
     get_comment_form_for_create_template = """

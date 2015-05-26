@@ -17,7 +17,7 @@ def map_session_patterns(interface, package, index):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'
     elif (interface['shortname'].endswith('LookupSession') and
         interface['shortname'][:-13] in index['package_relationships_caps']):
-        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceLookupSession'
+        index[interface['shortname'] + '.init_pattern'] = 'commenting.CommentLookupSession'
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_relationships_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'

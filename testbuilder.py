@@ -490,6 +490,10 @@ def make_init_methods(interface_name, package, patterns):
         object_name = interface_name[:-4]
     elif init_pattern == 'resource.ResourceLookupSession':
         object_name = interface_name[:-13]
+    elif init_pattern == 'commenting.CommentLookupSession':
+        object_name = interface_name[:-13]
+    elif init_pattern == 'resource.ResourceAdminSession':
+        object_name = interface_name[:-12]
     elif init_pattern == 'resource.Resource':
         object_name = interface_name
     #     try:
@@ -557,8 +561,8 @@ def make_init_methods(interface_name, package, patterns):
                                         'object_name_under_plural': camel_to_under(make_plural(object_name)),
                                         'cat_name': cat_name,
                                         'cat_name_plural': make_plural(cat_name),
-                                        'cat_name_under': cat_name.lower(),
-                                        'cat_name_under_plural': make_plural(cat_name).lower(),
+                                        'cat_name_under': camel_to_under(cat_name),
+                                        'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
                                         'cat_name_upper': cat_name.upper(),
                                         'init_object': init_object,
                                         'svc_mgr_or_catalog': svc_mgr_or_catalog})

@@ -36,6 +36,9 @@ def make_mgr_util_osids(build_abc = False, re_index = False, re_map = False):
     It processes all of the osid maps in the package maps directory.
     
     """
+
+    return "We are not building this one just yet"
+
     from abcbinder import make_abcosids
     if build_abc:
         make_abcosids(re_index, re_map)
@@ -149,7 +152,7 @@ def make_mgr_util_osid(file_name):
     ##
     # Initialize the module doc
     for module in modules:
-        docstr = '\"\"\"Mongodb implementations of ' + package['name'] + ' ' + module + '.\"\"\"\n'
+        docstr = '\"\"\"Manager delegation implementations of ' + package['name'] + ' ' + module + '.\"\"\"\n'
         modules[module]['imports'].append(docstr)
         pylintstr = (
             '# pylint: disable=no-init\n' +

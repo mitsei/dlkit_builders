@@ -35,7 +35,7 @@ def map_manager_patterns(interface, package, index):
                               var_name = method['name']))
                 
         ##
-        # Profile methods that test whether a particulaar session is supported.
+        # Profile methods that test whether a particular session is supported.
         elif (method['name'].startswith('supports') and 
               method['return_type'] == 'boolean' and
               not method['args']):
@@ -75,6 +75,34 @@ def map_manager_patterns(interface, package, index):
                                 method_name = method['name'],
                                 var_name = method['name'][4:],
                                 object_name_under = method['name'][4:-13]))
+
+        ##
+        # Profile methods that test whether a particulaar Type is supported.
+        elif (method['name'].startswith('supports') and 
+              method['name'].endswith('type') and
+              method['return_type'] == 'boolean' and
+              'osid.type.Type' in method['arg_types']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = 'repository.RepositoryProfile.supports_coordinate_type',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name'],
+                                var_name = method['name'][9:],
+                                arg0_name = method['args'][0]['var_name']))
+
+        ##
+        # Profile methods to get the supported Types.
+        elif (method['name'].startswith('get') and 
+              method['name'].endswith('types') and
+              method['return_type'] == 'osid.type.TypeList'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = 'repository.RepositoryProfile.get_coordinate_types',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name'],
+                                var_name = method['name'][4:]))
 
 
 
@@ -124,8 +152,7 @@ def map_manager_patterns(interface, package, index):
         ##
         # ProxyManager methods to get manager for a related service
         elif (method['name'].startswith('get') and 
-              method['name'].endswith('proxy_manager') and
-              'osid.proxy.Proxy' in method['arg_types']):
+              method['name'].endswith('proxy_manager')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = 'resource.ResourceProxyManager.get_resource_batch_proxy_manager',
                   kwargs = dict(interface_name = interface['shortname'],
