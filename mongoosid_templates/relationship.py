@@ -18,7 +18,7 @@ class RelationshipLookupSession:
         else:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${source_name_mixed}Id': str(${arg0_name})}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_source_template = """
@@ -38,7 +38,7 @@ class RelationshipLookupSession:
                                       'genusTypeId': str(${arg1_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                      'genusTypeId': str(${arg1_name})}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_for_destination_template = """
@@ -54,7 +54,7 @@ class RelationshipLookupSession:
         else:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${destination_name_mixed}Id': str(${arg0_name})}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_destination_template = """
@@ -74,7 +74,7 @@ class RelationshipLookupSession:
                                       'genusTypeId': str(${arg1_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                      'genusTypeId': str(${arg1_name})}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_for_peers_template = """
@@ -94,7 +94,7 @@ class RelationshipLookupSession:
                                       '${destination_name_mixed}Id': str(${arg1_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                      '${destination_name_mixed}Id': str(${arg1_name})}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_peers_template = """
@@ -118,7 +118,7 @@ class RelationshipLookupSession:
             count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                      '${destination_name_mixed}Id': str(${arg1_name}),
                                      'genusTypeId': str(${arg2_name})}).count()
-        mongo_client.close()
+        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
 class RelationshipAdminSession:
