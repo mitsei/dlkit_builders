@@ -1,8 +1,21 @@
 
 class RelationshipLookupSession:
 
-    import_statements_pattern = [
-        'from . import objects'
+    potential_import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
+        'from ..osid.sessions import OsidSession',
+        'from .. import mongo_client',
+        'from . import objects',
+        'from bson.objectid import ObjectId',
+        'DESCENDING = -1',
+        'ASCENDING = 1',
+        'COMPARATIVE = 0',
+        'PLENARY = 1',
+        'FEDERATED = 0',
+        'ISOLATED = 1',
+        'CREATED = True',
+        'UPDATED = True'
     ]
 
     get_relationships_for_source_template = """

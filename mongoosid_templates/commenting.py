@@ -1,3 +1,11 @@
+from .resource import ResourceLookupSession
+
+class CommentLookupSession:
+
+    import_statements_pattern = ResourceLookupSession.import_statements_pattern
+
+    init_template = ResourceLookupSession.init_template
+
 class CommentAdminSession:
 
     get_comment_form_for_create_template = """

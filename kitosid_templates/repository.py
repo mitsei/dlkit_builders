@@ -1,4 +1,19 @@
 
+class RepositoryProfile:
+
+    get_coordinate_types_template = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.repository.RepositoryProfile.get_coordinate_types
+        return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
+
+    supports_coordinate_type_template = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.repository.RepositoryProfile.supports_coordinate_type
+        return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
+
+
 class AssetAdminSession:
 
     # Why is this one not a template???

@@ -29,17 +29,16 @@ include_inheritance = False
 def make_abcosids(re_index = False, re_map = False):
     from mappers import make_xosid_map
     from mappers import make_interface_map
-    
     for xosid_file in os.listdir(xosid_dir):
         package = None
         if xosid_file.endswith(xosid_suffix):
             if (not os.path.exists(pkg_maps_dir + '/' +
-                xosid_file.split('.')[-3] + '.json') or re_map == True):
-                #print 'mapping', xosid_file.split('.')[-3], 'osid.'
+                xosid_file.split('.')[-2] + '.json') or re_map == True):
+                print 'mapping', xosid_file.split('.')[-2], 'osid.'
                 package = make_xosid_map(xosid_dir + '/' + xosid_file)
             if (not os.path.exists(interface_maps_dir + '/' +
-                xosid_file.split('.')[-3] + '.json') or re_index == True):
-                #print 'indexing interfaces for', xosid_file.split('.')[-3], 'osid.'
+                xosid_file.split('.')[-2] + '.json') or re_index == True):
+                print 'indexing interfaces for', xosid_file.split('.')[-2], 'osid.'
                 make_interface_map(xosid_dir + '/' + xosid_file, package)
     for json_file in os.listdir(pkg_maps_dir):
         if json_file.endswith('.json'):

@@ -412,7 +412,7 @@ def make_module_imports(interface_name, package, patterns):
             if hasattr(templates, init_pattern.split('.')[-1]):
                 template_class = getattr(templates, init_pattern.split('.')[-1])
                 if hasattr(template_class, 'import_statements_pattern'):
-                    #print 'FOUND import_statements_pattern', package['name'], interface_name
+                    #print 'FOUND import_statements_pattern', package['name'], init_pattern
                     return getattr(template_class, 'import_statements_pattern')
                 else:
                     #print 'import_statements_pattern not found
@@ -507,6 +507,8 @@ def make_init_methods(interface_name, package, patterns):
         object_name = interface_name[:-4]
     elif init_pattern == 'resource.ResourceLookupSession':
         object_name = interface_name[:-13]
+    elif init_pattern == 'commenting.CommentLookupSession':
+        object_name = interface_name[:-13]
     elif init_pattern == 'resource.Resource':
         object_name = interface_name
         try:
@@ -563,8 +565,8 @@ def make_init_methods(interface_name, package, patterns):
                                         'object_name_upper': camel_to_under(object_name).upper(),
                                         'cat_name': cat_name,
                                         'cat_name_plural': make_plural(cat_name),
-                                        'cat_name_under': cat_name.lower(),
-                                        'cat_name_under_plural': make_plural(cat_name).lower(),
+                                        'cat_name_under': camel_to_under(cat_name),
+                                        'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
                                         'cat_name_upper': cat_name.upper(),
                                         'init_object': init_object})
         else:
@@ -1065,6 +1067,10 @@ SUPPORTS = [ # Uncomment the following lines when implementations exist:
             # Check to see if someone activited support by hand
             elif method['name'] in old_supports:
                 comment = ''
+            ##
+            # Check to see if someone de-activited support by hand
+            elif method['name'] not in old_supports:
+                comment = '#'
             else: # Add check for session implementation flags here
                 comment = '#'
             supports_str = supports_str + ',\n    ' + comment + '\'' + method['name'] +'\''

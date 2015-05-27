@@ -133,17 +133,19 @@ class ResourceLookupSession:
             create_form = cls.catalog.get_${object_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + str(num)
             create_form.description = 'Test ${object_name} for ${interface_name} tests'
-            object = cls.catalog.create_${object_name_under}(create_form)
-            cls.${object_name_under}_list.append(object)
-            cls.${object_name_under}_ids.append(object.ident)
+            obj = cls.catalog.create_${object_name_under}(create_form)
+            cls.${object_name_under}_list.append(obj)
+            cls.${object_name_under}_ids.append(obj.ident)
 
     @classmethod
     def tearDownClass(cls):
-        for object in cls.catalog.get_${object_name_under_plural}():
-            cls.catalog.delete_${object_name_under}(object.ident)
+        #for obj in cls.catalog.get_${object_name_under_plural}():
+        #    cls.catalog.delete_${object_name_under}(obj.ident)
         #for catalog in cls.catalogs:
         #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
+            for obj in catalog.get_${object_name_under_plural}():
+                catalog.delete_${object_name_under}(obj.ident)
             cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
 """
 
@@ -245,6 +247,12 @@ class ResourceAdminSession:
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_${object_name_under_plural}():
+            cls.catalog.delete_${object_name_under}(obj.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)
 """
 
     can_create_resources_template = """

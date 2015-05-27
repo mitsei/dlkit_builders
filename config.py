@@ -28,6 +28,7 @@ packages_to_test = [
 
 managers_to_implement = [
     'assessment',
+    'authorization',
     'commenting',
     'grading',
     'hierarchy',

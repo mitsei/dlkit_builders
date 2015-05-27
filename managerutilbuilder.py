@@ -149,7 +149,7 @@ def make_mgr_util_osid(file_name):
     ##
     # Initialize the module doc
     for module in modules:
-        docstr = '\"\"\"Mongodb implementations of ' + package['name'] + ' ' + module + '.\"\"\"\n'
+        docstr = '\"\"\"Manager utility implementations of ' + package['name'] + ' ' + module + '.\"\"\"\n'
         modules[module]['imports'].append(docstr)
         pylintstr = (
             '# pylint: disable=no-init\n' +
