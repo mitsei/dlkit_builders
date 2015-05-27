@@ -45,7 +45,7 @@ def map_patterns(package, index, base_package=None):
         ##
         # Find all OsidObject names in this package
         if (interface['category'] == 'objects' and
-            'OsidObject' in interface['inherit_shortnames']):
+                'OsidObject' in interface['inherit_shortnames']):
             if not interface['shortname'] in object_names_caps:
                 object_names_caps.append(interface['shortname'])
             if not camel_to_under(interface['shortname']) in object_names_under:
@@ -83,12 +83,12 @@ def map_patterns(package, index, base_package=None):
                 third_method = interface['methods'][2]
                 fourth_method = interface['methods'][3]
                 if (first_method['name'] == second_method['name'] + '_id' and
-                    third_method['name'] == fourth_method['name'] + '_id'):
+                        third_method['name'] == fourth_method['name'] + '_id'):
                     relationships_detail[camel_to_under(interface['shortname'])] = {
-                    'source_name': second_method['name'][4:],
-                    'source_type': second_method['return_type'],
-                    'destination_name': fourth_method['name'][4:],
-                    'destination_type': fourth_method['return_type']                        
+                        'source_name': second_method['name'][4:],
+                        'source_type': second_method['return_type'],
+                        'destination_name': fourth_method['name'][4:],
+                        'destination_type': fourth_method['return_type']
                     }
                     #if second_method['return_type'] == 'osid.resource.Resource' or fourth_method['return_type'] == 'osid.resource.Resource':
                     #    print "RESOURCE TYPE FOUND IN", interface['shortname']
@@ -96,12 +96,12 @@ def map_patterns(package, index, base_package=None):
                     #index[interface['shortname'] + '.relationship_destination'][fourth_method['name'][4:]] = fourth_method['return_type']         
                     print '    2 args source =', second_method['name'][4:], 'dest =', fourth_method['name'][4:]
                 elif (first_method['name'] == second_method['name'] + '_id' and
-                    third_method['name'].endswith('_id')):
+                        third_method['name'].endswith('_id')):
                     relationships_detail[camel_to_under(interface['shortname'])] = {
-                    'source_name': second_method['name'][4:],
-                    'source_type': second_method['return_type'],
-                    'destination_name': third_method['name'][4:-3],
-                    'destination_type': 'UNKNOWN'                        
+                        'source_name': second_method['name'][4:],
+                        'source_type': second_method['return_type'],
+                        'destination_name': third_method['name'][4:-3],
+                        'destination_type': 'UNKNOWN'
                     }
                     #if second_method['return_type'] == 'osid.resource.Resource':
                     #    print "RESOURCE TYPE FOUND IN", interface['shortname']
@@ -109,12 +109,12 @@ def map_patterns(package, index, base_package=None):
                     #index[interface['shortname'] + '.relationship_destination'][third_method['name'][4:-3]] = 'UNKNOWN'         
                     print '    1 arg source =', second_method['name'][4:], 'dest =', third_method['name'][4:-3]
                 elif (first_method['name'].endswith('_id') and
-                    second_method['name'] == third_method['name'] + '_id'):
+                        second_method['name'] == third_method['name'] + '_id'):
                     relationships_detail[camel_to_under(interface['shortname'])] = {
-                    'source_name': first_method['name'][4:-3],
-                    'source_type': 'UNKNOWN',
-                    'destination_name': third_method['name'][4:],
-                    'destination_type': third_method['return_type']                        
+                        'source_name': first_method['name'][4:-3],
+                        'source_type': 'UNKNOWN',
+                        'destination_name': third_method['name'][4:],
+                        'destination_type': third_method['return_type']
                     }
                     #if third_method['return_type'] == 'osid.resource.Resource':
                     #    print "RESOURCE TYPE FOUND IN", interface['shortname']

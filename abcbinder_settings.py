@@ -15,7 +15,7 @@ XOSIDNAMESPACEURI = '{urn:inet:osid.org:schemas/osid/3}'
 ##
 # The suffix of the xosid package files downloaded from Assembla.  This is 
 # used to iterate over the approprite files in the XOSIDDIRECTORY.
-XOSIDFILESUFFIX = 'xosid.xml'
+XOSIDFILESUFFIX = 'xosid'
 
 ##
 # The directory path where the *.xosid.xml files for service to be built.  
@@ -36,7 +36,7 @@ PKGMAPSDIRECTORY = './builders/package_maps'
 INTERFACMAPSDIRECTORY = './builders/interface_maps'
 
 ##
-# The packate name to be used for the abstract base class osids if the
+# The package name to be used for the abstract base class osids if the
 # intention is to create all the abc osids in one package.  The 
 # binder will create a directory of this name if it doesn't already 
 # exist and insert a __init__.py file to create the package.  If None
