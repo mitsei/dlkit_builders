@@ -17,5 +17,5 @@ class CommentLookupSession:
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
-        self._id_namespace = '${pkg_name}.${pkg_name_caps}'
+        self._id_namespace = '${pkg_name}.${object_name}'
 """

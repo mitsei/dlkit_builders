@@ -225,7 +225,7 @@ def make_azosid(file_name):
                                interface['category'] + '.' +
                                interface['shortname']]
             ##
-            # Check to see if there are any additinal inheritances required
+            # Check to see if there are any additional inheritances required
             # by the implementation patterns.
             impl_class = load_impl_class(package['name'], interface['shortname'])
             if hasattr(impl_class, 'inheritance'):
@@ -355,7 +355,6 @@ def make_azosid(file_name):
                 class_doc = ('    \"\"\"' + interface['doc']['headline'] + '\n\n' +
                                         interface['doc']['body'] + '\n\n    \"\"\"')
             """
-            
             class_doc = '    \"\"\"Adapts underlying ' + interface['shortname'] + ' methods with authorization checks.\"\"\"'
             
             class_sig = 'class ' + interface['shortname'] + inheritance + ':'
@@ -452,6 +451,8 @@ def make_init_methods(interface_name, package, patterns):
     elif init_pattern == 'resource.ResourceForm':
         object_name = interface_name[:-4]
         initers = ''
+    elif init_pattern == 'commenting.CommentLookupSession':
+        object_name = interface_name[:7]
 
     if hasattr(templates, init_pattern.split('.')[-1]):
         template_class = getattr(templates, init_pattern.split('.')[-1])
