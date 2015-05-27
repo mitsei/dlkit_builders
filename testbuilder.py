@@ -212,7 +212,9 @@ def make_package_tests(file_name):
         if (interface['category'] != 'managers' and
                 not interface['shortname'].endswith('LookupSession') and
                 not interface['shortname'].endswith('AdminSession') and
-                not interface['shortname'] == (patterns['package_catalog_caps'] + 'HierarchySession')):
+                not interface['shortname'] == (patterns['package_catalog_caps'] + 'HierarchySession') and
+                not interface['shortname'] == 'ResourceAgentSession' and
+                not interface['shortname'] == 'ResourceAgentAssignmentSession'):
             continue
 
         ##

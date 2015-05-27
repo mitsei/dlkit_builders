@@ -585,6 +585,9 @@ class OsidObject:
             for asset_content in self.get_asset_contents():
                 obj_map['assetContents'].append(asset_content.get_object_map())
                 obj_map['assetContent'].append(asset_content.get_object_map())
+        if self._namespace == 'resource.Resource':
+            if 'agentIds' in obj_map:
+                del obj_map['agentIds']
         if self._namespace == 'repository.AssetContent':
             if 'dbPrefix' in obj_map:
                 del obj_map['dbPrefix']
