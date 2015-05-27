@@ -412,7 +412,7 @@ def make_module_imports(interface_name, package, patterns):
             if hasattr(templates, init_pattern.split('.')[-1]):
                 template_class = getattr(templates, init_pattern.split('.')[-1])
                 if hasattr(template_class, 'import_statements_pattern'):
-                    #print 'FOUND import_statements_pattern', package['name'], interface_name
+                    #print 'FOUND import_statements_pattern', package['name'], init_pattern
                     return getattr(template_class, 'import_statements_pattern')
                 else:
                     #print 'import_statements_pattern not found
