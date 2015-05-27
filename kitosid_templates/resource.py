@@ -364,6 +364,45 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.alias_resources_template
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
+class ResourceAgentSession:
+
+    init_template = """
+    def __init__(self, provider_session):
+        self._provider_session = provider_session
+"""
+
+    get_resource_id_by_agent = """
+        return self._get_provider_session('resource_agent_session').get_resource_id_by_agent(*args, **kwargs)"""
+
+    get_resource_by_agent = """
+        return self._get_provider_session('resource_agent_session').get_resource_by_agent(*args, **kwargs)"""
+
+    get_agent_ids_by_resource = """
+        return self._get_provider_session('resource_agent_session').get_agent_ids_by_resource(*args, **kwargs)"""
+
+    get_agents_by_resource = """
+        return self._get_provider_session('resource_agent_session').get_agents_by_resource(*args, **kwargs)"""
+
+
+class ResourceAgentAssignmentSession:
+
+    init_template = """
+    def __init__(self, provider_session):
+        self._provider_session = provider_session
+"""
+
+    can_assign_agents = """
+        return self._get_provider_session('resource_agent_assignment_session').can_assign_agents()"""
+
+    can_assign_agents_to_resource = """
+        return self._get_provider_session('resource_agent_assignment_session').can_assign_agents_to_resource(*args, **kwargs)"""
+
+    assign_agent_to_resource = """
+        return self._get_provider_session('resource_agent_assignment_session').assign_agent_to_resource(*args, **kwargs)"""
+
+    unassign_agent_from_resource = """
+        return self._get_provider_session('resource_agent_assignment_session').unassign_agent_from_resource(*args, **kwargs)"""
+
 
 class BinLookupSession:
 

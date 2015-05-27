@@ -504,7 +504,8 @@ class ResourceAdminSession:
 class ResourceAgentSession:
 
     import_statements = [
-        'from .simple_agent import Agent'
+        'from .simple_agent import Agent',
+        'from ..id.objects import IdList'
     ]
 
     init = """
@@ -523,6 +524,8 @@ class ResourceAgentSession:
         self._object_view = COMPARATIVE
         self._catalog_view = ISOLATED
         self._forms = dict()
+        self._object_view = COMPARATIVE
+        self._catalog_view = ISOLATED
 """
 
     get_resource_id_by_agent = """
@@ -534,18 +537,17 @@ class ResourceAgentSession:
         collection = mongo_client[self._db_prefix + 'resource']['Resource']
 
         if self._catalog_view == ISOLATED:
-            result = collection.find_one({'$in': {'agentIds': str(agent_id)},
-                                          '${cat_name_mixed}Id': str(self._catalog_id)})
+            result = collection.find_one({'agentIds': {'$in': [str(agent_id)]},
+                                          'binId': str(self._catalog_id)})
         else:
             # This should really look in the underlying hierarchy (when hierarchy is implemented)
-            result = collection.find_one({'$in': {'agentIds': str(agent_id)}})
+            result = collection.find_one({'agentIds': {'$in': [str(agent_id)]}})
         if result is None:
             raise errors.NotFound()
         return objects.Resource(
             result,
             db_prefix=self._db_prefix,
-            runtime=self._runtime)
-        #mongo_client.close()"""
+            runtime=self._runtime)"""
 
     get_agent_ids_by_resource = """
         if resource_id is None:
@@ -558,7 +560,6 @@ class ResourceAgentSession:
             result = IdList([])
         else:
             result = IdList(resource['agentIds'])
-        #mongo_client.close()
         return result"""
 
     get_agents_by_resource = """
@@ -594,12 +595,18 @@ class ResourceAgentAssignmentSession:
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
         if not resource:
             raise errors.NotFound()
+        try:
+            ResourceAgentSession(
+                self._catalog_id, self._proxy, self._runtime).get_resource_by_agent(agent_id)
+        except errors.NotFound:
+            pass
+        else:
+            raise errors.AlreadyExists()
         if 'agentIds' not in resource:
             resource['agentIds'] = [str(agent_id)]
         else:
             resource['agentIds'].append(str(agent_id))
-        collection.save(resource)
-        #mongo_client.close()"""
+        collection.save(resource)"""
 
     unassign_agent_from_resource = """
         if agent_id is None or resource_id is None:
@@ -612,8 +619,7 @@ class ResourceAgentAssignmentSession:
             resource['agentIds'].remove(str(agent_id))
         except (KeyError, ValueError):
             raise errors.NotFound('agent_id not assigned to resource')
-        collection.save(resource)
-        #mongo_client.close()"""
+        collection.save(resource)"""
 
 
 class BinLookupSession:

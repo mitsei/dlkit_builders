@@ -343,6 +343,71 @@ class ResourceAdminSession:
         else:
             return self._provider_session.${method_name}(${arg0_name})"""
 
+class ResourceAgentSession:
+
+    init_template = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = provider_session.get_bin_id()
+        self._id_namespace = 'resource.ResourceAgent'
+"""
+
+    can_lookup_resource_agent_mappings = """
+        return self._can('lookup')"""
+
+    get_resource_id_by_agent = """
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_resource_id_by_agent(agent_id)"""
+
+    get_resource_by_agent = """
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_resource_by_agent(agent_id)"""
+
+    get_agent_ids_by_resource = """
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_agent_ids_by_resource(resource_id)"""
+
+    get_agents_by_resource = """
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_agents_by_resource(resource_id)"""
+
+
+class ResourceAgentAssignmentSession:
+
+    init_template = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = provider_session.get_bin_id()
+        self._id_namespace = 'resource.ResourceAgent'
+"""
+
+    can_assign_agents = """
+        return self._can('assign')"""
+
+    can_assign_agents_to_resource = """
+        return False # don't have enough information yet"""
+
+    assign_agent_to_resource = """
+        if not self._can('assign'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.assign_agent_to_resource(agent_id, resource_id)"""
+
+    unassign_agent_from_resource = """
+        if not self._can('assign'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.unassign_agent_from_resource(agent_id, resource_id)"""
+
+
 class BinLookupSession:
     
     init_template = """

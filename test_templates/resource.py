@@ -281,32 +281,110 @@ class ResourceAdminSession:
 
 class ResourceAgentSession:
 
+    import_statements = [
+        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
+        'REQUEST = proxy_example.TestRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.primordium.id.primitives import Id',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'AGENT_ID_0 = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'authentication.Agent\', \'authority\': \'odl.mit.edu\',})\n',
+        'AGENT_ID_1 = Id(**{\'identifier\': \'john_doe\', \'namespace\': \'authentication.Agent\', \'authority\': \'odl.mit.edu\',})\n',
+    ]
+
     init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.resource_list = list()
+        cls.resource_ids = list()
+        cls.svc_mgr = RUNTIME.get_service_manager('RESOURCE', PROXY)
+        create_form = cls.svc_mgr.get_bin_form_for_create([])
+        create_form.display_name = 'Test Bin'
+        create_form.description = 'Test Bin for ResourceLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bin(create_form)
+        for num in [0, 1]:
+            create_form = cls.catalog.get_resource_form_for_create([])
+            create_form.display_name = 'Test Resource ' + str(num)
+            create_form.description = 'Test Resource for ResourceLookupSession tests'
+            obj = cls.catalog.create_resource(create_form)
+            cls.resource_list.append(obj)
+            cls.resource_ids.append(obj.ident)
+        cls.catalog.assign_agent_to_resource(AGENT_ID_0, cls.resource_ids[0])
+        cls.catalog.assign_agent_to_resource(AGENT_ID_1, cls.resource_ids[1])
+
+    @classmethod
+    def tearDownClass(cls):
+        #for obj in cls.catalog.get_resources():
+        #    cls.catalog.delete_resource(obj.ident)
+        #for catalog in cls.catalogs:
+        #    cls.svc_mgr.delete_bin(catalog.ident)
+        for catalog in cls.svc_mgr.get_bins():
+            for obj in catalog.get_resources():
+                catalog.delete_resource(obj.ident)
+            cls.svc_mgr.delete_bin(catalog.ident)
 """
 
     get_resource_id_by_agent = """
-        pass"""
+        resource_id = self.catalog.get_resource_id_by_agent(AGENT_ID_0)"""
 
     get_resource_by_agent = """
-        pass"""
+        resource = self.catalog.get_resource_by_agent(AGENT_ID_1)
+        self.assertEqual(resource.display_name.text, 'Test Resource 1')"""
 
     get_agent_ids_by_resource = """
-        pass"""
+        id_list = self.catalog.get_agent_ids_by_resource(self.resource_ids[0])
+        self.assertEqual(id_list.next(), AGENT_ID_0)"""
 
     get_agents_by_resource = """
-        pass"""
+        """
 
 
 class ResourceAgentAssignmentSession:
 
     init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.resource_list = list()
+        cls.resource_ids = list()
+        cls.svc_mgr = RUNTIME.get_service_manager('RESOURCE', PROXY)
+        create_form = cls.svc_mgr.get_bin_form_for_create([])
+        create_form.display_name = 'Test Bin'
+        create_form.description = 'Test Bin for ResourceLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bin(create_form)
+        for num in [0, 1]:
+            create_form = cls.catalog.get_resource_form_for_create([])
+            create_form.display_name = 'Test Resource ' + str(num)
+            create_form.description = 'Test Resource for ResourceLookupSession tests'
+            obj = cls.catalog.create_resource(create_form)
+            cls.resource_list.append(obj)
+            cls.resource_ids.append(obj.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        #for obj in cls.catalog.get_resources():
+        #    cls.catalog.delete_resource(obj.ident)
+        #for catalog in cls.catalogs:
+        #    cls.svc_mgr.delete_bin(catalog.ident)
+        for catalog in cls.svc_mgr.get_bins():
+            for obj in catalog.get_resources():
+                catalog.delete_resource(obj.ident)
+            cls.svc_mgr.delete_bin(catalog.ident)
 """
 
     assign_agent_to_resource = """
-        pass"""
+        self.catalog.assign_agent_to_resource(AGENT_ID_0, self.resource_ids[0])
+        with self.assertRaises(errors.AlreadyExists):
+            self.catalog.assign_agent_to_resource(AGENT_ID_0, self.resource_ids[1])"""
 
     unassign_agent_from_resource = """
-        pass"""
+        self.catalog.assign_agent_to_resource(AGENT_ID_1, self.resource_ids[1])
+        self.assertEqual(self.catalog.get_resource_by_agent(AGENT_ID_1).display_name.text, 'Test Resource 1')
+        self.catalog.unassign_agent_from_resource(AGENT_ID_1, self.resource_ids[1])
+        with self.assertRaises(errors.NotFound):
+            self.catalog.get_resource_by_agent(AGENT_ID_1)"""
+        
 
 
 class BinLookupSession:
