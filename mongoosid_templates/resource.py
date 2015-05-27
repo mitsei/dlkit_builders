@@ -520,6 +520,8 @@ class ResourceAgentSession:
             db_name='assessment',
             cat_name='Bin',
             cat_class=objects.Bin)
+        self._object_view = COMPARATIVE
+        self._catalog_view = ISOLATED
         self._forms = dict()
 """
 
