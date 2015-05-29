@@ -1074,6 +1074,59 @@ class OsidTemporalForm:
             'microsecond': date.microsecond,
         }"""
 
+class OsidContainableForm:
+
+    init = """
+    def __init__(self):
+        self._sequestered_metadata = None
+        self._sequestered_default = None
+        self._sequestered = None
+
+    def _init_metadata(self):
+        self._sequestered_metadata = {
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='sequestered')}
+        self._sequestered_metadata.update(mdata_conf.SEQUESTERED)
+        self._sequestered_default = False
+        self._sequestered = self._sequestered_default
+
+    def _init_map(self):
+        self._my_map['sequestered'] = self._sequestered_default
+"""
+
+    get_sequestered_metadata = """
+        return Metadata(**self._sequestered_metadata)"""
+
+    set_sequestered = """
+        if sequestered is None:
+            raise errors.NullArgument()
+        if self.get_sequestered_metadata().is_read_only():
+            raise errors.NoAccess()
+        if not isinstance(sequestered, bool):
+            raise errors.InvalidArgument()
+        self._my_map['sequestered'] = sequestered"""
+
+    clear_sequestered = """
+        if (self.get_sequestered_metadata().is_read_only() or
+                self.get_sequestered_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['sequestered'] = self._sequestered_default"""
+
+
+class OsidSourceableForm:
+
+    init = """
+    def __init__(self):
+        pass
+
+    def _init_metadata(self):
+        pass
+
+    def _init_map(self):
+        pass
+"""
+
 class OsidObjectForm:
 
     #inheritance = ['OsidObject']

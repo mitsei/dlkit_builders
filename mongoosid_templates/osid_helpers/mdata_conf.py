@@ -121,3 +121,13 @@ END_DATE = {
     'syntax': 'DATETIME',
     'date_time_set': [],
     }
+
+SEQUESTERED = {
+    'element_label': 'sequestered',
+    'instructions': 'enter either true or false.',
+    'required': False,
+    'read_only': False,
+    'linked': False,
+    'array': False,
+    'syntax': 'BOOLEAN',
+    }
