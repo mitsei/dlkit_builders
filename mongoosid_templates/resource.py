@@ -37,8 +37,6 @@ class ResourceProfile:
     supports_resource_record_type_template = """
         # Implemented from template for
         # osid.resource.ResourceProfile.supports_resource_record_type_template
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         try:
             from ..records import types
             record_type_maps = types.${object_name_upper}_RECORD_TYPES # pylint: disable=no-member
@@ -55,7 +53,7 @@ class ResourceProfile:
 class ResourceManager:
 
     import_statements_pattern = [
-    'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.abstract_osid.osid import errors',
     #'from ..osid.osid_errors import Unimplemented',
     #'from ..osid.osid_errors import NullArgument',
     #'from ..osid.osid_errors import NotFound # pylint: disable=unused-import',
@@ -74,8 +72,6 @@ class ResourceManager:
         return ${return_module}.${return_type}(runtime=self._runtime) # pylint: disable=no-member"""
 
     get_resource_lookup_session_for_bin_template = """
-        if not ${arg0_name}:
-            raise errors.NullArgument
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         ##
@@ -87,7 +83,7 @@ class ResourceManager:
 class ResourceProxyManager:
 
     import_statements_pattern = [
-    'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.abstract_osid.osid import errors',
     #'from ..osid.osid_errors import Unimplemented',
     #'from ..osid.osid_errors import NullArgument',
     #'from ..osid.osid_errors import NotFound # pylint: disable=unused-import',
@@ -100,15 +96,11 @@ class ResourceProxyManager:
 """
 
     get_resource_lookup_session_template = """
-        if proxy is None:
-            raise errors.NullArgument()
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime) # pylint: disable=no-member"""
 
     get_resource_lookup_session_for_bin_template = """
-        if ${arg0_name} is None or proxy is None:
-            raise errors.NullArgument
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         ##
@@ -205,8 +197,6 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resource
         # NOTE: This implementation currently ignores plenary view
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if not ${arg0_name}:
-            raise errors.NullArgument()
         if self._catalog_view == ISOLATED:
             result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier()),
                                           '${cat_name_mixed}Id': str(self._catalog_id)})
@@ -223,8 +213,6 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_by_ids
         # NOTE: This implementation currently ignores plenary view
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if not ${arg0_name}:
-            raise errors.NullArgument()
         object_id_list = []
         for i in ${arg0_name}:
             object_id_list.append(ObjectId(i.get_identifier()))
@@ -323,8 +311,6 @@ class ResourceQuerySession:
     get_resources_by_query_template = """
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resources_by_query
-        if not ${arg0_name}:
-            raise errors.NullArgument()
         query_terms = dict(${arg0_name}._query_terms)
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
         if self._catalog_view == ISOLATED:
@@ -381,8 +367,6 @@ class ResourceAdminSession:
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
@@ -407,8 +391,6 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.create_resource_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
@@ -436,8 +418,6 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
@@ -453,8 +433,6 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.update_resource_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
@@ -482,8 +460,6 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.delete_resource_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under}_map = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
@@ -532,8 +508,6 @@ class ResourceAgentSession:
         return self.get_resource_by_agent(agent_id).get_id()"""
 
     get_resource_by_agent = """
-        if agent_id is None:
-            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'resource']['Resource']
 
         if self._catalog_view == ISOLATED:
@@ -550,8 +524,6 @@ class ResourceAgentSession:
             runtime=self._runtime)"""
 
     get_agent_ids_by_resource = """
-        if resource_id is None:
-            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'resource']['Resource']
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
         if resource is None:
@@ -588,8 +560,6 @@ class ResourceAgentAssignmentSession:
 """
 
     assign_agent_to_resource = """
-        if agent_id is None or resource_id is None:
-            raise errors.NullArgument()
         # Should check for existence of Agent? We may mever manage them.
         collection = mongo_client[self._db_prefix + 'resource']['Resource']
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
@@ -662,8 +632,6 @@ class BinLookupSession:
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bin
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
-        if not ${arg0_name}:
-            raise errors.NullArgument()
         # Need to consider how to best deal with the "phantom root" catalog issue
         if ${arg0_name}.get_identifier() == '000000000000000000000000':
             return self._get_phantom_root_catalog(cat_class=objects.${cat_name}, cat_name='${cat_name}')
@@ -739,8 +707,6 @@ class BinAdminSession:
         # Implemented from template for
         # osid.resource.BinAdminSession.get_bin_form_for_create_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
@@ -761,8 +727,6 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.create_bin_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
@@ -790,8 +754,6 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
@@ -807,8 +769,6 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.update_bin_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
@@ -833,8 +793,6 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.delete_bin_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         for object_catalog in ${cataloged_object_caps_list}:
@@ -1109,8 +1067,6 @@ ${instance_initers}
     get_resource_record_template = """
         # This is now in Extensible and can be replaces with:
         # return self._get_record(${arg0_name}):
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not self.has_record_type(${arg0_name}):
             raise errors.Unsupported()
         if str(${arg0_name}) not in self._records:
@@ -1221,8 +1177,6 @@ ${persisted_initers}
 
     set_group_template = """
         # Implemented from template for osid.resource.ResourceForm.set_group_template
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_${arg0_type}(${arg0_name}):
@@ -1238,8 +1192,6 @@ ${persisted_initers}
 
     set_avatar_template = """
         # Implemented from template for osid.resource.ResourceForm.set_avatar_template
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_id(${arg0_name}):
@@ -1256,8 +1208,6 @@ ${persisted_initers}
     get_resource_form_record_template = """
         # This is now in OsidExtensibleForm and can be replaces with:
         # return self._get_record(${arg0_name}):
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not self.has_record_type(${arg0_name}):
             raise errors.Unsupported()
         if str(${arg0_name}) not in self._records: # Currently this should never be True
@@ -1393,7 +1343,7 @@ class BinForm:
             self._init_record(record_type_idstr)
 
     def _init_records(self, record_types):
-        \"\"\"Initalize all records for this catalog.\"\"\"
+        \"\"\"Initialize all records for this catalog.\"\"\"
         for record_type in record_types:
             # This conditional was inserted on 7/11/14. It may prove problematic:
             if str(record_type) not in self._my_map['recordTypeIds']:
@@ -1401,7 +1351,7 @@ class BinForm:
                 self._my_map['recordTypeIds'].append(str(record_type))
 
     def _init_record(self, record_type_idstr):
-        \"\"\"Initalize a record of record type.\"\"\"
+        \"\"\"Initialize a record of record type.\"\"\"
         record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
         module = importlib.import_module(record_type_data['module_path'])
         record = getattr(module, record_type_data['form_record_class_name'])

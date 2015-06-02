@@ -46,8 +46,7 @@ class ObjectiveRequisiteAssignmentSession:
     assign_objective_requisite_template= """
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
-        if ${arg0_name} is None or ${arg1_name} is None:
-            raise errors.NullArgument()
+
         requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
 
 
@@ -63,8 +62,7 @@ class ObjectiveRequisiteAssignmentSession:
         from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
         from ..relationship.managers import RelationshipManager
         from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied
-        if ${arg0_name} is None or ${arg1_name} is None:
-            raise errors.NullArgument()
+
         requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
         rls = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
         ras = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
@@ -82,8 +80,7 @@ class ObjectiveAdminSession:
         # Implemented from template for
         # osid.learning.ObjectiveAdminSession.delete_objective_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
+
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         collection = mongo_client[self._db_prefix + '${package_name}']['${dependent_object_name}']
@@ -142,8 +139,7 @@ class ActivityAdminSession:
         # osid.learning.ActivityAdminSession.get_activity_form_for_create_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
-        if ${arg0_name} is None or ${arg1_name} is None:
-            raise errors.NullArgument()
+
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument is not a valid OSID ${arg0_type}')
         for arg in ${arg1_name}:
@@ -241,8 +237,6 @@ class ActivityForm:
 
     set_assets_template = """
         # Implemented from template for osid.learning.ActivityForm.set_assets_template
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, list):
             raise errors.InvalidArgument()
         if self.get_${var_name}_metadata().is_read_only():

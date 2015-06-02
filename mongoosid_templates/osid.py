@@ -107,8 +107,6 @@ class OsidManager:
 """
     
     initialize = """
-        if runtime is None:
-            raise errors.NullArgument()
         if self._runtime is not None:
             raise errors.IllegalState('this manager has already been initialized.')
         self._runtime = runtime
@@ -126,8 +124,6 @@ class OsidProxyManager:
 """
     
     initialize = """
-        if runtime is None:
-            raise errors.NullArgument()
         if self._runtime is not None:
             raise errors.IllegalState('this manager has already been initialized.')
         self._runtime = runtime
@@ -208,8 +204,6 @@ class Extensible:
 
     def _get_record(self, record_type):
         \"\"\"Get the record string type value given the record_type.\"\"\"
-        if record_type is None:
-            raise errors.NullArgument()
         if not self.has_record_type(record_type):
             raise errors.Unsupported()
         if str(record_type) not in self._records:
@@ -976,8 +970,6 @@ class OsidExtensibleForm:
         Perhaps we should leverage it somehow?
 
         \"\"\"
-        if recordType is None:
-            raise errors.NullArgument()
         if not self.has_record_type(recordType):
             raise errors.Unsupported()
         if str(recordType) not in self._records: # Currently this should never be True
@@ -1028,8 +1020,6 @@ class OsidTemporalForm:
         return Metadata(**metadata)"""
 
     set_start_date = """
-        if date is None:
-            raise errors.NullArgument()
         if self.get_start_date_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_start_date_metadata()):
@@ -1048,8 +1038,6 @@ class OsidTemporalForm:
         return Metadata(**metadata)"""
 
     set_end_date = """
-        if date is None:
-            raise errors.NullArgument()
         if self.get_end_date_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_end_date_metadata()):
@@ -1159,8 +1147,6 @@ class OsidObjectForm:
         return Metadata(**self._display_name_metadata)"""
 
     set_display_name = """
-        if display_name is None:
-            raise errors.NullArgument()
         if self.get_display_name_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_string(display_name,
@@ -1178,8 +1164,6 @@ class OsidObjectForm:
         return Metadata(**self._description_metadata)"""
 
     set_description = """
-        if description is None:
-            raise errors.NullArgument()
         if self.get_description_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_string(description,
@@ -1197,8 +1181,6 @@ class OsidObjectForm:
         return Metadata(**self._genus_type_metadata)"""
 
     set_genus_type = """
-        if genus_type is None:
-            raise errors.NullArgument()
         if self.get_genus_type_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_type(genus_type):
@@ -1518,7 +1500,7 @@ class OsidRecord:
 class Metadata:
 
     import_statements = [
-        'from dlkit.abstract_osid.osid import errors'
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
     init = """
@@ -1538,8 +1520,6 @@ class Metadata:
 
     supports_coordinate_type_template = """
         # Implemented from template for osid.Metadata.supports_coordinate_type
-        if not ${arg0_name}:
-            raise errors.NullArgument('no inpt Type provided')
         if self._kwargs['syntax'] not in ${syntax_list}:
             raise errors.IllegalState()
         return ${arg0_name} in self.get_${var_name}"""

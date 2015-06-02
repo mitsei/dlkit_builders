@@ -14,8 +14,6 @@ class CommentAdminSession:
         # These really need to be in module imports:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
-        if ${arg0_name} is None or ${arg1_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument is not a valid OSID ${arg0_type}')
         for arg in ${arg1_name}:

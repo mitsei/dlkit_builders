@@ -8,8 +8,6 @@ class AssessmentManager:
     ]
     
     awkward_get_assessment_taken_query_session_for_bank_to_delete = """
-        if not bank_id:
-            raise errors.NullArgument
         if not self.supports_assessment_taken_query():
             raise errors.Unimplemented()
         return sessions.AssessmentTakenQuerySession(bank_id, runtime=self._runtime)
@@ -20,8 +18,6 @@ class AssessmentManager:
         return sessions.AssessmentTakenAdminSession(runtime=self._runtime)
     
     def get_assessment_taken_admin_session_for_bank(self, bank_id):
-        if not bank_id:
-            raise errors.NullArgument
         if not self.supports_assessment_taken_admin():
             raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(bank_id, runtime=self._runtime)"""
@@ -29,26 +25,20 @@ class AssessmentManager:
 class AssessmentProxyManager:
     
     import_statements = [
-        'from . import sessions'
+        'from . import sessions',
     ]
     
     awkward_get_assessment_taken_query_session_for_bank_to_delete = """
-        if not bank_id or proxy is None:
-            raise errors.NullArgument
         if not self.supports_assessment_taken_query():
             raise errors.Unimplemented()
         return sessions.AssessmentTakenQuerySession(bank_id, proxy, runtime=self._runtime)
     
     def get_assessment_taken_admin_session(self, proxy):
-        if proxy is None:
-            raise errors.NullArgument
         if not self.supports_assessment_taken_admin():
             raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(proxy=proxy, runtime=self._runtime)
     
     def get_assessment_taken_admin_session_for_bank(self, bank_id, proxy):
-        if not bank_id or proxy is None:
-            raise errors.NullArgument
         if not self.supports_assessment_taken_admin():
             raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(bank_id, proxy=proxy, runtime=self._runtime)"""
@@ -148,8 +138,6 @@ class AssessmentSession:
         return False"""
     
     get_first_assessment_section = """
-        if assessment_taken_id is None:
-            raise errors.NullArgument()
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         if not assessment_taken.has_started() or assessment_taken.has_ended():
             raise errors.IllegalState()
@@ -157,7 +145,7 @@ class AssessmentSession:
             assessment_taken._my_map['actualStartTime'] = None
         assessment_taken_map = assessment_taken._my_map
         if 'actualStartTime' not in assessment_taken_map or assessment_taken_map['actualStartTime'] is None:
-            # perhaps put everything here in a seperate helper method
+            # perhaps put everything here in a separate helper method
             collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
             assessment_id = assessment_taken.get_assessment_offered().get_assessment_id()
             assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
@@ -355,8 +343,6 @@ class AssessmentSession:
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
-        if item_id is None:
-            raise errors.NullArgument()
         if not isinstance(item_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
         ##
@@ -396,8 +382,6 @@ class AssessmentSession:
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
-        if answer_form is None:
-            raise errors.NullArgument()
         if not isinstance(answer_form, ABCAnswerForm):
             raise errors.InvalidArgument('argument type is not an AnswerForm')
         ##
@@ -640,14 +624,12 @@ class ItemAdminSession:
         'from bson.objectid import ObjectId',
         'UPDATED = True',
         'CREATED = True'
-        ]
+    ]
     
     # This method is hand implemented to raise errors.and error if the item
     # is found to be associated with an assessment
     delete_item = """
         from ...abstract_osid.id.primitives import Id as ABCId
-        if item_id is None:
-            raise errors.NullArgument()
         if not isinstance(item_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
@@ -671,8 +653,6 @@ class ItemAdminSession:
     create_question = """
         from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
-        if question_form is None:
-            raise errors.NullArgument()
         if not isinstance(question_form, ABCQuestionForm):
             raise errors.InvalidArgument('argument type is not an QuestionForm')
         if question_form.is_for_update():
@@ -705,8 +685,6 @@ class ItemAdminSession:
     get_question_form_for_update = """
         from ...abstract_osid.id.primitives import Id as ABCId
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
-        if question_id is None:
-            raise errors.NullArgument()
         if not isinstance(question_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
@@ -721,8 +699,6 @@ class ItemAdminSession:
     update_question = """
         from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
-        if question_form is None:
-            raise errors.NullArgument()
         if not isinstance(question_form, ABCQuestionForm):
             raise errors.InvalidArgument('argument type is not an QuestionForm')
         if not question_form.is_for_update():
@@ -761,8 +737,6 @@ class AssessmentAdminSession:
     delete_assessment = """
         from ...abstract_osid.id.primitives import Id as ABCId
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
-        if assessment_id is None:
-            raise errors.NullArgument()
         if not isinstance(assessment_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentOffered']
@@ -851,8 +825,6 @@ class AssessmentOfferedAdminSession:
         # sets a default display name based on the underlying Assessment...
         from ...abstract_osid.id.primitives import Id as ABCId
         from ...abstract_osid.type.primitives import Type as ABCType
-        if assessment_id is None or assessment_offered_record_types is None:
-            raise errors.NullArgument()
         if not isinstance(assessment_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
         for arg in assessment_offered_record_types:
@@ -905,8 +877,6 @@ class AssessmentTakenAdminSession:
         from ...abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm
         from ..osid.osid_errors import PermissionDenied
         collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
-        if assessment_taken_form is None:
-            raise errors.NullArgument()
         if not isinstance(assessment_taken_form, ABCAssessmentTakenForm):
             raise errors.InvalidArgument('argument type is not an AssessmentTakenForm')
         if assessment_taken_form.is_for_update():
@@ -976,8 +946,6 @@ class AssessmentBasicAuthoringSession:
         return True"""
     
     get_items = """
-        if assessment_id is None:
-            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if assessment is None:
@@ -993,8 +961,6 @@ class AssessmentBasicAuthoringSession:
         return objects.ItemList(item_list, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     add_item = """
-        if assessment_id is None or item_id is None:
-            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Item']
         item = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         if not item:
@@ -1011,8 +977,6 @@ class AssessmentBasicAuthoringSession:
         #mongo_client.close()"""
     
     remove_item = """
-        if assessment_id is None or item_id is None:
-            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if not assessment:
@@ -1025,8 +989,6 @@ class AssessmentBasicAuthoringSession:
         #mongo_client.close()"""
     
     move_item = """
-        if assessment_id is None or item_id is None or preceeding_item_id is None:
-            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if assessment is None:
@@ -1049,8 +1011,6 @@ class AssessmentBasicAuthoringSession:
         # included in the argument list. The case where a subset is provided
         # will be implemented later, but this covers the primary case
         # that we will see from a RESTful consumer.
-        if item_ids is None or assessment_id is None:
-            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if assessment is None:
@@ -1185,8 +1145,6 @@ class AssessmentOfferedForm:
     
     set_start_time_template = """
         # Implemented from template for osid.assessment.AssessmentOfferedForm.set_start_time_template
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_${arg0_type_under}(
@@ -1205,8 +1163,6 @@ class AssessmentOfferedForm:
     
     set_duration_template = """
         # Implemented from template for osid.assessment.AssessmentOfferedForm.set_duration_template
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_${arg0_type_under}(${arg0_name},
@@ -1444,8 +1400,6 @@ class Response:
         raise errors.PermissionDenied()"""
     
     get_response_record = """
-        if item_record_type is None:
-            raise errors.NullArgument()
         if not self.has_record_type(item_record_type):
             raise errors.Unsupported()
         if str(item_record_type) not in self._records:

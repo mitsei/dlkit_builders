@@ -315,6 +315,10 @@ def make_mongoosid(file_name):
             if import_str not in modules[interface['category']]['imports']:
                 modules[interface['category']]['imports'].append(import_str)
 
+        # add the none-argument check import if not already present
+        if 'from ..utilities import arguments_not_none' not in modules[interface['category']]['imports']:
+            modules[interface['category']]['imports'].append('from ..utilities import arguments_not_none')
+
         additional_methods = ''
         ##
         # Look for additional methods defined in class patterns. These
@@ -815,6 +819,7 @@ def make_method(package_name, method, interface, patterns):
 
     for arg in method['args']:
         args.append(arg['var_name'] + '=None')
+    decorator = '    @arguments_not_none'
     method_sig = ('    def ' + method['name'] + '(' +
                 ', '.join(args) + '):')
 
@@ -839,8 +844,11 @@ def make_method(package_name, method, interface, patterns):
                       method['doc']['body'] + '\n\n' +
                       '\n'.join(detail_docs) + '\n\n        \"\"\"')
 
-    return (method_sig + '\n' + method_doc + '\n' + method_impl)
-    
+    if len(args) > 1:
+        return (decorator + '\n' + method_sig + '\n' + method_doc + '\n' + method_impl)
+    else:
+        return (method_sig + '\n' + method_doc + '\n' + method_impl)
+
 def make_method_impl(package_name, method, interface, patterns):
     impl = ''
     pattern = ''
@@ -865,12 +873,15 @@ def make_method_impl(package_name, method, interface, patterns):
             if hasattr(templates, pattern.split('.')[-2]):
                 template_class = getattr(templates, pattern.split('.')[-2])
 
+    arg_list = []
+    for arg in method['args']:
+        arg_list.append(arg['var_name'])
+    kwargs['arg_list'] = ', '.join(arg_list)
     ##
     # Check if there is a 'by hand' implementation available for this method
     if (impl_class and 
         hasattr(impl_class, method['name'])):
         impl = getattr(impl_class, method['name']).strip('\n')
-
     ##
     # If there is no 'by hand' implementation, get the template for the 
     # method implementation that serves as the pattern, if one exixts.
@@ -893,11 +904,6 @@ def make_method_impl(package_name, method, interface, patterns):
  
         if kwargs['interface_name_under'].endswith('_session'):
             kwargs['session_shortname_dot'] = '.'.join(kwargs['interface_name_under'].split('_')[:-1])
-
-        arg_list = []
-        for arg in method['args']:
-            arg_list.append(arg['var_name'])
-        kwargs['arg_list'] = ', '.join(arg_list)
 
         if 'arg0_type_full' in kwargs:
             kwargs['arg0_type'] = kwargs['arg0_type_full'].split('.')[-1].strip('[]')

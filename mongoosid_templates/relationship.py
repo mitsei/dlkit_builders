@@ -148,8 +148,6 @@ class RelationshipAdminSession:
         # These really need to be in module imports:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from ${arg2_abcapp_name}.${arg2_abcpkg_name}.${arg2_module} import ${arg2_type} as ABC${arg2_type}
-        if ${arg0_name} is None or ${arg1_name} is None or ${arg2_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument is not a valid OSID ${arg0_type}')
         if not isinstance(${arg1_name}, ABC${arg1_type}):

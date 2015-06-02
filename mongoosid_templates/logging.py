@@ -29,8 +29,6 @@ class LoggingSession:
         return True"""
 
     log = """
-        if content is None or contentType is None:
-            raise errors.NullArgument()
         if not contentType in self._content_types:
             raise errors.Unsupported()
         lefc = self._leas.get_content_form_for_create([])
@@ -60,8 +58,6 @@ class LogEntryForm:
     
     set_priority_template = """
         # Implemented from template for osid.logging.LogEntryForm.set_priority
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_type(${arg0_name}, 

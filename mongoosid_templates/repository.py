@@ -27,8 +27,6 @@ class AssetAdminSession:
         # osid.repository.AssetAdminSession.create_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
@@ -59,8 +57,6 @@ class AssetAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .${return_module} import ${return_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         document = collection.find_one({'${aggregated_objects_name_mixed}._id': ObjectId(${arg0_name}.get_identifier())})
@@ -80,8 +76,6 @@ class AssetAdminSession:
         # osid.repository.AssetAdminSession.update_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
@@ -123,8 +117,6 @@ class AssetAdminSession:
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .objects import ${aggregated_object_name}
         collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under} = collection.find_one({'${aggregated_objects_name_mixed}._id': ObjectId(${arg0_name}.get_identifier())})
@@ -186,8 +178,6 @@ class AssetForm:
     set_title_template = """
         # Implemented from template for osid.repository.AssetForm.set_title_template
         #from ..osid.osid_errors import InvalidArgument, NullArgument, NoAccess
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_${arg0_type}(${arg0_name}, self.get_${arg0_name}_metadata()):
@@ -251,8 +241,6 @@ class AssetContentForm:
 
     set_url_template = """
         # Implemented from template for osid.repository.AssetContentForm.set_url_template
-        if ${arg0_name} is None:
-            raise errors.NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_${arg0_type}(

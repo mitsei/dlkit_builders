@@ -65,8 +65,6 @@ class TypeLookupSession:
 
     get_type = """
         from .primitives import Type
-        if namespace is None and identifier is None and authority is None:
-            raise errors.NullArgument()
         collection = self._db['Type']
         result = collection.find_one({'$and': [{'namespace': namespace},
                                                {'identifier': identifier},
@@ -104,8 +102,6 @@ class TypeAdminSession:
 #        from bson.objectid import ObjectId
         collection = self._db['Type']
         CREATED = True
-        if type_ is None:
-            raise errors.NullArgument()
         if not isinstance(type_, ABCType):
             raise errors.InvalidArgument('argument is not a Type')
         result = collection.find_one({'$and': [{'namespace': type_.get_identifier_namespace()},
@@ -122,8 +118,6 @@ class TypeAdminSession:
         from ...abstract_osid.type.objects import TypeForm as ABCTypeForm
         collection = self._db['Type']
         CREATED = True
-        if type_form is None:
-            raise errors.NullArgument()
         if not isinstance(type_form, ABCTypeForm):
             raise errors.InvalidArgument('argument type is not a TypeForm')
         if type_form.is_for_update():
@@ -156,8 +150,6 @@ class TypeAdminSession:
 #        from bson.objectid import ObjectId
         collection = self._db['Type']
         UPDATED = True
-        if type_ is None:
-            raise errors.NullArgument()
         if not isinstance(type_, ABCType):
             return InvalidArgument('the argument is not a valid OSID Type')
         result = collection.find_one({'$and': [{'namespace': type_.get_identifier_namespace()},
@@ -173,8 +165,6 @@ class TypeAdminSession:
         from ...abstract_osid.type.objects import TypeForm as ABCTypeForm
         collection = self._db['Type']
         UPDATED = True
-        if type_form is None:
-            raise errors.NullArgument()
         if not isinstance(type_form, ABCTypeForm):
             raise errors.InvalidArgument('argument type is not an TypeForm')
         if not type_form.is_for_update():
@@ -203,8 +193,6 @@ class TypeAdminSession:
         from bson.objectid import ObjectId
         collection = self._db['Type']
         UPDATED = True
-        if type_ is None:
-            raise errors.NullArgument()
         if not isinstance(type_, ABCType):
             return InvalidArgument('the argument is not a valid OSID Type')
         result = collection.delete_one({'$and': [{'namespace': type_.get_identifier_namespace()},
@@ -278,8 +266,6 @@ class TypeForm:
         return Metadata(**self._display_name_metadata)"""
 
     set_display_name = """
-        if display_name is None:
-            raise errors.NullArgument()
         if self.get_display_name_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_string(display_name, 
@@ -298,8 +284,6 @@ class TypeForm:
         return Metadata(**self._display_label_metadata)"""
 
     set_display_label = """
-        if display_label is None:
-            raise errors.NullArgument()
         if self.get_display_label_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_string(display_label, 
@@ -318,8 +302,6 @@ class TypeForm:
         return Metadata(**self._description_metadata)"""
 
     set_description = """
-        if description is None:
-            raise errors.NullArgument()
         if self.get_description_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_string(description, 
@@ -338,8 +320,6 @@ class TypeForm:
         return Metadata(**self._domain_metadata)"""
 
     set_domain = """
-        if domain is None:
-            raise errors.NullArgument()
         if self.get_domain_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_string(domain, 
