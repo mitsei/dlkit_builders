@@ -893,7 +893,12 @@ def make_method_impl(package_name, method, interface, patterns):
  
         if kwargs['interface_name_under'].endswith('_session'):
             kwargs['session_shortname_dot'] = '.'.join(kwargs['interface_name_under'].split('_')[:-1])
-        
+
+        arg_list = []
+        for arg in method['args']:
+            arg_list.append(arg['var_name'])
+        kwargs['arg_list'] = ', '.join(arg_list)
+
         if 'arg0_type_full' in kwargs:
             kwargs['arg0_type'] = kwargs['arg0_type_full'].split('.')[-1].strip('[]')
             kwargs['arg0_type_under'] = camel_to_under(kwargs['arg0_type'])
