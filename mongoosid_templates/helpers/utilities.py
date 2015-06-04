@@ -1,5 +1,6 @@
 """mongo utilities.py"""
-from .osid.osid_errors import NullArgument
+import json
+from .osid.osid_errors import NullArgument, NotFound
 
 
 def arguments_not_none(func):
@@ -14,3 +15,8 @@ def arguments_not_none(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+def mongo_find(db, query):
+    results = db.find_one(**query)
+    if results is None:
+        raise NotFound('Did not find: ' + json.dumps(query))

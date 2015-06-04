@@ -316,8 +316,8 @@ def make_mongoosid(file_name):
                 modules[interface['category']]['imports'].append(import_str)
 
         # add the none-argument check import if not already present
-        if 'from ..utilities import arguments_not_none' not in modules[interface['category']]['imports']:
-            modules[interface['category']]['imports'].append('from ..utilities import arguments_not_none')
+        if 'from .. import utilities' not in modules[interface['category']]['imports']:
+            modules[interface['category']]['imports'].append('from .. import utilities')
 
         additional_methods = ''
         ##
@@ -817,11 +817,13 @@ def make_method(package_name, method, interface, patterns):
     method_doc = ''
     method_impl = make_method_impl(package_name, method, interface, patterns)
 
+    default = ''  # TODO: Update this to read from the template and replace with X
+
     for arg in method['args']:
-        args.append(arg['var_name'] + '=None')
-    decorator = '    @arguments_not_none'
+        args.append(arg['var_name'] + default)
+    decorator = '    @utilities.arguments_not_none'
     method_sig = ('    def ' + method['name'] + '(' +
-                ', '.join(args) + '):')
+                  ', '.join(args) + '):')
 
     method_doc = ''
     detail_docs = filter(None, [method['arg_doc'].strip('\n'),

@@ -23,7 +23,7 @@ class AssessmentManager:
         return sessions.AssessmentTakenAdminSession(bank_id, runtime=self._runtime)"""
 
 class AssessmentProxyManager:
-    
+
     import_statements = [
         'from . import sessions',
     ]
@@ -56,6 +56,7 @@ class AssessmentSession:
         'from . import objects',
         'from .rules import Response',
         'from ..osid.sessions import OsidSession',
+        'from ..utilities import MongoClientValidated',
         'SUBMITTED = True',
     ]
     
@@ -122,7 +123,7 @@ class AssessmentSession:
     
     ## This method has been deprecated:
     finished_assessment = """
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         assessment_taken_map = assessment_taken._my_map
         if assessment_taken.has_started() and not assessment_taken.has_ended():
@@ -130,8 +131,7 @@ class AssessmentSession:
             assessment_taken_map['ended'] = True
             collection.save(assessment_taken_map)
         else:
-            raise errors.IllegalState()
-        #mongo_client.close()"""
+            raise errors.IllegalState()"""
     
     requires_synchronous_sections = """
         # NOTE: For now we are not really dealing with sections. Re-implement when we do.
@@ -146,7 +146,7 @@ class AssessmentSession:
         assessment_taken_map = assessment_taken._my_map
         if 'actualStartTime' not in assessment_taken_map or assessment_taken_map['actualStartTime'] is None:
             # perhaps put everything here in a separate helper method
-            collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
+            collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
             assessment_id = assessment_taken.get_assessment_offered().get_assessment_id()
             assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
             if 'itemIds' not in assessment:
@@ -160,7 +160,7 @@ class AssessmentSession:
             assessment_taken_map['responses'] = dict()
             for item_idstr in item_ids:
                 assessment_taken_map['responses'][Id(item_idstr).get_identifier()] = None
-            collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
+            collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
             collection.save(assessment_taken_map)
         assessment_section_map = {
             '_id': ObjectId(assessment_taken_id.get_identifier()),
@@ -171,7 +171,6 @@ class AssessmentSession:
             'bankId': str(self.get_bank_id()),
             'assessmentTakenId': str(assessment_taken_id)
         }
-        #mongo_client.close()
         return objects.AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     has_next_assessment_section = """
@@ -352,10 +351,8 @@ class AssessmentSession:
             from ..records.types import ANSWER_RECORD_TYPES as record_type_data_sets
         except (ImportError, AttributeError):
             record_type_data_sets = dict()
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        if item_map is None:
-            raise errors.NotFound()
         answer_record_types = []
         for record_type_idstr in item_map['question']['recordTypeIds']:
             identifier = Id(record_type_idstr).get_identifier()
@@ -373,12 +370,10 @@ class AssessmentSession:
             runtime=self._runtime)
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
-        #mongo_client.close()
         return obj_form"""
     
     submit_response = """
         from ...abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
@@ -403,11 +398,11 @@ class AssessmentSession:
         else:
             raise errors.NotFound()
         try:
+            collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
             collection.save(assessment_taken_map)
         except: # what exceptions does mongodb insert raise?
             raise errors.OperationFailed()
-        self._forms[answer_form.get_id().get_identifier()] = SUBMITTED
-        #mongo_client.close()"""
+        self._forms[answer_form.get_id().get_identifier()] = SUBMITTED"""
     
     skip_item = """
         #if (not self.has_assessment_section_begun(assessment_section_id) or
@@ -552,17 +547,16 @@ class AssessmentSession:
         return objects.ResponseList(answer_list)"""
     
     clear_response = """
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
         assessment_taken = self.get_assessment_section(assessment_section_id).get_assessment_taken()
         if item_id.get_identifier() in assessment_taken._my_map['responses']:
             assessment_taken._my_map['responses'][item_id.get_identifier()] = None
+            collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
             collection.save(assessment_taken._my_map)
         else:
-            raise errors.NotFound()
-        #mongo_client.close()"""
+            raise errors.NotFound()"""
     
     finish_assessment_section = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
@@ -578,16 +572,15 @@ class AssessmentSession:
         self.finish(assessment_section_id)"""
     
     finish_assessment = """
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         assessment_taken_map = assessment_taken._my_map
         if assessment_taken.has_started() and not assessment_taken.has_ended():
             assessment_taken_map['completionTime'] = DateTime.now()
             assessment_taken_map['ended'] = True
+            collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
             collection.save(assessment_taken_map)
         else:
-            raise errors.IllegalState()
-        #mongo_client.close()"""
+            raise errors.IllegalState()"""
 
     
     is_answer_available = """
@@ -605,11 +598,8 @@ class AssessmentSession:
     
     get_answers = """
         if self.is_answer_available(assessment_section_id, item_id):
-            collection = mongo_client[self._db_prefix + 'assessment']['Item']
+            collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
             item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-            if item_map is None:
-                raise errors.NotFound()
-            #mongo_client.close()
             return objects.AnswerList(item_map['answers'], db_prefix=self._db_prefix, runtime=self._runtime)
         else:
             raise errors.IllegalState()"""
@@ -622,6 +612,7 @@ class ItemAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from .. import mongo_client',
         'from bson.objectid import ObjectId',
+        'from ..utilities import MongoClientValidated',
         'UPDATED = True',
         'CREATED = True'
     ]
@@ -632,19 +623,14 @@ class ItemAdminSession:
         from ...abstract_osid.id.primitives import Id as ABCId
         if not isinstance(item_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
         # This needs to be updated to actually check for AssessmentsTaken (and does that find even work?)
         if collection.find({'itemIds': str(item_id)}).count() != 0:
             raise errors.IllegalState('this Item is being used in one or more Assessments')
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        if item_map is None:
-            raise errors.NotFound()
         objects.Item(item_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
-        delete_result = collection.delete_one({'_id': ObjectId(item_id.get_identifier())})
-        if delete_result.deleted_count == 0:
-            raise errors.NotFound()
-        #mongo_client.close()"""
+        collection.delete_one({'_id': ObjectId(item_id.get_identifier())})"""
     
     # These methods overwrite the canonical aggregate object admin methods to
     # deal with authoring Questions with are special: ie. there is only one per
@@ -652,7 +638,7 @@ class ItemAdminSession:
     
     create_question = """
         from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         if not isinstance(question_form, ABCQuestionForm):
             raise errors.InvalidArgument('argument type is not an QuestionForm')
         if question_form.is_for_update():
@@ -666,7 +652,8 @@ class ItemAdminSession:
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         item_id = Id(question_form._my_map['itemId']).get_identifier()
         question_form._my_map['_id'] = ObjectId(item_id)
-        item = collection.find_one({'$and': [{'_id': ObjectId(item_id)}, {'bankId': str(self._catalog_id)}]})
+        item = collection.find_one({'$and': [{'_id': ObjectId(item_id)},
+                                             {'bankId': str(self._catalog_id)}]})
         # set the name in the question, so it can be shown to students
         question_form._my_map['displayName']['text'] = item['displayName']['text']
         question_form._my_map['description']['text'] = item['description']['text']
@@ -675,30 +662,23 @@ class ItemAdminSession:
         else:
             item['question'] = question_form._my_map # Let's just assume we can overwrite it
             #raise errors.AlreadyExists()
-        result = collection.save(item)
-        if result == "What to look for here???":
-            pass # Need to figure out what writeConcernErrors to catch and deal with?
+        collection.save(item)
         self._forms[question_form.get_id().get_identifier()] = CREATED
-        #mongo_client.close()
         return objects.Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     get_question_form_for_update = """
         from ...abstract_osid.id.primitives import Id as ABCId
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         if not isinstance(question_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
-        if document is None:
-            raise errors.NotFound()
         obj_form = objects.QuestionForm(document['question'], self._db_prefix, runtime=self._runtime)
-        #obj_form._for_update = True # This seems redundant
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-        #mongo_client.close()
         return obj_form"""
     
     update_question = """
         from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         if not isinstance(question_form, ABCQuestionForm):
             raise errors.InvalidArgument('argument type is not an QuestionForm')
         if not question_form.is_for_update():
