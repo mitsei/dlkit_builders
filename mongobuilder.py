@@ -529,7 +529,7 @@ def make_init_methods(interface, package, patterns):
                 metadata_super_initers = metadata_super_initers + (
                     '\n        osid_objects.OsidSourceableForm._init_metadata(self)')
                 map_super_initers = map_super_initers + (
-                    '\n        osid_objects.OsidsourceableForm._init_map(self)')
+                    '\n        osid_objects.OsidSourceableForm._init_map(self)')
             if inherit_object == 'OsidContainableForm':
                 metadata_super_initers = metadata_super_initers + (
                     '\n        osid_objects.OsidContainableForm._init_metadata(self)')
@@ -916,7 +916,7 @@ def make_method_impl(package_name, method, interface, patterns):
  
         if kwargs['interface_name_under'].endswith('_session'):
             kwargs['session_shortname_dot'] = '.'.join(kwargs['interface_name_under'].split('_')[:-1])
-        
+
         if 'arg0_type_full' in kwargs:
             kwargs['arg0_type'] = kwargs['arg0_type_full'].split('.')[-1].strip('[]')
             kwargs['arg0_type_under'] = camel_to_under(kwargs['arg0_type'])

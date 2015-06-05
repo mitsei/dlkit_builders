@@ -33,7 +33,7 @@ class ActivityLookupSession:
     def setUpClass(cls):
         cls.activity_list = list()
         cls.activity_ids = list()
-        cls.svc_mgr = RUNTIME.get_service_manager('LEARNING', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
         create_form.description = 'Test ObjectiveBank for ActivityLookupSession tests'
