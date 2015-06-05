@@ -479,12 +479,7 @@ def make_additional_methods(interface_name, package, patterns):
 def make_init_methods(interface_name, package, patterns):
     templates = None
     init_pattern = ''
-    instance_initers = ''
-    persisted_initers = ''
-    metadata_initers = ''
-    object_name = ''
-    init_object = ''
-    cat_name = patterns['package_catalog_caps']
+
     impl_class = load_impl_class(pkg_name(package['name']), interface_name)
     if hasattr(impl_class, 'init'):
         return getattr(impl_class, 'init')
@@ -498,77 +493,12 @@ def make_init_methods(interface_name, package, patterns):
     else:
         return ''
 
-    ##
-    # Check for any special data initializations and call the appropriate makers
-    # to assemble them.
-    if init_pattern == 'resource.Bin':
-        object_name = interface_name
-    elif init_pattern == 'resource.BinForm':
-        object_name = interface_name[:-4]
-    elif init_pattern == 'resource.ResourceLookupSession':
-        object_name = interface_name[:-13]
-    elif init_pattern == 'commenting.CommentLookupSession':
-        object_name = interface_name[:-13]
-    elif init_pattern == 'resource.Resource':
-        object_name = interface_name
-        try:
-            instance_initers = make_instance_initers(
-                patterns[interface_name + '.instance_data'])
-        except KeyError:
-            pass
-    elif init_pattern == 'resource.ResourceForm':
-        object_name = interface_name[:-4]
-        if object_name in patterns['package_relationships_caps']:
-            init_object = 'osid_objects.OsidRelationshipForm'
-        else:
-            init_object = 'osid_objects.OsidObjectForm'
-        try:
-            persisted_initers = make_persistance_initers(
-                patterns[interface_name[:-4] + '.persisted_data'],
-                patterns[interface_name[:-4] + '.initialized_data'],
-                patterns[interface_name[:-4] + '.aggregate_data'])
-            #persisted_initers = make_persistance_initers(
-            #    patterns[interface_name[:-4] + '.persisted_data'],
-            #    dict(patterns[interface_name[:-4] + '.initialized_data'], **patterns[interface_name[:-4] + '.instance_data']),
-            #    patterns[interface_name[:-4] + '.aggregate_data'])
-        except KeyError:
-            pass
-        try:
-            metadata_initers = make_metadata_initers(
-                patterns[interface_name[:-4] + '.persisted_data'],
-                patterns[interface_name[:-4] + '.initialized_data'],
-                patterns[interface_name[:-4] + '.return_types'])
-        except KeyError:
-            pass
-    elif init_pattern == 'resource.ResourceQuery':
-        object_name = interface_name[:-5]
-    
-    #object_imports = []
-    #abject_import.append(patterns['package_objects_caps'])
-    #abject_import.append(patterns['package_relationships_caps'])
-    #for 
-
     if hasattr(templates, init_pattern.split('.')[-1]):
         template_class = getattr(templates, init_pattern.split('.')[-1])
         if hasattr(template_class, 'init_template'):
+            context = get_init_context(init_pattern, interface_name, package, patterns)
             template = string.Template(getattr(template_class, 'init_template'))
-            return template.substitute({'app_name': app_name(package['name']),
-                                        'implpkg_name': pkg_name(package['name']),
-                                        'pkg_name': package['name'],
-                                        'pkg_name_upper': package['name'].upper(),
-                                        'interface_name': interface_name,
-                                        'instance_initers': instance_initers,
-                                        'persisted_initers': persisted_initers,
-                                        'metadata_initers': metadata_initers,
-                                        'object_name': object_name,
-                                        'object_name_under': camel_to_under(object_name),
-                                        'object_name_upper': camel_to_under(object_name).upper(),
-                                        'cat_name': cat_name,
-                                        'cat_name_plural': make_plural(cat_name),
-                                        'cat_name_under': camel_to_under(cat_name),
-                                        'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
-                                        'cat_name_upper': cat_name.upper(),
-                                        'init_object': init_object})
+            return template.substitute(context)
         else:
             return ''
     else:
@@ -1134,3 +1064,79 @@ def app_name(string):
 
 def pkg_name(string):
     return pkg_prefix + '_'.join(string.split('.')) + pkg_suffix
+
+#################
+# Template context methods
+#################
+
+def get_init_context(init_pattern, interface_name, package, patterns):
+    """get the init context, for templating"""
+    instance_initers = ''
+    persisted_initers = ''
+    metadata_initers = ''
+    object_name = ''
+    init_object = ''
+    cat_name = patterns['package_catalog_caps']
+
+    ##
+    # Check for any special data initializations and call the appropriate makers
+    # to assemble them.
+    if init_pattern == 'resource.Bin':
+        object_name = interface_name
+    elif init_pattern == 'resource.BinForm':
+        object_name = interface_name[:-4]
+    elif init_pattern == 'resource.ResourceLookupSession':
+        object_name = interface_name[:-13]
+    elif init_pattern == 'commenting.CommentLookupSession':
+        object_name = interface_name[:-13]
+    elif init_pattern == 'resource.Resource':
+        object_name = interface_name
+        try:
+            instance_initers = make_instance_initers(
+                patterns[interface_name + '.instance_data'])
+        except KeyError:
+            pass
+    elif init_pattern == 'resource.ResourceForm':
+        object_name = interface_name[:-4]
+        if object_name in patterns['package_relationships_caps']:
+            init_object = 'osid_objects.OsidRelationshipForm'
+        else:
+            init_object = 'osid_objects.OsidObjectForm'
+        try:
+            persisted_initers = make_persistance_initers(
+                patterns[interface_name[:-4] + '.persisted_data'],
+                patterns[interface_name[:-4] + '.initialized_data'],
+                patterns[interface_name[:-4] + '.aggregate_data'])
+            #persisted_initers = make_persistance_initers(
+            #    patterns[interface_name[:-4] + '.persisted_data'],
+            #    dict(patterns[interface_name[:-4] + '.initialized_data'], **patterns[interface_name[:-4] + '.instance_data']),
+            #    patterns[interface_name[:-4] + '.aggregate_data'])
+        except KeyError:
+            pass
+        try:
+            metadata_initers = make_metadata_initers(
+                patterns[interface_name[:-4] + '.persisted_data'],
+                patterns[interface_name[:-4] + '.initialized_data'],
+                patterns[interface_name[:-4] + '.return_types'])
+        except KeyError:
+            pass
+    elif init_pattern == 'resource.ResourceQuery':
+        object_name = interface_name[:-5]
+
+    return {'app_name': app_name(package['name']),
+            'implpkg_name': pkg_name(package['name']),
+            'pkg_name': package['name'],
+            'pkg_name_upper': package['name'].upper(),
+            'interface_name': interface_name,
+            'instance_initers': instance_initers,
+            'persisted_initers': persisted_initers,
+            'metadata_initers': metadata_initers,
+            'object_name': object_name,
+            'object_name_under': camel_to_under(object_name),
+            'object_name_upper': camel_to_under(object_name).upper(),
+            'cat_name': cat_name,
+            'cat_name_plural': make_plural(cat_name),
+            'cat_name_under': camel_to_under(cat_name),
+            'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
+            'cat_name_upper': cat_name.upper(),
+            'init_object': init_object}
