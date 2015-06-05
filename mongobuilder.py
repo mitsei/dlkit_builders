@@ -957,6 +957,21 @@ def pkg_name(string):
 
 def get_method_context(package_name, method):
     """Get the method context vars, to be used in the template"""
+    def construct_arg_context(arg_number, arg_params):
+        arg_type_full = arg_params[0]
+        arg_type = arg_params[1]
+        arg_context = {
+            arg_number + '_type': arg_type_full.split('.')[-1].strip('[]'),
+            arg_number + '_type_under': camel_to_under(arg_type),
+            arg_number + '_type_mixed': camel_to_mixed(arg_type),
+            arg_number + '_abcapp_name': abc_app_name(get_pkg_name(arg_type_full.strip('[]'))),
+            arg_number + '_abcpkg_name': abc_pkg_name(get_pkg_name(arg_type_full.strip('[]'))),
+            arg_number + '_module': get_interface_module(
+                get_pkg_name(arg_type_full),
+                arg_type_full.split('.')[-1].strip('[]'))
+        }
+        return arg_context
+
     context = {}
     arg_list = []
     for arg in method['args']:
@@ -977,41 +992,17 @@ def get_method_context(package_name, method):
         context['session_shortname_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
 
     if 'arg0_type_full' in context:
-        context['arg0_type'] = context['arg0_type_full'].split('.')[-1].strip('[]')
-        context['arg0_type_under'] = camel_to_under(context['arg0_type'])
-        context['arg0_type_mixed'] = camel_to_mixed(context['arg0_type'])
-        context['arg0_abcapp_name'] = abc_app_name(get_pkg_name(context['arg0_type_full'].strip('[]')))
-        context['arg0_abcpkg_name'] = abc_pkg_name(get_pkg_name(context['arg0_type_full'].strip('[]')))
-        context['arg0_module'] = get_interface_module(
-                                get_pkg_name(context['arg0_type_full']),
-                                context['arg0_type_full'].split('.')[-1].strip('[]'))
+        context.update(construct_arg_context('arg0',
+                                             (context['arg0_type_full'], context['arg0_type'])))
     if 'arg1_type_full' in context:
-        context['arg1_type'] = context['arg1_type_full'].split('.')[-1].strip('[]')
-        context['arg1_type_under'] = camel_to_under(context['arg1_type'])
-        context['arg1_type_mixed'] = camel_to_mixed(context['arg1_type'])
-        context['arg1_abcapp_name'] = abc_app_name(get_pkg_name(context['arg1_type_full'].strip('[]')))
-        context['arg1_abcpkg_name'] = abc_pkg_name(get_pkg_name(context['arg1_type_full'].strip('[]')))
-        context['arg1_module'] = get_interface_module(
-                                get_pkg_name(context['arg1_type_full']),
-                                context['arg1_type_full'].split('.')[-1].strip('[]'))
+        context.update(construct_arg_context('arg1',
+                                             (context['arg1_type_full'], context['arg1_type'])))
     if 'arg2_type_full' in context:
-        context['arg2_type'] = context['arg2_type_full'].split('.')[-1].strip('[]')
-        context['arg2_type_under'] = camel_to_under(context['arg2_type'])
-        context['arg2_type_mixed'] = camel_to_mixed(context['arg2_type'])
-        context['arg2_abcapp_name'] = abc_app_name(get_pkg_name(context['arg2_type_full'].strip('[]')))
-        context['arg2_abcpkg_name'] = abc_pkg_name(get_pkg_name(context['arg2_type_full'].strip('[]')))
-        context['arg2_module'] = get_interface_module(
-                                get_pkg_name(context['arg2_type_full']),
-                                context['arg2_type_full'].split('.')[-1].strip('[]'))
+        context.update(construct_arg_context('arg2',
+                                             (context['arg2_type_full'], context['arg2_type'])))
     if 'arg3_type_full' in context:
-        context['arg3_type'] = context['arg3_type_full'].split('.')[-1].strip('[]')
-        context['arg3_type_under'] = camel_to_under(context['arg3_type'])
-        context['arg3_type_mixed'] = camel_to_mixed(context['arg3_type'])
-        context['arg3_abcapp_name'] = abc_app_name(get_pkg_name(context['arg3_type_full'].strip('[]')))
-        context['arg3_abcpkg_name'] = abc_pkg_name(get_pkg_name(context['arg3_type_full'].strip('[]')))
-        context['arg3_module'] = get_interface_module(
-                                get_pkg_name(context['arg3_type_full']),
-                                context['arg3_type_full'].split('.')[-1].strip('[]'))
+        context.update(construct_arg_context('arg3',
+                                             (context['arg3_type_full'], context['arg3_type'])))
     if 'arg0_object' in context:
         context['arg0_object_under'] = camel_to_under(context['arg0_object'])
         context['arg0_object_mixed'] = camel_to_mixed(context['arg0_object'])
@@ -1019,8 +1010,8 @@ def get_method_context(package_name, method):
         context['return_type'] = context['return_type_full'].split('.')[-1]
         context['return_pkg'] = get_pkg_name(context['return_type_full'])
         context['return_module'] = get_interface_module(
-                                  get_pkg_name(context['return_type_full']),
-                                  context['return_type_full'].split('.')[-1])
+            get_pkg_name(context['return_type_full']),
+            context['return_type_full'].split('.')[-1])
     if 'return_pkg' in context:
         context['return_app_name'] = app_name(context['return_pkg'])
         context['return_implpkg_name'] = pkg_name(context['return_pkg'])
@@ -1076,15 +1067,15 @@ def get_method_context(package_name, method):
     if 'Proxy' in context['interface_name']:
         context['non_proxy_interface_name'] = ''.join(context['interface_name'].split('Proxy'))
     if ('return_pkg' in context and 'return_module' in context and
-        context['package_name'] == context['return_pkg'] and
-        context['module_name'] == context['return_module']):
+            context['package_name'] == context['return_pkg'] and
+            context['module_name'] == context['return_module']):
         context['import_str'] = ''
     elif ('package_name' in context and 'return_pkg' in context and
           'return_type' in context and 'return_module' in context):
         context['import_str'] = ('        from ..' +
-                                context['return_implpkg_name'] + '.' +
-                                context['return_module'] + ' import ' +
-                                context['return_type'] + '\n')  ### WHY DO WE NEED import_str???
+                                 context['return_implpkg_name'] + '.' +
+                                 context['return_module'] + ' import ' +
+                                 context['return_type'] + '\n')  ### WHY DO WE NEED import_str???
 
     # Uncomment next line to identify on which method a KeyError is occurring
     #print interface['shortname'], method['name']
