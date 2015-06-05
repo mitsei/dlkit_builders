@@ -52,7 +52,6 @@ class AssessmentSession:
         'from ..primitives import DateTime',
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
-        'from .. import mongo_client',
         'from . import objects',
         'from .rules import Response',
         'from ..osid.sessions import OsidSession',
@@ -75,40 +74,6 @@ class AssessmentSession:
             cat_class=objects.Bank)
         self._forms = dict()
 """
-    
-    old_init ="""
-    def __init__(self, catalog_id = None, *args, **kwargs):
-        #from ..osid.sessions import OsidSession
-        from . import profile
-        OsidSession.__init__(self, *args, **kwargs)
-        collection = mongo_client[self._db_prefix + 'assessment']['Bank']
-        if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
-            self._catalog_identifier = catalog_id.get_identifier()
-            self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
-            if self._my_catalog_map is None:
-                raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier())
-        else:
-            from ..primitives import Id, Type
-            from .. import types
-            self._catalog_identifier = '000000000000000000000000'
-            self._my_catalog_map = {
-                '_id': ObjectId(self._catalog_identifier),
-                'displayName': {'text': 'Default Bank',
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'description': {'text': 'The Default Bank',
-                                'languageType': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptType': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatType': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'genusType': str(Type(**types.Genus().get_type_data('DEFAULT')))
-            }
-        self._catalog = Bank(self._my_catalog_map)
-        self._catalog_id = self._catalog.get_id()
-        self._forms = dict()
-        #mongo_client.close()
-"""
-
     
     can_take_assessments = """
         # NOTE: It is expected that real authentication hints will be
@@ -318,11 +283,8 @@ class AssessmentSession:
     def _get_question(self, item_idstr):
         \"\"\"Helper method for getting a Question object given an Id.\"\"\"
         item_id = Id(item_idstr)
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        if item_map is None:
-            raise errors.NotFound()
-        #mongo_client.close()
         return objects.Question(item_map['question'], db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     get_questions = """
@@ -610,7 +572,6 @@ class ItemAdminSession:
     import_statements = [
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
-        'from .. import mongo_client',
         'from bson.objectid import ObjectId',
         'from ..utilities import MongoClientValidated',
         'UPDATED = True',
@@ -699,7 +660,6 @@ class ItemAdminSession:
             raise errors.OperationFailed()
         self._forms[question_form.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
-        #mongo_client.close()
         return objects.Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
@@ -708,40 +668,36 @@ class AssessmentAdminSession:
     import_statements = [
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
-        'from .. import mongo_client',
         'from bson.objectid import ObjectId',
+        'from ..utilities import MongoClientValidated',
         'UPDATED = True',
         'CREATED = True'
         ]
     
     delete_assessment = """
         from ...abstract_osid.id.primitives import Id as ABCId
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
         if not isinstance(assessment_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentOffered']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentOffered')
         if collection.find({'assessmentId': str(assessment_id)}).count() != 0:
             raise errors.IllegalState('there are still AssessmentsOffered associated with this Assessment')
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
-        delete_result = collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
-        if delete_result.deleted_count == 0:
-            raise errors.NotFound()
-        #mongo_client.close()"""
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
+        collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})"""
 
 class AssessmentTakenLookupSession:
     
     import_statements = [
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
-        'from .. import mongo_client',
         'from . import objects',
-        ]
+        'from ..utilities import MongoClientValidated'
+    ]
     
     # This is hand built, but there may be a pattern to try to map, specifically
     # getting objects for another package object and a persisted id thingy
     get_assessments_taken_for_taker_and_assessment_offered = """
         # NOTE: This implementation currently ignores plenary view
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
         if self._catalog_view == ISOLATED:
             result = collection.find({'assessmentOfferedId': str(assessment_offered_id),
                                       'takingAgentId': str(resource_id),
@@ -754,11 +710,10 @@ class AssessmentTakenLookupSession:
                                       'takingAgentId': str(resource_id)}).sort('_id', DESCENDING)
             count = collection.find({'assessmentOfferedId': str(assessment_offered_id),
                                      'takingAgentId': str(resource_id)}).count()
-        #mongo_client.close()
         return objects.AssessmentTakenList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     get_assessments_taken_for_assessment = """
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentOffered']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentOffered')
         if self._catalog_view == ISOLATED:
             result = collection.find({'assessmentId': str(assessment_id),
                                       'bankId': str(self._catalog_id)}).sort('_id', DESCENDING)
@@ -773,7 +728,7 @@ class AssessmentTakenLookupSession:
             db_prefix=self._db_prefix,
             runtime=self._runtime)
 
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
         ao_ids = []
         for assessment_offered in assessments_offered:
             ao_ids.append(str(assessment_offered.get_id()))
@@ -786,15 +741,17 @@ class AssessmentTakenLookupSession:
         else:
             result = collection.find({'assessmentOfferedId': {"$in":[ao_ids]}}).sort('_id', DESCENDING)
             count = collection.find({'assessmentOfferedId': {"$in":[ao_ids]}}).count()
-        #mongo_client.close()
-        return objects.AssessmentTakenList(result, count, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.AssessmentTakenList(result,
+                                           count,
+                                           db_prefix=self._db_prefix,
+                                           runtime=self._runtime)"""
 
 
 class AssessmentOfferedAdminSession:
     
     deprecated_import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'UPDATED = True',
         'CREATED = True',
     ]
@@ -812,7 +769,7 @@ class AssessmentOfferedAdminSession:
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         ##
         #...Here:
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
         assessment_map = collection.find_one(
             {'$and': [{'_id': ObjectId(assessment_id.get_identifier())}, {'bankId': str(self._catalog_id)}]})
         ##
@@ -836,14 +793,13 @@ class AssessmentOfferedAdminSession:
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        #mongo_client.close()
         return obj_form"""
 
 class AssessmentTakenAdminSession:
     
     deprecated_import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'UPDATED = True',
         'CREATED = True',
     ]
@@ -856,7 +812,7 @@ class AssessmentTakenAdminSession:
         # and checks for exceeding max attempts...
         from ...abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm
         from ..osid.osid_errors import PermissionDenied
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
         if not isinstance(assessment_taken_form, ABCAssessmentTakenForm):
             raise errors.InvalidArgument('argument type is not an AssessmentTakenForm')
         if assessment_taken_form.is_for_update():
@@ -884,12 +840,9 @@ class AssessmentTakenAdminSession:
         except AttributeError:
             pass
         assessment_taken_form._my_map['takingAgentId'] = str(self.get_effective_agent_id())
-        ##
+
         insert_result = collection.insert_one(assessment_taken_form._my_map)
-        # what exceptions does mongodb insert_one raise?
-            #raise errors.OperationFailed()
         self._forms[assessment_taken_form.get_id().get_identifier()] = CREATED
-        #mongo_client.close()
         return objects.AssessmentTaken(
             collection.find_one({'_id': insert_result.inserted_id}), db_prefix=self._db_prefix, runtime=self._runtime)"""
 
@@ -900,8 +853,8 @@ class AssessmentBasicAuthoringSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
-        'from .. import mongo_client',
         'from ..osid.sessions import OsidSession',
+        'from ..utilities import MongoClientValidated'
     ]
     
     init = """
@@ -926,75 +879,68 @@ class AssessmentBasicAuthoringSession:
         return True"""
     
     get_items = """
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-        if assessment is None:
-            raise errors.NotFound()
         if 'itemIds' not in assessment or assessment['itemIds'] == []:
             return objects.ItemList([], db_prefix=self._db_prefix, runtime=self._runtime)
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
+
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         item_list = []
+
         # This appears to assume that all the Items exist. Need to consider this further:
         for i in assessment['itemIds']:
             item_list.append(collection.find_one({'_id': ObjectId(Id(i).get_identifier())}))
-        #mongo_client.close()
         return objects.ItemList(item_list, db_prefix=self._db_prefix, runtime=self._runtime)"""
     
     add_item = """
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
-        item = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        if not item:
-            raise errors.NotFound()
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
+        # make sure the item exists, first
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
+        collection.find_one({'_id': ObjectId(item_id.get_identifier())})
+
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-        if not assessment:
-            raise errors.NotFound()
+
         if 'itemIds' not in assessment:
             assessment['itemIds'] = [str(item_id)]
         else:
             assessment['itemIds'].append(str(item_id))
-        collection.save(assessment)
-        #mongo_client.close()"""
+        collection.save(assessment)"""
     
     remove_item = """
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-        if not assessment:
-            raise errors.NotFound('an assessment with assessment_id does not exist')
+
         try:
             assessment['itemIds'].remove(str(item_id))
         except (KeyError, ValueError):
             raise errors.NotFound('item_id not found on assessment')
-        collection.save(assessment)
-        #mongo_client.close()"""
+        collection.save(assessment)"""
     
     move_item = """
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-        if assessment is None:
-            raise errors.NotFound('an assessment with assessment_id does not exist')
+
         try:
             p_index = assessment['itemIds'].index(str(preceeding_item_id))
         except (KeyError, ValueError):
             raise errors.NotFound('preceeding_item_id not associated with assessment')
+
         try:
             assessment['itemIds'].remove(str(item_id))
         except ValueError:
             raise errors.NotFound('item_id not associated with assessment')
         assessment['itemIds'].insert(str(item_id), p_index + 1)
-        collection.save(assessment)
-        #mongo_client.close()"""
+        collection.save(assessment)"""
     
     order_items = """
-    ## STILL NOT DONE???
+        ## STILL NOT DONE???
         # Currently this implementation assumes that all item_ids are
         # included in the argument list. The case where a subset is provided
         # will be implemented later, but this covers the primary case
         # that we will see from a RESTful consumer.
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-        if assessment is None:
-            raise errors.NotFound('an assessment with assessment_id does not exist')
+
         try:
             if len(assessment['itemIds']) != len(item_ids):
                 raise errors.OperationFailed('number of items does not match those in assessment')
@@ -1006,8 +952,7 @@ class AssessmentBasicAuthoringSession:
                 raise errors.OperationFailed('one or more items are not associated with this assessment')
             item_id_list.append(str(i))
         assessment['itemIds'] = item_id_list
-        collection.save(assessment)
-        #mongo_client.close()"""
+        collection.save(assessment)"""
 
 
 class Question:
@@ -1016,7 +961,7 @@ class Question:
         '#from ..osid.objects import OsidObject',
         'from ..id.objects import IdList',
         'from ..primitives import Id',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'from bson.objectid import ObjectId',
     ]
     
@@ -1032,10 +977,8 @@ class Question:
     ##
     # This method mirrors that in the Item so that questions can also be inspected for learning objectives:
     def get_learning_objective_ids(self):
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         item_map = collection.find_one({'_id': ObjectId(Id(self._my_map['itemId']).get_identifier())})
-        if not item_map:
-            raise errors.OperationFailed()
         return IdList(item_map['learningObjectiveIds'])
 """
 
@@ -1166,7 +1109,7 @@ class AssessmentTaken:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from ..osid.objects import OsidObject',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
     ]
     
     additional_methods = """
@@ -1252,14 +1195,15 @@ class AssessmentTaken:
     ### These methods are under consideration:
     additional_methods_under_consideration = """
     def _start_assessment(self)
-        collection = mongo_client[self._db_prefix + 'assessment']['Assessment']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
         assessment_id = self.get_assessment_offered().get_assessment_id()
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if 'itemIds' not in assessment:
             item_ids = [] # But will this EVER be the case?
         else:
             item_ids = assessment['itemIds']
-        collection = mongo_client[self._db_prefix + 'assessment']['Items']
+
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Items')
         item_identifier_list = []
         for item_id in item_ids:
             item_identifier_list.append(item_id.get_identifier())
@@ -1278,20 +1222,16 @@ class AssessmentTaken:
         self._my_map['responses'] = dict()
         for item_idstr in item_ids:
             self._my_map['responses'][Id(item_idstr).get_identifier()] = None
-        collection = mongo_client[self._db_prefix + 'assessment']['AssessmentTaken']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
         collection.save(self._my_map)
-        #mongo_client.close()
     
     def _get_question(self, item_id):
-        from .. import mongo_client
-        collection = mongo_client[self._db_prefix + 'assessment']['Item']
+        collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        if item_map is None:
-            raise errors.NotFound()
+
         question = Item(item_map).get_question()
         if self._my_map['itemConfigs][str(item_id)]:
             question.config(self._my_map['itemConfigs][str(item_id)])
-        #mongo_client.close()
         return question"""
 
 

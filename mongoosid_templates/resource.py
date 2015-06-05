@@ -115,7 +115,7 @@ class ResourceLookupSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'from . import objects',
         'from bson.objectid import ObjectId',
         'DESCENDING = -1',
@@ -196,23 +196,21 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resource
         # NOTE: This implementation currently ignores plenary view
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier()),
                                           '${cat_name_mixed}Id': str(self._catalog_id)})
         else:
             # This should really look in the underlying hierarchy (when hierarchy is implemented)
             result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-        if result is None:
-            raise errors.NotFound()
-        #mongo_client.close()
+
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_resources_by_ids_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_ids
         # NOTE: This implementation currently ignores plenary view
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         object_id_list = []
         for i in ${arg0_name}:
             object_id_list.append(ObjectId(i.get_identifier()))
@@ -224,14 +222,14 @@ class ResourceLookupSession:
         else:
             result = collection.find({'_id': {'$$in': object_id_list}}).sort('_id', DESCENDING)
             count = collection.find({'_id': {'$$in': object_id_list}}).count()
-        #mongo_client.close()
+
         return objects.${return_type}(result, count=count, runtime=self._runtime)"""
 
     get_resources_by_genus_type_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type
         # NOTE: This implementation currently ignores plenary view
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'genusTypeId': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
@@ -240,7 +238,7 @@ class ResourceLookupSession:
         else:
             result = collection.find({'genusTypeId': str(${arg0_name})}).sort('_id', DESCENDING)
             count = collection.find({'genusTypeId': str(${arg0_name})}).count()
-        #mongo_client.close()
+
         return objects.${return_type}(result, count=count, runtime=self._runtime)"""
 
     get_resources_by_parent_genus_type_template = """
@@ -258,14 +256,14 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources
         # NOTE: This implementation currently ignores plenary view
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
             count = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find().sort('_id', DESCENDING)
             count = collection.count()
-        #mongo_client.close()
+
         return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class ResourceQuerySession:
@@ -273,7 +271,7 @@ class ResourceQuerySession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..osid.sessions import OsidSession',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'from . import queries',
         'DESCENDING = -1',
         'ASCENDING = 1'
@@ -312,12 +310,12 @@ class ResourceQuerySession:
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resources_by_query
         query_terms = dict(${arg0_name}._query_terms)
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             query_terms['${cat_name_mixed}Id'] = str(self._catalog_id)
         result = collection.find(query_terms).sort('_id', DESCENDING)
         count = collection.find(query_terms).count()
-        #mongo_client.close()
+
         return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
@@ -327,7 +325,7 @@ class ResourceAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..osid.sessions import OsidSession',
         'from ..primitives import Id',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'from . import objects',
         'from bson.objectid import ObjectId'
     ]
@@ -390,7 +388,7 @@ class ResourceAdminSession:
         # Implemented from template for
         # osid.resource.ResourceAdminSession.create_resource_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
@@ -402,37 +400,35 @@ class ResourceAdminSession:
             raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
-        insert_result = collection.insert_one(${arg0_name}._my_map)
-        # what exceptions does mongodb insert raise?
-            #raise errors.OperationFailed()
+        collection.insert_one(${arg0_name}._my_map)
+
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
             collection.find_one({'_id': insert_result.inserted_id}),
             db_prefix=self._db_prefix,
             runtime=self._runtime)
-        #mongo_client.close()
+
         return result"""
 
     get_resource_form_for_update_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-        if result == '':
-            raise errors.NotFound()
+
         obj_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-        #mongo_client.close()
+
         return obj_form"""
 
     update_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.update_resource_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
@@ -444,11 +440,10 @@ class ResourceAdminSession:
             raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
-        result = collection.save(${arg0_name}._my_map)
-        if result == "What to look for here???":
-            pass # Need to figure out what writeConcernErrors to catch and deal with?
+        collection.save(${arg0_name}._my_map)
+
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
-        #mongo_client.close()
+
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.${return_type}(
             ${arg0_name}._my_map,
@@ -459,17 +454,13 @@ class ResourceAdminSession:
         # Implemented from template for
         # osid.resource.ResourceAdminSession.delete_resource_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under}_map = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-        if ${object_name_under}_map is None:
-            raise errors.NotFound()
+
         objects.${object_name}(${object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
-        delete_result = collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-        # any reason to raise:
-            #raise errors.OperationFailed()
-        #mongo_client.close()"""
+        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
 
     alias_resources_template = """
@@ -508,7 +499,7 @@ class ResourceAgentSession:
         return self.get_resource_by_agent(agent_id).get_id()"""
 
     get_resource_by_agent = """
-        collection = mongo_client[self._db_prefix + 'resource']['Resource']
+        collection = MongoClientValidated(self._db_prefix + 'resource', 'Resource')
 
         if self._catalog_view == ISOLATED:
             result = collection.find_one({'agentIds': {'$in': [str(agent_id)]},
@@ -516,18 +507,16 @@ class ResourceAgentSession:
         else:
             # This should really look in the underlying hierarchy (when hierarchy is implemented)
             result = collection.find_one({'agentIds': {'$in': [str(agent_id)]}})
-        if result is None:
-            raise errors.NotFound()
+
         return objects.Resource(
             result,
             db_prefix=self._db_prefix,
             runtime=self._runtime)"""
 
     get_agent_ids_by_resource = """
-        collection = mongo_client[self._db_prefix + 'resource']['Resource']
+        collection = MongoClientValidated(self._db_prefix + 'resource', 'Resource')
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
-        if resource is None:
-            raise errors.NotFound()
+
         if 'agentIds' not in resource:
             result = IdList([])
         else:
@@ -561,10 +550,9 @@ class ResourceAgentAssignmentSession:
 
     assign_agent_to_resource = """
         # Should check for existence of Agent? We may mever manage them.
-        collection = mongo_client[self._db_prefix + 'resource']['Resource']
+        collection = MongoClientValidated(self._db_prefix + 'resource', 'Resource')
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
-        if not resource:
-            raise errors.NotFound()
+
         try:
             ResourceAgentSession(
                 self._catalog_id, self._proxy, self._runtime).get_resource_by_agent(agent_id)
@@ -579,10 +567,9 @@ class ResourceAgentAssignmentSession:
         collection.save(resource)"""
 
     unassign_agent_from_resource = """
-        collection = mongo_client[self._db_prefix + 'resource']['Resource']
+        collection = MongoClientValidated(self._db_prefix + 'resource', 'Resource')
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
-        if not resource:
-            raise errors.NotFound()
+
         try:
             resource['agentIds'].remove(str(agent_id))
         except (KeyError, ValueError):
@@ -597,7 +584,7 @@ class BinLookupSession:
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from . import objects',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'from bson.objectid import ObjectId',
         'DESCENDING = -1',
         'ASCENDING = 1',
@@ -629,15 +616,16 @@ class BinLookupSession:
     get_bin_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bin
-        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         # Need to consider how to best deal with the "phantom root" catalog issue
         if ${arg0_name}.get_identifier() == '000000000000000000000000':
             return self._get_phantom_root_catalog(cat_class=objects.${cat_name}, cat_name='${cat_name}')
-        result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-        if result is None:
+        try:
+            collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+        except errors.NotFound:
             # Try creating an orchestrated ${cat_name}.  Let it raise errors.NotFound()
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
-        #mongo_client.close()
+
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_bins_by_ids_template = """
@@ -648,10 +636,10 @@ class BinLookupSession:
         catalog_id_list = []
         for i in ${arg0_name}:
             catalog_id_list.append(ObjectId(i.get_identifier()))
-        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
         count = collection.find({'_id': {'$$in': catalog_id_list}}).count()
-        #mongo_client.close()
+
         return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
@@ -659,10 +647,10 @@ class BinLookupSession:
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bins_template
         # NOTE: This implementation currently ignores plenary view
-        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         result = collection.find().sort('_id', DESCENDING)
         count = collection.count()
-        #mongo_client.close()
+
         return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class BinAdminSession:
@@ -671,7 +659,7 @@ class BinAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'from . import objects',
         'from bson.objectid import ObjectId',
         'CREATED = True',
@@ -724,7 +712,7 @@ class BinAdminSession:
         # Implemented from template for
         # osid.resource.BinAdminSession.create_bin_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
@@ -736,37 +724,35 @@ class BinAdminSession:
             raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
-        insert_result = collection.insert_one(${arg0_name}._my_map)
-        # what errors does mongodb insert_one raise?
-            #raise errors.OperationFailed()
+        collection.insert_one(${arg0_name}._my_map)
+
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
             collection.find_one({'_id': insert_result.inserted_id}),
             db_prefix=self._db_prefix,
             runtime=self._runtime)
-        #mongo_client.close()
+
         return result"""
 
     get_bin_form_for_update_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-        if result is None:
-            raise errors.NotFound()
+
         cat_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
-        #mongo_client.close()
+
         return cat_form"""
 
     update_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.update_bin_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
@@ -778,11 +764,10 @@ class BinAdminSession:
             raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
-        result = collection.save(${arg0_name}._my_map) # save is deprecated - change to replace_one
-        if result == "What to look for here???":
-            pass # Need to figure out what writeConcernErrors to catch and deal with?
+        collection.save(${arg0_name}._my_map) # save is deprecated - change to replace_one
+
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
-        #mongo_client.close()
+
         # Note: this is out of spec. The OSIDs don't require an object to be returned
         return objects.${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
@@ -790,19 +775,14 @@ class BinAdminSession:
         # Implemented from template for
         # osid.resource.BinAdminSession.delete_bin_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${cat_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         for object_catalog in ${cataloged_object_caps_list}:
-            obj_collection = mongo_client[self._db_prefix + '${package_name}'][object_catalog]
+            obj_collection = MongoClientValidated(self._db_prefix + '${package_name}', object_catalog)
             if obj_collection.find({'${cat_name_mixed}Id': str(${arg0_name})}).count() != 0:
                 raise errors.IllegalState('catalog is not empty')
-        delete_result = collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-        # any reason to raise:
-            #raise errors.OperationFailed()
-        if delete_result.deleted_count == 0:
-            raise errors.NotFound()
-        #mongo_client.close()"""
+        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
     alias_bin_template = """
         # Implemented from template for

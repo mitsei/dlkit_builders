@@ -5,7 +5,7 @@ class RelationshipLookupSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'from . import objects',
         'from bson.objectid import ObjectId',
         'DESCENDING = -1',
@@ -22,7 +22,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
@@ -31,14 +31,13 @@ class RelationshipLookupSession:
         else:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${source_name_mixed}Id': str(${arg0_name})}).count()
-        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_source_template = """
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       'genusTypeId': str(${arg1_name}),
@@ -51,14 +50,13 @@ class RelationshipLookupSession:
                                       'genusTypeId': str(${arg1_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                      'genusTypeId': str(${arg1_name})}).count()
-        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_for_destination_template = """
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
@@ -67,14 +65,13 @@ class RelationshipLookupSession:
         else:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${destination_name_mixed}Id': str(${arg0_name})}).count()
-        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_destination_template = """
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                       'genusTypeId': str(${arg1_name}),
@@ -87,14 +84,13 @@ class RelationshipLookupSession:
                                       'genusTypeId': str(${arg1_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                      'genusTypeId': str(${arg1_name})}).count()
-        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_for_peers_template = """
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${destination_name_mixed}Id': str(${arg1_name}),
@@ -107,14 +103,13 @@ class RelationshipLookupSession:
                                       '${destination_name_mixed}Id': str(${arg1_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                      '${destination_name_mixed}Id': str(${arg1_name})}).count()
-        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_peers_template = """
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${destination_name_mixed}Id': str(${arg1_name}),
@@ -131,7 +126,6 @@ class RelationshipLookupSession:
             count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                      '${destination_name_mixed}Id': str(${arg1_name}),
                                      'genusTypeId': str(${arg2_name})}).count()
-        #mongo_client.close()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
 class RelationshipAdminSession:

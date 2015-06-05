@@ -34,10 +34,12 @@ class MongoClientValidated(object):
     def insert_one(self, doc):
         result = self._mc.insert_one(doc)
         self._validate_write(result)
+        return result
 
     def save(self, doc):
         result = self._mc.save(doc)
         self._validate_write(result)
+        return result
 
 def arguments_not_none(func):
     """decorator, to check if any arguments are None; raise exception if so"""

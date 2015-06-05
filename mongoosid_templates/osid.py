@@ -320,7 +320,7 @@ class OsidSession:
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
         'from importlib import import_module',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'from .. import types',
         'COMPARATIVE = 0',
         'PLENARY = 1',
@@ -366,12 +366,13 @@ class OsidSession:
             self._db_prefix = runtime.get_configuration().get_value_by_parameter(prefix_param_id).get_string_value()
         else:
             self._db_prefix = ''
-        collection = mongo_client[self._db_prefix + db_name][cat_name]
         if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
             self._catalog_identifier = catalog_id.get_identifier()
-            self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
-            if self._my_catalog_map is None:
-                # Should also check for the authority here:
+
+            collection = MongoClientValidated(self._db_prefix + db_name, cat_name)
+            try:
+                self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
+            except errors.NotFound():
                 if catalog_id.get_identifier_namespace() != db_name + '.' + cat_name:
                     self._my_catalog_map = self._create_orchestrated_cat(catalog_id, db_name, cat_name)
                 else:
@@ -394,7 +395,6 @@ class OsidSession:
         self._catalog = cat_class(self._my_catalog_map)
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
-        #mongo_client.close()
 
     def _get_phantom_root_catalog(self, cat_name, cat_class):
         \"\"\"Get's the catalog id corresponding to the root of all implementation catalogs.\"\"\"
@@ -419,14 +419,11 @@ class OsidSession:
         try:
             foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
             foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
-            collection = mongo_client[self._db_prefix + foreign_db_name][foreign_cat_name]
-            if not collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())}):
-                #mongo_client.close()
-                raise errors.NotFound()
+            collection = MongoClientValidated(self._db_prefix + foreign_db_name, foreign_cat_name)
+            collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())})
         except KeyError:
-            #mongo_client.close()
             raise errors.NotFound()
-        collection = mongo_client[self._db_prefix + db_name][cat_name]
+        collection = MongoClientValidated(self._db_prefix + db_name, cat_name)
         catalog_map = {
             '_id': ObjectId(foreign_catalog_id.get_identifier()),
             'displayName': {'text': ('Orchestrated ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' ' + cat_name),
@@ -442,7 +439,6 @@ class OsidSession:
 
         }
         collection.insert_one(catalog_map)
-        #mongo_client.close()
         return catalog_map
 
     def _get_provider_manager(self, osid):
