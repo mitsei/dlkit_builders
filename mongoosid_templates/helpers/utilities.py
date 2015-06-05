@@ -9,10 +9,16 @@ def arguments_not_none(func):
         for arg in args:
             if arg is None:
                 raise NullArgument()
-        for arg, val in kwargs:
+        for arg, val in kwargs.iteritems():
             if val is None:
                 raise NullArgument()
-        return func(*args, **kwargs)
+        try:
+            return func(*args, **kwargs)
+        except TypeError as ex:
+            if 'takes exactly' in ex.args[0]:
+                raise NullArgument('Not all arguments provided: ' + str(ex.args[0]))
+            else:
+                raise TypeError(ex.args[0])
 
     return wrapper
 

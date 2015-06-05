@@ -939,8 +939,6 @@ class OsidForm:
         return Metadata(**self._journal_comment_metadata)"""
 
     set_journal_comment = """
-        if comment is None:
-            raise errors.NullArgument()
         if self.get_journal_comment_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_string(comment, self.get_journal_comment_metadata()):
@@ -1263,6 +1261,7 @@ class OsidQuery:
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
         'from dlkit.primordium.locale.types.string import get_type_data',
+        'from .. import utilities',
     ]
 
     init = """
@@ -1285,12 +1284,9 @@ class OsidQuery:
         elif string_match_type == Type(**get_type_data(\'WORDIGNORECASE\')):
             return re.compile('.*' + string + '.*', re.I)
 
-    def _add_match(self, match_key, match_value, match):
+    @utilities.arguments_not_none
+    def _add_match(self, match_key, match_value, match=True):
         \"\"\"Adds a match key/value\"\"\"
-        if match_key is None:
-            raise errors.NullArgument()
-        if match is None:
-            match = True
         if match:
             inin = '$in'
         else:
@@ -1303,19 +1299,15 @@ class OsidQuery:
         else:
             self._query_terms[match_key] = {inin: [match_value]}
 
+    @utilities.arguments_not_none
     def _match_display_text(self, element_key, string, string_match_type, match):
         \"\"\"Matches a display text value\"\"\"
-        if string is None or string_match_type is None:
-            raise errors.NullArgument()
         match_value = self._get_string_match_value(string, string_match_type)
         self._add_match(element_key + '.text', match_value, match)
 
-    def _match_minimum_decimal(self, match_key, decimal_value, match):
+    @utilities.arguments_not_none
+    def _match_minimum_decimal(self, match_key, decimal_value, match=True):
         \"\"\"Matches a minimum decimal value\"\"\"
-        if decimal_value is None:
-            raise errors.NullArgument()
-        if match is None:
-            match = True
         if match:
             gtelt = '$gte'
         else:
@@ -1325,12 +1317,9 @@ class OsidQuery:
         else:
             self._query_terms[match_key] = {gtelt: decimal_value}
 
-    def _match_maximum_decimal(self, match_key, decimal_value, match):
+    @utilities.arguments_not_none
+    def _match_maximum_decimal(self, match_key, decimal_value, match=True):
         \"\"\"Matches a minimum decimal value\"\"\"
-        if decimal_value is None:
-            raise errors.NullArgument()
-        if match is None:
-            match = True
         if match:
             ltegt = '$lte'
         else:
@@ -1340,12 +1329,9 @@ class OsidQuery:
         else:
             self._query_terms[match_key] = {ltegt: decimal_value}
 
-    def _match_minimum_date_time(self, match_key, date_time_value, match):
+    @utilities.arguments_not_none
+    def _match_minimum_date_time(self, match_key, date_time_value, match=True):
         \"\"\"Matches a minimum date time value\"\"\"
-        if date_time_value is None:
-            raise errors.NullArgument()
-        if match is None:
-            match = True
         if match:
             gtelt = '$gte'
         else:
@@ -1355,12 +1341,9 @@ class OsidQuery:
         else:
             self._query_terms[match_key] = {gtelt: date_time_value}
 
-    def _match_maximum_date_time(self, match_key, date_time_value, match):
+    @utilities.arguments_not_none
+    def _match_maximum_date_time(self, match_key, date_time_value, match=True):
         \"\"\"Matches a maximum date time value\"\"\"
-        if date_time_value is None:
-            raise errors.NullArgument()
-        if match is None:
-            match = True
         if match:
             gtelt = '$lte'
         else:

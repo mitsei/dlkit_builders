@@ -3,7 +3,8 @@
 class ResourceProfile:
 
     import_statements_pattern = [
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
+        'from dlkit_django import PROXY_SESSION, proxy_example',
+        'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -16,7 +17,7 @@ class ResourceProfile:
     init_template = """
     @classmethod
     def setUpClass(cls):
-        cls.mgr = RUNTIME.get_service_manager('${pkg_name_upper}', PROXY)
+        cls.mgr = Runtime().get_service_manager('${pkg_name_upper}', 'TEST_SERVICE', PROXY)
 """
 
     supports_visible_federation_template = """
@@ -40,13 +41,13 @@ class ResourceManager:
     init_template = """
     @classmethod
     def setUpClass(cls):
-        cls.svc_mgr = RUNTIME.get_service_manager('${pkg_name_upper}', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${pkg_name} manager tests'
         catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.catalog_id = catalog.get_id()
-        cls.mgr = RUNTIME.get_manager('${pkg_name_upper}', 'MONGO_1', (3, 0, 0))
+        cls.mgr = Runtime().get_manager('${pkg_name_upper}', 'TEST_MONGO_1', (3, 0, 0))
 
     @classmethod
     def tearDownClass(cls):
@@ -77,13 +78,13 @@ class ResourceProxyManager:
     init_template = """
     @classmethod
     def setUpClass(cls):
-        cls.svc_mgr = RUNTIME.get_service_manager('${pkg_name_upper}', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${pkg_name} proxy manager tests'
         catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.catalog_id = catalog.get_id()
-        cls.mgr = RUNTIME.get_proxy_manager('${pkg_name_upper}', 'MONGO_1', (3, 0, 0))
+        cls.mgr = Runtime().get_proxy_manager('${pkg_name_upper}', 'TEST_MONGO_1', (3, 0, 0))
 
     @classmethod
     def tearDownClass(cls):
@@ -110,7 +111,8 @@ class ResourceProxyManager:
 class ResourceLookupSession:
 
     import_statements_pattern = [
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
+        'from dlkit_django import PROXY_SESSION, proxy_example',
+        'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -124,7 +126,7 @@ class ResourceLookupSession:
     def setUpClass(cls):
         cls.${object_name_under}_list = list()
         cls.${object_name_under}_ids = list()
-        cls.svc_mgr = RUNTIME.get_service_manager('${pkg_name_upper}', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
@@ -230,7 +232,8 @@ class ResourceQuerySession:
 class ResourceAdminSession:
 
     import_statements_pattern = [
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
+        'from dlkit_django import PROXY_SESSION, proxy_example',
+        'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -242,7 +245,7 @@ class ResourceAdminSession:
     init_template = """
     @classmethod
     def setUpClass(cls):
-        cls.svc_mgr = RUNTIME.get_service_manager('${pkg_name_upper}', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
@@ -282,7 +285,8 @@ class ResourceAdminSession:
 class ResourceAgentSession:
 
     import_statements = [
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
+        'from dlkit_django import PROXY_SESSION, proxy_example',
+        'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -299,7 +303,7 @@ class ResourceAgentSession:
     def setUpClass(cls):
         cls.resource_list = list()
         cls.resource_ids = list()
-        cls.svc_mgr = RUNTIME.get_service_manager('RESOURCE', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('RESOURCE', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
         create_form.description = 'Test Bin for ResourceLookupSession tests'
@@ -348,7 +352,7 @@ class ResourceAgentAssignmentSession:
     def setUpClass(cls):
         cls.resource_list = list()
         cls.resource_ids = list()
-        cls.svc_mgr = RUNTIME.get_service_manager('RESOURCE', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('RESOURCE', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
         create_form.description = 'Test Bin for ResourceLookupSession tests'
@@ -390,7 +394,8 @@ class ResourceAgentAssignmentSession:
 class BinLookupSession:
 
     import_statements_pattern = [
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
+        'from dlkit_django import PROXY_SESSION, proxy_example',
+        'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -404,7 +409,7 @@ class BinLookupSession:
     def setUpClass(cls):
         cls.catalogs = list()
         cls.catalog_ids = list()
-        cls.svc_mgr = RUNTIME.get_service_manager('${pkg_name_upper}', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', 'TEST_SERVICE', PROXY)
         for num in [0, 1]:
             create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
             create_form.display_name = 'Test ${cat_name} ' + str(num)
@@ -453,7 +458,8 @@ class BinLookupSession:
 class BinAdminSession:
 
     import_statements_pattern = [
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
+        'from dlkit_django import PROXY_SESSION, proxy_example',
+        'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -466,7 +472,7 @@ class BinAdminSession:
     init_template = """
     @classmethod
     def setUpClass(cls):
-        cls.svc_mgr = RUNTIME.get_service_manager('${pkg_name_upper}', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', 'TEST_SERVICE', PROXY)
         # Initialize test catalog:
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
@@ -534,7 +540,7 @@ class BinHierarchySession:
     init_template = """
     @classmethod
     def setUpClass(cls):
-        cls.svc_mgr = RUNTIME.get_service_manager('${pkg_name_upper}', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', 'TEST_SERVICE', PROXY)
         cls.catalogs = dict()
         for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
             create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
