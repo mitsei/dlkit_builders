@@ -483,12 +483,7 @@ def make_additional_methods(interface_name, package, patterns):
 def make_init_methods(interface_name, package, patterns):
     templates = None
     init_pattern = ''
-    instance_initers = ''
-    persisted_initers = ''
-    metadata_initers = ''
-    object_name = ''
-    init_object = ''
-    cat_name = patterns['package_catalog_caps']
+
     impl_class = load_impl_class(pkg_name(package['name']), interface_name)
     if hasattr(impl_class, 'init'):
         return getattr(impl_class, 'init')
@@ -502,77 +497,12 @@ def make_init_methods(interface_name, package, patterns):
     else:
         return ''
 
-    ##
-    # Check for any special data initializations and call the appropriate makers
-    # to assemble them.
-    if init_pattern == 'resource.Bin':
-        object_name = interface_name
-    elif init_pattern == 'resource.BinForm':
-        object_name = interface_name[:-4]
-    elif init_pattern == 'resource.ResourceLookupSession':
-        object_name = interface_name[:-13]
-    elif init_pattern == 'commenting.CommentLookupSession':
-        object_name = interface_name[:-13]
-    elif init_pattern == 'resource.Resource':
-        object_name = interface_name
-        try:
-            instance_initers = make_instance_initers(
-                patterns[interface_name + '.instance_data'])
-        except KeyError:
-            pass
-    elif init_pattern == 'resource.ResourceForm':
-        object_name = interface_name[:-4]
-        if object_name in patterns['package_relationships_caps']:
-            init_object = 'osid_objects.OsidRelationshipForm'
-        else:
-            init_object = 'osid_objects.OsidObjectForm'
-        try:
-            persisted_initers = make_persistance_initers(
-                patterns[interface_name[:-4] + '.persisted_data'],
-                patterns[interface_name[:-4] + '.initialized_data'],
-                patterns[interface_name[:-4] + '.aggregate_data'])
-            #persisted_initers = make_persistance_initers(
-            #    patterns[interface_name[:-4] + '.persisted_data'],
-            #    dict(patterns[interface_name[:-4] + '.initialized_data'], **patterns[interface_name[:-4] + '.instance_data']),
-            #    patterns[interface_name[:-4] + '.aggregate_data'])
-        except KeyError:
-            pass
-        try:
-            metadata_initers = make_metadata_initers(
-                patterns[interface_name[:-4] + '.persisted_data'],
-                patterns[interface_name[:-4] + '.initialized_data'],
-                patterns[interface_name[:-4] + '.return_types'])
-        except KeyError:
-            pass
-    elif init_pattern == 'resource.ResourceQuery':
-        object_name = interface_name[:-5]
-    
-    #object_imports = []
-    #abject_import.append(patterns['package_objects_caps'])
-    #abject_import.append(patterns['package_relationships_caps'])
-    #for 
-
     if hasattr(templates, init_pattern.split('.')[-1]):
         template_class = getattr(templates, init_pattern.split('.')[-1])
         if hasattr(template_class, 'init_template'):
+            context = get_init_context(init_pattern, interface_name, package, patterns)
             template = string.Template(getattr(template_class, 'init_template'))
-            return template.substitute({'app_name': app_name(package['name']),
-                                        'implpkg_name': pkg_name(package['name']),
-                                        'pkg_name': package['name'],
-                                        'pkg_name_upper': package['name'].upper(),
-                                        'interface_name': interface_name,
-                                        'instance_initers': instance_initers,
-                                        'persisted_initers': persisted_initers,
-                                        'metadata_initers': metadata_initers,
-                                        'object_name': object_name,
-                                        'object_name_under': camel_to_under(object_name),
-                                        'object_name_upper': camel_to_under(object_name).upper(),
-                                        'cat_name': cat_name,
-                                        'cat_name_plural': make_plural(cat_name),
-                                        'cat_name_under': camel_to_under(cat_name),
-                                        'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
-                                        'cat_name_upper': cat_name.upper(),
-                                        'init_object': init_object})
+            return template.substitute(context)
         else:
             return ''
     else:
@@ -854,13 +784,12 @@ def make_method(package_name, method, interface, patterns):
 def make_method_impl(package_name, method, interface, patterns):
     impl = ''
     pattern = ''
-    kwargs = {}
+    context = {}
     templates = None
 
-    
     if interface['shortname'] + '.' + method['name'] in patterns:
         pattern = patterns[interface['shortname'] + '.' + method['name']]['pattern']
-        kwargs = patterns[interface['shortname'] + '.' + method['name']]['kwargs']
+        context = patterns[interface['shortname'] + '.' + method['name']]['kwargs']
 
     impl_class = load_impl_class(package_name, interface['shortname'])
 
@@ -875,10 +804,6 @@ def make_method_impl(package_name, method, interface, patterns):
             if hasattr(templates, pattern.split('.')[-2]):
                 template_class = getattr(templates, pattern.split('.')[-2])
 
-    arg_list = []
-    for arg in method['args']:
-        arg_list.append(arg['var_name'])
-    kwargs['arg_list'] = ', '.join(arg_list)
     ##
     # Check if there is a 'by hand' implementation available for this method
     if (impl_class and 
@@ -890,141 +815,18 @@ def make_method_impl(package_name, method, interface, patterns):
     elif (template_class and
           hasattr(template_class, pattern.split('.')[-1] + '_template')):
         template_str = getattr(template_class, pattern.split('.')[-1] + 
-                                '_template').strip('\n')
+                               '_template').strip('\n')
         template = string.Template(template_str)
-        
-        ##
-        # Add keyword arguments to template kwargs that are particuler
-        # to the mongo implementation
-        kwargs['app_name'] = app_name(kwargs['package_name'])
-        kwargs['implpkg_name'] = pkg_name(kwargs['package_name'])
-        kwargs['abcapp_name'] = abc_app_name(kwargs['package_name'])
-        kwargs['abcpkg_name'] = abc_pkg_name(kwargs['package_name'])
-        kwargs['interface_name_under'] = camel_to_under(kwargs['interface_name'])
-        kwargs['interface_name_dot'] = '.'.join(kwargs['interface_name_under'].split('_')[:-1])
-        kwargs['package_name_caps'] = package_name.title()
- 
-        if kwargs['interface_name_under'].endswith('_session'):
-            kwargs['session_shortname_dot'] = '.'.join(kwargs['interface_name_under'].split('_')[:-1])
 
-        if 'arg0_type_full' in kwargs:
-            kwargs['arg0_type'] = kwargs['arg0_type_full'].split('.')[-1].strip('[]')
-            kwargs['arg0_type_under'] = camel_to_under(kwargs['arg0_type'])
-            kwargs['arg0_type_mixed'] = camel_to_mixed(kwargs['arg0_type'])
-            kwargs['arg0_abcapp_name'] = abc_app_name(get_pkg_name(kwargs['arg0_type_full'].strip('[]')))
-            kwargs['arg0_abcpkg_name'] = abc_pkg_name(get_pkg_name(kwargs['arg0_type_full'].strip('[]')))
-            kwargs['arg0_module'] = get_interface_module(
-                                    get_pkg_name(kwargs['arg0_type_full']),
-                                    kwargs['arg0_type_full'].split('.')[-1].strip('[]'))
-        if 'arg1_type_full' in kwargs:
-            kwargs['arg1_type'] = kwargs['arg1_type_full'].split('.')[-1].strip('[]')
-            kwargs['arg1_type_under'] = camel_to_under(kwargs['arg1_type'])
-            kwargs['arg1_type_mixed'] = camel_to_mixed(kwargs['arg1_type'])
-            kwargs['arg1_abcapp_name'] = abc_app_name(get_pkg_name(kwargs['arg1_type_full'].strip('[]')))
-            kwargs['arg1_abcpkg_name'] = abc_pkg_name(get_pkg_name(kwargs['arg1_type_full'].strip('[]')))
-            kwargs['arg1_module'] = get_interface_module(
-                                    get_pkg_name(kwargs['arg1_type_full']),
-                                    kwargs['arg1_type_full'].split('.')[-1].strip('[]'))
-        if 'arg2_type_full' in kwargs:
-            kwargs['arg2_type'] = kwargs['arg2_type_full'].split('.')[-1].strip('[]')
-            kwargs['arg2_type_under'] = camel_to_under(kwargs['arg2_type'])
-            kwargs['arg2_type_mixed'] = camel_to_mixed(kwargs['arg2_type'])
-            kwargs['arg2_abcapp_name'] = abc_app_name(get_pkg_name(kwargs['arg2_type_full'].strip('[]')))
-            kwargs['arg2_abcpkg_name'] = abc_pkg_name(get_pkg_name(kwargs['arg2_type_full'].strip('[]')))
-            kwargs['arg2_module'] = get_interface_module(
-                                    get_pkg_name(kwargs['arg2_type_full']),
-                                    kwargs['arg2_type_full'].split('.')[-1].strip('[]'))
-        if 'arg3_type_full' in kwargs:
-            kwargs['arg3_type'] = kwargs['arg3_type_full'].split('.')[-1].strip('[]')
-            kwargs['arg3_type_under'] = camel_to_under(kwargs['arg3_type'])
-            kwargs['arg3_type_mixed'] = camel_to_mixed(kwargs['arg3_type'])
-            kwargs['arg3_abcapp_name'] = abc_app_name(get_pkg_name(kwargs['arg3_type_full'].strip('[]')))
-            kwargs['arg3_abcpkg_name'] = abc_pkg_name(get_pkg_name(kwargs['arg3_type_full'].strip('[]')))
-            kwargs['arg3_module'] = get_interface_module(
-                                    get_pkg_name(kwargs['arg3_type_full']),
-                                    kwargs['arg3_type_full'].split('.')[-1].strip('[]'))
-        if 'arg0_object' in kwargs:
-            kwargs['arg0_object_under'] = camel_to_under(kwargs['arg0_object'])
-            kwargs['arg0_object_mixed'] = camel_to_mixed(kwargs['arg0_object'])
-        if 'return_type_full' in kwargs:
-            kwargs['return_type'] = kwargs['return_type_full'].split('.')[-1]
-            kwargs['return_pkg'] = get_pkg_name(kwargs['return_type_full'])
-            kwargs['return_module'] = get_interface_module(
-                                      get_pkg_name(kwargs['return_type_full']), 
-                                      kwargs['return_type_full'].split('.')[-1])
-        if 'return_pkg' in kwargs:
-            kwargs['return_app_name'] = app_name(kwargs['return_pkg'])
-            kwargs['return_implpkg_name'] = pkg_name(kwargs['return_pkg'])
-            kwargs['return_pkg_title'] = kwargs['return_pkg'].title()
-            kwargs['return_pkg_caps'] = kwargs['return_pkg'].upper()
-        if 'object_name_under' in kwargs:
-            kwargs['object_name_upper'] = kwargs['object_name_under'].upper()
-            # Might want to add creating kwargs['object_name' from this as well]
-        if 'object_name' in kwargs and 'package_name' in kwargs:
-            kwargs['object_app_name'] = app_name(kwargs['package_name'])
-            kwargs['object_implpkg_name'] = pkg_name(kwargs['package_name'])
-            kwargs['object_module'] = get_interface_module('package_name', 'object_name')
-        if 'var_name' in kwargs:
-            kwargs['var_name_upper'] = kwargs['var_name'].upper()
-            kwargs['var_name_mixed'] = under_to_mixed(kwargs['var_name'])
-            kwargs['var_name_plural'] = make_plural(kwargs['var_name'])
-            kwargs['var_name_plural_mixed'] = under_to_mixed(kwargs['var_name_plural'])
-            kwargs['var_name_singular'] = remove_plural(kwargs['var_name'])
-            kwargs['var_name_singular_mixed'] = under_to_mixed(kwargs['var_name_singular'])
-        if 'return_type' in kwargs:
-            kwargs['return_type_under'] = camel_to_under(kwargs['return_type'])
-        if 'return_type' in kwargs and kwargs['return_type'].endswith('List'):
-            kwargs['return_type_list_object'] = kwargs['return_type'][:-4]
-            kwargs['return_type_list_object_under'] = camel_to_under(kwargs['return_type_list_object'])
-            kwargs['return_type_list_object_plural_under'] = make_plural(kwargs['return_type_list_object_under'])
-        if 'object_name' in kwargs and not 'object_name_under' in kwargs and not 'object_name_upper' in kwargs:
-            kwargs['object_name_under'] = camel_to_under(kwargs['object_name'])
-            kwargs['object_name_mixed'] = camel_to_mixed(kwargs['object_name'])
-            kwargs['object_name_upper'] = camel_to_under(kwargs['object_name']).upper()
-        if 'aggregated_object_name' in kwargs:
-            kwargs['aggregated_object_name_under'] = camel_to_under(kwargs['aggregated_object_name'])
-            kwargs['aggregated_object_name_mixed'] = camel_to_mixed(kwargs['aggregated_object_name'])
-            kwargs['aggregated_objects_name_under'] = camel_to_under(make_plural(kwargs['aggregated_object_name']))
-            kwargs['aggregated_objects_name_mixed'] = camel_to_mixed(make_plural(kwargs['aggregated_object_name']))
-        if 'source_name' in kwargs:
-            kwargs['source_name_mixed'] = under_to_mixed(kwargs['source_name'])
-        if 'destination_name' in kwargs:
-            kwargs['destination_name_mixed'] = under_to_mixed(kwargs['destination_name'])
-        if 'cat_name' in kwargs:
-            kwargs['cat_name_under'] = camel_to_under(kwargs['cat_name'])
-            kwargs['cat_name_lower'] = kwargs['cat_name'].lower()
-            kwargs['cat_name_mixed'] = camel_to_mixed(kwargs['cat_name'])
-            kwargs['cat_name_plural'] = make_plural(kwargs['cat_name'])
-            kwargs['cat_name_plural_under'] = camel_to_under(kwargs['cat_name_plural'])
-            kwargs['cat_name_plural_lower'] = kwargs['cat_name_plural'].lower()
-            kwargs['cat_name_plural_mixed'] = camel_to_mixed(kwargs['cat_name_plural'])
-        if 'return_cat_name' in kwargs:
-            kwargs['return_cat_name_under'] = camel_to_under(kwargs['return_cat_name'])
-            kwargs['return_cat_name_lower'] = kwargs['return_cat_name'].lower()
-            kwargs['return_cat_name_mixed'] = camel_to_mixed(kwargs['return_cat_name'])
-        if 'Proxy' in kwargs['interface_name']:
-            kwargs['non_proxy_interface_name'] = ''.join(kwargs['interface_name'].split('Proxy'))
-        if ('return_pkg' in kwargs and 'return_module' in kwargs and
-            kwargs['package_name'] == kwargs['return_pkg'] and
-            kwargs['module_name'] == kwargs['return_module']):
-            kwargs['import_str'] = ''
-        elif ('package_name' in kwargs and 'return_pkg' in kwargs and
-              'return_type' in kwargs and 'return_module' in kwargs):
-            kwargs['import_str'] = ('        from ..' +
-                                    kwargs['return_implpkg_name'] + '.' +
-                                    kwargs['return_module'] + ' import ' +
-                                    kwargs['return_type'] + '\n')  ### WHY DO WE NEED import_str???
+        context = get_method_context(context, package_name, method)
 
-# Uncomment next line to identify on which method a KeyError is occuring
-        #print interface['shortname'], method['name']
-
-        impl = template.substitute(kwargs).strip('\n')
+        impl = template.substitute(context).strip('\n')
     if impl == '':
         impl = '        raise errors.Unimplemented()'
     else:
         if (interface['category'] in patterns['impl_log'] and
             interface['shortname'] in patterns['impl_log'][interface['category']]):
-            patterns['impl_log'][kwargs['module_name']][interface['shortname']][method['name']][1] = 'implemented'
+            patterns['impl_log'][context['module_name']][interface['shortname']][method['name']][1] = 'implemented'
     return impl
         
 
@@ -1147,3 +949,203 @@ def app_name(string):
 
 def pkg_name(string):
     return pkg_prefix + '_'.join(string.split('.')) + pkg_suffix
+
+######################
+# Templating Methods
+######################
+
+def get_method_context(context, package_name, method):
+    """Get the method context vars, to be used in the template"""
+    def construct_arg_context(arg_number, arg_type_full):
+        arg_type = arg_type_full.split('.')[-1].strip('[]')
+        arg_context = {
+            arg_number + '_type': arg_type,
+            arg_number + '_type_under': camel_to_under(arg_type),
+            arg_number + '_type_mixed': camel_to_mixed(arg_type),
+            arg_number + '_abcapp_name': abc_app_name(get_pkg_name(arg_type_full.strip('[]'))),
+            arg_number + '_abcpkg_name': abc_pkg_name(get_pkg_name(arg_type_full.strip('[]'))),
+            arg_number + '_module': get_interface_module(
+                get_pkg_name(arg_type_full),
+                arg_type_full.split('.')[-1].strip('[]'))
+        }
+        return arg_context
+
+    arg_list = []
+    for arg in method['args']:
+        arg_list.append(arg['var_name'])
+    context['arg_list'] = ', '.join(arg_list)
+    ##
+    # Add keyword arguments to template kwargs that are particuler
+    # to the mongo implementation
+    context['app_name'] = app_name(context['package_name'])
+    context['implpkg_name'] = pkg_name(context['package_name'])
+    context['abcapp_name'] = abc_app_name(context['package_name'])
+    context['abcpkg_name'] = abc_pkg_name(context['package_name'])
+    context['interface_name_under'] = camel_to_under(context['interface_name'])
+    context['interface_name_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
+    context['package_name_caps'] = package_name.title()
+
+    if context['interface_name_under'].endswith('_session'):
+        context['session_shortname_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
+
+    if 'arg0_type_full' in context:
+        context.update(construct_arg_context('arg0',
+                                             context['arg0_type_full']))
+    if 'arg1_type_full' in context:
+        context.update(construct_arg_context('arg1',
+                                             context['arg1_type_full']))
+    if 'arg2_type_full' in context:
+        context.update(construct_arg_context('arg2',
+                                             context['arg2_type_full']))
+    if 'arg3_type_full' in context:
+        context.update(construct_arg_context('arg3',
+                                             context['arg3_type_full']))
+    if 'arg0_object' in context:
+        context['arg0_object_under'] = camel_to_under(context['arg0_object'])
+        context['arg0_object_mixed'] = camel_to_mixed(context['arg0_object'])
+    if 'return_type_full' in context:
+        context['return_type'] = context['return_type_full'].split('.')[-1]
+        context['return_pkg'] = get_pkg_name(context['return_type_full'])
+        context['return_module'] = get_interface_module(
+            get_pkg_name(context['return_type_full']),
+            context['return_type_full'].split('.')[-1])
+    if 'return_pkg' in context:
+        context['return_app_name'] = app_name(context['return_pkg'])
+        context['return_implpkg_name'] = pkg_name(context['return_pkg'])
+        context['return_pkg_title'] = context['return_pkg'].title()
+        context['return_pkg_caps'] = context['return_pkg'].upper()
+    if 'object_name_under' in context:
+        context['object_name_upper'] = context['object_name_under'].upper()
+        # Might want to add creating kwargs['object_name' from this as well]
+    if 'object_name' in context and 'package_name' in context:
+        context['object_app_name'] = app_name(context['package_name'])
+        context['object_implpkg_name'] = pkg_name(context['package_name'])
+        context['object_module'] = get_interface_module('package_name', 'object_name')
+    if 'var_name' in context:
+        context['var_name_upper'] = context['var_name'].upper()
+        context['var_name_mixed'] = under_to_mixed(context['var_name'])
+        context['var_name_plural'] = make_plural(context['var_name'])
+        context['var_name_plural_mixed'] = under_to_mixed(context['var_name_plural'])
+        context['var_name_singular'] = remove_plural(context['var_name'])
+        context['var_name_singular_mixed'] = under_to_mixed(context['var_name_singular'])
+    if 'return_type' in context:
+        context['return_type_under'] = camel_to_under(context['return_type'])
+    if 'return_type' in context and context['return_type'].endswith('List'):
+        context['return_type_list_object'] = context['return_type'][:-4]
+        context['return_type_list_object_under'] = camel_to_under(context['return_type_list_object'])
+        context['return_type_list_object_plural_under'] = make_plural(context['return_type_list_object_under'])
+    if ('object_name' in context and
+            not 'object_name_under' in context and
+            not 'object_name_upper' in context):
+        context['object_name_under'] = camel_to_under(context['object_name'])
+        context['object_name_mixed'] = camel_to_mixed(context['object_name'])
+        context['object_name_upper'] = camel_to_under(context['object_name']).upper()
+    if 'aggregated_object_name' in context:
+        context['aggregated_object_name_under'] = camel_to_under(context['aggregated_object_name'])
+        context['aggregated_object_name_mixed'] = camel_to_mixed(context['aggregated_object_name'])
+        context['aggregated_objects_name_under'] = camel_to_under(make_plural(context['aggregated_object_name']))
+        context['aggregated_objects_name_mixed'] = camel_to_mixed(make_plural(context['aggregated_object_name']))
+    if 'source_name' in context:
+        context['source_name_mixed'] = under_to_mixed(context['source_name'])
+    if 'destination_name' in context:
+        context['destination_name_mixed'] = under_to_mixed(context['destination_name'])
+    if 'cat_name' in context:
+        context['cat_name_under'] = camel_to_under(context['cat_name'])
+        context['cat_name_lower'] = context['cat_name'].lower()
+        context['cat_name_mixed'] = camel_to_mixed(context['cat_name'])
+        context['cat_name_plural'] = make_plural(context['cat_name'])
+        context['cat_name_plural_under'] = camel_to_under(context['cat_name_plural'])
+        context['cat_name_plural_lower'] = context['cat_name_plural'].lower()
+        context['cat_name_plural_mixed'] = camel_to_mixed(context['cat_name_plural'])
+    if 'return_cat_name' in context:
+        context['return_cat_name_under'] = camel_to_under(context['return_cat_name'])
+        context['return_cat_name_lower'] = context['return_cat_name'].lower()
+        context['return_cat_name_mixed'] = camel_to_mixed(context['return_cat_name'])
+    if 'Proxy' in context['interface_name']:
+        context['non_proxy_interface_name'] = ''.join(context['interface_name'].split('Proxy'))
+    if ('return_pkg' in context and 'return_module' in context and
+            context['package_name'] == context['return_pkg'] and
+            context['module_name'] == context['return_module']):
+        context['import_str'] = ''
+    elif ('package_name' in context and 'return_pkg' in context and
+          'return_type' in context and 'return_module' in context):
+        context['import_str'] = ('        from ..' +
+                                 context['return_implpkg_name'] + '.' +
+                                 context['return_module'] + ' import ' +
+                                 context['return_type'] + '\n')  ### WHY DO WE NEED import_str???
+
+    # Uncomment next line to identify on which method a KeyError is occurring
+    #print interface['shortname'], method['name']
+    return context
+
+def get_init_context(init_pattern, interface_name, package, patterns):
+    """get the init context, for templating"""
+    instance_initers = ''
+    persisted_initers = ''
+    metadata_initers = ''
+    object_name = ''
+    init_object = ''
+    cat_name = patterns['package_catalog_caps']
+
+    ##
+    # Check for any special data initializations and call the appropriate makers
+    # to assemble them.
+    if init_pattern == 'resource.Bin':
+        object_name = interface_name
+    elif init_pattern == 'resource.BinForm':
+        object_name = interface_name[:-4]
+    elif init_pattern == 'resource.ResourceLookupSession':
+        object_name = interface_name[:-13]
+    elif init_pattern == 'commenting.CommentLookupSession':
+        object_name = interface_name[:-13]
+    elif init_pattern == 'resource.Resource':
+        object_name = interface_name
+        try:
+            instance_initers = make_instance_initers(
+                patterns[interface_name + '.instance_data'])
+        except KeyError:
+            pass
+    elif init_pattern == 'resource.ResourceForm':
+        object_name = interface_name[:-4]
+        if object_name in patterns['package_relationships_caps']:
+            init_object = 'osid_objects.OsidRelationshipForm'
+        else:
+            init_object = 'osid_objects.OsidObjectForm'
+        try:
+            persisted_initers = make_persistance_initers(
+                patterns[interface_name[:-4] + '.persisted_data'],
+                patterns[interface_name[:-4] + '.initialized_data'],
+                patterns[interface_name[:-4] + '.aggregate_data'])
+            #persisted_initers = make_persistance_initers(
+            #    patterns[interface_name[:-4] + '.persisted_data'],
+            #    dict(patterns[interface_name[:-4] + '.initialized_data'], **patterns[interface_name[:-4] + '.instance_data']),
+            #    patterns[interface_name[:-4] + '.aggregate_data'])
+        except KeyError:
+            pass
+        try:
+            metadata_initers = make_metadata_initers(
+                patterns[interface_name[:-4] + '.persisted_data'],
+                patterns[interface_name[:-4] + '.initialized_data'],
+                patterns[interface_name[:-4] + '.return_types'])
+        except KeyError:
+            pass
+    elif init_pattern == 'resource.ResourceQuery':
+        object_name = interface_name[:-5]
+
+    return {'app_name': app_name(package['name']),
+            'implpkg_name': pkg_name(package['name']),
+            'pkg_name': package['name'],
+            'pkg_name_upper': package['name'].upper(),
+            'interface_name': interface_name,
+            'instance_initers': instance_initers,
+            'persisted_initers': persisted_initers,
+            'metadata_initers': metadata_initers,
+            'object_name': object_name,
+            'object_name_under': camel_to_under(object_name),
+            'object_name_upper': camel_to_under(object_name).upper(),
+            'cat_name': cat_name,
+            'cat_name_plural': make_plural(cat_name),
+            'cat_name_under': camel_to_under(cat_name),
+            'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
+            'cat_name_upper': cat_name.upper(),
+            'init_object': init_object}
