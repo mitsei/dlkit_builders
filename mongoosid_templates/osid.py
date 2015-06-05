@@ -204,7 +204,7 @@ class Extensible:
                     return self._records[record][name]
                 except AttributeError:
                     pass
-        raise errors.AttributeError()
+        raise AttributeError()
 
     def _get_record(self, record_type):
         \"\"\"Get the record string type value given the record_type.\"\"\"
