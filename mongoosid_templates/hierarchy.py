@@ -131,12 +131,14 @@ class HierarchyTraversalSession:
 
     is_descendent = """
         raise errors.Unimplemented()"""
-    # TODO: Fix these default args in template
+
+    get_nodes_arg_template = {
+        1: 10,  # ancestor_levels,
+        2: 10,  # descendant_levels
+        3: False  # include_siblings
+    }
+
     get_nodes = """
-        if ancestor_levels is None:
-            ancestor_levels = 10
-        if descendant_levels is None:
-            descendant_levels = 10
         include_siblings = bool(include_siblings)
         parent_node_list = []
         child_node_list = []
