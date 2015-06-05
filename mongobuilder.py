@@ -817,8 +817,10 @@ def make_method(package_name, method, interface, patterns):
     method_doc = ''
     method_impl = make_method_impl(package_name, method, interface, patterns)
 
+    arg_default = ''
+
     for arg in method['args']:
-        args.append(arg['var_name'] + '=None')
+        args.append(arg['var_name'] + arg_default)
     decorator = '    @arguments_not_none'
     method_sig = ('    def ' + method['name'] + '(' +
                 ', '.join(args) + '):')

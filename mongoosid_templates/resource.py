@@ -579,8 +579,6 @@ class ResourceAgentAssignmentSession:
         collection.save(resource)"""
 
     unassign_agent_from_resource = """
-        if agent_id is None or resource_id is None:
-            raise errors.NullArgument()
         collection = mongo_client[self._db_prefix + 'resource']['Resource']
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
         if not resource:

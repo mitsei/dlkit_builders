@@ -8,7 +8,7 @@ def arguments_not_none(func):
         for arg in args:
             if arg is None:
                 raise NullArgument()
-        for arg, val in kwargs:
+        for arg, val in kwargs.iteritems():
             if val is None:
                 raise NullArgument()
         return func(*args, **kwargs)
