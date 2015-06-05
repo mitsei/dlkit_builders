@@ -787,7 +787,6 @@ def make_method_impl(package_name, method, interface, patterns):
     context = {}
     templates = None
 
-    
     if interface['shortname'] + '.' + method['name'] in patterns:
         pattern = patterns[interface['shortname'] + '.' + method['name']]['pattern']
         context = patterns[interface['shortname'] + '.' + method['name']]['kwargs']
@@ -819,7 +818,7 @@ def make_method_impl(package_name, method, interface, patterns):
                                '_template').strip('\n')
         template = string.Template(template_str)
 
-        context = get_method_context(package_name, method)
+        context = get_method_context(context, package_name, method)
 
         impl = template.substitute(context).strip('\n')
     if impl == '':
@@ -955,13 +954,12 @@ def pkg_name(string):
 # Templating Methods
 ######################
 
-def get_method_context(package_name, method):
+def get_method_context(context, package_name, method):
     """Get the method context vars, to be used in the template"""
-    def construct_arg_context(arg_number, arg_params):
-        arg_type_full = arg_params[0]
-        arg_type = arg_params[1]
+    def construct_arg_context(arg_number, arg_type_full):
+        arg_type = arg_type_full.split('.')[-1].strip('[]')
         arg_context = {
-            arg_number + '_type': arg_type_full.split('.')[-1].strip('[]'),
+            arg_number + '_type': arg_type,
             arg_number + '_type_under': camel_to_under(arg_type),
             arg_number + '_type_mixed': camel_to_mixed(arg_type),
             arg_number + '_abcapp_name': abc_app_name(get_pkg_name(arg_type_full.strip('[]'))),
@@ -972,7 +970,6 @@ def get_method_context(package_name, method):
         }
         return arg_context
 
-    context = {}
     arg_list = []
     for arg in method['args']:
         arg_list.append(arg['var_name'])
@@ -993,16 +990,16 @@ def get_method_context(package_name, method):
 
     if 'arg0_type_full' in context:
         context.update(construct_arg_context('arg0',
-                                             (context['arg0_type_full'], context['arg0_type'])))
+                                             context['arg0_type_full']))
     if 'arg1_type_full' in context:
         context.update(construct_arg_context('arg1',
-                                             (context['arg1_type_full'], context['arg1_type'])))
+                                             context['arg1_type_full']))
     if 'arg2_type_full' in context:
         context.update(construct_arg_context('arg2',
-                                             (context['arg2_type_full'], context['arg2_type'])))
+                                             context['arg2_type_full']))
     if 'arg3_type_full' in context:
         context.update(construct_arg_context('arg3',
-                                             (context['arg3_type_full'], context['arg3_type'])))
+                                             context['arg3_type_full']))
     if 'arg0_object' in context:
         context['arg0_object_under'] = camel_to_under(context['arg0_object'])
         context['arg0_object_mixed'] = camel_to_mixed(context['arg0_object'])
@@ -1079,6 +1076,7 @@ def get_method_context(package_name, method):
 
     # Uncomment next line to identify on which method a KeyError is occurring
     #print interface['shortname'], method['name']
+    return context
 
 def get_init_context(init_pattern, interface_name, package, patterns):
     """get the init context, for templating"""
