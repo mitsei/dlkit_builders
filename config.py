@@ -104,6 +104,10 @@ sessions_to_implement = [
     'AssetLookupSession',
     'AssetQuerySession',
     'AssetAdminSession',
+    'AssetCompositionSession',
+    'AssetCompositionDesignSession',
+    'CompositionLookupSession',
+    'CompositionAdminSession',
     'RepositoryLookupSession',
     'RepositoryAdminSession',
     'RepositoryHierarchySession',
@@ -160,6 +164,7 @@ objects_to_implement = [
     ### repository service
     'Asset',
     'AssetContent',
+    'Composition',
     'Repository',
     ### resource service
     'Resource',

@@ -49,6 +49,16 @@ def map_object_form_data_patterns(interface, package, index):
             index[interface['shortname'][:-4] + '.arg_detail'][method['name'].split('_', 1)[1]] = method['args']
             index[interface['shortname'][:-4] + '.persisted_data'][method['name'].split('_', 1)[1]] = method['args'][0]['arg_type']
 
+        ##
+        # Create a data element specifically for repository.Composition compositions
+        if (interface['shortname'] == 'CompositionForm' and method['name'] == 'get_composition_form_record'):
+            index[interface['shortname'][:-4] + '.arg_detail']['children'] = {
+                "var_name": "children_ids", 
+                "array": True, 
+                "arg_type": "osid.id.Id[]"
+             }
+            index[interface['shortname'][:-4] + '.persisted_data']['children'] = 'osid.id.Id[]'
+
     return index
 
 ##

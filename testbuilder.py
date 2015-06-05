@@ -213,8 +213,8 @@ def make_package_tests(file_name):
                 not interface['shortname'].endswith('LookupSession') and
                 not interface['shortname'].endswith('AdminSession') and
                 not interface['shortname'] == (patterns['package_catalog_caps'] + 'HierarchySession') and
-                not interface['shortname'] == 'ResourceAgentSession' and
-                not interface['shortname'] == 'ResourceAgentAssignmentSession'):
+                not interface['shortname'] in ['ResourceAgentSession', 'ResourceAgentAssignmentSession'] and
+                not interface['shortname'] in ['AssetCompositionSession', 'AssetCompositionDesignSession']):
             continue
 
         ##

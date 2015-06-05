@@ -139,12 +139,224 @@ class AssetAdminSession:
         #mongo_client.close()"""
 
 
+class CompositionLookupSession:
+
+    import_statements = [
+        'ACTIVE = 0',
+        'ANY_STATUS = 1',
+        'SEQUESTERED = 0',
+        'UNSEQUESTERED = 1',
+    ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        self._catalog_class = objects.Repository
+        self._session_name = 'CompositionLookupSession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
+        self._object_view = COMPARATIVE
+        self._catalog_view = ISOLATED
+        self._status_view = ACTIVE
+        self._sequestered_view = SEQUESTERED
+        self._kwargs = kwargs
+
+"""
+
+    use_active_composition_view = """
+        self._status_view = ACTIVE"""
+
+    use_any_status_composition_view = """
+        self._status_view = ANY_STATUS"""
+
+    use_sequestered_composition_view = """
+        self._status_view = SEQUESTERED"""
+
+    use_unsequestered_composition_view = """
+        self._status_view = UNSEQUESTERED"""
+
+
+class AssetCompositionSession:
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        self._catalog_class = objects.Repository
+        self._session_name = 'AssetCompositionSession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
+        self._forms = dict()
+        self._kwargs = kwargs
+"""
+
+    get_composition_assets = """
+        if composition_id is None:
+            raise NullArgument()
+        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+        if composition is None:
+            raise errors.NotFound('no Composition with this id was found')
+        if 'assetIds' not in composition:
+            raise NotFound('no Assets are assigned to this Composition')
+        return objects.AssetList()
+        """
+
+class AssetCompositionDesignSession:
+
+    import_statements = [
+        'from ..list_utilities import move_id_ahead, move_id_behind, order_ids',
+    ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        self._catalog_class = objects.Repository
+        self._session_name = 'AssetCompositionDesignSession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
+        self._forms = dict()
+        self._kwargs = kwargs
+"""
+
+    can_compose_assets = """
+        return True"""
+
+    add_asset = """
+        if asset_id is None or composition_id is None:
+            raise NullArgument()
+        # This asset found check may want to be run through _get_provider_manager
+        # so as to ensure assess control:
+        collection = mongo_client[self._db_prefix + 'repository']['Asset']
+        asset = collection.find_one({'_id': ObjectId(asset_id.get_identifier())})
+        if asset is None:
+            raise errors.NotFound('no Asset with this id was found')
+        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+        if composition is None:
+            raise errors.NotFound('no Composition with this id was found')
+        if 'assetIds' in composition:
+            composition['assetIds'].append(str(asset_id))
+        else:
+            composition['assetIds'] = [str(asset_id)]
+        collection.save(composition)"""
+
+    move_asset_ahead = """
+        if asset_id is None or composition_id is None:
+            raise NullArgument()
+        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+        if composition is None:
+            raise errors.NotFound('no Composition with this id was found')
+        if 'assetIds' not in composition:
+            raise NotFound('no Assets are assigned to this Composition')
+        composition['assetIds'] = move_ahead(asset_id, referenct_id, composition['assetIds'])
+        collection.save(composition)
+        """
+
+    move_asset_behind = """
+        if asset_id is None or composition_id is None or referenct_id is None:
+            raise NullArgument()
+        return 
+        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+        if composition is None:
+            raise errors.NotFound('no Composition with this id was found')
+        if 'assetIds' not in composition:
+            raise NotFound('no Assets are assigned to this Composition')
+        composition['assetIds'] = move_behind(asset_id, referenct_id, composition['assetIds'])
+        collection.save(composition)
+        """
+
+    order_assets = """
+        if asset_ids is None or composition_id is None:
+            raise NullArgument()
+        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+        if composition is None:
+            raise errors.NotFound('no Composition with this id was found')
+        if 'assetIds' not in composition:
+            raise NotFound('no Assets are assigned to this Composition')
+        composition['assetIds'] = order_ids(asset_ids, composition['assetIds'])
+        collection.save(composition)
+        """
+
+    remove_asset = """
+        if asset_id is None or composition_id is None:
+            raise NullArgument()
+        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+        if composition is None:
+            raise errors.NotFound('an assessment with assessment_id does not exist')
+        try:
+            composition['assetIds'].remove(str(asset_id))
+        except (KeyError, ValueError):
+            raise errors.NotFound()
+        collection.save(composition)"""
+
+
 class Asset:
 
     import_statements = [
         'from ..primitives import DisplayText',
         'from ..id.objects import IdList',
+        'from ..osid.markers import Extensible'
     ]
+
+    init = """
+    try:
+        from ..records.types import ASSET_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
+    except (ImportError, AttributeError):
+        _record_type_data_sets = {}
+    _namespace = 'repository.Asset'
+
+    def __init__(self, osid_object_map, db_prefix='', runtime=None):
+        self._my_map = osid_object_map
+        self._db_prefix = db_prefix
+        self._runtime = runtime
+        self._records = dict()
+        self._load_records(osid_object_map['recordTypeIds'])
+        if self.is_composition():
+            self._composition = self.get_composition()
+
+    # These next two private methods should be moved to osid.Extensible??? (I thought they were already)
+    def _load_records(self, record_type_idstrs):
+        \"\"\"Load all records of record type for this object.\"\"\"
+        for record_type_idstr in record_type_idstrs:
+            self._init_record(record_type_idstr)
+
+    def _init_record(self, record_type_idstr):
+        \"\"\"Initialize all records for this object.\"\"\"
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['object_record_class_name'])
+        self._records[record_type_idstr] = record(self)
+
+    def __getattr__(self, name):
+        if self.is_composition():
+            try:
+                return self._composition[name]
+            except AttributeError:
+                raise AttributeError()
+        #HOW TO PASS TO EXTENSIBLE!!!!
+"""
+
 
     get_title_template = """
         # Implemented from template for osid.repository.Asset.get_title_template
@@ -172,6 +384,10 @@ class Asset:
         for ${aggregated_object_name_under} in self.get_${aggregated_objects_name_under}():
             ${aggregated_object_name_under}._delete()
         osid_objects.OsidObject._delete(self)"""
+
+    is_composition = """
+        return bool(self._my_map['compositionId'])"""
+
 
 class AssetForm:
 
@@ -271,3 +487,69 @@ class AssetContentForm:
         self._my_map['data'] = self._data_default
         del self._my_map['base64']
         #mongo_client.close()"""
+
+class Composition:
+    
+    ## This two methods are defined here because of an inconsistency with
+    # Naming conventions.  The pattern mapper expected get_child_ids.  The second
+    # should otherwise come from the template for learning.Activity.get_asset_ids
+    get_children_ids = """
+        return IdList(self._my_map['childIds'])
+
+    def get_child_ids(self):
+        return self.get_children_ids()"""
+
+class CompositionForm:
+
+    # per Tom Coppeto. We are moving composition design to the CompositionForm
+    additional_methods = """
+    def get_children_metadata(self):
+        \"\"\"Gets the metadata for children.
+
+        return: (osid.Metadata) - metadata for the children
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        metadata = dict(self._children_metadata)
+        metadata.update({'existing_children_values': self._my_map['childIds']})
+        return Metadata(**metadata)
+
+    children_metadata = property(fget=get_children_metadata)
+
+    def set_children(self, child_ids=None):
+        \"\"\"Sets the children.
+
+        arg:    child_ids (osid.id.Id[]): the children``Ids``
+        raise:  InvalidArgument - ``child_ids`` is invalid
+        raise:  NoAccess - ``Metadata.isReadOnly()`` is ``true``
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        if child_ids is None:
+            raise errors.NullArgument()
+        if not isinstance(child_ids, list):
+            raise errors.InvalidArgument()
+        if self.get_children_metadata().is_read_only():
+            raise errors.NoAccess()
+        idstr_list = []
+        for object_id in child_ids:
+            if not self._is_valid_id(object_id):
+                raise errors.InvalidArgument()
+            idstr_list.append(str(object_id))
+        self._my_map['childIds'] = idstr_list
+
+    def clear_children(self):
+        \"\"\"Clears the children.
+
+        raise:  NoAccess - ``Metadata.isRequired()`` or
+                ``Metadata.isReadOnly()`` is ``true``
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        if (self.get_children_metadata().is_read_only() or
+                self.get_children_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['childIds'] = self._children_default
+
+    children = property(fset=set_children, fdel=clear_children)
+"""

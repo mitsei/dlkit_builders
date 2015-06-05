@@ -1134,11 +1134,10 @@ class ResourceForm:
         self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_metadata(self, **kwargs):
-        ${init_object}._init_metadata(self, **kwargs)
-${metadata_initers}
+        ${init_object}._init_metadata(self, **kwargs)${metadata_super_initers}${metadata_initers}
     def _init_map(self, **kwargs):
         ${init_object}._init_map(self)
-${persisted_initers}
+${map_super_initers}${persisted_initers}
     # These next three private methods should be moved to osid.Extensible??? (I thought they were already)
     def _load_records(self, record_type_idstrs):
         \"\"\"Load all records of record type for this form.\"\"\"
