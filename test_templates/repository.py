@@ -79,6 +79,10 @@ class AssetCompositionSession:
         create_form.display_name = 'Test Repository'
         create_form.description = 'Test Repository for AssetLookupSession tests'
         cls.catalog = cls.svc_mgr.create_repository(create_form)
+        create_form = cls.catalog.get_composition_form_for_create([])
+        create_form.display_name = 'Test Composition for AssetCompositionSession tests'
+        create_form.description = 'Test Compposion for AssetCompositionSession tests'
+        cls.composition = cls.catalog.create_composition(create_form)
         for num in [0, 3]:
             create_form = cls.catalog.get_asset_form_for_create([])
             create_form.display_name = 'Test Asset ' + str(num)
@@ -86,18 +90,23 @@ class AssetCompositionSession:
             obj = cls.catalog.create_asset(create_form)
             cls.asset_list.append(obj)
             cls.asset_ids.append(obj.ident)
+            cls.catalog.add_asset(obj.ident, cls.composition.ident)
 
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_repositories():
-            for obj in catalog.get_compositions():
-                catalog.delete_composition(obj.ident)
             for obj in catalog.get_assets():
                 catalog.delete_asset(obj.ident)
+            for obj in catalog.get_compositions():
+                catalog.delete_composition(obj.ident)
             cls.svc_mgr.delete_repository(catalog.ident)
 """
 
+    get_composition_assets = """
+        pass"""
 
+    get_compostions_by_asset = """
+        pass"""
 
 class AssetCompositionDesignSession:
 
