@@ -49,6 +49,11 @@ class MongoClientValidated(object):
         self._validate_write(result)
         return result
 
+    def raw(self):
+        """ return the raw mongo client object...used for GridFS
+        """
+        return self._mc
+
     def save(self, doc):
         result = self._mc.save(doc)
         self._validate_write(result)
