@@ -107,7 +107,7 @@ class AssetCompositionSession:
 
     get_compositions_by_asset = """
         self.assertEqual(self.catalog.get_compositions_by_asset(self.asset_ids[0]).available(), 1)
-        self.assertEqual(self.catalog.get_compositions_by_asset(self.asset_ids[0]).next.ident, self.composition.ident)"""
+        self.assertEqual(self.catalog.get_compositions_by_asset(self.asset_ids[0]).next().ident, self.composition.ident)"""
 
 class AssetCompositionDesignSession:
 

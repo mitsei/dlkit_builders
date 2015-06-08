@@ -76,11 +76,11 @@ class AssetCompositionSession:
 
     get_composition_assets = """
         \"\"\"Pass through to provider AssetCompositionSession.get_composition_assets\"\"\"
-        self._get_provider_session('asset_composition_session').get_composition_assets(*args, **kwargs)"""
+        return self._get_provider_session('asset_composition_session').get_composition_assets(*args, **kwargs)"""
 
     get_compositions_by_asset = """
         \"\"\"Pass through to provider AssetCompositionSession.get_compositions_by_asset\"\"\"
-        self._get_provider_session('asset_composition_session').get_compositions_by_asset(*args, **kwargs)"""
+        return self._get_provider_session('asset_composition_session').get_compositions_by_asset(*args, **kwargs)"""
 
 
 class AssetCompositionDesignSession:
