@@ -7,7 +7,7 @@ class ObjectiveRequisiteSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
         'from . import types',
         'from bson.objectid import ObjectId',
         'UPDATED = True',
@@ -19,7 +19,7 @@ class ObjectiveRequisiteSession:
         # osid.learning.ObjectiveRequisiteSession.get_requisite_objectives_template
         # NOTE: This implementation currently ignores plenary view
         pass
-        collection = mongo_client[self._db_prefix + 'relationship']['Relationship'] ## Really! No we should use OSIDs
+        collection = MongoClientValidated(self._db_prefix + 'relationship', 'Relationship') ## Really! No we should use OSIDs
         requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
         result = collection.find({'$$and': {'sourceId': str(objective_id)}, 'genusType': str(requisite_type)},
                                   {'destinationId': 1, '_id': 0})
@@ -30,7 +30,6 @@ class ObjectiveRequisiteSession:
         ## I LEFT OFF HERE - THERE'S A WAY TO RETURN ONLY DEST IDS I THINK
         result = collection.find({'_id': {'$$in': catalog_id_list}})
         count = collection.find({'_id': {'$$in': catalog_id_list}}).count()
-        #mongo_client.close()
         return objects.${return_type}(result, count)"""
 
 
@@ -39,7 +38,6 @@ class ObjectiveRequisiteAssignmentSession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-        'from .. import mongo_client',
     ]
 
 
@@ -73,7 +71,7 @@ class ObjectiveAdminSession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
     ]
 
     delete_objective_template = """
@@ -83,20 +81,12 @@ class ObjectiveAdminSession:
 
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        collection = mongo_client[self._db_prefix + '${package_name}']['${dependent_object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${dependent_object_name}')
         if collection.find({'${object_name_mixed}Id': str(${arg0_name})}).count() != 0:
             raise errors.IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
-        delete_result = collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-        if delete_result.deleted_count == 0:
-            raise errors.NotFound
-        # any reason to raise:
-            #raise errors.OperationFailed()
-        #if 'err' in result and result['err'] is not None:
-        #    raise errors.OperationFailed()
-        #if result['n'] == 0:
-        #    raise errors.NotFound()
-        #mongo_client.close()"""
+
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
 
 class ActivityLookupSession:
@@ -105,14 +95,14 @@ class ActivityLookupSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
-        'from .. import mongo_client',
+        'from ..utilities import MongoClientValidated',
     ]
 
     get_activities_for_objective_template = """
         # Implemented from template for
         # osid.learning.ActivityLookupSession.get_activities_for_objective_template
         # NOTE: This implementation currently ignores plenary view
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)})
@@ -121,7 +111,6 @@ class ActivityLookupSession:
         else:
             result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})})
             count = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})}).count()
-        #mongo_client.close()
         return objects.${return_type}(result, count=count, runtime=self._runtime)"""
 
 
@@ -131,7 +120,6 @@ class ActivityAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
-        'from .. import mongo_client',
     ]
 
     get_activity_form_for_create_template = """
@@ -228,6 +216,9 @@ class Activity:
 
 
 class ActivityForm:
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+    ]
 
     get_assets_metadata_template = """
         # Implemented from template for osid.learning.ActivityForm.get_assets_metadata_template

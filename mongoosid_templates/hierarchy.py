@@ -289,21 +289,19 @@ class HierarchyDesignSession:
 """
 
 class HierarchyAdminSession:
+    import_statements = [
+        'from ..utilities import MongoClientValidated'
+    ]
 
     delete_hierarchy = """
         from ...abstract_osid.id.primitives import Id as ABCId
-        collection = mongo_client[self._db_prefix + 'hierarchy']['Hierarchy']
+        collection = MongoClientValidated(self._db_prefix + 'hierarchy', 'Hierarchy')
         if not isinstance(hierarchy_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
 
         # Should we delete the underlying Relationship Family here???
 
-        result = collection.delete_one({'_id': ObjectId(hierarchy_id.get_identifier())})
-        if 'err' in result and result['err'] is not None:
-            raise errors.OperationFailed()
-        if result['n'] == 0:
-            raise errors.NotFound()
-        #mongo_client.close()"""
+        collection.delete_one({'_id': ObjectId(hierarchy_id.get_identifier())})"""
 
 class Hierarchy:
 
