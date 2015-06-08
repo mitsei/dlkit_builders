@@ -21,7 +21,7 @@ class MongoClientValidated(object):
         return self._mc.count()
 
     def delete_one(self, query):
-        result = self._mc.find_one(query)
+        result = self._mc.delete_one(query)
         if result is None or result.deleted_count == 0:
             raise NotFound(json.dumps(query) + ' returned None.')
         return result
