@@ -1,6 +1,4 @@
 """mongo utilities.py"""
-import json
-
 from .osid.osid_errors import NullArgument, NotFound, OperationFailed
 
 from . import mongo_client
@@ -16,7 +14,7 @@ class MongoClientValidated(object):
             if not result.acknowledged or result.inserted_id is None:
             # if (('writeErrors' in result and len(result['writeErrors']) > 0) or
             #         ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
-                raise OperationFailed(json.dumps(result))
+                raise OperationFailed(str(result))
         except AttributeError:
             # account for deprecated save() method
             if result is None:
@@ -28,7 +26,7 @@ class MongoClientValidated(object):
     def delete_one(self, query):
         result = self._mc.delete_one(query)
         if result is None or result.deleted_count == 0:
-            raise NotFound(json.dumps(query) + ' returned None.')
+            raise NotFound(str(query) + ' returned None.')
         return result
 
     def find(self, query=None):
@@ -40,7 +38,7 @@ class MongoClientValidated(object):
     def find_one(self, query):
         result = self._mc.find_one(query)
         if result is None:
-            raise NotFound(json.dumps(query) + ' returned None.')
+            raise NotFound(str(query) + ' returned None.')
         return result
 
     def insert_one(self, doc):
