@@ -12,8 +12,9 @@ class MongoClientValidated(object):
         self._mc = mongo_client[db][collection]
 
     def _validate_write(self, result):
-        if (('writeErrors' in result and len(result['writeErrors']) > 0) or
-                ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
+        if not result.acknowledged or result.inserted_id is None:
+        # if (('writeErrors' in result and len(result['writeErrors']) > 0) or
+        #         ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
             raise OperationFailed(json.dumps(result))
 
     def delete_one(self, query):
