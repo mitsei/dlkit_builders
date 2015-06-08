@@ -6,8 +6,11 @@ from . import mongo_client
 
 class MongoClientValidated(object):
     """automatically validates the insert_one, find_one, and delete_one methods"""
-    def __init__(self, db, collection):
-        self._mc = mongo_client[db][collection]
+    def __init__(self, db, collection=None):
+        if collection is None:
+            self._mc = mongo_client[db]
+        else:
+            self._mc = mongo_client[db][collection]
 
     def _validate_write(self, result):
         try:
