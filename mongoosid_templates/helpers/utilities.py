@@ -12,10 +12,15 @@ class MongoClientValidated(object):
         self._mc = mongo_client[db][collection]
 
     def _validate_write(self, result):
-        if not result.acknowledged or result.inserted_id is None:
-        # if (('writeErrors' in result and len(result['writeErrors']) > 0) or
-        #         ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
-            raise OperationFailed(json.dumps(result))
+        try:
+            if not result.acknowledged or result.inserted_id is None:
+            # if (('writeErrors' in result and len(result['writeErrors']) > 0) or
+            #         ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
+                raise OperationFailed(json.dumps(result))
+        except AttributeError:
+            # account for deprecated save() method
+            if result is None:
+                raise OperationFailed('Nothing saved to database.')
 
     def count(self):
         return self._mc.count()
