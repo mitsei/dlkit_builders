@@ -17,6 +17,9 @@ class MongoClientValidated(object):
         #         ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
             raise OperationFailed(json.dumps(result))
 
+    def count(self):
+        return self._mc.count()
+
     def delete_one(self, query):
         result = self._mc.find_one(query)
         if result is None or result.deleted_count == 0:
