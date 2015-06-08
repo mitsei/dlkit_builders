@@ -585,6 +585,9 @@ class OsidObject:
         if self._namespace == 'repository.AssetContent':
             if 'dbPrefix' in obj_map:
                 del obj_map['dbPrefix']
+        if self._namespace == 'repository.Composition':
+            if 'assetIds' in obj_map:
+                del obj_map['assetIds']
         if self._namespace == 'assessment.Item':
             if obj_map['question']:
                 obj_map['question'] = self.get_question().get_object_map()

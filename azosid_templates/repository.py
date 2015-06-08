@@ -1,5 +1,76 @@
 # repository templates for az_osid
 
+class RepositoryManager:
+    # This is here temporarily until Tom adds missing methods to RepositoryManager
+    
+    init = """
+    def __init__(self):
+        RepositoryProfile.__init__(self, 'RepositoryManager')
+
+
+    def initialize(self, runtime):
+        osid_managers.OsidManager.initialize(self, runtime)
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:repositoryProviderImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        self._provider_manager = runtime.get_manager('REPOSITORY', provider_impl) # need to add version argument
+
+    def get_asset_composition_session_for_repository(self, repository_id, proxy):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        try:
+            return getattr(sessions, 'AssetCompositionSession')(
+                self._provider_manager.get_asset_composition_session_for_repository(repository_id),
+                self._authz_session)
+        except AttributeError:
+            raise OperationFailed('AssetCompositionSession not implemented in authz_adapter')
+
+    def get_asset_composition_design_session_for_repository(self, repository_id, proxy):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        try:
+            return getattr(sessions, 'AssetCompositionDesignSession')(
+                self._provider_manager.get_asset_composition_design_session_for_repository(repository_id),
+                self._authz_session)
+        except AttributeError:
+            raise OperationFailed('AssetCompositionDesignSession not implemented in authz_adapter')
+"""
+
+
+class RepositoryProxyManager:
+    # This is here temporarily until Tom adds missing methods to RepositoryProxyManager
+
+    init = """
+    def __init__(self):
+        RepositoryProfile.__init__(self, 'RepositoryProxyManager')
+
+    def initialize(self, runtime):
+        osid_managers.OsidProxyManager.initialize(self, runtime)
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:repositoryProviderImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        self._provider_manager = runtime.get_proxy_manager('REPOSITORY', provider_impl) # need to add version argument
+
+    def get_asset_composition_session_for_repository(self, repository_id, proxy):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        try:
+            return getattr(sessions, 'AssetCompositionSession')(
+                self._provider_manager.get_asset_composition_session_for_repository(repository_id, proxy),
+                self._authz_session,
+                proxy)
+        except AttributeError:
+            raise OperationFailed('AssetCompositionSession not implemented in authz_adapter')
+
+    def get_asset_composition_design_session_for_repository(self, repository_id, proxy):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        try:
+            return getattr(sessions, 'AssetCompositionDesignSession')(
+                self._provider_manager.get_asset_composition_design_session_for_repository(repository_id, proxy),
+                self._authz_session,
+                proxy)
+        except AttributeError:
+            raise OperationFailed('AssetCompositionDesitnSession not implemented in authz_adapter')
+"""
+
+
 class AssetAdminSession:
 
     create_asset_content_template = """

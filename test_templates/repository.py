@@ -74,7 +74,7 @@ class AssetCompositionSession:
     def setUpClass(cls):
         cls.asset_list = list()
         cls.asset_ids = list()
-        cls.svc_mgr = Runtime('TEST_SERVICE').get_service_manager('REPOSITORY', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_repository_form_for_create([])
         create_form.display_name = 'Test Repository'
         create_form.description = 'Test Repository for AssetLookupSession tests'
@@ -83,7 +83,7 @@ class AssetCompositionSession:
         create_form.display_name = 'Test Composition for AssetCompositionSession tests'
         create_form.description = 'Test Compposion for AssetCompositionSession tests'
         cls.composition = cls.catalog.create_composition(create_form)
-        for num in [0, 3]:
+        for num in [0, 1, 2, 3]:
             create_form = cls.catalog.get_asset_form_for_create([])
             create_form.display_name = 'Test Asset ' + str(num)
             create_form.description = 'Test Asset for AssetLookupSession tests'
@@ -103,10 +103,11 @@ class AssetCompositionSession:
 """
 
     get_composition_assets = """
-        pass"""
+        self.assertEqual(self.catalog.get_composition_assets(self.composition.ident).available(), 4)"""
 
-    get_compostions_by_asset = """
-        pass"""
+    get_compositions_by_asset = """
+        self.assertEqual(self.catalog.get_compositions_by_asset(self.asset_ids[0]).available(), 1)
+        self.assertEqual(self.catalog.get_compositions_by_asset(self.asset_ids[0]).next.ident, self.composition.ident)"""
 
 class AssetCompositionDesignSession:
 
@@ -115,7 +116,7 @@ class AssetCompositionDesignSession:
     def setUpClass(cls):
         cls.asset_list = list()
         cls.asset_ids = list()
-        cls.svc_mgr = Runtime('TEST_SERVICE').get_service_manager('REPOSITORY', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_repository_form_for_create([])
         create_form.display_name = 'Test Repository'
         create_form.description = 'Test Repository for AssetLookupSession tests'
