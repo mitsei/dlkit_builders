@@ -74,30 +74,40 @@ class AssetCompositionSession:
     def setUpClass(cls):
         cls.asset_list = list()
         cls.asset_ids = list()
-        cls.svc_mgr = Runtime('TEST_SERVICE').get_service_manager('REPOSITORY', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_repository_form_for_create([])
         create_form.display_name = 'Test Repository'
         create_form.description = 'Test Repository for AssetLookupSession tests'
         cls.catalog = cls.svc_mgr.create_repository(create_form)
-        for num in [0, 3]:
+        create_form = cls.catalog.get_composition_form_for_create([])
+        create_form.display_name = 'Test Composition for AssetCompositionSession tests'
+        create_form.description = 'Test Compposion for AssetCompositionSession tests'
+        cls.composition = cls.catalog.create_composition(create_form)
+        for num in [0, 1, 2, 3]:
             create_form = cls.catalog.get_asset_form_for_create([])
             create_form.display_name = 'Test Asset ' + str(num)
             create_form.description = 'Test Asset for AssetLookupSession tests'
             obj = cls.catalog.create_asset(create_form)
             cls.asset_list.append(obj)
             cls.asset_ids.append(obj.ident)
+            cls.catalog.add_asset(obj.ident, cls.composition.ident)
 
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_repositories():
-            for obj in catalog.get_compositions():
-                catalog.delete_composition(obj.ident)
             for obj in catalog.get_assets():
                 catalog.delete_asset(obj.ident)
+            for obj in catalog.get_compositions():
+                catalog.delete_composition(obj.ident)
             cls.svc_mgr.delete_repository(catalog.ident)
 """
 
+    get_composition_assets = """
+        self.assertEqual(self.catalog.get_composition_assets(self.composition.ident).available(), 4)"""
 
+    get_compositions_by_asset = """
+        self.assertEqual(self.catalog.get_compositions_by_asset(self.asset_ids[0]).available(), 1)
+        self.assertEqual(self.catalog.get_compositions_by_asset(self.asset_ids[0]).next().ident, self.composition.ident)"""
 
 class AssetCompositionDesignSession:
 
@@ -106,7 +116,7 @@ class AssetCompositionDesignSession:
     def setUpClass(cls):
         cls.asset_list = list()
         cls.asset_ids = list()
-        cls.svc_mgr = Runtime('TEST_SERVICE').get_service_manager('REPOSITORY', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_repository_form_for_create([])
         create_form.display_name = 'Test Repository'
         create_form.description = 'Test Repository for AssetLookupSession tests'

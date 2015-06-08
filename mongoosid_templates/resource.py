@@ -498,7 +498,6 @@ class ResourceAgentSession:
 
     get_resource_by_agent = """
         collection = MongoClientValidated(self._db_prefix + 'resource', 'Resource')
-
         if self._catalog_view == ISOLATED:
             result = collection.find_one({'agentIds': {'$in': [str(agent_id)]},
                                           'binId': str(self._catalog_id)})

@@ -11,6 +11,55 @@ class RepositoryProfile:
         # osid.repository.RepositoryProfile.supports_coordinate_type
         return False"""
 
+class RepositoryManager:
+    # This is here temporarily until Tom adds missing methods to RepositoryManager
+    
+    additional_methods = """
+    @arguments_not_none
+    def get_asset_composition_session_for_repository(self, repository_id):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        if not self.supports_asset_composition():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return sessions.AssetCompositionSession(repository_id, runtime=self._runtime) # pylint: disable=no-member
+
+    @arguments_not_none
+    def get_asset_composition_design_session_for_repository(self, repository_id):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        if not self.supports_asset_composition():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return sessions.AssetCompositionDesignSession(repository_id, runtime=self._runtime) # pylint: disable=no-member
+"""
+
+class RepositoryProxyManager:
+    # This is here temporarily until Tom adds missing methods to RepositoryProxyManager
+
+    additional_methods = """
+    @arguments_not_none
+    def get_asset_composition_session_for_repository(self, repository_id, proxy):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        if not self.supports_asset_composition():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return sessions.AssetCompositionSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member
+
+    @arguments_not_none
+    def get_asset_composition_design_session_for_repository(self, repository_id, proxy):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        if not self.supports_asset_composition():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return sessions.AssetCompositionDesignSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member
+"""
 
 class AssetAdminSession:
 
@@ -174,6 +223,10 @@ class CompositionLookupSession:
 
 class AssetCompositionSession:
 
+    import_statements = [
+        'from dlkit.primordium.id.primitives import Id'
+    ]
+
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         self._catalog_class = objects.Repository
@@ -187,20 +240,42 @@ class AssetCompositionSession:
             db_name='repository',
             cat_name='Repository',
             cat_class=objects.Repository)
-        self._forms = dict()
+        self._object_view = COMPARATIVE
+        self._catalog_view = ISOLATED
         self._kwargs = kwargs
 """
 
     get_composition_assets = """
-        if composition_id is None:
-            raise NullArgument()
-        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        if self._catalog_view == ISOLATED:
+            composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier()),
+                                              'repositoryId': str(self._catalog_id)})
+        else:
+            composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if composition is None:
             raise errors.NotFound('no Composition with this id was found')
         if 'assetIds' not in composition:
             raise NotFound('no Assets are assigned to this Composition')
-        return objects.AssetList()
-        """
+        asset_ids = []
+        for idstr in composition['assetIds']:
+            asset_ids.append(Id(idstr))
+        mgr = self._get_provider_manager('REPOSITORY')
+        als = mgr.get_asset_lookup_session()
+        als.use_federated_repository_view()
+        return als.get_assets_by_ids(asset_ids)"""
+
+    get_compositions_by_asset = """
+        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        if self._catalog_view == ISOLATED:
+            result = collection.find({'assetIds': {'$in': [str(asset_id)]},
+                                      'repositoryId': str(self._catalog_id)}).sort('_id', DESCENDING)
+            count = collection.find({'assetIds': {'$in': [str(asset_id)]},
+                                     'repositoryId': str(self._catalog_id)}).count()
+        else:
+            result = collection.find({'assetIds': {'$in': [str(asset_id)]}}).sort('_id', DESCENDING)
+            count = collection.find({'assetIds': {'$in': [str(asset_id)]}}).count()
+        return objects.CompositionList(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
+
 
 class AssetCompositionDesignSession:
 
@@ -221,7 +296,6 @@ class AssetCompositionDesignSession:
             db_name='repository',
             cat_name='Repository',
             cat_class=objects.Repository)
-        self._forms = dict()
         self._kwargs = kwargs
 """
 
@@ -229,8 +303,6 @@ class AssetCompositionDesignSession:
         return True"""
 
     add_asset = """
-        if asset_id is None or composition_id is None:
-            raise NullArgument()
         # This asset found check may want to be run through _get_provider_manager
         # so as to ensure assess control:
         collection = mongo_client[self._db_prefix + 'repository']['Asset']
@@ -248,8 +320,6 @@ class AssetCompositionDesignSession:
         collection.save(composition)"""
 
     move_asset_ahead = """
-        if asset_id is None or composition_id is None:
-            raise NullArgument()
         collection = mongo_client[self._db_prefix + 'repository']['Composition']
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if composition is None:
@@ -261,9 +331,6 @@ class AssetCompositionDesignSession:
         """
 
     move_asset_behind = """
-        if asset_id is None or composition_id is None or referenct_id is None:
-            raise NullArgument()
-        return 
         collection = mongo_client[self._db_prefix + 'repository']['Composition']
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if composition is None:
@@ -275,8 +342,6 @@ class AssetCompositionDesignSession:
         """
 
     order_assets = """
-        if asset_ids is None or composition_id is None:
-            raise NullArgument()
         collection = mongo_client[self._db_prefix + 'repository']['Composition']
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if composition is None:
@@ -288,8 +353,6 @@ class AssetCompositionDesignSession:
         """
 
     remove_asset = """
-        if asset_id is None or composition_id is None:
-            raise NullArgument()
         collection = mongo_client[self._db_prefix + 'repository']['Composition']
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if composition is None:

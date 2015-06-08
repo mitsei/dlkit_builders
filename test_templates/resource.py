@@ -3,11 +3,7 @@
 class ResourceProfile:
 
     import_statements_pattern = [
-<<<<<<< HEAD
         'from dlkit_django import PROXY_SESSION, proxy_example',
-=======
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
->>>>>>> feature/jm/composition
         'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
@@ -115,11 +111,7 @@ class ResourceProxyManager:
 class ResourceLookupSession:
 
     import_statements_pattern = [
-<<<<<<< HEAD
         'from dlkit_django import PROXY_SESSION, proxy_example',
-=======
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
->>>>>>> feature/jm/composition
         'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
@@ -240,11 +232,7 @@ class ResourceQuerySession:
 class ResourceAdminSession:
 
     import_statements_pattern = [
-<<<<<<< HEAD
         'from dlkit_django import PROXY_SESSION, proxy_example',
-=======
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
->>>>>>> feature/jm/composition
         'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
@@ -297,11 +285,7 @@ class ResourceAdminSession:
 class ResourceAgentSession:
 
     import_statements = [
-<<<<<<< HEAD
         'from dlkit_django import PROXY_SESSION, proxy_example',
-=======
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
->>>>>>> feature/jm/composition
         'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
@@ -319,11 +303,7 @@ class ResourceAgentSession:
     def setUpClass(cls):
         cls.resource_list = list()
         cls.resource_ids = list()
-<<<<<<< HEAD
         cls.svc_mgr = Runtime().get_service_manager('RESOURCE', 'TEST_SERVICE', PROXY)
-=======
-        cls.svc_mgr = Runtime('TEST_SERVICE').get_service_manager('RESOURCE', PROXY)
->>>>>>> feature/jm/composition
         create_form = cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
         create_form.description = 'Test Bin for ResourceLookupSession tests'
@@ -372,11 +352,7 @@ class ResourceAgentAssignmentSession:
     def setUpClass(cls):
         cls.resource_list = list()
         cls.resource_ids = list()
-<<<<<<< HEAD
         cls.svc_mgr = Runtime().get_service_manager('RESOURCE', 'TEST_SERVICE', PROXY)
-=======
-        cls.svc_mgr = Runtime('TEST_SERVICE').get_service_manager('RESOURCE', PROXY)
->>>>>>> feature/jm/composition
         create_form = cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
         create_form.description = 'Test Bin for ResourceLookupSession tests'
@@ -418,11 +394,7 @@ class ResourceAgentAssignmentSession:
 class BinLookupSession:
 
     import_statements_pattern = [
-<<<<<<< HEAD
         'from dlkit_django import PROXY_SESSION, proxy_example',
-=======
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
->>>>>>> feature/jm/composition
         'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
@@ -486,11 +458,7 @@ class BinLookupSession:
 class BinAdminSession:
 
     import_statements_pattern = [
-<<<<<<< HEAD
         'from dlkit_django import PROXY_SESSION, proxy_example',
-=======
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
->>>>>>> feature/jm/composition
         'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
