@@ -488,11 +488,11 @@ class ResourceAgentSession:
             db_name='assessment',
             cat_name='Bin',
             cat_class=objects.Bin)
-        self._object_view = COMPARATIVE
-        self._catalog_view = ISOLATED
         self._forms = dict()
         self._object_view = COMPARATIVE
         self._catalog_view = ISOLATED
+        self._qualifier_id = provider_session.get_bin_id()
+        self._id_namespace = 'resource.ResourceAgent'
 """
 
     get_resource_id_by_agent = """
@@ -546,6 +546,8 @@ class ResourceAgentAssignmentSession:
             cat_name='Bin',
             cat_class=objects.Bin)
         self._forms = dict()
+        self._qualifier_id = provider_session.get_bin_id()
+        self._id_namespace = 'resource.ResourceAgent'
 """
 
     assign_agent_to_resource = """

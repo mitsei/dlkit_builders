@@ -16,7 +16,7 @@ packages_to_implement = [
     'repository',
     'resource',
     'type',
-    ]
+]
 
 packages_to_test = [
     'assessment',
@@ -24,7 +24,7 @@ packages_to_test = [
     'learning',
     'repository',
     'resource',
-    ]
+]
 
 managers_to_implement = [
     'assessment',
@@ -39,7 +39,7 @@ managers_to_implement = [
     'repository',
     'resource',
     'type',
-    ]
+]
 
 sessions_to_implement = [
     ### assessment service:
@@ -117,7 +117,7 @@ sessions_to_implement = [
     'BinAdminSession',
     'BinHierarchySession',
     'BinHierarchyDesignSession',
-    ]
+]
 
 objects_to_implement = [
     ### assessment service:
@@ -166,7 +166,7 @@ objects_to_implement = [
     'Bin',
     ### type service
     'Type',
-    ]
+]
 
 variants_to_implement = [
     'Form',
@@ -176,4 +176,4 @@ variants_to_implement = [
     'QueryRecord',
     'QueryFormRecord',
     'List',
-    ]
+]

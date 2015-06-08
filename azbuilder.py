@@ -28,7 +28,7 @@ from azbuilder_settings import TEMPLATEDIR as template_dir
 # This is the entry point for making python authz adapter classes for
 # the osids. It processes all of the osid maps in the package maps
 # directory.
-def make_azosids(build_abc = False, re_index = False, re_map = False):
+def make_azosids(build_abc=False, re_index=False, re_map=False):
     from abcbinder import make_abcosids
     if build_abc:
         make_abcosids(re_index, re_map)
@@ -50,6 +50,10 @@ def make_azosids(build_abc = False, re_index = False, re_map = False):
 # osid package that was prepared by the mapper.
 def make_azosid(file_name):
     from binder_helpers import get_interface_module
+
+    if 'resource' in file_name:
+        import pdb
+        pdb.set_trace()
 
     read_file = open(file_name, 'r')
     package = json.load(read_file)
