@@ -400,7 +400,7 @@ class ResourceAdminSession:
             raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
-        collection.insert_one(${arg0_name}._my_map)
+        insert_result = collection.insert_one(${arg0_name}._my_map)
 
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
@@ -724,7 +724,7 @@ class BinAdminSession:
             raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
-        collection.insert_one(${arg0_name}._my_map)
+        insert_result = collection.insert_one(${arg0_name}._my_map)
 
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
