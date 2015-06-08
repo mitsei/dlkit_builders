@@ -621,7 +621,7 @@ class BinLookupSession:
         if ${arg0_name}.get_identifier() == '000000000000000000000000':
             return self._get_phantom_root_catalog(cat_class=objects.${cat_name}, cat_name='${cat_name}')
         try:
-            collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+            result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         except errors.NotFound:
             # Try creating an orchestrated ${cat_name}.  Let it raise errors.NotFound()
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
