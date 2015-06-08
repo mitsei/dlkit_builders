@@ -372,7 +372,7 @@ class OsidSession:
             collection = MongoClientValidated(self._db_prefix + db_name, cat_name)
             try:
                 self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
-            except errors.NotFound():
+            except errors.NotFound:
                 if catalog_id.get_identifier_namespace() != db_name + '.' + cat_name:
                     self._my_catalog_map = self._create_orchestrated_cat(catalog_id, db_name, cat_name)
                 else:
