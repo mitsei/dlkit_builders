@@ -56,7 +56,7 @@ class AssetAdminSession:
         from .${return_module} import ${return_type}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         document = collection.find_one({'${aggregated_objects_name_mixed}._id': ObjectId(${arg0_name}.get_identifier())})
         for sub_doc in document['${aggregated_objects_name_mixed}']: # There may be a MongoDB shortcut for this
             if sub_doc['_id'] == ObjectId(${arg0_name}.get_identifier()):
@@ -113,7 +113,7 @@ class AssetAdminSession:
         from .objects import ${aggregated_object_name}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under} = collection.find_one({'${aggregated_objects_name_mixed}._id': ObjectId(${arg0_name}.get_identifier())})
 
         index = 0
