@@ -51,10 +51,6 @@ def make_azosids(build_abc=False, re_index=False, re_map=False):
 def make_azosid(file_name):
     from binder_helpers import get_interface_module
 
-    if 'resource' in file_name:
-        import pdb
-        pdb.set_trace()
-
     read_file = open(file_name, 'r')
     package = json.load(read_file)
     read_file.close()
