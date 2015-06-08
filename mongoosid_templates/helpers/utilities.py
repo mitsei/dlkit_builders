@@ -23,8 +23,11 @@ class MongoClientValidated(object):
             raise NotFound(json.dumps(query) + ' returned None.')
         return result
 
-    def find(self, query):
-        return self._mc.find(query)
+    def find(self, query=None):
+        if query is None:
+            return self._mc.find()
+        else:
+            return self._mc.find(query)
 
     def find_one(self, query):
         result = self._mc.find_one(query)
