@@ -66,7 +66,7 @@ class AssetAdminSession:
     import_statements_pattern = [
     'from dlkit.abstract_osid.osid import errors',
     'from bson.objectid import ObjectId',
-    'from .. import mongo_client',
+    'from ..utilities import MongoClientValidated',
     'CREATED = True'
     'UPDATED = True',
     ]
@@ -75,7 +75,7 @@ class AssetAdminSession:
         # Implemented from template for
         # osid.repository.AssetAdminSession.create_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
@@ -93,11 +93,9 @@ class AssetAdminSession:
             {'$$and': [{'_id': ObjectId(${object_name_under}_id)}, {'${cat_name_mixed}Id': str(self._catalog_id)}]})
         ${object_name_under}['${aggregated_objects_name_mixed}'].append(${arg0_name}._my_map)
         result = collection.save(${object_name_under})
-        if result == "What to look for here???":
-            pass # Need to figure out what writeConcernErrors to catch and deal with?
+
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         from .${return_module} import ${aggregated_object_name}
-        #mongo_client.close()
         return ${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_asset_content_form_for_update_template = """
@@ -105,26 +103,23 @@ class AssetAdminSession:
         # osid.repository.AssetAdminSession.get_asset_content_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .${return_module} import ${return_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         document = collection.find_one({'${aggregated_objects_name_mixed}._id': ObjectId(${arg0_name}.get_identifier())})
-        if document is None:
-            raise errors.NotFound()
         for sub_doc in document['${aggregated_objects_name_mixed}']: # There may be a MongoDB shortcut for this
             if sub_doc['_id'] == ObjectId(${arg0_name}.get_identifier()):
                 result = sub_doc
         obj_form = ${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-        #mongo_client.close()
         return obj_form"""
 
     update_asset_content_template = """
         # Implemented from template for
         # osid.repository.AssetAdminSession.update_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
@@ -157,7 +152,7 @@ class AssetAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         from .objects import ${aggregated_object_name}
-        #mongo_client.close()
+
         return ${aggregated_object_name}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     delete_asset_content_template = """
@@ -165,12 +160,11 @@ class AssetAdminSession:
         # osid.repository.AssetAdminSession.delete_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .objects import ${aggregated_object_name}
-        collection = mongo_client[self._db_prefix + '${package_name}']['${object_name}']
+        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
-            return InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under} = collection.find_one({'${aggregated_objects_name_mixed}._id': ObjectId(${arg0_name}.get_identifier())})
-        if ${object_name_under} is None:
-            raise errors.NotFound()
+
         index = 0
         found = False
         for i in ${object_name_under}['${aggregated_objects_name_mixed}']:
@@ -181,11 +175,7 @@ class AssetAdminSession:
         if not found:
             raise errors.OperationFailed()
         ${aggregated_object_name}(${aggregated_object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
-        try:
-            collection.save(${object_name_under})
-        except: # what exceptions does mongodb save raise?
-            raise errors.OperationFailed()
-        #mongo_client.close()"""
+        collection.save(${object_name_under})"""
 
 
 class CompositionLookupSession:
@@ -477,7 +467,7 @@ class AssetContent:
     import_statements = [
         'import gridfs',
         'from ..primitives import DataInputStream',
-        'from .. import mongo_client'
+        'from ..utilities import MongoClientValidated'
     ]
 
     has_url_template = """
@@ -494,19 +484,17 @@ class AssetContent:
         return self._my_map['${var_name_mixed}']"""
 
     get_data = """
-        dbase = mongo_client[self._db_prefix + 'repository']
+        dbase = MongoClientValidated(self._db_prefix + 'repository').raw()
         filesys = gridfs.GridFS(dbase)
-        #mongo_client.close()
         return DataInputStream(filesys.get(self._my_map['data']))""" 
 
     additional_methods = """
     def _delete(self):
-        dbase = mongo_client[self._db_prefix + 'repository']
+        dbase = MongoClientValidated(self._db_prefix + 'repository').raw()
         filesys = gridfs.GridFS(dbase)
         if self._my_map['data'] and filesys.exists(self._my_map['data']):
             filesys.delete(self._my_map['data'])
-        osid_objects.OsidObject._delete(self)
-        #mongo_client.close()"""
+        osid_objects.OsidObject._delete(self)"""
 
 class AssetContentForm:
 
@@ -515,7 +503,7 @@ class AssetContentForm:
         'import gridfs',
         'from ..primitives import DataInputStream',
         'from dlkit.abstract_osid.osid import errors',
-        'from .. import mongo_client'
+        'from ..utilities import MongoClientValidated'
         ]
 
     set_url_template = """
@@ -531,12 +519,11 @@ class AssetContentForm:
     set_data = """
         if data is None:
             raise errors.NullArgument()
-        dbase = mongo_client[self._db_prefix + 'repository']
+        dbase = MongoClientValidated(self._db_prefix + 'repository')
         filesys = gridfs.GridFS(dbase)
         self._my_map['data'] = filesys.put(data._my_data)
         data._my_data.seek(0)
-        self._my_map['base64'] = base64.b64encode(data._my_data.read())
-        #mongo_client.close()"""
+        self._my_map['base64'] = base64.b64encode(data._my_data.read())"""
 
     clear_data = """
         if (self.get_data_metadata().is_read_only() or
@@ -544,12 +531,11 @@ class AssetContentForm:
             raise errors.NoAccess()
         if self._my_map['data'] == self._data_default:
             pass
-        dbase = mongo_client[self._db_prefix + 'repository']
+        dbase = MongoClientValidated(self._db_prefix + 'repository')
         filesys = gridfs.GridFS(dbase)
         filesys.delete(self._my_map['data'])
         self._my_map['data'] = self._data_default
-        del self._my_map['base64']
-        #mongo_client.close()"""
+        del self._my_map['base64']"""
 
 class Composition:
     

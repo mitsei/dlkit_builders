@@ -35,3 +35,6 @@ pattern_maps
 
 # Mac Stuff
 .DS_Store
+
+# settings files
+*_settings.py
