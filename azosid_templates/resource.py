@@ -345,7 +345,7 @@ class ResourceAdminSession:
 
 class ResourceAgentSession:
 
-    init_template = """
+    init = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_bin_id()
@@ -382,7 +382,7 @@ class ResourceAgentSession:
 
 class ResourceAgentAssignmentSession:
 
-    init_template = """
+    init = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_bin_id()
