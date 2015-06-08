@@ -2,7 +2,8 @@
 class CommentLookupSession:
 
     import_statements_pattern = [
-        'from dlkit_django import RUNTIME, PROXY_SESSION, proxy_example',
+        'from dlkit_django import PROXY_SESSION, proxy_example',
+        'from dlkit_django.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -18,7 +19,7 @@ class CommentLookupSession:
     def setUpClass(cls):
         cls.${object_name_under}_list = list()
         cls.${object_name_under}_ids = list()
-        cls.svc_mgr = RUNTIME.get_service_manager('${pkg_name_upper}', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
