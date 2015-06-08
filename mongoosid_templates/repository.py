@@ -336,7 +336,7 @@ class AssetCompositionDesignSession:
             raise errors.NotFound('no Composition with this id was found')
         if 'assetIds' not in composition:
             raise NotFound('no Assets are assigned to this Composition')
-        composition['assetIds'] = move_ahead(asset_id, referenct_id, composition['assetIds'])
+        composition['assetIds'] = move_id_ahead(asset_id, referenct_id, composition['assetIds'])
         collection.save(composition)
         """
 
@@ -347,7 +347,7 @@ class AssetCompositionDesignSession:
             raise errors.NotFound('no Composition with this id was found')
         if 'assetIds' not in composition:
             raise NotFound('no Assets are assigned to this Composition')
-        composition['assetIds'] = move_behind(asset_id, referenct_id, composition['assetIds'])
+        composition['assetIds'] = move_id_behind(asset_id, referenct_id, composition['assetIds'])
         collection.save(composition)
         """
 

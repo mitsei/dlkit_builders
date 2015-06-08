@@ -11,7 +11,7 @@ APPNAMESUFFIX = ''
 
 ##
 # This package name (if provided) trumps package prefix and package suffix:
-PACKAGENAME = './dlkit/services'
+PACKAGENAME = '../dlkit_runtime_project/dlkit/services'
 
 ##
 # The prefix (if any) to be applied to Django-aware osid packages:

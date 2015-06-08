@@ -8,7 +8,8 @@
 # exist and insert a __init__.py file to create the package.  If None
 # is specified, then the builder will distribute impls based on the
 # kit package name specified elsewhere
-ROOTPACKAGE = './dlkit/mongo'
+#ROOTPACKAGE = './dlkit/mongo'
+ROOTPACKAGE = '../dlkit_runtime_project/dlkit/mongo'
 
 ##
 # The relative path to the azbuilder implementation root directory

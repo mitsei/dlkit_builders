@@ -116,18 +116,27 @@ class AssetCompositionDesignSession:
     def setUpClass(cls):
         cls.asset_list = list()
         cls.asset_ids = list()
+        cls.composition_list = list()
+        cls.composition_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', 'TEST_SERVICE', PROXY)
         create_form = cls.svc_mgr.get_repository_form_for_create([])
         create_form.display_name = 'Test Repository'
         create_form.description = 'Test Repository for AssetLookupSession tests'
         cls.catalog = cls.svc_mgr.create_repository(create_form)
-        for num in [0, 3]:
+        for num in [0, 1, 2, 3]:
             create_form = cls.catalog.get_asset_form_for_create([])
             create_form.display_name = 'Test Asset ' + str(num)
-            create_form.description = 'Test Asset for AssetLookupSession tests'
-            obj = cls.catalog.create_asset(create_form)
-            cls.asset_list.append(obj)
-            cls.asset_ids.append(obj.ident)
+            create_form.description = 'Test Asset for AssetLookupSession tests' + str(num)
+            asset = cls.catalog.create_asset(create_form)
+            cls.asset_list.append(asset)
+            cls.asset_ids.append(asset.ident)
+        for num in [0, 1, 2, 3]:
+            create_form = cls.catalog.get_composition_form_for_create([])
+            create_form.display_name = 'Test Composition' + str(num)
+            create_form.description = 'Test Compposion for AssetCompositionSession tests' + str(num)
+            composition = cls.catalog.create_composition(create_form)
+            cls.composition_list.append(composition)
+            cls.composition_ids.append(composition.ident)
 
     @classmethod
     def tearDownClass(cls):
@@ -139,6 +148,17 @@ class AssetCompositionDesignSession:
             cls.svc_mgr.delete_repository(catalog.ident)
 """
 
+    add_asset = """
+        for asset_id in self.asset_ids:
+            self.catalog.add_asset(asset_id, self.composition_ids[0])
+        self.assertEqual(self.catalog.get_composition_assets(self.composition_ids[0]).available(), 4)"""
+
+    move_asset_ahead = """
+        for asset_id in self.asset_ids:
+            self.catalog.add_asset(asset_id, self.composition_ids[1])
+        self.catalog.move_asset_ahead(self.asset_ids[2], self.composition_ids[1], self.asset_ids[0])
+        first_asset = self.catalog.get_composition_assets(self.composition_ids[1]).next()
+        self.assertEqual(first_asset.ident, self.asset_ids[2].ident)"""
 
 class Asset:
 
