@@ -421,13 +421,13 @@ class AssetContent:
         return self._my_map['${var_name_mixed}']"""
 
     get_data = """
-        dbase = MongoClientValidated(self._db_prefix + 'repository')
+        dbase = MongoClientValidated(self._db_prefix + 'repository').raw()
         filesys = gridfs.GridFS(dbase)
         return DataInputStream(filesys.get(self._my_map['data']))""" 
 
     additional_methods = """
     def _delete(self):
-        dbase = MongoClientValidated(self._db_prefix + 'repository')
+        dbase = MongoClientValidated(self._db_prefix + 'repository').raw()
         filesys = gridfs.GridFS(dbase)
         if self._my_map['data'] and filesys.exists(self._my_map['data']):
             filesys.delete(self._my_map['data'])

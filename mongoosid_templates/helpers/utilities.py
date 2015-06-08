@@ -6,8 +6,11 @@ from . import mongo_client
 
 class MongoClientValidated(object):
     """automatically validates the insert_one, find_one, and delete_one methods"""
-    def __init__(self, db, collection):
-        self._mc = mongo_client[db][collection]
+    def __init__(self, db, collection=None):
+        if collection is None:
+            self._mc = mongo_client[db]
+        else:
+            self._mc = mongo_client[db][collection]
 
     def _validate_write(self, result):
         try:
@@ -45,6 +48,11 @@ class MongoClientValidated(object):
         result = self._mc.insert_one(doc)
         self._validate_write(result)
         return result
+
+    def raw(self):
+        """ return the raw mongo client object...used for GridFS
+        """
+        return self._mc
 
     def save(self, doc):
         result = self._mc.save(doc)
