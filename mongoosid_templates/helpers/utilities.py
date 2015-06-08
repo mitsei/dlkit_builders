@@ -17,6 +17,6 @@ def arguments_not_none(func):
             if 'takes exactly' in ex.args[0]:
                 raise NullArgument('Not all arguments provided: ' + str(ex.args[0]))
             else:
-                raise TypeError(ex.args[0])
+                raise TypeError(*ex.args)
 
     return wrapper
