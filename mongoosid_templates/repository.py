@@ -15,7 +15,7 @@ class RepositoryManager:
     # This is here temporarily until Tom adds missing methods to RepositoryManager
     
     additional_methods = """
-    @arguments_not_none
+    @utilities.arguments_not_none
     def get_asset_composition_session_for_repository(self, repository_id):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         if not self.supports_asset_composition():
@@ -25,7 +25,7 @@ class RepositoryManager:
         ##
         return sessions.AssetCompositionSession(repository_id, runtime=self._runtime) # pylint: disable=no-member
 
-    @arguments_not_none
+    @utilities.arguments_not_none
     def get_asset_composition_design_session_for_repository(self, repository_id):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         if not self.supports_asset_composition():
@@ -40,7 +40,7 @@ class RepositoryProxyManager:
     # This is here temporarily until Tom adds missing methods to RepositoryProxyManager
 
     additional_methods = """
-    @arguments_not_none
+    @utilities.arguments_not_none
     def get_asset_composition_session_for_repository(self, repository_id, proxy):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         if not self.supports_asset_composition():
@@ -50,7 +50,7 @@ class RepositoryProxyManager:
         ##
         return sessions.AssetCompositionSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member
 
-    @arguments_not_none
+    @utilities.arguments_not_none
     def get_asset_composition_design_session_for_repository(self, repository_id, proxy):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         if not self.supports_asset_composition():
