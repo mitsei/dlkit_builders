@@ -758,7 +758,7 @@ def make_method(package_name, method, interface, patterns):
         else:
             args.append(arg['var_name'])
 
-    decorator = '    @arguments_not_none'
+    decorator = '    @utilities.arguments_not_none'
     method_sig = ('    def ' + method['name'] + '(' +
                   ', '.join(args) + '):')
 
