@@ -216,14 +216,20 @@ class ResourceLookupSession:
             object_id_list.append(ObjectId(i.get_identifier()))
         if self._catalog_view == ISOLATED:
             result = collection.find({'_id': {'$$in': object_id_list},
-                                      '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
+                                      '${cat_name_mixed}Id': str(self._catalog_id)})
             count = collection.find({'_id': {'$$in': object_id_list},
                                      '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
-            result = collection.find({'_id': {'$$in': object_id_list}}).sort('_id', DESCENDING)
+            result = collection.find({'_id': {'$$in': object_id_list}})
             count = collection.find({'_id': {'$$in': object_id_list}}).count()
-
-        return objects.${return_type}(result, count=count, runtime=self._runtime)"""
+        result = list(result)
+        sorted_result = []
+        for object_id in object_id_list:
+            for object_map in result:
+                if object_map['_id'] == object_id:
+                    sorted_result.append(object_map)
+                    break
+        return objects.${return_type}(sorted_result, count=len(sorted_result), runtime=self._runtime)"""
 
     get_resources_by_genus_type_template = """
         # Implemented from template for

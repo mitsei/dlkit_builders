@@ -130,10 +130,17 @@ class AssetCompositionDesignSession:
             asset = cls.catalog.create_asset(create_form)
             cls.asset_list.append(asset)
             cls.asset_ids.append(asset.ident)
+<<<<<<< HEAD
         for num in [0, 1, 2, 3]:
             create_form = cls.catalog.get_composition_form_for_create([])
             create_form.display_name = 'Test Composition' + str(num)
             create_form.description = 'Test Compposion for AssetCompositionSession tests' + str(num)
+=======
+        for num in [0, 1, 2, 3, 4]:
+            create_form = cls.catalog.get_composition_form_for_create([])
+            create_form.display_name = 'Test Composition ' + str(num)
+            create_form.description = 'Test Compposion for AssetCompositionSession tests ' + str(num)
+>>>>>>> feature/jm/composition
             composition = cls.catalog.create_composition(create_form)
             cls.composition_list.append(composition)
             cls.composition_ids.append(composition.ident)
@@ -151,14 +158,37 @@ class AssetCompositionDesignSession:
     add_asset = """
         for asset_id in self.asset_ids:
             self.catalog.add_asset(asset_id, self.composition_ids[0])
-        self.assertEqual(self.catalog.get_composition_assets(self.composition_ids[0]).available(), 4)"""
+        self.assertEqual(self.catalog.get_composition_assets(self.composition_ids[0]).available(), 4)
+        self.assertEqual(self.catalog.get_composition_assets(self.composition_ids[0]).next().display_name.text, 'Test Asset 0')"""
 
     move_asset_ahead = """
         for asset_id in self.asset_ids:
             self.catalog.add_asset(asset_id, self.composition_ids[1])
         self.catalog.move_asset_ahead(self.asset_ids[2], self.composition_ids[1], self.asset_ids[0])
         first_asset = self.catalog.get_composition_assets(self.composition_ids[1]).next()
-        self.assertEqual(first_asset.ident, self.asset_ids[2].ident)"""
+        self.assertEqual(first_asset.ident, self.asset_ids[2])"""
+
+    move_asset_behind = """
+        for asset_id in self.asset_ids:
+            self.catalog.add_asset(asset_id, self.composition_ids[2])
+        self.catalog.move_asset_behind(self.asset_ids[0], self.composition_ids[2], self.asset_ids[3])
+        last_asset = list(self.catalog.get_composition_assets(self.composition_ids[2]))[-1]
+        self.assertEqual(last_asset.ident, self.asset_ids[0])"""
+
+    order_assets = """
+        for asset_id in self.asset_ids:
+            self.catalog.add_asset(asset_id, self.composition_ids[3])
+        new_order = [self.asset_ids[2], self.asset_ids[3], self.asset_ids[1], self.asset_ids[0]]
+        self.catalog.order_assets(new_order, self.composition_ids[3])
+        asset_list = list(self.catalog.get_composition_assets(self.composition_ids[3]))
+        for num in [0, 1, 2, 3]:
+            self.assertEqual(new_order[num], asset_list[num].ident)"""
+
+    remove_asset = """
+        for asset_id in self.asset_ids:
+            self.catalog.add_asset(asset_id, self.composition_ids[4])
+        self.catalog.remove_asset(self.asset_ids[1], self.composition_ids[4])
+        self.assertEqual(self.catalog.get_composition_assets(self.composition_ids[4]).available(), 3)"""
 
 class Asset:
 
