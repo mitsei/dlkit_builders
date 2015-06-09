@@ -488,7 +488,7 @@ class AssetContentForm:
         'from ..primitives import DataInputStream',
         'from dlkit.abstract_osid.osid import errors',
         'from ..utilities import MongoClientValidated'
-        ]
+    ]
 
     set_url_template = """
         # Implemented from template for osid.repository.AssetContentForm.set_url_template
@@ -533,7 +533,6 @@ class Composition:
         return self.get_children_ids()"""
 
 class CompositionForm:
-
     # per Tom Coppeto. We are moving composition design to the CompositionForm
     additional_methods = """
     def get_children_metadata(self):
@@ -549,7 +548,8 @@ class CompositionForm:
 
     children_metadata = property(fget=get_children_metadata)
 
-    def set_children(self, child_ids=None):
+    @utilities.arguments_not_none
+    def set_children(self, child_ids):
         \"\"\"Sets the children.
 
         arg:    child_ids (osid.id.Id[]): the children``Ids``
@@ -558,8 +558,6 @@ class CompositionForm:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        if child_ids is None:
-            raise errors.NullArgument()
         if not isinstance(child_ids, list):
             raise errors.InvalidArgument()
         if self.get_children_metadata().is_read_only():
