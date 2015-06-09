@@ -263,7 +263,7 @@ class AssetCompositionSession:
         return als.get_assets_by_ids(asset_ids)"""
 
     get_compositions_by_asset = """
-        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         if self._catalog_view == ISOLATED:
             result = collection.find({'assetIds': {'$in': [str(asset_id)]},
                                       'repositoryId': str(self._catalog_id)}).sort('_id', DESCENDING)
