@@ -15,7 +15,7 @@ class RepositoryManager:
     # This is here temporarily until Tom adds missing methods to RepositoryManager
     
     additional_methods = """
-    @arguments_not_none
+    @utilities.arguments_not_none
     def get_asset_composition_session_for_repository(self, repository_id):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         if not self.supports_asset_composition():
@@ -25,7 +25,7 @@ class RepositoryManager:
         ##
         return sessions.AssetCompositionSession(repository_id, runtime=self._runtime) # pylint: disable=no-member
 
-    @arguments_not_none
+    @utilities.arguments_not_none
     def get_asset_composition_design_session_for_repository(self, repository_id):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         if not self.supports_asset_composition():
@@ -40,7 +40,7 @@ class RepositoryProxyManager:
     # This is here temporarily until Tom adds missing methods to RepositoryProxyManager
 
     additional_methods = """
-    @arguments_not_none
+    @utilities.arguments_not_none
     def get_asset_composition_session_for_repository(self, repository_id, proxy):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         if not self.supports_asset_composition():
@@ -50,7 +50,7 @@ class RepositoryProxyManager:
         ##
         return sessions.AssetCompositionSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member
 
-    @arguments_not_none
+    @utilities.arguments_not_none
     def get_asset_composition_design_session_for_repository(self, repository_id, proxy):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         if not self.supports_asset_composition():
@@ -246,14 +246,12 @@ class AssetCompositionSession:
 """
 
     get_composition_assets = """
-        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         if self._catalog_view == ISOLATED:
             composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier()),
                                               'repositoryId': str(self._catalog_id)})
         else:
             composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        if composition is None:
-            raise errors.NotFound('no Composition with this id was found')
         if 'assetIds' not in composition:
             raise NotFound('no Assets are assigned to this Composition')
         asset_ids = []
@@ -305,14 +303,10 @@ class AssetCompositionDesignSession:
     add_asset = """
         # This asset found check may want to be run through _get_provider_manager
         # so as to ensure assess control:
-        collection = mongo_client[self._db_prefix + 'repository']['Asset']
+        collection = MongoClientValidated(self._db_prefix + 'repository', 'Asset')
         asset = collection.find_one({'_id': ObjectId(asset_id.get_identifier())})
-        if asset is None:
-            raise errors.NotFound('no Asset with this id was found')
-        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        if composition is None:
-            raise errors.NotFound('no Composition with this id was found')
         if 'assetIds' in composition:
             composition['assetIds'].append(str(asset_id))
         else:
@@ -320,43 +314,33 @@ class AssetCompositionDesignSession:
         collection.save(composition)"""
 
     move_asset_ahead = """
-        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        if composition is None:
-            raise errors.NotFound('no Composition with this id was found')
         if 'assetIds' not in composition:
             raise NotFound('no Assets are assigned to this Composition')
-        composition['assetIds'] = move_id_ahead(asset_id, referenct_id, composition['assetIds'])
-        collection.save(composition)
-        """
+        composition['assetIds'] = move_id_ahead(asset_id, reference_id, composition['assetIds'])
+        collection.save(composition)"""
 
     move_asset_behind = """
-        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        if composition is None:
-            raise errors.NotFound('no Composition with this id was found')
         if 'assetIds' not in composition:
             raise NotFound('no Assets are assigned to this Composition')
-        composition['assetIds'] = move_id_behind(asset_id, referenct_id, composition['assetIds'])
-        collection.save(composition)
-        """
+        composition['assetIds'] = move_id_behind(asset_id, reference_id, composition['assetIds'])
+        collection.save(composition)"""
 
     order_assets = """
-        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        if composition is None:
-            raise errors.NotFound('no Composition with this id was found')
+        collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         if 'assetIds' not in composition:
             raise NotFound('no Assets are assigned to this Composition')
         composition['assetIds'] = order_ids(asset_ids, composition['assetIds'])
-        collection.save(composition)
-        """
+        collection.save(composition)"""
 
     remove_asset = """
-        collection = mongo_client[self._db_prefix + 'repository']['Composition']
+        collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        if composition is None:
-            raise errors.NotFound('an assessment with assessment_id does not exist')
         try:
             composition['assetIds'].remove(str(asset_id))
         except (KeyError, ValueError):

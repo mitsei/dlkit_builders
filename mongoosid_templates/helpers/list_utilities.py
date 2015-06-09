@@ -1,5 +1,6 @@
 """Utilities for manipulating lists of ids"""
 from dlkit.abstract_osid.osid.errors import NotFound
+import collections
 
 def move_id_ahead(element_id, reference_id, idstr_list):
     """Moves element_id ahead of referece_id in the list"""
@@ -21,7 +22,9 @@ def move_id_behind(element_id, reference_id, idstr_list):
     return idstr_list
 
 def order_ids(new_id_list, old_idstr_list):
-    compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
+    compare = (
+        lambda new_id_list, old_idstr_list: collections.Counter(new_id_list) == 
+        collections.Counter(old_idstr_list))
     new_idstr_list = []
     for id_ in new_id_list:
         new_idstr_list.append(str(id_))
