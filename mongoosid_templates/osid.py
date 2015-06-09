@@ -193,6 +193,16 @@ class Extensible:
     def __getitem__(self, item):
         return getattr(self, item)
 
+    def __getattribute__(self, name):
+        if not name.startswith('_'):
+            if '_records' in self.__dict__:
+                for record in self._records:
+                    try:
+                        return self._records[record][name]
+                    except AttributeError:
+                        pass
+        return object.__getattribute__(self, name)
+
     def __getattr__(self, name):
         if '_records' in self.__dict__:
             for record in self._records:
