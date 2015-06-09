@@ -144,7 +144,7 @@ def make_mongoosid(file_name):
                       package['version'] + '\n\n'+
                       package['summary'] + '\n\n\"\"\"').encode('utf-8') +
                       '\n')
-    write_file.close
+    write_file.close()
 
     ##
     # Initialize the module doc
@@ -259,7 +259,7 @@ def make_mongoosid(file_name):
             modules[interface['category']]['imports'].append(import_str)
 
         ##
-        # Interate through any inherited interfaces and build the inheritance
+        # Iterate through any inherited interfaces and build the inheritance
         # list for this interface. Also, check if an import statement is
         # required and append to the appropriate module's import list.
         for i in interface['inheritance']:
@@ -285,7 +285,7 @@ def make_mongoosid(file_name):
                     modules[interface['category']]['imports'].append(import_str)
 
         ##
-        # Check to see if there are any additinal inheritances required
+        # Check to see if there are any additional inheritances required
         # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
         # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
         impl_class = load_impl_class(package['name'], interface['shortname'])
@@ -385,7 +385,7 @@ def make_mongoosid(file_name):
                               module_name + '.py', 'w')
             write_file.write(('\n'.join(modules[module]['imports']) + '\n\n\n' +
                               modules[module]['body']).encode('utf-8'))
-            write_file.close
+            write_file.close()
 
     ##
     # Finally,  write out the implementation log for this service package
