@@ -1,56 +1,48 @@
-import time
-import os
-import json
+import glob
+import shutil
 import string
 import datetime
 import importlib
+
 from importlib import import_module
-from .binder_helpers import *
-from .config import *
+from binder_helpers import *
+from config import *
 from builders.mongoosid_templates import options
-from abcbinder_settings import XOSIDNAMESPACEURI as ns
-from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
-from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
-from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
-from abcbinder_settings import XOSIDFILESUFFIX as xosid_suffix
-#from abcbinder_settings import ABCROOTPACKAGE as abc_root_pkg
-from abcbinder_settings import ABCPREFIX as abc_prefix
-from abcbinder_settings import ABCSUFFIX as abc_suffix
-from abcbinder_settings import MAINDOCINDENTSTR as main_doc_indent
 from abcbinder_settings import ENCODING as utf_code
-from mongobuilder_settings import ABCROOTPACKAGE as abc_root_pkg
-from mongobuilder_settings import ROOTPACKAGE as root_pkg
-from mongobuilder_settings import ROOTPATH as root_path
-from mongobuilder_settings import APPNAMEPREFIX as app_prefix
-from mongobuilder_settings import APPNAMESUFFIX as app_suffix
-from mongobuilder_settings import PACKAGEPREFIX as pkg_prefix
-from mongobuilder_settings import PACKAGESUFFIX as pkg_suffix
-from mongobuilder_settings import PATTERN_DIR as pattern_dir
-from mongobuilder_settings import TEMPLATE_DIR as template_dir
-template_pkg = '.'.join(template_dir.split('/'))
 
-def make_mongoosids(build_abc = False, re_index = False, re_map = False):
-    """
-    This is the entry point for making mongo-based osid impls.
+from abcbinder import ABCBuilder
+from build_controller import BaseBuilder
 
-    It processes all of the osid maps in the package maps directory.
-    
-    """
-    from abcbinder import make_abcosids
-    if build_abc:
-        make_abcosids(re_index, re_map)
-    for json_file in os.listdir(pkg_maps_dir):
-        if json_file.endswith('.json'):
-            make_mongoosid(pkg_maps_dir + '/' + json_file)
-    ##
-    # Copy general config and primitive files, etc into the
-    # implementation root directory:
-    if os.path.exists('./' + template_dir + '/helpers'):
-        for helper_file in os.listdir('./' + template_dir + '/helpers'):
-            if helper_file.endswith('.py'):
-                os.system('cp ./' + template_dir + '/helpers/' + helper_file + ' ' +
-                          root_pkg + '/' + helper_file)
+class MongoBuilder(BaseBuilder):
+    def __init__(self, build_dir=None, *args, **kwargs):
+        super(MongoBuilder, self).__init__(*args, **kwargs)
+        if build_dir is None:
+            build_dir = self._abs_path
+        self._build_dir = build_dir
+        self._mongo_dir = self._build_dir + '/mongo'
+        self._template_dir = self._abs_path + '/mongoosid_templates'
 
+    def template(self, directory):
+        return self._template_dir + '/' + directory
+
+    def make_mongoosids(self, build_abc=False, re_index=False, re_map=False):
+        """
+        This is the entry point for making mongo-based osid impls.
+
+        It processes all of the osid maps in the package maps directory.
+
+        """
+        if build_abc:
+            ABCBuilder(build_dir=self._build_dir).make_abcosids(re_index, re_map)
+
+        for json_file in glob.glob(self.package_maps + '/*.json'):
+            self._make_mongoosid(json_file)
+
+        # Copy general config and primitive files, etc into the
+        # implementation root directory:
+        if os.path.exists(self.template('helpers')):
+            for helper_file in glob.glob(self.template('helpers') + '/*.py'):
+                shutil.copy(helper_file, self._mongo_dir)
 
 def make_mongoosid(file_name):
     """
@@ -163,7 +155,7 @@ def make_mongoosid(file_name):
         modules[module]['imports'].append(pylintstr)
 
     ##
-    # Copy settings and types and other files from the tamplates into the
+    # Copy settings and types and other files from the templates into the
     # appropriate implementation directories
     if os.path.exists('./' + template_dir + '/' + package['name'] + '_helpers'):
         #print 'FOUND:', package['name'] + '_helpers'

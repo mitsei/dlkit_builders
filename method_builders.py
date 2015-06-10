@@ -2,47 +2,58 @@ from binder_helpers import fix_reserved_word
 
 from build_controller import Utilities
 
+
 class MethodBuilder(Utilities):
+    """class that builds methods"""
     def __init__(self, method_class=None, *args, **kwargs):
         """method_class differentiates between different variations, i.e. abc
         looks different than mongo"""
         self._class = method_class or 'abc'
+        self._ind = 4 * ' '
+        self._dind = 2 * self._ind
         super(MethodBuilder, self).__init__()
 
     @property
     def _is_abc(self):
         return self._class == 'abc'
 
+    def _build_method_doc(self, method):
+        if self._is_abc:
+            detail_docs = filter(None, [method['sphinx_param_doc'].strip('\n'),
+                                        method['sphinx_return_doc'].strip('\n'),
+                                        method['sphinx_error_doc'].strip('\n') + '\n',
+                                        method['compliance_doc'].strip('\n'),
+                                        method['impl_notes_doc'].strip('\n')])
+        else:
+            # Mongo impl only?
+            detail_docs = filter(None, [method['arg_doc'].strip('\n'),
+                                        method['return_doc'].strip('\n'),
+                                        method['error_doc'].strip('\n'),
+                                        method['compliance_doc'].strip('\n'),
+                                        method['impl_notes_doc'].strip('\n')])
+
+        method_doc = self._dind + '\"\"\"' + method['doc']['headline']
+
+        if method['doc']['body'].strip() != '':
+            method_doc += '\n\n' + method['doc']['body']
+        if detail_docs:
+            method_doc += '\n\n' + '\n'.join(detail_docs) + '\n\n'
+
+        method_doc += self._dind + '\"\"\"'
+        return method_doc
+
     def _make_method(self, method):
-        decorator = '    @abc.abstractmethod'
+        decorator = self._ind + '@abc.abstractmethod'
         args = ['self']
         method_impl = self._make_method_impl(method)
 
         for arg in method['args']:
             args.append(arg['var_name'])
 
-        method_sig = ('    def ' + method['name'] + '(' +
+        method_sig = (self._ind + 'def ' + method['name'] + '(' +
                       ', '.join(args) + '):')
 
-        detail_docs = filter(None, [method['sphinx_param_doc'].strip('\n'),
-                                    method['sphinx_return_doc'].strip('\n'),
-                                    method['sphinx_error_doc'].strip('\n') + '\n',
-                                    method['compliance_doc'].strip('\n'),
-                                    method['impl_notes_doc'].strip('\n')])
-
-        if method['doc']['body'].strip() == '' and not detail_docs:
-            method_doc = ('        \"\"\"' +
-                          method['doc']['headline'] +
-                          '\"\"\"')
-        elif method['doc']['body'].strip() == '':
-            method_doc = ('        \"\"\"' + method['doc']['headline'] +
-                          '\n\n' +
-                          '\n'.join(detail_docs) + '\n\n        \"\"\"')
-        else:
-            method_doc = ('        \"\"\"' + method['doc']['headline'] +
-                          '\n\n' +
-                          method['doc']['body'] + '\n\n' +
-                          '\n'.join(detail_docs) + '\n\n        \"\"\"')
+        method_doc = self._build_method_doc(method)
 
         return (decorator + '\n' +
                 self._wrap(method_sig) + '\n' +

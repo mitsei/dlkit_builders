@@ -34,6 +34,7 @@ class Utilities(object):
             result.append('\n'.join(wrapper.wrap(line)))
         return '\n'.join(result)
 
+
 class BaseBuilder(Utilities):
     """base builder with some shared items, like package_maps dir, etc."""
     def __init__(self,
@@ -214,7 +215,7 @@ if __name__ == '__main__':
         print "  map: map the xosid files into pattern_maps/ and package_maps/"
         print "  abc: build the abstract_osids"
         print "  patterns: build the patterns"
-        print "  mdata: build the metadata files"
+        print "  #mdata: build the metadata files"
         print "  authz: build the authz_adapter impl"
         print "  mongo: build the mongo OSID impl"
         print "  dlkit: build the dlkit convenience service impls"
@@ -268,6 +269,7 @@ if __name__ == '__main__':
             builder.map()
             builder.patterns()
             builder.abc()
+            builder.mongo()
             pass
         else:
             # need to do these in a specific order, regardless of how
@@ -278,4 +280,6 @@ if __name__ == '__main__':
                 builder.patterns()
             if 'abc' in sys.argv:
                 builder.abc()
+            if 'mongo' in sys.argv:
+                builder.mongo()
     sys.exit(0)
