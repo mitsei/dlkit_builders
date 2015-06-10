@@ -1,12 +1,4 @@
-import string
-from collections import OrderedDict
-from builders.binder_helpers import make_twargs
-from builders.binder_helpers import camel_to_under
-from builders.binder_helpers import get_interface_module
-from builders.binder_helpers import make_plural
-from builders.binder_helpers import remove_plural
-from builders.binder_helpers import get_pkg_name
-from builders.osid_meta import OSID_Language_Primitives
+from binder_helpers import make_twargs, camel_to_under, make_plural, remove_plural
 
 def map_session_patterns(interface, package, index):
     if (interface['shortname'].endswith('LookupSession') and

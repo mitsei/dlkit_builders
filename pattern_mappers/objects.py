@@ -1,11 +1,5 @@
-import string
-from collections import OrderedDict
-from builders.binder_helpers import camel_to_under
-from builders.binder_helpers import get_interface_module
-from builders.binder_helpers import make_plural
-from builders.binder_helpers import remove_plural
-from builders.binder_helpers import get_pkg_name
-from builders.osid_meta import OSID_Language_Primitives
+from binder_helpers import make_plural, remove_plural, get_cat_name_for_pkg
+from osid_meta import OSID_Language_Primitives
 OSID_Calendaring_Primitives = ['osid.calendaring.Time', 'osid.calendaring.DateTime', 'osid.calendaring.Duration']
 
 def map_object_form_patterns(interface, package, index):
@@ -414,7 +408,6 @@ def map_object_patterns(interface, package, index):
 
     object_name = interface['shortname']
     index[object_name + '.init_pattern'] = 'resource.Resource'
-    from ..binder_helpers import get_cat_name_for_pkg
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]

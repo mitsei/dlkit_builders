@@ -2,61 +2,56 @@
 # The functions in this module can be called upon to create a full dict/list
 # representation of an entire osid package.  The data is returned following 
 # the patterns in this example structure:
-
-example_package = {
-'name': 'osid.package',
-'version': '3.#.#',
-'title': 'Title of this OSID Package',
-'copyright': 'The copyright statement',
-'license': 'The terms of the OSID license',
-'summary': 'The (often lengthy) package level descripion',
-'interfaces': [
-    {
-    'fullname': 'osid.thispackage.FirstInterface',
-    'shortname': 'FirstInterface',
-    'category': 'sessions',
-    'doc': {'headline': 'The first line of the doc string, non-indented.',
-            'body': '    The full description of this interface, indented once.'},
-    'inherit_fullnames': ['osid.package.FirstInheritedInterface',
-                           'osid.anotherpackage.SecondInheritedInterface', '...'],
-    'inherit_shortnames': ['FirstInheritedInterface', 
-                           'SecondInheritedInterface', '...'],
-    'inherit_pgk_names': ['package', 'anotherpackage', '...'],
-    'inheritance': [{'name': 'FirstInheritedInterface', 'pkg_name': 'package'},
-                    {'name': 'SecondInheritedInterface', 'pkg_name': 'anotherpackage'},
-                    {'name': '...', 'pkg_name': '...'}],
-    'method_names': ['first_method', 'second_method', '...'],
-    'methods': [
-        {
-        'name': 'first_method',
-        'doc': {'headline': 'The first line of the doc string, non-indented.',
-                'body': '        The remaining description doc, if any, indented twice.'},
-        'arg_doc': '        arg:    The doc lines for args, indented twice',
-        'return_doc': '        return: The doc lines for return, ditto.',
-        'error_doc': '        raise:  The doc lines for errors, and so on.',
-        'sphinx_param_doc': '        :param arg_name: The doc lines for parameters, Sphinx form',
-        'sphinx_return_doc': '        :return: The doc lines for return, ditto.',
-        'sphinx_error_doc': '        :raise:  The doc lines for errors, and so on.',
-        'compliance_doc': '        compliance: whether optional or mandatory.',
-        'impl_notes_doc': '        implementation notes: If available.',
-        'args': [{'var_name': 'firstArg', 'arg_type': 'osid.package.OsidThing[]', 'array': True},
-                   {'var_name': 'secondArg', 'arg_type': 'cardinal', 'array': False}],
-        'arg_types': ['osid.package.OsidThing', 'cardinal'],
-        'return_type': 'osid.package.SomeClass',
-        'errors': {'OperationFailed': 'Operational', 'IllegalState': 'ConsumerContract'}
-        }
-        # {and so on for each method...}
-        ]
-    },
-    # {and so on for each interface...}
-    ]
-}
+from collections import OrderedDict
 
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
-from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
-from abcbinder_settings import MAINDOCINDENTSTR as indent_str
-from collections import OrderedDict
-import os
+from binder_helpers import wrap_and_indent, reindent,\
+    camel_to_under, caps_under_to_camel, is_mixed_case, get_pkg_name
+
+
+EXAMPLE_PACKAGE = {
+    'name': 'osid.package',
+    'version': '3.#.#',
+    'title': 'Title of this OSID Package',
+    'copyright': 'The copyright statement',
+    'license': 'The terms of the OSID license',
+    'summary': 'The (often lengthy) package level descripion',
+    'interfaces': [{
+        'fullname': 'osid.thispackage.FirstInterface',
+        'shortname': 'FirstInterface',
+        'category': 'sessions',
+        'doc': {'headline': 'The first line of the doc string, non-indented.',
+                'body': '    The full description of this interface, indented once.'},
+        'inherit_fullnames': ['osid.package.FirstInheritedInterface',
+                               'osid.anotherpackage.SecondInheritedInterface', '...'],
+        'inherit_shortnames': ['FirstInheritedInterface',
+                               'SecondInheritedInterface', '...'],
+        'inherit_pgk_names': ['package', 'anotherpackage', '...'],
+        'inheritance': [{'name': 'FirstInheritedInterface', 'pkg_name': 'package'},
+                        {'name': 'SecondInheritedInterface', 'pkg_name': 'anotherpackage'},
+                        {'name': '...', 'pkg_name': '...'}],
+        'method_names': ['first_method', 'second_method', '...'],
+        'methods': [{
+            'name': 'first_method',
+            'doc': {'headline': 'The first line of the doc string, non-indented.',
+                    'body': '        The remaining description doc, if any, indented twice.'},
+            'arg_doc': '        arg:    The doc lines for args, indented twice',
+            'return_doc': '        return: The doc lines for return, ditto.',
+            'error_doc': '        raise:  The doc lines for errors, and so on.',
+            'sphinx_param_doc': '        :param arg_name: The doc lines for parameters, Sphinx form',
+            'sphinx_return_doc': '        :return: The doc lines for return, ditto.',
+            'sphinx_error_doc': '        :raise:  The doc lines for errors, and so on.',
+            'compliance_doc': '        compliance: whether optional or mandatory.',
+            'impl_notes_doc': '        implementation notes: If available.',
+            'args': [{'var_name': 'firstArg', 'arg_type': 'osid.package.OsidThing[]', 'array': True},
+                       {'var_name': 'secondArg', 'arg_type': 'cardinal', 'array': False}],
+            'arg_types': ['osid.package.OsidThing', 'cardinal'],
+            'return_type': 'osid.package.SomeClass',
+            'errors': {'OperationFailed': 'Operational', 'IllegalState': 'ConsumerContract'}
+        }]  # {and so on for each method...}
+    }]  # {and so on for each interface...}
+}
+
 
 OSID_ERRORS = ['ALREADY_EXISTS', 'NOT_FOUND', 'PERMISSION_DENIED', 
                'CONFIGURATION_ERROR', 'OPERATION_FAILED', 
@@ -64,63 +59,63 @@ OSID_ERRORS = ['ALREADY_EXISTS', 'NOT_FOUND', 'PERMISSION_DENIED',
                'INVALID_METHOD', 'NO_ACCESS', 'NULL_ARGUMENT', 
                'UNIMPLEMENTED', 'UNSUPPORTED']
 
-def map_xosid(file_name):
-    try:
-        import xml.etree.cElementTree as ET
-    except ImportError:
-        import xml.etree.ElementTree as ET
-    import os
-#    from django.core import management
-    from binder_helpers import wrap_and_indent
-    tree = ET.parse(file_name)
-    root = tree.getroot()
 
-    package = OrderedDict()
-    package['name'] = ''
-    package['version'] = ''
-    package['title'] = ''
-    package['copyright'] = ''
-    package['license'] = ''
-    package['summary'] = ''
-    package['interfaces'] = []
-    
-    for elem in root.iter(ns + 'osid'):
-        ##
-        # Get version and package name information from XML header. I
-        # don't recall why I was doing these seperately.
-        full_name = (elem.get(ns + 'name'))
-        package['full_name'] = full_name
-        if full_name == 'osid':
-            package['name'] = full_name
-        else:
-            package['name'] = full_name[5:]
-        package['version'] = (elem.get(ns + 'version'))
+class XOsidMapper(object):
+    def __init__(self, indent_str='', xosid_ns='{urn:inet:osid.org:schemas/osid/3}'):
+        self._indent_str = indent_str
+        self._xosid_ns = xosid_ns
+        super(XOsidMapper, self).__init__()
 
-    for child in root:
-        ##
-        # Load main documentation strings
-        if child.tag == (ns + 'title'):
-            package['title'] = wrap_and_indent(child.text, indent_str)
-        if child.tag == (ns + 'copyright'):
-            package['copyright'] = process_text(child, indent_str)
-        if child.tag == (ns + 'license'):
-            package['license'] = process_text(child, indent_str)
-        if child.tag == (ns + 'description'):
-            package['summary'] = process_text(child, indent_str)
-        ##
-        # For each interface fire up the interface iterator which will
-        # return dictionaries that get added to an interfaces list.
-        if child.tag == (ns + 'interface'):
-            package['interfaces'].append(interface_iterator(child))
+    def map_xosid(self, file_name):
+        try:
+            import xml.etree.cElementTree as ET
+        except ImportError:
+            import xml.etree.ElementTree as ET
 
-    return package
+        tree = ET.parse(file_name)
+        root = tree.getroot()
+
+        package = OrderedDict()
+        package['name'] = ''
+        package['version'] = ''
+        package['title'] = ''
+        package['copyright'] = ''
+        package['license'] = ''
+        package['summary'] = ''
+        package['interfaces'] = []
+
+        for elem in root.iter(self._xosid_ns + 'osid'):
+            ##
+            # Get version and package name information from XML header. I
+            # don't recall why I was doing these seperately.
+            full_name = (elem.get(self._xosid_ns + 'name'))
+            package['full_name'] = full_name
+            if full_name == 'osid':
+                package['name'] = full_name
+            else:
+                package['name'] = full_name[5:]
+            package['version'] = (elem.get(self._xosid_ns + 'version'))
+
+        for child in root:
+            ##
+            # Load main documentation strings
+            if child.tag == (self._xosid_ns + 'title'):
+                package['title'] = wrap_and_indent(child.text, self._indent_str)
+            if child.tag == (self._xosid_ns + 'copyright'):
+                package['copyright'] = process_text(child, self._indent_str)
+            if child.tag == (self._xosid_ns + 'license'):
+                package['license'] = process_text(child, self._indent_str)
+            if child.tag == (self._xosid_ns + 'description'):
+                package['summary'] = process_text(child, self._indent_str)
+            ##
+            # For each interface fire up the interface iterator which will
+            # return dictionaries that get added to an interfaces list.
+            if child.tag == (self._xosid_ns + 'interface'):
+                package['interfaces'].append(interface_iterator(child))
+
+        return package
 
 def interface_iterator(root):
-    from djmodelmaker import make_models
-    from binder_helpers import camel_to_under
-    from binder_helpers import caps_under_to_camel
-    from binder_helpers import get_pkg_name
-    
     interface = OrderedDict()    
     interface['fullname'] = root.get(ns + 'name')
     interface['shortname'] = root.get(ns + 'name').split('.')[-1]
@@ -307,15 +302,15 @@ def make_sphinx_param_doc(root):
 # regarding the method return type.
 def make_return_doc(root):
     from binder_helpers import wrap_and_indent
-    returnStr = 'return: '
+    return_str = 'return: '
     for child in root:
         if child.tag == (ns + 'interfaceType'):
-            returnStr = returnStr + '(' + child.get(ns + 'type') + ') - '
+            return_str = return_str + '(' + child.get(ns + 'type') + ') - '
         if child.tag == (ns + 'primitiveType'):
-            returnStr = returnStr + '(' + child.get(ns + 'type') + ') - '
+            return_str = return_str + '(' + child.get(ns + 'type') + ') - '
         if child.tag == (ns + 'description'):
-            returnStr = returnStr + process_text(child, '', '')
-            return wrap_and_indent(returnStr.strip(),
+            return_str = return_str + process_text(child, '', '')
+            return wrap_and_indent(return_str.strip(),
                                    '        ',
                                    '                ')
 
@@ -323,7 +318,7 @@ def make_return_doc(root):
 # Iterate through the method tree and return the Sphinx-style documentation 
 # strings regarding the method return type.
 def make_sphinx_return_doc(root):
-    returnStr = ':return: '
+    return_str = ':return: '
     returnTypeStr = ':rtype: '
     for child in root:
         if child.tag == (ns + 'interfaceType'):
@@ -331,8 +326,8 @@ def make_sphinx_return_doc(root):
         if child.tag == (ns + 'primitiveType'):
             returnTypeStr = returnTypeStr + '``' + child.get(ns + 'type') + '``'
         if child.tag == (ns + 'description'):
-            returnStr = returnStr + process_text(child, '', '', width = 200)
-    return ('        ' + returnStr.strip() + '\n        ' + returnTypeStr.strip())
+            return_str = return_str + process_text(child, '', '', width = 200)
+    return ('        ' + return_str.strip() + '\n        ' + returnTypeStr.strip())
 
 ##
 # Iterate through the method tree and return the documentation strings
@@ -387,71 +382,69 @@ def make_implnotes_doc(root):
 # like copyright symbols, paragraphs breaks, headings, tokens and code blocks
 # and outlines.  Outlines are dispatched to make_outline which isn't afraid 
 # to deal with them (but it should be).
-def process_text(root, iIndent = '', 
-                       sIndent = None, makeDocStringHead = False,
-                                       makeDocStringTail = False,
-                                       width = 72):
-    from binder_helpers import wrap_and_indent
-    from binder_helpers import reindent
-    from binder_helpers import camel_to_under, caps_under_to_camel, is_mixed_case
-    
-    if not sIndent:
-        sIndent = iIndent
-    makeStr = ''
-    iterStr = ' '.join(root.text.split())
+def process_text(root,
+                 i_indent='',
+                 s_indent=None,
+                 make_doc_string_head=False,
+                 make_doc_string_tail=False,
+                 width=72):
+    if not s_indent:
+        s_indent = i_indent
+    make_str = ''
+    iter_str = ' '.join(root.text.split())
     for child in root:
         if child.tag == (ns + 'copyrightSymbol'):
-            iterStr = iterStr + ' (c) ' + ' '.join(child.tail.split()) + ' '
+            iter_str = iter_str + ' (c) ' + ' '.join(child.tail.split()) + ' '
         if child.tag == (ns + 'pbreak'):
-            makeStr = (makeStr + wrap_and_indent(iterStr, 
-                                    iIndent, sIndent, width)) + '\n' + iIndent +'\n'
-            iterStr = ' '.join(child.tail.split())
+            make_str = (make_str + wrap_and_indent(iter_str, 
+                        i_indent, s_indent, width)) + '\n' + i_indent +'\n'
+            iter_str = ' '.join(child.tail.split())
         if child.tag == (ns + 'heading'):
-            iterStr = iterStr + ' '.join(str(child.text).split())
-            iterStr = iterStr + '' + ' '.join(str(child.tail).split()) + ''
+            iter_str += ' '.join(str(child.text).split())
+            iter_str += ' '.join(str(child.tail).split())
         if child.tag == (ns + 'token'):
             if is_mixed_case(str(child.text).strip()):
                 if len(str(child.text).split('.')) > 1:
                     segments = str(child.text).split('.')
                     segments[-1] = camel_to_under(segments[-1])
-                    convertedText = '.'.join(segments)
+                    converted_text = '.'.join(segments)
                 elif str(child.text).strip().split(' ')[0] != 'a':
-                    convertedText = camel_to_under(child.text.strip())
+                    converted_text = camel_to_under(child.text.strip())
                 else:
-                    convertedText = child.text
+                    converted_text = child.text
             elif str(child.text).strip('. ') in OSID_ERRORS:
-                convertedText = caps_under_to_camel(child.text)
+                converted_text = caps_under_to_camel(child.text)
             else:
-                convertedText = child.text
-            if convertedText is None or convertedText.strip() == '':
+                converted_text = child.text
+            if converted_text is None or converted_text.strip() == '':
                 pass
-            elif convertedText.strip().endswith('.'):
-                convertedText = convertedText.split('.')[0]
-                iterStr = iterStr + ' ``' + ' '.join(str(convertedText).split()) + '``. '
+            elif converted_text.strip().endswith('.'):
+                converted_text = converted_text.split('.')[0]
+                iter_str = iter_str + ' ``' + ' '.join(str(converted_text).split()) + '``. '
             else:
-                iterStr = iterStr + ' ``' + ' '.join(str(convertedText).split()) + '`` '
-            iterStr = iterStr + '' + ' '.join(str(child.tail).split()) + ''
+                iter_str = iter_str + ' ``' + ' '.join(str(converted_text).split()) + '`` '
+            iter_str = iter_str + '' + ' '.join(str(child.tail).split()) + ''
         if child.tag == (ns + 'code'):
-            makeStr = (makeStr + wrap_and_indent(iterStr,
-                                        iIndent, sIndent, width)).strip() + '\n'
-            iterStr = reindent(child.text.strip(), iIndent + '  ')
-            makeStr = makeStr + iterStr + iIndent + '\n'
-            iterStr = ' '.join(child.tail.split())
+            make_str = (make_str + wrap_and_indent(iter_str,
+                                        i_indent, s_indent, width)).strip() + '\n'
+            iter_str = reindent(child.text.strip(), i_indent + '  ')
+            make_str = make_str + iter_str + i_indent + '\n'
+            iter_str = ' '.join(child.tail.split())
         if child.tag == (ns + 'outline'):
-            makeStr = (makeStr + wrap_and_indent(iterStr, 
-                                        iIndent, sIndent, width)).strip() + '\n'
-            iterStr = iIndent + '\n' + make_outline(child, iIndent + '  * ',
-                                         iIndent + '    ', width)
-            makeStr = makeStr + iterStr
-            iterStr = ' '.join(child.tail.split())
+            make_str = (make_str + wrap_and_indent(iter_str, 
+                        i_indent, s_indent, width)).strip() + '\n'
+            iter_str = i_indent + '\n' + make_outline(child, i_indent + '  * ',
+                i_indent + '    ', width)
+            make_str += iter_str
+            iter_str = ' '.join(child.tail.split())
             
-    returnStr = makeStr + wrap_and_indent(iterStr, iIndent, sIndent, width)
-    if makeDocStringHead:
-        returnDoc = parse_docstring(returnStr, iIndent, sIndent,
-                                    makeTail = makeDocStringTail)
-        return returnDoc['headstring'] + '\n\n' + returnDoc['body']
+    return_str = make_str + wrap_and_indent(iter_str, i_indent, s_indent, width)
+    if make_doc_string_head:
+        return_doc = parse_docstring(return_str, i_indent, s_indent,
+                                    make_tail=make_doc_string_tail)
+        return return_doc['headstring'] + '\n\n' + return_doc['body']
     else:
-        return returnStr
+        return return_str
 
 ##
 # Accepts a pre-formatted documentation block and splits out the first
@@ -462,43 +455,41 @@ def process_text(root, iIndent = '',
 # False the returned headline will not be indented.  This too is left up
 # to the calling code.  parse_doc assumes that the incoming text block
 # does not begin with a special format section, like a code or outline, etc.
-def parse_docstring(text, iIndent, sIndent = False, 
-                         make_head = False, make_tail = False):
-    from binder_helpers import wrap_and_indent
-
-    if not sIndent:
-        sIndent = iIndent
+def parse_docstring(text, i_indent, s_indent=False, 
+                    make_head=False, make_tail=False):
+    if not s_indent:
+        s_indent = i_indent
     tail_str = ''
     head_str = ''
     if text:
-        first_paragraph = text.split('\n' + iIndent + '\n')[0]
+        first_paragraph = text.split('\n' + i_indent + '\n')[0]
         subsequent_paragraphs = ''
-        if len(text.split('\n' + iIndent + '\n', 1)) > 1:
-            subsequent_paragraphs = text.split('\n' + iIndent + '\n', 1)[1]
+        if len(text.split('\n' + i_indent + '\n', 1)) > 1:
+            subsequent_paragraphs = text.split('\n' + i_indent + '\n', 1)[1]
         if make_head:
-            head_str = iIndent + '\"\"\"'
+            head_str = i_indent + '\"\"\"'
         headline_str = (head_str + 
                                 (first_paragraph.split('.')[0]).strip() + '.')
-        headline_str = ' '.join(headline_str.split('\n' + iIndent))
+        headline_str = ' '.join(headline_str.split('\n' + i_indent))
         if (len(first_paragraph.split('.', 1)) > 1 and 
                first_paragraph.split('.', 1)[1].strip() != ''):
             remaining_text = first_paragraph.split('.', 1)[1].strip()
-            next_paragraph = remaining_text.split('\n' + iIndent + '\n', 1)[0]
+            next_paragraph = remaining_text.split('\n' + i_indent + '\n', 1)[0]
             next_paragraph = ' '.join(next_paragraph.split())
-            next_paragraph = wrap_and_indent(next_paragraph, iIndent, sIndent)
-            if len(remaining_text.split('\n' + iIndent + '\n', 1)) > 1:
-                remaining_text = next_paragraph + '\n' + remaining_text.split('\n' + iIndent + '\n', 1)[1]
+            next_paragraph = wrap_and_indent(next_paragraph, i_indent, s_indent)
+            if len(remaining_text.split('\n' + i_indent + '\n', 1)) > 1:
+                remaining_text = next_paragraph + '\n' + remaining_text.split('\n' + i_indent + '\n', 1)[1]
             else:
                 remaining_text = next_paragraph
             if subsequent_paragraphs.strip() != '':
                 if make_tail:
-                    tail_str = '\n\n' + iIndent + '\"\"\"'
+                    tail_str = '\n\n' + i_indent + '\"\"\"'
                 return {'headline': headline_str, 
                         'body': remaining_text + '\n\n' +
                         subsequent_paragraphs + tail_str}
             else:
                 if make_tail:
-                    tail_str = iIndent + '\"\"\"'
+                    tail_str = i_indent + '\"\"\"'
                 return {'headline': headline_str,
                         'body': remaining_text + tail_str}
         else:
@@ -512,21 +503,21 @@ def parse_docstring(text, iIndent, sIndent = False,
 
 ##
 # This function is used to properly process outline tagged text
-def make_outline(root, iIndent, sIndent = None, width = 72):
+def make_outline(root, i_indent, s_indent = None, width = 72):
     from binder_helpers import wrap_and_indent
-    if not sIndent:
-        sIndent = iIndent
+    if not s_indent:
+        s_indent = i_indent
     outline = ''
-    iterStr = ''
+    iter_str = ''
     for child in root:
         if child.tag == (ns + 'element'):
-            iterStr = ' '.join(child.text.split())
+            iter_str = ' '.join(child.text.split())
             for elem in child.iter():
                 if elem.tag == (ns + 'token'):
-                    iterStr = iterStr + ' ``' + ' '.join(str(elem.text).split()) + '`` '
-                    iterStr = iterStr + '' + ' '.join(str(elem.tail).split()) + ''
-            iterStr = wrap_and_indent(iterStr, iIndent, sIndent)
-            outline = outline + iterStr + '\n'
+                    iter_str = iter_str + ' ``' + ' '.join(str(elem.text).split()) + '`` '
+                    iter_str = iter_str + '' + ' '.join(str(elem.tail).split()) + ''
+            iter_str = wrap_and_indent(iter_str, i_indent, s_indent)
+            outline = outline + iter_str + '\n'
     return outline
 
 ##

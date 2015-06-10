@@ -512,15 +512,6 @@ def make_init_methods(interface, package, patterns):
 # Assemble the initializers for instance data managed by Osid Objects
 def make_instance_initers(instance_data):
     initers = ''
-#    for i in instance_data:
-#        if instance_data[i] == 'boolean':
-#            initers = initers + (initers + 
-#                '        self.' + i + ' = None\n')
-#        elif instance_data[i] == 'osid.id.Id':
-#            initers = initers + (initers + 
-#                '        self.' + i + '_authority = \'\'\n' +
-#                '        self.' + i + '_namespace = \'\'\n' +
-#                '        self.' + i + '_identifier = \'\'\n')
     return initers
 
 ##
@@ -901,7 +892,7 @@ SUPPORTS = [ # Uncomment the following lines when implementations exist:
     try:
         from builders.mongoosid_templates import package_profile
         template = string.Template(package_profile.PROFILE_TEMPLATE)
-    except ImportError, AttributeError:
+    except (ImportError, AttributeError):
         return ''
     else:
         return template.substitute({'osid_package': osid_package,

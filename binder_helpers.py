@@ -1,41 +1,43 @@
-
-from abcbinder_settings import XOSIDNAMESPACEURI as ns
-from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
-from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
+import os
+import re
 import json
+import keyword
+import textwrap
 
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+ABS_PATH = os.path.abspath(os.path.join(PROJECT_PATH, os.pardir))
 ##
 # This function takes an element tree method root and finds the 'return' tag
 # and returns the type.
-def get_return_type(root):
-    returnType = ''
-    for child in root:
-        if child.tag == (ns + 'return'):
-            for grandChild in child:
-                if grandChild.tag == (ns + 'interfaceType'):
-                    returnType = grandChild.get(ns + 'type')
-                if grandChild.tag == (ns + 'primitiveType'):
-                    returnType = grandChild.get(ns + 'type')           
-    return returnType
+# def get_return_type(root):
+#     returnType = ''
+#     for child in root:
+#         if child.tag == (ns + 'return'):
+#             for grandChild in child:
+#                 if grandChild.tag == (ns + 'interfaceType'):
+#                     returnType = grandChild.get(ns + 'type')
+#                 if grandChild.tag == (ns + 'primitiveType'):
+#                     returnType = grandChild.get(ns + 'type')
+#     return returnType
 
-def get_param_list(root):
-    """
-    Gets parameters from method roots.
-    
-    This function takes an element tree method root and iterates through any 
-    parameter names that are defined, beginning with the ubiquitous 'self', and 
-    returns a list.  It may want to be extended in the future to return a list
-    of dicts that also include the osid type of the parameter, but so far that
-    has not been necessary.  In fact so far I haven't even used this.
-    
-    """
-    paramList = ['self']
-    for child in root:
-        if child.tag == (ns + 'parameter'):
-            param = child.get(ns + 'name')
-            param = fix_reserved_word(param)
-            paramList.append(param)
-    return paramList
+# def get_param_list(root):
+#     """
+#     Gets parameters from method roots.
+#
+#     This function takes an element tree method root and iterates through any
+#     parameter names that are defined, beginning with the ubiquitous 'self', and
+#     returns a list.  It may want to be extended in the future to return a list
+#     of dicts that also include the osid type of the parameter, but so far that
+#     has not been necessary.  In fact so far I haven't even used this.
+#
+#     """
+#     paramList = ['self']
+#     for child in root:
+#         if child.tag == (ns + 'parameter'):
+#             param = child.get(ns + 'name')
+#             param = fix_reserved_word(param)
+#             paramList.append(param)
+#     return paramList
 
 def reindent(text, iIndent):
     """ Reindents a block of text to the new without re-wrapping"""
@@ -54,7 +56,6 @@ def wrap_and_indent(text, iIndent = '', sIndent = None, width = 72):
     and lines (I believe, need to check this)
     
     """
-    import textwrap
     if not sIndent:
         sIndent = iIndent
     wrapper = textwrap.TextWrapper()
@@ -74,13 +75,12 @@ def fix_reserved_word(word):
     osid things that are reserved word they can be dealt with here.
     
     """
-    import keyword
     if word == 'logging':
         word = 'logging' # Still deciding this
     if keyword.iskeyword(word):
-        word = word + '_'
+        word += '_'
     elif word in ['id', 'type', 'str', 'max', 'input', 'license', 'copyright', 'credits', 'help']:
-        word = word + '_'
+        word += '_'
     return word
 
 ##
@@ -88,7 +88,6 @@ def fix_reserved_word(word):
 # Useful for parsing out words when inspecting methods for bindings, etc. It 
 # will also work for mixedCase strings.
 def camel_to_list(string):
-    import re
     string = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', string)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', string).split('_')
 
@@ -178,37 +177,14 @@ def remove_plural(string):
 # from camelCase to underscore_case to make the binding and impls
 # a little more Pythonic.
 def camel_to_under(name):
-    import re
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 def camel_to_verbose(name):
-    import re
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1 \2', s1).lower()
 
-##
-# This function returns the category, or 'module' for the interface in question
-# By default it does not raise an exception, but can be called with report-
-# error equals True so that you can track un-categorized interfaces.
-def get_interface_module(pkg_name, interface_shortname, report_error = False):
-    category = 'UNKNOWN_MODULE'
-    try:
-        read_file = open(interface_maps_dir + '/' + pkg_name + '.json' , 'r')
-        index = json.load(read_file)
-        read_file.close()
-    except IOError:
-        if report_error:
-            print ('INTERFACE LOOKUP ERROR - interface map for \'' + pkg_name + 
-                   '.' + interface_shortname + '\' not found.')
-    else:
-        try:
-            category = index[pkg_name + '.' + interface_shortname]
-        except KeyError:
-            if report_error:
-                print ('INTERFACE LOOKUP ERROR - category for \'' + pkg_name + '.'
-                       + interface_shortname + '\' not found.')
-    return category
+
 
 
 ##
@@ -241,35 +217,35 @@ def get_pkg_name(interface):
 # Return the associated class name for a ProxyManager given a Manager name
 def proxy_manager_name(string):
     return string.split('Manager')[0] + 'ProxyManager'
-
-## THIS FUNCTION WAS PROBABLY A WASTE OF TIME.  REMOVE SOMEDAY???
-# This function returns the appropriate import string given a package and
-# module of a class being built and the interface name.
-def make_import_string(source_pkg, source_module, interface):
-    interface_components = interface.split('.')
-    if len(interface_components) == 1:
-        return ''
-    elif len(interface_components) == 2:
-        interface_pkg = interface_components[0]
-        interface_module = get_interface_module(
-                           interface_components[0],
-                           interface_components[-1])
-    else:
-        interface_pkg = interface_components[1]
-        interface_module = get_interface_module(
-                           interface_components[1],
-                           interface_components[-1])
-    interface_name = interface_components[-1]
-    if (interface_pkg == source_pkg and
-        interface_module == source_module):
-        return ''
-    elif interface_module == 'UNKNOWN_MODULE':
-        return ('# IMPORT STRING ERROR: Unknown module for ' + 
-                interface)
-    else:
-        return ('from ${app_root}' + interface_pkg + '.' +
-                                     interface_module +
-                ' import ' + interface_name)
+#
+# ## THIS FUNCTION WAS PROBABLY A WASTE OF TIME.  REMOVE SOMEDAY???
+# # This function returns the appropriate import string given a package and
+# # module of a class being built and the interface name.
+# def make_import_string(source_pkg, source_module, interface):
+#     interface_components = interface.split('.')
+#     if len(interface_components) == 1:
+#         return ''
+#     elif len(interface_components) == 2:
+#         interface_pkg = interface_components[0]
+#         interface_module = get_interface_module(
+#                            interface_components[0],
+#                            interface_components[-1])
+#     else:
+#         interface_pkg = interface_components[1]
+#         interface_module = get_interface_module(
+#                            interface_components[1],
+#                            interface_components[-1])
+#     interface_name = interface_components[-1]
+#     if (interface_pkg == source_pkg and
+#         interface_module == source_module):
+#         return ''
+#     elif interface_module == 'UNKNOWN_MODULE':
+#         return ('# IMPORT STRING ERROR: Unknown module for ' +
+#                 interface)
+#     else:
+#         return ('from ${app_root}' + interface_pkg + '.' +
+#                                      interface_module +
+#                 ' import ' + interface_name)
 
 ##
 # The SkipMethod exception is used for implementation builders like the
@@ -296,8 +272,9 @@ def make_twargs(index, package, interface, method, rtype=True, object_name=None,
     return twargs
 
 def get_cat_name_for_pkg(return_pkg):
+    # TODO: Move this into the BaseBuilder class??
     try:
-        read_file = open(pkg_maps_dir + '/' + return_pkg + '.json', 'r')
+        read_file = open(ABS_PATH + '/builders/package_maps/' + return_pkg + '.json', 'r')
         package = json.load(read_file)
         read_file.close()
     except IOError:

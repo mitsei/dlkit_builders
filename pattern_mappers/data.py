@@ -1,11 +1,5 @@
-import string
 from collections import OrderedDict
-from builders.binder_helpers import camel_to_under
-from builders.binder_helpers import get_interface_module
-from builders.binder_helpers import make_plural
-from builders.binder_helpers import remove_plural
-from builders.binder_helpers import get_pkg_name
-from builders.osid_meta import OSID_Language_Primitives
+from binder_helpers import make_plural, remove_plural
 
 ##
 # Investigate all the setter-like methods in each form interface to find
