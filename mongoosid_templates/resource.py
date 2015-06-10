@@ -331,9 +331,14 @@ class ResourceAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..osid.sessions import OsidSession',
         'from ..primitives import Id',
+        'from ..primitives import Type',
         'from ..utilities import MongoClientValidated',
         'from . import objects',
-        'from bson.objectid import ObjectId'
+        'from bson.objectid import ObjectId',
+        """ENCLOSURE_RECORD_TYPE = Type(
+    identifier=\'enclosure\',
+    namespace=\'osid-object\',
+    authority=\'ODL.MIT.EDU\')""",
     ]
 
     init_template = """
@@ -423,12 +428,36 @@ class ResourceAdminSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+        if ${arg0_name}.get_identifier_namespace() != '${package_name}.${object_name}':
+            if ${arg0_name}.get_authority() != self._authority:
+                raise errors.InvalidArgument()
+            else:
+                ${arg0_name} = self._get_${object_name_under}_id_with_enclosure(${arg0_name})
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
         obj_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
-        return obj_form"""
+        return obj_form
+    
+    def _get_${object_name_under}_id_with_enclosure(self, enclosure_id):
+        \"\"\"Create an ${object_name} with an enclosed foreign object.
+        
+        return: (osid.id.Id) - the id of the new ${object_name}
+        
+        \"\"\"
+        mgr = self._get_provider_manager('REPOSITORY')
+        query_session = mgr.get_${object_name_under}_query_session_for_${cat_name_under}(self._catalog_id)
+        query_form = query_session.get_${object_name_under}_query()
+        query_form.match_enclosed_object_id(enclosure_id)
+        query_result = query_session.get_${object_name_plural_under}_by_query(query_form)
+        if query_result.available() > 0:
+            ${object_name_under}_id = query_result.next().get_id()
+        else:
+            create_form = self.get_${object_name_under}_form_for_create([ENCLOSURE_RECORD_TYPE])
+            create_form.set_enclosed_object(enclosure_id)
+            ${object_name_under}_id = self.create_${object_name_under}(create_form).get_id()
+        return ${object_name_under}_id"""
 
     update_resource_template = """
         # Implemented from template for

@@ -303,6 +303,16 @@ class AssetCompositionDesignSession:
     add_asset = """
         # This asset found check may want to be run through _get_provider_manager
         # so as to ensure assess control:
+        from ...abstract_osid.id.primitives import Id as ABCId
+        if not isinstance(asset_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+        if asset_id.get_identifier_namespace() != 'repository.Asset':
+            if asset_id.get_authority() != self._authority:
+                raise errors.InvalidArgument()
+            else:
+                mgr = self._get_provider_manager('REPOSITORY')
+                admin_session = mgr.get_asset_admin_session_for_repository(self._catalog_id)
+                asset_id = admin_session._get_asset_id_with_enclosure(asset_id)
         collection = MongoClientValidated(self._db_prefix + 'repository', 'Asset')
         asset = collection.find_one({'_id': ObjectId(asset_id.get_identifier())})
         collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
