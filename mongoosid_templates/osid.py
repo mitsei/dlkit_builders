@@ -1136,7 +1136,7 @@ class OsidObjectForm:
         'from dlkit.abstract_osid.osid import errors',
         'from . import mdata_conf',
         'from .metadata import Metadata',
-        ]
+    ]
 
     init = """
     _namespace = "mongo.OsidObjectForm"
@@ -1271,15 +1271,18 @@ class OsidRelationshipForm:
 """
 
 class OsidList:
+    import_statements = [
+        'from pymongo.cursor import Cursor',
+    ]
 
     init = """
-    def __init__(self, iter_object=None, count=None, db_prefix='', runtime=None):
+    def __init__(self, iter_object=None, db_prefix='', runtime=None):
         if iter_object is None:
             iter_object = []
-        if count != None:
-            self._count = count
-        elif isinstance(iter_object, dict) or isinstance(iter_object, list):
+        if isinstance(iter_object, dict) or isinstance(iter_object, list):
             self._count = len(iter_object)
+        elif isinstance(iter_object, Cursor):
+            self._count = iter_object.count()
         else:
             self._count = None
         self._runtime = runtime

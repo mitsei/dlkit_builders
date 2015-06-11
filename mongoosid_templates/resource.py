@@ -217,11 +217,8 @@ class ResourceLookupSession:
         if self._catalog_view == ISOLATED:
             result = collection.find({'_id': {'$$in': object_id_list},
                                       '${cat_name_mixed}Id': str(self._catalog_id)})
-            count = collection.find({'_id': {'$$in': object_id_list},
-                                     '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'_id': {'$$in': object_id_list}})
-            count = collection.find({'_id': {'$$in': object_id_list}}).count()
         result = list(result)
         sorted_result = []
         for object_id in object_id_list:
@@ -229,7 +226,7 @@ class ResourceLookupSession:
                 if object_map['_id'] == object_id:
                     sorted_result.append(object_map)
                     break
-        return objects.${return_type}(sorted_result, count=len(sorted_result), runtime=self._runtime)"""
+        return objects.${return_type}(sorted_result, runtime=self._runtime)"""
 
     get_resources_by_genus_type_template = """
         # Implemented from template for
@@ -239,13 +236,10 @@ class ResourceLookupSession:
         if self._catalog_view == ISOLATED:
             result = collection.find({'genusTypeId': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
-            count = collection.find({'genusTypeId': str(${arg0_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'genusTypeId': str(${arg0_name})}).sort('_id', DESCENDING)
-            count = collection.find({'genusTypeId': str(${arg0_name})}).count()
 
-        return objects.${return_type}(result, count=count, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
     get_resources_by_parent_genus_type_template = """
         # Implemented from template for
@@ -265,12 +259,10 @@ class ResourceLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if self._catalog_view == ISOLATED:
             result = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
-            count = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find().sort('_id', DESCENDING)
-            count = collection.count()
 
-        return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class ResourceQuerySession:
 
@@ -320,9 +312,8 @@ class ResourceQuerySession:
         if self._catalog_view == ISOLATED:
             query_terms['${cat_name_mixed}Id'] = str(self._catalog_id)
         result = collection.find(query_terms).sort('_id', DESCENDING)
-        count = collection.find(query_terms).count()
 
-        return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
@@ -664,15 +655,14 @@ class BinLookupSession:
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bins_by_ids_template
         # NOTE: This implementation currently ignores plenary view
-        # Also, this should be implemeted to use get_${cat_name}() instead of direct to database
+        # Also, this should be implemented to use get_${cat_name}() instead of direct to database
         catalog_id_list = []
         for i in ${arg0_name}:
             catalog_id_list.append(ObjectId(i.get_identifier()))
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
-        count = collection.find({'_id': {'$$in': catalog_id_list}}).count()
 
-        return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
     get_bins_template = """
@@ -681,9 +671,8 @@ class BinLookupSession:
         # NOTE: This implementation currently ignores plenary view
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         result = collection.find().sort('_id', DESCENDING)
-        count = collection.count()
 
-        return objects.${return_type}(result, count=count, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class BinAdminSession:
 
