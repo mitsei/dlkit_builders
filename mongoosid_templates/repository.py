@@ -253,7 +253,7 @@ class AssetCompositionSession:
         else:
             composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if 'assetIds' not in composition:
-            raise NotFound('no Assets are assigned to this Composition')
+            raise errors.NotFound('no Assets are assigned to this Composition')
         asset_ids = []
         for idstr in composition['assetIds']:
             asset_ids.append(Id(idstr))
