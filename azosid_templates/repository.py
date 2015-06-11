@@ -67,7 +67,7 @@ class RepositoryProxyManager:
                 self._authz_session,
                 proxy)
         except AttributeError:
-            raise OperationFailed('AssetCompositionDesitnSession not implemented in authz_adapter')
+            raise OperationFailed('AssetCompositionDesignSession not implemented in authz_adapter')
 """
 
 
@@ -133,7 +133,7 @@ class CompositionLookupSession:
 
 class AssetCompositionSession:
 
-    init_template = """
+    init = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_repository_id()
@@ -158,7 +158,7 @@ class AssetCompositionSession:
 
 class AssetCompositionDesignSession:
 
-    init_template = """
+    init = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_repository_id()
