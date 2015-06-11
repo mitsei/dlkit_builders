@@ -577,6 +577,11 @@ class OsidObject:
         del obj_map['_id']
         my_idstr = str(self.get_id())
 
+        # to handle over-ridden fields, like for enclosed assessments
+        obj_map['displayName']['text'] = self.display_name.text
+        obj_map['description']['text'] = self.description.text
+        obj_map['genusTypeId'] = str(self.genus_type)
+
         # The following is crappy. Should be over-ridden in the corresponding
         # object's get_object_map() methods instead:
         if self._namespace == 'repository.Asset':
