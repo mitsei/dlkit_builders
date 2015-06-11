@@ -1037,6 +1037,8 @@ def get_method_context(package_name, method, interface, patterns):
             context['object_name_under'] = camel_to_under(context['object_name'])
             context['object_name_mixed'] = camel_to_mixed(context['object_name'])
             context['object_name_upper'] = camel_to_under(context['object_name']).upper()
+        if 'object_name_under' in context:
+            context['object_name_plural_under'] = make_plural(context['object_name_under'])
         if 'aggregated_object_name' in context:
             context['aggregated_object_name_under'] = camel_to_under(context['aggregated_object_name'])
             context['aggregated_object_name_mixed'] = camel_to_mixed(context['aggregated_object_name'])
