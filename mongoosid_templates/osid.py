@@ -444,7 +444,7 @@ class OsidSession:
                             'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
                             'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
                             'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-            'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
+            'genusTypeId': str(Type(**types.Genus().get_type_data('DEFAULT'))),
             'recordTypeIds': [] # Could this somehow inherit source catalog records?
 
         }
@@ -1256,7 +1256,7 @@ class OsidObjectForm:
         if (self.get_genus_type_metadata().is_read_only() or
                 self.get_genus_type_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['genusType'] = self._genus_type_metadata['default_type_values'][0]"""
+        self._my_map['genusTypeId'] = self._genus_type_metadata['default_type_values'][0]"""
 
 class OsidRelationshipForm:
 
