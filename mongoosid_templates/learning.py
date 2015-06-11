@@ -29,8 +29,7 @@ class ObjectiveRequisiteSession:
         collection = self._db['Relationship']
         ## I LEFT OFF HERE - THERE'S A WAY TO RETURN ONLY DEST IDS I THINK
         result = collection.find({'_id': {'$$in': catalog_id_list}})
-        count = collection.find({'_id': {'$$in': catalog_id_list}}).count()
-        return objects.${return_type}(result, count)"""
+        return objects.${return_type}(result)"""
 
 
 class ObjectiveRequisiteAssignmentSession:
@@ -106,12 +105,9 @@ class ActivityLookupSession:
         if self._catalog_view == ISOLATED:
             result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)})
-            count = collection.find({'${arg0_object_mixed}Id': str(${arg0_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})})
-            count = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})}).count()
-        return objects.${return_type}(result, count=count, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 
 class ActivityAdminSession:

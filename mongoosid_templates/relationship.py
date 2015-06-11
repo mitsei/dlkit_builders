@@ -26,12 +26,9 @@ class RelationshipLookupSession:
         if self._catalog_view == ISOLATED:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${source_name_mixed}Id': str(${arg0_name})}).count()
-        return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_source_template = """
         # Implemented from template for
@@ -42,15 +39,10 @@ class RelationshipLookupSession:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       'genusTypeId': str(${arg1_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                     'genusTypeId': str(${arg1_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       'genusTypeId': str(${arg1_name})}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                     'genusTypeId': str(${arg1_name})}).count()
-        return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_for_destination_template = """
         # Implemented from template for
@@ -60,12 +52,9 @@ class RelationshipLookupSession:
         if self._catalog_view == ISOLATED:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${destination_name_mixed}Id': str(${arg0_name})}).count()
-        return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_destination_template = """
         # Implemented from template for
@@ -76,15 +65,10 @@ class RelationshipLookupSession:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                       'genusTypeId': str(${arg1_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
-                                     'genusTypeId': str(${arg1_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                       'genusTypeId': str(${arg1_name})}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
-                                     'genusTypeId': str(${arg1_name})}).count()
-        return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_for_peers_template = """
         # Implemented from template for
@@ -95,15 +79,10 @@ class RelationshipLookupSession:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${destination_name_mixed}Id': str(${arg1_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                     '${destination_name_mixed}Id': str(${arg1_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${destination_name_mixed}Id': str(${arg1_name})}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                     '${destination_name_mixed}Id': str(${arg1_name})}).count()
-        return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_peers_template = """
         # Implemented from template for
@@ -115,18 +94,11 @@ class RelationshipLookupSession:
                                       '${destination_name_mixed}Id': str(${arg1_name}),
                                       'genusTypeId': str(${arg2_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                     '${destination_name_mixed}Id': str(${arg1_name}),
-                                     'genusTypeId': str(${arg2_name}),
-                                     '${cat_name_mixed}Id': str(self._catalog_id)}).count()
         else:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${destination_name_mixed}Id': str(${arg1_name}),
                                       'genusTypeId': str(${arg2_name})}).sort('_sort_id', ASCENDING)
-            count = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                     '${destination_name_mixed}Id': str(${arg1_name}),
-                                     'genusTypeId': str(${arg2_name})}).count()
-        return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)"""
 
 class RelationshipAdminSession:
 
