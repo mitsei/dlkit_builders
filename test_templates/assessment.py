@@ -184,7 +184,7 @@ class AssessmentOfferedLookupSession:
     def setUpClass(cls):
         cls.assessment_offered_list = list()
         cls.assessment_offered_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', 'TEST_SERVICE', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
         create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
@@ -222,7 +222,7 @@ class AssessmentTakenLookupSession:
     def setUpClass(cls):
         cls.assessment_taken_list = list()
         cls.assessment_taken_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', 'TEST_SERVICE', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
         create_form.description = 'Test Bank for AssessmentTakenLookupSession tests'

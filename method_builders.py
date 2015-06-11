@@ -13,12 +13,11 @@ class MethodBuilder(Utilities):
         self._dind = 2 * self._ind
         super(MethodBuilder, self).__init__()
 
-    @property
-    def _is_abc(self):
-        return self._class == 'abc'
+    def _is(self, desired_type):
+        return self._class == str(desired_type)
 
     def _build_method_doc(self, method):
-        if self._is_abc:
+        if self._is('abc'):
             detail_docs = filter(None, [method['sphinx_param_doc'].strip('\n'),
                                         method['sphinx_return_doc'].strip('\n'),
                                         method['sphinx_error_doc'].strip('\n') + '\n',
@@ -61,7 +60,7 @@ class MethodBuilder(Utilities):
                 self._wrap(method_impl))
 
     def _make_method_impl(self, method):
-        if self._is_abc:
+        if self._is('abc'):
             if method['return_type'].strip():
                 return '        return # ' + method['return_type']
             else:

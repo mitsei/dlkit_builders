@@ -74,7 +74,7 @@ class AssetCompositionSession:
     def setUpClass(cls):
         cls.asset_list = list()
         cls.asset_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', 'TEST_SERVICE', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_repository_form_for_create([])
         create_form.display_name = 'Test Repository'
         create_form.description = 'Test Repository for AssetLookupSession tests'
@@ -118,7 +118,7 @@ class AssetCompositionDesignSession:
         cls.asset_ids = list()
         cls.composition_list = list()
         cls.composition_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', 'TEST_SERVICE', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_repository_form_for_create([])
         create_form.display_name = 'Test Repository'
         create_form.description = 'Test Repository for AssetLookupSession tests'
