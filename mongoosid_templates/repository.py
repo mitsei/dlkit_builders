@@ -327,7 +327,7 @@ class AssetCompositionDesignSession:
         collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if 'assetIds' not in composition:
-            raise NotFound('no Assets are assigned to this Composition')
+            raise errors.NotFound('no Assets are assigned to this Composition')
         composition['assetIds'] = move_id_ahead(asset_id, reference_id, composition['assetIds'])
         collection.save(composition)"""
 
@@ -335,7 +335,7 @@ class AssetCompositionDesignSession:
         collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if 'assetIds' not in composition:
-            raise NotFound('no Assets are assigned to this Composition')
+            raise errors.NotFound('no Assets are assigned to this Composition')
         composition['assetIds'] = move_id_behind(asset_id, reference_id, composition['assetIds'])
         collection.save(composition)"""
 
@@ -344,7 +344,7 @@ class AssetCompositionDesignSession:
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         collection = MongoClientValidated(self._db_prefix + 'repository', 'Composition')
         if 'assetIds' not in composition:
-            raise NotFound('no Assets are assigned to this Composition')
+            raise errors.NotFound('no Assets are assigned to this Composition')
         composition['assetIds'] = order_ids(asset_ids, composition['assetIds'])
         collection.save(composition)"""
 
