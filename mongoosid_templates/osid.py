@@ -444,7 +444,7 @@ class OsidSession:
                             'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
                             'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
                             'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-            'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
+            'genusTypeId': str(Type(**types.Genus().get_type_data('DEFAULT'))),
             'recordTypeIds': [] # Could this somehow inherit source catalog records?
 
         }
@@ -576,6 +576,11 @@ class OsidObject:
             obj_map = dict(self._my_map)
         del obj_map['_id']
         my_idstr = str(self.get_id())
+
+        # to handle over-ridden fields, like for enclosed assessments
+        obj_map['displayName']['text'] = self.display_name.text
+        obj_map['description']['text'] = self.description.text
+        obj_map['genusTypeId'] = str(self.genus_type)
 
         # The following is crappy. Should be over-ridden in the corresponding
         # object's get_object_map() methods instead:
@@ -1131,7 +1136,7 @@ class OsidObjectForm:
         'from dlkit.abstract_osid.osid import errors',
         'from . import mdata_conf',
         'from .metadata import Metadata',
-        ]
+    ]
 
     init = """
     _namespace = "mongo.OsidObjectForm"
@@ -1251,7 +1256,7 @@ class OsidObjectForm:
         if (self.get_genus_type_metadata().is_read_only() or
                 self.get_genus_type_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['genusType'] = self._genus_type_metadata['default_type_values'][0]"""
+        self._my_map['genusTypeId'] = self._genus_type_metadata['default_type_values'][0]"""
 
 class OsidRelationshipForm:
 
@@ -1266,15 +1271,18 @@ class OsidRelationshipForm:
 """
 
 class OsidList:
+    import_statements = [
+        'from pymongo.cursor import Cursor',
+    ]
 
     init = """
-    def __init__(self, iter_object=None, count=None, db_prefix='', runtime=None):
+    def __init__(self, iter_object=None, db_prefix='', runtime=None):
         if iter_object is None:
             iter_object = []
-        if count != None:
-            self._count = count
-        elif isinstance(iter_object, dict) or isinstance(iter_object, list):
+        if isinstance(iter_object, dict) or isinstance(iter_object, list):
             self._count = len(iter_object)
+        elif isinstance(iter_object, Cursor):
+            self._count = iter_object.count()
         else:
             self._count = None
         self._runtime = runtime
