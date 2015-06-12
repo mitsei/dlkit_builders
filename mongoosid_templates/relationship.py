@@ -4,8 +4,10 @@ class RelationshipLookupSession:
     potential_import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
+        'from ..primitives import DateTime'
         'from ..osid.sessions import OsidSession',
         'from ..utilities import MongoClientValidated',
+        'fro, ..utilities import overlap',
         'from . import objects',
         'from bson.objectid import ObjectId',
         'DESCENDING = -1',
@@ -17,6 +19,15 @@ class RelationshipLookupSession:
         'CREATED = True',
         'UPDATED = True'
     ]
+
+    get_relationships_on_date_template = """
+        # Implemented from template for
+        # osid.relationship.RelationshipLookupSession.get_relationships_on_date
+        ${object_name_under}_list = []
+        for ${object_name_under} in self.get_${object_name_plural_under}:
+            if overlap(${arg0_name}, ${arg1_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+                ${object_name_under}_list.append(${object_name_under})
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
 
     get_relationships_for_source_template = """
         # Implemented from template for
@@ -32,6 +43,15 @@ class RelationshipLookupSession:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${source_name_mixed}Id': str(${arg0_name})}).count()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
+
+    get_relationships_for_source_on_date_template = """
+        # Implemented from template for
+        # osid.relationship.RelationshipLookupSession.get_relationships_for_source_on_date
+        ${object_name_under}_list = []
+        for ${object_name_under} in self.get_${object_name_plural_under}_for_${source_name}:
+            if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+                ${object_name_under}_list.append(${object_name_under})
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_source_template = """
         # Implemented from template for
@@ -52,6 +72,15 @@ class RelationshipLookupSession:
                                      'genusTypeId': str(${arg1_name})}).count()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
 
+    get_relationships_by_genus_type_for_source_on_date_template = """
+        # Implemented from template for
+        # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source_on_date
+        ${object_name_under}_list = []
+        for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${source_name}:
+            if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+                ${object_name_under}_list.append(${object_name_under})
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+
     get_relationships_for_destination_template = """
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
@@ -66,6 +95,15 @@ class RelationshipLookupSession:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
             count = collection.find({'${destination_name_mixed}Id': str(${arg0_name})}).count()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
+
+    get_relationships_for_destination_on_date_template = """
+        # Implemented from template for
+        # osid.relationship.RelationshipLookupSession.get_relationships_for_destination_on_date
+        ${object_name_under}_list = []
+        for ${object_name_under} in self.get_${object_name_plural_under}_for_${destination_name}:
+            if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+                ${object_name_under}_list.append(${object_name_under})
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_destination_template = """
         # Implemented from template for
@@ -85,6 +123,15 @@ class RelationshipLookupSession:
             count = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                      'genusTypeId': str(${arg1_name})}).count()
         return objects.${object_name}List(result, count=count, runtime=self._runtime)"""
+
+    get_relationships_by_genus_type_for_destination_on_date_template = """
+        # Implemented from template for
+        # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination_on_date
+        ${object_name_under}_list = []
+        for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${destination_name}:
+            if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+                ${object_name_under}_list.append(${object_name_under})
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
 
     get_relationships_for_peers_template = """
         # Implemented from template for

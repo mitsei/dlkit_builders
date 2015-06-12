@@ -40,6 +40,14 @@ STRING_MDATA = """
     'maximum_string_length': ${max_length},
     'string_set': [],"""
 
+DECIMAL_MDATA = """
+    'default_decimal_values': [None],
+    'syntax': 'DECIMAL',
+    'decimal_scale': None,
+    'minimum_decimal_value': None,
+    'maximum_decimal_value': None,
+    'decimal_set': [],"""
+
 DISPLAY_TEXT_MDATA = """
     'default_string_values': [{
         'text': '',

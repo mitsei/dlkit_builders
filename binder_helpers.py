@@ -157,6 +157,10 @@ _singular_to_plural = {
     'hierarchy': 'hierarchies',
     'Query': 'Queries',
     'query': 'queries',
+    'Entry': 'Entries',
+    'entry': 'entries',
+    'GradeEntry': 'GradeEntries',
+    'grade_entry': 'grade_entries',
 }
 
 _plural_to_singular = {v: k for k, v in _singular_to_plural.items()}
@@ -333,3 +337,17 @@ def flagged_for_implementation(interface,
                 #print "        Implement", interface['category'] + ":", interface['shortname']
                 test = True
     return test
+
+def fix_bad_name(name):
+    """
+    Occasionally there are bad names of things in the osid spec.
+    
+    Here these can be overriden until they are fixed in the spec.
+    
+    """
+    bad_names_map = {
+        'set_base_on_grades': 'set_based_on_grades',
+    }
+    if name in bad_names_map:
+        name = bad_names_map[name]
+    return name
