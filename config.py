@@ -21,6 +21,7 @@ packages_to_implement = [
 packages_to_test = [
     'assessment',
     'commenting',
+    'grading',
     'learning',
     'repository',
     'resource',
