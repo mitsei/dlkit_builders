@@ -558,6 +558,10 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
             initers = initers + (
             '        self._my_map[\'' + under_to_mixed(data_name) + '\'] = self._' + 
                 data_name + '_default\n')
+        elif persisted_data[data_name] == 'decimal':
+            initers = initers + (
+            '        self._my_map[\'' + under_to_mixed(data_name) + '\'] = self._' + 
+                data_name + '_default\n')
         elif persisted_data[data_name] == 'boolean':
             initers = initers + (
             '        self._my_map[\'' + under_to_mixed(data_name) + '\'] = self._' + 
@@ -1028,6 +1032,8 @@ def get_method_context(package_name, method, interface, patterns):
             context['return_implpkg_name'] = pkg_name(context['return_pkg'])
             context['return_pkg_title'] = context['return_pkg'].title()
             context['return_pkg_caps'] = context['return_pkg'].upper()
+        if 'return_cat_name' in context:
+            context['return_cat_name_under'] = camel_to_under(context['return_cat_name'])
         if 'object_name_under' in context:
             context['object_name_upper'] = context['object_name_under'].upper()
             # Might want to add creating kwargs['object_name' from this as well]

@@ -1,5 +1,6 @@
 """mongo utilities.py"""
 from .osid.osid_errors import NullArgument, NotFound, OperationFailed
+from dlkit.primordium.calendaring.primitives import DateTime
 
 from . import mongo_client
 
@@ -87,3 +88,15 @@ def overlap(start1, end1, start2, end2):
     
     """
     return not (end1 < start2 or end2 < start1)
+
+def now_map():
+    now = DateTime(now)
+    return {
+        'year': now.year,
+        'month': now.month,
+        'day': now.day,
+        'hour': now.hour,
+        'minute': now.minute,
+        'second': now.second,
+        'microsecond': now.microsecond,
+    }

@@ -1059,7 +1059,7 @@ ${instance_initers}
         if not mgr.supports_${return_type_under}_lookup():
             raise errors.OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
         lookup_session = mgr.get_${return_type_under}_lookup_session()
-        lookup_session.use_federated_${return_pkg}_view()
+        lookup_session.use_federated_${return_cat_name_under}_view()
         osid_object = lookup_session.get_${return_type_under}(self.get_${var_name}_id())
         return osid_object"""
 

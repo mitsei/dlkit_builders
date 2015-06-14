@@ -437,7 +437,6 @@ class AssetForm:
 
     set_title_template = """
         # Implemented from template for osid.repository.AssetForm.set_title_template
-        #from ..osid.osid_errors import InvalidArgument, NullArgument, NoAccess
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_${arg0_type}(${arg0_name}, self.get_${arg0_name}_metadata()):
@@ -446,7 +445,6 @@ class AssetForm:
 
     clear_title_template = """
         # Implemented from template for osid.repository.AssetForm.clear_title_template
-        #from ..osid.osid_errors import NoAccess
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess()

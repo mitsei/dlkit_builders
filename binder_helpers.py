@@ -2,6 +2,7 @@
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
 from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
+from mongobuilder_settings import PATTERN_DIR as pattern_maps_dir
 import json
 
 ##
@@ -299,18 +300,31 @@ def make_twargs(index, package, interface, method, rtype=True, object_name=None,
         n += 1
     return twargs
 
-def get_cat_name_for_pkg(return_pkg):
+def get_cat_name_for_pkg(pkg):
     try:
-        read_file = open(pkg_maps_dir + '/' + return_pkg + '.json', 'r')
+        read_file = open(pkg_maps_dir + '/' + pkg + '.json', 'r')
         package = json.load(read_file)
         read_file.close()
     except IOError:
-        print 'No package map found for return package \'' + return_pkg + '\''
+        print 'No package map found for package \'' + pkg + '\''
         return 'NoCatalog'
     for interface in package['interfaces']:
         if (interface['category'] == 'objects' and
             'OsidCatalog' in interface['inherit_shortnames']):
             return interface['shortname']
+    return 'NoCatalog'
+
+def get_cat_name_for_pkg_from_pattern(pkg):
+    try:
+        read_file = open(pattern_maps_dir + '/' + pkg + '.json', 'r')
+        pattern = json.load(read_file)
+        read_file.close()
+    except IOError:
+        #print 'No pattern map found for package \'' + pkg + '\''
+        return 'NoCatalog'
+    if 'package_catalog_caps' in pattern:
+        #print pattern['package_catalog_caps']
+        return pattern['package_catalog_caps']
     return 'NoCatalog'
 
 def flagged_for_implementation(interface,
@@ -347,6 +361,8 @@ def fix_bad_name(name):
     """
     bad_names_map = {
         'set_base_on_grades': 'set_based_on_grades',
+        'clear_lowest_score': 'clear_lowest_numeric_score',
+        'clear_input_start_score_range': 'clear_input_score_start_range',
     }
     if name in bad_names_map:
         name = bad_names_map[name]

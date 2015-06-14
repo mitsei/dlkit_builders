@@ -191,7 +191,7 @@ def map_object_form_patterns(interface, package, index):
               len(method['arg_types']) == 1 and
               method['arg_types'][0] == 'decimal'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'grading.GradeEntry.set_score',
+                pattern = 'grading.GradeSystemForm.set_lowest_numeric_score',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -200,6 +200,19 @@ def map_object_form_patterns(interface, package, index):
                               arg0_name = method['args'][0]['var_name'],
                               arg0_type_full = method['args'][0]['arg_type']))
 
+        ##
+        # ObjectForm methods that clear a persisted decimal value.
+        elif (method['name'].startswith('clear_') and
+              var_name in index[object_name + '.persisted_data'] and
+              len(index[object_name + '.arg_detail'][var_name]) == 1 and
+              index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'decimal'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'grading.GradeSystemForm.clear_lowest_numeric_score',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name))
 
         ##
         # ObjectForm methods that set a persisted DateTime. Also looks for timestamps
@@ -685,7 +698,7 @@ def map_object_patterns(interface, package, index):
               method['name'].startswith('get_') and
               index[object_name + '.persisted_data'][var_name] == 'decimal'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'grading.GradeEntry.get_score',
+                pattern = 'grading.GradeSystem.get_lowest_numeric_score',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -961,7 +974,7 @@ def map_object_patterns(interface, package, index):
 
         ##
         # Object methods that get the osid.id.Id of an instance object that may
-        # be required and and is from this osid package. 
+        # be required and and is from this osid package. NOTE: Patterned as above
         elif (var_name in index[object_name + '.instance_data'] and
               method['name'].startswith('get_') and
               method['name'].endswith('_id') and
@@ -1107,6 +1120,7 @@ def map_object_patterns(interface, package, index):
                               var_name = var_name,
                               object_name = object_name,
                               return_type_full = method['return_type'],
+                              return_cat_name = get_cat_name_for_pkg(method['return_type'].split('.')[1]),
                               cat_name = index['package_catalog_caps']))
         ##
         # Object methods that get the an instance and perhaps required object 
@@ -1125,12 +1139,32 @@ def map_object_patterns(interface, package, index):
                               var_name = var_name,
                               object_name = object_name,
                               return_type_full = method['return_type'],
+                              return_cat_name = get_cat_name_for_pkg(method['return_type'].split('.')[1]),
                               cat_name = index['package_catalog_caps']))
 
         ##
         # We might need one that checks for persisted and not required object, 
         # That looks for related has_ and is_ type methods
 
+
+        ##
+        # Object methods that get the a persisted object id from another
+        # package for which an osid.id.Id is persisted.  This doesn't check
+        # for a "has" method, but is currently patterned like it does
+        elif (var_name in index[object_name + '.persisted_data'] and
+              method['name'].startswith('get_') and
+              method['name'].endswith('_id') and
+              len(index[object_name + '.arg_detail'][var_name]) == 1 and
+              index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.id.Id'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.Resource.get_avatar_id',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              object_name = object_name,
+                              return_type_full = method['return_type']))
 
         ##
         # Object methods that get the a persisted object from another
@@ -1147,7 +1181,8 @@ def map_object_patterns(interface, package, index):
                               method_name = method['name'],
                               var_name = var_name,
                               object_name = object_name,
-                              return_type_full = method['return_type']))
+                              return_type_full = method['return_type'],
+                              return_cat_name = get_cat_name_for_pkg(method['return_type'].split('.')[1])))
 
         ##
         # We might need one that checks for instance and not required object, 
@@ -1169,7 +1204,8 @@ def map_object_patterns(interface, package, index):
                               method_name = method['name'],
                               var_name = var_name,
                               object_name = object_name,
-                              return_type_full = method['return_type']))
+                              return_type_full = method['return_type'],
+                              return_cat_name = get_cat_name_for_pkg(method['return_type'].split('.')[1])))
 
         ##
         # Object methods that get a persisted object list from another
