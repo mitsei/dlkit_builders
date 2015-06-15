@@ -281,7 +281,6 @@ class GradeEntryForm:
             raise errors.InvalidArgument()
         if self.get_score_metadata().is_read_only():
             raise errors.NoAccess()
-        if self._my_map[]
         if not self._is_valid_decimal(score, self.get_score_metadata()):
             raise errors.InvalidArgument()
         if (self._grade_system.get_numeric_score_increment() and 
