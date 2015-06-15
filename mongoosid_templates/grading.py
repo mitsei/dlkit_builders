@@ -90,7 +90,11 @@ class GradeSystemForm:
         # Implemented from template for osid.grading.GradeSystemForm.set_lowest_numeric_score
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
-        if not self._is_valid_${arg0_type}(${arg0_name}, self.get_${arg0_name}_metadata()):
+        try:
+            ${arg0_name} = float(${arg0_name})
+        except ValueError:
+            raise errors.InvalidArgument()
+        if not self._is_valid_${arg0_type}(${arg0_name}, self.get_${var_name}_metadata()):
             raise errors.InvalidArgument()
         self._my_map['${var_name_mixed}'] = ${arg0_name}"""
 
@@ -167,7 +171,7 @@ class GradeEntryForm:
         mgr = self._get_provider_manager('GRADING')
         lookup_session = mgr.get_gradebook_column_lookup_session()
         lookup_session.use_federated_gradebook_view()
-        gradebook_column = lookup_session.get_gradebook_column(Id(self._my_map['gradebookColumnId']))
+        gradebook_column = lookup_session.get_gradebook_column(kwargs['gradebook_column_id'])
         self._grade_system = gradebook_column.get_grade_system()
 
         if 'catalog_id' in kwargs:
@@ -186,10 +190,6 @@ class GradeEntryForm:
             if record_types is not None:
                 self._init_records(record_types)
         self._supported_record_type_ids = self._my_map['recordTypeIds']
-        mgr = self._get_provider_manager('GRADING')
-        lookup_session = mgr.get_gradebook_column_lookup_session()
-        lookup_session.use_federated_gradebook_view()
-        gradebook_column = lookup_session.get_gradebook_column(Id(self._my_map['gradebookColumnId']))
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)

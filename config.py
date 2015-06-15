@@ -151,6 +151,7 @@ objects_to_implement = [
     'GradeSystem',
     'GradeEntry',
     'GradebookColumn',
+    'GradebookColumnSummary',
     'Gradebook',
     ### hierarchy service
     'Hierarchy',

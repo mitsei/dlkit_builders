@@ -733,7 +733,7 @@ class OsidForm:
 
     init = """
     # pylint: disable=no-self-use
-    # MUCH OF THESE SHOULD BE MOVED TO A UTILITY MODULE
+    # MUCH OF THIS SHOULD BE MOVED TO A UTILITY MODULE
 
     _namespace = 'mongo.OsidForm'
 

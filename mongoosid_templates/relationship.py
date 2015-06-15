@@ -1,3 +1,4 @@
+from .resource import ResourceAdminSession
 
 class RelationshipLookupSession:
 
@@ -149,7 +150,12 @@ class RelationshipLookupSession:
 
 class RelationshipAdminSession:
 
-    
+    # For when we get Relatioship based init patterns figured out:
+    new_import_statements_pattern = ResourceAdminSession.import_statements_pattern
+
+    # For when we get Relatioship based init patterns figured out:
+    new_init_template = ResourceAdminSession.init_template
+
     import_statements_pattern = [
         'from . import objects',
         'from dlkit.abstract_osid.osid import errors',
