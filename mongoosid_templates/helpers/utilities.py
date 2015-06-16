@@ -1,5 +1,6 @@
 """mongo utilities.py"""
 from .osid.osid_errors import NullArgument, NotFound, OperationFailed
+from dlkit.primordium.calendaring.primitives import DateTime
 
 from . import mongo_client
 
@@ -77,3 +78,25 @@ def arguments_not_none(func):
                 raise TypeError(*ex.args)
 
     return wrapper
+
+def overlap(start1, end1, start2, end2):
+    """
+    Does the range (start1, end1) overlap with (start2, end2)?
+    
+    From Ned Batchelder
+    http://nedbatchelder.com/blog/201310/range_overlap_in_two_compares.html
+    
+    """
+    return not (end1 < start2 or end2 < start1)
+
+def now_map():
+    now = DateTime(now)
+    return {
+        'year': now.year,
+        'month': now.month,
+        'day': now.day,
+        'hour': now.hour,
+        'minute': now.minute,
+        'second': now.second,
+        'microsecond': now.microsecond,
+    }

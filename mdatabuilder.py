@@ -254,7 +254,7 @@ def make_mdata_map(data_name, data_type, options):
     elif data_type == 'string':
         template = string.Template(options.COMMON_MDATA + 
                                    options.STRING_MDATA)
-        # In the following max_length may want to come from a settings file:
+        # In the following max_length may want to come from a configuration setting:
         mdata = template.substitute({
             'element_identifier': data_name,
             'element_label': ' '.join(data_name.split('_')),
@@ -262,10 +262,19 @@ def make_mdata_map(data_name, data_type, options):
             'max_length': 256,
             'array': 'False'
             })
+    elif data_type == 'decimal':
+        template = string.Template(options.COMMON_MDATA + 
+                                   options.DECIMAL_MDATA)
+        mdata = template.substitute({
+            'element_identifier': data_name,
+            'element_label': ' '.join(data_name.split('_')),
+            'instructions': 'enter a decimal value.',
+            'array': 'False'
+            })
     elif data_type == 'DisplayText':
         template = string.Template(options.COMMON_MDATA + 
                                    options.DISPLAY_TEXT_MDATA)
-        # In the following max_length may want to come from a settings file:
+        # In the following max_length may want to come from a configuration setting:
         mdata = template.substitute({
             'element_identifier': data_name,
             'element_label': ' '.join(data_name.split('_')),

@@ -14,8 +14,8 @@ TYPE_PROVIDER_MANAGER_PATH = '..handcar.type.managers'
 #ID_PROVIDER_MANAGER_PATH = '..mongo.id.managers'
 ID_PROVIDER_MANAGER_PATH = '..handcar.id.managers'
 
-#GRADING_PROVIDER_MANAGER_PATH = '..mongo.grading.managers'
-GRADING_PROVIDER_MANAGER_PATH = '..handcar.grading.managers'
+GRADING_PROVIDER_MANAGER_PATH = '..mongo.grading.managers'
+#GRADING_PROVIDER_MANAGER_PATH = '..handcar.grading.managers'
 
 #RELATIONSHIP_PROVIDER_MANAGER_PATH = '..mongo.relationship.managers'
 RELATIONSHIP_PROVIDER_MANAGER_PATH = '..handcar.relationship.managers'

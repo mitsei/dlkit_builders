@@ -1,0 +1,8 @@
+
+class RelationshipAdminSession:
+
+    get_relationship_form_for_create_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.relationship.RelationshipAdminSession.get_relationship_form_for_create_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""

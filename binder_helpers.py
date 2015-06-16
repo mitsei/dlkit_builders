@@ -1,5 +1,10 @@
 import os
 import re
+
+from abcbinder_settings import XOSIDNAMESPACEURI as ns
+from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
+from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
+from mongobuilder_settings import PATTERN_DIR as pattern_maps_dir
 import json
 import keyword
 import textwrap
@@ -156,6 +161,10 @@ _singular_to_plural = {
     'hierarchy': 'hierarchies',
     'Query': 'Queries',
     'query': 'queries',
+    'Entry': 'Entries',
+    'entry': 'entries',
+    'GradeEntry': 'GradeEntries',
+    'grade_entry': 'grade_entries',
 }
 
 _plural_to_singular = {v: k for k, v in _singular_to_plural.items()}
@@ -272,18 +281,29 @@ def make_twargs(index, package, interface, method, rtype=True, object_name=None,
     return twargs
 
 def get_cat_name_for_pkg(return_pkg):
-    # TODO: Move this into the BaseBuilder class??
-    try:
-        read_file = open(ABS_PATH + '/builders/package_maps/' + return_pkg + '.json', 'r')
+        read_file = open(pkg_maps_dir + '/' + pkg + '.json', 'r')
         package = json.load(read_file)
         read_file.close()
     except IOError:
-        print 'No package map found for return package \'' + return_pkg + '\''
+        print 'No package map found for package \'' + pkg + '\''
         return 'NoCatalog'
     for interface in package['interfaces']:
         if (interface['category'] == 'objects' and
             'OsidCatalog' in interface['inherit_shortnames']):
             return interface['shortname']
+    return 'NoCatalog'
+
+def get_cat_name_for_pkg_from_pattern(pkg):
+    try:
+        read_file = open(pattern_maps_dir + '/' + pkg + '.json', 'r')
+        pattern = json.load(read_file)
+        read_file.close()
+    except IOError:
+        #print 'No pattern map found for package \'' + pkg + '\''
+        return 'NoCatalog'
+    if 'package_catalog_caps' in pattern:
+        #print pattern['package_catalog_caps']
+        return pattern['package_catalog_caps']
     return 'NoCatalog'
 
 def flagged_for_implementation(interface,
@@ -310,3 +330,19 @@ def flagged_for_implementation(interface,
                 #print "        Implement", interface['category'] + ":", interface['shortname']
                 test = True
     return test
+
+def fix_bad_name(name):
+    """
+    Occasionally there are bad names of things in the osid spec.
+    
+    Here these can be overriden until they are fixed in the spec.
+    
+    """
+    bad_names_map = {
+        'set_base_on_grades': 'set_based_on_grades',
+        'clear_lowest_score': 'clear_lowest_numeric_score',
+        'clear_input_start_score_range': 'clear_input_score_start_range',
+    }
+    if name in bad_names_map:
+        name = bad_names_map[name]
+    return name

@@ -543,6 +543,9 @@ def is_manager_session(interface, patterns, package_name):
     if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
         is_manager_session = True
     elif (interface['category'] == 'sessions' and
+        interface['shortname'].startswith('GradebookColumn')):
+        is_manager_session = False
+    elif (interface['category'] == 'sessions' and
         interface['shortname'].startswith(patterns['package_catalog_caps'])):
         is_manager_session = True
     return is_manager_session
@@ -557,6 +560,9 @@ def is_catalog_session(interface, patterns, package_name):
 #        not interface['shortname'].startswith(patterns['package_catalog_caps'])):
     if package_name in ['type', 'proxy']:
         is_catalog_session = False
+    elif (interface['category'] == 'sessions' and
+        interface['shortname'].startswith('GradebookColumn')):
+        is_catalog_session = True
     elif (interface['category'] == 'sessions' and
         not interface['shortname'].startswith(patterns['package_catalog_caps'])):
         is_catalog_session = True

@@ -158,11 +158,10 @@ def interface_iterator(root):
     return interface
 
 def method_iterator(root):
-    from binder_helpers import fix_reserved_word
-    from binder_helpers import camel_to_under
+    from binder_helpers import fix_reserved_word, camel_to_under, fix_bad_name
 
     method = OrderedDict()
-    method['name'] = camel_to_under(root.get(ns + 'name'))
+    method['name'] = fix_bad_name(camel_to_under(root.get(ns + 'name')))
 
     ##
     # Initialize the various dictionary elements so as to assure that there

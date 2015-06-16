@@ -170,24 +170,16 @@ class Activity:
 
     get_objective_template = """
         # Implemented from template for osid.learning.Activity.get_objective
-        try:
-            mgr = self._get_provider_manager('${return_pkg_caps}')
-        except ImportError:
-            raise errors.OperationFailed('failed to instantiate ${return_pkg_title}Manager')
+        mgr = self._get_provider_manager('${return_pkg_caps}')
         if not mgr.supports_${return_type_under}_lookup():
             raise errors.OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
-        try:
-            lookup_session = mgr.get_${return_type_under}_lookup_session()
-            lookup_session.use_federated_${cat_name_under}_view()
-            result = lookup_session.get_${return_type_under}(self.get_${var_name}_id())
-        except:
-            raise errors.OperationFailed()
-        else:
-            return result"""
+        lookup_session = mgr.get_${return_type_under}_lookup_session()
+        lookup_session.use_federated_${return_cat_name_under}_view()
+        return lookup_session.get_${return_type_under}(self.get_${var_name}_id())"""
 
     is_asset_based_activity_template = """
         # Implemented from template for osid.learning.Activity.is_asset_based_activity_template
-        return self.my_model.${var_name}"""
+        return self._my_map['${var_name_mixed}']"""
 
     get_asset_ids_template = """
         # Implemented from template for osid.learning.Activity.get_asset_ids_template
@@ -201,14 +193,9 @@ class Activity:
             raise errors.OperationFailed('failed to instantiate ${return_pkg_title}Manager')
         if not mgr.supports_${return_type_list_object_under}_lookup():
             raise errors.OperationFailed('${return_pkg_title} does not support ${return_type_list_object} lookup')
-        try:
-            lookup_session = mgr.get_${return_type_list_object_under}_lookup_session()
-            lookup_session.use_federated_${return_cat_name_under}_view()
-            result = lookup_session.get_${return_type_list_object_plural_under}_by_ids(self.get_${var_name_singular}_ids())
-        except:
-            raise errors.OperationFailed()
-        else:
-            return result"""
+        lookup_session = mgr.get_${return_type_list_object_under}_lookup_session()
+        lookup_session.use_federated_${return_cat_name_under}_view()
+        return lookup_session.get_${return_type_list_object_plural_under}_by_ids(self.get_${var_name_singular}_ids())"""
 
 
 class ActivityForm:

@@ -21,6 +21,7 @@ packages_to_implement = [
 packages_to_test = [
     'assessment',
     'commenting',
+    'grading',
     'learning',
     'repository',
     'resource',
@@ -72,6 +73,12 @@ sessions_to_implement = [
     ### grading service:
     'GradebookLookupSession',
     'GradebookAdminSession',
+    'GradeSystemLookupSession',
+    'GradeSystemAdminSession',
+    'GradeEntryLookupSession',
+    'GradeEntryAdminSession',
+    'GradebookColumnLookupSession',
+    'GradebookColumnAdminSession',
     ### hierarchy service:
     'HierarchyLookupSession',
     'HierarchyAdminSession',
@@ -142,6 +149,9 @@ objects_to_implement = [
     ### grading service:
     'Grade',
     'GradeSystem',
+    'GradeEntry',
+    'GradebookColumn',
+    'GradebookColumnSummary',
     'Gradebook',
     ### hierarchy service
     'Hierarchy',
