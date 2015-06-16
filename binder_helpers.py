@@ -280,8 +280,9 @@ def make_twargs(index, package, interface, method, rtype=True, object_name=None,
         n += 1
     return twargs
 
-def get_cat_name_for_pkg(return_pkg):
-        read_file = open(pkg_maps_dir + '/' + pkg + '.json', 'r')
+def get_cat_name_for_pkg(pkg):
+    try:
+        read_file = open(ABS_PATH + '/builders/package_maps/' + pkg + '.json', 'r')
         package = json.load(read_file)
         read_file.close()
     except IOError:

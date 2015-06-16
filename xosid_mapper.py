@@ -61,10 +61,10 @@ OSID_ERRORS = ['ALREADY_EXISTS', 'NOT_FOUND', 'PERMISSION_DENIED',
 
 
 class XOsidMapper(object):
-    def __init__(self, indent_str='', xosid_ns='{urn:inet:osid.org:schemas/osid/3}'):
+    def __init__(self, indent_str='', xosid_ns='{urn:inet:osid.org:schemas/osid/3}', *args, **kwargs):
         self._indent_str = indent_str
         self._xosid_ns = xosid_ns
-        super(XOsidMapper, self).__init__()
+        super(XOsidMapper, self).__init__(*args, **kwargs)
 
     def map_xosid(self, file_name):
         try:

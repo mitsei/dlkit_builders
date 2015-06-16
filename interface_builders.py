@@ -7,8 +7,9 @@ import string
 import datetime
 
 from abcbinder_settings import ENCODING as utf_code
-from binder_helpers import under_to_caps
-from build_controller import Utilities, BaseBuilder
+from binder_helpers import under_to_caps, under_to_mixed,\
+    remove_plural, camel_to_under, make_plural
+from build_controller import Utilities, BaseBuilder, Templates
 from config import sessions_to_implement, managers_to_implement,\
     objects_to_implement, variants_to_implement
 from method_builders import MethodBuilder
@@ -17,25 +18,32 @@ from mappers import Mapper
 from importlib import import_module
 
 
-class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
+METADATA_INITER = """
+        self._${data_name}_metadata = {
+            'element_id': Id(
+                self._authority,
+                self._namespace,
+                '${data_name}')}
+        self._${data_name}_metadata.update(mdata_conf.${data_name_upper})"""
+
+
+class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
     """class that builds interfaces"""
     def __init__(self, method_class=None, root_dir=None, template_dir=None, *args, **kwargs):
         """method_class differentiates between different variations, i.e. abc
         looks different than mongo"""
-        super(InterfaceBuilder, self).__init__()
+        super(InterfaceBuilder, self).__init__(template_dir=template_dir)
         self._class = method_class or 'abc'
         self._ind = 4 * ' '
         self._dind = 2 * self._ind
 
         self._root_dir = root_dir
-        self._template_dir = template_dir
 
         if root_dir is not None:
             self._make_dir(root_dir)
-        if template_dir is not None:
-            self._make_dir(template_dir)
 
-        self.method_builder = MethodBuilder(method_class=self._class)
+        self.method_builder = MethodBuilder(method_class=self._class,
+                                            template_dir=self._template_dir)
 
     def _get_class_inheritance(self, package, interface):
         def get_full_interface_class():
@@ -74,7 +82,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
         # Check to see if there are any additional inheritances required
         # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
         # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
-        impl_class = load_impl_class(package['name'], interface['shortname'])
+        impl_class = self._load_impl_class(package['name'], interface['shortname'])
         if hasattr(impl_class, 'inheritance'):
             inheritance = inheritance + getattr(impl_class, 'inheritance')
 
@@ -83,13 +91,138 @@ class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
         if last_inheritance:
             inheritance = inheritance + last_inheritance
         if inheritance:
-            inheritance = '(' + ', '.join(inheritance) + ')'
+            inheritance = '({})'.format(', '.join(inheritance))
         else:
             inheritance = ''
 
-    # This function expects a file containing a json representation of an
-    # osid package that was prepared by the mapper.
+        return inheritance
+
+    def _get_extra_patterns(self, package, interface_name, import_statement, default=None):
+        patterns = self._patterns(package)
+        if interface_name + '.init_pattern' in patterns:
+            init_pattern = patterns[interface_name + '.init_pattern']
+            try:
+                templates = import_module(self._package_templates(self.first(init_pattern)))
+                if hasattr(templates, self.last(init_pattern)):
+                    template_class = getattr(templates, self.last(init_pattern))
+                    if hasattr(template_class, import_statement):
+                        return getattr(template_class, import_statement)
+            except ImportError:
+                return default
+        return default
+
+    def _get_init_context(self, init_pattern, interface, package):
+        """get the init context, for templating"""
+        def init_string(name, init_type):
+            return '\n{}osid_objects.{}._init_{}(self)'.format(self._dind,
+                                                               name,
+                                                               init_type)
+        patterns = self._patterns(package)
+
+        instance_initers = ''
+        persisted_initers = ''
+        metadata_initers = ''
+        metadata_super_initers = ''
+        map_super_initers = ''
+        object_name = ''
+        init_object = ''
+
+        cat_name = patterns['package_catalog_caps']
+
+        # Check for any special data initializations and call the appropriate makers
+        # to assemble them.
+        if init_pattern == 'resource.Bin':
+            object_name = interface['shortname']
+        elif init_pattern == 'resource.BinForm':
+            object_name = interface['shortname'][:-4]
+        elif init_pattern == 'resource.ResourceLookupSession':
+            object_name = interface['shortname'][:-13]
+        elif init_pattern == 'commenting.CommentLookupSession':
+            object_name = interface['shortname'][:-13]
+        elif init_pattern == 'resource.Resource':
+            object_name = interface['shortname']
+        elif init_pattern == 'resource.ResourceForm':
+            object_name = interface['shortname'][:-4]
+            if object_name in patterns['package_relationships_caps']:
+                init_object = 'osid_objects.OsidRelationshipForm'
+            else:
+                init_object = 'osid_objects.OsidObjectForm'
+
+            for inherit_object in interface['inherit_shortnames']:
+                if inherit_object in ['OsidSourceableForm', 'OsidContainableForm']:
+                    metadata_super_initers += init_string(inherit_object, 'metadata')
+                    map_super_initers += init_string(inherit_object, 'map')
+
+            if metadata_super_initers:
+                metadata_super_initers += '\n'
+            if map_super_initers:
+                map_super_initers += '\n'
+            try:
+                persisted_initers = make_persistance_initers(
+                    patterns[interface['shortname'][:-4] + '.persisted_data'],
+                    patterns[interface['shortname'][:-4] + '.initialized_data'],
+                    patterns[interface['shortname'][:-4] + '.aggregate_data'])
+            except KeyError:
+                pass
+
+            try:
+                metadata_initers = make_metadata_initers(
+                    patterns[interface['shortname'][:-4] + '.persisted_data'],
+                    patterns[interface['shortname'][:-4] + '.initialized_data'],
+                    patterns[interface['shortname'][:-4] + '.return_types'])
+            except KeyError:
+                pass
+        elif init_pattern == 'resource.ResourceQuery':
+            object_name = interface['shortname'][:-5]
+
+        return {'app_name': self._app_name(package['name']),
+                'implpkg_name': self._abc_pkg_name(package['name'], abc=False),
+                'pkg_name': package['name'],
+                'pkg_name_upper': package['name'].upper(),
+                'interface_name': interface['shortname'],
+                'instance_initers': instance_initers,
+                'persisted_initers': persisted_initers,
+                'metadata_initers': metadata_initers,
+                'metadata_super_initers': metadata_super_initers,
+                'map_super_initers': map_super_initers,
+                'object_name': object_name,
+                'object_name_under': camel_to_under(object_name),
+                'object_name_upper': camel_to_under(object_name).upper(),
+                'cat_name': cat_name,
+                'cat_name_plural': make_plural(cat_name),
+                'cat_name_under': camel_to_under(cat_name),
+                'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
+                'cat_name_upper': cat_name.upper(),
+                'init_object': init_object}
+
+    def _make_init_methods(self, package, interface):
+        templates = None
+        init_pattern = ''
+        patterns = self._patterns(package)
+
+        impl_class = self._load_impl_class(self._abc_pkg_name(package['name'], abc=False),
+                                           interface['shortname'])
+        if hasattr(impl_class, 'init'):
+            return getattr(impl_class, 'init')
+        elif interface['shortname'] + '.init_pattern' in patterns:
+            init_pattern = patterns[interface['shortname'] + '.init_pattern']
+            try:
+                templates = import_module(self._package_templates(self.first(init_pattern)))
+            except ImportError:
+                pass
+
+        if templates is not None and hasattr(templates, self.last(init_pattern)):
+            template_class = getattr(templates, self.last(init_pattern))
+            if hasattr(template_class, 'init_template'):
+                context = self._get_init_context(init_pattern, interface, package)
+                template = string.Template(getattr(template_class, 'init_template'))
+                return template.substitute(context)
+
+        return ''
+
     def _make_osid(self, file_name):
+        # This function expects a file containing a json representation of an
+        # osid package that was prepared by the mapper.
         with open(file_name, 'r') as read_file:
             package = json.load(read_file)
 
@@ -133,11 +266,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
         else:
             # Check if a directory already exists for the abc osid.  If not,
             # create one and initialize as a python package.
-            self._make_dir(self._app_name(package))
-            os.system('touch ' + self._app_name(package) + '/__init__.py')
-            abc_path = self._abc_pkg_path(package)
-            self._make_dir(abc_path)
-            os.system('touch ' + abc_path + '/__init__.py')
+            self._make_dir(self._app_name(package), python=True)
+            self._make_dir(self._abc_pkg_path(package), python=True)
 
         if self._is('abc'):
             # Write the osid license documentation file.
@@ -200,7 +330,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
                 write_file.write(self._make_profile_py(package))
 
         # The real work starts here.  Iterate through all interfaces to build
-        # all the abc classes for this osid package.
+        # all the classes for this osid package.
         for interface in package['interfaces']:
             if self._is('mongo') and not build_this_interface(package, interface):
                 continue  # don't build it
@@ -209,43 +339,33 @@ class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
                 inheritance = ''
             else:
                 inheritance = self._get_class_inheritance(package, interface)
+
             additional_methods = ''
 
-            # Interate through any inherited interfaces and build the inheritance
-            # list for this interface. Also, check if an import statement is
-            # required and append to the appropriate module's import list.
             if not self._is('abc'):
-                for i in interface['inheritance']:
-                    unknown_module_protection = ''
-                    inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
-                    if inherit_category == 'UNKNOWN_MODULE':
-                        unknown_module_protection = '\"\"\"'
-                    if (i['pkg_name'] == package['name'] and
-                            inherit_category == interface['category']):
-                        inheritance.append(i['name'])
-                    else:
-                        inheritance.append(unknown_module_protection +
-                                           self._abc_pkg_name(i['pkg_name']) + '_' +
-                                           inherit_category + '.' + i['name'] +
-                                           unknown_module_protection)
-                        import_str = ('from ..' + self._abc_pkg_name(i['pkg_name']) +
-                                      ' import ' + inherit_category + ' as ' +
-                                      self._abc_pkg_name(i['pkg_name']) + '_' + inherit_category)
-                        if (import_str not in modules[interface['category']]['imports'] and
-                                inherit_category != 'UNKNOWN_MODULE'):
-                            modules[interface['category']]['imports'].append(import_str)
+                self._update_module_imports(modules, package, interface)
 
-            # Note that the following re-assigns the inheritance variable from a
-            # list to a string.
-            if inheritance:
-                inheritance = '(' + ', '.join(inheritance) + ')'
+            if self._is('abc'):
+                # Add the equality methods to Ids and Types:
+                if interface['shortname'] == 'Id' or interface['shortname'] == 'Type':
+                    additional_methods += eq_methods(interface['shortname'])
+                    additional_methods += str_methods()
             else:
-                inheritance = ''
+                # Look for additional methods defined in class patterns. These
+                # need to be coded in the impl_class as a string with the
+                # attribute name 'additional_methods_pattern'
+                additional_methods += self._get_extra_patterns(package,
+                                                               interface['shortname'],
+                                                               'additional_methods_pattern',
+                                                               default='')
 
-            # Add the equality methods to Ids and Types:
-            if interface['shortname'] == 'Id' or interface['shortname'] == 'Type':
-                additional_methods += eq_methods(interface['shortname'])
-                additional_methods += str_methods()
+                # Here we further inspect the impl_class to identify any additional
+                # hand built methods to be included at the end of the class definition. These
+                # need to be coded in the impl_class as a string with the
+                # attribute name 'additional_methods'
+                impl_class = self._impl_class(package, interface)
+                if hasattr(impl_class, 'additional_methods'):
+                    additional_methods += getattr(impl_class, 'additional_methods')
 
             # Inspect the class doc string for headline + body and create
             # appropriate doc string style. Trying to conform to PEP 257 as
@@ -263,22 +383,44 @@ class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
 
             class_sig = 'class ' + interface['shortname'] + inheritance + ':'
 
-            modules[interface['category']]['body'] = (
-                modules[interface['category']]['body'] +
-                class_sig + '\n' +
-                class_doc + '\n' +
-                '    __metaclass__ = abc.ABCMeta\n\n' +
-                additional_methods +
-                self.method_builder.make_methods(package['name'],
-                                                 interface,
-                                                 None) + '\n\n\n')
+            if self._is('abc'):
+                modules[interface['category']]['body'] = (
+                    modules[interface['category']]['body'] +
+                    class_sig + '\n' +
+                    class_doc + '\n' +
+                    '    __metaclass__ = abc.ABCMeta\n\n' +
+                    additional_methods +
+                    self.method_builder.make_methods(package['name'],
+                                                     interface,
+                                                     None) + '\n\n\n')
+            else:
+                init_methods = self._make_init_methods(interface, package)
+
+                methods = self.method_builder.make_methods(self._abc_pkg_name(package['name'], abc=False),
+                                                           interface,
+                                                           self._patterns(package))
+
+                if additional_methods:
+                    methods += '\n' + additional_methods
+
+                modules[interface['category']]['body'] = (
+                    modules[interface['category']]['body'] +
+                    class_sig + '\n' +
+                    class_doc + '\n' +
+                    init_methods + '\n' +
+                    methods + '\n\n\n')
 
         # Finally, iterate through the completed package module structure and
         # write out both the import statements and class definitions to the
         # appropriate module for this package.
         for module in modules:
+            if module == 'records' and package['name'] != 'osid':
+                module_name = 'record_templates'
+            else:
+                module_name = module
+
             if modules[module]['body'].strip() != '':
-                with open(self._abc_module(package, module), 'w') as write_file:
+                with open(self._abc_module(package, module_name), 'w') as write_file:
                     write_file.write(('\n'.join(modules[module]['imports']) + '\n\n\n' +
                                       modules[module]['body']).encode('utf-8'))
 
@@ -306,9 +448,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
 
         profile['VERSIONCOMPONENTS'][2] += 1
         profile['RELEASEDATE'] = str(datetime.date.today())
-        profile['SUPPORTS'].append('# Remove the # when implementations exist:',
-                                   "#supports_journal_rollback",
-                                   "#supports_journal_branching")
+        profile['SUPPORTS'].extend(['# Remove the # when implementations exist:',
+                                    "#supports_journal_rollback",
+                                    "#supports_journal_branching"])
 
         # Find the Profile interface for this package
         if not any('OsidProfile' in i['inherit_shortnames'] for i in package['interfaces']):
@@ -351,10 +493,82 @@ class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
     def _patterns(self, package):
         # Get the pattern map for this osid package.
         with open(self._package_pattern_file(package), 'r') as read_file:
-            return json.loads(read_file)
+            return json.load(read_file)
 
-    def _template(self, directory):
-        return self._template_dir + '/' + directory
+    def _update_module_imports(self, modules, package, interface):
+        # And make sure there is a corresponding import statement for this
+        # interface's abc_osid and associated module/category name.
+        imports = modules[interface['category']]['imports']
+
+        def append(import_str):
+            if import_str not in imports:
+                imports.append(import_str)
+
+        def package_interface():
+            return self._abc_pkg_name(package['name'] + '_' + interface['category'])
+
+        if package['name'] != 'osid' and interface['category'] == 'managers':
+            import_str = ('from dlkit.manager_impls.' +
+                          self._abc_pkg_name(package) + ' import ' +
+                          interface['category'] + ' as ' +
+                          package_interface())
+        else:
+            import_str = ('from ' + self._app_name(package) + '.' +
+                          self._abc_pkg_name(package) + ' import ' +
+                          interface['category'] + ' as abc_' +
+                          package_interface())
+
+        append(import_str)
+
+        # Iterate through any inherited interfaces and build the inheritance
+        # list for this interface. Also, check if an import statement is
+        # required and append to the appropriate module's import list.
+        for i in interface['inheritance']:
+            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+            if (i['pkg_name'] == package['name'] and
+                  inherit_category == interface['category']):
+                pass
+            else:
+                import_str = ('from ' + self._app_name(i['pkg_name']) +
+                              self._abc_pkg_name(i['pkg_name'], abc=False) +
+                              ' import ' + inherit_category + ' as ' +
+                              self._abc_pkg_name(i['pkg_name'], abc=False) +
+                              '_' + inherit_category)
+
+                if inherit_category != 'UNKNOWN_MODULE':
+                    append(import_str)
+
+        # Check to see if there are any additional inheritances required
+        # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
+        # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
+        impl_class = self._impl_class(package, interface)
+        # if hasattr(impl_class, 'inheritance_imports'):
+        #     modules[interface['category']]['imports'] = (
+        #         modules[interface['category']]['imports'] +
+        #         getattr(impl_class, 'inheritance_imports'))
+
+        ##
+        # Here we further inspect the impl_class to identify any additional
+        # hand built import statements to be loaded at the module level. These
+        # need to be coded in the impl_class as a list of strings with the
+        # attribute name 'import_statements'
+        if hasattr(impl_class, 'import_statements'):
+            for import_str in getattr(impl_class, 'import_statements'):
+                append(import_str)
+
+        ##
+        # Look for module import statements defined in class patterns. These
+        # need to be coded in the class pattern as a list of strings with the
+        # attribute name 'import_statements_pattern'
+        for import_str in self._get_extra_patterns(package,
+                                                   interface['shortname'],
+                                                   'import_statements_pattern',
+                                                   default=[]):
+            append(import_str)
+
+        # add the none-argument check import if not already present
+        append('from .. import utilities')
+
 
     # This is the entry point for making the Python abstract base classes for
     # the osids. It processes all of the osids in the xosid directory, making
@@ -376,11 +590,12 @@ class InterfaceBuilder(Mapper, BaseBuilder, Utilities):
         for json_file in glob.glob(self.package_maps + '/*.json'):
             self._make_osid(json_file)
 
-        # Copy general config and primitive files, etc into the
-        # implementation root directory:
-        if os.path.exists(self._template('helpers')):
-            for helper_file in glob.glob(self._template('helpers') + '/*.py'):
-                shutil.copy(helper_file, self._root_dir)
+        if not self._is('abc'):
+            # Copy general config and primitive files, etc into the
+            # implementation root directory:
+            if os.path.exists(self._template('helpers')):
+                for helper_file in glob.glob(self._template('helpers') + '/*.py'):
+                    shutil.copy(helper_file, self._root_dir)
 
 
 def build_this_interface(package, interface):
@@ -456,11 +671,144 @@ def flagged_for_implementation(interface):
                 test = True
     return test
 
+# Assemble the initializers for metadata managed by Osid Object Forms
+def make_metadata_initers(persisted_data, initialized_data, return_types):
+
+    def default_string(name, default_type, is_list=False):
+        if is_list:
+            return '        self._{0}_default = self._{0}_metadata[\'default_{1}_values\'])\n'.format(name,
+                                                                                                      default_type)
+        else:
+            return '        self._{0}_default = self._{0}_metadata[\'default_{1}_values\'][0])\n'.format(name,
+                                                                                                         default_type)
+
+    imports = ''
+    initer = ''
+    default = ''
+    for data_name in persisted_data:
+        data_name_upper = data_name.upper()
+
+        if (persisted_data[data_name] != 'OsidCatalog' and
+                data_name not in initialized_data):
+            template = string.Template(METADATA_INITER)
+            if persisted_data[data_name] == 'boolean':
+                default += '        self._{}_default = None\n'.format(data_name)
+            elif (persisted_data[data_name] == 'string' and
+                    return_types[data_name] == 'osid.locale.DisplayText'):
+                default += '        self._{0}_default = ' \
+                           'dict(self._{0}_metadata[\'default_string_values\'][0])\n'.format(data_name)
+            elif persisted_data[data_name] == 'string':
+                default += default_string(data_name, 'string')
+            elif (persisted_data[data_name] == 'osid.id.Id' and
+                    data_name not in initialized_data):
+                default += default_string(data_name, 'id')
+            elif persisted_data[data_name] == 'osid.id.Id[]':
+                default += default_string(data_name, 'id', is_list=True)
+            elif (persisted_data[data_name] == 'osid.type.Type' and
+                    data_name not in initialized_data):
+                default += default_string(data_name, 'type')
+            elif persisted_data[data_name] == 'osid.type.Type[]':
+                default += default_string(data_name, 'type', is_list=True)
+            elif persisted_data[data_name] in ['osid.calendaring.DateTime', 'timestamp']:
+                default += default_string(data_name, 'date_time')
+            elif persisted_data[data_name] == 'osid.calendaring.Duration':
+                default += default_string(data_name, 'duration')
+            elif persisted_data[data_name] == 'osid.transport.DataInputStream':
+                default += default_string(data_name, 'object')
+            elif persisted_data[data_name] == 'osid.mapping.SpatialUnit':
+                pass  # Put SpatialUnit initters here
+            elif persisted_data[data_name] == 'decimal':
+                default += default_string(data_name, 'decimal')
+
+            initer += template.substitute({'data_name': data_name,
+                                           'data_name_upper': data_name_upper})
+    if initer:
+        initer += '\n'
+    if default:
+        default += '\n'
+    return imports + initer + default
+
+# Assemble the initializers for persistance data managed by Osid Object Forms
+# initialized with the form.
+def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
+    initers = ''
+
+    singular_data_types = ['osid.id.Id', 'osid.type.Type', 'string', 'decimal',
+                           'boolean', 'OsidCatalog', 'osid.calendaring.DateTime',
+                           'timestamp','osid.calendaring.Duration',
+                           'osid.transport.DataInputStream']
+
+    append_ids = ['osid.id.Id', 'osid.type.Type']
+
+    plural_data_types = ['osid.id.Id[]', 'osid.type.Type[]']
+
+    for data_name in persisted_data:
+        mixed_name = under_to_mixed(data_name)
+        mixed_singular = under_to_mixed(remove_plural(data_name))
+
+        persisted_name = persisted_data[data_name]
+
+        if ((persisted_name == 'osid.id.Id' or
+                persisted_name == 'OsidCatalog') and
+                data_name in initialized_data):
+            initers += '        self._my_map[\'{}Id\'] = str(kwargs[\'{}_id\'])\n'.format(mixed_name,
+                                                                                          data_name)
+        elif (persisted_name == 'osid.resource.Resource' and
+                data_name in initialized_data):
+            initers += '        self._my_map[\'{}Id\'] = str(kwargs[\'effective_agent_id\'])\n'.format(mixed_name)
+        elif persisted_name in singular_data_types:
+            if persisted_name in append_ids:
+                initers += '        self._my_map[\'{}Id\'] = self._{}_default\n'.format(mixed_name,
+                                                                                        data_name)
+            else:
+                initers += '        self._my_map[\'{}\'] = self._{}_default\n'.format(mixed_name,
+                                                                                        data_name)
+        elif persisted_name in plural_data_types:
+            initers += '        self._my_map[\'{}Ids\'] = self._{}_default\n'.format(mixed_singular,
+                                                                                     data_name)
+
+    for data_name in aggregate_data:
+        mixed_name = under_to_mixed(data_name)
+        if aggregate_data[data_name].endswith('List'):
+            initers += '        self._my_map[\'{}\'] = []\n'.format(mixed_name)
+        else:
+            initers += '        self._my_map[\'{}\'] = None\n'.format(mixed_name)
+
+
+    initialize_to_none = ['boolean', 'osid.calendaring.DateTime', 'timestamp',
+                          'osid.calendaring.Duration']
+    initialize_to_empty_string = ['decimal', 'cardinal', 'string']
+
+    for data_name in initialized_data:
+        mixed_name = under_to_mixed(data_name)
+
+        if data_name in persisted_data:
+            pass
+        elif initialized_data[data_name] in initialize_to_none:
+            initers += '        self._my_map[\'{}\'] = None\n'.format(mixed_name)
+        elif initialized_data[data_name] in initialize_to_empty_string:
+            initers += '        self._my_map[\'{}\'] = \'\'\n'.format(mixed_name)
+        elif initialized_data[data_name] == 'osid.locale.DisplayText':
+            initers += (
+                '        self._my_map[\'{}\'] = {\n' +
+                '            \'text\': \'\',\n' +
+                '            \'languageTypeId\': str(default_language_type),\n' +
+                '            \'scriptTypeId\': str(default_script_type),\n' +
+                '            \'formatTypeId\': str(default_format_type),\n' +
+                '        }\n').format(mixed_name)
+        elif initialized_data[data_name] == 'osid.id.Id':
+            initers += '        self._my_map[\'{}Id\'] = \'\'\n'.format(mixed_name)
+        elif initialized_data[data_name] == 'osid.id.Id[]':
+            initers += '        self._my_map[\'{}Id\'] = []\n'.format(mixed_name)
+
+    return initers
+
+
 def serialize(var_dict):
     """an attempt to make the builders more variable-based, instead of
     purely string based..."""
     return_dict = {}
-    pp = pprint.PrettyPrinter(indent=4)
+    ppr = pprint.PrettyPrinter(indent=4)
 
     for k, v in var_dict.iteritems():
         if isinstance(v, basestring):
@@ -468,7 +816,7 @@ def serialize(var_dict):
         elif isinstance(v, list) and len(v) <= 3:  # this is stupid and horrible, I know
             return_dict[k] = k + ' = ' + str(v)
         elif isinstance(v, list) or isinstance(v, dict):
-            return_dict[k] = k + ' = ' + pp.pprint(v)
+            return_dict[k] = k + ' = ' + ppr.pformat(v)
 
     return return_dict
 

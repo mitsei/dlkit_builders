@@ -1,5 +1,3 @@
-import glob
-import shutil
 import string
 import datetime
 import importlib
@@ -7,7 +5,7 @@ import importlib
 from importlib import import_module
 from binder_helpers import *
 from config import *
-from builders.mongoosid_templates import options
+from mongoosid_templates import options
 from abcbinder_settings import ENCODING as utf_code
 
 from interface_builders import InterfaceBuilder

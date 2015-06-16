@@ -10,7 +10,7 @@ import glob
 import textwrap
 
 from collections import OrderedDict
-
+from importlib import import_module
 
 from pattern_mapper import map_patterns
 from xosid_mapper import XOsidMapper
@@ -20,11 +20,13 @@ ABS_PATH = os.path.abspath(os.path.join(PROJECT_PATH, os.pardir))
 
 
 class Utilities(object):
-    def _make_dir(self, target_dir):
+    def _make_dir(self, target_dir, python=False):
         if ABS_PATH not in target_dir:
-            target_dir = ABS_PATH + '/' + target_dir
+            target_dir = ABS_PATH + target_dir
         if not os.path.exists(target_dir):
             os.makedirs(target_dir)
+        if python:
+            os.system('touch ' + target_dir + '/__init__.py')
         return target_dir
 
     def _wrap(self, text):
@@ -40,7 +42,8 @@ class BaseBuilder(Utilities):
     def __init__(self,
                  package_maps_dir='/builders/package_maps',
                  pattern_maps_dir='/builders/pattern_maps',
-                 interface_maps_dir='/builders/interface_maps'):
+                 interface_maps_dir='/builders/interface_maps',
+                 *args, **kwargs):
         self._package_maps_dir = None
         self._pattern_maps_dir = None
         self._interface_maps_dir = None
@@ -59,13 +62,15 @@ class BaseBuilder(Utilities):
         self.package_maps = package_maps_dir
         self.pattern_maps = pattern_maps_dir
         self.interface_maps = interface_maps_dir
-        super(BaseBuilder, self).__init__()
+        super(BaseBuilder, self).__init__(*args, **kwargs)
 
     # The following functions return the app name and module name strings
     # by prepending and appending the appropriate suffixes and prefixes. Note
     # that the django app_name() function is included to support building of
     # the abc osids into a Django project environment.
     def _abc_pkg_name(self, string, abc=True):
+        if isinstance(string, dict):
+            string = string['name']
         if abc:
             return self._abc_prefix + '_'.join(string.split('.')) + self._abc_suffix
         else:
@@ -100,7 +105,12 @@ class BaseBuilder(Utilities):
             return self.interface_maps + '/' + package + self._map_ext
 
     def _package_pattern_file(self, package):
-        return self.pattern_maps + '/' + package['name'] + self._map_ext
+        import pdb
+        pdb.set_trace()
+        if isinstance(package, dict):
+            return self.pattern_maps + '/' + package['name'] + self._map_ext
+        else:
+            return self.pattern_maps + '/' + package + self._map_ext
 
     def _pattern_map_exists(self, package):
         return self.first(package['name']) + self._map_ext in os.listdir(self.pattern_maps)
@@ -208,6 +218,97 @@ class PatternBuilder(XOsidMapper, BaseBuilder):
                       package['name']
 
 
+class Templates(Utilities):
+    def __init__(self, template_dir=None, *args, **kwargs):
+        self._template_dir = template_dir
+
+        if template_dir is not None:
+            self._make_dir(template_dir)
+        super(Templates, self).__init__()
+
+    def _impl_class(self, package, interface):
+        return self._load_impl_class(package['name'], interface['shortname'])
+
+    def _load_impl_class(self, package_name, interface_name):
+    # Try loading hand-built implementations class for this interface
+        impl_class = None
+        try:
+            impls = import_module(self._package_templates(package_name))
+        except ImportError:
+            pass
+        else:
+            if hasattr(impls, interface_name):
+                impl_class = getattr(impls, interface_name)
+        return impl_class
+
+    def _package_templates(self, package):
+        local_template_dir = self._template_dir.replace(ABS_PATH, '')
+        if local_template_dir[0] == '/':
+            local_template_dir = local_template_dir[1::]
+        if isinstance(package, dict) and 'name' in package:
+            return '.'.join(local_template_dir.split('/')) + '.' + package['name']
+        else:
+            return '.'.join(local_template_dir.split('/')) + '.' + package
+
+    def _template(self, directory):
+        return self._template_dir + '/' + directory
+
+    def arg_default_template_exists(self, package_name, method, interface, patterns):
+        """checks if an argument template with default values
+         exists for the given method"""
+
+        # first check for non-templated methods, if they have arg_default_template
+        impl_class = self._load_impl_class(package_name, interface['shortname'])
+        if (impl_class and
+                hasattr(impl_class, method['name'] + '_arg_template')):
+            return True
+        # now check if it is a templated method.
+        elif interface['shortname'] + '.' + method['name'] in patterns:
+            pattern = patterns[interface['shortname'] + '.' + method['name']]['pattern']
+            if pattern != '':
+                try:
+                    templates = import_module(self._package_templates(pattern.split('.')[0]))
+                except ImportError:
+                    pass
+                else:
+                    if hasattr(templates, pattern.split('.')[-2]):
+                        template_class = getattr(templates, pattern.split('.')[-2])
+                        if hasattr(template_class, pattern.split('.')[-1] + '_arg_template'):
+                            return True
+        return False
+
+    def get_arg_default_map(self, arg_context, package_name, method, interface, patterns):
+        """gets an argument template and maps the keys to the actual arg names"""
+        arg_map = {}
+        arg_template = None
+
+        impl_class = self._load_impl_class(package_name, interface['shortname'])
+        if (impl_class and
+                hasattr(impl_class, method['name'] + '_arg_template')):
+            arg_template = getattr(impl_class, method['name'] + '_arg_template')
+        elif interface['shortname'] + '.' + method['name'] in patterns:
+            pattern = patterns[interface['shortname'] + '.' + method['name']]['pattern']
+            try:
+                templates = import_module(self._package_templates(pattern.split('.')[0]))
+            except ImportError:
+                pass
+            else:
+                if hasattr(templates, pattern.split('.')[-2]):
+                    template_class = getattr(templates, pattern.split('.')[-2])
+                    if hasattr(template_class, pattern.split('.')[-1] + '_arg_template'):
+                        arg_template = getattr(template_class, pattern.split('.')[-1] + '_arg_template')
+
+        if arg_template is not None:
+            arg_list = arg_context['arg_list'].split(',')
+            for index, val in arg_template.iteritems():
+                try:
+                    arg_map[arg_list[int(index)].strip()] = str(val)
+                except KeyError:
+                    pass
+
+        return arg_map
+
+
 class Builder(Utilities):
     def __init__(self, build_dir='./dlkit/'):
         """configure the builder"""
@@ -226,13 +327,17 @@ class Builder(Utilities):
 
     def abc(self):
         from abcbinder import ABCBuilder
-        ABCBuilder(build_dir=self.build_dir).make_abcosids()
+        ABCBuilder(build_dir=self.build_dir).make()
 
     def map(self):
         """map all the xosid files"""
         from mappers import Mapper
         print "Mapping OSIDs"
         Mapper().map_all('all')
+
+    def mongo(self):
+        from mongobuilder import MongoBuilder
+        MongoBuilder(build_dir=self.build_dir).make()
 
     def patterns(self):
         print "Creating pattern files"
