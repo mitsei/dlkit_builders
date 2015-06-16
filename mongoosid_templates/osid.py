@@ -225,6 +225,14 @@ class Extensible:
         for record_type_idstr in record_type_idstrs:
             self._init_record(record_type_idstr)
 
+    def _init_records(self, record_types):
+        \"\"\"Initalize all records for this form.\"\"\"
+        for record_type in record_types:
+            # This conditional was inserted on 7/11/14. It may prove problematic:
+            if str(record_type) not in self._my_map['recordTypeIds']:
+                self._init_record(str(record_type))
+                self._my_map['recordTypeIds'].append(str(record_type))
+
     def _init_record(self, record_type_idstr):
         \"\"\"Initialize the record identified by the record_type_idstr.\"\"\"
         import importlib
@@ -974,6 +982,9 @@ class OsidForm:
         return []"""
 
 class OsidExtensibleForm:
+    import_statements = [
+        'import importlib',
+    ]
 
     init = """
     def _get_record(self, recordType):
@@ -989,6 +1000,14 @@ class OsidExtensibleForm:
             if str(recordType) not in self._my_map['recordTypeIds']: # nor this
                 self._my_map['recordTypeIds'].append(str(recordType))
         return self._records[str(recordType)]
+
+    def _init_record(self, record_type_idstr):
+        \"\"\"Override this from osid.Extensible because Forms use a different
+        attribute in record_type_data.\"\"\"
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = importlib.import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['form_record_class_name'])
+        self._records[record_type_idstr] = record(self)
 """
 
 class OsidTemporalForm:

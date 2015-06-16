@@ -232,27 +232,6 @@ class GradeEntryForm:
         self._my_map['derived'] = False
         self._my_map['timeGraded'] = None
         self._my_map['overriddenCalculatedEntryId'] = '' # This will soon do something different
-
-    # These next three private methods should be moved to osid.Extensible??? (I thought they were already)
-    # def _load_records(self, record_type_idstrs):
-    #     \"\"\"Load all records of record type for this form.\"\"\"
-    #     for record_type_idstr in record_type_idstrs:
-    #         self._init_record(record_type_idstr)
-    # 
-    # def _init_records(self, record_types):
-    #     \"\"\"Initalize all records for this form.\"\"\"
-    #     for record_type in record_types:
-    #         # This conditional was inserted on 7/11/14. It may prove problematic:
-    #         if str(record_type) not in self._my_map['recordTypeIds']:
-    #             self._init_record(str(record_type))
-    #             self._my_map['recordTypeIds'].append(str(record_type))
-    # 
-    # def _init_record(self, record_type_idstr):
-    #     \"\"\"Initalize a record of record type.\"\"\"
-    #     record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-    #     module = importlib.import_module(record_type_data['module_path'])
-    #     record = getattr(module, record_type_data['form_record_class_name'])
-    #     self._records[record_type_idstr] = record(self)
 """
 
     set_grade = """

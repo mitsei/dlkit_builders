@@ -32,7 +32,7 @@ class ResourceProfile:
         record_types = []
         for record_type_map in record_type_maps:
             record_types.append(Type(**record_type_maps[record_type_map]))
-        return TypeList(record_types, count=len(record_types))"""
+        return TypeList(record_types)"""
 
     supports_resource_record_type_template = """
         # Implemented from template for
@@ -1019,18 +1019,7 @@ class Resource:
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
 ${instance_initers}
-    # These next two private methods should be moved to osid.Extensible??? (I thought they were already)
-    def _load_records(self, record_type_idstrs):
-        \"\"\"Load all records of record type for this object.\"\"\"
-        for record_type_idstr in record_type_idstrs:
-            self._init_record(record_type_idstr)
 
-    def _init_record(self, record_type_idstr):
-        \"\"\"Initialize all records for this object.\"\"\"
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['object_record_class_name'])
-        self._records[record_type_idstr] = record(self)
 """
 
     is_group_template = """
@@ -1064,13 +1053,7 @@ ${instance_initers}
         return osid_object"""
 
     get_resource_record_template = """
-        # This is now in Extensible and can be replaces with:
-        # return self._get_record(${arg0_name}):
-        if not self.has_record_type(${arg0_name}):
-            raise errors.Unsupported()
-        if str(${arg0_name}) not in self._records:
-            raise errors.Unimplemented()
-        return self._records[str(${arg0_name})]"""
+        return self._get_record(${arg0_name})"""
 
 class ResourceQuery:
 
@@ -1139,26 +1122,6 @@ class ResourceForm:
     def _init_map(self, **kwargs):
         ${init_object}._init_map(self)
 ${map_super_initers}${persisted_initers}
-    # These next three private methods should be moved to osid.Extensible??? (I thought they were already)
-    def _load_records(self, record_type_idstrs):
-        \"\"\"Load all records of record type for this form.\"\"\"
-        for record_type_idstr in record_type_idstrs:
-            self._init_record(record_type_idstr)
-
-    def _init_records(self, record_types):
-        \"\"\"Initalize all records for this form.\"\"\"
-        for record_type in record_types:
-            # This conditional was inserted on 7/11/14. It may prove problematic:
-            if str(record_type) not in self._my_map['recordTypeIds']:
-                self._init_record(str(record_type))
-                self._my_map['recordTypeIds'].append(str(record_type))
-
-    def _init_record(self, record_type_idstr):
-        \"\"\"Initalize a record of record type.\"\"\"
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['form_record_class_name'])
-        self._records[record_type_idstr] = record(self)
 """
 
     get_group_metadata_template = """
@@ -1204,15 +1167,7 @@ ${map_super_initers}${persisted_initers}
         self._my_map['${var_name_mixed}Id'] = self._${var_name}_default"""
 
     get_resource_form_record_template = """
-        # This is now in OsidExtensibleForm and can be replaces with:
-        # return self._get_record(${arg0_name}):
-        if not self.has_record_type(${arg0_name}):
-            raise errors.Unsupported()
-        if str(${arg0_name}) not in self._records: # Currently this should never be True
-            self._init_record(str(${arg0_name}))
-            if str(${arg0_name}) not in self._my_map['recordTypeIds']: # nor this
-                self._my_map['recordTypeIds'].append(str(${arg0_name}))
-        return self._records[str(${arg0_name})]"""
+        return self._get_record(${arg0_name})"""
 
 
 
@@ -1280,17 +1235,6 @@ class Bin:
         except KeyError:
             print 'KeyError: recordTypeIds key not found in ', self._my_map['displayName']['text']
             self._load_records([]) # In place for transition purposes
-
-    # These next two private methods should be moved to osid.Extensible??? (I thought they were already)
-    def _load_records(self, record_type_idstrs):
-        for record_type_idstr in record_type_idstrs:
-            self._init_record(record_type_idstr)
-
-    def _init_record(self, record_type_idstr):
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['object_record_class_name'])
-        self._records[record_type_idstr] = record(self)
 """
 
 class BinForm:
@@ -1333,26 +1277,4 @@ class BinForm:
     def _init_map(self):
         #from ..osid.objects import OsidObjectForm
         osid_objects.OsidObjectForm._init_map(self)
-
-    # These next three private methods should be moved to osid.Extensible??? (I thought they were already)
-    def _load_records(self, record_type_idstrs):
-        \"\"\"Load all records of record type for this catalog.\"\"\"
-        for record_type_idstr in record_type_idstrs:
-            self._init_record(record_type_idstr)
-
-    def _init_records(self, record_types):
-        \"\"\"Initialize all records for this catalog.\"\"\"
-        for record_type in record_types:
-            # This conditional was inserted on 7/11/14. It may prove problematic:
-            if str(record_type) not in self._my_map['recordTypeIds']:
-                self._init_record(str(record_type))
-                self._my_map['recordTypeIds'].append(str(record_type))
-
-    def _init_record(self, record_type_idstr):
-        \"\"\"Initialize a record of record type.\"\"\"
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['form_record_class_name'])
-        self._records[record_type_idstr] = record(self)
-
 """

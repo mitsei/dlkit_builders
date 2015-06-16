@@ -1274,15 +1274,7 @@ class Response:
     def _load_records(self, record_type_idstrs):
         for record_type_idstr in record_type_idstrs:
             self._init_record(record_type_idstr)
-    
-    def _init_record(self, record_type_idstr):
-        import importlib
-        from ..primitives import Id
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['object_record_class_name'])
-        self._records[record_type_idstr] = record(self)
-    
+
     def __iter__(self):
         for attr in dir(self):
             if not attr.startswith('__'):
