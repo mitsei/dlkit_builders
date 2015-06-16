@@ -300,3 +300,11 @@ class GradeEntryForm:
         self._my_map['gradingAgentId'] = ''
         self._my_map['timeGraded'] = None"""
 
+class GradebookColumnLookupSession:
+
+    supports_summary = """
+        # Not yet:
+        return False"""
+
+    get_gradebook_column_summary = """
+        raise errors.Unimplemented()"""
