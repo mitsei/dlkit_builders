@@ -1,9 +1,5 @@
-import os
-import json
-import glob
-
-from method_builders import MethodBuilder
 from build_controller import BaseBuilder
+from interface_builders import InterfaceBuilder
 from mappers import Mapper
 
 # These next two are here for the purpose of loading abc modules
@@ -19,32 +15,14 @@ class ABCBuilder(Mapper, BaseBuilder):
         if build_dir is None:
             build_dir = self._abs_path
 
-        self.method_builder = MethodBuilder(method_class='abc')
+        self._root_dir = build_dir + '/abstract_osids'
+        self._make_dir(self._root_dir)
 
-        self._abc_dir = build_dir + '/abstract_osids'
-        self._app_prefix = ''
-        self._abc_prefix = ''
-        self._app_suffix = ''
-        self._abc_suffix = ''
-        self._make_dir(self._abc_dir)
+        self.interface_builder = InterfaceBuilder('abc',
+                                                  self._root_dir)
 
-    # The following functions return the app name and module name strings
-    # by prepending and appending the appropriate suffixes and prefixes. Note
-    # that the django app_name() function is included to support building of
-    # the abc osids into a Django project environment.
-    def _abc_pkg_name(self, string):
-        return self._abc_prefix + '_'.join(string.split('.')) + self._abc_suffix
+    def make(self):
+        self.interface_builder.make_osids(build_abc=True)
 
-    def _app_name(self, package):
-        if self._abc_dir:
-            return self._abc_dir
-        else:
-            return self._app_prefix + package['name'] + self._app_suffix
-
-    def _abc_module(self, package, module):
-        return self._abc_pkg_path(package) + '/' + module + '.py'
-
-    def _abc_pkg_path(self, package):
-        return self._app_name(package) + '/' + self._abc_pkg_name(package['name'])
 
 

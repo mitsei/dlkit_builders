@@ -10,7 +10,7 @@ from config import *
 from builders.mongoosid_templates import options
 from abcbinder_settings import ENCODING as utf_code
 
-from abcbinder import ABCBuilder
+from interface_builders import InterfaceBuilder
 from build_controller import BaseBuilder
 
 class MongoBuilder(BaseBuilder):
@@ -19,30 +19,15 @@ class MongoBuilder(BaseBuilder):
         if build_dir is None:
             build_dir = self._abs_path
         self._build_dir = build_dir
-        self._mongo_dir = self._build_dir + '/mongo'
+        self._root_dir = self._build_dir + '/mongo'
         self._template_dir = self._abs_path + '/mongoosid_templates'
 
-    def template(self, directory):
-        return self._template_dir + '/' + directory
+        self.interface_builder = InterfaceBuilder('mongo',
+                                                  self._root_dir,
+                                                  self._template_dir)
 
-    def make_mongoosids(self, build_abc=False, re_index=False, re_map=False):
-        """
-        This is the entry point for making mongo-based osid impls.
-
-        It processes all of the osid maps in the package maps directory.
-
-        """
-        if build_abc:
-            ABCBuilder(build_dir=self._build_dir).make_abcosids(re_index, re_map)
-
-        for json_file in glob.glob(self.package_maps + '/*.json'):
-            self._make_mongoosid(json_file)
-
-        # Copy general config and primitive files, etc into the
-        # implementation root directory:
-        if os.path.exists(self.template('helpers')):
-            for helper_file in glob.glob(self.template('helpers') + '/*.py'):
-                shutil.copy(helper_file, self._mongo_dir)
+    def make(self):
+        self.interface_builder.make_osids()
 
 def make_mongoosid(file_name):
     """
@@ -910,35 +895,6 @@ def make_impl_log(log):
                             log[category][interface][method][1] + '\n')
     return log_str
             
-
-##
-# The following functions return the app name and module name strings
-# by prepending and appending the appropriate suffixes and prefixes. Note
-# that the django app_name() function is included to support building of
-# the abc osids into a Django project environment.
-def abc_app_name(string):
-    if abc_root_pkg:
-        return abc_root_pkg
-    else:
-        return app_prefix + string + app_suffix
-    
-def abc_pkg_name(string):
-    return abc_prefix + '_'.join(string.split('.')) + abc_suffix
-    
-def impl_root_path(string):
-    if root_path:
-        return root_path
-    else:
-        return app_prefix + string + app_suffix
-
-def app_name(string):
-    if root_pkg:
-        return root_pkg
-    else:
-        return app_prefix + string + app_suffix
-
-def pkg_name(string):
-    return pkg_prefix + '_'.join(string.split('.')) + pkg_suffix
 
 ######################
 # Templating Methods

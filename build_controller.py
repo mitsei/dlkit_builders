@@ -47,10 +47,44 @@ class BaseBuilder(Utilities):
         self._map_ext = '.json'
         self._abs_path = ABS_PATH
 
+        self._app_prefix = ''
+        self._abc_prefix = ''
+        self._pkg_prefix = ''
+        self._app_suffix = ''
+        self._abc_suffix = ''
+        self._pkg_suffix = ''
+        self._root_dir = None
+        self._class = None
+
         self.package_maps = package_maps_dir
         self.pattern_maps = pattern_maps_dir
         self.interface_maps = interface_maps_dir
         super(BaseBuilder, self).__init__()
+
+    # The following functions return the app name and module name strings
+    # by prepending and appending the appropriate suffixes and prefixes. Note
+    # that the django app_name() function is included to support building of
+    # the abc osids into a Django project environment.
+    def _abc_pkg_name(self, string, abc=True):
+        if abc:
+            return self._abc_prefix + '_'.join(string.split('.')) + self._abc_suffix
+        else:
+            return self._pkg_prefix + '_'.join(string.split('.')) + self._pkg_suffix
+
+    def _app_name(self, package):
+        if self._root_dir is not None:
+            return self._root_dir
+        else:
+            return self._app_prefix + package['name'] + self._app_suffix
+
+    def _abc_module(self, package, module, abc=True):
+        return self._abc_pkg_path(package, abc) + '/' + module + '.py'
+
+    def _abc_pkg_path(self, package, abc=True):
+        return self._app_name(package) + '/' + self._abc_pkg_name(package['name'], abc)
+
+    def _is(self, desired_type):
+        return self._class == str(desired_type)
 
     def _package_file(self, package):
         if isinstance(package, dict) and 'name' in package:
