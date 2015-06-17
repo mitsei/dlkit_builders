@@ -420,8 +420,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
 
             if modules[module]['body'].strip() != '':
                 with open(self._abc_module(package, module_name), 'wb') as write_file:
-                    write_file.write(('\n'.join(modules[module]['imports']) + '\n\n\n' +
-                                      modules[module]['body']).encode('utf-8'))
+                    write_file.write(('\n'.join(order_module_imports(modules[module]['imports'])) +
+                                      '\n\n\n' + modules[module]['body']).encode('utf-8'))
 
     def _make_profile_py(self, package):
         """create the profile.py file for this package"""
@@ -812,6 +812,27 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
             initers += '        self._my_map[\'{}Id\'] = []\n'.format(mixed_name)
 
     return initers
+
+def order_module_imports(imports):
+    # does not separate built-in libraries from third-party libraries
+    docstrings = [imp for imp in imports if '"""' in imp or imp.startswith('#')]
+    full_imports = [imp for imp in imports if imp.startswith('import ')]
+    local_imports = [imp for imp in imports if imp.startswith('from .') or imp.startswith('from dlkit')]
+    constants = [imp for imp in imports if 'import' not in imp and imp not in docstrings]
+    partial_third_party_imports = [imp for imp in imports
+                                   if imp not in full_imports and
+                                   imp not in local_imports and
+                                   imp not in constants and
+                                   imp not in docstrings and
+                                   imp.strip() != '']
+
+    newline = ['\n']
+
+    full_imports.sort()
+    local_imports.sort()
+    partial_third_party_imports.sort()
+
+    return docstrings + newline + full_imports + newline + partial_third_party_imports + newline + local_imports + newline + constants
 
 
 def serialize(var_dict):

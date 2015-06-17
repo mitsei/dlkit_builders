@@ -335,6 +335,13 @@ def make_mongoosid(file_name):
         init_methods = make_init_methods(interface, package, patterns) 
         
         methods = make_methods(pkg_name(package['name']), interface, patterns)
+        templated_imports = get_methods_templated_imports(pkg_name(package['name']),
+                                                          interface,
+                                                          patterns)
+
+        for imp in templated_imports:
+            if imp not in modules[interface['category']]['imports']:
+                modules[interface['category']]['imports'].append(imp)
 
         if additional_methods:
             methods = methods + '\n' + additional_methods
@@ -355,10 +362,10 @@ def make_mongoosid(file_name):
         else:
             module_name = module
         if modules[module]['body'].strip() != '':
-            write_file = open(app_name(package['name']) + '/' + 
+            write_file = open(app_name(package['name']) + '/' +
                               pkg_name(package['name']) + '/' +
                               module_name + '.py', 'w')
-            write_file.write(('\n'.join(modules[module]['imports']) + '\n\n\n' +
+            write_file.write(('\n'.join(order_module_imports(modules[module]['imports'])) + '\n\n\n' +
                               modules[module]['body']).encode('utf-8'))
             write_file.close()
 
@@ -369,6 +376,33 @@ def make_mongoosid(file_name):
     #write_file.write(make_impl_log(patterns['impl_log']))
     #write_file.close
 
+
+def get_methods_templated_imports(package_name, interface, patterns):
+    """get all the method-level imports that require arguments, and
+    group them into a single interface-level import"""
+    imports = []
+    for method in interface['methods']:
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Manager') and
+                method['name'].startswith('get') and
+                'session' in method['name'] and
+                method['return_type'].split('.')[-1] not in sessions_to_implement):
+            continue
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Profile') and
+                method['name'].startswith('supports_') and
+                under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
+            continue
+
+        if extra_templates_exists(package_name, method, interface, patterns, '_import_templates'):
+            arg_context = get_method_context(package_name, method, interface, patterns)
+            imports += get_templated_imports(arg_context, package_name, method, interface, patterns)
+        else:
+            continue
+
+    return imports
 ##
 # Try loading hand-built implementations class for this interface
 def load_impl_class(package_name, interface_name):
@@ -720,7 +754,7 @@ def make_method(package_name, method, interface, patterns):
     args = ['self']
     method_impl = make_method_impl(package_name, method, interface, patterns)
 
-    if arg_default_template_exists(package_name, method, interface, patterns):
+    if extra_templates_exists(package_name, method, interface, patterns, '_arg_template'):
         arg_context = get_method_context(package_name, method, interface, patterns)
         arg_default_map = get_arg_default_map(arg_context, package_name, method, interface, patterns)
     else:
@@ -809,6 +843,7 @@ def make_method_impl(package_name, method, interface, patterns):
 
 def make_profile_py(package):    
     osid_package = package['name']
+    old_supports = []
     #print ('.'.join(app_name(package['name']).split('/')[1:]) + '.' +
     #                                pkg_name(package['name']) + '.profile', 'dlkit_project.builders')
     try:
@@ -897,6 +932,56 @@ def make_impl_log(log):
                             log[category][interface][method][1] + '\n')
     return log_str
             
+
+def order_module_imports(imports):
+    # does not separate built-in libraries from third-party libraries
+    docstrings = [imp for imp in imports if '"""' in imp or imp.startswith('#')]
+    full_imports = [imp for imp in imports if imp.startswith('import ')]
+    local_imports = [imp for imp in imports if imp.startswith('from .') or imp.startswith('from dlkit')]
+    constants = [imp for imp in imports if 'import' not in imp and imp not in docstrings]
+    partial_third_party_imports = [imp for imp in imports
+                                   if imp not in full_imports and
+                                   imp not in local_imports and
+                                   imp not in constants and
+                                   imp not in docstrings and
+                                   imp.strip() != '']
+
+    newline = ['\n']
+
+    full_imports.sort()
+    local_imports.sort()
+    partial_third_party_imports.sort()
+
+    return docstrings + newline + full_imports + newline + partial_third_party_imports + newline + local_imports + newline + constants
+
+##
+# The following functions return the app name and module name strings
+# by prepending and appending the appropriate suffixes and prefixes. Note
+# that the django app_name() function is included to support building of
+# the abc osids into a Django project environment.
+def abc_app_name(string):
+    if abc_root_pkg:
+        return abc_root_pkg
+    else:
+        return app_prefix + string + app_suffix
+    
+def abc_pkg_name(string):
+    return abc_prefix + '_'.join(string.split('.')) + abc_suffix
+    
+def impl_root_path(string):
+    if root_path:
+        return root_path
+    else:
+        return app_prefix + string + app_suffix
+
+def app_name(string):
+    if root_pkg:
+        return root_pkg
+    else:
+        return app_prefix + string + app_suffix
+
+def pkg_name(string):
+    return pkg_prefix + '_'.join(string.split('.')) + pkg_suffix
 
 ######################
 # Templating Methods
@@ -1132,14 +1217,14 @@ def get_init_context(init_pattern, interface, package, patterns):
 # To help with argument templating
 ##########################
 
-def arg_default_template_exists(package_name, method, interface, patterns):
+def extra_templates_exists(package_name, method, interface, patterns, template_extension):
     """checks if an argument template with default values
      exists for the given method"""
 
     # first check for non-templated methods, if they have arg_default_template
     impl_class = load_impl_class(package_name, interface['shortname'])
     if (impl_class and
-            hasattr(impl_class, method['name'] + '_arg_template')):
+            hasattr(impl_class, method['name'] + template_extension)):
         return True
     # now check if it is a templated method.
     elif interface['shortname'] + '.' + method['name'] in patterns:
@@ -1153,9 +1238,10 @@ def arg_default_template_exists(package_name, method, interface, patterns):
             else:
                 if hasattr(templates, pattern.split('.')[-2]):
                     template_class = getattr(templates, pattern.split('.')[-2])
-                    if hasattr(template_class, pattern.split('.')[-1] + '_arg_template'):
+                    if hasattr(template_class, pattern.split('.')[-1] + template_extension):
                         return True
     return False
+
 
 def get_arg_default_map(arg_context, package_name, method, interface, patterns):
     """gets an argument template and maps the keys to the actual arg names"""
@@ -1187,3 +1273,40 @@ def get_arg_default_map(arg_context, package_name, method, interface, patterns):
                 pass
 
     return arg_map
+
+
+##########################
+# To help with import templating
+##########################
+
+def get_templated_imports(arg_context, package_name, method, interface, patterns):
+    """gets an import template and maps the keys to the actual arg names.
+    Returns a list of imports..."""
+    imports = []
+    import_templates = []
+
+    impl_class = load_impl_class(package_name, interface['shortname'])
+
+    import_list = method['name'] + '_import_templates'
+
+    if (impl_class and
+            hasattr(impl_class, import_list)):
+        import_templates = getattr(impl_class, import_list)
+    elif interface['shortname'] + '.' + method['name'] in patterns:
+        pattern = patterns[interface['shortname'] + '.' + method['name']]['pattern']
+        try:
+            templates = importlib.import_module(template_pkg + '.' +
+                                                pattern.split('.')[0])
+        except ImportError:
+            pass
+        else:
+            if hasattr(templates, pattern.split('.')[-2]):
+                template_class = getattr(templates, pattern.split('.')[-2])
+                if hasattr(template_class, pattern.split('.')[-1] + '_import_templates'):
+                    import_templates = getattr(template_class, pattern.split('.')[-1] + '_import_templates')
+
+    for item in import_templates:
+        template = string.Template(item)
+        imports.append(template.substitute(arg_context))
+
+    return imports

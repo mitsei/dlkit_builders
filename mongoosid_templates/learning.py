@@ -39,11 +39,12 @@ class ObjectiveRequisiteAssignmentSession:
         'from ..primitives import Id',
     ]
 
+    assign_objective_requisite_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
+        'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}'
+    ]
 
-    assign_objective_requisite_template= """
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
-
+    assign_objective_requisite_template = """
         requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
 
 
@@ -54,12 +55,14 @@ class ObjectiveRequisiteAssignmentSession:
         rfc.set_genus_type(requisite_type)
         ras.create_relationship(rfc)"""
 
-    unassign_objective_requisite_template = """
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
-        from ..relationship.managers import RelationshipManager
-        from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied
+    unassign_objective_requisite_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
+        'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}',
+        'from ..relationship.managers import RelationshipManager',
+        'from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied'
+    ]
 
+    unassign_objective_requisite_template = """
         requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
         rls = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
         ras = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
@@ -73,10 +76,13 @@ class ObjectiveAdminSession:
         'from ..utilities import MongoClientValidated',
     ]
 
+    delete_objective_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     delete_objective_template = """
         # Implemented from template for
         # osid.learning.ObjectiveAdminSession.delete_objective_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
 
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
@@ -118,11 +124,14 @@ class ActivityAdminSession:
         'from . import objects',
     ]
 
+    get_activity_form_for_create_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
+        'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}'
+    ]
+
     get_activity_form_for_create_template = """
         # Implemented from template for
         # osid.learning.ActivityAdminSession.get_activity_form_for_create_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}
 
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument is not a valid OSID ${arg0_type}')
