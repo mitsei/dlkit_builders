@@ -262,12 +262,6 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         else:
             pass
 
-    def _package_templates(self, package):
-        if isinstance(package, dict) and 'name' in package:
-            return '.'.join(self._template_dir.split('/')) + '.' + package['name']
-        else:
-            return '.'.join(self._template_dir.split('/')) + '.' + package
-
     def make_methods(self, package_name, interface, patterns):
         body = []
         for method in interface['methods']:

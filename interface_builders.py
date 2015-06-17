@@ -98,9 +98,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         return inheritance
 
     def _get_extra_patterns(self, package, interface_name, import_statement, default=None):
-        patterns = self._patterns(package)
-        if interface_name + '.init_pattern' in patterns:
-            init_pattern = patterns[interface_name + '.init_pattern']
+        if interface_name + '.init_pattern' in self.patterns:
+            init_pattern = self.patterns[interface_name + '.init_pattern']
             try:
                 templates = import_module(self._package_templates(self.first(init_pattern)))
                 if hasattr(templates, self.last(init_pattern)):
@@ -117,7 +116,6 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             return '\n{}osid_objects.{}._init_{}(self)'.format(self._dind,
                                                                name,
                                                                init_type)
-        patterns = self._patterns(package)
 
         instance_initers = ''
         persisted_initers = ''
@@ -127,7 +125,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         object_name = ''
         init_object = ''
 
-        cat_name = patterns['package_catalog_caps']
+        cat_name = self.patterns['package_catalog_caps']
 
         # Check for any special data initializations and call the appropriate makers
         # to assemble them.
@@ -143,7 +141,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             object_name = interface['shortname']
         elif init_pattern == 'resource.ResourceForm':
             object_name = interface['shortname'][:-4]
-            if object_name in patterns['package_relationships_caps']:
+            if object_name in self.patterns['package_relationships_caps']:
                 init_object = 'osid_objects.OsidRelationshipForm'
             else:
                 init_object = 'osid_objects.OsidObjectForm'
@@ -159,17 +157,17 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 map_super_initers += '\n'
             try:
                 persisted_initers = make_persistance_initers(
-                    patterns[interface['shortname'][:-4] + '.persisted_data'],
-                    patterns[interface['shortname'][:-4] + '.initialized_data'],
-                    patterns[interface['shortname'][:-4] + '.aggregate_data'])
+                    self.patterns[interface['shortname'][:-4] + '.persisted_data'],
+                    self.patterns[interface['shortname'][:-4] + '.initialized_data'],
+                    self.patterns[interface['shortname'][:-4] + '.aggregate_data'])
             except KeyError:
                 pass
 
             try:
                 metadata_initers = make_metadata_initers(
-                    patterns[interface['shortname'][:-4] + '.persisted_data'],
-                    patterns[interface['shortname'][:-4] + '.initialized_data'],
-                    patterns[interface['shortname'][:-4] + '.return_types'])
+                    self.patterns[interface['shortname'][:-4] + '.persisted_data'],
+                    self.patterns[interface['shortname'][:-4] + '.initialized_data'],
+                    self.patterns[interface['shortname'][:-4] + '.return_types'])
             except KeyError:
                 pass
         elif init_pattern == 'resource.ResourceQuery':
@@ -198,14 +196,13 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
     def _make_init_methods(self, package, interface):
         templates = None
         init_pattern = ''
-        patterns = self._patterns(package)
 
         impl_class = self._load_impl_class(self._abc_pkg_name(package['name'], abc=False),
                                            interface['shortname'])
         if hasattr(impl_class, 'init'):
             return getattr(impl_class, 'init')
-        elif interface['shortname'] + '.init_pattern' in patterns:
-            init_pattern = patterns[interface['shortname'] + '.init_pattern']
+        elif interface['shortname'] + '.init_pattern' in self.patterns:
+            init_pattern = self.patterns[interface['shortname'] + '.init_pattern']
             try:
                 templates = import_module(self._package_templates(self.first(init_pattern)))
             except ImportError:
@@ -329,6 +326,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             with open(self._abc_module(package, 'profile', abc=False), 'w') as write_file:
                 write_file.write(self._make_profile_py(package))
 
+        self.patterns = self._patterns(package)
+
         # The real work starts here.  Iterate through all interfaces to build
         # all the classes for this osid package.
         for interface in package['interfaces']:
@@ -398,7 +397,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
 
                 methods = self.method_builder.make_methods(self._abc_pkg_name(package['name'], abc=False),
                                                            interface,
-                                                           self._patterns(package))
+                                                           self.patterns)
 
                 if additional_methods:
                     methods += '\n' + additional_methods
