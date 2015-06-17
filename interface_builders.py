@@ -1,4 +1,5 @@
 import os
+import sys
 import glob
 import json
 import pprint
@@ -323,8 +324,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
 
         if self._is('mongo') and package['name'] in managers_to_implement:
             # Assemble and write profile.py file for this package.
+            new_profile = self._make_profile_py(package)
             with open(self._abc_module(package, 'profile', abc=False), 'w') as write_file:
-                write_file.write(self._make_profile_py(package))
+                write_file.write(new_profile)
 
         self.patterns = self._patterns(package)
 
@@ -393,7 +395,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                                                      interface,
                                                      None) + '\n\n\n')
             else:
-                init_methods = self._make_init_methods(interface, package)
+                init_methods = self._make_init_methods(package, interface)
 
                 methods = self.method_builder.make_methods(self._abc_pkg_name(package['name'], abc=False),
                                                            interface,
@@ -434,8 +436,13 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         osid_package = package['name']
 
         try:
-            old_profile = import_module('.'.join(self._app_name(package['name']).split('/')[1:]) + '.' +
-                                        self._abc_pkg_name(package['name'], abc=False) + '.profile', 'dlkit_project.builders')
+            # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
+            if self._root_dir not in sys.path:
+                sys.path.insert(0, self._abs_path)
+            profile_module = '{}.{}.{}.profile'.format(self.first(self._import_path(self._root_dir)),
+                                                       self.last(self._import_path(self._root_dir)),
+                                                       self._abc_pkg_name(package['name'], abc=False))
+            old_profile = import_module(profile_module)
         except ImportError:
             print 'Old Profile not found:', self._abc_pkg_name(package['name'], abc=False)
         else:
@@ -474,12 +481,12 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                     supports_str += '#'
 
                 supports_str += method['name']
-                profile['SUPPORTS'].append(supports_str)
+                profile['SUPPORTS'].append(str(supports_str))
 
         profile = serialize(profile)
 
         try:
-            from builders.mongoosid_templates import package_profile
+            from mongoosid_templates import package_profile
             template = string.Template(package_profile.PROFILE_TEMPLATE)
         except (ImportError, AttributeError):
             return ''
@@ -512,7 +519,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                           interface['category'] + ' as ' +
                           package_interface())
         else:
-            import_str = ('from ' + self._app_name(package) + '.' +
+            import_str = ('from ' + self._import_path(self._app_name(package)) + '.' +
                           self._abc_pkg_name(package) + ' import ' +
                           interface['category'] + ' as abc_' +
                           package_interface())
@@ -528,11 +535,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                   inherit_category == interface['category']):
                 pass
             else:
-                import_str = ('from ' + self._app_name(i['pkg_name']) +
-                              self._abc_pkg_name(i['pkg_name'], abc=False) +
-                              ' import ' + inherit_category + ' as ' +
-                              self._abc_pkg_name(i['pkg_name'], abc=False) +
-                              '_' + inherit_category)
+                import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(self._app_name(i['pkg_name'])),
+                                                                         self._abc_pkg_name(i['pkg_name'], abc=False),
+                                                                         inherit_category)
 
                 if inherit_category != 'UNKNOWN_MODULE':
                     append(import_str)
@@ -595,6 +600,11 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             if os.path.exists(self._template('helpers')):
                 for helper_file in glob.glob(self._template('helpers') + '/*.py'):
                     shutil.copy(helper_file, self._root_dir)
+        else:
+            # copy over the abc_errors.py file to abstract_osid.osid.errors.py
+            error_file = self._abs_path + '/builders/abc_errors.py'
+            if os.path.exists(error_file):
+                shutil.copyfile(error_file, self._root_dir + '/osid/errors.py')
 
 
 def build_this_interface(package, interface):

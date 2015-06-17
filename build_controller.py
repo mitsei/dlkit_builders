@@ -19,6 +19,13 @@ PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 ABS_PATH = os.path.abspath(os.path.join(PROJECT_PATH, os.pardir))
 
 
+def remove_abs_path(path):
+    local_template_dir = path.replace(ABS_PATH, '')
+    if local_template_dir[0] == '/':
+        local_template_dir = local_template_dir[1::]
+    return local_template_dir
+
+
 class Utilities(object):
     def _make_dir(self, target_dir, python=False):
         if ABS_PATH not in target_dir:
@@ -80,7 +87,10 @@ class BaseBuilder(Utilities):
         if self._root_dir is not None:
             return self._root_dir
         else:
-            return self._app_prefix + package['name'] + self._app_suffix
+            if isinstance(package, dict):
+                return self._app_prefix + package['name'] + self._app_suffix
+            else:
+                return self._app_prefix + package + self._app_suffix
 
     def _abc_module(self, package, module, abc=True):
         return self._abc_pkg_path(package, abc) + '/' + module + '.py'
@@ -90,6 +100,9 @@ class BaseBuilder(Utilities):
 
     def _is(self, desired_type):
         return self._class == str(desired_type)
+
+    def _import_path(self, path):
+        return remove_abs_path(path).replace('/', '.')
 
     def _package_file(self, package):
         if isinstance(package, dict) and 'name' in package:
@@ -105,8 +118,6 @@ class BaseBuilder(Utilities):
             return self.interface_maps + '/' + package + self._map_ext
 
     def _package_pattern_file(self, package):
-        import pdb
-        pdb.set_trace()
         if isinstance(package, dict):
             return self.pattern_maps + '/' + package['name'] + self._map_ext
         else:
@@ -139,18 +150,18 @@ class BaseBuilder(Utilities):
     def pattern_maps(self, pattern_maps_dir):
         self._pattern_maps_dir = self._make_dir(pattern_maps_dir)
 
-    def first(self, package_path):
+    def first(self, package_path, char='.'):
         """a lot of builder patterns refer to the first item in a
         dot-separated path"""
-        return package_path.split('.')[0]
+        return package_path.split(char)[0]
 
     def grab_osid_name(self, xosid_filepath):
         return xosid_filepath.split('/')[-1].split('.')[-2]
 
-    def last(self, package_path):
+    def last(self, package_path, char='.'):
         """a lot of builder patterns refer to the last item in a
         dot-separated path"""
-        return package_path.split('.')[-1]
+        return package_path.split(char)[-1]
 
     def get_interface_module(self, pkg_name, interface_shortname, report_error=False):
         """This function returns the category, or 'module' for the interface in question
@@ -242,9 +253,7 @@ class Templates(Utilities):
         return impl_class
 
     def _package_templates(self, package):
-        local_template_dir = self._template_dir.replace(ABS_PATH, '')
-        if local_template_dir[0] == '/':
-            local_template_dir = local_template_dir[1::]
+        local_template_dir = remove_abs_path(self._template_dir)
         if isinstance(package, dict) and 'name' in package:
             return '.'.join(local_template_dir.split('/')) + '.' + package['name']
         else:
@@ -310,11 +319,11 @@ class Templates(Utilities):
 
 
 class Builder(Utilities):
-    def __init__(self, build_dir='./dlkit/'):
+    def __init__(self, build_dir='/dlkit'):
         """configure the builder"""
         self._build_to_dir = None
         self.build_dir = build_dir
-        self._xosid_dir = './xosid/'
+        self._xosid_dir = '/xosid'
         super(Builder, self).__init__()
 
     @property

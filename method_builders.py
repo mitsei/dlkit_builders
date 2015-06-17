@@ -1,8 +1,9 @@
+import string
+from importlib import import_module
+
 from binder_helpers import fix_reserved_word, under_to_caps, get_pkg_name, camel_to_under, \
     camel_to_mixed, under_to_mixed, make_plural, remove_plural
-
 from build_controller import Utilities, BaseBuilder, Templates
-
 from config import sessions_to_implement
 
 
@@ -77,7 +78,6 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         context['arg_list'] = ', '.join(arg_list)
 
         if 'package_name' in context:
-            ##
             # Add keyword arguments to template kwargs that are particular
             # to the mongo implementation
             context['app_name'] = self._app_name(context['package_name'])
@@ -253,6 +253,9 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 return method_sig + '\n' + method_doc + '\n' + method_impl
 
     def _make_method_impl(self, method, package_name, interface, patterns):
+        def stripn(_string):
+            return _string.strip('\n')
+
         if self._is('abc'):
             if method['return_type'].strip():
                 return '{}return # {}'.format(self._dind,
@@ -260,7 +263,52 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             else:
                 return '{}pass'.format(self._dind)
         else:
-            pass
+            impl = ''
+            pattern = ''
+            templates = None
+            interface_sn = interface['shortname']
+            method_n = method['name']
+
+            if interface_sn + '.' + method_n in patterns:
+                pattern = patterns[interface_sn + '.' + method_n]['pattern']
+
+            impl_class = self._load_impl_class(package_name, interface_sn)
+
+            template_class = None
+            if pattern:
+                try:
+                    templates = import_module(self._package_templates(self.first(pattern)))
+                except ImportError:
+                    pass
+                else:
+                    if hasattr(templates, pattern.split('.')[-2]):
+                        template_class = getattr(templates, pattern.split('.')[-2])
+
+            context = self._get_method_context(package_name, method, interface, patterns)
+
+            template_name = self.last(pattern) + '_template'
+
+            # Check if there is a 'by hand' implementation available for this method
+            if (impl_class and
+                    hasattr(impl_class, method_n)):
+                impl = stripn(getattr(impl_class, method_n))
+
+            # If there is no 'by hand' implementation, get the template for the
+            # method implementation that serves as the pattern, if one exists.
+            elif (template_class and
+                  hasattr(template_class, template_name)):
+                template_str = stripn(getattr(template_class, template_name))
+                template = string.Template(template_str)
+                impl = stripn(template.substitute(context))
+
+            if impl == '':
+                impl = '{}raise errors.Unimplemented()'.format(self._dind)
+            else:
+                if (interface['category'] in patterns['impl_log'] and
+                        interface_sn in patterns['impl_log'][interface['category']]):
+                    patterns['impl_log'][context['module_name']][interface_sn][method_n][1] = 'implemented'
+
+            return impl
 
     def make_methods(self, package_name, interface, patterns):
         body = []
@@ -336,8 +384,8 @@ def set_and_del_property(method):
     clear_method = 'clear_' + method_name
     set_method = 'set_' + method_name
 
-    prop += ' = abc.abstractproperty(fset={}, fdel={})'.format(set_method,
-                                                               clear_method)
+    prop += ' = property(fset={}, fdel={})'.format(set_method,
+                                                   clear_method)
     return prop
 
 def simple_property(prop_type, method, property_name=None):
@@ -358,8 +406,8 @@ def simple_property(prop_type, method, property_name=None):
     else:
         raise ValueError()
 
-    prop += ' = abc.abstractproperty(f{}={})'.format(prop_type,
-                                                     method_name)
+    prop += ' = property(f{}={})'.format(prop_type,
+                                         method_name)
     return prop
 
 def strip_prefixes(name):

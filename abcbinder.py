@@ -15,7 +15,7 @@ class ABCBuilder(Mapper, BaseBuilder):
         if build_dir is None:
             build_dir = self._abs_path
 
-        self._root_dir = build_dir + '/abstract_osids'
+        self._root_dir = build_dir + '/abstract_osid'
         self._make_dir(self._root_dir)
 
         self.interface_builder = InterfaceBuilder('abc',

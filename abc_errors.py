@@ -3,8 +3,6 @@
 # for complete documentation go to 
 # http://osid.org/specifications/meta/Errors.html
 
-import abc
-
 # Errors are specified in each method specification. Only the specified errors are permitted
 # as error conditions in OSID method contracts with exceptions noted in the descriptions
 # below. Provider Contract errors are never specified but may be returned at any time by an
@@ -23,18 +21,16 @@ import abc
 # User errors are only permitted where specified in method signatures and should be handled 
 # directly by a consumer application.
 
-class AlreadyExists: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta
+
+class AlreadyExists(Exception):
     pass
 
 
-class NotFound: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta
+class NotFound(Exception):
     pass
 
 
-class PermissionDenied: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta
+class PermissionDenied(Exception):
     pass
 
 
@@ -42,18 +38,15 @@ class PermissionDenied: # inherits (Exception):
 # Operational errors result from failures in the system. These errors are only permitted 
 # where specified and should be handled directly by the consumer application.
 
-class ConfigurationError: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class ConfigurationError(Exception):
     pass
     
 
-class OperationFailed: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class OperationFailed(Exception):
     pass
 
 
-class TransactionFailure: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class TransactionFailure(Exception):
     pass
 
 # ConsumerContract
@@ -61,36 +54,29 @@ class TransactionFailure: # inherits (Exception):
 # should be checked for accuracy. These errors should be avoided by using the defined 
 # interoperability and flow control tests.
 
-class IllegalState: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class IllegalState(Exception):
     pass
 
 
-class InvalidArgument: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class InvalidArgument(Exception):
     pass
     
 
-class InvalidMethod: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class InvalidMethod(Exception):
     pass
 
 
-class NoAccess: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class NoAccess(Exception):
     pass
 
 
-class NullArgument: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class NullArgument(Exception):
     pass
 
 
-class Unimplemented: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class Unimplemented(Exception):
     pass
 
 
-class Unsupported: # inherits (Exception):
-    __metaclass__ = abc.ABCMeta    
+class Unsupported(Exception):
     pass

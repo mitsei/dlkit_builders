@@ -22,5 +22,6 @@ DESCRIPTION = 'MongoDB based ${osid_package} implementation'
 ${version_str}
 
 ${release_str}
+
 ${supports_str}
 """
