@@ -843,6 +843,7 @@ def make_method_impl(package_name, method, interface, patterns):
 
 def make_profile_py(package):    
     osid_package = package['name']
+    old_supports = []
     #print ('.'.join(app_name(package['name']).split('/')[1:]) + '.' +
     #                                pkg_name(package['name']) + '.profile', 'dlkit_project.builders')
     try:
