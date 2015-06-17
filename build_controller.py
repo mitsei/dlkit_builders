@@ -38,7 +38,7 @@ class Utilities(object):
 
     def _wrap(self, text):
         result = []
-        wrapper = textwrap.TextWrapper(subsequent_indent=8*' ', width=80)
+        wrapper = textwrap.TextWrapper(subsequent_indent=8*' ', width=100)
         for line in text.splitlines():
             result.append('\n'.join(wrapper.wrap(line)))
         return '\n'.join(result)
@@ -83,8 +83,10 @@ class BaseBuilder(Utilities):
         else:
             return self._pkg_prefix + '_'.join(string.split('.')) + self._pkg_suffix
 
-    def _app_name(self, package):
-        if self._root_dir is not None:
+    def _app_name(self, package, abstract=False):
+        if abstract:
+            return '...abstract_osid'
+        elif self._root_dir is not None:
             return self._root_dir
         else:
             if isinstance(package, dict):

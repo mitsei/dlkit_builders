@@ -404,12 +404,10 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 if additional_methods:
                     methods += '\n' + additional_methods
 
-                modules[interface['category']]['body'] = (
-                    modules[interface['category']]['body'] +
-                    class_sig + '\n' +
-                    class_doc + '\n' +
-                    init_methods + '\n' +
-                    methods + '\n\n\n')
+                modules[interface['category']]['body'] += '{}\n{}\n{}\n{}\n\n\n'.format(class_sig,
+                                                                                        class_doc,
+                                                                                        init_methods,
+                                                                                        methods)
 
         # Finally, iterate through the completed package module structure and
         # write out both the import statements and class definitions to the
@@ -421,7 +419,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 module_name = module
 
             if modules[module]['body'].strip() != '':
-                with open(self._abc_module(package, module_name), 'w') as write_file:
+                with open(self._abc_module(package, module_name), 'wb') as write_file:
                     write_file.write(('\n'.join(modules[module]['imports']) + '\n\n\n' +
                                       modules[module]['body']).encode('utf-8'))
 
@@ -519,7 +517,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                           interface['category'] + ' as ' +
                           package_interface())
         else:
-            import_str = ('from ' + self._import_path(self._app_name(package)) + '.' +
+            import_str = ('from ' + self._app_name(package, abstract=True) + '.' +
                           self._abc_pkg_name(package) + ' import ' +
                           interface['category'] + ' as abc_' +
                           package_interface())
@@ -684,12 +682,15 @@ def flagged_for_implementation(interface):
 def make_metadata_initers(persisted_data, initialized_data, return_types):
 
     def default_string(name, default_type, is_list=False):
+        dind = 8 * ' '
         if is_list:
-            return '        self._{0}_default = self._{0}_metadata[\'default_{1}_values\'])\n'.format(name,
-                                                                                                      default_type)
+            return '{0}self._{1}_default = self._{1}_metadata[\'default_{2}_values\']\n'.format(dind,
+                                                                                                name,
+                                                                                                default_type)
         else:
-            return '        self._{0}_default = self._{0}_metadata[\'default_{1}_values\'][0])\n'.format(name,
-                                                                                                         default_type)
+            return '{0}self._{1}_default = self._{1}_metadata[\'default_{2}_values\'][0]\n'.format(dind,
+                                                                                                   name,
+                                                                                                   default_type)
 
     imports = ''
     initer = ''

@@ -59,7 +59,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 arg_number + '_type': arg_type,
                 arg_number + '_type_under': camel_to_under(arg_type),
                 arg_number + '_type_mixed': camel_to_mixed(arg_type),
-                arg_number + '_abcapp_name': self._app_name(get_pkg_name(arg_type_full.strip('[]'))),
+                arg_number + '_abcapp_name': self._app_name(get_pkg_name(arg_type_full.strip('[]')), abstract=True),
                 arg_number + '_abcpkg_name': self._abc_pkg_name(get_pkg_name(arg_type_full.strip('[]')), abc=False),
                 arg_number + '_module': self.get_interface_module(
                     get_pkg_name(arg_type_full),
