@@ -293,8 +293,11 @@ class HierarchyAdminSession:
         'from ..utilities import MongoClientValidated'
     ]
 
+    delete_hierarchy_import_templates = [
+        'from ...abstract_osid.id.primitives import Id as ABCId'
+    ]
+
     delete_hierarchy = """
-        from ...abstract_osid.id.primitives import Id as ABCId
         collection = MongoClientValidated(self._db_prefix + 'hierarchy', 'Hierarchy')
         if not isinstance(hierarchy_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
