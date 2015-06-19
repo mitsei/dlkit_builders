@@ -645,7 +645,7 @@ class ItemAdminSession:
     get_question_form_for_update = """
         collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         if not isinstance(question_id, ABCId):
-            return InvalidArgument('the argument is not a valid OSID Id')
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
         obj_form = objects.QuestionForm(document['question'], self._db_prefix, runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
@@ -697,7 +697,7 @@ class AssessmentAdminSession:
 
     delete_assessment = """
         if not isinstance(assessment_id, ABCId):
-            return InvalidArgument('the argument is not a valid OSID Id')
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
         collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentOffered')
         if collection.find({'assessmentId': str(assessment_id)}).count() != 0:
             raise errors.IllegalState('there are still AssessmentsOffered associated with this Assessment')
