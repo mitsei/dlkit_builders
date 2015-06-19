@@ -186,6 +186,9 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                                                                             context['return_module'],
                                                                             context['return_type'])
 
+            if 'method_name' in context and context['method_name'].startswith('can_'):
+                context['func_name'] = context['method_name'].split('_')[1]
+
         return context
 
     def _make_method(self, method, package_name, interface, patterns):
@@ -207,7 +210,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     self._wrap(method_sig) + '\n' +
                     self._wrap(method_doc) + '\n' +
                     self._wrap(method_impl))
-        elif self._is('mongo') or self._is('services'):
+        elif self._is('mongo') or self._is('services') or self._is('authz'):
             args = ['self']
             decorator = ''
             method_sig = ''
@@ -252,6 +255,11 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 else:
                     method_sig = '{}def {}(self):'.format(self._ind,
                                                           method['name'])
+            elif self._is('authz'):
+                args += [a['var_name'] for a in method['args']]
+                method_sig = '{}def {}({}):'.format(self._ind,
+                                                    method['name'],
+                                                    ', '.join(args))
 
             detail_docs = filter(None, [method['arg_doc'].strip('\n'),
                                         method['return_doc'].strip('\n'),
@@ -272,7 +280,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                                                                               self._wrap(method['doc']['body']),
                                                                               self._wrap('\n'.join(detail_docs)))
 
-            if self._is('services'):
+            if self._is('services') or self._is('authz'):
                 return method_sig + '\n' + method_impl
             else:
                 if len(args) > 1:
@@ -374,6 +382,9 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 elif impl == '' and not method['args']:
                     impl = '{}{}raise Unimplemented(\'Unimplemented in dlkit.services\')'.format(un_impl_doc,
                                                                                                  self._dind)
+            elif self._is('authz'):
+                if impl == '':
+                    impl = '{}raise Unimplemented()'.format(self._dind)
 
             return impl
 
@@ -406,6 +417,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
     def make_methods(self, package_name, interface, patterns):
         body = []
+
         for method in interface['methods']:
             if self._is('mongo'):
                 if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
@@ -416,7 +428,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentBasicAuthoringSession':
                     method['name'] = 'get_assessment_items'
 
-            if ((self._is('mongo') or self._is('services')) and
+            if ((self._is('mongo') or self._is('services') or self._is('authz')) and
                     not build_this_method(package_name, interface, method)):
                 continue
 

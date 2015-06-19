@@ -3,26 +3,27 @@ import time
 import os
 import json
 import string
-from .config import *
-from .binder_helpers import *
-from abcbinder_settings import XOSIDNAMESPACEURI as ns
-from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
-from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
-from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
-from abcbinder_settings import XOSIDFILESUFFIX as xosid_suffix
-#from abcbinder_settings import ABCROOTPACKAGE as abc_root_pkg
-from abcbinder_settings import ABCPREFIX as abc_prefix
-from abcbinder_settings import ABCSUFFIX as abc_suffix
-from abcbinder_settings import MAINDOCINDENTSTR as main_doc_indent
-from abcbinder_settings import ENCODING as utf_code
-from azbuilder_settings import ABCROOTPACKAGE as abc_root_pkg
-from azbuilder_settings import ROOTPACKAGE as root_pkg
-from azbuilder_settings import ROOTPATH as root_path
-from azbuilder_settings import APPNAMEPREFIX as app_prefix
-from azbuilder_settings import APPNAMESUFFIX as app_suffix
-from azbuilder_settings import PACKAGEPREFIX as pkg_prefix
-from azbuilder_settings import PACKAGESUFFIX as pkg_suffix
-from azbuilder_settings import TEMPLATEDIR as template_dir
+from binder_helpers import *
+
+from build_controller import BaseBuilder
+from interface_builders import InterfaceBuilder
+
+
+class AZBuilder(BaseBuilder):
+    def __init__(self, build_dir=None, *args, **kwargs):
+        super(AZBuilder, self).__init__(*args, **kwargs)
+        if build_dir is None:
+            build_dir = self._abs_path
+        self._build_dir = build_dir
+        self._root_dir = self._build_dir + '/authz_adapter'
+        self._template_dir = self._abs_path + '/builders/azosid_templates'
+
+        self.interface_builder = InterfaceBuilder('authz',
+                                                  self._root_dir,
+                                                  self._template_dir)
+
+    def make(self):
+        self.interface_builder.make_osids()
 
 ##
 # This is the entry point for making python authz adapter classes for

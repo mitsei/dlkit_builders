@@ -367,6 +367,10 @@ class Builder(Utilities):
         from abcbinder import ABCBuilder
         ABCBuilder(build_dir=self.build_dir).make()
 
+    def authz(self):
+        from azbuilder import AZBuilder
+        AZBuilder(build_dir=self.build_dir).make()
+
     def map(self):
         """map all the xosid files"""
         from mappers import Mapper
@@ -452,6 +456,7 @@ if __name__ == '__main__':
             builder.abc()
             builder.mongo()
             builder.services()
+            builder.authz()
             pass
         else:
             # need to do these in a specific order, regardless of how
@@ -466,4 +471,6 @@ if __name__ == '__main__':
                 builder.mongo()
             if 'services' in sys.argv:
                 builder.services()
+            if 'authz' in sys.argv:
+                builder.authz()
     sys.exit(0)
