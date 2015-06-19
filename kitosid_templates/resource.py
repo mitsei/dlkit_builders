@@ -35,19 +35,12 @@ class ResourceManager:
 
     init_template = """
     def __init__(self, proxy=None):
-        from . import settings
-        import importlib
-        provider_module = importlib.import_module(settings.${pkg_name_upper}_PROVIDER_MANAGER_PATH, settings.ANCHOR_PATH)
-        if proxy is None:
-            provider_manager_class = getattr(provider_module, '${interface_name}')
-        else:
-            provider_manager_class = getattr(provider_module, '${proxy_interface_name}')
-        self._provider_manager = provider_manager_class()
+        self._runtime = None
+        self._provider_manager = None
         self._provider_sessions = dict()
         self._session_management = AUTOMATIC
-        osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
         self._views = dict()
-        self._runtime = None
+        osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
 
     def _get_view(self, view):
         \"\"\"Gets the currently set view\"\"\"

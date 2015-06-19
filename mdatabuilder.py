@@ -158,7 +158,7 @@ DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data('DEFAULT'))"""
             else:
                 mdata_maps = getattr(impl_class, 'mdata')
             ##
-            # Assemble complete model string to be saved as models.py
+            # Assemble complete mdata string to be saved as mdata.py
             mdata = (mdata +  '\n' +  mdata_maps + '\n')
 
     ##
@@ -199,20 +199,23 @@ def make_mdata_maps(interface, patterns):
         for data_name in patterns[pd]:
             if patterns[pd][data_name] == 'OsidCatalog':
                 pass
-                """
-                cat_table = cat_table + make_cat_table(data_name,
-                                        interface['shortname'],
-                                        patterns['package_objects_caps'],
-                                        patterns['package_catalog_caps'])
-                """
+                # cat_table = cat_table + make_cat_table(data_name,
+                #                         interface['shortname'],
+                #                         patterns['package_objects_caps'],
+                #                         patterns['package_catalog_caps'])
             elif (rt in patterns and 
                   data_name in patterns[rt] and 
                   patterns[rt][data_name] == 'osid.locale.DisplayText'):
-                mdata = mdata + make_mdata_map(data_name, 
-                                    'DisplayText', options) + '\n'                
+                mdata = mdata + make_mdata_map(interface['shortname'],
+                                               data_name,
+                                               'DisplayText',
+                                               options) + '\n'                
             else:
-                mdata = mdata + make_mdata_map(data_name, 
-                                    patterns[pd][data_name], options) + '\n'
+                mdata_map = make_mdata_map(interface['shortname'],
+                                           data_name,
+                                           patterns[pd][data_name],
+                                           options) + '\n'
+                mdata = mdata + mdata_map
 
     """
     if field_options != '':
@@ -237,9 +240,9 @@ def make_mdata_maps(interface, patterns):
     return mdata
 
 ##### NEED TO FINISH THIS #####
-def make_mdata_map(data_name, data_type, options):
+def make_mdata_map(interface_name, data_name, data_type, options):
     mdata = ''
-    lead_in = data_name.upper() + ' = {'
+    lead_in = camel_to_caps_under(interface_name) + '_' +data_name.upper() + ' = {'
     lead_out = '\n    }\n'
 
     if data_type == 'boolean':

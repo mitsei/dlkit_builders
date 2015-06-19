@@ -53,6 +53,8 @@ class ResourceProfile:
 class ResourceManager:
 
     import_statements_pattern = [
+        'from pymongo import MongoClient',
+        'from .. import MONGO_CLIENT',
         'from dlkit.abstract_osid.osid import errors',
     #'from ..osid.osid_errors import Unimplemented',
     #'from ..osid.osid_errors import NullArgument',
@@ -63,6 +65,12 @@ class ResourceManager:
     init_template = """
     def __init__(self):
         osid_managers.OsidManager.__init__(self)
+        if MONGO_CLIENT.is_mongo_client_set():
+            pass
+        else:
+            print 'SETTING MONGO CLIENT'
+            # Get parameters from runtime config
+            MONGO_CLIENT.set_mongo_client(MongoClient())
 """
 
 
@@ -93,6 +101,12 @@ class ResourceProxyManager:
     init_template = """
     def __init__(self):
         osid_managers.OsidProxyManager.__init__(self)
+        if MONGO_CLIENT.is_mongo_client_set():
+            pass
+        else:
+            print 'SETTING MONGO CLIENT'
+            # Get parameters from runtime config
+            MONGO_CLIENT.set_mongo_client(MongoClient())
 """
 
     get_resource_lookup_session_template = """
