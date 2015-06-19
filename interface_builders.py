@@ -46,6 +46,11 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         self.method_builder = MethodBuilder(method_class=self._class,
                                             template_dir=self._template_dir)
 
+    def _copy_package_helpers(self, package):
+        package_helper_dir = self._template(package['name'] + '_helpers')
+        for helper_file in glob.glob(package_helper_dir + '/*.py'):
+                shutil.copy(helper_file, self._root_dir + '/' + package['name'])
+
     def _get_class_inheritance(self, package, interface):
         def get_full_interface_class():
             return (self._abc_pkg_name(package['name'], abc=self._is('abc')) + '_' +
@@ -267,6 +272,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
 
         if package['name'] not in managers_to_implement:
             return
+
+        self._copy_package_helpers(package)
 
         print "Building " + self._class + " osid for " + package['name']
 
