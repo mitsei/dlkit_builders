@@ -13,7 +13,23 @@ class OsidProfile:
     def __init__(self):
         self._runtime = None
         self._config = None
+
+    def _initialize_manager(self, runtime):
+        \"\"\"Sets the runtime, configuration and mongo client\"\"\"
+        if self._runtime is not None:
+            raise errors.IllegalState('this manager has already been initialized.')
+        self._runtime = runtime
+        self._config = runtime.get_configuration()
+        if not MONGO_CLIENT.is_mongo_client_set():
+            try:
+                mongo_host_param_id = Id('parameter:mongoHostURI@mongo')
+                mongo_host = runtime.get_configuration().get_value_by_parameter(mongo_host_param_id).get_string_value()
+            except (AttributeError, KeyError, errors.NotFound):
+                MONGO_CLIENT.set_mongo_client(MongoClient())
+            else:
+                MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))
 """
+
     get_id = """
         return Id(**profile.ID)
         """
@@ -99,6 +115,8 @@ class OsidManager:
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import DisplayText',
+        'from pymongo import MongoClient',
+        'from .. import MONGO_CLIENT',
     ]  
 
     init = """
@@ -107,10 +125,7 @@ class OsidManager:
 """
     
     initialize = """
-        if self._runtime is not None:
-            raise errors.IllegalState('this manager has already been initialized.')
-        self._runtime = runtime
-        self._config = runtime.get_configuration()"""
+        OsidProfile._initialize_manager(self, runtime)"""
 
 class OsidProxyManager:
 
@@ -124,10 +139,7 @@ class OsidProxyManager:
 """
     
     initialize = """
-        if self._runtime is not None:
-            raise errors.IllegalState('this manager has already been initialized.')
-        self._runtime = runtime
-        self._config = runtime.get_configuration()"""
+        OsidProfile._initialize_manager(self, runtime)"""
 
 
 class OsidRuntimeManager:

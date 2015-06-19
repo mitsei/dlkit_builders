@@ -198,19 +198,19 @@ class GradeEntryForm:
                 self._authority,
                 self._namespace,
                 'grade')}
-        self._grade_metadata.update(mdata_conf.GRADE)
+        self._grade_metadata.update(mdata_conf.GRADE_ENTRY_GRADE)
         self._ignored_for_calculations_metadata = {
             'element_id': Id(
                 self._authority,
                 self._namespace,
                 'ignored_for_calculations')}
-        self._ignored_for_calculations_metadata.update(mdata_conf.IGNORED_FOR_CALCULATIONS)
+        self._ignored_for_calculations_metadata.update(mdata_conf.GRADE_ENTRY_IGNORED_FOR_CALCULATIONS)
         self._score_metadata = {
             'element_id': Id(
                 self._authority,
                 self._namespace,
                 'score')}
-        self._score_metadata.update(mdata_conf.SCORE)
+        self._score_metadata.update(mdata_conf.GRADE_ENTRY_SCORE)
         self._score_metadata.update(
             {'minimum_decimal_value': self._grade_system.get_lowest_numeric_score(),
              'maximum_decimal_value': self._grade_system.get_highest_numeric_score()})

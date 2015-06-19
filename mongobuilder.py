@@ -631,12 +631,12 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 
 ##
 # Assemble the initializers for metadata managed by Osid Object Forms
-def make_metadata_initers(persisted_data, initialized_data, return_types):
+def make_metadata_initers(interface_name, persisted_data, initialized_data, return_types):
     imports = ''
     initer = ''
     default = ''
     for data_name in persisted_data:
-        data_name_upper = data_name.upper()
+        data_name_upper = camel_to_caps_under(interface_name[:-4]) + '_' + data_name.upper()
         template = ''
         if (persisted_data[data_name] != 'OsidCatalog' and 
             data_name not in initialized_data):
@@ -1185,6 +1185,7 @@ def get_init_context(init_pattern, interface, package, patterns):
             pass
         try:
             metadata_initers = make_metadata_initers(
+                interface['shortname'],
                 patterns[interface['shortname'][:-4] + '.persisted_data'],
                 patterns[interface['shortname'][:-4] + '.initialized_data'],
                 patterns[interface['shortname'][:-4] + '.return_types'])

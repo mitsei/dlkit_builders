@@ -130,17 +130,10 @@ class AssetCompositionDesignSession:
             asset = cls.catalog.create_asset(create_form)
             cls.asset_list.append(asset)
             cls.asset_ids.append(asset.ident)
-<<<<<<< HEAD
-        for num in [0, 1, 2, 3]:
-            create_form = cls.catalog.get_composition_form_for_create([])
-            create_form.display_name = 'Test Composition' + str(num)
-            create_form.description = 'Test Compposion for AssetCompositionSession tests' + str(num)
-=======
         for num in [0, 1, 2, 3, 4]:
             create_form = cls.catalog.get_composition_form_for_create([])
             create_form.display_name = 'Test Composition ' + str(num)
             create_form.description = 'Test Compposion for AssetCompositionSession tests ' + str(num)
->>>>>>> feature/jm/composition
             composition = cls.catalog.create_composition(create_form)
             cls.composition_list.append(composition)
             cls.composition_ids.append(composition.ident)
