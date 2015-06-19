@@ -1037,7 +1037,8 @@ class Resource:
 
     init_template = """
     try:
-        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
+        #pylint: disable=no-name-in-module
+        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
     except (ImportError, AttributeError):
         _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${interface_name}'
@@ -1095,7 +1096,8 @@ class ResourceQuery:
     init_template = """
     def __init__(self):
         try:
-            from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets #pylint: disable=no-name-in-module
+            #pylint: disable=no-name-in-module
+            from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
         except (ImportError, AttributeError):
             record_type_data_sets = {}
         self._all_supported_record_type_data_sets = record_type_data_sets
@@ -1120,7 +1122,8 @@ class ResourceForm:
 
     init_template = """
     try:
-        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
+        #pylint: disable=no-name-in-module
+        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
     except (ImportError, AttributeError):
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'
@@ -1249,7 +1252,8 @@ class Bin:
 
     init_template = """
     try:
-        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
+        #pylint: disable=no-name-in-module
+        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
     except (ImportError, AttributeError):
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${interface_name}'
@@ -1276,7 +1280,8 @@ class BinForm:
 
     init_template = """
     try:
-        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
+        #pylint: disable=no-name-in-module
+        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
     except (ImportError, AttributeError):
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'

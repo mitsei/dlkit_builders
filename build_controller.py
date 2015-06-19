@@ -7,6 +7,7 @@ import os
 import sys
 import json
 import glob
+import string
 import textwrap
 
 from collections import OrderedDict
@@ -38,10 +39,20 @@ class Utilities(object):
 
     def _wrap(self, text):
         result = []
-        wrapper = textwrap.TextWrapper(subsequent_indent=8*' ', width=100)
+        wrapper = textwrap.TextWrapper(subsequent_indent=8*' ', width=120)
         for line in text.splitlines():
             result.append('\n'.join(wrapper.wrap(line)))
         return '\n'.join(result)
+
+    def first(self, package_path, char='.'):
+        """a lot of builder patterns refer to the first item in a
+        dot-separated path"""
+        return package_path.split(char)[0]
+
+    def last(self, package_path, char='.'):
+        """a lot of builder patterns refer to the last item in a
+        dot-separated path"""
+        return package_path.split(char)[-1]
 
 
 class BaseBuilder(Utilities):
@@ -85,7 +96,10 @@ class BaseBuilder(Utilities):
 
     def _app_name(self, package, abstract=False):
         if abstract:
-            return '...abstract_osid'
+            if self._is('services'):
+                return '..abstract_osid'
+            else:
+                return '...abstract_osid'
         elif self._root_dir is not None:
             return self._root_dir
         else:
@@ -152,18 +166,8 @@ class BaseBuilder(Utilities):
     def pattern_maps(self, pattern_maps_dir):
         self._pattern_maps_dir = self._make_dir(pattern_maps_dir)
 
-    def first(self, package_path, char='.'):
-        """a lot of builder patterns refer to the first item in a
-        dot-separated path"""
-        return package_path.split(char)[0]
-
     def grab_osid_name(self, xosid_filepath):
         return xosid_filepath.split('/')[-1].split('.')[-2]
-
-    def last(self, package_path, char='.'):
-        """a lot of builder patterns refer to the last item in a
-        dot-separated path"""
-        return package_path.split(char)[-1]
 
     def get_interface_module(self, pkg_name, interface_shortname, report_error=False):
         """This function returns the category, or 'module' for the interface in question
@@ -239,6 +243,31 @@ class Templates(Utilities):
             self._make_dir(template_dir)
         super(Templates, self).__init__()
 
+    def _get_templates(self, package_name, interface, method, patterns, template_extension):
+        """get the extra templates for specified method name"""
+        impl_class = self._load_impl_class(package_name, interface['shortname'])
+        templates_obj = None
+        template_name = method['name'] + template_extension
+        interface_dot_name = interface['shortname'] + '.' + method['name']
+
+        if (impl_class and
+                hasattr(impl_class, template_name)):
+            templates_obj = getattr(impl_class, template_name)
+        elif interface_dot_name in patterns:
+            pattern = patterns[interface_dot_name]['pattern']
+            try:
+                templates = import_module(self._package_templates(self.first(pattern)))
+            except ImportError:
+                pass
+            else:
+                if hasattr(templates, pattern.split('.')[-2]):
+                    template_class = getattr(templates, pattern.split('.')[-2])
+                    pattern_template = self.last(pattern) + '_import_templates'
+                    if hasattr(template_class, pattern_template):
+                        templates_obj = getattr(template_class, pattern_template)
+
+        return templates_obj
+
     def _impl_class(self, package, interface):
         return self._load_impl_class(package['name'], interface['shortname'])
 
@@ -246,6 +275,8 @@ class Templates(Utilities):
     # Try loading hand-built implementations class for this interface
         impl_class = None
         try:
+            if ABS_PATH not in sys.path:
+                sys.path.insert(0, ABS_PATH)
             impls = import_module(self._package_templates(package_name))
         except ImportError:
             pass
@@ -264,50 +295,34 @@ class Templates(Utilities):
     def _template(self, directory):
         return self._template_dir + '/' + directory
 
-    def arg_default_template_exists(self, package_name, method, interface, patterns):
+    def extra_templates_exists(self, package_name, method, interface, patterns, template_extension):
         """checks if an argument template with default values
          exists for the given method"""
 
         # first check for non-templated methods, if they have arg_default_template
         impl_class = self._load_impl_class(package_name, interface['shortname'])
         if (impl_class and
-                hasattr(impl_class, method['name'] + '_arg_template')):
+                hasattr(impl_class, method['name'] + template_extension)):
             return True
         # now check if it is a templated method.
         elif interface['shortname'] + '.' + method['name'] in patterns:
             pattern = patterns[interface['shortname'] + '.' + method['name']]['pattern']
             if pattern != '':
                 try:
-                    templates = import_module(self._package_templates(pattern.split('.')[0]))
+                    templates = import_module(self._package_templates(self.first(pattern)))
                 except ImportError:
                     pass
                 else:
                     if hasattr(templates, pattern.split('.')[-2]):
                         template_class = getattr(templates, pattern.split('.')[-2])
-                        if hasattr(template_class, pattern.split('.')[-1] + '_arg_template'):
+                        if hasattr(template_class, self.last(pattern) + template_extension):
                             return True
         return False
 
     def get_arg_default_map(self, arg_context, package_name, method, interface, patterns):
         """gets an argument template and maps the keys to the actual arg names"""
         arg_map = {}
-        arg_template = None
-
-        impl_class = self._load_impl_class(package_name, interface['shortname'])
-        if (impl_class and
-                hasattr(impl_class, method['name'] + '_arg_template')):
-            arg_template = getattr(impl_class, method['name'] + '_arg_template')
-        elif interface['shortname'] + '.' + method['name'] in patterns:
-            pattern = patterns[interface['shortname'] + '.' + method['name']]['pattern']
-            try:
-                templates = import_module(self._package_templates(pattern.split('.')[0]))
-            except ImportError:
-                pass
-            else:
-                if hasattr(templates, pattern.split('.')[-2]):
-                    template_class = getattr(templates, pattern.split('.')[-2])
-                    if hasattr(template_class, pattern.split('.')[-1] + '_arg_template'):
-                        arg_template = getattr(template_class, pattern.split('.')[-1] + '_arg_template')
+        arg_template = self._get_templates(package_name, interface, method, patterns, '_arg_template')
 
         if arg_template is not None:
             arg_list = arg_context['arg_list'].split(',')
@@ -318,6 +333,18 @@ class Templates(Utilities):
                     pass
 
         return arg_map
+
+    def get_templated_imports(self, arg_context, package_name, method, interface, patterns):
+        """gets an import template and maps the keys to the actual arg names.
+        Returns a list of imports..."""
+        imports = []
+        import_templates = self._get_templates(package_name, interface, method, patterns, '_import_templates')
+        if import_templates is not None:
+            for item in import_templates:
+                template = string.Template(item)
+                imports.append(template.substitute(arg_context))
+
+        return imports
 
 
 class Builder(Utilities):
@@ -354,6 +381,10 @@ class Builder(Utilities):
         print "Creating pattern files"
         PatternBuilder().make_patterns()
 
+    def services(self):
+        from kitbuilder import KitBuilder
+        KitBuilder(build_dir=self.build_dir).make()
+
 if __name__ == '__main__':
 
     def usage():
@@ -368,7 +399,7 @@ if __name__ == '__main__':
         print "  #mdata: build the metadata files"
         print "  authz: build the authz_adapter impl"
         print "  mongo: build the mongo OSID impl"
-        print "  dlkit: build the dlkit convenience service impls"
+        print "  services: build the dlkit convenience service impls"
         print "  tests: build the tests"
         print "  --all: build all of the above"
         print "  --buildto <directory>: the target build-to directory"
@@ -393,7 +424,7 @@ if __name__ == '__main__':
                     'mdata',
                     'mongo',
                     'authz',
-                    'dlkit',
+                    'services',
                     'tests']
         if not any(c in sys.argv for c in commands):
             usage()
@@ -420,6 +451,7 @@ if __name__ == '__main__':
             builder.patterns()
             builder.abc()
             builder.mongo()
+            builder.services()
             pass
         else:
             # need to do these in a specific order, regardless of how
@@ -432,4 +464,6 @@ if __name__ == '__main__':
                 builder.abc()
             if 'mongo' in sys.argv:
                 builder.mongo()
+            if 'services' in sys.argv:
+                builder.services()
     sys.exit(0)

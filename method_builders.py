@@ -2,7 +2,7 @@ import string
 from importlib import import_module
 
 from binder_helpers import fix_reserved_word, under_to_caps, get_pkg_name, camel_to_under, \
-    camel_to_mixed, under_to_mixed, make_plural, remove_plural
+    camel_to_mixed, under_to_mixed, make_plural, remove_plural, SkipMethod
 from build_controller import Utilities, BaseBuilder, Templates
 from config import sessions_to_implement
 
@@ -87,6 +87,11 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             context['interface_name_under'] = camel_to_under(context['interface_name'])
             context['interface_name_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
             context['package_name_caps'] = package_name.title()
+
+            if method['args']:
+                 context['args_kwargs_or_nothing'] = '*args, **kwargs'
+            else:
+                 context['args_kwargs_or_nothing'] = ''
 
             if context['interface_name_under'].endswith('_session'):
                 context['session_shortname_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
@@ -202,32 +207,52 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     self._wrap(method_sig) + '\n' +
                     self._wrap(method_doc) + '\n' +
                     self._wrap(method_impl))
-        else:
+        elif self._is('mongo') or self._is('services'):
             args = ['self']
+            decorator = ''
+            method_sig = ''
             method_impl = self._make_method_impl(method, package_name, interface, patterns)
 
-            if self.arg_default_template_exists(package_name, method, interface, patterns):
-                arg_context = self._get_method_context(package_name, method, interface, patterns)
-                arg_default_map = self.get_arg_default_map(arg_context,
-                                                           package_name,
-                                                           method,
-                                                           interface,
-                                                           patterns)
-            else:
-                arg_default_map = {}
-
-            for arg in method['args']:
-                if arg['var_name'] in arg_default_map:
-                    args.append(arg['var_name'] + '=' + arg_default_map[arg['var_name']])
+            if self._is('mongo'):
+                if self.extra_templates_exists(package_name, method, interface, patterns, '_arg_template'):
+                    arg_context = self._get_method_context(package_name, method, interface, patterns)
+                    arg_default_map = self.get_arg_default_map(arg_context,
+                                                               package_name,
+                                                               method,
+                                                               interface,
+                                                               patterns)
                 else:
-                    args.append(arg['var_name'])
+                    arg_default_map = {}
 
-            decorator = '{}@utilities.arguments_not_none'.format(self._ind)
-            method_sig = '{}def {}({}):'.format(self._ind,
-                                                method['name'],
-                                                ', '.join(args))
+                for arg in method['args']:
+                    if arg['var_name'] in arg_default_map:
+                        args.append(arg['var_name'] + '=' + arg_default_map[arg['var_name']])
+                    else:
+                        args.append(arg['var_name'])
 
-            method_doc = ''
+                decorator = '{}@utilities.arguments_not_none'.format(self._ind)
+                method_sig = '{}def {}({}):'.format(self._ind,
+                                                    method['name'],
+                                                    ', '.join(args))
+            elif self._is('services'):
+                # The following method sig builder specifically creates the arguments.  It
+                # is the one used by most of the other builders.
+                interface_name = interface['shortname']
+                if interface_name.endswith('List') or method['name'] == 'initialize':
+                    args += [arg['var_name'] for arg in method['args']]
+                    method_sig = '{}def {}({}):'.format(self._ind,
+                                                        method['name'],
+                                                        ', '.join(args))
+                # The following method sig builder uses *args, **kwargs for all methods. It is used
+                # by the dlkit builder to pass arguments in the blind.
+                elif (method['args'] or interface_name.endswith('Manager') and
+                        not 'Runtime' in interface_name):
+                    method_sig = '{}def {}(self, *args, **kwargs):'.format(self._ind,
+                                                                           method['name'])
+                else:
+                    method_sig = '{}def {}(self):'.format(self._ind,
+                                                          method['name'])
+
             detail_docs = filter(None, [method['arg_doc'].strip('\n'),
                                         method['return_doc'].strip('\n'),
                                         method['error_doc'].strip('\n'),
@@ -235,22 +260,25 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                                         method['impl_notes_doc'].strip('\n')])
 
             if method['doc']['body'].strip() == '' and not detail_docs:
-                method_doc = '{}\"\"\"{}\"\"\"'.format(self._dind,
-                                                       method['doc']['headline'])
+                method_doc = self._wrap('{}\"\"\"{}\"\"\"'.format(self._dind,
+                                                                  method['doc']['headline']))
             elif method['doc']['body'].strip() == '':
                 method_doc = '{0}\"\"\"{1}\n\n{2}\n\n{0}\"\"\"'.format(self._dind,
-                                                                       method['doc']['headline'],
-                                                                       '\n'.join(detail_docs))
+                                                                       self._wrap(method['doc']['headline']),
+                                                                       self._wrap('\n'.join(detail_docs)))
             else:
                 method_doc = '{0}\"\"\"{1}\n\n{2}\n\n{3}\n\n{0}\"\"\"'.format(self._dind,
-                                                                              method['doc']['headline'],
-                                                                              method['doc']['body'],
-                                                                              '\n'.join(detail_docs))
+                                                                              self._wrap(method['doc']['headline']),
+                                                                              self._wrap(method['doc']['body']),
+                                                                              self._wrap('\n'.join(detail_docs)))
 
-            if len(args) > 1:
-                return decorator + '\n' + method_sig + '\n' + method_doc + '\n' + method_impl
+            if self._is('services'):
+                return method_sig + '\n' + method_impl
             else:
-                return method_sig + '\n' + method_doc + '\n' + method_impl
+                if len(args) > 1:
+                    return decorator + '\n' + method_sig + '\n' + method_doc + '\n' + method_impl
+                else:
+                    return method_sig + '\n' + method_doc + '\n' + method_impl
 
     def _make_method_impl(self, method, package_name, interface, patterns):
         def stripn(_string):
@@ -269,6 +297,13 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             interface_sn = interface['shortname']
             method_n = method['name']
 
+            if self._is('services'):
+                if ('implemented_view_methods' in patterns and
+                        method_n in patterns['implemented_view_methods']):
+                    raise SkipMethod()
+                elif 'implemented_view_methods' in patterns:
+                    patterns['implemented_view_methods'].append(method_n)
+
             if interface_sn + '.' + method_n in patterns:
                 pattern = patterns[interface_sn + '.' + method_n]['pattern']
 
@@ -284,9 +319,26 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     if hasattr(templates, pattern.split('.')[-2]):
                         template_class = getattr(templates, pattern.split('.')[-2])
 
+            if self._is('services'):
+                # Check if this method is marked to be skipped (the assumption
+                # is that it will be implemented elsewhere, perhaps in an init.)
+                if (impl_class and
+                        hasattr(impl_class, method_n) and
+                        getattr(impl_class, method_n) is None):
+                    raise SkipMethod()
+
             context = self._get_method_context(package_name, method, interface, patterns)
 
             template_name = self.last(pattern) + '_template'
+
+            if self._is('services'):
+                if interface_sn.endswith('ProxyManager'):
+                    pass
+                elif interface_sn.endswith('Manager') and 'session' in method_n:
+                    if patterns[method_n[4:].split('_for_')[0] + '.is_manager_session']:
+                        template_name = self.last(pattern) + '_managertemplate'
+                    elif patterns[method_n[4:].split('_for_')[0] + '.is_catalog_session']:
+                        template_name = self.last(pattern) + '_catalogtemplate'
 
             # Check if there is a 'by hand' implementation available for this method
             if (impl_class and
@@ -297,51 +349,103 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             # method implementation that serves as the pattern, if one exists.
             elif (template_class and
                   hasattr(template_class, template_name)):
+
+                if self._is('services') and getattr(template_class, template_name) is None:
+                    raise SkipMethod()
+
                 template_str = stripn(getattr(template_class, template_name))
                 template = string.Template(template_str)
                 impl = stripn(template.substitute(context))
 
-            if impl == '':
-                impl = '{}raise errors.Unimplemented()'.format(self._dind)
-            else:
-                if (interface['category'] in patterns['impl_log'] and
-                        interface_sn in patterns['impl_log'][interface['category']]):
-                    patterns['impl_log'][context['module_name']][interface_sn][method_n][1] = 'implemented'
+            if self._is('mongo'):
+                if impl == '':
+                    impl = '{}raise errors.Unimplemented()'.format(self._dind)
+                else:
+                    if (interface['category'] in patterns['impl_log'] and
+                            interface_sn in patterns['impl_log'][interface['category']]):
+                        patterns['impl_log'][context['module_name']][interface_sn][method_n][1] = 'implemented'
+            elif self._is('services'):
+                un_impl_doc = '{}\"\"\"Pass through to provider unimplemented\"\"\"\n'.format(self._dind)
+
+                if impl == '' and method['args']:
+                    impl = ('{}{}raise Unimplemented(\'Unimplemented in dlkit.services - ' +
+                            'args=\' + str(args) + \', kwargs=\' + str(kwargs))').format(un_impl_doc,
+                                                                                         self._dind)
+                elif impl == '' and not method['args']:
+                    impl = '{}{}raise Unimplemented(\'Unimplemented in dlkit.services\')'.format(un_impl_doc,
+                                                                                                 self._dind)
 
             return impl
+
+    def get_methods_templated_imports(self, package_name, interface, patterns):
+        """get all the method-level imports that require arguments, and
+        group them into a single interface-level import"""
+        imports = []
+        for method in interface['methods']:
+            if (interface['category'] == 'managers' and
+                    package_name != 'osid' and
+                    interface['shortname'].endswith('Manager') and
+                    method['name'].startswith('get') and
+                    'session' in method['name'] and
+                    self.last(method['return_type']) not in sessions_to_implement):
+                continue
+            if (interface['category'] == 'managers' and
+                    package_name != 'osid' and
+                    interface['shortname'].endswith('Profile') and
+                    method['name'].startswith('supports_') and
+                    under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
+                continue
+
+            if self.extra_templates_exists(package_name, method, interface, patterns, '_import_templates'):
+                arg_context = self._get_method_context(package_name, method, interface, patterns)
+                imports += self.get_templated_imports(arg_context, package_name, method, interface, patterns)
+            else:
+                continue
+
+        return imports
 
     def make_methods(self, package_name, interface, patterns):
         body = []
         for method in interface['methods']:
-            if self._is('mongo') and not build_this_method(package_name, interface, method):
-                continue
-
             if self._is('mongo'):
                 if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
                     method['name'] = 'read_to_buffer'
+            elif self._is('services'):
+                if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentResultsSession':
+                    method['name'] = 'get_taken_items'
+                if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentBasicAuthoringSession':
+                    method['name'] = 'get_assessment_items'
 
-            body.append(self._make_method(method, package_name, interface, patterns))
+            if ((self._is('mongo') or self._is('services')) and
+                    not build_this_method(package_name, interface, method)):
+                continue
 
-            # Here is where we add the Python properties stuff:
-            if argless_get(method):
-                body.append(simple_property('get', method))
-            elif one_arg_set(method):
-                if (simple_property('del', method)) in body:
-                    body.remove(simple_property('del', method))
-                    body.append(set_and_del_property(method))
-                else:
-                    body.append(simple_property('set', method))
-            elif argless_clear(method):
-                if (simple_property('set', method)) in body:
-                    body.remove(simple_property('set', method))
-                    body.append(set_and_del_property(method))
-                else:
-                    body.append(simple_property('del', method))
+            try:
+                body.append(self._make_method(method, package_name, interface, patterns))
+            except SkipMethod:
+                # Only expected from kitosid / services builder
+                pass
+            else:
+                # Here is where we add the Python properties stuff:
+                if argless_get(method):
+                    body.append(simple_property('get', method))
+                elif one_arg_set(method):
+                    if (simple_property('del', method)) in body:
+                        body.remove(simple_property('del', method))
+                        body.append(set_and_del_property(method))
+                    else:
+                        body.append(simple_property('set', method))
+                elif argless_clear(method):
+                    if (simple_property('set', method)) in body:
+                        body.remove(simple_property('set', method))
+                        body.append(set_and_del_property(method))
+                    else:
+                        body.append(simple_property('del', method))
 
-            if method['name'] == 'get_id':
-                    body.append(simple_property('get', method, 'ident'))
-            if method['name'] == 'get_identifier_namespace':
-                    body.append(simple_property('get', method, 'namespace'))
+                if method['name'] == 'get_id':
+                        body.append(simple_property('get', method, 'ident'))
+                if method['name'] == 'get_identifier_namespace':
+                        body.append(simple_property('get', method, 'namespace'))
 
         return '\n\n'.join(body)
 

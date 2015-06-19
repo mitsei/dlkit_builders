@@ -100,9 +100,11 @@ class ResourceManager:
         parameter_id = Id('parameter:${pkg_name}ProviderImpl@dlkit_service')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         if self._proxy is None:
-            self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl) # need to add version argument
+            # need to add version argument
+            self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl)
         else:
-            self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl) # need to add version argument
+            # need to add version argument
+            self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl)
 
     def close_sessions(self):
         \"\"\"Close all sessions, unless session management is set to MANDATORY\"\"\"

@@ -18,7 +18,7 @@ class MongoBuilder(BaseBuilder):
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/mongo'
-        self._template_dir = self._abs_path + '/mongoosid_templates'
+        self._template_dir = self._abs_path + '/builders/mongoosid_templates'
 
         self.interface_builder = InterfaceBuilder('mongo',
                                                   self._root_dir,

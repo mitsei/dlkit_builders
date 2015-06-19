@@ -75,17 +75,32 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                     inherit_category == interface['category']):
                 inheritance.append(i['name'])
             else:
-                inheritance.append(unknown_module_protection +
-                                   pkg_name + '_' +
-                                   inherit_category + '.' + i['name'] +
-                                   unknown_module_protection)
+                if self._is('services') and i['pkg_name'] != package['name']:
+                    inheritance.append(i['pkg_name'] + '.' + i['name'])
 
-        # Check to see if there are any additional inheritances required
-        # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
-        # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
-        impl_class = self._load_impl_class(package['name'], interface['shortname'])
-        if hasattr(impl_class, 'inheritance'):
-            inheritance = inheritance + getattr(impl_class, 'inheritance')
+                if not self._is('services'):
+                    inheritance.append(unknown_module_protection +
+                                       pkg_name + '_' +
+                                       inherit_category + '.' + i['name'] +
+                                       unknown_module_protection)
+
+        if self._is('mongo') or self._is('services'):
+            # Check to see if there are any additional inheritances required
+            # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
+            # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
+
+            # For services, this is later in the code than the original
+            # builder. Not sure if that matters or not...will find out.
+            impl_class = self._load_impl_class(package['name'], interface['shortname'])
+            if hasattr(impl_class, 'inheritance'):
+                inheritance += getattr(impl_class, 'inheritance')
+
+        if self._is('services'):
+            # Don't forget the OsidSession inheritance:
+            if (('OsidManager' in interface['inherit_shortnames'] or
+                    interface['shortname'] == self.patterns['package_catalog_caps']) and
+                    package['name'] != 'osid'):
+                inheritance.insert(1, 'osid.OsidSession')
 
         # Note that the following re-assigns the inheritance variable from a
         # list to a string.
@@ -125,6 +140,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         map_super_initers = ''
         object_name = ''
         init_object = ''
+
+        interface_name = interface['shortname']
 
         cat_name = self.patterns['package_catalog_caps']
 
@@ -176,9 +193,13 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
 
         return {'app_name': self._app_name(package['name']),
                 'implpkg_name': self._abc_pkg_name(package['name'], abc=False),
+                'kitpkg_name': self._abc_pkg_name(package['name'], abc=False),
                 'pkg_name': package['name'],
+                'pkg_name_caps': package['name'].title(),
                 'pkg_name_upper': package['name'].upper(),
                 'interface_name': interface['shortname'],
+                'proxy_interface_name': proxy_manager_name(interface_name),
+                'interface_name_title': interface_name.title(),
                 'instance_initers': instance_initers,
                 'persisted_initers': persisted_initers,
                 'metadata_initers': metadata_initers,
@@ -193,6 +214,25 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
                 'cat_name_upper': cat_name.upper(),
                 'init_object': init_object}
+
+    def _grab_service_methods(self, package, type_check_method):
+        self.patterns['implemented_view_methods'] = []
+        inherited_imports = []
+        methods = ''
+        for inf in package['interfaces']:
+            # Check to see if this interface is meant to be implemented.
+            if package['name'] != 'osid':
+                if not flagged_for_implementation(inf):
+                    continue
+
+            if type_check_method(inf, self.patterns, package['name']):
+                methods += '\n##\n# The following methods are from {}\n\n'.format(inf['fullname'])
+                methods += self.method_builder.make_methods(package['name'], inf, self.patterns) + '\n\n'
+                inherited_imports = self.method_builder.get_methods_templated_imports(self._abc_pkg_name(package,
+                                                                                                         abc=False),
+                                                                                      inf,
+                                                                                      self.patterns)
+        return methods, inherited_imports
 
     def _make_init_methods(self, package, interface):
         templates = None
@@ -224,13 +264,18 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         with open(file_name, 'r') as read_file:
             package = json.load(read_file)
 
+        if package['name'] not in managers_to_implement:
+            return
+
         print "Building " + self._class + " osid for " + package['name']
 
         # The map structure for the modules to be created by this function.
         # Each module will get a body string that holds the class and method
         # signatures for the particular interface category, and a list of
         # for the modules that the module's classes may inherit.
-        modules = dict(properties=dict(imports=[], body=''),
+        modules = dict(manager=dict(imports=[], body=''),  # for kitosids only
+                       catalog=dict(imports=[], body=''),  # for kitosids only
+                       properties=dict(imports=[], body=''),
                        objects=dict(imports=[], body=''),
                        queries=dict(imports=[], body=''),
                        query_inspectors=dict(imports=[], body=''),
@@ -245,6 +290,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                        primitives=dict(imports=[], body=''),
                        markers=dict(imports=[], body=''),
                        others_please_move=dict(imports=[], body=''))
+        if self._is('services'):
+            modules[package['name']] = dict(imports=[], body='')
 
         if self._root_dir is None:
             ##
@@ -255,17 +302,19 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             from django.core.management import call_command
             if not os.path.exists(self._app_name(package)):
                 call_command('startapp', self._app_name(package))
-            if not os.path.exists(self._app_name(package) + '/' +
-                                  self._abc_pkg_name(package['name'])):
-                os.system('mkdir '+ self._app_name(package) + '/' +
-                          self._abc_pkg_name(package['name']))
-                os.system('touch ' + self._app_name(package) + '/' +
-                          self._abc_pkg_name(package['name']) + '/__init__.py')
+            if self._is('mongo'):
+                if not os.path.exists(self._app_name(package) + '/' +
+                                      self._abc_pkg_name(package['name'])):
+                    os.system('mkdir '+ self._app_name(package) + '/' +
+                              self._abc_pkg_name(package['name']))
+                    os.system('touch ' + self._app_name(package) + '/' +
+                              self._abc_pkg_name(package['name']) + '/__init__.py')
         else:
             # Check if a directory already exists for the abc osid.  If not,
             # create one and initialize as a python package.
             self._make_dir(self._app_name(package), python=True)
-            self._make_dir(self._abc_pkg_path(package), python=True)
+            if self._is('mongo'):
+                self._make_dir(self._abc_pkg_path(package), python=True)
 
         if self._is('abc'):
             # Write the osid license documentation file.
@@ -278,14 +327,15 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                                   package['license'] + '\n\n\"\"\"').encode('utf-8') +
                                  '\n')
 
-        # Write the summary documentation for this package.
-        with open(self._abc_module(package, 'summary_doc', abc=self._is('abc')), 'w') as write_file:
-            write_file.write((utf_code + '\"\"\"' +
-                              package['title'] + '\n' +
-                              package['name'] + ' version ' +
-                              package['version'] + '\n\n' +
-                              package['summary'] + '\n\n\"\"\"').encode('utf-8') +
-                             '\n')
+        if self._is('mongo'):
+            # Write the summary documentation for this package.
+            with open(self._abc_module(package, 'summary_doc', abc=self._is('abc')), 'w') as write_file:
+                write_file.write((utf_code + '\"\"\"' +
+                                  package['title'] + '\n' +
+                                  package['name'] + ' version ' +
+                                  package['version'] + '\n\n' +
+                                  package['summary'] + '\n\n\"\"\"').encode('utf-8') +
+                                 '\n')
 
         # Initialize the module doc and abc import string for each module
         for module in modules:
@@ -321,6 +371,21 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                     '# pylint: disable=too-many-ancestors\n' +
                     '#     Inheritance defined in specification\n')
                 modules[module]['imports'].append(pylintstr)
+            elif self._is('services'):
+                docstr = ('\"\"\"DLKit Services implementations of ' + package['name'] + ' service.\"\"\"\n' +
+                          '# pylint: disable=no-init\n' +
+                          '# osid specification includes some \'marker\' interfaces.\n' +
+                          '# pylint: disable=too-many-ancestors\n' +
+                          '# number of ancestors defined in spec.\n' +
+                          '# pylint: disable=too-few-public-methods,too-many-public-methods\n' +
+                          '# number of methods defined in spec. Worse yet, these are aggregates.\n' +
+                          '# pylint: disable=invalid-name\n' +
+                          '# method and class names defined in spec.\n' +
+                          '# pylint: disable=no-self-use,unused-argument\n' +
+                          '# to catch unimplemented methods.\n' +
+                          '# pylint: disable=super-init-not-called\n' +
+                          '# it just isn\'t.\n')
+                modules[module]['imports'].append(docstr)
 
         if self._is('mongo') and package['name'] in managers_to_implement:
             # Assemble and write profile.py file for this package.
@@ -330,11 +395,31 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
 
         self.patterns = self._patterns(package)
 
+        if self._is('services'):
+            # Add manager and catalog session checks to patterns for later use
+            # Used in template flag check
+            for inf in package['interfaces']:
+                self.patterns[is_session(inf, 'manager')] = is_manager_session(inf,
+                                                                               self.patterns,
+                                                                               package['name'])
+                self.patterns[is_session(inf, 'catalog')] = is_catalog_session(inf,
+                                                                               self.patterns,
+                                                                               package['name'])
+
         # The real work starts here.  Iterate through all interfaces to build
         # all the classes for this osid package.
         for interface in package['interfaces']:
-            if self._is('mongo') and not build_this_interface(package, interface):
+            if ((self._is('mongo') or self._is('services')) and
+                    not build_this_interface(package, interface)):
                 continue  # don't build it
+
+            if (self._is('services') and not
+                    ((interface['category'] == 'managers' or
+                      interface['shortname'] == self.patterns['package_catalog_caps'] or
+                      interface['shortname'] == self.patterns['package_catalog_caps'] + 'List' or
+                      interface['shortname'] in ['OsidSession', 'OsidObject', 'OsidCatalog', 'OsidList'] or
+                      interface['category'] == 'markers'))):
+                continue  # don't build this for services, only build managers and catalogs
 
             if self._is('abc'):
                 inheritance = ''
@@ -368,21 +453,27 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 if hasattr(impl_class, 'additional_methods'):
                     additional_methods += getattr(impl_class, 'additional_methods')
 
-            # Inspect the class doc string for headline + body and create
-            # appropriate doc string style. Trying to conform to PEP 257 as
-            # much as the source osid doc will allow.
-            if interface['doc']['body'].strip() == '':
-                class_doc = ('    \"\"\"' +
-                             self._wrap(interface['doc']['headline']) +
-                             '\"\"\"')
+            if not self._is('services'):
+                # Inspect the class doc string for headline + body and create
+                # appropriate doc string style. Trying to conform to PEP 257 as
+                # much as the source osid doc will allow.
+                if interface['doc']['body'].strip() == '':
+                    class_doc = ('    \"\"\"' +
+                                 self._wrap(interface['doc']['headline']) +
+                                 '\"\"\"')
+                else:
+                    class_doc = ('    \"\"\"' +
+                                 self._wrap(interface['doc']['headline']) +
+                                 '\n\n' +
+                                 self._wrap(interface['doc']['body']) +
+                                 '\n\n    \"\"\"')
             else:
-                class_doc = ('    \"\"\"' +
-                             self._wrap(interface['doc']['headline']) +
-                             '\n\n' +
-                             self._wrap(interface['doc']['body']) +
-                             '\n\n    \"\"\"')
+                class_doc = ('{}\"\"\"{} convenience adapter ' +
+                             'including related Session methods."\"\"').format(self._ind,
+                                                                               interface['shortname'])
 
-            class_sig = 'class ' + interface['shortname'] + inheritance + ':'
+            class_sig = 'class {}{}:'.format(interface['shortname'],
+                                             inheritance)
 
             if self._is('abc'):
                 modules[interface['category']]['body'] = (
@@ -396,22 +487,47 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                                                      None) + '\n\n\n')
             else:
                 init_methods = self._make_init_methods(package, interface)
-
                 methods = self.method_builder.make_methods(self._abc_pkg_name(package['name'], abc=False),
                                                            interface,
                                                            self.patterns)
 
+                if self._is('services'):
+                    # Add all the appropriate manager related session methods to the manager interface
+                    # Add all the appropriate catalog related session methods to the catalog interface
+                    new_imports = []
+                    if 'OsidManager' in interface['inherit_shortnames']:
+                        new_methods, new_imports = self._grab_service_methods(package, is_manager_session)
+                        methods += new_methods
+                    # Add all the appropriate catalog related session methods to the catalog interface
+                    elif interface['shortname'] == self.patterns['package_catalog_caps']:
+                        new_methods, new_imports = self._grab_service_methods(package, is_catalog_session)
+                        methods += new_methods
+
+                    for imp in new_imports:
+                        if imp not in modules[package['name']]['imports']:
+                            modules[package['name']]['imports'].append(imp)
+
+                    if not init_methods.strip() and not methods.strip():
+                        init_methods = '{}pass'.format(self._ind)
+
                 if additional_methods:
                     methods += '\n' + additional_methods
 
-                modules[interface['category']]['body'] += '{}\n{}\n{}\n{}\n\n\n'.format(class_sig,
-                                                                                        class_doc,
-                                                                                        init_methods,
-                                                                                        methods)
+                body = '{}\n{}\n{}\n{}\n\n\n'.format(class_sig,
+                                                     self._wrap(class_doc),
+                                                     self._wrap(init_methods),
+                                                     methods)
+
+                if self._is('services'):
+                    modules[package['name']]['body'] += body
+                else:
+                    modules[interface['category']]['body'] += body
+
 
         # Finally, iterate through the completed package module structure and
         # write out both the import statements and class definitions to the
         # appropriate module for this package.
+
         for module in modules:
             if module == 'records' and package['name'] != 'osid':
                 module_name = 'record_templates'
@@ -419,9 +535,26 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 module_name = module
 
             if modules[module]['body'].strip() != '':
-                with open(self._abc_module(package, module_name), 'wb') as write_file:
-                    write_file.write(('\n'.join(order_module_imports(modules[module]['imports'])) +
-                                      '\n\n\n' + modules[module]['body']).encode('utf-8'))
+                if self._is('services'):
+                    with open(self._abc_pkg_path(package, abc=False) + '.py', 'wb') as write_file:
+                        constant_declarations = """
+
+DEFAULT = 0
+COMPARATIVE = 0
+PLENARY = 1
+FEDERATED = 0
+ISOLATED = 1
+AUTOMATIC = 0
+MANDATORY = 1
+DISABLED = -1"""
+                        write_file.write('{}{}\n\n\n{}'.format('\n'.join(order_module_imports(modules[module]['imports'])),
+                                                               constant_declarations,
+                                                               modules[module]['body']).encode('utf-8'))
+                else:
+                    with open(self._abc_module(package, module_name), 'wb') as write_file:
+                        write_file.write(('\n'.join(order_module_imports(modules[module]['imports'])) +
+                                          '\n\n\n' + modules[module]['body']).encode('utf-8'))
+
 
     def _make_profile_py(self, package):
         """create the profile.py file for this package"""
@@ -502,75 +635,98 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
     def _update_module_imports(self, modules, package, interface):
         # And make sure there is a corresponding import statement for this
         # interface's abc_osid and associated module/category name.
-        imports = modules[interface['category']]['imports']
+        if self._is('mongo'):
+            imports = modules[interface['category']]['imports']
+        else:  # services
+            imports = modules[package['name']]['imports']
 
-        def append(import_str):
-            if import_str not in imports:
-                imports.append(import_str)
+        def append(import_str_):
+            if import_str_ not in imports:
+                imports.append(import_str_)
 
         def package_interface():
             return self._abc_pkg_name(package['name'] + '_' + interface['category'])
 
         if package['name'] != 'osid' and interface['category'] == 'managers':
-            import_str = ('from dlkit.manager_impls.' +
-                          self._abc_pkg_name(package) + ' import ' +
-                          interface['category'] + ' as ' +
-                          package_interface())
+            import_str = 'from dlkit.manager_impls.{} import {} as {}'.format(self._abc_pkg_name(package),
+                                                                              interface['category'],
+                                                                              package_interface())
         else:
-            import_str = ('from ' + self._app_name(package, abstract=True) + '.' +
-                          self._abc_pkg_name(package) + ' import ' +
-                          interface['category'] + ' as abc_' +
-                          package_interface())
+            import_str = 'from {}.{} import {} as abc_{}'.format(self._app_name(package, abstract=True),
+                                                                 self._abc_pkg_name(package),
+                                                                 interface['category'],
+                                                                 package_interface())
 
         append(import_str)
 
-        # Iterate through any inherited interfaces and build the inheritance
-        # list for this interface. Also, check if an import statement is
+        # Iterate through any inherited interfaces and check if an import statement is
         # required and append to the appropriate module's import list.
         for i in interface['inheritance']:
             inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
             if (i['pkg_name'] == package['name'] and
-                  inherit_category == interface['category']):
+                    inherit_category == interface['category']):
                 pass
             else:
-                import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(self._app_name(i['pkg_name'])),
-                                                                         self._abc_pkg_name(i['pkg_name'], abc=False),
-                                                                         inherit_category)
+                if self._is('services') and i['pkg_name'] != package['name']:
+                    import_str = 'from . import {}'.format(i['pkg_name'])
+
+                if not self._is('services'):
+                    import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(self._app_name(i['pkg_name'])),
+                                                                             self._abc_pkg_name(i['pkg_name'], abc=False),
+                                                                             inherit_category)
 
                 if inherit_category != 'UNKNOWN_MODULE':
                     append(import_str)
 
-        # Check to see if there are any additional inheritances required
-        # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
-        # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
-        impl_class = self._impl_class(package, interface)
-        # if hasattr(impl_class, 'inheritance_imports'):
-        #     modules[interface['category']]['imports'] = (
-        #         modules[interface['category']]['imports'] +
-        #         getattr(impl_class, 'inheritance_imports'))
+        if self._is('mongo'):
+            # Check to see if there are any additional inheritances required
+            # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
+            # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
+            impl_class = self._impl_class(package, interface)
+            # if hasattr(impl_class, 'inheritance_imports'):
+            #     modules[interface['category']]['imports'] = (
+            #         modules[interface['category']]['imports'] +
+            #         getattr(impl_class, 'inheritance_imports'))
 
-        ##
-        # Here we further inspect the impl_class to identify any additional
-        # hand built import statements to be loaded at the module level. These
-        # need to be coded in the impl_class as a list of strings with the
-        # attribute name 'import_statements'
-        if hasattr(impl_class, 'import_statements'):
-            for import_str in getattr(impl_class, 'import_statements'):
+            ##
+            # Here we further inspect the impl_class to identify any additional
+            # hand built import statements to be loaded at the module level. These
+            # need to be coded in the impl_class as a list of strings with the
+            # attribute name 'import_statements'
+            if hasattr(impl_class, 'import_statements'):
+                for import_str in getattr(impl_class, 'import_statements'):
+                    append(import_str)
+
+            ##
+            # Look for module import statements defined in class patterns. These
+            # need to be coded in the class pattern as a list of strings with the
+            # attribute name 'import_statements_pattern'
+            for import_str in self._get_extra_patterns(package,
+                                                       interface['shortname'],
+                                                       'import_statements_pattern',
+                                                       default=[]):
                 append(import_str)
 
-        ##
-        # Look for module import statements defined in class patterns. These
-        # need to be coded in the class pattern as a list of strings with the
-        # attribute name 'import_statements_pattern'
-        for import_str in self._get_extra_patterns(package,
-                                                   interface['shortname'],
-                                                   'import_statements_pattern',
-                                                   default=[]):
+            # add the none-argument check import if not already present
+            append('from .. import utilities')
+        elif self._is('services'):
+            # Don't forget the OsidSession inheritance:
+            if (('OsidManager' in interface['inherit_shortnames'] or
+                    interface['shortname'] == self.patterns['package_catalog_caps']) and
+                    package['name'] != 'osid'):
+                import_str = 'from . import osid'
+                append(import_str)
+
+            # And don't forget the osid_error import:
+            import_str = 'from .osid_errors import Unimplemented, IllegalState'
             append(import_str)
 
-        # add the none-argument check import if not already present
-        append('from .. import utilities')
-
+        # Now also check for templated imports
+        templated_imports = self.method_builder.get_methods_templated_imports(self._abc_pkg_name(package, abc=False),
+                                                                              interface,
+                                                                              self.patterns)
+        for imp in templated_imports:
+            append(imp)
 
     # This is the entry point for making the Python abstract base classes for
     # the osids. It processes all of the osids in the xosid directory, making
@@ -595,9 +751,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         if not self._is('abc'):
             # Copy general config and primitive files, etc into the
             # implementation root directory:
-            if os.path.exists(self._template('helpers')):
-                for helper_file in glob.glob(self._template('helpers') + '/*.py'):
-                    shutil.copy(helper_file, self._root_dir)
+            for helper_file in glob.glob(self._template('helpers') + '/*.py'):
+                shutil.copy(helper_file, self._root_dir)
         else:
             # copy over the abc_errors.py file to abstract_osid.osid.errors.py
             error_file = self._abs_path + '/builders/abc_errors.py'
@@ -605,7 +760,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 shutil.copyfile(error_file, self._root_dir + '/osid/errors.py')
 
 
-def build_this_interface(package, interface):
+def build_this_interface(package, interface, services=False):
     exceptions = ['ObjectiveHierarchySession',
                   'ObjectiveHierarchyDesignSession',
                   'ObjectiveSequencingSession',
@@ -624,19 +779,23 @@ def build_this_interface(package, interface):
             package['name'] not in managers_to_implement):
         return False
 
-    # Check to see if this interface is meant to be implemented.
-    if (package['name'] != 'osid' and
-            interface['category'] not in excepted_osid_categories):
-        if flagged_for_implementation(interface):
-            if interface['shortname'] in exceptions:
-                return False
-            else:
-                pass
-        else:
+    if services:
+        if package['name'] != 'osid' and not flagged_for_implementation(interface):
             return False
+    else:
+        # Check to see if this interface is meant to be implemented.
+        if (package['name'] != 'osid' and
+                interface['category'] not in excepted_osid_categories):
+            if flagged_for_implementation(interface):
+                if interface['shortname'] in exceptions:
+                    return False
+                else:
+                    pass
+            else:
+                return False
 
-    if interface['category'] in excepted_osid_categories:
-        return False
+        if interface['category'] in excepted_osid_categories:
+            return False
     return True
 
 def eq_methods(interface_name):
@@ -677,6 +836,39 @@ def flagged_for_implementation(interface):
                     interface['shortname'][:-len(variant)] in objects_to_implement):
                 test = True
     return test
+
+##
+# Determine if the interface represents a manager related session
+def is_manager_session(interface, patterns, package_name):
+    _is_manager_session = False
+    if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
+        _is_manager_session = True
+    elif (interface['category'] == 'sessions' and
+            interface['shortname'].startswith('GradebookColumn')):
+        _is_manager_session = False
+    elif (interface['category'] == 'sessions' and
+            interface['shortname'].startswith(patterns['package_catalog_caps'])):
+        _is_manager_session = True
+    return _is_manager_session
+
+##
+# Determine if the interface represents a catalog related session
+def is_catalog_session(interface, patterns, package_name):
+    _is_catalog_session = False
+    if package_name in ['type', 'proxy']:
+        _is_catalog_session = False
+    elif (interface['category'] == 'sessions' and
+            interface['shortname'].startswith('GradebookColumn')):
+        _is_catalog_session = True
+    elif (interface['category'] == 'sessions' and
+            not interface['shortname'].startswith(patterns['package_catalog_caps'])):
+        _is_catalog_session = True
+    return _is_catalog_session
+
+
+def is_session(interface, type_):
+    return '{}.is_{}_session'.format(camel_to_under(interface['shortname']),
+                                     type_)
 
 # Assemble the initializers for metadata managed by Osid Object Forms
 def make_metadata_initers(persisted_data, initialized_data, return_types):
@@ -832,8 +1024,18 @@ def order_module_imports(imports):
     local_imports.sort()
     partial_third_party_imports.sort()
 
-    return docstrings + newline + full_imports + newline + partial_third_party_imports + newline + local_imports + newline + constants
+    import_lists = [docstrings, full_imports, partial_third_party_imports, local_imports, constants]
 
+    results = []
+    for import_list in import_lists:
+        if len(import_list) > 0:
+            results += import_list + newline
+
+    return results
+
+# Return the associated class name for a ProxyManager given a Manager name
+def proxy_manager_name(string_):
+    return string_.split('Manager')[0] + 'ProxyManager'
 
 def serialize(var_dict):
     """an attempt to make the builders more variable-based, instead of
