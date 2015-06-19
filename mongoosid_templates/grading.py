@@ -243,7 +243,7 @@ class GradeEntryForm:
             raise errors.InvalidArgument()
         self._my_map['gradeId'] = str(grade_id)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
-        self._my_map['timeGraded'] = now_map"""
+        self._my_map['timeGraded'] = now_map()"""
 
     clear_grade = """
         if not self._grade_system.is_based_on_grades():
@@ -267,7 +267,7 @@ class GradeEntryForm:
             raise errors.InvalidArgument('score must be in increments of ' + str(self._score_increment))
         self._my_map['score'] = score
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
-        self._my_map['timeGraded'] = now_map"""
+        self._my_map['timeGraded'] = now_map()"""
 
     clear_score = """
         if self._grade_system.is_based_on_grades():
