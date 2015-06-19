@@ -1,6 +1,4 @@
 """mongo utilities.py"""
-import datetime
-
 from .osid.osid_errors import NullArgument, NotFound, OperationFailed
 from dlkit.primordium.calendaring.primitives import DateTime
 
@@ -102,4 +100,4 @@ def now_map():
         'second': now.second,
         'microsecond': now.microsecond,
     }
-        
+
