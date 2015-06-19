@@ -4,16 +4,6 @@ class OsidProfile:
 
     init = """
     def __init__(self, service_name, interface_name):
-        #import importlib
-        #from .. import settings
-        #provider_path = settings.PROVIDER_MANAGER_MODULE_PATHS[service_name]
-        #provider_module = importlib.import_module(provider_path, settings.ANCHOR_PATH)
-        #authz_module = importlib.import_module(settings.AUTHZ_MANAGER_MODULE_PATH, settings.ANCHOR_PATH)
-        #provider_manager = getattr(provider_module, interface_name)()
-        #authz_manager = getattr(authz_module, 'AuthorizationManager')()
-        #self._provider_manager = provider_manager
-        #self._authz_session = authz_manager.get_authorization_session()
-        #self._my_runtime = None
         self._provider_manager = None
         self._authz_session = None
         self._my_runtime = None
