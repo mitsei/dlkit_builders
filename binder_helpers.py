@@ -256,6 +256,28 @@ def proxy_manager_name(string):
 #                                      interface_module +
 #                 ' import ' + interface_name)
 
+# This function returns the category, or 'module' for the interface in question
+# By default it does not raise an exception, but can be called with report-
+# error equals True so that you can track un-categorized interfaces.
+def get_interface_module(pkg_name, interface_shortname, report_error = False):
+    category = 'UNKNOWN_MODULE'
+    try:
+        read_file = open(interface_maps_dir + '/' + pkg_name + '.json' , 'r')
+        index = json.load(read_file)
+        read_file.close()
+    except IOError:
+        if report_error:
+            print ('INTERFACE LOOKUP ERROR - interface map for \'' + pkg_name +
+                   '.' + interface_shortname + '\' not found.')
+    else:
+        try:
+            category = index[pkg_name + '.' + interface_shortname]
+        except KeyError:
+            if report_error:
+                print ('INTERFACE LOOKUP ERROR - category for \'' + pkg_name + '.'
+                       + interface_shortname + '\' not found.')
+    return category
+
 ##
 # The SkipMethod exception is used for implementation builders like the
 # Kit builder where methods must occasionally be skipped for whatever reason.
