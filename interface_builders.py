@@ -9,7 +9,7 @@ import datetime
 
 from abcbinder_settings import ENCODING as utf_code
 from binder_helpers import under_to_caps, under_to_mixed,\
-    remove_plural, camel_to_under, make_plural
+    remove_plural, camel_to_under, make_plural, camel_to_caps_under
 from build_controller import Utilities, BaseBuilder, Templates
 from config import sessions_to_implement, managers_to_implement,\
     objects_to_implement, variants_to_implement
@@ -183,6 +183,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
 
             try:
                 metadata_initers = make_metadata_initers(
+                    interface['shortname'],
                     self.patterns[interface['shortname'][:-4] + '.persisted_data'],
                     self.patterns[interface['shortname'][:-4] + '.initialized_data'],
                     self.patterns[interface['shortname'][:-4] + '.return_types'])
@@ -871,7 +872,7 @@ def is_session(interface, type_):
                                      type_)
 
 # Assemble the initializers for metadata managed by Osid Object Forms
-def make_metadata_initers(persisted_data, initialized_data, return_types):
+def make_metadata_initers(interface_name, persisted_data, initialized_data, return_types):
 
     def default_string(name, default_type, is_list=False):
         dind = 8 * ' '
@@ -888,7 +889,7 @@ def make_metadata_initers(persisted_data, initialized_data, return_types):
     initer = ''
     default = ''
     for data_name in persisted_data:
-        data_name_upper = data_name.upper()
+        data_name_upper = camel_to_caps_under(interface_name[:-4]) + '_' + data_name.upper()
 
         if (persisted_data[data_name] != 'OsidCatalog' and
                 data_name not in initialized_data):
