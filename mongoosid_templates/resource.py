@@ -377,10 +377,13 @@ class ResourceAdminSession:
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
+    get_resource_form_for_create_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     get_resource_form_for_create_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
@@ -400,10 +403,13 @@ class ResourceAdminSession:
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
+    create_resource_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     create_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.create_resource_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
@@ -426,10 +432,13 @@ class ResourceAdminSession:
 
         return result"""
 
+    get_resource_form_for_update_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     get_resource_form_for_update_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
@@ -464,10 +473,13 @@ class ResourceAdminSession:
             ${object_name_under}_id = self.create_${object_name_under}(create_form).get_id()
         return ${object_name_under}_id"""
 
+    update_resource_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     update_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.update_resource_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
@@ -490,10 +502,13 @@ class ResourceAdminSession:
             db_prefix=self._db_prefix,
             runtime=self._runtime)"""
 
+    delete_resource_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     delete_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.delete_resource_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
@@ -724,10 +739,13 @@ class BinAdminSession:
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
+    get_bin_form_for_create_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     get_bin_form_for_create_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.get_bin_form_for_create_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
@@ -743,10 +761,13 @@ class BinAdminSession:
         self._forms[result.get_id().get_identifier()] = not CREATED
         return result"""
 
+    create_bin_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     create_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.create_bin_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
@@ -769,10 +790,13 @@ class BinAdminSession:
 
         return result"""
 
+    get_bin_form_for_update_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     get_bin_form_for_update_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
@@ -783,10 +807,13 @@ class BinAdminSession:
 
         return cat_form"""
 
+    update_bin_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     update_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.update_bin_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
@@ -806,10 +833,13 @@ class BinAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned
         return objects.${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
+    delete_bin_import_templates = [
+        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    ]
+
     delete_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.delete_bin_template
-        from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')

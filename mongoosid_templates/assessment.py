@@ -298,9 +298,12 @@ class AssessmentSession:
         for item_idstr in item_ids:
             questions.append(self._get_question(item_idstr))
         return objects.QuestionList(questions, db_prefix=self._db_prefix, runtime=self._runtime)"""
-    
+
+    get_response_form_import_templates = [
+        'from ...abstract_osid.id.primitives import Id as ABCId'
+    ]
+
     get_response_form = """
-        from ...abstract_osid.id.primitives import Id as ABCId
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
@@ -333,9 +336,12 @@ class AssessmentSession:
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form"""
-    
+
+    submit_response_import_templates = [
+        'from ...abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
+    ]
+
     submit_response = """
-        from ...abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
@@ -580,8 +586,11 @@ class ItemAdminSession:
     
     # This method is hand implemented to raise errors.and error if the item
     # is found to be associated with an assessment
+    delete_item_import_templates = [
+        'from ...abstract_osid.id.primitives import Id as ABCId'
+    ]
+
     delete_item = """
-        from ...abstract_osid.id.primitives import Id as ABCId
         if not isinstance(item_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         collection = MongoClientValidated(self._db_prefix + 'assessment', 'Assessment')
@@ -596,9 +605,11 @@ class ItemAdminSession:
     # These methods overwrite the canonical aggregate object admin methods to
     # deal with authoring Questions with are special: ie. there is only one per
     # Item.  Perhaps we will see this pattern again and can make templates.
-    
+    create_question_import_templates = [
+        'from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
+    ]
+
     create_question = """
-        from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm
         collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         if not isinstance(question_form, ABCQuestionForm):
             raise errors.InvalidArgument('argument type is not an QuestionForm')
@@ -626,9 +637,12 @@ class ItemAdminSession:
         collection.save(item)
         self._forms[question_form.get_id().get_identifier()] = CREATED
         return objects.Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
-    
+
+    get_question_form_for_update_import_templates = [
+        'from ...abstract_osid.id.primitives import Id as ABCId'
+    ]
+
     get_question_form_for_update = """
-        from ...abstract_osid.id.primitives import Id as ABCId
         collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         if not isinstance(question_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
@@ -636,9 +650,12 @@ class ItemAdminSession:
         obj_form = objects.QuestionForm(document['question'], self._db_prefix, runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
-    
+
+    update_question_import_templates = [
+        'from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
+    ]
+
     update_question = """
-        from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm
         collection = MongoClientValidated(self._db_prefix + 'assessment', 'Item')
         if not isinstance(question_form, ABCQuestionForm):
             raise errors.InvalidArgument('argument type is not an QuestionForm')
@@ -673,9 +690,12 @@ class AssessmentAdminSession:
         'UPDATED = True',
         'CREATED = True'
         ]
-    
+
+    delete_assessment_import_templates = [
+        'from ...abstract_osid.id.primitives import Id as ABCId'
+    ]
+
     delete_assessment = """
-        from ...abstract_osid.id.primitives import Id as ABCId
         if not isinstance(assessment_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
         collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentOffered')
@@ -791,14 +811,16 @@ class AssessmentTakenAdminSession:
         'CREATED = True',
     ]
 
+    create_assessment_taken_import_templates = [
+        'from ...abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm',
+        'from ..osid.osid_errors import PermissionDenied'
+    ]
     
     create_assessment_taken = """
         ##
         # This impl differs from the usual create_osid_object method in that it
         # sets an agent id and default display name based on the underlying Assessment
         # and checks for exceeding max attempts...
-        from ...abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm
-        from ..osid.osid_errors import PermissionDenied
         collection = MongoClientValidated(self._db_prefix + 'assessment', 'AssessmentTaken')
         if not isinstance(assessment_taken_form, ABCAssessmentTakenForm):
             raise errors.InvalidArgument('argument type is not an AssessmentTakenForm')
