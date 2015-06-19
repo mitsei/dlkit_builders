@@ -192,6 +192,9 @@ def camel_to_verbose(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1 \2', s1).lower()
 
+def camel_to_caps_under(name):
+    return camel_to_under(name).upper()
+
 ##
 # This function returns the category, or 'module' for the interface in question
 # By default it does not raise an exception, but can be called with report-
