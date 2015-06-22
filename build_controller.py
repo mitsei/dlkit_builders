@@ -37,6 +37,13 @@ class Utilities(object):
             os.makedirs(target_dir)
         if python:
             os.system('touch ' + target_dir + '/__init__.py')
+            # for every directory between ABS_PATH and target_dir, add __init__.py
+            intermediate_dirs = target_dir.replace(ABS_PATH, '').split('/')
+            start_dir = ABS_PATH + '/'
+            for dir_ in intermediate_dirs:
+                start_dir += dir_ + '/'
+                if not os.path.exists(start_dir + '__init__.py'):
+                    os.system('touch ' + start_dir + '__init__.py')
         return target_dir
 
     def _wrap(self, text):
@@ -363,7 +370,7 @@ class Builder(Utilities):
 
     @build_dir.setter
     def build_dir(self, value):
-        self._build_to_dir = self._make_dir(value)
+        self._build_to_dir = self._make_dir(value, python=True)
 
     def abc(self):
         from abcbinder import ABCBuilder
