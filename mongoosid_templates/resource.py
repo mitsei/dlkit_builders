@@ -196,7 +196,9 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resource
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier()),
                                           '${cat_name_mixed}Id': str(self._catalog_id)})
@@ -210,7 +212,9 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_ids
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         object_id_list = []
         for i in ${arg0_name}:
             object_id_list.append(ObjectId(i.get_identifier()))
@@ -232,7 +236,9 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find({'genusTypeId': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
@@ -256,7 +262,9 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
         else:
@@ -308,7 +316,9 @@ class ResourceQuerySession:
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resources_by_query
         query_terms = dict(${arg0_name}._query_terms)
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             query_terms['${cat_name_mixed}Id'] = str(self._catalog_id)
         result = collection.find(query_terms).sort('_id', DESCENDING)
@@ -396,7 +406,9 @@ class ResourceAdminSession:
     create_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.create_resource_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
@@ -425,7 +437,9 @@ class ResourceAdminSession:
     get_resource_form_for_update_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         if ${arg0_name}.get_identifier_namespace() != '${package_name}.${object_name}':
@@ -466,7 +480,9 @@ class ResourceAdminSession:
     update_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.update_resource_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
@@ -495,7 +511,9 @@ class ResourceAdminSession:
     delete_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.delete_resource_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under}_map = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
@@ -538,7 +556,9 @@ class ResourceAgentSession:
         return self.get_resource_by_agent(agent_id).get_id()"""
 
     get_resource_by_agent = """
-        collection = MongoClientValidated(self._db_prefix + 'resource', 'Resource')
+        collection = MongoClientValidated(self._db_prefix + 'resource',
+                                          collection='Resource',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find_one({'agentIds': {'$in': [str(agent_id)]},
                                           'binId': str(self._catalog_id)})
@@ -552,7 +572,9 @@ class ResourceAgentSession:
             runtime=self._runtime)"""
 
     get_agent_ids_by_resource = """
-        collection = MongoClientValidated(self._db_prefix + 'resource', 'Resource')
+        collection = MongoClientValidated(self._db_prefix + 'resource',
+                                          collection='Resource',
+                                          runtime=self._runtime)
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
 
         if 'agentIds' not in resource:
@@ -588,7 +610,9 @@ class ResourceAgentAssignmentSession:
 
     assign_agent_to_resource = """
         # Should check for existence of Agent? We may mever manage them.
-        collection = MongoClientValidated(self._db_prefix + 'resource', 'Resource')
+        collection = MongoClientValidated(self._db_prefix + 'resource',
+                                          collection='Resource',
+                                          runtime=self._runtime)
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
 
         try:
@@ -605,7 +629,9 @@ class ResourceAgentAssignmentSession:
         collection.save(resource)"""
 
     unassign_agent_from_resource = """
-        collection = MongoClientValidated(self._db_prefix + 'resource', 'Resource')
+        collection = MongoClientValidated(self._db_prefix + 'resource',
+                                          collection='Resource',
+                                          runtime=self._runtime)
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
 
         try:
@@ -654,7 +680,9 @@ class BinLookupSession:
     get_bin_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bin
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${cat_name}',
+                                          runtime=self._runtime)
         # Need to consider how to best deal with the "phantom root" catalog issue
         if ${arg0_name}.get_identifier() == '000000000000000000000000':
             return self._get_phantom_root_catalog(cat_class=objects.${cat_name}, cat_name='${cat_name}')
@@ -674,7 +702,9 @@ class BinLookupSession:
         catalog_id_list = []
         for i in ${arg0_name}:
             catalog_id_list.append(ObjectId(i.get_identifier()))
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${cat_name}',
+                                          runtime=self._runtime)
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
 
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
@@ -684,7 +714,9 @@ class BinLookupSession:
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bins_template
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${cat_name}',
+                                          runtime=self._runtime)
         result = collection.find().sort('_id', DESCENDING)
 
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
@@ -754,7 +786,9 @@ class BinAdminSession:
     create_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.create_bin_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${cat_name}',
+                                          runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
@@ -783,7 +817,9 @@ class BinAdminSession:
     get_bin_form_for_update_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${cat_name}',
+                                          runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
@@ -800,7 +836,9 @@ class BinAdminSession:
     update_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.update_bin_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${cat_name}',
+                                          runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
@@ -826,11 +864,15 @@ class BinAdminSession:
     delete_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.delete_bin_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${cat_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${cat_name}',
+                                          runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         for object_catalog in ${cataloged_object_caps_list}:
-            obj_collection = MongoClientValidated(self._db_prefix + '${package_name}', object_catalog)
+            obj_collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                                  collection=object_catalog,
+                                                  runtime=self._runtime)
             if obj_collection.find({'${cat_name_mixed}Id': str(${arg0_name})}).count() != 0:
                 raise errors.IllegalState('catalog is not empty')
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""

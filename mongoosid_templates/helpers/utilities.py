@@ -1,13 +1,24 @@
 """mongo utilities.py"""
+from pymongo import MongoClient
+
 from .osid.osid_errors import NullArgument, NotFound, OperationFailed
 from dlkit.primordium.calendaring.primitives import DateTime
+from dlkit.primordium.id.primitives import Id
 
 from . import MONGO_CLIENT
 
 
 class MongoClientValidated(object):
     """automatically validates the insert_one, find_one, and delete_one methods"""
-    def __init__(self, db, collection=None):
+    def __init__(self, db, collection=None, runtime=None):
+        if not MONGO_CLIENT.is_mongo_client_set() and runtime is not None:
+            try:
+                mongo_host_param_id = Id('parameter:mongoHostURI@mongo')
+                mongo_host = runtime.get_configuration().get_value_by_parameter(mongo_host_param_id).get_string_value()
+            except (AttributeError, KeyError, NotFound):
+                MONGO_CLIENT.set_mongo_client(MongoClient())
+            else:
+                MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))
         if collection is None:
             self._mc = MONGO_CLIENT.mongo_client[db]
         else:

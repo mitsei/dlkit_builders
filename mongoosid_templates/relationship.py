@@ -34,7 +34,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
@@ -55,7 +57,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       'genusTypeId': str(${arg1_name}),
@@ -78,7 +82,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
@@ -99,7 +105,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
                                       'genusTypeId': str(${arg1_name}),
@@ -122,7 +130,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${destination_name_mixed}Id': str(${arg1_name}),
@@ -136,7 +146,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
                                       '${destination_name_mixed}Id': str(${arg1_name}),

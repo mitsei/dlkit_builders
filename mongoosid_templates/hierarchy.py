@@ -298,7 +298,9 @@ class HierarchyAdminSession:
     ]
 
     delete_hierarchy = """
-        collection = MongoClientValidated(self._db_prefix + 'hierarchy', 'Hierarchy')
+        collection = MongoClientValidated(self._db_prefix + 'hierarchy',
+                                          collection='Hierarchy',
+                                          runtime=self._runtime)
         if not isinstance(hierarchy_id, ABCId):
             return InvalidArgument('the argument is not a valid OSID Id')
 

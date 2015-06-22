@@ -399,7 +399,9 @@ class OsidSession:
         if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
             self._catalog_identifier = catalog_id.get_identifier()
 
-            collection = MongoClientValidated(self._db_prefix + db_name, cat_name)
+            collection = MongoClientValidated(self._db_prefix + db_name,
+                                              collection=cat_name,
+                                              runtime=self._runtime)
             try:
                 self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
             except errors.NotFound:
@@ -449,11 +451,15 @@ class OsidSession:
         try:
             foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
             foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
-            collection = MongoClientValidated(self._db_prefix + foreign_db_name, foreign_cat_name)
+            collection = MongoClientValidated(self._db_prefix + foreign_db_name,
+                                              collection=foreign_cat_name,
+                                              runtime=self._runtime)
             collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())})
         except KeyError:
             raise errors.NotFound()
-        collection = MongoClientValidated(self._db_prefix + db_name, cat_name)
+        collection = MongoClientValidated(self._db_prefix + db_name,
+                                          collection=cat_name,
+                                          runtime=self._runtime)
         catalog_map = {
             '_id': ObjectId(foreign_catalog_id.get_identifier()),
             'displayName': {'text': ('Orchestrated ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' ' + cat_name),

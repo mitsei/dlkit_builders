@@ -19,7 +19,9 @@ class ObjectiveRequisiteSession:
         # osid.learning.ObjectiveRequisiteSession.get_requisite_objectives_template
         # NOTE: This implementation currently ignores plenary view
         pass
-        collection = MongoClientValidated(self._db_prefix + 'relationship', 'Relationship') ## Really! No we should use OSIDs
+        collection = MongoClientValidated(self._db_prefix + 'relationship',
+                                          collection='Relationship',
+                                          runtime=self._runtime) ## Really! No we should use OSIDs
         requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
         result = collection.find({'$$and': {'sourceId': str(objective_id)}, 'genusType': str(requisite_type)},
                                   {'destinationId': 1, '_id': 0})
@@ -86,11 +88,15 @@ class ObjectiveAdminSession:
 
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${dependent_object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${dependent_object_name}',
+                                          runtime=self._runtime)
         if collection.find({'${object_name_mixed}Id': str(${arg0_name})}).count() != 0:
             raise errors.IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
 
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
 
@@ -107,7 +113,9 @@ class ActivityLookupSession:
         # Implemented from template for
         # osid.learning.ActivityLookupSession.get_activities_for_objective_template
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}', '${object_name}')
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
         if self._catalog_view == ISOLATED:
             result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name}),
                                       '${cat_name_mixed}Id': str(self._catalog_id)})

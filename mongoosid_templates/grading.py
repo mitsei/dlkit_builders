@@ -40,7 +40,9 @@ class GradeEntryAdminSession:
         return obj_form"""
 
     get_grade_entry_form_for_update = """
-        collection = MongoClientValidated(self._db_prefix + 'grading', 'GradeEntry')
+        collection = MongoClientValidated(self._db_prefix + 'grading',
+                                          collection='GradeEntry',
+                                          runtime=self._runtime)
         if not isinstance(grade_entry_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         if grade_entry_id.get_identifier_namespace() != 'grading.GradeEntry':
