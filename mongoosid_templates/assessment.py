@@ -1323,6 +1323,13 @@ class AssessmentTakenForm:
         'default_format_type = Type(**types.Format().get_type_data(\'DEFAULT\'))'
     ]
 
+
+class AssessmentTakenQuery:
+    match_taking_agent_id = """
+        self._add_match('takingAgentId', str(agent_id), bool(match))
+    """
+
+
 class AssessmentSection:
     
     has_allocated_time = """
