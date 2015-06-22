@@ -314,9 +314,6 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         if self._is('services'):
             modules[package['name']] = dict(imports=[], body='')
 
-        if package['name'] == 'learning':
-            import pdb
-            pdb.set_trace()
         if self._root_dir is None:
             ##
             # Check if an app directory and abc osid subdirectory already exist.
