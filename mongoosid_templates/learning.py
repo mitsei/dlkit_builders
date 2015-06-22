@@ -121,7 +121,7 @@ class ActivityLookupSession:
                                       '${cat_name_mixed}Id': str(self._catalog_id)})
         else:
             result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})})
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
 class ActivityAdminSession:

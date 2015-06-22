@@ -1292,36 +1292,14 @@ class ResourceList:
 
     get_next_resource_template = """
         # Implemented from template for osid.resource.ResourceList.get_next_resource
-        try:
-            next_item = self.next()
-        except StopIteration:
-            raise errors.IllegalState('no more elements available in this list')
-        #except: #Need to specify exceptions here
-        #    raise errors.OperationFailed()
-        else:
-            return next_item
+        return self.next()
 
     def next(self):
-        next_item = osid_objects.OsidList.next(self)
-        if isinstance(next_item, dict):
-            next_item = ${return_type}(next_item, db_prefix=self._db_prefix, runtime=self._runtime)
-        return next_item"""
+        return self._get_next_object(${return_type})"""
 
     get_next_resources_template = """
-    # Implemented from template for osid.resource.ResourceList.get_next_resources
-        if ${arg0_name} > self.available():
-            # !!! This is not quite as specified (see method docs) !!!
-            raise errors.IllegalState('not enough elements available in this list')
-        else:
-            next_list = []
-            i = 0
-            while i < ${arg0_name}:
-                try:
-                    next_list.append(self.next())
-                except StopIteration:
-                    break
-                i += 1
-            return next_list"""
+        # Implemented from template for osid.resource.ResourceList.get_next_resources
+        return self._get_next_n(${arg0_name})"""
 
 class Bin:
 
