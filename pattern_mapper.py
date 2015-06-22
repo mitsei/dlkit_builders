@@ -4,7 +4,10 @@ from pattern_mappers.managers import map_manager_patterns
 from pattern_mappers.sessions import map_session_patterns
 from pattern_mappers.core import map_osid_patterns, map_type_patterns, map_id_patterns
 from pattern_mappers.data import map_object_form_data_patterns, map_object_data_patterns, map_admin_session_data_patterns
-from pattern_mappers.objects import map_object_form_patterns, map_object_patterns, map_list_patterns, map_query_patterns, map_catalog_patterns
+from pattern_mappers.objects import map_object_form_patterns,\
+    map_object_patterns, map_list_patterns,\
+    map_query_patterns, map_catalog_patterns,\
+    map_catalog_query_patterns
 
 
 def append_caps(value, caps_list):
@@ -253,5 +256,7 @@ def map_patterns(package, index, base_package=None):
             map_list_patterns(interface, package, index)
         elif 'OsidCatalog' in interface['inherit_shortnames']:
             map_catalog_patterns(interface, package, index)
+        elif 'OsidCatalogQuery' in interface['inherit_shortnames']:
+            map_catalog_query_patterns(interface, package, index)
 
     return index

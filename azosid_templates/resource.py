@@ -716,3 +716,32 @@ class BinHierarchyDesignSession:
         else:
             return self._provider_session.${method_name}(${arg0_name})"""
 
+class BinQuerySession:
+
+    init_template = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._id_namespace = '${pkg_name}.${cat_name}'
+"""
+
+    can_search_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinQuerySession.can_search_bins_template
+        return self._can('${func_name}')"""
+
+    get_bin_query_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinQuerySession.get_bin_query_template
+        if not self._can('search'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}()"""
+
+    get_bins_by_query_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinQuerySession.get_bins_by_query_template
+        if not self._can('search'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""

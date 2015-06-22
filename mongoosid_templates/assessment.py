@@ -1403,4 +1403,3 @@ class ItemQuery:
     clear_learning_objective_id_terms = """
         self._clear_match('learningObjectiveIds')
     """
-
