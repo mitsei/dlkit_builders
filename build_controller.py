@@ -30,7 +30,9 @@ def remove_abs_path(path):
 class Utilities(object):
     def _make_dir(self, target_dir, python=False):
         if ABS_PATH not in target_dir:
-            target_dir = ABS_PATH + target_dir
+            target_dir = (ABS_PATH + target_dir).replace('//', '/')
+        if target_dir[-1] == '/':
+            target_dir = target_dir[0:-1]
         if not os.path.exists(target_dir):
             os.makedirs(target_dir)
         if python:
@@ -436,6 +438,7 @@ if __name__ == '__main__':
 
         # check that a follow-on directory to --buildto exists
         target_dir = None
+
         if '--buildto' in sys.argv:
             try:
                 target_dir = sys.argv[sys.argv.index('--buildto') + 1]

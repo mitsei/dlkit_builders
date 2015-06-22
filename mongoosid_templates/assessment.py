@@ -1327,3 +1327,14 @@ class Response:
             raise errors.Unimplemented()
         return self._records[str(item_record_type)]"""
 
+
+class ItemQuery:
+
+    match_learning_objective_id = """
+        self._add_match('learningObjectiveIds', str(objective_id), bool(match))
+    """
+
+    clear_learning_objective_id_terms = """
+        self._clear_match('learningObjectiveIds')
+    """
+

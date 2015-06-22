@@ -52,7 +52,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             if self._is('services'):
                 shutil.copy(helper_file, self._root_dir)
             else:
-                shutil.copy(helper_file, self._root_dir + '/' + package['name'])
+                package_dir = self._root_dir + '/' + package['name'] + '/'
+                self._make_dir(package_dir)
+                shutil.copy(helper_file, package_dir)
 
     def _get_class_inheritance(self, package, interface):
         def get_full_interface_class():
@@ -312,6 +314,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         if self._is('services'):
             modules[package['name']] = dict(imports=[], body='')
 
+        if package['name'] == 'learning':
+            import pdb
+            pdb.set_trace()
         if self._root_dir is None:
             ##
             # Check if an app directory and abc osid subdirectory already exist.
