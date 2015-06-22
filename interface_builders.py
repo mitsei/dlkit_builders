@@ -286,7 +286,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         if package['name'] not in managers_to_implement:
             return
 
-        self._copy_package_helpers(package)
+        if not self._is('abc'):
+            self._copy_package_helpers(package)
 
         print "Building " + self._class + " osid for " + package['name']
 

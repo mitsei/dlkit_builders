@@ -702,6 +702,27 @@ class BinHierarchyDesignSession:
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
 
+class BinQuerySession:
+
+    can_search_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.BinQuerySession.can_search_bins_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    get_bin_query_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.BinQuerySession.get_bin_query_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    get_bins_by_query_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.BinQuerySession.get_bins_by_query_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+
 
 class ResourceList:
 

@@ -188,7 +188,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'] == index['package_catalog_caps'] + 'QuerySession' and
             method['name'] == 'get_' + make_plural(index['package_catalog_under']) + '_by_query'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.BinQuerySession.get_bins',
+                pattern = 'resource.BinQuerySession.get_bins_by_query',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
