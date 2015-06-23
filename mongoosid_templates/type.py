@@ -341,44 +341,14 @@ class TypeList:
     ]
 
     get_next_type = """
-        import sys
-        try:
-            next_item = self.next()
-        except StopIteration:
-            raise errors.IllegalState('no more elements available in this list')
-        except: #Need to specify exceptions here
-            raise errors.OperationFailed()
-        else:
-            return next_item
+        return self.next()
             
     def next(self):
-        from ..osid.objects import OsidList
-        from .primitives import Type 
-        try:
-            next_item = OsidList.next(self)
-        except:
-            raise
-        if isinstance(next_item, dict):
-            next_item = Type(next_item)
-        return next_item
-
-    next_type = property(fget=get_next_type)"""
+        from .primitives import Type
+        return self._get_next_object(Type)"""
 
     get_next_types = """
-        import sys
-        if n > self.available():
-            # !!! This is not quite as specified (see method docs) !!!
-            raise errors.IllegalState('not enough elements available in this list')
-        else:
-            next_list = []
-            x = 0
-            while x < n:
-                try:
-                    next_list.append(self.next())
-                except: #Need to specify exceptions here
-                    raise errors.OperationFailed()
-                x = x + 1
-            return next_list"""
+        return self._get_next_n(n)"""
 
 class Type:
 

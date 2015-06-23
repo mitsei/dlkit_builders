@@ -150,5 +150,4 @@ class LocaleList:
             return next_item
 
     def next(self):
-        next_item = osid_objects.OsidList.next(self)
-        return Locale(next_item)"""
+        return self._get_next_object(Locale)"""
