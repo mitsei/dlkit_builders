@@ -161,24 +161,24 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         # Check for any special data initializations and call the appropriate makers
         # to assemble them.
         if init_pattern == 'resource.Bin':
-            object_name = interface['shortname']
+            object_name = interface_name
         elif init_pattern == 'resource.BinForm':
-            object_name = interface['shortname'][:-4]
+            object_name = interface_name[:-4]
         elif init_pattern == 'resource.ResourceLookupSession':
-            object_name = interface['shortname'][:-13]
+            object_name = interface_name[:-13]
         elif init_pattern == 'resource.ResourceQuerySession':
-            object_name = interface['shortname'][:-12]
+            object_name = interface_name[:-12]
         elif init_pattern == 'resource.ResourceAdminSession':
-            object_name = interface['shortname'][:-12]
+            object_name = interface_name[:-12]
         elif init_pattern == 'commenting.CommentLookupSession':
             if self._is('authz'):
-                object_name = interface_name[:7]
+                object_name = interface_name.replace('LookupSession', '')
             else:
-                object_name = interface['shortname'][:-13]
+                object_name = interface_name[:-13]
         elif init_pattern == 'resource.Resource':
-            object_name = interface['shortname']
+            object_name = interface_name
         elif init_pattern == 'resource.ResourceForm':
-            object_name = interface['shortname'][:-4]
+            object_name = interface_name[:-4]
             if not self._is('authz'):
                 if object_name in self.patterns['package_relationships_caps']:
                     init_object = 'osid_objects.OsidRelationshipForm'
@@ -196,22 +196,22 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                     map_super_initers += '\n'
                 try:
                     persisted_initers = make_persistance_initers(
-                        self.patterns[interface['shortname'][:-4] + '.persisted_data'],
-                        self.patterns[interface['shortname'][:-4] + '.initialized_data'],
-                        self.patterns[interface['shortname'][:-4] + '.aggregate_data'])
+                        self.patterns[interface_name[:-4] + '.persisted_data'],
+                        self.patterns[interface_name[:-4] + '.initialized_data'],
+                        self.patterns[interface_name[:-4] + '.aggregate_data'])
                 except KeyError:
                     pass
 
                 try:
                     metadata_initers = make_metadata_initers(
-                        interface['shortname'],
-                        self.patterns[interface['shortname'][:-4] + '.persisted_data'],
-                        self.patterns[interface['shortname'][:-4] + '.initialized_data'],
-                        self.patterns[interface['shortname'][:-4] + '.return_types'])
+                        interface_name,
+                        self.patterns[interface_name[:-4] + '.persisted_data'],
+                        self.patterns[interface_name[:-4] + '.initialized_data'],
+                        self.patterns[interface_name[:-4] + '.return_types'])
                 except KeyError:
                     pass
         elif init_pattern == 'resource.ResourceQuery':
-            object_name = interface['shortname'][:-5]
+            object_name = interface_name[:-5]
 
         # Special one for services test builder to select whether a session method
         # should be called from a service manager or catalog
@@ -226,7 +226,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 'pkg_name': package['name'],
                 'pkg_name_caps': package['name'].title(),
                 'pkg_name_upper': package['name'].upper(),
-                'interface_name': interface['shortname'],
+                'interface_name': interface_name,
                 'proxy_interface_name': proxy_manager_name(interface_name),
                 'interface_name_title': interface_name.title(),
                 'instance_initers': instance_initers,
