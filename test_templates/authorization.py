@@ -8,4 +8,4 @@ class AuthorizationSession:
         pass"""
 
 class Authorization:
-
+    pass

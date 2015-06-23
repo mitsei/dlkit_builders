@@ -117,8 +117,11 @@ class BaseBuilder(Utilities):
             else:
                 return self._app_prefix + package + self._app_suffix
 
-    def _abc_module(self, package, module, abc=True):
-        return self._abc_pkg_path(package, abc) + '/' + module + '.py'
+    def _abc_module(self, package, module, abc=True, test=False):
+        if test:
+            return self._abc_pkg_path(package, abc) + '/test_' + module + '.py'
+        else:
+            return self._abc_pkg_path(package, abc) + '/' + module + '.py'
 
     def _abc_pkg_path(self, package, abc=True):
         return self._app_name(package) + '/' + self._abc_pkg_name(package['name'], abc)
@@ -398,6 +401,13 @@ class Builder(Utilities):
         from kitbuilder import KitBuilder
         KitBuilder(build_dir=self.build_dir).make()
 
+    def tests(self, create_parent_dir=False):
+        from testbuilder import TestBuilder
+        if create_parent_dir:
+            TestBuilder(build_dir=self.build_dir + '/tests').make()
+        else:
+            TestBuilder(build_dir=self.build_dir).make()
+
 if __name__ == '__main__':
 
     def usage():
@@ -418,6 +428,10 @@ if __name__ == '__main__':
         print "  --buildto <directory>: the target build-to directory"
         print ""
         print "This searches the ./xosid/ directory for *.xosid files, which are parsed into code."
+        print ""
+        print "NOTE: if Tests are built with the other apps, they will be in a sub-folder of the "
+        print "      buildto directory called \"tests/\". Otherwise they will be built into the "
+        print "      specified directory."
         print ""
         print "This will build the files to the directory specified, default of ./dlkit/."
         print ''
@@ -467,20 +481,29 @@ if __name__ == '__main__':
             builder.mongo()
             builder.services()
             builder.authz()
-            pass
+            builder.tests(True)
         else:
             # need to do these in a specific order, regardless of how
             # they are passed in.
+            non_test_build = False
             if 'map' in sys.argv:
                 builder.map()
+                non_test_build = True
             if 'patterns' in sys.argv:
                 builder.patterns()
+                non_test_build = True
             if 'abc' in sys.argv:
                 builder.abc()
+                non_test_build = True
             if 'mongo' in sys.argv:
                 builder.mongo()
+                non_test_build = True
             if 'services' in sys.argv:
                 builder.services()
+                non_test_build = True
             if 'authz' in sys.argv:
                 builder.authz()
+                non_test_build = True
+            if 'tests' in sys.argv:
+                builder.tests(non_test_build)
     sys.exit(0)

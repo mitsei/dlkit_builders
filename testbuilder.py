@@ -1,33 +1,32 @@
-import time
-import os
-import json
 import string
 import datetime
 import importlib
 from importlib import import_module
-from .binder_helpers import *
-from .config import *
-from builders.mongoosid_templates import options
-from abcbinder_settings import XOSIDNAMESPACEURI as ns
-from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
-from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
-from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
-from abcbinder_settings import XOSIDFILESUFFIX as xosid_suffix
-#from abcbinder_settings import ABCROOTPACKAGE as abc_root_pkg
-from abcbinder_settings import ABCPREFIX as abc_prefix
-from abcbinder_settings import ABCSUFFIX as abc_suffix
-from abcbinder_settings import MAINDOCINDENTSTR as main_doc_indent
-from abcbinder_settings import ENCODING as utf_code
-from testbuilder_settings import ABCROOTPACKAGE as abc_root_pkg
-from testbuilder_settings import ROOTPACKAGE as root_pkg
-from testbuilder_settings import ROOTPATH as root_path
-from testbuilder_settings import APPNAMEPREFIX as app_prefix
-from testbuilder_settings import APPNAMESUFFIX as app_suffix
-from testbuilder_settings import PACKAGEPREFIX as pkg_prefix
-from testbuilder_settings import PACKAGESUFFIX as pkg_suffix
-from testbuilder_settings import PATTERN_DIR as pattern_dir
-from testbuilder_settings import TEMPLATE_DIR as template_dir
-template_pkg = '.'.join(template_dir.split('/'))
+
+from binder_helpers import *
+
+
+from build_controller import BaseBuilder
+from interface_builders import InterfaceBuilder
+
+
+class TestBuilder(BaseBuilder):
+    def __init__(self, build_dir=None, *args, **kwargs):
+        super(TestBuilder, self).__init__(*args, **kwargs)
+        if build_dir is None:
+            build_dir = self._abs_path
+        self._build_dir = build_dir
+        self._root_dir = self._build_dir
+        self._template_dir = self._abs_path + '/builders/test_templates'
+
+        self.interface_builder = InterfaceBuilder('tests',
+                                                  self._root_dir,
+                                                  self._template_dir)
+
+    def make(self):
+        self.interface_builder.make_osids()
+
+
 
 def make_tests(build_abc = False, re_index = False, re_map = False):
     """
