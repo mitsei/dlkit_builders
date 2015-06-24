@@ -25,7 +25,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_on_date
         ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}:
+        for ${object_name_under} in self.get_${object_name_plural_under}():
             if overlap(${arg0_name}, ${arg1_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
@@ -48,7 +48,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_source_on_date
         ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_for_${source_name}:
+        for ${object_name_under} in self.get_${object_name_plural_under}_for_${source_name}():
             if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
@@ -73,7 +73,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source_on_date
         ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${source_name}:
+        for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${source_name}():
             if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
@@ -96,7 +96,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination_on_date
         ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_for_${destination_name}:
+        for ${object_name_under} in self.get_${object_name_plural_under}_for_${destination_name}():
             if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
@@ -121,7 +121,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination_on_date
         ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${destination_name}:
+        for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${destination_name}():
             if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
