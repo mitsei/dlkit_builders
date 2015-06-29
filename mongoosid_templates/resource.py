@@ -147,12 +147,12 @@ class ResourceLookupSession:
 
     def _${cat_name_under}_view_filter(self):
         \"\"\"Returns the mongodb catalog filter for isolated or federated views\"\"\"
-        if self._catalog_view = ISOLATED:
-            filter = {'$or': {${cat_name_mixed}Id': str(self._catalog_id),
-                              'assigned${cat_name_plural}': {'$in': [str(self._catalog_id)]}}}
+        if self._catalog_view == ISOLATED:
+            filter = {'$$or': {'${cat_name_mixed}Id': str(self._catalog_id),
+                              'assigned${cat_name_plural}': {'$$in': [str(self._catalog_id)]}}}
         else:
             filter = {}
-            # This needs to traverse hierarchy somehow
+            # This still needs to traverse the catalog hierarchy somehow
         return filter
 """
 

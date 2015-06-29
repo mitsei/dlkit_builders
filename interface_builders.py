@@ -8,7 +8,7 @@ import string
 import datetime
 
 from abcbinder_settings import ENCODING as utf_code
-from binder_helpers import under_to_caps, under_to_mixed,\
+from binder_helpers import under_to_caps, under_to_mixed, camel_to_mixed,\
     remove_plural, camel_to_under, make_plural, camel_to_caps_under
 from build_controller import Utilities, BaseBuilder, Templates
 from config import sessions_to_implement, managers_to_implement,\
@@ -241,6 +241,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 'object_name_under_plural': camel_to_under(make_plural(object_name)),
                 'cat_name': cat_name,
                 'cat_name_plural': make_plural(cat_name),
+                'cat_name_mixed': camel_to_mixed(cat_name),
                 'cat_name_under': camel_to_under(cat_name),
                 'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
                 'cat_name_upper': cat_name.upper(),

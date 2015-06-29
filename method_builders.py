@@ -197,6 +197,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             else:
                 context['svc_mgr_or_catalog'] = 'catalog'
 
+        # Uncomment next line to identify on which method a KeyError is occurring
+        #print interface['shortname'], method['name']
         return context
 
     def _make_method(self, method, package_name, interface, patterns):
