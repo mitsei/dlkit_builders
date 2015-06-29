@@ -131,3 +131,46 @@ SEQUESTERED = {
     'array': False,
     'syntax': 'BOOLEAN',
     }
+
+PROVIDER = {
+    'element_label': 'provider',
+    'instructions': 'accepts an osid.id.Id object',
+    'required': False,
+    'read_only': False,
+    'linked': False,
+    'array': False,
+    'default_id_values': [''],
+    'syntax': 'ID',
+    'id_set': [],
+    }
+
+BRANDING = {
+    'element_label': 'branding',
+    'instructions': 'accepts an osid.id.Id object',
+    'required': False,
+    'read_only': False,
+    'linked': False,
+    'array': True,
+    'default_id_values': [''],
+    'syntax': 'ID',
+    'id_set': [],
+    }
+
+LICENSE = {
+    'element_label': 'License',
+    'instructions': 'Optional',
+    'required': False,
+    'read_only': False,
+    'linked': False,
+    'array': False,
+    'default_string_values': [{
+        'text': '',
+        'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+        'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+        'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+        }],
+    'syntax': 'STRING',
+    'minimum_string_length': 0,
+    'maximum_string_length': None,
+    'string_set': []
+    }

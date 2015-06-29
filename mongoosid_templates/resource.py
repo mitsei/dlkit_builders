@@ -145,16 +145,15 @@ class ResourceLookupSession:
         self._catalog_view = ISOLATED
         self._kwargs = kwargs
 
-    def _catalog_view_idstrs(self):
-        \"\"\"Implement me soon? \"\"\"
-        pass
-        #if self._catalog_view == ISOLATED:
-        #    return [str(self._catalog_id)]
-        #try:
-        #    ${pkg_name}_manager = self._get_provider_manager('pkg_name_upper')
-        #    hs = ${pkg_name}_manager.get_${cat_name_under}_hierarchy_session() # What about proxy?
-        #except:
-        #    return [str(self._catalog_id)]
+    def _${cat_name_under}_view_filter(self):
+        \"\"\"Returns the mongodb catalog filter for isolated or federated views\"\"\"
+        if self._catalog_view = ISOLATED:
+            filter = {'$or': {${cat_name_mixed}Id': str(self._catalog_id),
+                              'assigned${cat_name_plural}': {'$in': [str(self._catalog_id)]}}}
+        else:
+            filter = {}
+            # This needs to traverse hierarchy somehow
+        return filter
 """
 
     get_bin_id_template = """
@@ -199,12 +198,14 @@ class ResourceLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier()),
-                                          '${cat_name_mixed}Id': str(self._catalog_id)})
-        else:
-            # This should really look in the underlying hierarchy (when hierarchy is implemented)
-            result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+        #if self._catalog_view == ISOLATED:
+        #    result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier()),
+        #                                  '${cat_name_mixed}Id': str(self._catalog_id)})
+        #else:
+        #    # This should really look in the underlying hierarchy (when hierarchy is implemented)
+        #    result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+        result = collection.find_one(
+            {'_id': ObjectId(${arg0_name}.get_identifier())}.update(self._${cat_name_under}_view_filter()))
 
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
@@ -521,11 +522,15 @@ class ResourceAdminSession:
         objects.${object_name}(${object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
+    can_manage_asset_aliases_template = """
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
 
     alias_resources_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.alias_resources_template
-        raise errors.Unimplemented()"""
+        self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
 
 class ResourceAgentSession:
 
@@ -1365,10 +1370,11 @@ class BinForm:
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidObjectForm._init_metadata(self)
+        osid_objects.OsidSourceableForm._init_metadata(self)
 
     def _init_map(self):
-        #from ..osid.objects import OsidObjectForm
         osid_objects.OsidObjectForm._init_map(self)
+        osid_objects.OsidSourceableForm._init_map(self)
 """
 
 

@@ -322,6 +322,10 @@ class Containable:
     is_sequestered = """
         return self._my_map['sequestered']"""
 
+class Sourceable:
+
+
+
 class Operable:
 
     is_active = """
@@ -495,6 +499,42 @@ class OsidSession:
             if self._runtime is not None:
                 manager.initialize(self._runtime)
         return manager
+
+    def _get_id(self, id_):
+        collection = MongoClientValidated(self._db_prefix + 'id',
+                                          collection='Id',
+                                          runtime=self._runtime)
+        try:
+            result = collection.find_one({'aliasIds': {'$in': [str(id_)]}})
+        except errors.NotFound:
+            return id_
+        else:
+            return Id(result['_id'])
+
+    def _alias_id(self, primary_id, equivalent_id):
+        pkg_name = primary_id.get_identifier_namespace().split('.')[0]
+        obj_name = primary_id.get_identifier_namespace().split('.')[1]
+        collection = MongoClientValidated(self._db_prefix + pkg_name,
+                                          collection=obj_name,
+                                          runtime=self._runtime)
+        collection.find_one({'_id': primary_id.get_identifier()}) # to raise NotFound
+        collection = MongoClientValidated(self._db_prefix + 'id',
+                                          collection='Id',
+                                          runtime=self._runtime)
+        try:
+            result = collection.find_one({'aliasIds': {'$in': [str(equivalent_id)]}})
+        except errors.NotFound:
+            pass
+        else:
+            result['aliasIds'].remove(str(equivalent_id))
+            # collection.replace_one ( result )
+        try:
+            id_map = collection.find_one({'_id': str(primary_id)})
+        except errors.NotFound:
+            collection.insert_one({'_id': str(primary_id), 'aliasIds': [str(equivalent_id)]})
+        else:
+            id_map['aliasIds'].append(str(equivalent_id))
+            #collection.replace_one ( id_map )
 """
 
     get_locale = """
@@ -706,6 +746,9 @@ class OsidObject:
                     pass
         except AttributeError:
             pass
+        
+        if 'assignedCatalogs' in obj_map:
+            del obj_map['assignedCatalogs']
 
         obj_map.update(
             {'type': self._namespace.split('.')[-1],
@@ -1155,14 +1198,96 @@ class OsidSourceableForm:
 
     init = """
     def __init__(self):
-        pass
+        self._provider_metadata = None
+        self._provider_default = None
+        self._branding_metadata = None
+        self._branding_default = None
+        self._license_metadata = None
+        self._license_default = None
 
     def _init_metadata(self):
-        pass
+        self._provider_metadata = {
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='provider')}
+        self._provider_metadata.update(mdata_conf.PROVIDER)
+        self._provider_default = self._provider_metadata['default_id_values'][0]
+
+        self._branding_metadata = {
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='branding')}
+        self._branding_metadata.update(mdata_conf.BRANDING)
+        self._branding_default = self._branding_metadata['default_id_values']
+
+        self._license_metadata = {
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='license')}
+        self._license_metadata.update(mdata_conf.LICENSE)
+        self._license_default = self._license_metadata['default_string_values'][0]
 
     def _init_map(self):
-        pass
+        pass # Should we initialize the map?
 """
+
+    get_provider_metadata = """
+        metadata = dict(self._provider_metadata)
+        metadata.update({'existing_id_values': self._my_map['providerId']})
+        return Metadata(**metadata)"""
+
+    set_provider = """
+        if self.get_provider_metadata().is_read_only():
+            raise errors.NoAccess()
+        if not self._is_valid_id(provider_id):
+            raise errors.InvalidArgument()
+        self._my_map['providerId'] = str(provider_id)"""
+
+    clear_provider = """
+        if (self.get_provider_metadata().is_read_only() or
+                self.get_provider_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['providerId'] = self._provider_default"""
+
+    get_branding_metadata = """
+        metadata = dict(self._branding_metadata)
+        metadata.update({'existing_id_values': self._my_map['brandingIds']})
+        return Metadata(**metadata)"""
+
+    set_branding = """
+        if self.get_branding_metadata().is_read_only():
+            raise errors.NoAccess()
+        if not self._is_valid_input(asset_ids, self.get_branding_metadata(), array=True):
+            raise errors.InvalidArgument()
+        branding_ids = []
+        for asset_id in asset_ids:
+            branding_ids.append(str(asset_id))
+        self._my_map['brandingIds'] = branding_ids"""
+
+    clear_branding = """
+        if (self.get_branding_metadata().is_read_only() or
+                self.get_branding_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['brandingIds'] = self._branding_default"""
+
+    get_license_metadata = """
+        metadata = dict(self._license_metadata)
+        metadata.update({'existing_string_values': self._my_map['license']})
+        return Metadata(**metadata)"""
+
+    set_license = """
+        if self.get_license_metadata().is_read_only():
+            raise errors.NoAccess()
+        if not self._is_valid_string(license, self.get_license_metadata()):
+            raise errors.InvalidArgument()
+        self._my_map['license']['text'] = license"""
+
+    clear_license = """
+        if (self.get_license_metadata().is_read_only() or
+                self.get_license_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['license'] = dict(self._license_default)"""
+
 
 class OsidObjectForm:
 
