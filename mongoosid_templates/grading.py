@@ -105,7 +105,7 @@ class GradeSystemForm:
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['${var_name_mixed}'] = ${var_name}_default"""
+        self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
 
 class GradeEntry:
 
