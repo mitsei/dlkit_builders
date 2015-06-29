@@ -61,11 +61,12 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             return (self._abc_pkg_name(package['name'], abc=self._is('abc')) + '_' +
                     interface['category'] + '.' +
                     interface['shortname'])
-
         last_inheritance = []
 
         # Seed the inheritance list with this interface's abc_osid
-        if package['name'] != 'osid' and interface['category'] == 'managers':
+        if self._is('tests'):
+            inheritance = ['unittest.TestCase']
+        elif package['name'] != 'osid' and interface['category'] == 'managers':
             inheritance = []
             last_inheritance = [get_full_interface_class()]
         else:
@@ -74,27 +75,28 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         # Iterate through any inherited interfaces and build the inheritance
         # list for this interface. Also, check if an import statement is
         # required and append to the appropriate module's import list.
-        for i in interface['inheritance']:
-            pkg_name = self._abc_pkg_name(i['pkg_name'], abc=self._is('abc'))
-            unknown_module_protection = ''
-            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
-            if inherit_category == 'UNKNOWN_MODULE':
-                unknown_module_protection = '\"\"\"'
+        if not self._is('tests'):
+            for i in interface['inheritance']:
+                pkg_name = self._abc_pkg_name(i['pkg_name'], abc=self._is('abc'))
+                unknown_module_protection = ''
+                inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+                if inherit_category == 'UNKNOWN_MODULE':
+                    unknown_module_protection = '\"\"\"'
 
-            if (i['pkg_name'] == package['name'] and
-                    inherit_category == interface['category']):
-                inheritance.append(i['name'])
-            else:
-                if self._is('services') and i['pkg_name'] != package['name']:
-                    inheritance.append(i['pkg_name'] + '.' + i['name'])
+                if (i['pkg_name'] == package['name'] and
+                        inherit_category == interface['category']):
+                    inheritance.append(i['name'])
+                else:
+                    if self._is('services') and i['pkg_name'] != package['name']:
+                        inheritance.append(i['pkg_name'] + '.' + i['name'])
 
-                if not self._is('services'):
-                    inheritance.append(unknown_module_protection +
-                                       pkg_name + '_' +
-                                       inherit_category + '.' + i['name'] +
-                                       unknown_module_protection)
+                    if not self._is('services'):
+                        inheritance.append(unknown_module_protection +
+                                           pkg_name + '_' +
+                                           inherit_category + '.' + i['name'] +
+                                           unknown_module_protection)
 
-        if self._is('mongo') or self._is('services') or self._is('authz'):
+        if self._is('mongo') or self._is('services') or self._is('authz') or self._is('tests'):
             # Check to see if there are any additional inheritances required
             # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
             # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
@@ -158,24 +160,24 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         # Check for any special data initializations and call the appropriate makers
         # to assemble them.
         if init_pattern == 'resource.Bin':
-            object_name = interface['shortname']
+            object_name = interface_name
         elif init_pattern == 'resource.BinForm':
-            object_name = interface['shortname'][:-4]
+            object_name = interface_name[:-4]
         elif init_pattern == 'resource.ResourceLookupSession':
-            object_name = interface['shortname'][:-13]
+            object_name = interface_name[:-13]
         elif init_pattern == 'resource.ResourceQuerySession':
-            object_name = interface['shortname'][:-12]
+            object_name = interface_name[:-12]
         elif init_pattern == 'resource.ResourceAdminSession':
-            object_name = interface['shortname'][:-12]
+            object_name = interface_name[:-12]
         elif init_pattern == 'commenting.CommentLookupSession':
             if self._is('authz'):
-                object_name = interface_name[:7]
+                object_name = interface_name.replace('LookupSession', '')
             else:
-                object_name = interface['shortname'][:-13]
+                object_name = interface_name[:-13]
         elif init_pattern == 'resource.Resource':
-            object_name = interface['shortname']
+            object_name = interface_name
         elif init_pattern == 'resource.ResourceForm':
-            object_name = interface['shortname'][:-4]
+            object_name = interface_name[:-4]
             if not self._is('authz'):
                 if object_name in self.patterns['package_relationships_caps']:
                     init_object = 'osid_objects.OsidRelationshipForm'
@@ -193,22 +195,29 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                     map_super_initers += '\n'
                 try:
                     persisted_initers = make_persistance_initers(
-                        self.patterns[interface['shortname'][:-4] + '.persisted_data'],
-                        self.patterns[interface['shortname'][:-4] + '.initialized_data'],
-                        self.patterns[interface['shortname'][:-4] + '.aggregate_data'])
+                        self.patterns[interface_name[:-4] + '.persisted_data'],
+                        self.patterns[interface_name[:-4] + '.initialized_data'],
+                        self.patterns[interface_name[:-4] + '.aggregate_data'])
                 except KeyError:
                     pass
 
                 try:
                     metadata_initers = make_metadata_initers(
-                        interface['shortname'],
-                        self.patterns[interface['shortname'][:-4] + '.persisted_data'],
-                        self.patterns[interface['shortname'][:-4] + '.initialized_data'],
-                        self.patterns[interface['shortname'][:-4] + '.return_types'])
+                        interface_name,
+                        self.patterns[interface_name[:-4] + '.persisted_data'],
+                        self.patterns[interface_name[:-4] + '.initialized_data'],
+                        self.patterns[interface_name[:-4] + '.return_types'])
                 except KeyError:
                     pass
         elif init_pattern == 'resource.ResourceQuery':
-            object_name = interface['shortname'][:-5]
+            object_name = interface_name[:-5]
+
+        # Special one for services test builder to select whether a session method
+        # should be called from a service manager or catalog
+        if object_name == cat_name:
+            svc_mgr_or_catalog = 'svc_mgr'
+        else:
+            svc_mgr_or_catalog = 'catalog'
 
         return {'app_name': self._app_name(package['name']),
                 'implpkg_name': self._abc_pkg_name(package['name'], abc=False),
@@ -216,7 +225,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 'pkg_name': package['name'],
                 'pkg_name_caps': package['name'].title(),
                 'pkg_name_upper': package['name'].upper(),
-                'interface_name': interface['shortname'],
+                'interface_name': interface_name,
                 'proxy_interface_name': proxy_manager_name(interface_name),
                 'interface_name_title': interface_name.title(),
                 'instance_initers': instance_initers,
@@ -227,12 +236,15 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 'object_name': object_name,
                 'object_name_under': camel_to_under(object_name),
                 'object_name_upper': camel_to_under(object_name).upper(),
+                'object_name_plural': make_plural(object_name),
+                'object_name_under_plural': camel_to_under(make_plural(object_name)),
                 'cat_name': cat_name,
                 'cat_name_plural': make_plural(cat_name),
                 'cat_name_under': camel_to_under(cat_name),
                 'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
                 'cat_name_upper': cat_name.upper(),
-                'init_object': init_object}
+                'init_object': init_object,
+                'svc_mgr_or_catalog': svc_mgr_or_catalog}
 
     def _grab_service_methods(self, package, type_check_method):
         self.patterns['implemented_view_methods'] = []
@@ -286,7 +298,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         if package['name'] not in managers_to_implement:
             return
 
-        self._copy_package_helpers(package)
+        if not self._is('abc'):
+            self._copy_package_helpers(package)
 
         print "Building " + self._class + " osid for " + package['name']
 
@@ -334,7 +347,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             # Check if a directory already exists for the abc osid.  If not,
             # create one and initialize as a python package.
             self._make_dir(self._app_name(package), python=True)
-            if self._is('mongo') or self._is('authz'):
+            if self._is('mongo') or self._is('authz') or self._is('tests'):
                 self._make_dir(self._abc_pkg_path(package), python=True)
 
         if self._is('abc'):
@@ -416,6 +429,11 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                           '# pylint: disable=too-many-ancestors\n' +
                           '#     Inheritance defined in specification\n')
                 modules[module]['imports'].append(docstr)
+            elif self._is('tests'):
+                docstr = '\"\"\"Unit tests of ' + package['name'] + ' ' + module + '.\"\"\"\n'
+                modules[module]['imports'].append(docstr)
+                pylintstr = ''
+                modules[module]['imports'].append(pylintstr)
 
         if self._is('mongo') and package['name'] in managers_to_implement:
             # Assemble and write profile.py file for this package.
@@ -439,7 +457,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         # The real work starts here.  Iterate through all interfaces to build
         # all the classes for this osid package.
         for interface in package['interfaces']:
-            if ((self._is('mongo') or self._is('services')) and
+            if ((self._is('mongo') or self._is('services') or self._is('tests')) and
                     not build_this_interface(package, interface)):
                 continue  # don't build it
 
@@ -494,6 +512,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 class_doc = ('{}\"\"\"Adapts underlying {} methods' +
                              'with authorization checks.\"\"\"').format(self._ind,
                                                                         interface['shortname'])
+            elif self._is('tests'):
+                class_doc = '{}\"\"\"Tests for {}\"\"\"'.format(self._ind,
+                                                                interface['shortname'])
             elif not self._is('services'):
                 # Inspect the class doc string for headline + body and create
                 # appropriate doc string style. Trying to conform to PEP 257 as
@@ -513,8 +534,12 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                              'including related Session methods."\"\"').format(self._ind,
                                                                                interface['shortname'])
 
-            class_sig = 'class {}{}:'.format(interface['shortname'],
-                                             inheritance)
+            if self._is('tests'):
+                class_sig = 'class Test{}{}:'.format(interface['shortname'],
+                                                     inheritance)
+            else:
+                class_sig = 'class {}{}:'.format(interface['shortname'],
+                                                 inheritance)
 
             if self._is('abc'):
                 modules[interface['category']]['body'] = (
@@ -591,6 +616,10 @@ DISABLED = -1"""
                         write_file.write('{}{}\n\n\n{}'.format('\n'.join(order_module_imports(modules[module]['imports'])),
                                                                constant_declarations,
                                                                modules[module]['body']).encode('utf-8'))
+                elif self._is('tests'):
+                    with open(self._abc_module(package, module_name, test=True), 'wb') as write_file:
+                        write_file.write(('\n'.join(modules[module]['imports']) + '\n\n\n' +
+                            modules[module]['body']).encode('utf-8'))
                 else:
                     with open(self._abc_module(package, module_name), 'wb') as write_file:
                         write_file.write(('\n'.join(order_module_imports(modules[module]['imports'])) +
@@ -675,7 +704,7 @@ DISABLED = -1"""
     def _update_module_imports(self, modules, package, interface):
         # And make sure there is a corresponding import statement for this
         # interface's abc_osid and associated module/category name.
-        if self._is('mongo') or self._is('authz'):
+        if self._is('mongo') or self._is('authz') or self._is('tests'):
             imports = modules[interface['category']]['imports']
         else:  # services
             imports = modules[package['name']]['imports']
@@ -687,38 +716,49 @@ DISABLED = -1"""
         def package_interface():
             return self._abc_pkg_name(package['name'] + '_' + interface['category'])
 
-        if package['name'] != 'osid' and interface['category'] == 'managers':
-            import_str = 'from dlkit.manager_impls.{} import {} as {}'.format(self._abc_pkg_name(package),
-                                                                              interface['category'],
-                                                                              package_interface())
+        if self._is('tests'):
+            import_str = 'import unittest'
         else:
-            import_str = 'from {}.{} import {} as abc_{}'.format(self._app_name(package, abstract=True),
-                                                                 self._abc_pkg_name(package),
-                                                                 interface['category'],
-                                                                 package_interface())
+            if package['name'] != 'osid' and interface['category'] == 'managers':
+                import_str = 'from dlkit.manager_impls.{} import {} as {}'.format(self._abc_pkg_name(package),
+                                                                                  interface['category'],
+                                                                                  package_interface())
+            else:
+                import_str = 'from {}.{} import {} as abc_{}'.format(self._app_name(package, abstract=True),
+                                                                     self._abc_pkg_name(package),
+                                                                     interface['category'],
+                                                                     package_interface())
 
         append(import_str)
 
-        # Iterate through any inherited interfaces and check if an import statement is
-        # required and append to the appropriate module's import list.
-        for i in interface['inheritance']:
-            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
-            if (i['pkg_name'] == package['name'] and
-                    inherit_category == interface['category']):
-                pass
-            else:
-                if self._is('services') and i['pkg_name'] != package['name']:
-                    import_str = 'from . import {}'.format(i['pkg_name'])
+        if self._is('tests'):
+            # Check to see if there are any additinal inheritances required
+            # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
+            # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
+            impl_class = self._load_impl_class(package['name'], interface['shortname'])
+            if hasattr(impl_class, 'inheritance_imports'):
+                modules[interface['category']]['imports'] += getattr(impl_class, 'inheritance_imports')
+        else:
+            # Iterate through any inherited interfaces and check if an import statement is
+            # required and append to the appropriate module's import list.
+            for i in interface['inheritance']:
+                inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+                if (i['pkg_name'] == package['name'] and
+                        inherit_category == interface['category']):
+                    pass
+                else:
+                    if self._is('services') and i['pkg_name'] != package['name']:
+                        import_str = 'from . import {}'.format(i['pkg_name'])
 
-                if not self._is('services'):
-                    import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(self._app_name(i['pkg_name'])),
-                                                                             self._abc_pkg_name(i['pkg_name'], abc=False),
-                                                                             inherit_category)
+                    if not self._is('services'):
+                        import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(self._app_name(i['pkg_name'])),
+                                                                                 self._abc_pkg_name(i['pkg_name'], abc=False),
+                                                                                 inherit_category)
 
-                if inherit_category != 'UNKNOWN_MODULE':
-                    append(import_str)
+                    if inherit_category != 'UNKNOWN_MODULE':
+                        append(import_str)
 
-        if self._is('mongo'):
+        if self._is('mongo') or self._is('tests'):
             # Check to see if there are any additional inheritances required
             # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
             # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
@@ -741,8 +781,9 @@ DISABLED = -1"""
                                                        default=[]):
                 append(import_str)
 
-            # add the none-argument check import if not already present
-            append('from .. import utilities')
+            if self._is('mongo'):
+                # add the none-argument check import if not already present
+                append('from .. import utilities')
         elif self._is('services'):
             # Don't forget the OsidSession inheritance:
             if (('OsidManager' in interface['inherit_shortnames'] or
@@ -869,7 +910,7 @@ def eq_methods(interface_name):
                 self.get_identifier_namespace() == other.get_identifier_namespace() and
                 self.get_identifier() == other.get_identifier()
             )
-        return NotImplemented()
+        return NotImplemented
 
     def __ne__(self, other):
         result = self.__eq__(other)

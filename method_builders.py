@@ -28,7 +28,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
     def _build_method_doc(self, method):
         if self._is('abc'):
-            detail_docs = filter(None, [method['sphinx_param_doc'].strip('\n'),
+           detail_docs = filter(None, [method['sphinx_param_doc'].strip('\n'),
                                         method['sphinx_return_doc'].strip('\n'),
                                         method['sphinx_error_doc'].strip('\n') + '\n',
                                         method['compliance_doc'].strip('\n'),
@@ -53,6 +53,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
     def _get_method_context(self, package_name, method, interface, patterns):
         """Get the method context vars, to be used in the template"""
+        from interface_builders import is_manager_session
+
         def construct_arg_context(arg_number, arg_type_full):
             arg_type = self.last(arg_type_full).strip('[]')
             arg_context = {
@@ -189,6 +191,12 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             if 'method_name' in context and context['method_name'].startswith('can_'):
                 context['func_name'] = context['method_name'].split('_')[1]
 
+            # Special one for services test builder:
+            if is_manager_session(interface, patterns, package_name):
+                context['svc_mgr_or_catalog'] = 'svc_mgr'
+            else:
+                context['svc_mgr_or_catalog'] = 'catalog'
+
         return context
 
     def _make_method(self, method, package_name, interface, patterns):
@@ -210,7 +218,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     self._wrap(method_sig) + '\n' +
                     self._wrap(method_doc) + '\n' +
                     self._wrap(method_impl))
-        elif self._is('mongo') or self._is('services') or self._is('authz'):
+        elif self._is('mongo') or self._is('services') or self._is('authz') or self._is('tests'):
             args = ['self']
             decorator = ''
             method_sig = ''
@@ -260,6 +268,14 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 method_sig = '{}def {}({}):'.format(self._ind,
                                                     method['name'],
                                                     ', '.join(args))
+            elif self._is('tests'):
+                method_sig = '{}def test_{}({}):'.format(self._ind,
+                                                         method['name'],
+                                                         ', '.join(args))
+
+                if method_impl == '{}pass'.format(self._dind):
+                    method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
+                                                                                       method_sig)
 
             detail_docs = filter(None, [method['arg_doc'].strip('\n'),
                                         method['return_doc'].strip('\n'),
@@ -267,18 +283,22 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                                         method['compliance_doc'].strip('\n'),
                                         method['impl_notes_doc'].strip('\n')])
 
-            if method['doc']['body'].strip() == '' and not detail_docs:
-                method_doc = self._wrap('{}\"\"\"{}\"\"\"'.format(self._dind,
-                                                                  method['doc']['headline']))
-            elif method['doc']['body'].strip() == '':
-                method_doc = '{0}\"\"\"{1}\n\n{2}\n\n{0}\"\"\"'.format(self._dind,
-                                                                       self._wrap(method['doc']['headline']),
-                                                                       self._wrap('\n'.join(detail_docs)))
+            if self._is('tests'):
+                method_doc = '{}\"\"\"Tests {}\"\"\"'.format(self._dind,
+                                                             method['name'])
             else:
-                method_doc = '{0}\"\"\"{1}\n\n{2}\n\n{3}\n\n{0}\"\"\"'.format(self._dind,
-                                                                              self._wrap(method['doc']['headline']),
-                                                                              self._wrap(method['doc']['body']),
-                                                                              self._wrap('\n'.join(detail_docs)))
+                if method['doc']['body'].strip() == '' and not detail_docs:
+                    method_doc = self._wrap('{}\"\"\"{}\"\"\"'.format(self._dind,
+                                                                      method['doc']['headline']))
+                elif method['doc']['body'].strip() == '':
+                    method_doc = '{0}\"\"\"{1}\n\n{2}\n\n{0}\"\"\"'.format(self._dind,
+                                                                           self._wrap(method['doc']['headline']),
+                                                                           self._wrap('\n'.join(detail_docs)))
+                else:
+                    method_doc = '{0}\"\"\"{1}\n\n{2}\n\n{3}\n\n{0}\"\"\"'.format(self._dind,
+                                                                                  self._wrap(method['doc']['headline']),
+                                                                                  self._wrap(method['doc']['body']),
+                                                                                  self._wrap('\n'.join(detail_docs)))
 
             if self._is('services') or self._is('authz'):
                 return method_sig + '\n' + method_impl
@@ -385,6 +405,13 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             elif self._is('authz'):
                 if impl == '':
                     impl = '{}raise Unimplemented()'.format(self._dind)
+            elif self._is('tests'):
+                if impl == '':
+                    impl = '{}pass'.format(self._dind)
+                else:
+                    if (interface['category'] in patterns['impl_log'] and
+                            interface_sn in patterns['impl_log'][interface['category']]):
+                        patterns['impl_log'][context['module_name']][interface_sn][method_n][1] = 'implemented'
 
             return impl
 
@@ -419,7 +446,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         body = []
 
         for method in interface['methods']:
-            if self._is('mongo'):
+            if self._is('mongo') or self._is('tests'):
                 if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
                     method['name'] = 'read_to_buffer'
             elif self._is('services'):
@@ -428,7 +455,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentBasicAuthoringSession':
                     method['name'] = 'get_assessment_items'
 
-            if ((self._is('mongo') or self._is('services') or self._is('authz')) and
+            if ((self._is('mongo') or self._is('services') or self._is('authz') or self._is('tests')) and
                     not build_this_method(package_name, interface, method)):
                 continue
 
@@ -438,26 +465,27 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 # Only expected from kitosid / services builder
                 pass
             else:
-                # Here is where we add the Python properties stuff:
-                if argless_get(method):
-                    body.append(simple_property('get', method))
-                elif one_arg_set(method):
-                    if (simple_property('del', method)) in body:
-                        body.remove(simple_property('del', method))
-                        body.append(set_and_del_property(method))
-                    else:
-                        body.append(simple_property('set', method))
-                elif argless_clear(method):
-                    if (simple_property('set', method)) in body:
-                        body.remove(simple_property('set', method))
-                        body.append(set_and_del_property(method))
-                    else:
-                        body.append(simple_property('del', method))
+                if not self._is('tests'):
+                    # Here is where we add the Python properties stuff:
+                    if argless_get(method):
+                        body.append(simple_property('get', method))
+                    elif one_arg_set(method):
+                        if (simple_property('del', method)) in body:
+                            body.remove(simple_property('del', method))
+                            body.append(set_and_del_property(method))
+                        else:
+                            body.append(simple_property('set', method))
+                    elif argless_clear(method):
+                        if (simple_property('set', method)) in body:
+                            body.remove(simple_property('set', method))
+                            body.append(set_and_del_property(method))
+                        else:
+                            body.append(simple_property('del', method))
 
-                if method['name'] == 'get_id':
-                        body.append(simple_property('get', method, 'ident'))
-                if method['name'] == 'get_identifier_namespace':
-                        body.append(simple_property('get', method, 'namespace'))
+                    if method['name'] == 'get_id':
+                            body.append(simple_property('get', method, 'ident'))
+                    if method['name'] == 'get_identifier_namespace':
+                            body.append(simple_property('get', method, 'namespace'))
 
         return '\n\n'.join(body)
 

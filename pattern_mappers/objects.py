@@ -1353,3 +1353,35 @@ def map_query_patterns(interface, package, index):
                                 module_name = interface['category'],
                                 method_name = method['name']))  
     return index
+
+def map_catalog_query_patterns(interface, package, index):
+
+    object_name = interface['shortname'][:-5]
+    index[interface['shortname'] + '.init_pattern'] = 'resource.BinQuery'
+
+    for method in interface['methods']:
+        var_name = method['name'].split('_', 1)[-1]
+
+        # Query methods that clear all terms (do we need one for each element type?)
+        if (method['name'].endswith('_terms') and
+              method['name'].startswith('clear_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.BinQuery.clear_group_terms',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name[:-6],
+                              object_name = object_name,
+                              return_type_full = method['return_type']))
+
+        else:
+            # uncomment the following line to print all unknown object patterns
+#            print 'unknown object pattern:', interface['fullname'], method['name']
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = '',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name']))
+    return index

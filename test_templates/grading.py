@@ -48,7 +48,7 @@ class GradeEntryLookupSession:
         cls.grade_entry_ids = list()
         cls.gradebook_column_list = list()
         cls.gradebook_column_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', 'TEST_SERVICE', PROXY)
+        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test Gradebook'
         create_form.description = 'Test Gradebook for GradeEntryLookupSession tests'

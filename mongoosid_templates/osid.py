@@ -1329,6 +1329,49 @@ class OsidList:
     def __iter__(self):
         return self
 
+    def _get_next_n(self, number=None):
+        \"\"\"Gets the next set of \"n\" elements in this list.
+
+        The specified amount must be less than or equal to the return
+        from ``available()``.
+
+        arg:    n (cardinal): the number of ``Relationship`` elements
+                requested which must be less than or equal to
+                ``available()``
+        return: (osid.relationship.Relationship) - an array of
+                ``Relationship`` elements.The length of the array is
+                less than or equal to the number specified.
+        raise:  IllegalState - no more elements available in this list
+        raise:  OperationFailed - unable to complete request
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        if number > self.available():
+            # !!! This is not quite as specified (see method docs) !!!
+            raise errors.IllegalState('not enough elements available in this list')
+        else:
+            next_list = []
+            counter = 0
+            while counter < number:
+                try:
+                    next_list.append(self.next())
+                except Exception:  # Need to specify exceptions here!
+                    raise errors.OperationFailed()
+                counter += 1
+            return next_list
+
+    def _get_next_object(self, object_class):
+        \"\"\"stub\"\"\"
+        try:
+            next_object = OsidList.next(self)
+        except StopIteration:
+            raise
+        except Exception:  # Need to specify exceptions here!
+            raise errors.OperationFailed()
+        if isinstance(next_object, dict):
+            next_object = object_class(next_object, db_prefix=self._db_prefix, runtime=self._runtime)
+        return next_object
+
     def next(self):
         \"\"\"next method for iterator.\"\"\"
         next_object = self._iter_object.next()

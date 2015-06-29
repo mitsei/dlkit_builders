@@ -1068,6 +1068,43 @@ class BinHierarchyDesignSession:
         return self._hierarchy_session.remove_children(id_=${arg0_name})"""
 
 
+class BinQuerySession:
+
+    import_statements_pattern = [
+    ]
+
+    init_template = """
+    _session_name = '${interface_name}'
+
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._forms = dict()
+        self._kwargs = kwargs
+"""
+
+    can_query_bins_template = """
+        # Implemented from template for
+        # osid.resource.BinQuerySession.can_query_bins
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
+    get_bin_query_template = """
+        # Implemented from template for
+        # osid.resource.BinQuerySession.get_bin_query_template
+        return queries.${return_type}()"""
+
+    get_bins_by_query_template = """
+        # Implemented from template for
+        # osid.resource.BinQuerySession.get_bins_by_query_template
+        query_terms = dict(${arg0_name}._query_terms)
+        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+                                          collection='${cat_name}',
+                                          runtime=self._runtime)
+        result = collection.find(query_terms).sort('_id', DESCENDING)
+
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+
 class Resource:
 
     import_statements_pattern = [
@@ -1255,36 +1292,14 @@ class ResourceList:
 
     get_next_resource_template = """
         # Implemented from template for osid.resource.ResourceList.get_next_resource
-        try:
-            next_item = self.next()
-        except StopIteration:
-            raise errors.IllegalState('no more elements available in this list')
-        #except: #Need to specify exceptions here
-        #    raise errors.OperationFailed()
-        else:
-            return next_item
+        return self.next()
 
     def next(self):
-        next_item = osid_objects.OsidList.next(self)
-        if isinstance(next_item, dict):
-            next_item = ${return_type}(next_item, db_prefix=self._db_prefix, runtime=self._runtime)
-        return next_item"""
+        return self._get_next_object(${return_type})"""
 
     get_next_resources_template = """
-    # Implemented from template for osid.resource.ResourceList.get_next_resources
-        if ${arg0_name} > self.available():
-            # !!! This is not quite as specified (see method docs) !!!
-            raise errors.IllegalState('not enough elements available in this list')
-        else:
-            next_list = []
-            i = 0
-            while i < ${arg0_name}:
-                try:
-                    next_list.append(self.next())
-                except StopIteration:
-                    break
-                i += 1
-            return next_list"""
+        # Implemented from template for osid.resource.ResourceList.get_next_resources
+        return self._get_next_n(${arg0_name})"""
 
 class Bin:
 
@@ -1355,3 +1370,27 @@ class BinForm:
         #from ..osid.objects import OsidObjectForm
         osid_objects.OsidObjectForm._init_map(self)
 """
+
+
+class BinQuery:
+
+    import_statements_pattern = [
+        'from ..primitives import Id'
+    ]
+
+    init_template = """
+    def __init__(self):
+        try:
+            #pylint: disable=no-name-in-module
+            from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
+        except (ImportError, AttributeError):
+            record_type_data_sets = {}
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidCatalogQuery.__init__(self)
+"""
+
+    clear_group_terms_template = """
+        self._clear_terms('${var_name_mixed}')"""

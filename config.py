@@ -60,6 +60,7 @@ sessions_to_implement = [
     'AssessmentTakenQuerySession',
     'AssessmentTakenAdminSession',
     'BankLookupSession',
+    'BankQuerySession',
     'BankAdminSession',
     'BankHierarchySession',
     'BankHierarchyDesignSession',

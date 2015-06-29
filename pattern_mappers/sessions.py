@@ -24,6 +24,9 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'].endswith('LookupSession') and
         interface['shortname'][:-13] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinLookupSession'
+    elif (interface['shortname'].endswith('QuerySession') and
+            interface['shortname'][:-12] in index['package_catalog_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.BinQuerySession'
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinAdminSession'
@@ -188,7 +191,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'] == index['package_catalog_caps'] + 'QuerySession' and
             method['name'] == 'get_' + make_plural(index['package_catalog_under']) + '_by_query'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.BinQuerySession.get_bins',
+                pattern = 'resource.BinQuerySession.get_bins_by_query',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
