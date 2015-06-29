@@ -61,7 +61,6 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             return (self._abc_pkg_name(package['name'], abc=self._is('abc')) + '_' +
                     interface['category'] + '.' +
                     interface['shortname'])
-
         last_inheritance = []
 
         # Seed the inheritance list with this interface's abc_osid
