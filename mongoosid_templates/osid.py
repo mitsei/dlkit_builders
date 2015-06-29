@@ -697,6 +697,10 @@ class OsidObject:
                 del obj_map['itemIds']
             if 'responses' in obj_map:
                 del obj_map['responses']
+        if self._namespace == 'grading.GradeSystem':
+            obj_map['grades'] = []
+            for grade in self.get_grades():
+                obj_map['grades'].append(grade.object_map)
 
         try: # Need to implement records for catalogs one of these days
             for record in self._records:
