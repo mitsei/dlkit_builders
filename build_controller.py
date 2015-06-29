@@ -130,7 +130,7 @@ class BaseBuilder(Utilities):
         return self._class == str(desired_type)
 
     def _import_path(self, path):
-        return remove_abs_path(path).replace('/', '.')
+        return '.'.join(remove_abs_path(path).split('/')[1::])
 
     def _package_file(self, package):
         if isinstance(package, dict) and 'name' in package:
