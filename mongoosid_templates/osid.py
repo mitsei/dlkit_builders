@@ -501,6 +501,13 @@ class OsidSession:
         return manager
 
     def _get_id(self, id_):
+        \"\"\"
+        Returns the primary id given an alias.
+
+        If the id provided is not in the alias table, it will simply be
+        returned as is.
+
+        \"\"\"
         collection = MongoClientValidated(self._db_prefix + 'id',
                                           collection='Id',
                                           runtime=self._runtime)
@@ -512,6 +519,7 @@ class OsidSession:
             return Id(result['_id'])
 
     def _alias_id(self, primary_id, equivalent_id):
+        \"\"\"Adds the given equivalent_id as an alias for primary_id if possible\"\"\"
         pkg_name = primary_id.get_identifier_namespace().split('.')[0]
         obj_name = primary_id.get_identifier_namespace().split('.')[1]
         collection = MongoClientValidated(self._db_prefix + pkg_name,
@@ -535,6 +543,26 @@ class OsidSession:
         else:
             id_map['aliasIds'].append(str(equivalent_id))
             #collection.replace_one ( id_map )
+
+    def _get_catalog_idstrs(self):
+        \"\"\"Returns the proper list of catalog idstrs based on catalog view\"\"\"
+        if self._catalog_view == ISOLATED:
+            return [str(self._catalog_id)]
+        else:
+            return self._get_descendent_cat_idstrs(self._catalog_id)
+
+    def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
+        \"\"\"
+        This method is to be overridden by inheriting class
+
+        The inheriting method override should return a list of all descendent
+        catalog id strings, including the string of the given cat_id.
+        \"\"\"
+        pass
+
+    def _is_phantom_root_federated(self):
+        return (self._catalog_view == FEDERATED and 
+                self._catalog_id.get_identifier() == '000000000000000000000000')
 """
 
     get_locale = """

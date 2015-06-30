@@ -146,14 +146,34 @@ class ResourceLookupSession:
         self._kwargs = kwargs
 
     def _${cat_name_under}_view_filter(self):
-        \"\"\"Returns the mongodb catalog filter for isolated or federated views\"\"\"
-        if self._catalog_view == ISOLATED:
-            filter = {'$$or': {'${cat_name_mixed}Id': str(self._catalog_id),
-                              'assigned${cat_name_plural}': {'$$in': [str(self._catalog_id)]}}}
-        else:
-            filter = {}
-            # This still needs to traverse the catalog hierarchy somehow
-        return filter
+        \"\"\"
+        Returns the mongodb catalog filter for isolated or federated views.
+        
+        This also searches across all underlying ${cat_name_plural} in federated
+        ${cat_name_under} view. Real authz for controlling access to underlying
+        ${cat_name_under_plural} will need to be managed in an adapter above the
+        pay grade of this implementation.
+        
+        \"\"\"
+        if self._is_phantom_root_federated():
+            return {}
+        idstr_list = self._get_catalog_idstrs()
+        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
+                         {'assigned${cat_name_plural}': {'$$in': idstr_list}}]}
+
+    def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
+        \"\"\"Recursively returns a list of all descendent ${cat_name_under} ids, inclusive\"\"\"
+        if hierarchy_session is None:
+            try:
+                mgr = self._get_provider_manager('${pkg_name_upper}')
+                hierarchy_session = mgr.get_${cat_name_under}_hierarchy_session()
+            except (errors.OperationFailed, errors.Unsupported):
+                return [str(cat_id)] # there is no ${cat_name_under} hierarchy
+        idstr_list = [str(cat_id)]
+        if hierarchy_session.has_child_${cat_name_under_plural}(cat_id):
+            for child_id in hierarchy_session.get_child_${cat_name_under}_ids(cat_id):
+                idstr_list = idstr_list + self._get_descendent_${cat_name_under}_idstrs(child_id, hierarchy_session)
+        return idstr_list
 """
 
     get_bin_id_template = """
@@ -198,15 +218,8 @@ class ResourceLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        #if self._catalog_view == ISOLATED:
-        #    result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier()),
-        #                                  '${cat_name_mixed}Id': str(self._catalog_id)})
-        #else:
-        #    # This should really look in the underlying hierarchy (when hierarchy is implemented)
-        #    result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
         result = collection.find_one(
-            {'_id': ObjectId(${arg0_name}.get_identifier())}.update(self._${cat_name_under}_view_filter()))
-
+            dict({'_id': ObjectId(${arg0_name}.get_identifier())}, **self._${cat_name_under}_view_filter()))
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_resources_by_ids_template = """
@@ -219,11 +232,8 @@ class ResourceLookupSession:
         object_id_list = []
         for i in ${arg0_name}:
             object_id_list.append(ObjectId(i.get_identifier()))
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'_id': {'$$in': object_id_list},
-                                      '${cat_name_mixed}Id': str(self._catalog_id)})
-        else:
-            result = collection.find({'_id': {'$$in': object_id_list}})
+        result = collection.find(
+            dict({'_id': {'$$in': object_id_list}}, **self._${cat_name_under}_view_filter()))
         result = list(result)
         sorted_result = []
         for object_id in object_id_list:
@@ -240,12 +250,8 @@ class ResourceLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'genusTypeId': str(${arg0_name}),
-                                      '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
-        else:
-            result = collection.find({'genusTypeId': str(${arg0_name})}).sort('_id', DESCENDING)
-
+        result = collection.find(
+            dict({'genusTypeId': str(${arg0_name})}, **self._${cat_name_under}_view_filter())).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime)"""
 
     get_resources_by_parent_genus_type_template = """
@@ -266,11 +272,7 @@ class ResourceLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
-        else:
-            result = collection.find().sort('_id', DESCENDING)
-
+        result = collection.find(self._${cat_name_under}_view_filter()).sort('_id', DESCENDING)
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class ResourceQuerySession:
@@ -299,6 +301,39 @@ class ResourceQuerySession:
             cat_class=objects.${cat_name})
         self._catalog_view = ISOLATED
         self._kwargs = kwargs
+
+    # The following two methods are duplicated in LookupSession. The 
+    # LookupSession should really be delegating to this QuerySession
+    # anyway.
+    def _${cat_name_under}_view_filter(self):
+        \"\"\"
+        Returns the mongodb catalog filter for isolated or federated views.
+        
+        This also searches across all underlying ${cat_name_plural} in federated
+        ${cat_name_under} view. Real authz for controlling access to underlying
+        ${cat_name_under_plural} will need to be managed in an adapter above the
+        pay grade of this implementation.
+        
+        \"\"\"
+        if self._is_phantom_root_federated():
+            return {}
+        idstr_list = self._get_catalog_idstrs()
+        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list},
+                         'assigned${cat_name_plural}': {'$$in': idstr_list}}]}
+
+    def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
+        \"\"\"Recursively returns a list of all descendent ${cat_name_under} ids, inclusive\"\"\"
+        if hierarchy_session is None:
+            try:
+                mgr = self._get_provider_manager('${pkg_name_upper}')
+                hierarchy_session = mgr.get_${cat_name_under}_hierarchy_session()
+            except (errors.OperationFailed, errors.Unsupported):
+                return [str(cat_id)] # there is no ${cat_name_under} hierarchy
+        idstr_list = [str(cat_id)]
+        if hierarchy_session.has_child_${cat_name_under_plural}(cat_id):
+            for child_id in hierarchy_session.get_child_${cat_name_under}_ids(cat_id):
+                idstr_list = idstr_list + self._get_descendent_${cat_name_under}_idstrs(child_id, hierarchy_session)
+        return idstr_list
 """
 
     can_query_resources_template = """
@@ -320,10 +355,8 @@ class ResourceQuerySession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            query_terms['${cat_name_mixed}Id'] = str(self._catalog_id)
+        query_terms.update(self._${cat_name_under}_view_filter())
         result = collection.find(query_terms).sort('_id', DESCENDING)
-
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 

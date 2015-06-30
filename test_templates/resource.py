@@ -173,6 +173,10 @@ class ResourceLookupSession:
         self.catalog.${method_name}()"""
 
     get_resource_template = """
+        self.catalog.use_isolated_${object_name_under}_view()
+        obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
+        self.assertEqual(obj.ident, self.${object_name_under}_list[0].ident)
+        self.catalog.use_federated_${object_name_under}_view()
         obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
         self.assertEqual(obj.ident, self.${object_name_under}_list[0].ident)"""
 
