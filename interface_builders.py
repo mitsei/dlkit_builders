@@ -639,7 +639,9 @@ DISABLED = -1"""
 
         try:
             # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
-            profile_module = '{}.{}.profile'.format(self._import_path(self._root_dir),
+            if self._root_dir not in sys.path:
+                sys.path.insert(0, self._abs_path)
+            profile_module = '{}.{}.profile'.format(self._import_path(self._root_dir, limited=False),
                                                     self._abc_pkg_name(package['name'], abc=False))
             old_profile = import_module(profile_module)
         except ImportError:
