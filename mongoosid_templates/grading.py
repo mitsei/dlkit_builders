@@ -300,3 +300,26 @@ class GradebookColumnLookupSession:
 
     get_gradebook_column_summary = """
         raise errors.Unimplemented()"""
+
+class GradebookColumnAdminSession:
+
+    delete_gradebook_column = """
+        if not isinstance(gradebook_column_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+
+        # check that no entries already exist for this gradebook column
+        collection = MongoClientValidated(self._db_prefix + 'grading',
+                                          collection='GradeEntry',
+                                          runtime=self._runtime)
+        if collection.find({"gradebookColumnId": str(gradebook_column_id)}).count() > 0:
+            raise errors.IllegalState('Entries exist in this gradebook column. Cannot delete it.')
+
+        collection = MongoClientValidated(self._db_prefix + 'grading',
+                                          collection='GradebookColumn',
+                                          runtime=self._runtime)
+
+        gradebook_column_map = collection.find_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
+
+        objects.GradebookColumn(gradebook_column_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
+        """
