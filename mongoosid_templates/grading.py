@@ -174,7 +174,12 @@ class GradeEntryForm:
         mgr = self._get_provider_manager('GRADING')
         lookup_session = mgr.get_gradebook_column_lookup_session()
         lookup_session.use_federated_gradebook_view()
-        gradebook_column = lookup_session.get_gradebook_column(kwargs['gradebook_column_id'])
+        if 'gradebook_column_id' in kwargs:
+            gradebook_column = lookup_session.get_gradebook_column(kwargs['gradebook_column_id'])
+        elif osid_object_map is not None:
+            gradebook_column = lookup_session.get_gradebook_column(osid_object_map['gradebookColumnId'])
+        else:
+            raise NullArgument('gradebook_column_id required for create forms.')
         self._grade_system = gradebook_column.get_grade_system()
 
         if 'catalog_id' in kwargs:
@@ -283,7 +288,7 @@ class GradeEntryForm:
         if (self.get_score_metadata().is_read_only() or
                 self.get_score_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['score'] = score_default
+        self._my_map['score'] = self._score_default
         self._my_map['gradingAgentId'] = ''
         self._my_map['timeGraded'] = None"""
 
