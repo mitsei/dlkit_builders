@@ -151,7 +151,7 @@ BRANDING = {
     'read_only': False,
     'linked': False,
     'array': True,
-    'default_id_values': [''],
+    'default_id_values': [],
     'syntax': 'ID',
     'id_set': [],
     }

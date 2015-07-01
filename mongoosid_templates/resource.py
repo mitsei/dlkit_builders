@@ -808,12 +808,14 @@ class BinAdminSession:
         if ${arg0_name} == []:
             result = objects.${return_type}(
                 db_prefix=self._db_prefix,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id())
         else:
             result = objects.${return_type}(
                 record_types=${arg0_name},
                 db_prefix=self._db_prefix,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id())
         self._forms[result.get_id().get_identifier()] = not CREATED
         return result"""
 
@@ -1382,7 +1384,6 @@ class BinForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_catalog_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
-        #from ..osid.objects import OsidForm
         osid_objects.OsidForm.__init__(self)
         self._runtime = runtime
         self._db_prefix = db_prefix
@@ -1405,9 +1406,9 @@ class BinForm:
         osid_objects.OsidObjectForm._init_metadata(self)
         osid_objects.OsidSourceableForm._init_metadata(self)
 
-    def _init_map(self):
+    def _init_map(self, **kwargs):
         osid_objects.OsidObjectForm._init_map(self)
-        osid_objects.OsidSourceableForm._init_map(self)
+        osid_objects.OsidSourceableForm._init_map(self, **kwargs)
 """
 
 

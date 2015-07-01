@@ -188,6 +188,7 @@ class Extensible:
     import_statements = [
         'from ..primitives import Id',
         'from ..primitives import Type',
+        'from importlib import import_module',
     ]  
 
     init = """
@@ -196,6 +197,8 @@ class Extensible:
         self._records = None
         self._supported_record_type_ids = None
         self._record_type_data_sets = None
+        self._runtime = None
+        self._proxy = None
 
     def __iter__(self):
         for attr in dir(self):
@@ -263,6 +266,36 @@ class Extensible:
                     pass
         except AttributeError:
             pass
+
+    ##
+    # DUPLICATE: There is one of these in OsidSession as well.
+    def _get_provider_manager(self, osid, local=False):
+        \"\"\"
+        Gets the most appropriate provider manager depending on config.
+        
+        If local is True, then don't bother with the runtime/config and
+        try to get the requested service manager directly from the local
+        service implementations known to this mongodb implementation.
+        
+        \"\"\"
+        if not local:
+            try:
+                # Try to get the manager from the runtime, if available:
+                config = self._runtime.get_configuration()
+                parameter_id = Id('parameter:repositoryProviderImpl@mongo')
+                impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
+                return self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
+            except (AttributeError, KeyError, errors.NotFound):
+                pass
+        # Try to return a Manager from this implementation, or raise OperationFailed:
+        try:
+            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+            manager = getattr(module, osid.title() + 'Manager')()
+        except (ImportError, AttributeError):
+            raise errors.OperationFailed()
+        if self._runtime is not None:
+            manager.initialize(self._runtime)
+        return manager
 """
 
     has_record_type = """
@@ -481,23 +514,34 @@ class OsidSession:
         collection.insert_one(catalog_map)
         return catalog_map
 
-    def _get_provider_manager(self, osid):
-        \"\"\"Gets the most appropriate provider manager depending on config\"\"\"
-        try:
-            # Try to get the Manager from the runtime, if available:
-            config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
-            impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
-            manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        except (AttributeError, KeyError, errors.NotFound):
-            # Just return a Manager from this implementation:
+    ##
+    # DUPLICATE: There is one of these in Extensible as well.
+    def _get_provider_manager(self, osid, local=False):
+        \"\"\"
+        Gets the most appropriate provider manager depending on config.
+        
+        If local is True, then don't bother with the runtime/config and
+        try to get the requested service manager directly from the local
+        service implementations known to this mongodb implementation.
+        
+        \"\"\"
+        if not local:
             try:
-                module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
-                manager = getattr(module, osid.title() + 'Manager')()
-            except (ImportError, AttributeError):
-                raise errors.OperationFailed()
-            if self._runtime is not None:
-                manager.initialize(self._runtime)
+                # Try to get the manager from the runtime, if available:
+                config = self._runtime.get_configuration()
+                parameter_id = Id('parameter:repositoryProviderImpl@mongo')
+                impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
+                return self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
+            except (AttributeError, KeyError, errors.NotFound):
+                pass
+        # Try to return a Manager from this implementation, or raise OperationFailed:
+        try:
+            module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+            manager = getattr(module, osid.title() + 'Manager')()
+        except (ImportError, AttributeError):
+            raise errors.OperationFailed()
+        if self._runtime is not None:
+            manager.initialize(self._runtime)
         return manager
 
     def _get_id(self, id_):
@@ -602,8 +646,8 @@ class OsidSession:
         else:
             return Id(
                 identifier='MC3GUE$T@MIT.EDU',
-                namespace='agent.Agent',
-                authority='MIT-OEIT')"""
+                namespace='authentication.Agent',
+                authority='MIT-ODL')"""
 
     get_effective_agent = """
         #effective_agent_id = self.get_effective_agent_id()
@@ -629,7 +673,6 @@ class OsidObject:
         'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from dlkit.abstract_osid.osid import errors',
         'from .. import types',
-        'from importlib import import_module'
         ]
 
     init = """
@@ -638,31 +681,6 @@ class OsidObject:
     def __init__(self, osid_object_map, runtime=None):
         self._my_map = osid_object_map
         self._runtime = runtime
-
-    ##
-    # DUPLICATE: There is one of these in OsidObjectForm as well.
-    def _get_provider_manager(self, osid):
-        \"\"\"Gets provider manager from runtime, if a runtime and config exists
-
-        If not, then gets the mongo implementation manager.
-
-        \"\"\"
-        try:
-            # Try to get the Manager from the runtime, if available:
-            config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
-            impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
-            manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        except (AttributeError, KeyError, errors.NotFound):
-            # Just return a Manager from this implementation:
-            try:
-                module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
-                manager = getattr(module, osid.title() + 'Manager')()
-            except (ImportError, AttributeError):
-                raise errors.OperationFailed()
-            if self._runtime is not None:
-                manager.initialize(self._runtime)
-        return manager
 
     def get_object_map(self, obj_map=None):
         # pylint: disable=too-many-branches
@@ -1232,6 +1250,7 @@ class OsidSourceableForm:
         self._branding_default = None
         self._license_metadata = None
         self._license_default = None
+        self._catalog_id = None
 
     def _init_metadata(self):
         self._provider_metadata = {
@@ -1255,8 +1274,23 @@ class OsidSourceableForm:
         self._license_metadata.update(mdata_conf.LICENSE)
         self._license_default = self._license_metadata['default_string_values'][0]
 
-    def _init_map(self):
-        pass # Should we initialize the map?
+    def _init_map(self, **kwargs):
+        if 'effective_agent_id' in kwargs:
+            try:
+                mgr = self._get_provider_manager('RESOURCE', local=True)
+                agent_session = mgr.get_resource_agent_session()
+                agent_session.use_federated_bin_view()
+                resource_idstr = str(agent_session.get_resource_id_by_agent(kwargs['effective_agent_id']))
+            except (errors.OperationFailed,
+                    errors.Unsupported,
+                    errors.Unimplemented,
+                    errors.NotFound):
+                resource_idstr = self._provider_default
+            self._my_map['providerId'] = resource_idstr
+        else:
+            self._my_map['providerId'] = self._provider_default
+        self._my_map['brandingIds'] = self._branding_default
+        self._my_map['license'] = dict(self._license_default)
 """
 
     get_provider_metadata = """
@@ -1371,31 +1405,6 @@ class OsidObjectForm:
         self._my_map['description'] = dict(self._description_metadata['default_string_values'][0])
         self._my_map['genusTypeId'] = self._genus_type_metadata['default_type_values'][0]
         self._my_map['recordTypeIds'] = []
-
-    ##
-    # DUPLICATE: There is one of these in OsidObjectForm as well.
-    def _get_provider_manager(self, osid):
-        \"\"\"Gets provider manager from runtime, if a runtime and config exists
-
-        If not, then gets the mongo implementation manager.
-
-        \"\"\"
-        try:
-            # Try to get the Manager from the runtime, if available:
-            config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
-            impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
-            manager = self._runtime.get_manager(osid, impl_name) # What about ProxyManagers?
-        except (AttributeError, KeyError, errors.NotFound):
-            # Just return a Manager from this implementation:
-            try:
-                module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
-                manager = getattr(module, osid.title() + 'Manager')()
-            except (ImportError, AttributeError):
-                raise errors.OperationFailed()
-            if self._runtime is not None:
-                manager.initialize(self._runtime)
-        return manager
 """
 
     get_display_name_metadata = """
