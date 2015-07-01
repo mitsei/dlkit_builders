@@ -128,6 +128,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['return_cat_name_under'] = camel_to_under(context['return_cat_name'])
             if 'object_name_under' in context:
                 context['object_name_upper'] = context['object_name_under'].upper()
+                context['object_name_mixed'] = under_to_mixed(context['object_name_under'])
                 # Might want to add creating kwargs['object_name' from this as well]
             if 'object_name' in context and 'package_name' in context:
                 context['object_app_name'] = self._app_name(context['package_name'])
