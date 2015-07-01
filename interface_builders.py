@@ -669,9 +669,6 @@ DISABLED = -1"""
             if (len(method['args']) == 0 and
                     method['name'].startswith('supports_')):
                 supports_str = ''
-                if method['name'] == 'supports_assessment':
-                    import pdb
-                    pdb.set_trace()
                 # Check to see if support flagged in builder config OR
                 # Check to see if someone activated support by hand
                 if '-'+ method['name'] in old_supports:
