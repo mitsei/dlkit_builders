@@ -216,12 +216,12 @@ class GradeEntryForm:
         self._score_metadata.update(mdata_conf.GRADE_ENTRY_SCORE)
         if self._grade_system.is_based_on_grades():
             self._score_metadata.update(
-                {'minimum_decimal_value': None,
-                 'maximum_decimal_value': None})
+                {'minimum_decimal': None,
+                 'maximum_decimal': None})
         else:
             self._score_metadata.update(
-                {'minimum_decimal_value': self._grade_system.get_lowest_numeric_score(),
-                 'maximum_decimal_value': self._grade_system.get_highest_numeric_score()})
+                {'minimum_decimal': self._grade_system.get_lowest_numeric_score(),
+                 'maximum_decimal': self._grade_system.get_highest_numeric_score()})
         self._grade_default = self._grade_metadata['default_id_values'][0]
         self._ignored_for_calculations_default = None
         self._score_default = self._score_metadata['default_decimal_values'][0]
