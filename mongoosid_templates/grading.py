@@ -158,7 +158,8 @@ class GradeEntryForm:
 
     init = """
     try:
-        from ..records.types import GRADE_ENTRY_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
+        #pylint: disable=no-name-in-module
+        from ..records.types import GRADE_ENTRY_RECORD_TYPES as _record_type_data_sets
     except (ImportError, AttributeError):
         _record_type_data_sets = dict()
     _namespace = 'grading.GradeEntry'
@@ -213,9 +214,14 @@ class GradeEntryForm:
                 self._namespace,
                 'score')}
         self._score_metadata.update(mdata_conf.GRADE_ENTRY_SCORE)
-        self._score_metadata.update(
-            {'minimum_decimal_value': self._grade_system.get_lowest_numeric_score(),
-             'maximum_decimal_value': self._grade_system.get_highest_numeric_score()})
+        if self._grade_system.is_based_on_grades():
+            self._score_metadata.update(
+                {'minimum_decimal_value': None,
+                 'maximum_decimal_value': None})
+        else:
+            self._score_metadata.update(
+                {'minimum_decimal_value': self._grade_system.get_lowest_numeric_score(),
+                 'maximum_decimal_value': self._grade_system.get_highest_numeric_score()})
         self._grade_default = self._grade_metadata['default_id_values'][0]
         self._ignored_for_calculations_default = None
         self._score_default = self._score_metadata['default_decimal_values'][0]
