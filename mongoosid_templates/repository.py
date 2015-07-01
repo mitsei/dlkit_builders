@@ -214,6 +214,35 @@ class CompositionLookupSession:
         self._sequestered_view = SEQUESTERED
         self._kwargs = kwargs
 
+    # def _repository_view_filter(self):
+    #     \"\"\"
+    #     Returns the mongodb catalog filter for isolated or federated views.
+    #     
+    #     This also searches across all underlying repositories in federated
+    #     repository view. Real authz for controlling access to underlying
+    #     repositories will need to be managed in an adapter above the
+    #     pay grade of this implementation.
+    #     
+    #     \"\"\"
+    #     if self._is_phantom_root_federated():
+    #         return {}
+    #     idstr_list = self._get_catalog_idstrs()
+    #     return {'$$or': [{'repositoryId': {'$$in': idstr_list}},
+    #                      {'assignedRepositories': {'$$in': idstr_list}}]}
+
+    # def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
+    #     \"\"\"Recursively returns a list of all descendent repositories ids, inclusive\"\"\"
+    #     if hierarchy_session is None:
+    #         try:
+    #             mgr = self._get_provider_manager('REPOSITORY')
+    #             hierarchy_session = mgr.get_repository_hierarchy_session()
+    #         except (errors.OperationFailed, errors.Unsupported):
+    #             return [str(cat_id)] # there is no repository hierarchy
+    #     idstr_list = [str(cat_id)]
+    #     if hierarchy_session.has_child_repositories(cat_id):
+    #         for child_id in hierarchy_session.get_child_repository_ids(cat_id):
+    #             idstr_list = idstr_list + self._get_descendent_repository_idstrs(child_id, hierarchy_session)
+    #     return idstr_list
 """
 
     use_active_composition_view = """

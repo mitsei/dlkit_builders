@@ -596,13 +596,23 @@ class OsidSession:
             return self._get_descendent_cat_idstrs(self._catalog_id)
 
     def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
-        \"\"\"
-        This method is to be overridden by inheriting class
-
-        The inheriting method override should return a list of all descendent
-        catalog id strings, including the string of the given cat_id.
-        \"\"\"
-        pass
+        \"\"\"Recursively returns a list of all descendent catalog ids, inclusive\"\"\"
+        idstr_list = [str(cat_id)]
+        if hierarchy_session is None:
+            pkg_name = cat_id.get_identifier_namespace().split('.')[0]
+            cat_name = cat_id.get_identifier_namespace().split('.')[1]
+            try:
+                mgr = self._get_provider_manager('HIERARCHY')
+                hierarchy_session = mgr.get_hierarchy_traversal_session_for_hierarchy(
+                    Id(authority=pkg_name.upper(),
+                       namespace='CATALOG',
+                       identifier=cat_name.upper()))
+            except (errors.OperationFailed, errors.Unsupported):
+                return idstr_list # there is no hierarchy
+        if hierarchy_session.has_children(cat_id):
+            for child_id in hierarchy_session.get_children(cat_id):
+                idstr_list = idstr_list + self._get_descendent_cat_idstrs(child_id, hierarchy_session)
+        return idstr_list
 
     def _is_phantom_root_federated(self):
         return (self._catalog_view == FEDERATED and 

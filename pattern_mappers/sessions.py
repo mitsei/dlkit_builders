@@ -2499,7 +2499,7 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              cat_name = index['package_catalog_under'],
+                              cat_name = index['package_catalog_caps'],
                               var_name = 'comparative_view'))
 
         ##
@@ -2512,7 +2512,7 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              cat_name = index['package_catalog_under'],
+                              cat_name = index['package_catalog_caps'],
                               var_name = 'plenary_view'))
 
         ##
@@ -2549,7 +2549,7 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              cat_name = index['package_catalog_under'],
+                              cat_name = index['package_catalog_caps'],
                               var_name = 'federated_vew'))
 
         ##
@@ -2562,7 +2562,7 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              cat_name = index['package_catalog_under'],
+                              cat_name = index['package_catalog_caps'],
                               var_name = 'isolated_view'))
 
 
