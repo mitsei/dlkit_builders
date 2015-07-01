@@ -669,9 +669,14 @@ DISABLED = -1"""
             if (len(method['args']) == 0 and
                     method['name'].startswith('supports_')):
                 supports_str = ''
+                if method['name'] == 'supports_assessment':
+                    import pdb
+                    pdb.set_trace()
                 # Check to see if support flagged in builder config OR
                 # Check to see if someone activated support by hand
-                if (under_to_caps(method['name'])[8:] + 'Session' in sessions_to_implement or
+                if '-'+ method['name'] in old_supports:
+                    supports_str += '-'
+                elif (under_to_caps(method['name'])[8:] + 'Session' in sessions_to_implement or
                         method['name'] in old_supports):
                     pass
                 # Check to see if someone de-activated support by hand OR
