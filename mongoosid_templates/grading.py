@@ -308,10 +308,11 @@ class GradebookColumnAdminSession:
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
 
         # check that no entries already exist for this gradebook column
-        collection = MongoClientValidated(self._db_prefix + 'grading',
-                                          collection='GradeEntry',
-                                          runtime=self._runtime)
-        if collection.find({"gradebookColumnId": str(gradebook_column_id)}).count() > 0:
+        grading_manager = self._get_provider_manager('GRADING')
+        gels = grading_manager.get_grade_entry_lookup_session()
+        gels.use_federated_gradebook_view()
+        entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
+        if entries.available() > 0:
             raise errors.IllegalState('Entries exist in this gradebook column. Cannot delete it.')
 
         collection = MongoClientValidated(self._db_prefix + 'grading',
