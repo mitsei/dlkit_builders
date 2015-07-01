@@ -12,7 +12,7 @@ from binder_helpers import under_to_caps, under_to_mixed, camel_to_mixed,\
     remove_plural, camel_to_under, make_plural, camel_to_caps_under
 from build_controller import Utilities, BaseBuilder, Templates
 from config import sessions_to_implement, managers_to_implement,\
-    objects_to_implement, variants_to_implement
+    objects_to_implement, variants_to_implement, packages_to_test
 from method_builders import MethodBuilder
 from mappers import Mapper
 
@@ -296,6 +296,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         with open(file_name, 'r') as read_file:
             package = json.load(read_file)
 
+        if self._is('tests'):
+            if package['name'] not in packages_to_test:
+                return
         if package['name'] not in managers_to_implement:
             return
 
