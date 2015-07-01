@@ -177,9 +177,9 @@ class GradeEntryForm:
         if 'gradebook_column_id' in kwargs:
             gradebook_column = lookup_session.get_gradebook_column(kwargs['gradebook_column_id'])
         elif osid_object_map is not None:
-            gradebook_column = lookup_session.get_gradebook_column(osid_object_map['gradebookColumnId'])
+            gradebook_column = lookup_session.get_gradebook_column(Id(osid_object_map['gradebookColumnId']))
         else:
-            raise NullArgument('gradebook_column_id required for create forms.')
+            raise errors.NullArgument('gradebook_column_id required for create forms.')
         self._grade_system = gradebook_column.get_grade_system()
 
         if 'catalog_id' in kwargs:
