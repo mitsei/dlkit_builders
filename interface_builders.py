@@ -170,10 +170,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         elif init_pattern == 'resource.ResourceAdminSession':
             object_name = interface_name[:-12]
         elif init_pattern == 'commenting.CommentLookupSession':
-            if self._is('authz'):
-                object_name = interface_name.replace('LookupSession', '')
-            else:
-                object_name = interface_name[:-13]
+            object_name = interface_name.replace('LookupSession', '')
+        elif init_pattern == 'commenting.CommentQuerySession':
+            object_name = interface_name.replace('QuerySession', '')
         elif init_pattern == 'resource.Resource':
             object_name = interface_name
         elif init_pattern == 'resource.ResourceForm':

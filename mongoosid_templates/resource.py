@@ -1,6 +1,4 @@
 
-from .error_lists import session_errors
-
 class ResourceProfile:
 
     import_statements_pattern = [
@@ -321,35 +319,35 @@ class ResourceQuerySession:
     # The following two methods are duplicated in LookupSession. The 
     # LookupSession should really be delegating to this QuerySession
     # anyway.
-    def _${cat_name_under}_view_filter(self):
-        \"\"\"
-        Returns the mongodb catalog filter for isolated or federated views.
-        
-        This also searches across all underlying ${cat_name_plural} in federated
-        ${cat_name_under} view. Real authz for controlling access to underlying
-        ${cat_name_under_plural} will need to be managed in an adapter above the
-        pay grade of this implementation.
-        
-        \"\"\"
-        if self._is_phantom_root_federated():
-            return {}
-        idstr_list = self._get_catalog_idstrs()
-        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list},
-                         'assigned${cat_name_plural}': {'$$in': idstr_list}}]}
+    # def _${cat_name_under}_view_filter(self):
+    #     \"\"\"
+    #     Returns the mongodb catalog filter for isolated or federated views.
+    #     
+    #     This also searches across all underlying ${cat_name_plural} in federated
+    #     ${cat_name_under} view. Real authz for controlling access to underlying
+    #     ${cat_name_under_plural} will need to be managed in an adapter above the
+    #     pay grade of this implementation.
+    #     
+    #     \"\"\"
+    #     if self._is_phantom_root_federated():
+    #         return {}
+    #     idstr_list = self._get_catalog_idstrs()
+    #     return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list},
+    #                      'assigned${cat_name_plural}': {'$$in': idstr_list}}]}
 
-    def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
-        \"\"\"Recursively returns a list of all descendent ${cat_name_under} ids, inclusive\"\"\"
-        if hierarchy_session is None:
-            try:
-                mgr = self._get_provider_manager('${pkg_name_upper}')
-                hierarchy_session = mgr.get_${cat_name_under}_hierarchy_session()
-            except (errors.OperationFailed, errors.Unsupported):
-                return [str(cat_id)] # there is no ${cat_name_under} hierarchy
-        idstr_list = [str(cat_id)]
-        if hierarchy_session.has_child_${cat_name_under_plural}(cat_id):
-            for child_id in hierarchy_session.get_child_${cat_name_under}_ids(cat_id):
-                idstr_list = idstr_list + self._get_descendent_${cat_name_under}_idstrs(child_id, hierarchy_session)
-        return idstr_list
+    # def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
+        # \"\"\"Recursively returns a list of all descendent ${cat_name_under} ids, inclusive\"\"\"
+        # if hierarchy_session is None:
+        #     try:
+        #         mgr = self._get_provider_manager('${pkg_name_upper}')
+        #         hierarchy_session = mgr.get_${cat_name_under}_hierarchy_session()
+        #     except (errors.OperationFailed, errors.Unsupported):
+        #         return [str(cat_id)] # there is no ${cat_name_under} hierarchy
+        # idstr_list = [str(cat_id)]
+        # if hierarchy_session.has_child_${cat_name_under_plural}(cat_id):
+        #     for child_id in hierarchy_session.get_child_${cat_name_under}_ids(cat_id):
+        #         idstr_list = idstr_list + self._get_descendent_${cat_name_under}_idstrs(child_id, hierarchy_session)
+        # return idstr_list
 """
 
     can_query_resources_template = """

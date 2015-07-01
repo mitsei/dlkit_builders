@@ -356,7 +356,45 @@ class Containable:
         return self._my_map['sequestered']"""
 
 class Sourceable:
-    pass
+
+    import_statements = [
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.locale.primitives import DisplayText',
+        'from ..id.objects import IdList',
+    ]
+
+    get_provider_id = """
+        if 'providerId' not in self._my_map or not self._my_map['providerId']:
+            raise errors.IllegalState('this sourceable object has no provider set')
+        return Id(self._my_map['providerId'])"""
+
+    get_provider = """
+        if 'providerId' not in self._my_map or not self._my_map['providerId']:
+            raise errors.IllegalState('this sourceable object has no provider set')
+        mgr = self._get_provider_manager('RESOURCE')
+        lookup_session = mgr.get_resource_lookup_session()
+        lookup_session.use_federated_bin_view()
+        resource = lookup_session.get_resource(self.get_provider_id())"""
+
+    get_branding_ids = """
+        if 'brandingIds' not in self._my_map:
+            return IdList([])
+        id_list = []
+        for idstr in self._my_map['brandingIds']:
+            id_list.append(Id(idstr))
+        return IdList(id_list)"""
+
+    get_branding = """
+        mgr = self._get_provider_session('REPOSITORY')
+        lookup_session = mgr.get_asset_lookup_session()
+        return lookup_session.get_assets_by_ids(self.get_branding_ids())"""
+
+    get_license = """
+        if 'license' in self._my_map:
+            license_text = self._my_map['license']
+        else:
+            license_text = ''
+        return DisplayText('license_text')"""
 
 
 class Operable:
