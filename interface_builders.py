@@ -639,8 +639,6 @@ DISABLED = -1"""
 
         try:
             # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
-            if self._root_dir not in sys.path:
-                sys.path.insert(0, self._abs_path)
             profile_module = '{}.{}.profile'.format(self._import_path(self._root_dir),
                                                     self._abc_pkg_name(package['name'], abc=False))
             old_profile = import_module(profile_module)
@@ -672,6 +670,9 @@ DISABLED = -1"""
                 supports_str = ''
                 # Check to see if support flagged in builder config OR
                 # Check to see if someone activated support by hand
+                if method['name'] == 'supports_objective_hierarchy':
+                    import pdb
+                    pdb.set_trace()
                 if '-'+ method['name'] in old_supports:
                     supports_str += '-'
                 elif (under_to_caps(method['name'])[8:] + 'Session' in sessions_to_implement or
