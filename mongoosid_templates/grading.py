@@ -158,7 +158,8 @@ class GradeEntryForm:
 
     init = """
     try:
-        from ..records.types import GRADE_ENTRY_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
+        #pylint: disable=no-name-in-module
+        from ..records.types import GRADE_ENTRY_RECORD_TYPES as _record_type_data_sets
     except (ImportError, AttributeError):
         _record_type_data_sets = dict()
     _namespace = 'grading.GradeEntry'
@@ -173,7 +174,12 @@ class GradeEntryForm:
         mgr = self._get_provider_manager('GRADING')
         lookup_session = mgr.get_gradebook_column_lookup_session()
         lookup_session.use_federated_gradebook_view()
-        gradebook_column = lookup_session.get_gradebook_column(kwargs['gradebook_column_id'])
+        if 'gradebook_column_id' in kwargs:
+            gradebook_column = lookup_session.get_gradebook_column(kwargs['gradebook_column_id'])
+        elif osid_object_map is not None:
+            gradebook_column = lookup_session.get_gradebook_column(Id(osid_object_map['gradebookColumnId']))
+        else:
+            raise errors.NullArgument('gradebook_column_id required for create forms.')
         self._grade_system = gradebook_column.get_grade_system()
 
         if 'catalog_id' in kwargs:
@@ -213,9 +219,17 @@ class GradeEntryForm:
                 self._namespace,
                 'score')}
         self._score_metadata.update(mdata_conf.GRADE_ENTRY_SCORE)
-        self._score_metadata.update(
-            {'minimum_decimal_value': self._grade_system.get_lowest_numeric_score(),
-             'maximum_decimal_value': self._grade_system.get_highest_numeric_score()})
+        if self._grade_system.is_based_on_grades():
+            self._score_metadata.update(
+                {'minimum_decimal': None,
+                 'maximum_decimal': None})
+            allowable_grades = self._grade_system.get_grades()
+            allowable_grade_ids = [g.ident for g in allowable_grades]
+            self._grade_metadata['id_set'] = allowable_grade_ids
+        else:
+            self._score_metadata.update(
+                {'minimum_decimal': self._grade_system.get_lowest_numeric_score(),
+                 'maximum_decimal': self._grade_system.get_highest_numeric_score()})
         self._grade_default = self._grade_metadata['default_id_values'][0]
         self._ignored_for_calculations_default = None
         self._score_default = self._score_metadata['default_decimal_values'][0]
@@ -243,6 +257,8 @@ class GradeEntryForm:
             raise errors.NoAccess()
         if not self._is_valid_id(grade_id):
             raise errors.InvalidArgument()
+        if not self._is_in_set(grade_id, self.get_grade_metadata()):
+            raise errors.InvalidArgument('Grade ID not in the acceptable set.')
         self._my_map['gradeId'] = str(grade_id)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
         self._my_map['timeGraded'] = now_map()"""
@@ -277,7 +293,7 @@ class GradeEntryForm:
         if (self.get_score_metadata().is_read_only() or
                 self.get_score_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['score'] = score_default
+        self._my_map['score'] = self._score_default
         self._my_map['gradingAgentId'] = ''
         self._my_map['timeGraded'] = None"""
 
@@ -289,3 +305,106 @@ class GradebookColumnLookupSession:
 
     get_gradebook_column_summary = """
         raise errors.Unimplemented()"""
+
+class GradebookColumnAdminSession:
+
+    additional_methods = """
+    def _has_entries(self, gradebook_column_id):
+        grading_manager = self._get_provider_manager('GRADING')
+        gels = grading_manager.get_grade_entry_lookup_session()
+        gels.use_federated_gradebook_view()
+        entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
+        return entries.available() > 0
+        """
+
+    delete_gradebook_column = """
+        if not isinstance(gradebook_column_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+
+        # check that no entries already exist for this gradebook column
+        grading_manager = self._get_provider_manager('GRADING')
+        gels = grading_manager.get_grade_entry_lookup_session()
+        gels.use_federated_gradebook_view()
+        entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
+        if self._has_entries(gradebook_column_id):
+            raise errors.IllegalState('Entries exist in this gradebook column. Cannot delete it.')
+
+        collection = MongoClientValidated(self._db_prefix + 'grading',
+                                          collection='GradebookColumn',
+                                          runtime=self._runtime)
+
+        gradebook_column_map = collection.find_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
+
+        objects.GradebookColumn(gradebook_column_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
+        """
+
+    update_gradebook_column = """
+        collection = MongoClientValidated(self._db_prefix + 'grading',
+                                          collection='GradebookColumn',
+                                          runtime=self._runtime)
+        if not isinstance(gradebook_column_form, ABCGradebookColumnForm):
+            raise errors.InvalidArgument('argument type is not an GradebookColumnForm')
+        if not gradebook_column_form.is_for_update():
+            raise errors.InvalidArgument('the GradebookColumnForm is for update only, not create')
+        try:
+            if self._forms[gradebook_column_form.get_id().get_identifier()] == UPDATED:
+                raise errors.IllegalState('gradebook_column_form already used in an update transaction')
+        except KeyError:
+            raise errors.Unsupported('gradebook_column_form did not originate from this session')
+        if not gradebook_column_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+
+        # check that there are no entries, if updating the gradeSystemId
+        old_column = collection.find_one({"_id": gradebook_column_form._my_map['_id']})
+        if old_column['gradeSystemId'] != gradebook_column_form._my_map['gradeSystemId']:
+            if self._has_entries(gradebook_column_form.id_):
+                raise errors.IllegalState('Entries exist in this gradebook column. ' +
+                                          'Cannot change the grade system.')
+
+        collection.save(gradebook_column_form._my_map)
+
+        self._forms[gradebook_column_form.get_id().get_identifier()] = UPDATED
+
+        # Note: this is out of spec. The OSIDs don't require an object to be returned:
+        return objects.GradebookColumn(
+            gradebook_column_form._my_map,
+            db_prefix=self._db_prefix,
+            runtime=self._runtime)
+        """
+
+class GradebookColumnQuery:
+
+    match_grade_system_id = """
+        self._add_match('gradeSystemId', str(grade_system_id), bool(match))
+    """
+
+class GradeSystemAdminSession:
+
+    additional_methods = """
+    def _has_columns(self, grade_system_id):
+        grading_manager = self._get_provider_manager('GRADING')
+        gcqs = grading_manager.get_gradebook_column_query_session()
+        gcqs.use_federated_gradebook_view()
+        querier = gcqs.get_gradebook_column_query()
+        querier.match_grade_system_id(grade_system_id, match=True)
+        columns = gcqs.get_gradebook_columns_by_query(querier)
+        return columns.available() > 0
+        """
+
+    delete_grade_system = """
+        collection = MongoClientValidated(self._db_prefix + 'grading',
+                                          collection='GradeSystem',
+                                          runtime=self._runtime)
+        if not isinstance(grade_system_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+        grade_system_map = collection.find_one({'_id': ObjectId(grade_system_id.get_identifier())})
+
+        # check if has columns first
+        if self._has_columns(grade_system_id):
+            raise errors.InvalidArgument('Grade system being used by gradebook columns. ' +
+                                         'Cannot delete it.')
+
+        objects.GradeSystem(grade_system_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
+        """
