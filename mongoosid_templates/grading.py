@@ -303,6 +303,15 @@ class GradebookColumnLookupSession:
 
 class GradebookColumnAdminSession:
 
+    additional_methods = """
+    def _has_entries(self, gradebook_column_id):
+        grading_manager = self._get_provider_manager('GRADING')
+        gels = grading_manager.get_grade_entry_lookup_session()
+        gels.use_federated_gradebook_view()
+        entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
+        return entries.available() > 0
+        """
+
     delete_gradebook_column = """
         if not isinstance(gradebook_column_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
@@ -312,7 +321,7 @@ class GradebookColumnAdminSession:
         gels = grading_manager.get_grade_entry_lookup_session()
         gels.use_federated_gradebook_view()
         entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
-        if entries.available() > 0:
+        if self._has_entries(gradebook_column_id):
             raise errors.IllegalState('Entries exist in this gradebook column. Cannot delete it.')
 
         collection = MongoClientValidated(self._db_prefix + 'grading',
@@ -323,4 +332,38 @@ class GradebookColumnAdminSession:
 
         objects.GradebookColumn(gradebook_column_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
+        """
+
+    update_gradebook_column = """
+        collection = MongoClientValidated(self._db_prefix + 'grading',
+                                          collection='GradebookColumn',
+                                          runtime=self._runtime)
+        if not isinstance(gradebook_column_form, ABCGradebookColumnForm):
+            raise errors.InvalidArgument('argument type is not an GradebookColumnForm')
+        if not gradebook_column_form.is_for_update():
+            raise errors.InvalidArgument('the GradebookColumnForm is for update only, not create')
+        try:
+            if self._forms[gradebook_column_form.get_id().get_identifier()] == UPDATED:
+                raise errors.IllegalState('gradebook_column_form already used in an update transaction')
+        except KeyError:
+            raise errors.Unsupported('gradebook_column_form did not originate from this session')
+        if not gradebook_column_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+
+        # check that there are no entries, if updating the gradeSystemId
+        old_column = collection.find_one({"_id": gradebook_column_form._my_map['_id']})
+        if old_column['gradeSystemId'] != gradebook_column_form._my_map['gradeSystemId']:
+            if self._has_entries(gradebook_column_form.id_):
+                raise errors.IllegalState('Entries exist in this gradebook column. ' +
+                                          'Cannot change the grade system.')
+
+        collection.save(gradebook_column_form._my_map)
+
+        self._forms[gradebook_column_form.get_id().get_identifier()] = UPDATED
+
+        # Note: this is out of spec. The OSIDs don't require an object to be returned:
+        return objects.GradebookColumn(
+            gradebook_column_form._my_map,
+            db_prefix=self._db_prefix,
+            runtime=self._runtime)
         """
