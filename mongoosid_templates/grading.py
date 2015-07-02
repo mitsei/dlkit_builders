@@ -223,6 +223,9 @@ class GradeEntryForm:
             self._score_metadata.update(
                 {'minimum_decimal': None,
                  'maximum_decimal': None})
+            allowable_grades = self._grade_system.get_grades()
+            allowable_grade_ids = [g.ident for g in allowable_grades]
+            self._grade_metadata['id_set'] = allowable_grade_ids
         else:
             self._score_metadata.update(
                 {'minimum_decimal': self._grade_system.get_lowest_numeric_score(),
@@ -254,6 +257,8 @@ class GradeEntryForm:
             raise errors.NoAccess()
         if not self._is_valid_id(grade_id):
             raise errors.InvalidArgument()
+        if not self._is_in_set(grade_id, self.get_grade_metadata()):
+            raise errors.InvalidArgument('Grade ID not in the acceptable set.')
         self._my_map['gradeId'] = str(grade_id)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
         self._my_map['timeGraded'] = now_map()"""
