@@ -203,7 +203,7 @@ class ResourceLookupSession:
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find_one(
-            dict({'_id': ObjectId(${arg0_name}.get_identifier())},
+            dict({'_id': ObjectId(self._get_id(${arg0_name}).get_identifier())},
                  **self._${cat_name_under}_view_filter()))
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
@@ -216,7 +216,7 @@ class ResourceLookupSession:
                                           runtime=self._runtime)
         object_id_list = []
         for i in ${arg0_name}:
-            object_id_list.append(ObjectId(i.get_identifier()))
+            object_id_list.append(ObjectId(self._get_id(i).get_identifier()))
         result = collection.find(
             dict({'_id': {'$$in': object_id_list}},
                  **self._${cat_name_under}_view_filter()))
