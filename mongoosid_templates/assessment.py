@@ -752,24 +752,19 @@ class AssessmentTakenLookupSession:
         collection = MongoClientValidated(self._db_prefix + 'assessment',
                                           collection='AssessmentTaken',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'assessmentOfferedId': str(assessment_offered_id),
-                                      'takingAgentId': str(resource_id),
-                                      'bankId': str(self._catalog_id)}).sort('_id', DESCENDING)
-        else:
-            result = collection.find({'assessmentOfferedId': str(assessment_offered_id),
-                                      'takingAgentId': str(resource_id)}).sort('_id', DESCENDING)
+        result = collection.find(
+            dict({'assessmentOfferedId': str(assessment_offered_id),
+                  'takingAgentId': str(resource_id)},
+                  **self._repository_view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
-    
+
     get_assessments_taken_for_assessment = """
         collection = MongoClientValidated(self._db_prefix + 'assessment',
                                           collection='AssessmentOffered',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'assessmentId': str(assessment_id),
-                                      'bankId': str(self._catalog_id)}).sort('_id', DESCENDING)
-        else:
-            result = collection.find({'assessmentId': str(assessment_id)}).sort('_id', DESCENDING)
+        result = collection.find(
+            dict({'assessmentId': str(assessment_id)},
+                 **self._repository_view_filter())).sort('_id', DESCENDING)
         assessments_offered = objects.AssessmentOfferedList(
             result,
             db_prefix=self._db_prefix,
@@ -782,11 +777,9 @@ class AssessmentTakenLookupSession:
         for assessment_offered in assessments_offered:
             ao_ids.append(str(assessment_offered.get_id()))
 
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'assessmentOfferedId': {'$in':[ao_ids]},
-                                      'bankId': str(self._catalog_id)}).sort('_id', DESCENDING)
-        else:
-            result = collection.find({'assessmentOfferedId': {"$in":[ao_ids]}}).sort('_id', DESCENDING)
+        result = collection.find(
+            dict({'assessmentOfferedId': {'$in':[ao_ids]}},
+                 **self._repository_view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result,
                                            db_prefix=self._db_prefix,
                                            runtime=self._runtime)"""

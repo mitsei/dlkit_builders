@@ -116,11 +116,9 @@ class ActivityLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name}),
-                                      '${cat_name_mixed}Id': str(self._catalog_id)})
-        else:
-            result = collection.find({'${arg0_object_mixed}Id': str(${arg0_name})})
+        result = collection.find(
+            dict({'${arg0_object_mixed}Id': str(${arg0_name})},
+                 **self._objective_bank_view_filter()))
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 

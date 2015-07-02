@@ -360,7 +360,6 @@ class Sourceable:
     import_statements = [
         'from dlkit.primordium.id.primitives import Id',
         'from dlkit.primordium.locale.primitives import DisplayText',
-        'from ..id.objects import IdList',
     ]
 
     get_provider_id = """
@@ -377,6 +376,7 @@ class Sourceable:
         resource = lookup_session.get_resource(self.get_provider_id())"""
 
     get_branding_ids = """
+        from ..id.objects import IdList
         if 'brandingIds' not in self._my_map:
             return IdList([])
         id_list = []
@@ -387,6 +387,7 @@ class Sourceable:
     get_branding = """
         mgr = self._get_provider_session('REPOSITORY')
         lookup_session = mgr.get_asset_lookup_session()
+        lookup_session.get_federated_repository_view()
         return lookup_session.get_assets_by_ids(self.get_branding_ids())"""
 
     get_license = """

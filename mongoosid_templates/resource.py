@@ -142,36 +142,6 @@ class ResourceLookupSession:
         self._object_view = COMPARATIVE
         self._catalog_view = ISOLATED
         self._kwargs = kwargs
-
-    # def _${cat_name_under}_view_filter(self):
-    #     \"\"\"
-    #     Returns the mongodb catalog filter for isolated or federated views.
-    #     
-    #     This also searches across all underlying ${cat_name_plural} in federated
-    #     ${cat_name_under} view. Real authz for controlling access to underlying
-    #     ${cat_name_under_plural} will need to be managed in an adapter above the
-    #     pay grade of this implementation.
-    #     
-    #     \"\"\"
-    #     if self._is_phantom_root_federated():
-    #         return {}
-    #     idstr_list = self._get_catalog_idstrs()
-    #     return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-    #                      {'assigned${cat_name_plural}': {'$$in': idstr_list}}]}
-
-    # def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
-    #     \"\"\"Recursively returns a list of all descendent ${cat_name_under} ids, inclusive\"\"\"
-    #     if hierarchy_session is None:
-    #         try:
-    #             mgr = self._get_provider_manager('${pkg_name_upper}')
-    #             hierarchy_session = mgr.get_${cat_name_under}_hierarchy_session()
-    #         except (errors.OperationFailed, errors.Unsupported):
-    #             return [str(cat_id)] # there is no ${cat_name_under} hierarchy
-    #     idstr_list = [str(cat_id)]
-    #     if hierarchy_session.has_child_${cat_name_under_plural}(cat_id):
-    #         for child_id in hierarchy_session.get_child_${cat_name_under}_ids(cat_id):
-    #             idstr_list = idstr_list + self._get_descendent_${cat_name_under}_idstrs(child_id, hierarchy_session)
-    #     return idstr_list
 """
 
     get_bin_id_template = """
@@ -223,7 +193,7 @@ class ResourceLookupSession:
             return {}
         idstr_list = self._get_catalog_idstrs()
         return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-                         {'assigned${cat_name_plural}': {'$$in': idstr_list}}]}"""
+                        {'assigned${cat_name_plural}': {'$$in': idstr_list}}]}"""
 
     get_resource_template = """
         # Implemented from template for
@@ -233,7 +203,8 @@ class ResourceLookupSession:
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find_one(
-            dict({'_id': ObjectId(${arg0_name}.get_identifier())}, **self._${cat_name_under}_view_filter()))
+            dict({'_id': ObjectId(${arg0_name}.get_identifier())},
+                 **self._${cat_name_under}_view_filter()))
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_resources_by_ids_template = """
@@ -247,7 +218,8 @@ class ResourceLookupSession:
         for i in ${arg0_name}:
             object_id_list.append(ObjectId(i.get_identifier()))
         result = collection.find(
-            dict({'_id': {'$$in': object_id_list}}, **self._${cat_name_under}_view_filter()))
+            dict({'_id': {'$$in': object_id_list}},
+                 **self._${cat_name_under}_view_filter()))
         result = list(result)
         sorted_result = []
         for object_id in object_id_list:
@@ -265,7 +237,8 @@ class ResourceLookupSession:
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
-            dict({'genusTypeId': str(${arg0_name})}, **self._${cat_name_under}_view_filter())).sort('_id', DESCENDING)
+            dict({'genusTypeId': str(${arg0_name})},
+                 **self._${cat_name_under}_view_filter())).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime)"""
 
     get_resources_by_parent_genus_type_template = """
@@ -315,39 +288,6 @@ class ResourceQuerySession:
             cat_class=objects.${cat_name})
         self._catalog_view = ISOLATED
         self._kwargs = kwargs
-
-    # The following two methods are duplicated in LookupSession. The 
-    # LookupSession should really be delegating to this QuerySession
-    # anyway.
-    # def _${cat_name_under}_view_filter(self):
-    #     \"\"\"
-    #     Returns the mongodb catalog filter for isolated or federated views.
-    #     
-    #     This also searches across all underlying ${cat_name_plural} in federated
-    #     ${cat_name_under} view. Real authz for controlling access to underlying
-    #     ${cat_name_under_plural} will need to be managed in an adapter above the
-    #     pay grade of this implementation.
-    #     
-    #     \"\"\"
-    #     if self._is_phantom_root_federated():
-    #         return {}
-    #     idstr_list = self._get_catalog_idstrs()
-    #     return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list},
-    #                      'assigned${cat_name_plural}': {'$$in': idstr_list}}]}
-
-    # def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
-        # \"\"\"Recursively returns a list of all descendent ${cat_name_under} ids, inclusive\"\"\"
-        # if hierarchy_session is None:
-        #     try:
-        #         mgr = self._get_provider_manager('${pkg_name_upper}')
-        #         hierarchy_session = mgr.get_${cat_name_under}_hierarchy_session()
-        #     except (errors.OperationFailed, errors.Unsupported):
-        #         return [str(cat_id)] # there is no ${cat_name_under} hierarchy
-        # idstr_list = [str(cat_id)]
-        # if hierarchy_session.has_child_${cat_name_under_plural}(cat_id):
-        #     for child_id in hierarchy_session.get_child_${cat_name_under}_ids(cat_id):
-        #         idstr_list = idstr_list + self._get_descendent_${cat_name_under}_idstrs(child_id, hierarchy_session)
-        # return idstr_list
 """
 
     can_query_resources_template = """
@@ -611,13 +551,9 @@ class ResourceAgentSession:
         collection = MongoClientValidated(self._db_prefix + 'resource',
                                           collection='Resource',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find_one({'agentIds': {'$in': [str(agent_id)]},
-                                          'binId': str(self._catalog_id)})
-        else:
-            # This should really look in the underlying hierarchy (when hierarchy is implemented)
-            result = collection.find_one({'agentIds': {'$in': [str(agent_id)]}})
-
+        result = collection.find_one(
+            dict({'agentIds': {'$in': [str(agent_id)]}},
+                 **self._bin_view_filter()))
         return objects.Resource(
             result,
             db_prefix=self._db_prefix,
@@ -627,8 +563,9 @@ class ResourceAgentSession:
         collection = MongoClientValidated(self._db_prefix + 'resource',
                                           collection='Resource',
                                           runtime=self._runtime)
-        resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
-
+        resource = collection.find_one(
+            dict({'_id': ObjectId(resource_id.get_identifier())},
+                 **self._bin_view_filter()))
         if 'agentIds' not in resource:
             result = IdList([])
         else:

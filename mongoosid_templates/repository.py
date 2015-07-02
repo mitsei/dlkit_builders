@@ -213,36 +213,6 @@ class CompositionLookupSession:
         self._status_view = ACTIVE
         self._sequestered_view = SEQUESTERED
         self._kwargs = kwargs
-
-    # def _repository_view_filter(self):
-    #     \"\"\"
-    #     Returns the mongodb catalog filter for isolated or federated views.
-    #     
-    #     This also searches across all underlying repositories in federated
-    #     repository view. Real authz for controlling access to underlying
-    #     repositories will need to be managed in an adapter above the
-    #     pay grade of this implementation.
-    #     
-    #     \"\"\"
-    #     if self._is_phantom_root_federated():
-    #         return {}
-    #     idstr_list = self._get_catalog_idstrs()
-    #     return {'$$or': [{'repositoryId': {'$$in': idstr_list}},
-    #                      {'assignedRepositories': {'$$in': idstr_list}}]}
-
-    # def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
-    #     \"\"\"Recursively returns a list of all descendent repositories ids, inclusive\"\"\"
-    #     if hierarchy_session is None:
-    #         try:
-    #             mgr = self._get_provider_manager('REPOSITORY')
-    #             hierarchy_session = mgr.get_repository_hierarchy_session()
-    #         except (errors.OperationFailed, errors.Unsupported):
-    #             return [str(cat_id)] # there is no repository hierarchy
-    #     idstr_list = [str(cat_id)]
-    #     if hierarchy_session.has_child_repositories(cat_id):
-    #         for child_id in hierarchy_session.get_child_repository_ids(cat_id):
-    #             idstr_list = idstr_list + self._get_descendent_repository_idstrs(child_id, hierarchy_session)
-    #     return idstr_list
 """
 
     use_active_composition_view = """
@@ -286,11 +256,9 @@ class AssetCompositionSession:
         collection = MongoClientValidated(self._db_prefix + 'repository',
                                           collection='Composition',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier()),
-                                              'repositoryId': str(self._catalog_id)})
-        else:
-            composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+        composition = collection.find_one(
+            dict({'_id': ObjectId(composition_id.get_identifier())},
+                 **self._repository_view_filter()))
         if 'assetIds' not in composition:
             raise errors.NotFound('no Assets are assigned to this Composition')
         asset_ids = []
@@ -305,11 +273,9 @@ class AssetCompositionSession:
         collection = MongoClientValidated(self._db_prefix + 'repository',
                                           collection='Composition',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'assetIds': {'$in': [str(asset_id)]},
-                                      'repositoryId': str(self._catalog_id)}).sort('_id', DESCENDING)
-        else:
-            result = collection.find({'assetIds': {'$in': [str(asset_id)]}}).sort('_id', DESCENDING)
+        result = collection.find(
+            dict({'assetIds': {'$in': [str(asset_id)]}},
+                 **self._repository_view_filter())).sort('_id', DESCENDING)
         return objects.CompositionList(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
