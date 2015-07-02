@@ -39,7 +39,7 @@ class RelationshipLookupSession:
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._${cat_name_under}_view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_for_source_on_date_template = """
