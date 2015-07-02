@@ -129,8 +129,11 @@ class BaseBuilder(Utilities):
     def _is(self, desired_type):
         return self._class == str(desired_type)
 
-    def _import_path(self, path):
-        return '.'.join(remove_abs_path(path).split('/')[-2::])
+    def _import_path(self, path, limited=True):
+        if limited:
+            return '.'.join(remove_abs_path(path).split('/')[-2::])
+        else:
+            return '.'.join(remove_abs_path(path).split('/'))
 
     def _package_file(self, package):
         if isinstance(package, dict) and 'name' in package:

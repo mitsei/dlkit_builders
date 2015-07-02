@@ -85,6 +85,7 @@ sessions_to_implement = [
     'GradeEntryAdminSession',
     'GradebookColumnLookupSession',
     'GradebookColumnAdminSession',
+    'GradebookColumnQuerySession',
     ### hierarchy service:
     'HierarchyLookupSession',
     'HierarchyAdminSession',

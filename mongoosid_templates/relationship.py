@@ -37,11 +37,9 @@ class RelationshipLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                      '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-        else:
-            result = collection.find({'${source_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
+        result = collection.find(
+            dict({'${source_name_mixed}Id': str(${arg0_name})},
+                 **self._${cat_name_under}_view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_for_source_on_date_template = """
@@ -60,13 +58,10 @@ class RelationshipLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                      'genusTypeId': str(${arg1_name}),
-                                      '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-        else:
-            result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                      'genusTypeId': str(${arg1_name})}).sort('_sort_id', ASCENDING)
+        result = collection.find(
+            dict({'${source_name_mixed}Id': str(${arg0_name}),
+                  'genusTypeId': str(${arg1_name})},
+                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_source_on_date_template = """
@@ -85,11 +80,9 @@ class RelationshipLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
-                                      '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-        else:
-            result = collection.find({'${destination_name_mixed}Id': str(${arg0_name})}).sort('_sort_id', ASCENDING)
+        result = collection.find(
+            dict({'${destination_name_mixed}Id': str(${arg0_name})},
+                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_for_destination_on_date_template = """
@@ -108,13 +101,10 @@ class RelationshipLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
-                                      'genusTypeId': str(${arg1_name}),
-                                      '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-        else:
-            result = collection.find({'${destination_name_mixed}Id': str(${arg0_name}),
-                                      'genusTypeId': str(${arg1_name})}).sort('_sort_id', ASCENDING)
+        result = collection.find(
+            dict({'${destination_name_mixed}Id': str(${arg0_name}),
+                  'genusTypeId': str(${arg1_name})},
+                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_destination_on_date_template = """
@@ -133,13 +123,10 @@ class RelationshipLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                      '${destination_name_mixed}Id': str(${arg1_name}),
-                                      '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-        else:
-            result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                      '${destination_name_mixed}Id': str(${arg1_name})}).sort('_sort_id', ASCENDING)
+        result = collection.find(
+            dict({'${source_name_mixed}Id': str(${arg0_name}),
+                  '${destination_name_mixed}Id': str(${arg1_name})},
+                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_peers_template = """
@@ -149,15 +136,11 @@ class RelationshipLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                      '${destination_name_mixed}Id': str(${arg1_name}),
-                                      'genusTypeId': str(${arg2_name}),
-                                      '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_sort_id', ASCENDING)
-        else:
-            result = collection.find({'${source_name_mixed}Id': str(${arg0_name}),
-                                      '${destination_name_mixed}Id': str(${arg1_name}),
-                                      'genusTypeId': str(${arg2_name})}).sort('_sort_id', ASCENDING)
+        result = collection.find(
+            dict({'${source_name_mixed}Id': str(${arg0_name}),
+                  '${destination_name_mixed}Id': str(${arg1_name}),
+                  'genusTypeId': str(${arg2_name})},
+                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
 class RelationshipAdminSession:

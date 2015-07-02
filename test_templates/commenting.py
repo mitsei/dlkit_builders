@@ -44,6 +44,14 @@ class CommentLookupSession:
             cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
 """
 
+
+class CommentQuerySession:
+
+    import_statements_pattern = CommentLookupSession.import_statements_pattern
+
+    init_template = CommentLookupSession.init_template
+
+
 class CommentAdminSession:
 
     get_comment_form_for_create_template = """

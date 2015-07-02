@@ -8,11 +8,11 @@ import string
 import datetime
 
 from abcbinder_settings import ENCODING as utf_code
-from binder_helpers import under_to_caps, under_to_mixed,\
+from binder_helpers import under_to_caps, under_to_mixed, camel_to_mixed,\
     remove_plural, camel_to_under, make_plural, camel_to_caps_under
 from build_controller import Utilities, BaseBuilder, Templates
 from config import sessions_to_implement, managers_to_implement,\
-    objects_to_implement, variants_to_implement
+    objects_to_implement, variants_to_implement, packages_to_test
 from method_builders import MethodBuilder
 from mappers import Mapper
 
@@ -170,10 +170,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         elif init_pattern == 'resource.ResourceAdminSession':
             object_name = interface_name[:-12]
         elif init_pattern == 'commenting.CommentLookupSession':
-            if self._is('authz'):
-                object_name = interface_name.replace('LookupSession', '')
-            else:
-                object_name = interface_name[:-13]
+            object_name = interface_name.replace('LookupSession', '')
+        elif init_pattern == 'commenting.CommentQuerySession':
+            object_name = interface_name.replace('QuerySession', '')
         elif init_pattern == 'resource.Resource':
             object_name = interface_name
         elif init_pattern == 'resource.ResourceForm':
@@ -240,6 +239,7 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
                 'object_name_under_plural': camel_to_under(make_plural(object_name)),
                 'cat_name': cat_name,
                 'cat_name_plural': make_plural(cat_name),
+                'cat_name_mixed': camel_to_mixed(cat_name),
                 'cat_name_under': camel_to_under(cat_name),
                 'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
                 'cat_name_upper': cat_name.upper(),
@@ -295,6 +295,9 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         with open(file_name, 'r') as read_file:
             package = json.load(read_file)
 
+        if self._is('tests'):
+            if package['name'] not in packages_to_test:
+                return
         if package['name'] not in managers_to_implement:
             return
 
@@ -640,7 +643,7 @@ DISABLED = -1"""
             # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
             if self._root_dir not in sys.path:
                 sys.path.insert(0, self._abs_path)
-            profile_module = '{}.{}.profile'.format(self._import_path(self._root_dir),
+            profile_module = '{}.{}.profile'.format(self._import_path(self._root_dir, limited=False),
                                                     self._abc_pkg_name(package['name'], abc=False))
             old_profile = import_module(profile_module)
         except ImportError:
@@ -671,7 +674,9 @@ DISABLED = -1"""
                 supports_str = ''
                 # Check to see if support flagged in builder config OR
                 # Check to see if someone activated support by hand
-                if (under_to_caps(method['name'])[8:] + 'Session' in sessions_to_implement or
+                if '-'+ method['name'] in old_supports:
+                    supports_str += '-'
+                elif (under_to_caps(method['name'])[8:] + 'Session' in sessions_to_implement or
                         method['name'] in old_supports):
                     pass
                 # Check to see if someone de-activated support by hand OR

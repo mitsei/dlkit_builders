@@ -20,7 +20,7 @@ def map_session_patterns(interface, package, index):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceQuerySession'
     elif (interface['shortname'].endswith('QuerySession') and
         interface['shortname'][:-12] in index['package_relationships_caps']):
-        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceQuerySession'
+        index[interface['shortname'] + '.init_pattern'] = 'commenting.CommentQuerySession'
     elif (interface['shortname'].endswith('LookupSession') and
         interface['shortname'][:-13] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinLookupSession'
@@ -2499,7 +2499,7 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              cat_name = index['package_catalog_under'],
+                              cat_name = index['package_catalog_caps'],
                               var_name = 'comparative_view'))
 
         ##
@@ -2512,7 +2512,7 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              cat_name = index['package_catalog_under'],
+                              cat_name = index['package_catalog_caps'],
                               var_name = 'plenary_view'))
 
         ##
@@ -2549,7 +2549,7 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              cat_name = index['package_catalog_under'],
+                              cat_name = index['package_catalog_caps'],
                               var_name = 'federated_vew'))
 
         ##
@@ -2562,7 +2562,7 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              cat_name = index['package_catalog_under'],
+                              cat_name = index['package_catalog_caps'],
                               var_name = 'isolated_view'))
 
 

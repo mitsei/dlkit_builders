@@ -90,7 +90,7 @@ class AssetAdminSession:
         if not ${arg0_name}.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         ${arg0_name}._my_map['_id'] = ObjectId()
-        ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_under}Id']).get_identifier()
+        ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_mixed}Id']).get_identifier()
         ${object_name_under} = collection.find_one(
             {'$$and': [{'_id': ObjectId(${object_name_under}_id)}, {'${cat_name_mixed}Id': str(self._catalog_id)}]})
         ${object_name_under}['${aggregated_objects_name_mixed}'].append(${arg0_name}._my_map)
@@ -213,7 +213,6 @@ class CompositionLookupSession:
         self._status_view = ACTIVE
         self._sequestered_view = SEQUESTERED
         self._kwargs = kwargs
-
 """
 
     use_active_composition_view = """
@@ -257,11 +256,9 @@ class AssetCompositionSession:
         collection = MongoClientValidated(self._db_prefix + 'repository',
                                           collection='Composition',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier()),
-                                              'repositoryId': str(self._catalog_id)})
-        else:
-            composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+        composition = collection.find_one(
+            dict({'_id': ObjectId(composition_id.get_identifier())},
+                 **self._repository_view_filter()))
         if 'assetIds' not in composition:
             raise errors.NotFound('no Assets are assigned to this Composition')
         asset_ids = []
@@ -276,11 +273,9 @@ class AssetCompositionSession:
         collection = MongoClientValidated(self._db_prefix + 'repository',
                                           collection='Composition',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'assetIds': {'$in': [str(asset_id)]},
-                                      'repositoryId': str(self._catalog_id)}).sort('_id', DESCENDING)
-        else:
-            result = collection.find({'assetIds': {'$in': [str(asset_id)]}}).sort('_id', DESCENDING)
+        result = collection.find(
+            dict({'assetIds': {'$in': [str(asset_id)]}},
+                 **self._repository_view_filter())).sort('_id', DESCENDING)
         return objects.CompositionList(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 

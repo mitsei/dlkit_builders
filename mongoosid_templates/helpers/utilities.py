@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from .osid.osid_errors import NullArgument, NotFound, OperationFailed
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id
+from importlib import import_module
 
 from . import MONGO_CLIENT
 
@@ -112,3 +113,30 @@ def now_map():
         'microsecond': now.microsecond,
     }
 
+def get_provider_manager(osid, runtime=None, proxy=None, local=False):
+    """
+    Gets the most appropriate provider manager depending on config.
+    
+    If local is True, then don't bother with the runtime/config and
+    try to get the requested service manager directly from the local
+    service implementations known to this mongodb implementation.
+    
+    """
+    if runtime is not None and not local:
+        try:
+            # Try to get the manager from the runtime, if available:
+            config = runtime.get_configuration()
+            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
+            impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
+            return runtime.get_manager(osid, impl_name) # What about ProxyManagers?
+        except (AttributeError, KeyError, NotFound):
+            pass
+    # Try to return a Manager from this implementation, or raise OperationFailed:
+    try:
+        module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
+        manager = getattr(module, osid.title() + 'Manager')()
+    except (ImportError, AttributeError):
+        raise OperationFailed()
+    if runtime is not None:
+        manager.initialize(runtime)
+    return manager

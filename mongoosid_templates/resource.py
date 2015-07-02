@@ -1,6 +1,4 @@
 
-from .error_lists import session_errors
-
 class ResourceProfile:
 
     import_statements_pattern = [
@@ -144,17 +142,6 @@ class ResourceLookupSession:
         self._object_view = COMPARATIVE
         self._catalog_view = ISOLATED
         self._kwargs = kwargs
-
-    def _catalog_view_idstrs(self):
-        \"\"\"Implement me soon? \"\"\"
-        pass
-        #if self._catalog_view == ISOLATED:
-        #    return [str(self._catalog_id)]
-        #try:
-        #    ${pkg_name}_manager = self._get_provider_manager('pkg_name_upper')
-        #    hs = ${pkg_name}_manager.get_${cat_name_under}_hierarchy_session() # What about proxy?
-        #except:
-        #    return [str(self._catalog_id)]
 """
 
     get_bin_id_template = """
@@ -190,7 +177,23 @@ class ResourceLookupSession:
     use_isolated_bin_view_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.use_isolated_bin_view
-        self._catalog_view = ISOLATED"""
+        self._catalog_view = ISOLATED
+
+    def _${cat_name_under}_view_filter(self):
+        \"\"\"
+        Returns the mongodb catalog filter for isolated or federated views.
+        
+        This also searches across all underlying ${cat_name_plural} in federated
+        ${cat_name_under} view. Real authz for controlling access to underlying
+        ${cat_name_plural_under} will need to be managed in an adapter above the
+        pay grade of this implementation.
+        
+        \"\"\"
+        if self._is_phantom_root_federated():
+            return {}
+        idstr_list = self._get_catalog_idstrs()
+        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
+                        {'assigned${cat_name_plural}': {'$$in': idstr_list}}]}"""
 
     get_resource_template = """
         # Implemented from template for
@@ -199,13 +202,9 @@ class ResourceLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier()),
-                                          '${cat_name_mixed}Id': str(self._catalog_id)})
-        else:
-            # This should really look in the underlying hierarchy (when hierarchy is implemented)
-            result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-
+        result = collection.find_one(
+            dict({'_id': ObjectId(self._get_id(${arg0_name}).get_identifier())},
+                 **self._${cat_name_under}_view_filter()))
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_resources_by_ids_template = """
@@ -217,12 +216,10 @@ class ResourceLookupSession:
                                           runtime=self._runtime)
         object_id_list = []
         for i in ${arg0_name}:
-            object_id_list.append(ObjectId(i.get_identifier()))
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'_id': {'$$in': object_id_list},
-                                      '${cat_name_mixed}Id': str(self._catalog_id)})
-        else:
-            result = collection.find({'_id': {'$$in': object_id_list}})
+            object_id_list.append(ObjectId(self._get_id(i).get_identifier()))
+        result = collection.find(
+            dict({'_id': {'$$in': object_id_list}},
+                 **self._${cat_name_under}_view_filter()))
         result = list(result)
         sorted_result = []
         for object_id in object_id_list:
@@ -239,12 +236,9 @@ class ResourceLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'genusTypeId': str(${arg0_name}),
-                                      '${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
-        else:
-            result = collection.find({'genusTypeId': str(${arg0_name})}).sort('_id', DESCENDING)
-
+        result = collection.find(
+            dict({'genusTypeId': str(${arg0_name})},
+                 **self._${cat_name_under}_view_filter())).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime)"""
 
     get_resources_by_parent_genus_type_template = """
@@ -265,11 +259,7 @@ class ResourceLookupSession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find({'${cat_name_mixed}Id': str(self._catalog_id)}).sort('_id', DESCENDING)
-        else:
-            result = collection.find().sort('_id', DESCENDING)
-
+        result = collection.find(self._${cat_name_under}_view_filter()).sort('_id', DESCENDING)
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class ResourceQuerySession:
@@ -319,10 +309,8 @@ class ResourceQuerySession:
         collection = MongoClientValidated(self._db_prefix + '${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            query_terms['${cat_name_mixed}Id'] = str(self._catalog_id)
+        query_terms.update(self._${cat_name_under}_view_filter())
         result = collection.find(query_terms).sort('_id', DESCENDING)
-
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
@@ -521,11 +509,15 @@ class ResourceAdminSession:
         objects.${object_name}(${object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
+    can_manage_asset_aliases_template = """
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
 
     alias_resources_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.alias_resources_template
-        raise errors.Unimplemented()"""
+        self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
 
 class ResourceAgentSession:
 
@@ -559,13 +551,9 @@ class ResourceAgentSession:
         collection = MongoClientValidated(self._db_prefix + 'resource',
                                           collection='Resource',
                                           runtime=self._runtime)
-        if self._catalog_view == ISOLATED:
-            result = collection.find_one({'agentIds': {'$in': [str(agent_id)]},
-                                          'binId': str(self._catalog_id)})
-        else:
-            # This should really look in the underlying hierarchy (when hierarchy is implemented)
-            result = collection.find_one({'agentIds': {'$in': [str(agent_id)]}})
-
+        result = collection.find_one(
+            dict({'agentIds': {'$in': [str(agent_id)]}},
+                 **self._bin_view_filter()))
         return objects.Resource(
             result,
             db_prefix=self._db_prefix,
@@ -575,8 +563,9 @@ class ResourceAgentSession:
         collection = MongoClientValidated(self._db_prefix + 'resource',
                                           collection='Resource',
                                           runtime=self._runtime)
-        resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
-
+        resource = collection.find_one(
+            dict({'_id': ObjectId(resource_id.get_identifier())},
+                 **self._bin_view_filter()))
         if 'agentIds' not in resource:
             result = IdList([])
         else:
@@ -770,12 +759,14 @@ class BinAdminSession:
         if ${arg0_name} == []:
             result = objects.${return_type}(
                 db_prefix=self._db_prefix,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id())
         else:
             result = objects.${return_type}(
                 record_types=${arg0_name},
                 db_prefix=self._db_prefix,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id())
         self._forms[result.get_id().get_identifier()] = not CREATED
         return result"""
 
@@ -1344,7 +1335,6 @@ class BinForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_catalog_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
-        #from ..osid.objects import OsidForm
         osid_objects.OsidForm.__init__(self)
         self._runtime = runtime
         self._db_prefix = db_prefix
@@ -1365,10 +1355,11 @@ class BinForm:
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidObjectForm._init_metadata(self)
+        osid_objects.OsidSourceableForm._init_metadata(self)
 
-    def _init_map(self):
-        #from ..osid.objects import OsidObjectForm
+    def _init_map(self, **kwargs):
         osid_objects.OsidObjectForm._init_map(self)
+        osid_objects.OsidSourceableForm._init_map(self, **kwargs)
 """
 
 
