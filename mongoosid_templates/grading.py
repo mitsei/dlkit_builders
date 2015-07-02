@@ -372,3 +372,39 @@ class GradebookColumnAdminSession:
             db_prefix=self._db_prefix,
             runtime=self._runtime)
         """
+
+class GradebookColumnQuery:
+
+    match_grade_system_id = """
+        self._add_match('gradeSystemId', str(grade_system_id), bool(match))
+    """
+
+class GradeSystemAdminSession:
+
+    additional_methods = """
+    def _has_columns(self, grade_system_id):
+        grading_manager = self._get_provider_manager('GRADING')
+        gcqs = grading_manager.get_gradebook_column_query_session()
+        gcqs.use_federated_gradebook_view()
+        querier = gcqs.get_gradebook_column_query()
+        querier.match_grade_system_id(grade_system_id, match=True)
+        columns = gcqs.get_gradebook_columns_by_query(querier)
+        return columns.available() > 0
+        """
+
+    delete_grade_system = """
+        collection = MongoClientValidated(self._db_prefix + 'grading',
+                                          collection='GradeSystem',
+                                          runtime=self._runtime)
+        if not isinstance(grade_system_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+        grade_system_map = collection.find_one({'_id': ObjectId(grade_system_id.get_identifier())})
+
+        # check if has columns first
+        if self._has_columns(grade_system_id):
+            raise errors.InvalidArgument('Grade system being used by gradebook columns. ' +
+                                         'Cannot delete it.')
+
+        objects.GradeSystem(grade_system_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
+        """
