@@ -268,8 +268,6 @@ class Extensible:
         except AttributeError:
             pass
 
-    ##
-    # DUPLICATE: There is one of these in OsidSession as well.
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
         return get_provider_manager(osid, runtime=self._runtime, local=local)
@@ -549,8 +547,6 @@ class OsidSession:
         collection.insert_one(catalog_map)
         return catalog_map
 
-    ##
-    # DUPLICATE: There is one of these in Extensible as well.
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
         return get_provider_manager(osid, runtime=self._runtime, local=local)
@@ -1085,21 +1081,6 @@ class OsidForm:
             return True
         else:
             return False
-
-    def _is_in_set(self, inpt, metadata):
-        \"\"\"checks if the input is in the metadata's *_set list\"\"\"
-        # makes an assumption there is only one _set in the metadata dict
-        get_set_methods = [m for m in dir(metadata) if 'get_' in m and '_set' in m]
-        set_results = None
-        for m in get_set_methods:
-            try:
-                set_results = getattr(metadata, m)()
-                break
-            except errors.IllegalState:
-                pass
-        if set_results is not None and inpt in set_results:
-            return True
-        return False
 """
 
     is_for_update = """
