@@ -1,6 +1,3 @@
-
-from error_lists import session_errors
-
 class ObjectiveRequisiteSession:
 
     import_statements_pattern = [
@@ -10,28 +7,49 @@ class ObjectiveRequisiteSession:
         'from ..utilities import MongoClientValidated',
         'from . import types',
         'from bson.objectid import ObjectId',
+        'from dlkit.mongo.types import Relationship',
         'UPDATED = True',
         'CREATED = True'
     ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveRequisiteSession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+        self._object_view = COMPARATIVE
+        self._catalog_view = ISOLATED
+    """
 
     get_requisite_objectives_template = """
         # Implemented from template for
         # osid.learning.ObjectiveRequisiteSession.get_requisite_objectives_template
         # NOTE: This implementation currently ignores plenary view
-        pass
+        requisite_type = Type(**Relationship().get_type_data('REQUISITE'))
+        relm = self._get_provider_manager('RELATIONSHIP')
+        rls = relm.get_relationship_lookup_session()
+        requisite_relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name},
+                                                                                 requisite_type)
+        destination_ids = [ObjectId(r.get_destination_id().identifier)
+                           for r in requisite_relationships]
         collection = MongoClientValidated(self._db_prefix + 'relationship',
                                           collection='Relationship',
-                                          runtime=self._runtime) ## Really! No we should use OSIDs
-        requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
-        result = collection.find({'$$and': {'sourceId': str(objective_id)}, 'genusType': str(requisite_type)},
-                                  {'destinationId': 1, '_id': 0})
-        catalog_id_list = []
-        for i in ${arg0_name}:
-            catalog_id_list.append(ObjectId(i.get_identifier()))
-        collection = self._db['Relationship']
-        ## I LEFT OFF HERE - THERE'S A WAY TO RETURN ONLY DEST IDS I THINK
-        result = collection.find({'_id': {'$$in': catalog_id_list}})
+                                          runtime=self._runtime)
+        result = collection.find({'_id': {'$in': destination_ids}})
         return objects.${return_type}(result)"""
+
+    can_lookup_objective_prerequisites = """
+        return True
+    """
 
 
 class ObjectiveRequisiteAssignmentSession:
@@ -39,6 +57,7 @@ class ObjectiveRequisiteAssignmentSession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
+        'from dlkit.mongo.types import Relationship'
     ]
 
     assign_objective_requisite_import_templates = [
@@ -47,10 +66,9 @@ class ObjectiveRequisiteAssignmentSession:
     ]
 
     assign_objective_requisite_template = """
-        requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
+        requisite_type = Type(**Relationship().get_type_data('REQUISITE'))
 
-
-        ras = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
+        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
         rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name})
         rfc.set_display_name('Objective Requisite')
         rfc.set_description('An Objective Requisite created by the ObjectiveRequisiteAssignmentSession')
@@ -60,14 +78,12 @@ class ObjectiveRequisiteAssignmentSession:
     unassign_objective_requisite_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
         'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}',
-        'from ..relationship.managers import RelationshipManager',
-        'from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied'
     ]
 
     unassign_objective_requisite_template = """
-        requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
-        rls = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
-        ras = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
+        requisite_type = Type(**Relationship().get_type_data('REQUISITE'))
+        rls = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
+        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
     """
 
 class ObjectiveAdminSession:
