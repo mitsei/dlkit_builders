@@ -396,6 +396,7 @@ class OsidSession:
 
     import_statements = [
         'import socket',
+        'import datetime',
         'from ..primitives import Id',
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
@@ -408,8 +409,10 @@ class OsidSession:
         'PLENARY = 1',
         'FEDERATED = 0',
         'ISOLATED = 1',
+        'EFFECTIVE = 0',
+        'ANY_EFFECTIVE = 1',
         'CREATED = True',
-        'UPDATED = True'
+        'UPDATED = True',
     ]
 
     init = """
@@ -427,6 +430,9 @@ class OsidSession:
         self._catalog_id = None
         self._catalog = None
         self._forms = None
+        self._object_view = COMPARATIVE
+        self._catalog_view = ISOLATED
+        self._effective_view = ANY_EFFECTIVE
 
     def _init_catalog(self, proxy=None, runtime=None):
         \"\"\"Initialize this object as an OsidCatalog.\"\"\"
@@ -606,6 +612,31 @@ class OsidSession:
     def _is_phantom_root_federated(self):
         return (self._catalog_view == FEDERATED and 
                 self._catalog_id.get_identifier() == '000000000000000000000000')
+
+    def _use_comparative_object_view(self):
+        self._object_view = COMPARATIVE
+
+    def _use_plenary_object_view(self):
+        self._object_view = PLENARY
+
+    def _use_federated_catalog_view(self):
+        self._catalog_view = FEDERATED
+
+    def _use_isolated_catalog_view(self):
+        self._catalog_view = ISOLATED
+
+    def _use_effective_view(self):
+        self._effective_view = EFFECTIVE
+
+    def _use_any_effective_view(self):
+        self._effective_view = ANY_EFFECTIVE
+
+    def _effective_view_filter(self):
+        \"\"\"Returns the mongodb relationship filter for effective views\"\"\"
+        if self._effective_view == EFFECTIVE:
+            now = datetime.datetime.now()
+            return {'startDate': {'$$lte': now}, 'endDate': {'$$gte': now}}
+        return {}
 """
 
     get_locale = """

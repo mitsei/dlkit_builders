@@ -197,6 +197,7 @@ class CompositionLookupSession:
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Repository
         self._session_name = 'CompositionLookupSession'
         self._catalog_name = 'Repository'
@@ -208,8 +209,6 @@ class CompositionLookupSession:
             db_name='repository',
             cat_name='Repository',
             cat_class=objects.Repository)
-        self._object_view = COMPARATIVE
-        self._catalog_view = ISOLATED
         self._status_view = ACTIVE
         self._sequestered_view = SEQUESTERED
         self._kwargs = kwargs
@@ -236,6 +235,7 @@ class AssetCompositionSession:
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Repository
         self._session_name = 'AssetCompositionSession'
         self._catalog_name = 'Repository'
@@ -247,8 +247,6 @@ class AssetCompositionSession:
             db_name='repository',
             cat_name='Repository',
             cat_class=objects.Repository)
-        self._object_view = COMPARATIVE
-        self._catalog_view = ISOLATED
         self._kwargs = kwargs
 """
 
@@ -287,6 +285,7 @@ class AssetCompositionDesignSession:
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Repository
         self._session_name = 'AssetCompositionDesignSession'
         self._catalog_name = 'Repository'

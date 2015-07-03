@@ -118,16 +118,13 @@ class ResourceLookupSession:
         'from bson.objectid import ObjectId',
         'DESCENDING = -1',
         'ASCENDING = 1',
-        'COMPARATIVE = 0',
-        'PLENARY = 1',
-        'FEDERATED = 0',
-        'ISOLATED = 1',
         'CREATED = True',
         'UPDATED = True'
     ]
 
     init_template = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
         self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
@@ -139,8 +136,6 @@ class ResourceLookupSession:
             db_name='${pkg_name}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
-        self._object_view = COMPARATIVE
-        self._catalog_view = ISOLATED
         self._kwargs = kwargs
 """
 
@@ -162,22 +157,22 @@ class ResourceLookupSession:
     use_comparative_resource_view_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.use_comparative_resource_view
-        self._object_view = COMPARATIVE"""
+        self._use_comparative_object_view()"""
 
     use_plenary_resource_view_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.use_plenary_resource_view
-        self._object_view = PLENARY"""
+        self._use_plenary_object_view()"""
 
     use_federated_bin_view_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.use_federated_bin_view
-        self._catalog_view = FEDERATED"""
+        self._use_federated_catalog_view()"""
 
     use_isolated_bin_view_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.use_isolated_bin_view
-        self._catalog_view = ISOLATED
+        self._use_federated_catalog_view()
 
     def _${cat_name_under}_view_filter(self):
         \"\"\"
@@ -275,6 +270,7 @@ class ResourceQuerySession:
 
     init_template = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
         self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
@@ -286,7 +282,6 @@ class ResourceQuerySession:
             db_name='${pkg_name}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
-        self._catalog_view = ISOLATED
         self._kwargs = kwargs
 """
 
@@ -332,6 +327,7 @@ class ResourceAdminSession:
 
     init_template = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
         self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
@@ -528,6 +524,7 @@ class ResourceAgentSession:
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Bin
         self._session_name = 'ResourceAgentSession'
         self._catalog_name = 'Bin'
@@ -540,8 +537,6 @@ class ResourceAgentSession:
             cat_name='Bin',
             cat_class=objects.Bin)
         self._forms = dict()
-        self._object_view = COMPARATIVE
-        self._catalog_view = ISOLATED
 """
 
     get_resource_id_by_agent = """
@@ -583,6 +578,7 @@ class ResourceAgentAssignmentSession:
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Bin
         self._session_name = 'ResourceAgentAssignmentSession'
         self._catalog_name = 'Bin'
@@ -889,9 +885,9 @@ class BinHierarchySession:
     _session_name = '${interface_name}'
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         OsidSession._init_catalog(self, proxy, runtime)
         self._forms = dict()
-        self._catalog_view = ISOLATED
         self._kwargs = kwargs
         hierarchy_mgr = self._get_provider_manager('HIERARCHY')
         self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
