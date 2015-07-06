@@ -188,7 +188,7 @@ class ResourceLookupSession:
             return {}
         idstr_list = self._get_catalog_idstrs()
         return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-                        {'assigned${cat_name_plural}': {'$$in': idstr_list}}]}"""
+                        {'assignedCatalogIds': {'$$in': idstr_list}}]}"""
 
     get_resource_template = """
         # Implemented from template for
@@ -515,6 +515,150 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.alias_resources_template
         self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
 
+
+class ResourceBinSession:
+
+    import_statements_pattern = [
+        'from ..id.objects import IdList',
+    ]
+
+    init_template = """
+    _session_name = '${interface_name}'
+
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._catalog_view = COMPARATIVE
+        self._kwargs = kwargs
+"""
+
+    can_lookup_resource_bin_mappings_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinSession.can_lookup_resource_bin_mappings
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
+    get_resource_ids_by_bin_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinSession.get_resource_ids_by_bin
+        id_list = []
+        for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_under}(${arg0_name}):
+            id_list.append(${object_name_under}.get_id())
+        return IdList(id_list)"""
+
+    get_resources_by_bin_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinSession.get_resources_by_bin
+        mgr = self._get_provider_manager('${package_name_upper}')
+        lookup_session = mgr.get_${object_name_under}_lookup_session(${arg0_name})
+        lookup_session.use_isolated_${cat_name_under}_view()
+        return lookup_session.get_${object_name_plural_under}()"""
+
+    get_resource_ids_by_bins_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinSession.get_resource_ids_by_bins
+        id_list = []
+        for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_plural_under}(${arg0_name}):
+            id_list.append(${object_name_under}.get_id())
+        return IdList(id_list)"""
+
+    get_resources_by_bins_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinSession.get_resources_by_bins
+        ${object_name_under}_list = []
+        for ${cat_name_under}_id in ${arg0_name}:
+            ${object_name_under}_list += list(
+                get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
+        return objects.${return_type}(${object_name_under}_list)"""
+
+    get_bin_ids_by_resource_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinSession.get_bin_ids_by_resource
+        mgr = self._get_provider_manager('${package_name_upper}', local=True)
+        lookup_session = mgr.get_${object_name_under}_lookup_session()
+        lookup_session.use_federated_${cat_name_under}_view()
+        ${object_name_under} = lookup_session.get_${object_name_under}(${arg0_name})
+        id_list = [Id(${object_name_under}._my_map['${cat_name_mixed}Id'])]
+        if 'assignedCatalogIds' in ${object_name_under}._my_map:
+            for idstr in ${object_name_under}._my_map['assignedCatalogIds']:
+                id_list.append(Id(idstr))
+        return IdList(id_list)"""
+
+    get_bins_by_resource_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinSession.get_bins_by_resource
+        mgr = self._get_provider_manager('${package_name_upper}')
+        lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        return lookup_session.get_${cat_name_plural_under}_by_ids(
+            self.get_${cat_name_under}_ids_by_${object_name_under}(${arg0_name}))"""
+
+
+class ResourceBinAssignmentSession:
+
+    import_statements_pattern = [
+        'from ..id.objects import IdList',
+    ]
+
+    init_template = """
+    _session_name = '${interface_name}'
+
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._forms = dict()
+        self._kwargs = kwargs
+"""
+
+    can_assign_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinAssignmentSession.can_assign_resources
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
+    can_assign_resources_to_bin_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinAssignmentSession.can_assign_resources_to_bin
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        if ${arg0_name}.get_identifier() == '000000000000000000000000':
+            return False
+        return True"""
+
+    get_assignable_bin_ids_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids
+        # This will likely be overridden by an authorization adapter
+        mgr = self._get_provider_manager('${package_name_upper}', local=True)
+        lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        ${object_name_plural_under} = lookup_session.get_${cat_name_plural_under}()
+        id_list = []
+        for ${object_name_under} in ${object_name_plural_under}:
+            id_list.append(${object_name_plural_under}.get_id())
+        return IdList(id_list)"""
+
+    get_assignable_bin_ids_for_resource_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource
+        # This will likely be overridden by an authorization adapter
+        return self.get_assignable_bin_ids()"""
+
+    assign_resource_to_bin_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
+        mgr = self._get_provider_manager('${package_name_upper}', local=True)
+        cat_lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
+        self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
+
+    unassign_resource_from_bin_template = """
+        # Implemented from template for
+        # osid.resource.ResourceBinAssignmentSession.unassign_resource_from_bin
+        mgr = self._get_provider_manager('${package_name_upper}', local=True)
+        cat_lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        cat = lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
+        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
+
+
 class ResourceAgentSession:
 
     import_statements = [
@@ -639,8 +783,8 @@ class BinLookupSession:
         'ASCENDING = 1',
         'COMPARATIVE = 0',
         'PLENARY = 1',
-        'CREATED = True',
-        'UPDATED = True'
+        #'CREATED = True',
+        #'UPDATED = True'
     ]
 
     init_template = """

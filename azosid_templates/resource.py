@@ -343,6 +343,121 @@ class ResourceAdminSession:
         else:
             return self._provider_session.${method_name}(${arg0_name})"""
 
+
+class ResourceBinSession:
+
+    init_template = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._id_namespace = '${pkg_name}.${object_name}${cat_name}'
+"""
+
+    can_lookup_resource_bin_mappings_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinSession.can_lookup_resource_bin_mappings
+        return self._can('${func_name}')"""
+
+    get_resource_ids_by_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinSession.get_resource_ids_by_bin
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_${object_name_under}_ids_by_${cat_name_under}(${cat_name_under}_id)"""
+
+    get_resources_by_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinSession.get_resources_by_bin_template
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_${object_name_under}_ids_by_${cat_name_under}(${cat_name_under}_id)"""
+
+    get_resource_ids_by_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinSession.get_resource_ids_by_bins
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_${object_name_under}_ids_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
+
+    get_resources_by_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinSession.get_resources_by_bins
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_${object_name_plural_under}_ids_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
+
+    get_bin_ids_by_resource_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinSession.get_bin_ids_by_resource
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_${cat_name_under}_ids_by_${object_name_under}(${object_name_under}_id)"""
+
+    get_bins_by_resource_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinSession.get_bins_by_resource
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_${cat_name_plural_under}_by_${object_name_under}(${object_name_under}_id)"""
+
+class ResourceBinAssignmentSession:
+
+    init_template = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._id_namespace = '${pkg_name}.${object_name}${cat_name}'
+"""
+
+    can_assign_resources_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinAssignmentSession.can_assign_resources
+        return self._can('${func_name}')"""
+
+    can_assign_resources_to_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinAssignmentSession.can_assign_resources_to_bin
+        return self._can('${func_name}', qualifier_id=bin_id)"""
+
+    get_assignable_bin_ids_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids
+        if not self._can('assign'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assignable_${cat_name_under}_ids()"""
+
+    get_assignable_bin_ids_for_resource_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource
+        if not self._can('assign'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assignable_${cat_name_under}_ids_for_${object_name_under}(${object_name_under}_id)"""
+
+    assign_resource_to_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
+        if not self._can('assign'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.assign_${object_name_under}_to_${cat_name_under}(${object_name_under}_id)"""
+
+    unassign_resource_from_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
+        if not self._can('assign'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.unassign_${object_name_under}_from_${cat_name_under}(${object_name_under}_id)"""
+
+
 class ResourceAgentSession:
 
     init = """

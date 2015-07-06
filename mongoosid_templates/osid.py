@@ -637,6 +637,35 @@ class OsidSession:
             now = datetime.datetime.now()
             return {'startDate': {'$$lte': now}, 'endDate': {'$$gte': now}}
         return {}
+
+    def _assign_object_to_catalog(self, obj_id, cat_id):
+        pkg_name = obj_id.get_identifier_namespace().split('.')[0]
+        obj_name = obj_id.get_identifier_namespace().split('.')[1]
+        collection = MongoClientValidated(self._db_prefix + pkg_name,
+                                          collection=obj_name,
+                                          runtime=self._runtime)
+        obj = collection.find_one({'_id': obj_id.get_identifier()})
+        if 'assignedCatalogIds' in obj._my_map:
+            if str(cat_id) in obj._my_map['assignedCatalogIds']:
+                raise errors.AlreadyExists()
+            else:
+                obj._my_map['assignedCatalogIds'].append(str(cat_id))
+        else:
+            obj._my_map['assignedCatalogIds'] = [str(cat_id)]
+        collection.save(obj._my_map)
+
+    def _unassign_object_from_catalog(self, obj_id, cat_id):
+        pkg_name = obj_id.get_identifier_namespace().split('.')[0]
+        obj_name = obj_id.get_identifier_namespace().split('.')[1]
+        collection = MongoClientValidated(self._db_prefix + pkg_name,
+                                          collection=obj_name,
+                                          runtime=self._runtime)
+        obj = collection.find_one({'_id': obj_id.get_identifier()})
+        try:
+            obj._my_map['assignedCatalogIds'].remove(str(cat_id))
+        except (KeyError, ValueError):
+            raise errors.NotFound()
+        collection.save(obj._my_map)
 """
 
     get_locale = """

@@ -122,16 +122,18 @@ class OsidSession:
         self._id_namespace = None
         self._qualifier_id = None
 
-    def _can(self, func_name):
+    def _can(self, func_name, qualifier_id=None):
         \"\"\"Tests if the named function is authorized with agent and qualifier.\"\"\"
         function_id = Id(
             identifier=func_name,
             namespace=self._id_namespace,
             authority='birdland.mit.edu')
+        if qualifier_id is None:
+            qualifier_id = self._qualifier_id
         return self._authz_session.is_authorized(
             agent_id=self.get_effective_agent_id(),
             function_id=function_id,
-            qualifier_id=self._qualifier_id)
+            qualifier_id=qualifier_id)
 """
 
     get_locale = """

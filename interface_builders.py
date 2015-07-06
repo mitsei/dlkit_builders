@@ -169,6 +169,10 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             object_name = interface_name[:-12]
         elif init_pattern == 'resource.ResourceAdminSession':
             object_name = interface_name[:-12]
+        elif init_pattern == 'resource.ResourceBinSession':
+            object_name = interface_name.replace(cat_name + 'Session', '')
+        elif init_pattern == 'resource.ResourceBinAssignmentSession':
+            object_name = interface_name.replace(cat_name + 'AssignmentSession', '')
         elif init_pattern == 'commenting.CommentLookupSession':
             object_name = interface_name.replace('LookupSession', '')
         elif init_pattern == 'commenting.CommentQuerySession':

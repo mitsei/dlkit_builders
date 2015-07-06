@@ -15,6 +15,22 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_relationships_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'
+
+    elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+        'Smart' not in interface['shortname'] and
+        interface['shortname'].replace(index['package_catalog_caps'] + 'Session', '') in index['package_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceBinSession'
+    elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+        interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', '') in index['package_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceBinAssignmentSession'
+    elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+        'Smart' not in interface['shortname'] and
+        interface['shortname'].replace(index['package_catalog_caps'] + 'Session', '') in index['package_relationships_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceBinSession'
+    elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+        interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', '') in index['package_relationships_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceBinAssignmentSession'
+
     elif (interface['shortname'].endswith('QuerySession') and
         interface['shortname'][:-12] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceQuerySession'
@@ -2493,7 +2509,7 @@ def map_session_patterns(interface, package, index):
               '_to_' not in method['name'] and
               method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceBinSession.can_assign_resources',
+                pattern = 'resource.ResourceBinAssignmentSession.can_assign_resources',
                 kwargs = make_twargs(
                     index,
                     package,
@@ -2509,7 +2525,7 @@ def map_session_patterns(interface, package, index):
               method['name'].endswith('_to_' + index['package_catalog_under']) and
               method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceBinSession.can_assign_resource_to_bin',
+                pattern = 'resource.ResourceBinAssignmentSession.can_assign_resources_to_bin',
                 kwargs = make_twargs(
                     index,
                     package,
@@ -2526,7 +2542,7 @@ def map_session_patterns(interface, package, index):
               '_for_' not in method['name'] and
               method['return_type'] == 'osid.id.IdList'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceBinSession.get_assignable_bins',
+                pattern = 'resource.ResourceBinAssignmentSession.get_assignable_bin_ids',
                 kwargs = make_twargs(
                     index,
                     package,
@@ -2543,7 +2559,7 @@ def map_session_patterns(interface, package, index):
               '_for_' in method['name'] and
               method['return_type'] == 'osid.id.IdList'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceBinSession.get_assignable_bins_for_resource',
+                pattern = 'resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource',
                 kwargs = make_twargs(
                     index,
                     package,
@@ -2559,7 +2575,7 @@ def map_session_patterns(interface, package, index):
               method['name'].startswith('assign_') and
               method['name'].endswith('_to_' + index['package_catalog_under'])):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceBinSession.assign_resource_to_bin',
+                pattern = 'resource.ResourceBinAssignmentSession.assign_resource_to_bin',
                 kwargs = make_twargs(
                     index,
                     package,
@@ -2575,7 +2591,7 @@ def map_session_patterns(interface, package, index):
               method['name'].startswith('unassign_') and
               method['name'].endswith('_from_' + index['package_catalog_under'])):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceBinSession.unassign_resource_from_bin',
+                pattern = 'resource.ResourceBinAssignmentSession.unassign_resource_from_bin',
                 kwargs = make_twargs(
                     index,
                     package,
