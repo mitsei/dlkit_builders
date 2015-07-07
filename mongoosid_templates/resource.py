@@ -510,7 +510,7 @@ class ResourceAdminSession:
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
-    alias_resources_template = """
+    alias_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.alias_resources_template
         self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
@@ -550,7 +550,7 @@ class ResourceBinSession:
         # Implemented from template for
         # osid.resource.ResourceBinSession.get_resources_by_bin
         mgr = self._get_provider_manager('${package_name_upper}')
-        lookup_session = mgr.get_${object_name_under}_lookup_session(${arg0_name})
+        lookup_session = mgr.get_${object_name_under}_lookup_session_for_${cat_name_under}(${arg0_name})
         lookup_session.use_isolated_${cat_name_under}_view()
         return lookup_session.get_${object_name_plural_under}()"""
 
@@ -646,7 +646,7 @@ class ResourceBinAssignmentSession:
         # Implemented from template for
         # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
-        cat_lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        lookup_session = mgr.get_${cat_name_under}_lookup_session()
         lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
         self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
 
@@ -654,7 +654,7 @@ class ResourceBinAssignmentSession:
         # Implemented from template for
         # osid.resource.ResourceBinAssignmentSession.unassign_resource_from_bin
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
-        cat_lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        lookup_session = mgr.get_${cat_name_under}_lookup_session()
         cat = lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
         self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
 

@@ -353,7 +353,7 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.delete_resource_template
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
-    alias_resources_template = """
+    alias_resource_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceAdminSession.alias_resources_template

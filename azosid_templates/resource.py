@@ -335,7 +335,7 @@ class ResourceAdminSession:
         else:
             return self._provider_session.${method_name}(${arg0_name})"""
 
-    alias_resources_template = """
+    alias_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.alias_resources_template
         if not self._can('alias'):

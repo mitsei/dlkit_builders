@@ -959,6 +959,12 @@ def is_manager_session(interface, patterns, package_name):
             interface['shortname'].startswith('GradebookColumn')):
         _is_manager_session = False
     elif (interface['category'] == 'sessions' and
+            interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
+        _is_manager_session = True
+    elif (interface['category'] == 'sessions' and
+            interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
+        _is_manager_session = True
+    elif (interface['category'] == 'sessions' and
             interface['shortname'].startswith(patterns['package_catalog_caps'])):
         _is_manager_session = True
     return _is_manager_session
@@ -972,6 +978,12 @@ def is_catalog_session(interface, patterns, package_name):
     elif (interface['category'] == 'sessions' and
             interface['shortname'].startswith('GradebookColumn')):
         _is_catalog_session = True
+    elif (interface['category'] == 'sessions' and
+            interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
+        _is_catalog_session = False
+    elif (interface['category'] == 'sessions' and
+            interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
+        _is_catalog_session = False
     elif (interface['category'] == 'sessions' and
             not interface['shortname'].startswith(patterns['package_catalog_caps'])):
         _is_catalog_session = True

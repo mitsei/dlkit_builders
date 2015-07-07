@@ -564,7 +564,7 @@ class OsidSession:
         collection = MongoClientValidated(self._db_prefix + pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
-        collection.find_one({'_id': primary_id.get_identifier()}) # to raise NotFound
+        collection.find_one({'_id': ObjectId(primary_id.get_identifier())}) # to raise NotFound
         collection = MongoClientValidated(self._db_prefix + 'id',
                                           collection='Id',
                                           runtime=self._runtime)
@@ -574,14 +574,14 @@ class OsidSession:
             pass
         else:
             result['aliasIds'].remove(str(equivalent_id))
-            # collection.replace_one ( result )
+            collection.save(result)
         try:
             id_map = collection.find_one({'_id': str(primary_id)})
         except errors.NotFound:
             collection.insert_one({'_id': str(primary_id), 'aliasIds': [str(equivalent_id)]})
         else:
             id_map['aliasIds'].append(str(equivalent_id))
-            #collection.replace_one ( id_map )
+            collection.save(id_map)
 
     def _get_catalog_idstrs(self):
         \"\"\"Returns the proper list of catalog idstrs based on catalog view\"\"\"
@@ -644,15 +644,15 @@ class OsidSession:
         collection = MongoClientValidated(self._db_prefix + pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
-        obj = collection.find_one({'_id': obj_id.get_identifier()})
-        if 'assignedCatalogIds' in obj._my_map:
-            if str(cat_id) in obj._my_map['assignedCatalogIds']:
+        obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
+        if 'assignedCatalogIds' in obj_map:
+            if str(cat_id) in obj_map['assignedCatalogIds']:
                 raise errors.AlreadyExists()
             else:
-                obj._my_map['assignedCatalogIds'].append(str(cat_id))
+                obj_map['assignedCatalogIds'].append(str(cat_id))
         else:
-            obj._my_map['assignedCatalogIds'] = [str(cat_id)]
-        collection.save(obj._my_map)
+            obj_map['assignedCatalogIds'] = [str(cat_id)]
+        collection.save(obj_map)
 
     def _unassign_object_from_catalog(self, obj_id, cat_id):
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
@@ -660,12 +660,12 @@ class OsidSession:
         collection = MongoClientValidated(self._db_prefix + pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
-        obj = collection.find_one({'_id': obj_id.get_identifier()})
+        obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
         try:
-            obj._my_map['assignedCatalogIds'].remove(str(cat_id))
+            obj_map['assignedCatalogIds'].remove(str(cat_id))
         except (KeyError, ValueError):
             raise errors.NotFound()
-        collection.save(obj._my_map)
+        collection.save(obj_map)
 """
 
     get_locale = """
