@@ -729,7 +729,8 @@ class OsidSession:
 class OsidObject:
 
     import_statements = [
-        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import Type',
+        'from ..primitives import DisplayText',
         'from dlkit.abstract_osid.osid import errors',
         'from .. import types',
         ]
@@ -903,7 +904,7 @@ class OsidRule:
 class OsidForm:
 
     import_statements = [
-        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from . import mdata_conf',
         'from .metadata import Metadata',
@@ -1183,7 +1184,7 @@ class OsidExtensibleForm:
 class OsidTemporalForm:
 
     import_statements = [
-        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'import datetime',
         'from . import mdata_conf',
@@ -1419,7 +1420,6 @@ class OsidObjectForm:
     #inheritance = ['OsidObject']
 
     import_statements = [
-        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from dlkit.abstract_osid.osid import errors',
         'from . import mdata_conf',
         'from .metadata import Metadata',

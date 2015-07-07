@@ -341,7 +341,7 @@ class ResourceAdminSession:
         if not self._can('alias'):
             raise PermissionDenied()
         else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
 
 class ResourceBinSession:
@@ -447,7 +447,7 @@ class ResourceBinAssignmentSession:
         if not self._can('assign'):
             raise PermissionDenied()
         else:
-            return self._provider_session.assign_${object_name_under}_to_${cat_name_under}(${object_name_under}_id)"""
+            return self._provider_session.assign_${object_name_under}_to_${cat_name_under}(${object_name_under}_id, ${cat_name_under}_id)"""
 
     unassign_resource_from_bin_template = """
         # Implemented from azosid template for -
@@ -455,7 +455,7 @@ class ResourceBinAssignmentSession:
         if not self._can('assign'):
             raise PermissionDenied()
         else:
-            return self._provider_session.unassign_${object_name_under}_from_${cat_name_under}(${object_name_under}_id)"""
+            return self._provider_session.unassign_${object_name_under}_from_${cat_name_under}(${object_name_under}_id, ${cat_name_under}_id)"""
 
 
 class ResourceAgentSession:
