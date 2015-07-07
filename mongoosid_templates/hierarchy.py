@@ -7,12 +7,11 @@ class HierarchyTraversalSession:
         'from ..osid.sessions import OsidSession',
         'from ..osid.objects import OsidNode',
         'from ..id.objects import IdList',
-        'FEDERATED = 0',
-        'ISOLATED = 1',
     ]
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         from .objects import Hierarchy
         self._catalog_class = Hierarchy
         self._session_name = 'HierarchyTraversalSession'
@@ -31,8 +30,6 @@ class HierarchyTraversalSession:
             except errors.NotFound:
                 catalog_id = self._create_catalog_hierarchy(catalog_id, proxy, runtime)
         OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='hierarchy', cat_name='Hierarchy', cat_class=Hierarchy)
-        self._object_view = COMPARATIVE
-        self._catalog_view = ISOLATED
         self._kwargs = kwargs
         rm = self._get_provider_manager('RELATIONSHIP')
         self._rls = rm.get_relationship_lookup_session_for_family(catalog_id)
@@ -168,6 +165,7 @@ class HierarchyDesignSession:
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         from .objects import Hierarchy
         self._catalog_class = Hierarchy
         self._session_name = 'HierarchyTraversalSession'

@@ -13,13 +13,19 @@ class RelationshipLookupSession:
         'from bson.objectid import ObjectId',
         'DESCENDING = -1',
         'ASCENDING = 1',
-        'COMPARATIVE = 0',
-        'PLENARY = 1',
-        'FEDERATED = 0',
-        'ISOLATED = 1',
         'CREATED = True',
         'UPDATED = True'
     ]
+
+    use_effective_relationship_view_template = """
+        # Implemented from template for
+        # osid.relationship.RelationshipLookupSession.use_effective_relationship_view
+        self._use_effective_view()"""
+
+    use_any_effective_relationship_view_template = """
+        # Implemented from template for
+        # osid.relationship.RelationshipLookupSession.use_any_effective_relationship_view
+        self._use_any_effective_view()"""
 
     get_relationships_on_date_template = """
         # Implemented from template for

@@ -15,6 +15,22 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_relationships_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'
+
+    elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+        'Smart' not in interface['shortname'] and
+        interface['shortname'].replace(index['package_catalog_caps'] + 'Session', '') in index['package_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceBinSession'
+    elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+        interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', '') in index['package_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceBinAssignmentSession'
+    elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+        'Smart' not in interface['shortname'] and
+        interface['shortname'].replace(index['package_catalog_caps'] + 'Session', '') in index['package_relationships_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceBinSession'
+    elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+        interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', '') in index['package_relationships_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceBinAssignmentSession'
+
     elif (interface['shortname'].endswith('QuerySession') and
         interface['shortname'][:-12] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceQuerySession'
@@ -2354,6 +2370,238 @@ def map_session_patterns(interface, package, index):
                 pattern = 'ontology.SubjectHierarchyDesignSession.remove_child_subjects',
                 kwargs = make_twargs(index, package, interface, method, 
                     rtype=False, object_name=interface['shortname'][:-22], arg_count=1))
+
+
+
+        ##################################################################
+        ## Inspect this package's Object-Catalog methods.               ##
+        ##################################################################
+
+        ##
+        # ObjectCatalogSession methods that return an authorization hint.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+              'Smart' not in interface['shortname'] and 
+              method['name'].startswith('can_lookup_') and
+              method['return_type'] == 'boolean'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinSession.can_lookup_resource_bin_mappings',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'Session', '')))
+
+        ##
+        # ObjectCatalogSession methods that return object ids by catalog.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+              'Smart' not in interface['shortname'] and 
+              method['name'].endswith('by_' + index['package_catalog_under']) and
+              method['return_type'] == 'osid.id.IdList'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinSession.get_resource_ids_by_bin',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'Session', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectCatalogSession methods that return objects by catalog.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+              'Smart' not in interface['shortname'] and 
+              method['name'].endswith('by_' + index['package_catalog_under']) and
+              method['return_type'] != 'osid.id.IdList'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinSession.get_resources_by_bin',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'Session', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectCatalogSession methods that return object ids by multiple catalogs.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+              'Smart' not in interface['shortname'] and 
+              method['name'].endswith('by_' + make_plural(index['package_catalog_under'])) and
+              method['return_type'] == 'osid.id.IdList'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinSession.get_resource_ids_by_bins',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'Session', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectCatalogSession methods that return objects by multiple catalogs.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+              'Smart' not in interface['shortname'] and 
+              method['name'].endswith('by_' + make_plural(index['package_catalog_under'])) and
+              method['return_type'] != 'osid.id.IdList'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinSession.get_resources_by_bins',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'Session', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectCatalogSession methods that return catalog ids by object.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+              'Smart' not in interface['shortname'] and 
+              method['name'].startswith('get_' + index['package_catalog_under'] + '_ids') and
+              method['return_type'] == 'osid.id.IdList'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinSession.get_bin_ids_by_resource',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'Session', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectCatalogSession methods that return catalogs by object.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'Session') and
+              'Smart' not in interface['shortname'] and 
+              method['name'].startswith('get_' + make_plural(index['package_catalog_under'])) and
+              method['return_type'] != 'osid.id.IdList'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinSession.get_bins_by_resource',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'Session', ''),
+                    arg_count=1))
+
+
+
+
+        ##################################################################
+        ## Inspect this package's Object-Catalog Assignment methods.    ##
+        ##################################################################
+
+        ##
+        # ObjectCatalogAssignmentSession methods that return a basic authorization hint.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+              method['name'].startswith('can_assign_') and
+              '_to_' not in method['name'] and
+              method['return_type'] == 'boolean'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinAssignmentSession.can_assign_resources',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', '')))
+
+        ##
+        # ObjectCatalogAssignmentSession methods that return authorization hint specific to assignable catalogs.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+              method['name'].startswith('can_assign_') and
+              method['name'].endswith('_to_' + index['package_catalog_under']) and
+              method['return_type'] == 'boolean'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinAssignmentSession.can_assign_resources_to_bin',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectCatalogAssignmentSession methods that return assignable catalogs.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+              method['name'].startswith('get_assignable_') and
+              '_for_' not in method['name'] and
+              method['return_type'] == 'osid.id.IdList'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinAssignmentSession.get_assignable_bin_ids',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectCatalogAssignmentSession methods that return assignable catalogs for object.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+              method['name'].startswith('get_assignable_') and
+              '_for_' in method['name'] and
+              method['return_type'] == 'osid.id.IdList'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', ''),
+                    arg_count=2))
+
+        ##
+        # ObjectCatalogAssignmentSession methods that assigns an object to a catalog.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+              method['name'].startswith('assign_') and
+              method['name'].endswith('_to_' + index['package_catalog_under'])):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinAssignmentSession.assign_resource_to_bin',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', ''),
+                    arg_count=2))
+
+        ##
+        # ObjectCatalogAssignmentSession methods that unassign an object from a catalog.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+              method['name'].startswith('unassign_') and
+              method['name'].endswith('_from_' + index['package_catalog_under'])):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinAssignmentSession.unassign_resource_from_bin',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', ''),
+                    arg_count=2))
+
+
 
         ##################################################################
         ## Inspect this package's ObjectRequisiteSession methods.       ##

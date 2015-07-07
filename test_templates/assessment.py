@@ -299,6 +299,115 @@ class AssessmentTakenAdminSession:
     proposed_create_assessment_taken = """
         pass"""
 
+
+class AssessmentOfferedBankSession:
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.assessment_offered_list = list()
+        cls.assessment_offered_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank Assigned'
+        create_form.description = 'Test Bank for AssessmentOfferedBankSession tests'
+        cls.assigned_catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentOfferedBankSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        for num in [0, 1, 2]:
+            create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+            create_form.display_name = 'Test AssessmentOffered ' + str(num)
+            create_form.description = 'Test AssessmentOffered for AssessmentOfferedBankSession tests'
+            obj = cls.catalog.create_assessment_offered(create_form)
+            cls.assessment_offered_list.append(obj)
+            cls.assessment_offered_ids.append(obj.ident)
+        cls.svc_mgr.assign_assessment_offered_to_bank(
+            cls.assessment_offered_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.assign_assessment_offered_to_bank(
+            cls.assessment_offered_ids[2], cls.assigned_catalog.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        #for obj in cls.catalog.get_assessments_offered():
+        #    cls.catalog.delete_assessment_offered(obj.ident)
+        #for catalog in cls.catalogs:
+        #    cls.svc_mgr.delete_bank(catalog.ident)
+        cls.svc_mgr.unassign_assessment_offered_from_bank(
+            cls.assessment_offered_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.unassign_assessment_offered_from_bank(
+            cls.assessment_offered_ids[2], cls.assigned_catalog.ident)
+        for catalog in cls.svc_mgr.get_banks():
+            for obj in catalog.get_assessments_offered():
+                catalog.delete_assessment_offered(obj.ident)
+            for obj in catalog.get_assessments():
+                catalog.delete_assessment(obj.ident)
+            cls.svc_mgr.delete_bank(catalog.ident)
+"""
+
+class AssessmentTakenBankSession:
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.assessment_taken_list = list()
+        cls.assessment_taken_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentTakenBankSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank Assigned'
+        create_form.description = 'Test Bank for AssessmentTakenBankSession tests'
+        cls.assigned_catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentTakenBankSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        create_form.display_name = 'Test AssessmentOffered'
+        create_form.description = 'Test AssessmentOffered for AssessmentTakenLBankSession tests'
+        cls.assessment_offered = cls.catalog.create_assessment_offered(create_form)
+        for num in [0, 1, 2]:
+            create_form = cls.catalog.get_assessment_taken_form_for_create(cls.assessment_offered.ident, [])
+            create_form.display_name = 'Test AssessmentTaken ' + str(num)
+            create_form.description = 'Test AssessmentTaken for AssessmentTakenLookupSession tests'
+            obj = cls.catalog.create_assessment_taken(create_form)
+            cls.assessment_taken_list.append(obj)
+            cls.assessment_taken_ids.append(obj.ident)
+        cls.svc_mgr.assign_assessment_taken_to_bank(
+            cls.assessment_taken_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.assign_assessment_taken_to_bank(
+            cls.assessment_taken_ids[2], cls.assigned_catalog.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        #for obj in cls.catalog.get_assessments_taken():
+        #    cls.catalog.delete_assessment_taken(obj.ident)
+        #for catalog in cls.catalogs:
+        #    cls.svc_mgr.delete_bank(catalog.ident)
+        cls.svc_mgr.unassign_assessment_taken_from_bank(
+            cls.assessment_taken_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.unassign_assessment_taken_from_bank(
+            cls.assessment_taken_ids[2], cls.assigned_catalog.ident)
+        for catalog in cls.svc_mgr.get_banks():
+            for obj in catalog.get_assessments_taken():
+                catalog.delete_assessment_taken(obj.ident)
+            for obj in catalog.get_assessments_offered():
+                catalog.delete_assessment_offered(obj.ident)
+            for obj in catalog.get_assessments():
+                catalog.delete_assessment(obj.ident)
+            cls.svc_mgr.delete_bank(catalog.ident)
+
+"""
+
+
 class AssessmentBasicAuthoringSession:
     
     init = """

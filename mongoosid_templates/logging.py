@@ -12,6 +12,7 @@ class LoggingSession:
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        OsidSession.__init__(self)
         self._catalog_class = objects.LogBook
         self._session_name = 'LoggingSession'
         self._catalog_name = 'LogBook'

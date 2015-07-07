@@ -119,6 +119,8 @@ class ResourceLookupSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\',})\n',
     ]
 
     init_template = """
@@ -213,8 +215,13 @@ class ResourceLookupSession:
         objects = self.catalog.${method_name}()
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}()"""
+        objects = self.catalog.${method_name}()
 
+    def test_get_${object_name_under}_with_alias(self):
+        self.catalog.alias_${object_name_under}(self.${object_name_under}_ids[0], ALIAS_ID)
+        obj = self.catalog.get_${object_name_under}(ALIAS_ID)
+        self.assertEqual(obj.get_id(), self.${object_name_under}_ids[0])"""
+        
 class ResourceQuerySession:
 
     import_statements_pattern = [
@@ -279,6 +286,8 @@ class ResourceAdminSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\',})\n',
     ]
 
     init_template = """
@@ -318,8 +327,80 @@ class ResourceAdminSession:
     delete_resource_template = """
         pass"""
 
-    alias_resources_template = """
+    alias_resource_template = """
         pass"""
+
+class ResourceBinSession:
+
+    import_statements_pattern = [
+        'from dlkit_django import PROXY_SESSION, proxy_example',
+        'from dlkit_django.managers import Runtime',
+        'REQUEST = proxy_example.TestRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+    ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        cls.${object_name_under}_list = list()
+        cls.${object_name_under}_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name} for Assignment'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests assignment'
+        cls.assigned_catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        for num in [0, 1, 2]:
+            create_form = cls.catalog.get_${object_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + str(num)
+            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            obj = cls.catalog.create_${object_name_under}(create_form)
+            cls.${object_name_under}_list.append(obj)
+            cls.${object_name_under}_ids.append(obj.ident)
+        cls.svc_mgr.assign_${object_name_under}_to_${cat_name_under}(
+            cls.${object_name_under}_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.assign_${object_name_under}_to_${cat_name_under}(
+            cls.${object_name_under}_ids[2], cls.assigned_catalog.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        #for obj in cls.catalog.get_${object_name_under_plural}():
+        #    cls.catalog.delete_${object_name_under}(obj.ident)
+        #for catalog in cls.catalogs:
+        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
+        cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
+            cls.${object_name_under}_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
+            cls.${object_name_under}_ids[2], cls.assigned_catalog.ident)
+        for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
+            for obj in catalog.get_${object_name_under_plural}():
+                catalog.delete_${object_name_under}(obj.ident)
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
+"""
+
+    get_resource_ids_by_bin_template = """
+        objects = self.svc_mgr.get_${object_name_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
+        self.assertEqual(objects.available(), 2)"""
+
+    get_resource_by_bin_template = """
+        objects = self.svc_mgr.get_${object_name_plural_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
+        self.assertEqual(objects.available(), 2)"""
+
+    get_bin_ids_by_resource_template = """
+        cats = self.svc_mgr.get_${cat_name_under}_ids_by_${object_name_under}(self.${object_name_under}_ids[1])
+        self.assertEqual(cats.available(), 2)"""
+
+    get_bins_by_resource_template = """
+        cats = self.svc_mgr.get_${cat_name_plural_under}_by_${object_name_under}(self.${object_name_under}_ids[1])
+        self.assertEqual(cats.available(), 2)"""
+
 
 class ResourceAgentSession:
 

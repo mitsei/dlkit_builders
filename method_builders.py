@@ -89,6 +89,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             context['interface_name_under'] = camel_to_under(context['interface_name'])
             context['interface_name_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
             context['package_name_caps'] = package_name.title()
+            context['package_name_upper'] = package_name.upper()
 
             if method['args']:
                  context['args_kwargs_or_nothing'] = '*args, **kwargs'
