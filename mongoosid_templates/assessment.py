@@ -61,7 +61,7 @@ class AssessmentSession:
     
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
-        #from ..osid.sessions import OsidSession
+        OsidSession.__init__(self)
         self._catalog_class = objects.Bank
         self._session_name = 'AssessmentSession'
         self._catalog_name = 'Bank'
@@ -903,6 +903,7 @@ class AssessmentBasicAuthoringSession:
     
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Bank
         self._session_name = 'AssessmentSession'
         self._catalog_name = 'Bank'

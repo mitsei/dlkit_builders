@@ -396,6 +396,7 @@ class OsidSession:
 
     import_statements = [
         'import socket',
+        'import datetime',
         'from ..primitives import Id',
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
@@ -408,8 +409,10 @@ class OsidSession:
         'PLENARY = 1',
         'FEDERATED = 0',
         'ISOLATED = 1',
+        'EFFECTIVE = 0',
+        'ANY_EFFECTIVE = 1',
         'CREATED = True',
-        'UPDATED = True'
+        'UPDATED = True',
     ]
 
     init = """
@@ -427,6 +430,9 @@ class OsidSession:
         self._catalog_id = None
         self._catalog = None
         self._forms = None
+        self._object_view = COMPARATIVE
+        self._catalog_view = ISOLATED
+        self._effective_view = ANY_EFFECTIVE
 
     def _init_catalog(self, proxy=None, runtime=None):
         \"\"\"Initialize this object as an OsidCatalog.\"\"\"
@@ -558,7 +564,7 @@ class OsidSession:
         collection = MongoClientValidated(self._db_prefix + pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
-        collection.find_one({'_id': primary_id.get_identifier()}) # to raise NotFound
+        collection.find_one({'_id': ObjectId(primary_id.get_identifier())}) # to raise NotFound
         collection = MongoClientValidated(self._db_prefix + 'id',
                                           collection='Id',
                                           runtime=self._runtime)
@@ -568,14 +574,14 @@ class OsidSession:
             pass
         else:
             result['aliasIds'].remove(str(equivalent_id))
-            # collection.replace_one ( result )
+            collection.save(result)
         try:
             id_map = collection.find_one({'_id': str(primary_id)})
         except errors.NotFound:
             collection.insert_one({'_id': str(primary_id), 'aliasIds': [str(equivalent_id)]})
         else:
             id_map['aliasIds'].append(str(equivalent_id))
-            #collection.replace_one ( id_map )
+            collection.save(id_map)
 
     def _get_catalog_idstrs(self):
         \"\"\"Returns the proper list of catalog idstrs based on catalog view\"\"\"
@@ -606,6 +612,60 @@ class OsidSession:
     def _is_phantom_root_federated(self):
         return (self._catalog_view == FEDERATED and 
                 self._catalog_id.get_identifier() == '000000000000000000000000')
+
+    def _use_comparative_object_view(self):
+        self._object_view = COMPARATIVE
+
+    def _use_plenary_object_view(self):
+        self._object_view = PLENARY
+
+    def _use_federated_catalog_view(self):
+        self._catalog_view = FEDERATED
+
+    def _use_isolated_catalog_view(self):
+        self._catalog_view = ISOLATED
+
+    def _use_effective_view(self):
+        self._effective_view = EFFECTIVE
+
+    def _use_any_effective_view(self):
+        self._effective_view = ANY_EFFECTIVE
+
+    def _effective_view_filter(self):
+        \"\"\"Returns the mongodb relationship filter for effective views\"\"\"
+        if self._effective_view == EFFECTIVE:
+            now = datetime.datetime.now()
+            return {'startDate': {'$$lte': now}, 'endDate': {'$$gte': now}}
+        return {}
+
+    def _assign_object_to_catalog(self, obj_id, cat_id):
+        pkg_name = obj_id.get_identifier_namespace().split('.')[0]
+        obj_name = obj_id.get_identifier_namespace().split('.')[1]
+        collection = MongoClientValidated(self._db_prefix + pkg_name,
+                                          collection=obj_name,
+                                          runtime=self._runtime)
+        obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
+        if 'assignedCatalogIds' in obj_map:
+            if str(cat_id) in obj_map['assignedCatalogIds']:
+                raise errors.AlreadyExists()
+            else:
+                obj_map['assignedCatalogIds'].append(str(cat_id))
+        else:
+            obj_map['assignedCatalogIds'] = [str(cat_id)]
+        collection.save(obj_map)
+
+    def _unassign_object_from_catalog(self, obj_id, cat_id):
+        pkg_name = obj_id.get_identifier_namespace().split('.')[0]
+        obj_name = obj_id.get_identifier_namespace().split('.')[1]
+        collection = MongoClientValidated(self._db_prefix + pkg_name,
+                                          collection=obj_name,
+                                          runtime=self._runtime)
+        obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
+        try:
+            obj_map['assignedCatalogIds'].remove(str(cat_id))
+        except (KeyError, ValueError):
+            raise errors.NotFound()
+        collection.save(obj_map)
 """
 
     get_locale = """
@@ -669,7 +729,8 @@ class OsidSession:
 class OsidObject:
 
     import_statements = [
-        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import Type',
+        'from ..primitives import DisplayText',
         'from dlkit.abstract_osid.osid import errors',
         'from .. import types',
         ]
@@ -843,7 +904,7 @@ class OsidRule:
 class OsidForm:
 
     import_statements = [
-        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from . import mdata_conf',
         'from .metadata import Metadata',
@@ -1138,7 +1199,7 @@ class OsidExtensibleForm:
 class OsidTemporalForm:
 
     import_statements = [
-        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
+        'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'import datetime',
         'from . import mdata_conf',
@@ -1374,7 +1435,6 @@ class OsidObjectForm:
     #inheritance = ['OsidObject']
 
     import_statements = [
-        'from ..primitives import * # pylint: disable=wildcard-import,unused-wildcard-import',
         'from dlkit.abstract_osid.osid import errors',
         'from . import mdata_conf',
         'from .metadata import Metadata',
