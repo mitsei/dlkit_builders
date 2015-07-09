@@ -452,6 +452,13 @@ class OsidSession:
         if runtime is not None:
             prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
             self._db_prefix = runtime.get_configuration().get_value_by_parameter(prefix_param_id).get_string_value()
+
+            try:
+                authority_param_id = Id('parameter:authorityPrefix@mongo')
+                self._authority = runtime.get_configuration().get_value_by_parameter(
+                    authority_param_id).get_string_value()
+            except KeyError:
+                pass
         else:
             self._db_prefix = ''
         if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':

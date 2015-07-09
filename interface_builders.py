@@ -1169,7 +1169,7 @@ def serialize(var_dict):
 
     for k, v in var_dict.iteritems():
         if isinstance(v, basestring):
-            return_dict[k] = k + ' = ' + str(v)
+            return_dict[k] = k + ' = "' + str(v) + '"'
         elif isinstance(v, list) and len(v) <= 3:  # this is stupid and horrible, I know
             return_dict[k] = k + ' = ' + str(v)
         elif isinstance(v, list) or isinstance(v, dict):
