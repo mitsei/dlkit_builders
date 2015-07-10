@@ -172,7 +172,7 @@ class Identifiable:
                 authority_param_id = Id('parameter:authorityPrefix@mongo')
                 self._authority = runtime.get_configuration().get_value_by_parameter(
                     authority_param_id).get_string_value()
-            except KeyError:
+            except (KeyError, errors.NotFound):
                 pass
 """
 
