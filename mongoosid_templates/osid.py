@@ -166,14 +166,13 @@ class Identifiable:
         self._authority = authority or 'ODL.MIT.EDU'
         self._my_map = {}
 
-    def _set_authority(self, runtime=None):
-        if runtime is not None:
-            try:
-                authority_param_id = Id('parameter:authorityPrefix@mongo')
-                self._authority = runtime.get_configuration().get_value_by_parameter(
-                    authority_param_id).get_string_value()
-            except (KeyError, errors.NotFound):
-                pass
+    def _set_authority(self, runtime):
+        try:
+            authority_param_id = Id('parameter:authorityPrefix@mongo')
+            self._authority = runtime.get_configuration().get_value_by_parameter(
+                authority_param_id).get_string_value()
+        except (KeyError, errors.NotFound):
+            self._authority = 'ODL.MIT.EDU'
 """
 
     get_id = """
