@@ -1254,9 +1254,8 @@ class Resource:
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, osid_object_map, db_prefix='', runtime=None):
-        self._my_map = osid_object_map
+        osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
         self._db_prefix = db_prefix
-        self._runtime = runtime
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
 ${instance_initers}
@@ -1339,8 +1338,7 @@ class ResourceForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_object_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self)
-        self._runtime = runtime
+        osid_objects.OsidForm.__init__(self, runtime=runtime)
         self._db_prefix = db_prefix
         self._kwargs = kwargs
         if 'catalog_id' in kwargs:
@@ -1447,8 +1445,7 @@ class Bin:
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, osid_catalog_map, db_prefix='', runtime=None):
-        self._my_map = osid_catalog_map
-        self._runtime = runtime
+        osid_objects.OsidCatalog.__init__(self, osid_catalog_map, runtime)
         self._db_prefix = db_prefix
         self._records = dict()
         # This check is here for transition purposes:
@@ -1475,8 +1472,7 @@ class BinForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_catalog_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self)
-        self._runtime = runtime
+        osid_objects.OsidForm.__init__(self, runtime=runtime)
         self._db_prefix = db_prefix
         self._kwargs = kwargs
         self._init_metadata(**kwargs)
