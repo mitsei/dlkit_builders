@@ -168,7 +168,7 @@ class Identifiable:
 
     def _set_authority(self, runtime):
         try:
-            authority_param_id = Id('parameter:authorityPrefix@mongo')
+            authority_param_id = Id('parameter:authority@mongo')
             self._authority = runtime.get_configuration().get_value_by_parameter(
                 authority_param_id).get_string_value()
         except (KeyError, errors.NotFound):
@@ -433,19 +433,7 @@ class OsidSession:
         self._effective_view = ANY_EFFECTIVE
         self._authority = 'ODL.MIT.EDU'
 
-    def _init_catalog(self, proxy=None, runtime=None):
-        \"\"\"Initialize this object as an OsidCatalog.\"\"\"
-        self._proxy = proxy
-        self._runtime = runtime
-        if runtime is not None:
-            prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
-            self._db_prefix = runtime.get_configuration().get_value_by_parameter(prefix_param_id).get_string_value()
-        else:
-            self._db_prefix = ''
-
-    def _init_object(self, catalog_id, proxy, runtime, db_name, cat_name, cat_class):
-        \"\"\"Initialize this object as an OsidObject.\"\"\"
-        self._catalog_identifier = None
+    def _init_proxy_and_runtime(self, proxy, runtime):
         self._proxy = proxy
         self._runtime = runtime
         if runtime is not None:
@@ -453,13 +441,23 @@ class OsidSession:
             self._db_prefix = runtime.get_configuration().get_value_by_parameter(prefix_param_id).get_string_value()
 
             try:
-                authority_param_id = Id('parameter:authorityPrefix@mongo')
+                authority_param_id = Id('parameter:authority@mongo')
                 self._authority = runtime.get_configuration().get_value_by_parameter(
                     authority_param_id).get_string_value()
-            except KeyError:
-                pass
+            except (KeyError, errors.NotFound):
+                self._authority = 'ODL.MIT.EDU'
         else:
             self._db_prefix = ''
+
+    def _init_catalog(self, proxy=None, runtime=None):
+        \"\"\"Initialize this object as an OsidCatalog.\"\"\"
+        self._init_proxy_and_runtime(proxy, runtime)
+
+    def _init_object(self, catalog_id, proxy, runtime, db_name, cat_name, cat_class):
+        \"\"\"Initialize this object as an OsidObject.\"\"\"
+        self._catalog_identifier = None
+        self._init_proxy_and_runtime(proxy, runtime)
+
         if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
             self._catalog_identifier = catalog_id.get_identifier()
 
