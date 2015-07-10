@@ -165,8 +165,7 @@ class GradeEntryForm:
     _namespace = 'grading.GradeEntry'
 
     def __init__(self, osid_object_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self)
-        self._runtime = runtime
+        osid_objects.OsidForm.__init__(self, runtime=runtime)
         self._db_prefix = db_prefix
         self._kwargs = kwargs
         self._effective_agent_id = kwargs['effective_agent_id']

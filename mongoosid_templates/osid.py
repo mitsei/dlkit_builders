@@ -161,15 +161,19 @@ class Identifiable:
     ]  
 
     init = """
-    import socket
-    if 'macbook' in socket.gethostname().lower():
-        _authority = socket.gethostname().lower().split('.')[0]
-    else:
-        _authority = socket.gethostname()
-    _namespace = 'osid.Identifiable'
-
-    def __init__(self):
+    def __init__(self, authority=None):
+        self._namespace = 'osid.Identifiable'
+        self._authority = authority or 'ODL.MIT.EDU'
         self._my_map = {}
+
+    def _set_authority(self, runtime=None):
+        if runtime is not None:
+            try:
+                authority_param_id = Id('parameter:authorityPrefix@mongo')
+                self._authority = runtime.get_configuration().get_value_by_parameter(
+                    authority_param_id).get_string_value()
+            except KeyError:
+                pass
 """
 
     get_id = """
@@ -416,11 +420,6 @@ class OsidSession:
     ]
 
     init = """
-    if 'macbook' in socket.gethostname().lower():
-        _authority = socket.gethostname().lower().split('.')[0]
-    else:
-        _authority = socket.gethostname()
-
     def __init__(self):
         self._proxy = None
         self._runtime = None
@@ -433,6 +432,7 @@ class OsidSession:
         self._object_view = COMPARATIVE
         self._catalog_view = ISOLATED
         self._effective_view = ANY_EFFECTIVE
+        self._authority = 'ODL.MIT.EDU'
 
     def _init_catalog(self, proxy=None, runtime=None):
         \"\"\"Initialize this object as an OsidCatalog.\"\"\"
@@ -490,6 +490,7 @@ class OsidSession:
                 'recordTypeIds': [] # Could this somehow inherit source catalog records?
             }
         self._catalog = cat_class(self._my_catalog_map)
+        self._catalog._authority = self._authority  # there should be a better way...
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
 
@@ -740,7 +741,7 @@ class OsidObject:
         'from ..primitives import DisplayText',
         'from dlkit.abstract_osid.osid import errors',
         'from .. import types',
-        ]
+    ]
 
     init = """
     _namespace = 'mongo.OsidObject'
@@ -748,6 +749,8 @@ class OsidObject:
     def __init__(self, osid_object_map, runtime=None):
         self._my_map = osid_object_map
         self._runtime = runtime
+        if runtime is not None:
+            self._set_authority(runtime=runtime)
 
     def get_object_map(self, obj_map=None):
         # pylint: disable=too-many-branches
@@ -915,7 +918,8 @@ class OsidForm:
         'from dlkit.abstract_osid.osid import errors',
         'from . import mdata_conf',
         'from .metadata import Metadata',
-        ]
+        'import uuid',
+    ]
 
     init = """
     # pylint: disable=no-self-use
@@ -923,10 +927,12 @@ class OsidForm:
 
     _namespace = 'mongo.OsidForm'
 
-    def __init__(self):
-        import uuid
+    def __init__(self, runtime=None):
         self._identifier = str(uuid.uuid4())
         self._for_update = None
+        self._runtime = runtime
+        if runtime is not None:
+            self._set_authority(runtime=runtime)
 
     def _init_metadata(self):
         \"\"\"Initialize OsidObjectForm metadata.\"\"\"

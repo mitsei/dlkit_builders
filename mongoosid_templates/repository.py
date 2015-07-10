@@ -391,9 +391,8 @@ class Asset:
     _namespace = 'repository.Asset'
 
     def __init__(self, osid_object_map, db_prefix='', runtime=None):
-        self._my_map = osid_object_map
+        osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
         self._db_prefix = db_prefix
-        self._runtime = runtime
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         if self.is_composition():
