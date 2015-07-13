@@ -916,6 +916,7 @@ class OsidForm:
         'from . import mdata_conf',
         'from .metadata import Metadata',
         'import uuid',
+        'from decimal import Decimal',
     ]
 
     init = """
@@ -1079,7 +1080,7 @@ class OsidForm:
 
     def _is_valid_decimal(self, inpt, metadata):
         \"\"\"Checks if input is a valid decimal value\"\"\"
-        if not isinstance(inpt, float):
+        if not (isinstance(inpt, float) or isinstance(inpt, Decimal)):
             return False
         if metadata.get_minimum_decimal() and inpt < metadata.get_minimum_decimal():
             return False

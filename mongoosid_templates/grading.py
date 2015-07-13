@@ -63,27 +63,30 @@ class GradeEntryAdminSession:
 
 
 class GradeSystem:
+    import_statements = [
+        'from decimal import Decimal',
+    ]
 
     get_lowest_numeric_score_template = """
         # Implemented from template for osid.grading.GradeSystem.get_lowest_numeric_score_template
-        return self._my_map['${var_name_mixed}']"""
+        return Decimal(str(self._my_map['${var_name_mixed}']))"""
 
     # But the real implementations need to check is_based_on_grades():
 
     get_lowest_numeric_score = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
-        return self._my_map['lowestNumericScore']"""
+        return Decimal(str(self._my_map['lowestNumericScore']))"""
 
     get_highest_numeric_score = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
-        return self._my_map['highestNumericScore']"""
+        return Decimal(str(self._my_map['highestNumericScore']))"""
 
     get_numeric_score_increment = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
-        return self._my_map['numericScoreIncrement']"""
+        return Decimal(str(self._my_map['numericScoreIncrement']))"""
 
 
 class GradeSystemForm:
@@ -282,7 +285,7 @@ class GradeEntryForm:
         if (self._grade_system.get_numeric_score_increment() and 
                 score % self._grade_system.get_numeric_score_increment() != 0):
             raise errors.InvalidArgument('score must be in increments of ' + str(self._score_increment))
-        self._my_map['score'] = score
+        self._my_map['score'] = float(score)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
         self._my_map['timeGraded'] = now_map()"""
 
