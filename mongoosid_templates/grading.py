@@ -69,24 +69,36 @@ class GradeSystem:
 
     get_lowest_numeric_score_template = """
         # Implemented from template for osid.grading.GradeSystem.get_lowest_numeric_score_template
-        return Decimal(str(self._my_map['${var_name_mixed}']))"""
+        if self._my_map['${var_name_mixed}'] is None:
+            return None
+        else:
+            return Decimal(str(self._my_map['${var_name_mixed}']))"""
 
     # But the real implementations need to check is_based_on_grades():
 
     get_lowest_numeric_score = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
-        return Decimal(str(self._my_map['lowestNumericScore']))"""
+        if self._my_map['lowestNumericScore'] is None:
+            return None
+        else:
+            return Decimal(str(self._my_map['lowestNumericScore']))"""
 
     get_highest_numeric_score = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
-        return Decimal(str(self._my_map['highestNumericScore']))"""
+        if self._my_map['highestNumericScore'] is None:
+            return None
+        else:
+            return Decimal(str(self._my_map['highestNumericScore']))"""
 
     get_numeric_score_increment = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
-        return Decimal(str(self._my_map['numericScoreIncrement']))"""
+        if self._my_map['numericScoreIncrement'] is None:
+            return None
+        else:
+            return Decimal(str(self._my_map['numericScoreIncrement']))"""
 
 
 class GradeSystemForm:
