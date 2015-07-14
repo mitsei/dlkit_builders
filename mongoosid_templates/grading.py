@@ -300,13 +300,19 @@ class GradeEntryForm:
         self._my_map['timeGraded'] = None"""
 
 class GradebookColumnLookupSession:
+    import_statements = [
+        'from .objects import GradebookColumnSummary',
+    ]
 
     supports_summary = """
         # Not yet:
         return False"""
 
     get_gradebook_column_summary = """
-        raise errors.Unimplemented()"""
+        gradebook_column = self.get_gradebook_column(gradebook_column_id)
+        return GradebookColumnSummary(osid_object_map=gradebook_column._my_map,
+                                      db_prefix=self._db_prefix,
+                                      runtime=self._runtime)"""
 
 class GradebookColumnAdminSession:
 
@@ -410,3 +416,71 @@ class GradeSystemAdminSession:
         objects.GradeSystem(grade_system_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
         """
+
+
+class GradebookColumnSummary:
+    import_statements = [
+        'import numpy as np',
+    ]
+
+    init = """
+    try:
+        #pylint: disable=no-name-in-module
+        from ..records.types import GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES as _record_type_data_sets
+    except (ImportError, AttributeError):
+        _record_type_data_sets = {}
+    _namespace = 'grading.GradebookColumnSummary'
+
+    def __init__(self, osid_object_map, db_prefix='', runtime=None):
+        osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
+        self._db_prefix = db_prefix
+        self._records = dict()
+        self._load_records(osid_object_map['recordTypeIds'])
+
+        # Not set the entries to be included in the calculation
+        self._entries = self._get_entries_for_calculation()
+        self._entry_scores = self._get_entry_scores()
+
+    def _get_entries_for_calculation(self):
+        \"\"\"Ignores entries flagged with ignoreForCalculation\"\"\"
+        mgr = self._get_provider_manager('Grading')
+        if not mgr.supports_gradebook_column_lookup():
+            raise errors.OperationFailed('Grading does not support GradebookColumn lookup')
+        gradebook_id = Id(self._my_map['gradebookId'])
+        lookup_session = mgr.get_grade_entry_lookup_session_for_gradebook(gradebook_id)
+        entries = lookup_session.get_grade_entries_for_gradebook_column(self.get_gradebook_column_id())
+        return [e for e in entries if not e.isIgnoredForCalculations()]
+
+    def _get_entry_scores(self):
+        \"\"\"Takes entries from self._entries and returns a list of scores (or
+        output scores, if based on grades)\"\"\"
+        if self.get_gradebook_column().get_grade_system().is_based_on_grades():
+            return [e.get_grade().get_output_score() for e in self._entries if e.is_graded()]
+        else:
+            return [e.get_score() for e in self._entries if e.is_graded()]
+    """
+
+    get_mean = """
+        return np.mean(self._entry_scores)
+    """
+
+    get_median = """
+        return np.median(self._entry_scores)
+    """
+
+    get_mode = """
+        # http://stackoverflow.com/questions/10797819/finding-the-mode-of-a-list-in-python
+        return max(set(self._entry_scores), key=list.count)
+    """
+
+    get_rms = """
+        return np.sqrt(np.mean(np.square(self._entry_scores)))
+    """
+
+    get_standard_deviation = """
+        return np.std(self._entry_scores)
+    """
+
+    get_sum = """
+        return sum(self._entry_scores)
+    """

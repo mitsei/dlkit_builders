@@ -89,6 +89,8 @@ sessions_to_implement = [
     'GradebookColumnLookupSession',
     'GradebookColumnAdminSession',
     'GradebookColumnQuerySession',
+    'GradebookColumnCalculationLookupSession',
+    'GradebookColumnCalculationAdminSession',
     ### hierarchy service:
     'HierarchyLookupSession',
     'HierarchyAdminSession',
@@ -172,6 +174,7 @@ objects_to_implement = [
     'GradeEntry',
     'GradebookColumn',
     'GradebookColumnSummary',
+    'GradebookColumnCalculation',
     'Gradebook',
     ### hierarchy service
     'Hierarchy',
