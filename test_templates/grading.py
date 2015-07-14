@@ -52,8 +52,8 @@ class GradebookColumnLookupSession:
         create_form.description = 'Test Grade System for GradebookColumnLookupSession tests'
         create_form.based_on_grades = False
         create_form.lowest_numeric_score = 0
-        create_form.highest_numeric_score = 5
-        create_form.numeric_score_increment = 0.25
+        create_form.highest_numeric_score = 100
+        create_form.numeric_score_increment = 1
         cls.grade_system = cls.catalog.create_grade_system(create_form)
         for num in [0, 1]:
             create_form = cls.catalog.get_gradebook_column_form_for_create([])
@@ -63,7 +63,7 @@ class GradebookColumnLookupSession:
             obj = cls.catalog.create_gradebook_column(create_form)
             cls.gradebook_column_list.append(obj)
             cls.gradebook_column_ids.append(obj.ident)
-        for num in [0, 100]:
+        for num in range(0, 100):
             create_form = cls.catalog.get_grade_entry_form_for_create(cls.gradebook_column_ids[0], AGENT_ID, [])
             create_form.display_name = 'Test GradeEntry ' + str(num)
             create_form.description = 'Test GradeEntry for GradebookColumnLookupSession tests'
