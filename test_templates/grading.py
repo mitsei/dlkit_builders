@@ -85,7 +85,7 @@ class GradebookColumnLookupSession:
     """
     # skip this one until gradebook column summary is supported
     get_gradebook_column_summary = """
-        self.assertTrue(isinstance(self.gradebook_column_list[0].get_gradebook_column_summary(),
+        self.assertTrue(isinstance(self.catalog.get_gradebook_column_summary(self.gradebook_column_ids[0]),
                                    GradebookColumnSummary))"""
 
 

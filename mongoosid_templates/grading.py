@@ -168,7 +168,8 @@ class GradeEntryForm:
     import_statements = [
         'from dlkit.primordium.id.primitives import Id',
         'from dlkit.primordium.calendaring.primitives import DateTime',
-        'from ..utilities import now_map'
+        'from ..utilities import now_map',
+        'from decimal import Decimal'
     ]
 
     init = """
@@ -294,6 +295,8 @@ class GradeEntryForm:
             raise errors.NoAccess()
         if not self._is_valid_decimal(score, self.get_score_metadata()):
             raise errors.InvalidArgument()
+        if not isinstance(score, Decimal):
+            score = Decimal(str(score))
         if (self._grade_system.get_numeric_score_increment() and 
                 score % self._grade_system.get_numeric_score_increment() != 0):
             raise errors.InvalidArgument('score must be in increments of ' + str(self._score_increment))
@@ -322,7 +325,9 @@ class GradebookColumnLookupSession:
 
     get_gradebook_column_summary = """
         gradebook_column = self.get_gradebook_column(gradebook_column_id)
-        return GradebookColumnSummary(osid_object_map=gradebook_column._my_map,
+        summary_map = gradebook_column._my_map
+        summary_map['gradebookColumnId'] = str(gradebook_column.ident)
+        return GradebookColumnSummary(osid_object_map=summary_map,
                                       db_prefix=self._db_prefix,
                                       runtime=self._runtime)"""
 
@@ -461,7 +466,7 @@ class GradebookColumnSummary:
         gradebook_id = Id(self._my_map['gradebookId'])
         lookup_session = mgr.get_grade_entry_lookup_session_for_gradebook(gradebook_id)
         entries = lookup_session.get_grade_entries_for_gradebook_column(self.get_gradebook_column_id())
-        return [e for e in entries if not e.isIgnoredForCalculations()]
+        return [e for e in entries if not e.is_ignored_for_calculations()]
 
     def _get_entry_scores(self):
         \"\"\"Takes entries from self._entries and returns a list of scores (or
