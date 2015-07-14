@@ -544,16 +544,18 @@ class OsidSession:
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
         return get_provider_manager(osid, runtime=self._runtime, local=local)
 
-    def _get_id(self, id_):
+    def _get_id(self, id_, pkg_name):
         \"\"\"
         Returns the primary id given an alias.
 
         If the id provided is not in the alias table, it will simply be
         returned as is.
 
+        Only looks within the Id Alias namespace for the session package
+
         \"\"\"
         collection = MongoClientValidated(self._db_prefix + 'id',
-                                          collection='Id',
+                                          collection=pkg_name + 'Ids',
                                           runtime=self._runtime)
         try:
             result = collection.find_one({'aliasIds': {'$in': [str(id_)]}})
@@ -571,7 +573,7 @@ class OsidSession:
                                           runtime=self._runtime)
         collection.find_one({'_id': ObjectId(primary_id.get_identifier())}) # to raise NotFound
         collection = MongoClientValidated(self._db_prefix + 'id',
-                                          collection='Id',
+                                          collection=pkg_name + 'Ids',
                                           runtime=self._runtime)
         try:
             result = collection.find_one({'aliasIds': {'$in': [str(equivalent_id)]}})
