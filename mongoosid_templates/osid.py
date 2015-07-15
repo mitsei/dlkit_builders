@@ -1084,6 +1084,8 @@ class OsidForm:
         \"\"\"Checks if input is a valid decimal value\"\"\"
         if not (isinstance(inpt, float) or isinstance(inpt, Decimal)):
             return False
+        if not isinstance(inpt, Decimal):
+            inpt = Decimal(str(inpt))
         if metadata.get_minimum_decimal() and inpt < metadata.get_minimum_decimal():
             return False
         if metadata.get_maximum_decimal() and inpt > metadata.get_maximum_decimal():
