@@ -145,7 +145,7 @@ class GradeEntry:
             time_graded['microsecond'])"""
 
     is_graded = """
-        return self._my_map['gradeId'] or self._my_map['score']"""
+        return bool(self._my_map['gradeId'] is not None or self._my_map['score'] is not None)"""
 
     get_grading_agent_id = """
         if not self.is_graded or self.is_derived():
@@ -487,7 +487,7 @@ class GradebookColumnSummary:
 
     get_mode = """
         # http://stackoverflow.com/questions/10797819/finding-the-mode-of-a-list-in-python
-        return max(set(self._entry_scores), key=list.count)
+        return max(set(self._entry_scores), key=self._entry_scores.count)
     """
 
     get_rms = """
