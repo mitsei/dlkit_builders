@@ -142,7 +142,7 @@ class ResourceManager:
         return ${cat_name}(
             self._provider_manager,
             session_instance.get_${cat_name_under}(),
-            self._proxy, c=session_instance)"""
+            self._proxy, ${method_session_name}=session_instance)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"

@@ -192,6 +192,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
             if 'method_name' in context and context['method_name'].startswith('can_'):
                 context['func_name'] = context['method_name'].split('_')[1]
+            if 'method_name' in context:
+                context['method_session_name'] = context['method_name'].replace('get_', '')
 
             # Special one for services test builder:
             if is_manager_session(interface, patterns, package_name):
