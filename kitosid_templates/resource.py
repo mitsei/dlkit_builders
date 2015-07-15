@@ -138,11 +138,11 @@ class ResourceManager:
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_catalog_template
-        session_instance = self._instantiate_session(*args, **kwargs)
+        session_instance = self._instantiate_session('${method_name}', proxy=self._proxy, *args, **kwargs)
         return ${cat_name}(
             self._provider_manager,
-            self.get_${cat_name_under}(*args, **kwargs),
-            self._proxy, ${return_type_under}=session_instance)"""
+            session_instance.get_${cat_name_under}(),
+            self._proxy, c=session_instance)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
