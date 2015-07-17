@@ -908,8 +908,11 @@ class Bin:
         return self
 
     def __getattr__(self, name):
-        if '_catalog' in self.__dict__ and name in self._catalog:
-            return self._catalog[name]
+        if '_catalog' in self.__dict__:
+            try:
+                return self._catalog[name]
+            except AttributeError:
+                pass
         raise AttributeError
 
     def close_sessions(self):
