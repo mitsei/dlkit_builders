@@ -1138,7 +1138,11 @@ class BinHierarchySession:
     get_bin_nodes_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_bin_nodes
-        raise errors.Unimplemented()"""
+        return objects.${return_type}(self.get_${cat_name_under}_node_ids(
+            ${arg0_name}=${arg0_name},
+            ${arg1_name}=${arg1_name},
+            ${arg2_name}=${arg2_name},
+            ${arg3_name}=${arg3_name})._my_map, runtime=self._runtime, proxy=self._proxy)"""
 
 class BinHierarchyDesignSession:
 
@@ -1521,3 +1525,52 @@ class BinQuery:
 
     clear_group_terms_template = """
         self._clear_terms('${var_name_mixed}')"""
+
+
+class BinNode:
+
+    import_statements_pattern = [
+        'from ..utilities import get_provider_manager',
+        'from dlkit.primordium.id.primitives import Id',
+    ]
+
+    init_template = """
+    def __init__(self, node_map, runtime=None, proxy=None):
+        osid_objects.OsidNode.__init__(self, node_map)
+        self._runtime = runtime
+        self._proxy = proxy
+
+    def get_object_node_map(self):
+        node_map = dict(self.get_${object_name_under}().get_object_map())
+        node_map['type'] = '${object_name}Node'
+        node_map['parentNodes'] = []
+        node_map['childNodes'] = []
+        for ${object_name_under}_node in self.get_parent_${object_name_under}_nodes():
+            node_map['parentNodes'].append(${object_name_under}_node.get_object_node_map())
+        for ${object_name_under}_node in self.get_child_${object_name_under}_nodes():
+            node_map['childNodes'].append(${object_name_under}_node.get_object_node_map())
+        return node_map
+"""
+
+    get_bin_template = """
+        mgr = get_provider_manager('${package_name_upper}', runtime=self._runtime, proxy=self._proxy)
+        lookup_session = mgr.get_${object_name_under}_lookup_session()
+        return lookup_session.get_${object_name_under}(Id(self._my_map['id']))"""
+
+    get_parent_bin_nodes_template = """
+        parent_${object_name_under}_nodes = []
+        for node in self._my_map['parentNodes']:
+            parent_${object_name_under}_nodes.append(${object_name}Node(
+                node._my_map,
+                runtime=self._runtime,
+                proxy=self._proxy))
+        return ${return_type}(parent_${object_name_under}_nodes)"""
+
+    get_child_bin_nodes_template = """
+        parent_${object_name_under}_nodes = []
+        for node in self._my_map['childNodes']:
+            parent_${object_name_under}_nodes.append(${object_name}Node(
+                node._my_map,
+                runtime=self._runtime,
+                proxy=self._proxy))
+        return ${return_type}(parent_${object_name_under}_nodes)"""

@@ -759,7 +759,8 @@ def map_session_patterns(interface, package, index):
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               arg2_name = method['args'][2]['var_name'],
-                              arg3_name = method['args'][3]['var_name']))
+                              arg3_name = method['args'][3]['var_name'],
+                              cat_name = index['package_catalog_caps']))
 
 
 

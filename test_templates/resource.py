@@ -753,11 +753,13 @@ class BinHierarchySession:
         pass"""
 
     get_bin_node_ids_template = """
-        node_ids = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 1, False)
+        node_ids = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
         # add some tests on the returned node"""
 
     get_bin_nodes_template = """
-        pass"""
+        nodes = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
+        print nodes.get_object_node_map()
+        # add some tests on the returned node"""
 
 class BinHierarchyDesignSession:
 

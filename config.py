@@ -177,6 +177,7 @@ objects_to_implement = [
     'GradebookColumnCalculation',
     'Gradebook',
     ### hierarchy service
+    'Node',
     'Hierarchy',
     'HierarchyNode',
     ### id service
@@ -214,4 +215,6 @@ variants_to_implement = [
     'QueryRecord',
     'QueryFormRecord',
     'List',
+    'Node',
+    'NodeList',
 ]

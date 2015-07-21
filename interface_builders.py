@@ -163,6 +163,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             object_name = interface_name
         elif init_pattern == 'resource.BinForm':
             object_name = interface_name[:-4]
+        elif init_pattern == 'resource.BinNode':
+            object_name = interface_name[:-4]
         elif init_pattern == 'resource.ResourceLookupSession':
             object_name = interface_name[:-13]
         elif init_pattern == 'resource.ResourceQuerySession':
