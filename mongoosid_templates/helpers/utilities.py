@@ -35,7 +35,10 @@ class MongoClientValidated(object):
                         self._mc.create_index(field)
             except (AttributeError, KeyError, NotFound):
                 pass
-
+            text_index_fields = [('displayName.text', 'text'), ('description.text', 'text')]
+            # add additional text index fields based on the configuration
+            # HERE
+            self._mc.create_index(text_index_fields)
 
     def _validate_write(self, result):
         try:
