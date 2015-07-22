@@ -20,10 +20,22 @@ class MongoClientValidated(object):
                 MONGO_CLIENT.set_mongo_client(MongoClient())
             else:
                 MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))
+
         if collection is None:
             self._mc = MONGO_CLIENT.mongo_client[db]
         else:
             self._mc = MONGO_CLIENT.mongo_client[db][collection]
+            # add the collection index, if available in the configs
+            try:
+                mongo_indexes_param_id = Id('parameter:indexes@mongo')
+                mongo_indexes = runtime.get_configuration().get_value_by_parameter(mongo_indexes_param_id).get_object_value()
+                namespace = '{0}.{1}'.format(db, collection)
+                if namespace in mongo_indexes:
+                    for field in mongo_indexes[namespace]:
+                        self._mc.create_index(field)
+            except (AttributeError, KeyError, NotFound):
+                pass
+
 
     def _validate_write(self, result):
         try:
