@@ -1535,8 +1535,9 @@ class BinNode:
     ]
 
     init_template = """
-    def __init__(self, node_map, runtime=None, proxy=None):
+    def __init__(self, node_map, runtime=None, proxy=None, lookup_session=None):
         osid_objects.OsidNode.__init__(self, node_map)
+        self._lookup_session = lookup_session
         self._runtime = runtime
         self._proxy = proxy
 
@@ -1553,9 +1554,10 @@ class BinNode:
 """
 
     get_bin_template = """
-        mgr = get_provider_manager('${package_name_upper}', runtime=self._runtime, proxy=self._proxy)
-        lookup_session = mgr.get_${object_name_under}_lookup_session()
-        return lookup_session.get_${object_name_under}(Id(self._my_map['id']))"""
+        if self._lookup_session is None:
+            mgr = get_provider_manager('${package_name_upper}', runtime=self._runtime, proxy=self._proxy)
+            self._lookup_session = mgr.get_${object_name_under}_lookup_session()
+        return self._lookup_session.get_${object_name_under}(Id(self._my_map['id']))"""
 
     get_parent_bin_nodes_template = """
         parent_${object_name_under}_nodes = []
@@ -1563,7 +1565,8 @@ class BinNode:
             parent_${object_name_under}_nodes.append(${object_name}Node(
                 node._my_map,
                 runtime=self._runtime,
-                proxy=self._proxy))
+                proxy=self._proxy,
+                lookup_session=self._lookup_session))
         return ${return_type}(parent_${object_name_under}_nodes)"""
 
     get_child_bin_nodes_template = """
@@ -1572,5 +1575,6 @@ class BinNode:
             parent_${object_name_under}_nodes.append(${object_name}Node(
                 node._my_map,
                 runtime=self._runtime,
-                proxy=self._proxy))
+                proxy=self._proxy,
+                lookup_session=self._lookup_session))
         return ${return_type}(parent_${object_name_under}_nodes)"""
