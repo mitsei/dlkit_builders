@@ -461,7 +461,7 @@ class OsidSession:
         if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
             self._catalog_identifier = catalog_id.get_identifier()
 
-            collection = MongoClientValidated(self._db_prefix + db_name,
+            collection = MongoClientValidated(db_name,
                                               collection=cat_name,
                                               runtime=self._runtime)
             try:
@@ -514,13 +514,13 @@ class OsidSession:
         try:
             foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
             foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
-            collection = MongoClientValidated(self._db_prefix + foreign_db_name,
+            collection = MongoClientValidated(foreign_db_name,
                                               collection=foreign_cat_name,
                                               runtime=self._runtime)
             collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())})
         except KeyError:
             raise errors.NotFound()
-        collection = MongoClientValidated(self._db_prefix + db_name,
+        collection = MongoClientValidated(db_name,
                                           collection=cat_name,
                                           runtime=self._runtime)
         catalog_map = {
@@ -554,7 +554,7 @@ class OsidSession:
         Only looks within the Id Alias namespace for the session package
 
         \"\"\"
-        collection = MongoClientValidated(self._db_prefix + 'id',
+        collection = MongoClientValidated('id',
                                           collection=pkg_name + 'Ids',
                                           runtime=self._runtime)
         try:
@@ -568,11 +568,11 @@ class OsidSession:
         \"\"\"Adds the given equivalent_id as an alias for primary_id if possible\"\"\"
         pkg_name = primary_id.get_identifier_namespace().split('.')[0]
         obj_name = primary_id.get_identifier_namespace().split('.')[1]
-        collection = MongoClientValidated(self._db_prefix + pkg_name,
+        collection = MongoClientValidated(pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
         collection.find_one({'_id': ObjectId(primary_id.get_identifier())}) # to raise NotFound
-        collection = MongoClientValidated(self._db_prefix + 'id',
+        collection = MongoClientValidated('id',
                                           collection=pkg_name + 'Ids',
                                           runtime=self._runtime)
         try:
@@ -648,7 +648,7 @@ class OsidSession:
     def _assign_object_to_catalog(self, obj_id, cat_id):
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
         obj_name = obj_id.get_identifier_namespace().split('.')[1]
-        collection = MongoClientValidated(self._db_prefix + pkg_name,
+        collection = MongoClientValidated(pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
         obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
@@ -664,7 +664,7 @@ class OsidSession:
     def _unassign_object_from_catalog(self, obj_id, cat_id):
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
         obj_name = obj_id.get_identifier_namespace().split('.')[1]
-        collection = MongoClientValidated(self._db_prefix + pkg_name,
+        collection = MongoClientValidated(pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
         obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})

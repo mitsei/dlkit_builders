@@ -40,7 +40,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
@@ -61,7 +61,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
@@ -83,7 +83,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
@@ -104,7 +104,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
@@ -126,7 +126,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
@@ -139,7 +139,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(

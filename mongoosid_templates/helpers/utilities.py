@@ -43,6 +43,7 @@ class MongoClientValidated(object):
                         self._mc.create_index(field)
             except (AttributeError, KeyError, NotFound):
                 pass
+
             text_index_fields = [('displayName.text', 'text'), ('description.text', 'text')]
             try:
                 mongo_text_indexes_param_id = Id('parameter:textIndexes@mongo')

@@ -75,7 +75,7 @@ class AssetAdminSession:
         # Implemented from template for
         # osid.repository.AssetAdminSession.create_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -105,7 +105,7 @@ class AssetAdminSession:
         # osid.repository.AssetAdminSession.get_asset_content_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .${return_module} import ${return_type}
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -123,7 +123,7 @@ class AssetAdminSession:
         # Implemented from template for
         # osid.repository.AssetAdminSession.update_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -166,7 +166,7 @@ class AssetAdminSession:
         # osid.repository.AssetAdminSession.delete_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .objects import ${aggregated_object_name}
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -251,7 +251,7 @@ class AssetCompositionSession:
 """
 
     get_composition_assets = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one(
@@ -268,7 +268,7 @@ class AssetCompositionSession:
         return als.get_assets_by_ids(asset_ids)"""
 
     get_compositions_by_asset = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         result = collection.find(
@@ -316,11 +316,11 @@ class AssetCompositionDesignSession:
                 mgr = self._get_provider_manager('REPOSITORY')
                 admin_session = mgr.get_asset_admin_session_for_repository(self._catalog_id)
                 asset_id = admin_session._get_asset_id_with_enclosure(asset_id)
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Asset',
                                           runtime=self._runtime)
         asset = collection.find_one({'_id': ObjectId(asset_id.get_identifier())})
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
@@ -331,7 +331,7 @@ class AssetCompositionDesignSession:
         collection.save(composition)"""
 
     move_asset_ahead = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
@@ -341,7 +341,7 @@ class AssetCompositionDesignSession:
         collection.save(composition)"""
 
     move_asset_behind = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
@@ -351,11 +351,11 @@ class AssetCompositionDesignSession:
         collection.save(composition)"""
 
     order_assets = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         if 'assetIds' not in composition:
@@ -364,7 +364,7 @@ class AssetCompositionDesignSession:
         collection.save(composition)"""
 
     remove_asset = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
@@ -479,14 +479,14 @@ class AssetContent:
         return self._my_map['${var_name_mixed}']"""
 
     get_data = """
-        dbase = MongoClientValidated(self._db_prefix + 'repository',
+        dbase = MongoClientValidated('repository',
                                      runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
         return DataInputStream(filesys.get(self._my_map['data']))""" 
 
     additional_methods = """
     def _delete(self):
-        dbase = MongoClientValidated(self._db_prefix + 'repository',
+        dbase = MongoClientValidated('repository',
                                      runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
         if self._my_map['data'] and filesys.exists(self._my_map['data']):
@@ -516,7 +516,7 @@ class AssetContentForm:
     set_data = """
         if data is None:
             raise errors.NullArgument()
-        dbase = MongoClientValidated(self._db_prefix + 'repository',
+        dbase = MongoClientValidated('repository',
                                      runtime=self._runtime)
         filesys = gridfs.GridFS(dbase)
         self._my_map['data'] = filesys.put(data._my_data)
@@ -529,7 +529,7 @@ class AssetContentForm:
             raise errors.NoAccess()
         if self._my_map['data'] == self._data_default:
             pass
-        dbase = MongoClientValidated(self._db_prefix + 'repository',
+        dbase = MongoClientValidated('repository',
                                      runtime=self._runtime)
         filesys = gridfs.GridFS(dbase)
         filesys.delete(self._my_map['data'])
