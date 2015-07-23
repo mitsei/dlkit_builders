@@ -36,8 +36,15 @@ class MongoClientValidated(object):
             except (AttributeError, KeyError, NotFound):
                 pass
             text_index_fields = [('displayName.text', 'text'), ('description.text', 'text')]
-            # add additional text index fields based on the configuration
-            # HERE
+            try:
+                mongo_text_indexes_param_id = Id('parameter:textIndexes@mongo')
+                mongo_text_indexes = runtime.get_configuration().get_value_by_parameter(mongo_text_indexes_param_id).get_object_value()
+                namespace = '{0}.{1}'.format(db, collection)
+                if namespace in mongo_text_indexes:
+                    for field in mongo_text_indexes[namespace]:
+                        text_index_fields.append((field, 'text'))
+            except (AttributeError, KeyError, NotFound):
+                pass
             self._mc.create_index(text_index_fields)
 
     def _validate_write(self, result):
