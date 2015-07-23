@@ -21,11 +21,19 @@ class MongoClientValidated(object):
             else:
                 MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))
 
+        db_prefix = ''
+        try:
+            db_prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
+            db_prefix = runtime.get_configuration().get_value_by_parameter(db_prefix_param_id).get_string_value()
+        except (AttributeError, KeyError, NotFound):
+            pass
+
         if collection is None:
-            self._mc = MONGO_CLIENT.mongo_client[db]
+            self._mc = MONGO_CLIENT.mongo_client[db_prefix + db]
         else:
-            self._mc = MONGO_CLIENT.mongo_client[db][collection]
+            self._mc = MONGO_CLIENT.mongo_client[db_prefix + db][collection]
             # add the collection index, if available in the configs
+
             try:
                 mongo_indexes_param_id = Id('parameter:indexes@mongo')
                 mongo_indexes = runtime.get_configuration().get_value_by_parameter(mongo_indexes_param_id).get_object_value()
