@@ -1,5 +1,6 @@
 """mongo utilities.py"""
 from pymongo import MongoClient
+from pymongo.errors import OperationFailure as PyMongoOperationFailed
 
 from .osid.osid_errors import NullArgument, NotFound, OperationFailed
 from dlkit.primordium.calendaring.primitives import DateTime
@@ -54,7 +55,14 @@ class MongoClientValidated(object):
                         text_index_fields.append((field, 'text'))
             except (AttributeError, KeyError, NotFound):
                 pass
-            self._mc.create_index(text_index_fields)
+            try:
+                self._mc.create_index(text_index_fields)
+            except PyMongoOperationFailed:
+                current_indexes = self._mc.list_indexes()
+                text_index = [i['name'] for i in current_indexes
+                              if '_fts' in i['key'] and i['key']['_fts'] == 'text'][0]
+                self._mc.drop_index(text_index)
+                self._mc.create_index(text_index_fields)
 
     def _validate_write(self, result):
         try:
