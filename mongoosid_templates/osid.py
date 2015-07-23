@@ -1798,6 +1798,18 @@ class OsidQuery:
             pass
 """
 
+    match_keyword = """
+        #match_value = self._get_string_match_value(keyword, string_match_type)
+        if not match:
+            #match_value = '-' + match_value
+            keyword = '-' + keyword
+        self._query_terms['$text'] = dict()
+        self._query_terms['$text']['$search'] = keyword #match_value
+        self._query_terms['$text']['$language'] = 'en' # this should come from the locale"""
+
+    clear_keyword_terms = """
+        self._clear_terms('$text')"""
+
 class OsidIdentifiableQuery:
 
     import_statements = [
