@@ -1,11 +1,10 @@
 class ObjectiveRequisiteSession:
 
-    import_statements_pattern = [
+    import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
         'from ..utilities import MongoClientValidated',
-        'from . import types',
         'from bson.objectid import ObjectId',
         'from dlkit.mongo.types import Relationship',
         'UPDATED = True',
@@ -32,27 +31,47 @@ class ObjectiveRequisiteSession:
         # Implemented from template for
         # osid.learning.ObjectiveRequisiteSession.get_requisite_objectives_template
         # NOTE: This implementation currently ignores plenary view
-        requisite_type = Type(**Relationship().get_type_data('REQUISITE'))
+        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
         relm = self._get_provider_manager('RELATIONSHIP')
         rls = relm.get_relationship_lookup_session()
+        rls.use_federated_family_view()
         requisite_relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name},
                                                                                  requisite_type)
         destination_ids = [ObjectId(r.get_destination_id().identifier)
                            for r in requisite_relationships]
-        collection = MongoClientValidated('relationship',
-                                          collection='Relationship',
+        collection = MongoClientValidated('learning',
+                                          collection='Objective',
                                           runtime=self._runtime)
         result = collection.find({'_id': {'$$in': destination_ids}})
-        return objects.${return_type}(result)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     can_lookup_objective_prerequisites = """
         return True
     """
 
+    get_dependent_objectives_template = """
+        # Implemented from template for
+        # osid.learning.ObjectiveRequisiteSession.get_dependent_objectives_template
+        # NOTE: This implementation currently ignores plenary view
+        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+        relm = self._get_provider_manager('RELATIONSHIP')
+        rls = relm.get_relationship_lookup_session()
+        rls.use_federated_family_view()
+        requisite_relationships = rls.get_relationships_by_genus_type_for_destination(${arg0_name},
+                                                                                      requisite_type)
+        source_ids = [ObjectId(r.get_source_id().identifier)
+                      for r in requisite_relationships]
+        collection = MongoClientValidated('learning',
+                                          collection='Objective',
+                                          runtime=self._runtime)
+        result = collection.find({'_id': {'$$in': source_ids}})
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
+    """
+
 
 class ObjectiveRequisiteAssignmentSession:
 
-    import_statements_pattern = [
+    import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from dlkit.mongo.types import Relationship'
@@ -80,10 +99,10 @@ class ObjectiveRequisiteAssignmentSession:
     ]
 
     assign_objective_requisite_template = """
-        requisite_type = Type(**Relationship().get_type_data('REQUISITE'))
+        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
 
-        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
-        rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name})
+        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
+        rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name}, [])
         rfc.set_display_name('Objective Requisite')
         rfc.set_description('An Objective Requisite created by the ObjectiveRequisiteAssignmentSession')
         rfc.set_genus_type(requisite_type)
@@ -95,9 +114,9 @@ class ObjectiveRequisiteAssignmentSession:
     ]
 
     unassign_objective_requisite_template = """
-        requisite_type = Type(**Relationship().get_type_data('REQUISITE'))
-        rls = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
-        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
+        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+        rls = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
+        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
     """
 
 class ObjectiveAdminSession:
