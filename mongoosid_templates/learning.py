@@ -26,8 +26,6 @@ class ObjectiveRequisiteSession:
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
         self._forms = dict()
-        self._object_view = COMPARATIVE
-        self._catalog_view = ISOLATED
     """
 
     get_requisite_objectives_template = """
@@ -44,7 +42,7 @@ class ObjectiveRequisiteSession:
         collection = MongoClientValidated('relationship',
                                           collection='Relationship',
                                           runtime=self._runtime)
-        result = collection.find({'_id': {'$in': destination_ids}})
+        result = collection.find({'_id': {'$$in': destination_ids}})
         return objects.${return_type}(result)"""
 
     can_lookup_objective_prerequisites = """
@@ -59,6 +57,22 @@ class ObjectiveRequisiteAssignmentSession:
         'from ..primitives import Id',
         'from dlkit.mongo.types import Relationship'
     ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveRequisiteAssignmentSession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+    """
 
     assign_objective_requisite_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
@@ -260,3 +274,76 @@ class ActivityForm:
             raise errors.NoAccess()
         self._my_map['${var_name_singular_mixed}Ids'] = self._${var_name}_default"""
 
+
+class ObjectiveHierarchySession:
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveHierarchySession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+        self._kwargs = kwargs
+        hierarchy_mgr = self._get_provider_manager('HIERARCHY')
+        self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+            Id(authority='LEARNING',
+               namespace='CATALOG',
+               identifier='OBJECTIVEBANK')
+        )
+    """
+
+
+class ObjectiveHierarchyDesignSession:
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveHierarchyDesignSession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+        self._kwargs = kwargs
+        hierarchy_mgr = self._get_provider_manager('HIERARCHY')
+        self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+            Id(authority='LEARNING',
+               namespace='CATALOG',
+               identifier='OBJECTIVEBANK')
+        )
+    """
+
+
+class ObjectiveSequencingSession:
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
+        'from dlkit.mongo.types import Relationship'
+    ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveSequencingSession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+    """

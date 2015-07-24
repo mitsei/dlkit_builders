@@ -881,7 +881,8 @@ def build_this_interface(package, interface, services=False):
     #               'ObjectiveRequisiteSession',
     #               'ObjectiveRequisiteAssignmentSession',]
 
-    exceptions = ['ObjectiveSequencingSession',]
+    # exceptions = ['ObjectiveSequencingSession',]
+    exceptions = []
 
     excepted_osid_categories = ['properties',
                                 'query_inspectors',
