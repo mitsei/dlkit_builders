@@ -296,7 +296,7 @@ class HierarchyAdminSession:
     ]
 
     delete_hierarchy = """
-        collection = MongoClientValidated(self._db_prefix + 'hierarchy',
+        collection = MongoClientValidated('hierarchy',
                                           collection='Hierarchy',
                                           runtime=self._runtime)
         if not isinstance(hierarchy_id, ABCId):

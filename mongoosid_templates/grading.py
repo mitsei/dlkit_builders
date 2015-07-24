@@ -40,7 +40,7 @@ class GradeEntryAdminSession:
         return obj_form"""
 
     get_grade_entry_form_for_update = """
-        collection = MongoClientValidated(self._db_prefix + 'grading',
+        collection = MongoClientValidated('grading',
                                           collection='GradeEntry',
                                           runtime=self._runtime)
         if not isinstance(grade_entry_id, ABCId):
@@ -354,7 +354,7 @@ class GradebookColumnAdminSession:
         if self._has_entries(gradebook_column_id):
             raise errors.IllegalState('Entries exist in this gradebook column. Cannot delete it.')
 
-        collection = MongoClientValidated(self._db_prefix + 'grading',
+        collection = MongoClientValidated('grading',
                                           collection='GradebookColumn',
                                           runtime=self._runtime)
 
@@ -365,7 +365,7 @@ class GradebookColumnAdminSession:
         """
 
     update_gradebook_column = """
-        collection = MongoClientValidated(self._db_prefix + 'grading',
+        collection = MongoClientValidated('grading',
                                           collection='GradebookColumn',
                                           runtime=self._runtime)
         if not isinstance(gradebook_column_form, ABCGradebookColumnForm):
@@ -418,7 +418,7 @@ class GradeSystemAdminSession:
         """
 
     delete_grade_system = """
-        collection = MongoClientValidated(self._db_prefix + 'grading',
+        collection = MongoClientValidated('grading',
                                           collection='GradeSystem',
                                           runtime=self._runtime)
         if not isinstance(grade_system_id, ABCId):
