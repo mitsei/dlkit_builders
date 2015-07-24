@@ -314,7 +314,7 @@ class ObjectiveHierarchySession:
         self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
             Id(authority='LEARNING',
                namespace='CATALOG',
-               identifier='OBJECTIVEBANK')
+               identifier='OBJECTIVE')
         )
     """
 
@@ -336,10 +336,10 @@ class ObjectiveHierarchyDesignSession:
         self._forms = dict()
         self._kwargs = kwargs
         hierarchy_mgr = self._get_provider_manager('HIERARCHY')
-        self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+        self._hierarchy_session = hierarchy_mgr.get_hierarchy_design_session_for_hierarchy(
             Id(authority='LEARNING',
                namespace='CATALOG',
-               identifier='OBJECTIVEBANK')
+               identifier='OBJECTIVE')
         )
     """
 

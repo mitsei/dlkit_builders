@@ -106,7 +106,70 @@ class ObjectiveRequisiteAssignmentSession:
 """
 
     assign_objective_requisite_template= """
-        pass"""
+        self.catalog.assign_objective_requisite(self.objective.ident, self.requisite_ids[0])
+    """
+
+class ObjectiveHierarchyDesignSession:
+    init = """
+    def setUp(cls):
+        cls.child_list = list()
+        cls.child_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ObjectiveHierarchyDesignSession tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+        create_form = cls.catalog.get_objective_form_for_create([])
+        create_form.display_name = 'Test Objective for ObjectiveHierarchyDesignSession Lookup'
+        create_form.description = 'Test Objective for ObjectiveHierarchyDesignSession tests'
+        cls.objective = cls.catalog.create_objective(create_form)
+        for num in [0, 1]:
+            create_form = cls.catalog.get_objective_form_for_create([])
+            create_form.display_name = 'Test Objective ' + str(num)
+            create_form.description = 'Test Objective for ObjectiveHierarchyDesignSession tests'
+            obj = cls.catalog.create_objective(create_form)
+            cls.child_list.append(obj)
+            cls.child_ids.append(obj.ident)
+
+    def tearDown(cls):
+        for catalog in cls.svc_mgr.get_objective_banks():
+            for obj_id in cls.child_ids:
+                catalog.delete_objective(obj_id)
+            for obj in catalog.get_objectives():
+                catalog.delete_objective(obj.ident)
+            cls.svc_mgr.delete_objective_bank(catalog.ident)
+"""
+
+    add_child_objective = """
+        self.catalog.add_root_objective(self.objective.ident)
+        self.catalog.add_child_objective(self.objective.ident, self.child_ids[0])
+    """
+
+    add_root_objective = """
+        self.catalog.add_root_objective(self.objective.ident)
+    """
+
+    can_modify_objective_hierarchy = """
+        self.assertTrue(self.catalog.can_modify_objective_hierarchy())
+    """
+
+    remove_child_objective = """
+        self.catalog.add_root_objective(self.objective.ident)
+        self.catalog.add_child_objective(self.objective.ident, self.child_ids[0])
+        self.catalog.remove_child_objective(self.objective.ident, self.child_ids[0])
+    """
+
+    remove_child_objectives = """
+        self.catalog.add_root_objective(self.objective.ident)
+        self.catalog.add_child_objective(self.objective.ident, self.child_ids[0])
+        self.catalog.add_child_objective(self.objective.ident, self.child_ids[1])
+        self.catalog.remove_child_objectives(self.objective.ident)
+    """
+
+    remove_root_objective = """
+        self.catalog.add_root_objective(self.objective.ident)
+        self.catalog.remove_root_objective(self.objective.ident)
+    """
 
 
 class ObjectiveHierarchySession:
@@ -141,6 +204,46 @@ class ObjectiveHierarchySession:
                 catalog.delete_objective(obj.ident)
             cls.svc_mgr.delete_objective_bank(catalog.ident)
 """
+
+    get_root_objective_ids = """
+    """
+
+    get_root_objectives = """
+    """
+
+    has_parent_objectives = """
+    """
+
+    is_parent_of_objective = """
+    """
+
+    get_parent_objective_ids = """
+
+    """
+
+    get_parent_objectives = """
+
+    """
+
+    has_child_objectives = """
+
+    """
+
+    is_child_of_objective = """
+
+    """
+
+    get_child_objective_ids = """
+
+    """
+
+    get_child_objectives = """
+    """
+
+    is_descendant_of_objective = """
+    """
+
+
 
 class ObjectiveAdminSession:
 

@@ -10,6 +10,7 @@ packages_to_implement = [
     'learning',
     'locale',
     'mapping',
+    'ontology',
     'osid',
     'proxy',
     'relationship',
@@ -114,6 +115,8 @@ sessions_to_implement = [
     'ObjectiveBankAdminSession',
     'ObjectiveBankHierarchySession',
     'ObjectiveBankHierarchyDesignSession',
+    ## ontology service:
+    'SubjectHierarchyDesignSession',
     ### proxy service
     'ProxySession',
     ### relationship service
@@ -189,6 +192,8 @@ objects_to_implement = [
     ### locale service
     'Locale',
     'LocaleList',
+    ### ontology service
+    'Subject',
     ### proxy service
     'Proxy',
     'ProxyCondition',
