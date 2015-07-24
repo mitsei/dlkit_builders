@@ -7,7 +7,7 @@ from pattern_mappers.data import map_object_form_data_patterns, map_object_data_
 from pattern_mappers.objects import map_object_form_patterns,\
     map_object_patterns, map_list_patterns,\
     map_query_patterns, map_catalog_patterns,\
-    map_catalog_query_patterns
+    map_catalog_query_patterns, map_catalog_node_patterns
 
 
 def append_caps(value, caps_list):
@@ -258,5 +258,8 @@ def map_patterns(package, index, base_package=None):
             map_catalog_patterns(interface, package, index)
         elif 'OsidCatalogQuery' in interface['inherit_shortnames']:
             map_catalog_query_patterns(interface, package, index)
+        elif ('OsidNode' in interface['inherit_shortnames'] and 
+                interface['shortname'][:-4] == index['package_catalog_caps']):
+            map_catalog_node_patterns(interface, package, index)
 
     return index

@@ -163,6 +163,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             object_name = interface_name
         elif init_pattern == 'resource.BinForm':
             object_name = interface_name[:-4]
+        elif init_pattern == 'resource.BinNode':
+            object_name = interface_name[:-4]
         elif init_pattern == 'resource.ResourceLookupSession':
             object_name = interface_name[:-13]
         elif init_pattern == 'resource.ResourceQuerySession':
@@ -1171,7 +1173,7 @@ def serialize(var_dict):
 
     for k, v in var_dict.iteritems():
         if isinstance(v, basestring):
-            return_dict[k] = k + ' = ' + str(v)
+            return_dict[k] = k + ' = "' + str(v) + '"'
         elif isinstance(v, list) and len(v) <= 3:  # this is stupid and horrible, I know
             return_dict[k] = k + ' = ' + str(v)
         elif isinstance(v, list) or isinstance(v, dict):

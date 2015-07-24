@@ -40,7 +40,7 @@ class GradeEntryAdminSession:
         return obj_form"""
 
     get_grade_entry_form_for_update = """
-        collection = MongoClientValidated(self._db_prefix + 'grading',
+        collection = MongoClientValidated('grading',
                                           collection='GradeEntry',
                                           runtime=self._runtime)
         if not isinstance(grade_entry_id, ABCId):
@@ -63,27 +63,42 @@ class GradeEntryAdminSession:
 
 
 class GradeSystem:
+    import_statements = [
+        'from decimal import Decimal',
+    ]
 
     get_lowest_numeric_score_template = """
         # Implemented from template for osid.grading.GradeSystem.get_lowest_numeric_score_template
-        return self._my_map['${var_name_mixed}']"""
+        if self._my_map['${var_name_mixed}'] is None:
+            return None
+        else:
+            return Decimal(str(self._my_map['${var_name_mixed}']))"""
 
     # But the real implementations need to check is_based_on_grades():
 
     get_lowest_numeric_score = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
-        return self._my_map['lowestNumericScore']"""
+        if self._my_map['lowestNumericScore'] is None:
+            return None
+        else:
+            return Decimal(str(self._my_map['lowestNumericScore']))"""
 
     get_highest_numeric_score = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
-        return self._my_map['highestNumericScore']"""
+        if self._my_map['highestNumericScore'] is None:
+            return None
+        else:
+            return Decimal(str(self._my_map['highestNumericScore']))"""
 
     get_numeric_score_increment = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
-        return self._my_map['numericScoreIncrement']"""
+        if self._my_map['numericScoreIncrement'] is None:
+            return None
+        else:
+            return Decimal(str(self._my_map['numericScoreIncrement']))"""
 
 
 class GradeSystemForm:
@@ -130,7 +145,7 @@ class GradeEntry:
             time_graded['microsecond'])"""
 
     is_graded = """
-        return self._my_map['gradeId'] or self._my_map['score']"""
+        return bool(self._my_map['gradeId'] is not None or self._my_map['score'] is not None)"""
 
     get_grading_agent_id = """
         if not self.is_graded or self.is_derived():
@@ -153,7 +168,8 @@ class GradeEntryForm:
     import_statements = [
         'from dlkit.primordium.id.primitives import Id',
         'from dlkit.primordium.calendaring.primitives import DateTime',
-        'from ..utilities import now_map'
+        'from ..utilities import now_map',
+        'from decimal import Decimal'
     ]
 
     init = """
@@ -165,8 +181,7 @@ class GradeEntryForm:
     _namespace = 'grading.GradeEntry'
 
     def __init__(self, osid_object_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self)
-        self._runtime = runtime
+        osid_objects.OsidForm.__init__(self, runtime=runtime)
         self._db_prefix = db_prefix
         self._kwargs = kwargs
         self._effective_agent_id = kwargs['effective_agent_id']
@@ -280,10 +295,12 @@ class GradeEntryForm:
             raise errors.NoAccess()
         if not self._is_valid_decimal(score, self.get_score_metadata()):
             raise errors.InvalidArgument()
+        if not isinstance(score, Decimal):
+            score = Decimal(str(score))
         if (self._grade_system.get_numeric_score_increment() and 
                 score % self._grade_system.get_numeric_score_increment() != 0):
             raise errors.InvalidArgument('score must be in increments of ' + str(self._score_increment))
-        self._my_map['score'] = score
+        self._my_map['score'] = float(score)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
         self._my_map['timeGraded'] = now_map()"""
 
@@ -298,13 +315,21 @@ class GradeEntryForm:
         self._my_map['timeGraded'] = None"""
 
 class GradebookColumnLookupSession:
+    import_statements = [
+        'from .objects import GradebookColumnSummary',
+    ]
 
     supports_summary = """
         # Not yet:
         return False"""
 
     get_gradebook_column_summary = """
-        raise errors.Unimplemented()"""
+        gradebook_column = self.get_gradebook_column(gradebook_column_id)
+        summary_map = gradebook_column._my_map
+        summary_map['gradebookColumnId'] = str(gradebook_column.ident)
+        return GradebookColumnSummary(osid_object_map=summary_map,
+                                      db_prefix=self._db_prefix,
+                                      runtime=self._runtime)"""
 
 class GradebookColumnAdminSession:
 
@@ -329,7 +354,7 @@ class GradebookColumnAdminSession:
         if self._has_entries(gradebook_column_id):
             raise errors.IllegalState('Entries exist in this gradebook column. Cannot delete it.')
 
-        collection = MongoClientValidated(self._db_prefix + 'grading',
+        collection = MongoClientValidated('grading',
                                           collection='GradebookColumn',
                                           runtime=self._runtime)
 
@@ -340,7 +365,7 @@ class GradebookColumnAdminSession:
         """
 
     update_gradebook_column = """
-        collection = MongoClientValidated(self._db_prefix + 'grading',
+        collection = MongoClientValidated('grading',
                                           collection='GradebookColumn',
                                           runtime=self._runtime)
         if not isinstance(gradebook_column_form, ABCGradebookColumnForm):
@@ -393,7 +418,7 @@ class GradeSystemAdminSession:
         """
 
     delete_grade_system = """
-        collection = MongoClientValidated(self._db_prefix + 'grading',
+        collection = MongoClientValidated('grading',
                                           collection='GradeSystem',
                                           runtime=self._runtime)
         if not isinstance(grade_system_id, ABCId):
@@ -408,3 +433,71 @@ class GradeSystemAdminSession:
         objects.GradeSystem(grade_system_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
         """
+
+
+class GradebookColumnSummary:
+    import_statements = [
+        'import numpy as np',
+    ]
+
+    init = """
+    try:
+        #pylint: disable=no-name-in-module
+        from ..records.types import GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES as _record_type_data_sets
+    except (ImportError, AttributeError):
+        _record_type_data_sets = {}
+    _namespace = 'grading.GradebookColumnSummary'
+
+    def __init__(self, osid_object_map, db_prefix='', runtime=None):
+        osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
+        self._db_prefix = db_prefix
+        self._records = dict()
+        self._load_records(osid_object_map['recordTypeIds'])
+
+        # Not set the entries to be included in the calculation
+        self._entries = self._get_entries_for_calculation()
+        self._entry_scores = self._get_entry_scores()
+
+    def _get_entries_for_calculation(self):
+        \"\"\"Ignores entries flagged with ignoreForCalculation\"\"\"
+        mgr = self._get_provider_manager('Grading')
+        if not mgr.supports_gradebook_column_lookup():
+            raise errors.OperationFailed('Grading does not support GradebookColumn lookup')
+        gradebook_id = Id(self._my_map['gradebookId'])
+        lookup_session = mgr.get_grade_entry_lookup_session_for_gradebook(gradebook_id)
+        entries = lookup_session.get_grade_entries_for_gradebook_column(self.get_gradebook_column_id())
+        return [e for e in entries if not e.is_ignored_for_calculations()]
+
+    def _get_entry_scores(self):
+        \"\"\"Takes entries from self._entries and returns a list of scores (or
+        output scores, if based on grades)\"\"\"
+        if self.get_gradebook_column().get_grade_system().is_based_on_grades():
+            return [e.get_grade().get_output_score() for e in self._entries if e.is_graded()]
+        else:
+            return [e.get_score() for e in self._entries if e.is_graded()]
+    """
+
+    get_mean = """
+        return np.mean(self._entry_scores)
+    """
+
+    get_median = """
+        return np.median(self._entry_scores)
+    """
+
+    get_mode = """
+        # http://stackoverflow.com/questions/10797819/finding-the-mode-of-a-list-in-python
+        return max(set(self._entry_scores), key=self._entry_scores.count)
+    """
+
+    get_rms = """
+        return np.sqrt(np.mean(np.square(self._entry_scores)))
+    """
+
+    get_standard_deviation = """
+        return np.std(self._entry_scores)
+    """
+
+    get_sum = """
+        return sum(self._entry_scores)
+    """

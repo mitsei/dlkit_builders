@@ -138,11 +138,11 @@ class ResourceManager:
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_catalog_template
-        session_instance = self._instantiate_session(*args, **kwargs)
+        session_instance = self._instantiate_session('${method_name}', proxy=self._proxy, *args, **kwargs)
         return ${cat_name}(
             self._provider_manager,
-            self.get_${cat_name_under}(*args, **kwargs),
-            self._proxy, ${return_type_under}=session_instance)"""
+            session_instance.get_${cat_name_under}(),
+            self._proxy, ${method_session_name}=session_instance)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
@@ -863,21 +863,13 @@ class Bin:
     ##
     # WILL THIS EVER BE CALLED DIRECTLY - OUTSIDE OF A MANAGER?
     def __init__(self, provider_manager, catalog, proxy, **kwargs):
-#        if provider_manager:
         self._provider_manager = provider_manager
-#        else:
-#            import settings
-#            import importlib
-#            provider_module = importlib.import_module(settings.PROVIDER_MANAGER_MODULE_PATH)
-#            provider_manager_class = getattr(provider_module, '${pkg_name_caps}Manager')
-#            self._provider_manager = provider_manager_class()
         self._catalog = catalog
         osid.OsidObject.__init__(self, self._catalog) # This is to initialize self._object
         osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
         self._catalog_id = catalog.get_id()
         self._provider_sessions = kwargs
         self._session_management = AUTOMATIC
-        osid.OsidObject.__init__(self, catalog) # This is to initialize self._object
         self._views = dict()
 
     def _get_provider_session(self, session):
@@ -916,8 +908,11 @@ class Bin:
         return self
 
     def __getattr__(self, name):
-        if '_catalog' in self.__dict__ and name in self._catalog:
-            return self._catalog[name]
+        if '_catalog' in self.__dict__:
+            try:
+                return self._catalog[name]
+            except AttributeError:
+                pass
         raise AttributeError
 
     def close_sessions(self):

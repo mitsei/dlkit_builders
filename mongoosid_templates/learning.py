@@ -41,7 +41,7 @@ class ObjectiveRequisiteSession:
                                                                                  requisite_type)
         destination_ids = [ObjectId(r.get_destination_id().identifier)
                            for r in requisite_relationships]
-        collection = MongoClientValidated(self._db_prefix + 'relationship',
+        collection = MongoClientValidated('relationship',
                                           collection='Relationship',
                                           runtime=self._runtime)
         result = collection.find({'_id': {'$in': destination_ids}})
@@ -104,13 +104,13 @@ class ObjectiveAdminSession:
 
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${dependent_object_name}',
                                           runtime=self._runtime)
         if collection.find({'${object_name_mixed}Id': str(${arg0_name})}).count() != 0:
             raise errors.IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
 
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
@@ -129,7 +129,7 @@ class ActivityLookupSession:
         # Implemented from template for
         # osid.learning.ActivityLookupSession.get_activities_for_objective_template
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
