@@ -43,7 +43,7 @@ class ObjectiveRequisiteSession:
                                           collection='Objective',
                                           runtime=self._runtime)
         result = collection.find({'_id': {'$$in': destination_ids}})
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
     can_lookup_objective_prerequisites = """
         return True
@@ -65,7 +65,7 @@ class ObjectiveRequisiteSession:
                                           collection='Objective',
                                           runtime=self._runtime)
         result = collection.find({'_id': {'$$in': source_ids}})
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
+        return objects.${return_type}(result, runtime=self._runtime)
     """
 
 
@@ -168,7 +168,7 @@ class ActivityLookupSession:
         result = collection.find(
             dict({'${arg0_object_mixed}Id': str(${arg0_name})},
                  **self._bank_view_filter()))
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 
 class ActivityAdminSession:
@@ -199,7 +199,6 @@ class ActivityAdminSession:
                 ${cat_name_under}_id=self._catalog_id,
                 ${arg0_name}=${arg0_name},
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         else:
             obj_form = objects.${return_type}(
@@ -207,7 +206,6 @@ class ActivityAdminSession:
                 record_types=${arg1_name},
                 ${arg0_name}=${arg0_name},
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED

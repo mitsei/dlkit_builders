@@ -98,7 +98,7 @@ class AssetAdminSession:
 
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         from .${return_module} import ${aggregated_object_name}
-        return ${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return ${return_type}(${arg0_name}._my_map, runtime=self._runtime)"""
 
     get_asset_content_form_for_update_template = """
         # Implemented from template for
@@ -114,7 +114,7 @@ class AssetAdminSession:
         for sub_doc in document['${aggregated_objects_name_mixed}']: # There may be a MongoDB shortcut for this
             if sub_doc['_id'] == ObjectId(${arg0_name}.get_identifier()):
                 result = sub_doc
-        obj_form = ${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
+        obj_form = ${return_type}(result, runtime=self._runtime)
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
@@ -159,7 +159,7 @@ class AssetAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         from .objects import ${aggregated_object_name}
 
-        return ${aggregated_object_name}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return ${aggregated_object_name}(${arg0_name}._my_map, runtime=self._runtime)"""
 
     delete_asset_content_template = """
         # Implemented from template for
@@ -182,7 +182,7 @@ class AssetAdminSession:
             found = True
         if not found:
             raise errors.OperationFailed()
-        ${aggregated_object_name}(${aggregated_object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        ${aggregated_object_name}(${aggregated_object_name_under}_map, runtime=self._runtime)._delete()
         collection.save(${object_name_under})"""
 
 
@@ -274,7 +274,7 @@ class AssetCompositionSession:
         result = collection.find(
             dict({'assetIds': {'$in': [str(asset_id)]}},
                  **self._repository_view_filter())).sort('_id', DESCENDING)
-        return objects.CompositionList(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.CompositionList(result, runtime=self._runtime)"""
 
 
 class AssetCompositionDesignSession:
@@ -390,9 +390,8 @@ class Asset:
         _record_type_data_sets = {}
     _namespace = 'repository.Asset'
 
-    def __init__(self, osid_object_map, db_prefix='', runtime=None):
+    def __init__(self, osid_object_map, runtime=None):
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._db_prefix = db_prefix
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         if self.is_composition():
@@ -428,7 +427,7 @@ class Asset:
 
     get_asset_contents_template = """
         # Implemented from template for osid.repository.Asset.get_asset_contents_template
-        return ${aggregated_object_name}List(self._my_map['${var_name_plural_mixed}'], db_prefix=self._db_prefix, runtime=self._runtime)
+        return ${aggregated_object_name}List(self._my_map['${var_name_plural_mixed}'], runtime=self._runtime)
 
     def _delete(self):
         for ${aggregated_object_name_under} in self.get_${aggregated_objects_name_under}():

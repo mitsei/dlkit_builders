@@ -422,7 +422,6 @@ class OsidSession:
     def __init__(self):
         self._proxy = None
         self._runtime = None
-        self._db_prefix = None
         self._catalog_identifier = None
         self._my_catalog_map = None
         self._catalog_id = None
@@ -437,17 +436,12 @@ class OsidSession:
         self._proxy = proxy
         self._runtime = runtime
         if runtime is not None:
-            prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
-            self._db_prefix = runtime.get_configuration().get_value_by_parameter(prefix_param_id).get_string_value()
-
             try:
                 authority_param_id = Id('parameter:authority@mongo')
                 self._authority = runtime.get_configuration().get_value_by_parameter(
                     authority_param_id).get_string_value()
             except (KeyError, errors.NotFound):
                 self._authority = 'ODL.MIT.EDU'
-        else:
-            self._db_prefix = ''
 
     def _init_catalog(self, proxy=None, runtime=None):
         \"\"\"Initialize this object as an OsidCatalog.\"\"\"
@@ -1568,7 +1562,7 @@ class OsidList:
     ]
 
     init = """
-    def __init__(self, iter_object=None, db_prefix='', runtime=None):
+    def __init__(self, iter_object=None, runtime=None):
         if iter_object is None:
             iter_object = []
         if isinstance(iter_object, dict) or isinstance(iter_object, list):
@@ -1578,7 +1572,6 @@ class OsidList:
         else:
             self._count = None
         self._runtime = runtime
-        self._db_prefix = db_prefix
         self._iter_object = iter(iter_object)
 
     def __iter__(self):
@@ -1624,7 +1617,7 @@ class OsidList:
         except Exception:  # Need to specify exceptions here!
             raise errors.OperationFailed()
         if isinstance(next_object, dict):
-            next_object = object_class(next_object, db_prefix=self._db_prefix, runtime=self._runtime)
+            next_object = object_class(next_object, runtime=self._runtime)
         return next_object
 
     def next(self):

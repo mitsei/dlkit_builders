@@ -182,7 +182,6 @@ class RelationshipAdminSession:
                 ${arg0_name}=${arg0_name},
                 ${arg1_name}=${arg1_name},
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         else:
             obj_form = objects.${return_type}(
@@ -191,7 +190,6 @@ class RelationshipAdminSession:
                 ${arg0_name}=${arg0_name},
                 ${arg1_name}=${arg1_name},
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
