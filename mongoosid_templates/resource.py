@@ -295,7 +295,7 @@ class ResourceQuerySession:
     get_resource_query_template = """
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resource_query_template
-        return queries.${return_type}()"""
+        return queries.${return_type}(runtime=self._runtime)"""
 
     get_resources_by_query_template = """
         # Implemented from template for
@@ -304,7 +304,9 @@ class ResourceQuerySession:
         collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        query_terms.update(self._${cat_name_under}_view_filter())
+        query_terms = {'$$and': [query_terms, self._${cat_name_under}_view_filter()]}
+        print query_terms
+        #query_terms.update(self._${cat_name_under}_view_filter())
         result = collection.find(query_terms).sort('_id', DESCENDING)
         return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
@@ -1307,7 +1309,7 @@ class ResourceQuery:
     ]
 
     init_template = """
-    def __init__(self):
+    def __init__(self, runtime):
         try:
             #pylint: disable=no-name-in-module
             from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
@@ -1317,7 +1319,7 @@ class ResourceQuery:
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidQuery.__init__(self)
+        osid_queries.OsidObjectQuery.__init__(self, runtime)
 """
 
     clear_group_terms_template = """

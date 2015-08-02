@@ -1671,12 +1671,13 @@ class OsidQuery:
     ]
 
     init = """
-    def __init__(self):
+    def __init__(self, runtime):
         self._records = dict()
         # _load_records is in OsidExtensibleQuery:
         # _all_supported_record_type_ids comes from inheriting query object
         # THIS SHOULD BE RE-DONE:
         self._load_records(self._all_supported_record_type_ids)
+        self._runtime = runtime
         self._query_terms = {}
 
     def _get_string_match_value(self, string, string_match_type):
@@ -1861,6 +1862,10 @@ class OsidObjectQuery:
         'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
         'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))'
     ]
+
+    init = """
+    def __init__(self, runtime):
+        OsidQuery.__init__(self, runtime)"""
 
     match_display_name_arg_template = {
         1: 'DEFAULT_STRING_MATCH_TYPE',
