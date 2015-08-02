@@ -875,11 +875,14 @@ DISABLED = -1"""
 
 
 def build_this_interface(package, interface, services=False):
-    exceptions = ['ObjectiveHierarchySession',
-                  'ObjectiveHierarchyDesignSession',
-                  'ObjectiveSequencingSession',
-                  'ObjectiveRequisiteSession',
-                  'ObjectiveRequisiteAssignmentSession',]
+    # exceptions = ['ObjectiveHierarchySession',
+    #               'ObjectiveHierarchyDesignSession',
+    #               'ObjectiveSequencingSession',
+    #               'ObjectiveRequisiteSession',
+    #               'ObjectiveRequisiteAssignmentSession',]
+
+    # exceptions = ['ObjectiveSequencingSession',]
+    exceptions = []
 
     excepted_osid_categories = ['properties',
                                 'query_inspectors',

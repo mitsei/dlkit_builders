@@ -142,7 +142,7 @@ class AssessmentSession:
             'bankId': str(self.get_bank_id()),
             'assessmentTakenId': str(assessment_taken_id)
         }
-        return objects.AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.AssessmentSection(assessment_section_map, runtime=self._runtime)"""
     
     has_next_assessment_section = """
         # For now we are only working only with 'sectionless' assessments
@@ -184,13 +184,12 @@ class AssessmentSession:
             'bankId': str(self.get_bank_id()),
             'assessmentTakenId': str(assessment_taken.get_id())
         }
-        return objects.AssessmentSection(assessment_section_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.AssessmentSection(assessment_section_map, runtime=self._runtime)"""
     
     get_assessment_sections = """
         # This currently assumes that there is only one section:
         return objects.AssessmentSectionList(
             [self.get_first_assessment_section(assessment_taken_id)],
-            db_prefix=self._db_prefix,
             runtime=self._runtime)
 
     def _get_assessment_taken(self, assessment_taken_id):
@@ -208,11 +207,10 @@ class AssessmentSession:
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         # Is this right?  How do we define complete?
         if assessment_taken.has_ended():
-            return objects.AssessmentSectionList([], db_prefix=self._db_prefix, runtime=self._runtime)
+            return objects.AssessmentSectionList([], runtime=self._runtime)
         else:
             return objects.AssessmentSectionList(
                 [self.get_assessment_section(assessment_taken_id)],
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)"""
     
     has_assessment_section_begun = """
@@ -293,7 +291,7 @@ class AssessmentSession:
                                           collection='Item',
                                           runtime=self._runtime)
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        return objects.Question(item_map['question'], db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.Question(item_map['question'], runtime=self._runtime)"""
     
     get_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
@@ -305,7 +303,7 @@ class AssessmentSession:
         questions = []
         for item_idstr in item_ids:
             questions.append(self._get_question(item_idstr))
-        return objects.QuestionList(questions, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.QuestionList(questions, runtime=self._runtime)"""
 
     get_response_form_import_templates = [
         'from ...abstract_osid.id.primitives import Id as ABCId'
@@ -341,7 +339,6 @@ class AssessmentSession:
             item_id=item_id,
             catalog_id=self._catalog_id,
             assessment_section_id=assessment_section_id,
-            db_prefix=self._db_prefix,
             runtime=self._runtime)
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
@@ -412,7 +409,7 @@ class AssessmentSession:
         for item_idstr in item_ids:
             if responses[Id(item_idstr).get_identifier()] is None:
                 question_list.append(self._get_question(item_idstr))
-        return objects.QuestionList(question_list, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.QuestionList(question_list, runtime=self._runtime)"""
     
     has_unanswered_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
@@ -507,7 +504,6 @@ class AssessmentSession:
         if item_id.get_identifier() in responses and responses[item_id.get_identifier()] is not None:
             return Response(objects.Answer(
                 responses[item_id.get_identifier()],
-                db_prefix=self._db_prefix,
                 runtime=self._runtime))
         else:
             raise errors.NotFound()"""
@@ -522,7 +518,6 @@ class AssessmentSession:
             if responses[item_idstr] is not None:
                 answer_list.append(objects.Answer(
                     responses[Id(item_idstr).get_identifier()],
-                    db_prefix=self._db_prefix,
                     runtime=self._runtime))
         return objects.ResponseList(answer_list)"""
     
@@ -586,7 +581,7 @@ class AssessmentSession:
                                               collection='Item',
                                               runtime=self._runtime)
             item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-            return objects.AnswerList(item_map['answers'], db_prefix=self._db_prefix, runtime=self._runtime)
+            return objects.AnswerList(item_map['answers'], runtime=self._runtime)
         else:
             raise errors.IllegalState()"""
 
@@ -621,7 +616,7 @@ class ItemAdminSession:
                                           collection='Item',
                                           runtime=self._runtime)
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        objects.Item(item_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        objects.Item(item_map, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(item_id.get_identifier())})"""
     
     # These methods overwrite the canonical aggregate object admin methods to
@@ -660,7 +655,7 @@ class ItemAdminSession:
             #raise errors.AlreadyExists()
         collection.save(item)
         self._forms[question_form.get_id().get_identifier()] = CREATED
-        return objects.Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.Question(question_form._my_map, runtime=self._runtime)"""
 
     get_question_form_for_update_import_templates = [
         'from ...abstract_osid.id.primitives import Id as ABCId'
@@ -673,7 +668,7 @@ class ItemAdminSession:
         if not isinstance(question_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
-        obj_form = objects.QuestionForm(document['question'], self._db_prefix, runtime=self._runtime)
+        obj_form = objects.QuestionForm(document['question'], runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
 
@@ -705,7 +700,7 @@ class ItemAdminSession:
             raise errors.OperationFailed()
         self._forms[question_form.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
-        return objects.Question(question_form._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.Question(question_form._my_map, runtime=self._runtime)"""
 
 
 class AssessmentAdminSession:
@@ -756,7 +751,7 @@ class AssessmentTakenLookupSession:
             dict({'assessmentOfferedId': str(assessment_offered_id),
                   'takingAgentId': str(resource_id)},
                   **self._bank_view_filter())).sort('_id', DESCENDING)
-        return objects.AssessmentTakenList(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.AssessmentTakenList(result, runtime=self._runtime)"""
 
     get_assessments_taken_for_assessment = """
         collection = MongoClientValidated('assessment',
@@ -767,7 +762,6 @@ class AssessmentTakenLookupSession:
                  **self._bank_view_filter())).sort('_id', DESCENDING)
         assessments_offered = objects.AssessmentOfferedList(
             result,
-            db_prefix=self._db_prefix,
             runtime=self._runtime)
 
         collection = MongoClientValidated('assessment',
@@ -781,7 +775,6 @@ class AssessmentTakenLookupSession:
             dict({'assessmentOfferedId': {'$in':[ao_ids]}},
                  **self._bank_view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result,
-                                           db_prefix=self._db_prefix,
                                            runtime=self._runtime)"""
 
 
@@ -820,7 +813,6 @@ class AssessmentOfferedAdminSession:
                 assessment_id=assessment_id,
                 catalog_id=self._catalog_id,
                 default_display_name=assessment_map['displayName']['text'],
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         else:
             obj_form = objects.AssessmentOfferedForm(
@@ -829,7 +821,6 @@ class AssessmentOfferedAdminSession:
                 assessment_id=assessment_id,
                 catalog_id=self._catalog_id,
                 default_display_name=assessment_map['displayName']['text'],
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
@@ -888,7 +879,7 @@ class AssessmentTakenAdminSession:
         insert_result = collection.insert_one(assessment_taken_form._my_map)
         self._forms[assessment_taken_form.get_id().get_identifier()] = CREATED
         return objects.AssessmentTaken(
-            collection.find_one({'_id': insert_result.inserted_id}), db_prefix=self._db_prefix, runtime=self._runtime)"""
+            collection.find_one({'_id': insert_result.inserted_id}), runtime=self._runtime)"""
 
 class AssessmentBasicAuthoringSession:
     
@@ -929,7 +920,7 @@ class AssessmentBasicAuthoringSession:
                                           runtime=self._runtime)
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if 'itemIds' not in assessment or assessment['itemIds'] == []:
-            return objects.ItemList([], db_prefix=self._db_prefix, runtime=self._runtime)
+            return objects.ItemList([], runtime=self._runtime)
 
         collection = MongoClientValidated('assessment',
                                           collection='Item',
@@ -939,7 +930,7 @@ class AssessmentBasicAuthoringSession:
         # This appears to assume that all the Items exist. Need to consider this further:
         for i in assessment['itemIds']:
             item_list.append(collection.find_one({'_id': ObjectId(Id(i).get_identifier())}))
-        return objects.ItemList(item_list, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.ItemList(item_list, runtime=self._runtime)"""
     
     add_item = """
         # make sure the item exists, first
@@ -1049,7 +1040,7 @@ class Item:
         self.get_question().get_id()"""
     
     get_question = """
-        return Question(self._my_map['question'], db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return Question(self._my_map['question'], runtime=self._runtime)"""
     
     additional_methods = """
     

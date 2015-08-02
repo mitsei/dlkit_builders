@@ -23,7 +23,6 @@ class GradeEntryAdminSession:
                 resource_id=resource_id,
                 effective_agent_id=str(self.get_effective_agent_id()),
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         else:
             obj_form = objects.GradeEntryForm(
@@ -33,7 +32,6 @@ class GradeEntryAdminSession:
                 resource_id=resource_id,
                 effective_agent_id=str(self.get_effective_agent_id()),
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
@@ -55,7 +53,6 @@ class GradeEntryAdminSession:
         obj_form = objects.GradeEntryForm(
             result,
             effective_agent_id=str(self.get_effective_agent_id()),
-            db_prefix=self._db_prefix,
             runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
@@ -180,9 +177,8 @@ class GradeEntryForm:
         _record_type_data_sets = dict()
     _namespace = 'grading.GradeEntry'
 
-    def __init__(self, osid_object_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
+    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
         osid_objects.OsidForm.__init__(self, runtime=runtime)
-        self._db_prefix = db_prefix
         self._kwargs = kwargs
         self._effective_agent_id = kwargs['effective_agent_id']
 
@@ -328,7 +324,6 @@ class GradebookColumnLookupSession:
         summary_map = gradebook_column._my_map
         summary_map['gradebookColumnId'] = str(gradebook_column.ident)
         return GradebookColumnSummary(osid_object_map=summary_map,
-                                      db_prefix=self._db_prefix,
                                       runtime=self._runtime)"""
 
 class GradebookColumnAdminSession:
@@ -360,7 +355,7 @@ class GradebookColumnAdminSession:
 
         gradebook_column_map = collection.find_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
 
-        objects.GradebookColumn(gradebook_column_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        objects.GradebookColumn(gradebook_column_map, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
         """
 
@@ -394,7 +389,6 @@ class GradebookColumnAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.GradebookColumn(
             gradebook_column_form._my_map,
-            db_prefix=self._db_prefix,
             runtime=self._runtime)
         """
 
@@ -430,7 +424,7 @@ class GradeSystemAdminSession:
             raise errors.InvalidArgument('Grade system being used by gradebook columns. ' +
                                          'Cannot delete it.')
 
-        objects.GradeSystem(grade_system_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        objects.GradeSystem(grade_system_map, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
         """
 
@@ -448,9 +442,8 @@ class GradebookColumnSummary:
         _record_type_data_sets = {}
     _namespace = 'grading.GradebookColumnSummary'
 
-    def __init__(self, osid_object_map, db_prefix='', runtime=None):
+    def __init__(self, osid_object_map, runtime=None):
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._db_prefix = db_prefix
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
 
