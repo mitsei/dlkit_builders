@@ -360,7 +360,7 @@ def flagged_for_implementation(interface,
                 test = True
     return test
 
-def fix_bad_name(name):
+def fix_bad_name(name, optional_match_term=None):
     """
     Occasionally there are bad names of things in the osid spec.
     
@@ -371,7 +371,12 @@ def fix_bad_name(name):
         'set_base_on_grades': 'set_based_on_grades',
         'clear_lowest_score': 'clear_lowest_numeric_score',
         'clear_input_start_score_range': 'clear_input_score_start_range',
+        'CompositionSearchSession': 'CompositionQuerySession'
     }
-    if name in bad_names_map:
+
+    if optional_match_term == 'get_composition_query_session':
         name = bad_names_map[name]
+    else:
+        if name in bad_names_map:
+            name = bad_names_map[name]
     return name

@@ -219,8 +219,8 @@ def method_iterator(root):
                 if grand_child.tag == (ns + 'interfaceType'):
                     return_type = grand_child.get(ns + 'type')
                 if grand_child.tag == (ns + 'primitiveType'):
-                    return_type = grand_child.get(ns + 'type')           
-            method['return_type'] = return_type
+                    return_type = grand_child.get(ns + 'type')
+            method['return_type'] = fix_bad_name(return_type, method['name'])
             method['return_doc'] = make_return_doc(child)
             method['sphinx_return_doc'] = make_sphinx_return_doc(child)
         ##
