@@ -310,6 +310,13 @@ class GradeEntryForm:
         self._my_map['gradingAgentId'] = ''
         self._my_map['timeGraded'] = None"""
 
+class GradeEntryQuery:
+    match_gradebook_column_id = """
+        self._add_match('gradebookColumnId',
+                        gradebook_column_id,
+                        match)
+    """
+
 class GradebookColumnLookupSession:
     import_statements = [
         'from .objects import GradebookColumnSummary',
