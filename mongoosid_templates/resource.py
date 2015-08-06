@@ -200,7 +200,7 @@ class ResourceLookupSession:
         result = collection.find_one(
             dict({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name}').get_identifier())},
                  **self._${cat_name_under}_view_filter()))
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_resources_by_ids_template = """
         # Implemented from template for
@@ -255,7 +255,7 @@ class ResourceLookupSession:
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(self._${cat_name_under}_view_filter()).sort('_id', DESCENDING)
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class ResourceQuerySession:
 
@@ -305,10 +305,9 @@ class ResourceQuerySession:
                                           collection='${object_name}',
                                           runtime=self._runtime)
         query_terms = {'$$and': [query_terms, self._${cat_name_under}_view_filter()]}
-        print query_terms
         #query_terms.update(self._${cat_name_under}_view_filter())
         result = collection.find(query_terms).sort('_id', DESCENDING)
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
@@ -372,12 +371,14 @@ class ResourceAdminSession:
         if ${arg0_name} == []:
             obj_form = objects.${return_type}(
                 ${cat_name_under}_id=self._catalog_id,
+                db_prefix=self._db_prefix,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id())
         else:
             obj_form = objects.${return_type}(
                 ${cat_name_under}_id=self._catalog_id,
                 record_types=${arg0_name},
+                db_prefix=self._db_prefix,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id())
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
@@ -409,6 +410,7 @@ class ResourceAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
             collection.find_one({'_id': insert_result.inserted_id}),
+            db_prefix=self._db_prefix,
             runtime=self._runtime)
 
         return result"""
@@ -432,7 +434,7 @@ class ResourceAdminSession:
                 ${arg0_name} = self._get_${object_name_under}_id_with_enclosure(${arg0_name})
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        obj_form = objects.${return_type}(result, runtime=self._runtime)
+        obj_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form
@@ -484,6 +486,7 @@ class ResourceAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.${return_type}(
             ${arg0_name}._my_map,
+            db_prefix=self._db_prefix,
             runtime=self._runtime)"""
 
     delete_resource_import_templates = [
@@ -500,7 +503,7 @@ class ResourceAdminSession:
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under}_map = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        objects.${object_name}(${object_name_under}_map, runtime=self._runtime)._delete()
+        objects.${object_name}(${object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
     can_manage_asset_aliases_template = """
@@ -566,7 +569,7 @@ class ResourceBinSession:
         ${object_name_under}_list = []
         for ${cat_name_under}_id in ${arg0_name}:
             ${object_name_under}_list += list(
-                self.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
+                get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
         return objects.${return_type}(${object_name_under}_list)"""
 
     get_bin_ids_by_resource_template = """
@@ -693,6 +696,7 @@ class ResourceAgentSession:
                  **self._bin_view_filter()))
         return objects.Resource(
             result,
+            db_prefix=self._db_prefix,
             runtime=self._runtime)"""
 
     get_agent_ids_by_resource = """
@@ -818,7 +822,7 @@ class BinLookupSession:
             # Try creating an orchestrated ${cat_name}.  Let it raise errors.NotFound()
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
 
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     get_bins_by_ids_template = """
         # Implemented from template for
@@ -833,7 +837,7 @@ class BinLookupSession:
                                           runtime=self._runtime)
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 
     get_bins_template = """
@@ -845,7 +849,7 @@ class BinLookupSession:
                                           runtime=self._runtime)
         result = collection.find().sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class BinAdminSession:
 
@@ -895,11 +899,13 @@ class BinAdminSession:
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
         if ${arg0_name} == []:
             result = objects.${return_type}(
+                db_prefix=self._db_prefix,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id())
         else:
             result = objects.${return_type}(
                 record_types=${arg0_name},
+                db_prefix=self._db_prefix,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id())
         self._forms[result.get_id().get_identifier()] = not CREATED
@@ -931,6 +937,7 @@ class BinAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
             collection.find_one({'_id': insert_result.inserted_id}),
+            db_prefix=self._db_prefix,
             runtime=self._runtime)
 
         return result"""
@@ -949,7 +956,7 @@ class BinAdminSession:
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        cat_form = objects.${return_type}(result, runtime=self._runtime)
+        cat_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
 
         return cat_form"""
@@ -980,7 +987,7 @@ class BinAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned
-        return objects.${return_type}(${arg0_name}._my_map, runtime=self._runtime)"""
+        return objects.${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
     delete_bin_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
@@ -1232,7 +1239,7 @@ class BinQuerySession:
                                           runtime=self._runtime)
         result = collection.find(query_terms).sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
 
 class Resource:
 
@@ -1251,8 +1258,9 @@ class Resource:
         _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __init__(self, osid_object_map, runtime=None):
+    def __init__(self, osid_object_map, db_prefix='', runtime=None):
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
+        self._db_prefix = db_prefix
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
 ${instance_initers}
@@ -1334,8 +1342,9 @@ class ResourceForm:
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'
 
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+    def __init__(self, osid_object_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
         osid_objects.OsidForm.__init__(self, runtime=runtime)
+        self._db_prefix = db_prefix
         self._kwargs = kwargs
         if 'catalog_id' in kwargs:
             self._catalog_id = kwargs['catalog_id']
@@ -1440,8 +1449,9 @@ class Bin:
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __init__(self, osid_catalog_map, runtime=None):
+    def __init__(self, osid_catalog_map, db_prefix='', runtime=None):
         osid_objects.OsidCatalog.__init__(self, osid_catalog_map, runtime)
+        self._db_prefix = db_prefix
         self._records = dict()
         # This check is here for transition purposes:
         try:
@@ -1466,8 +1476,9 @@ class BinForm:
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'
 
-    def __init__(self, osid_catalog_map=None, record_types=None, runtime=None, **kwargs):
+    def __init__(self, osid_catalog_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
         osid_objects.OsidForm.__init__(self, runtime=runtime)
+        self._db_prefix = db_prefix
         self._kwargs = kwargs
         self._init_metadata(**kwargs)
         self._records = dict()
