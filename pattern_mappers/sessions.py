@@ -2460,7 +2460,7 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectNotificationSession methods that register changed objects.
         elif (interface['shortname'].endswith('NotificationSession') and
-              method['name'].startswith('register_for_changed_'):
+              method['name'].startswith('register_for_changed_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceNotificationSession.register_for_changed_resources',
                 kwargs = make_twargs(
@@ -2490,7 +2490,7 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectNotificationSession methods that register deleted objects.
         elif (interface['shortname'].endswith('NotificationSession') and
-              method['name'].startswith('register_for_deleted_'):
+              method['name'].startswith('register_for_deleted_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceNotificationSession.register_for_deleted_resources',
                 kwargs = make_twargs(
