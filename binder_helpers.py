@@ -371,7 +371,7 @@ def fix_bad_name(name, optional_match_term=None):
         'set_base_on_grades': 'set_based_on_grades',
         'clear_lowest_score': 'clear_lowest_numeric_score',
         'clear_input_start_score_range': 'clear_input_score_start_range',
-        'CompositionSearchSession': 'CompositionQuerySession'
+        'osid.repository.CompositionSearchSession': 'osid.repository.CompositionQuerySession'
     }
 
     if optional_match_term == 'get_composition_query_session':

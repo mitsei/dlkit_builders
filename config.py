@@ -85,6 +85,7 @@ sessions_to_implement = [
     'GradebookAdminSession',
     'GradeSystemLookupSession',
     'GradeSystemAdminSession',
+    'GradeSystemQuerySession',
     'GradeEntryLookupSession',
     'GradeEntryAdminSession',
     'GradeEntryQuerySession',
@@ -142,6 +143,7 @@ sessions_to_implement = [
     'CompositionRepositoryAssignmentSession',
     'RepositoryLookupSession',
     'RepositoryAdminSession',
+    'RepositoryQuerySession',
     'RepositoryHierarchySession',
     'RepositoryHierarchyDesignSession',
     ## resource service
@@ -153,6 +155,7 @@ sessions_to_implement = [
     'ResourceAgentAssignmentSession',
     'BinLookupSession',
     'BinAdminSession',
+    'BinQuerySession',
     'BinHierarchySession',
     'BinHierarchyDesignSession',
 ]
