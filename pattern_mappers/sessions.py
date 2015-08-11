@@ -7,6 +7,9 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'
+    elif (interface['shortname'].endswith('NotificationSession') and
+        interface['shortname'][:-12] in index['package_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceNotificationSession'
     elif interface['shortname'] == "RelationshipLookupSession":
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceLookupSession'
     elif (interface['shortname'].endswith('LookupSession') and
@@ -46,6 +49,9 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinAdminSession'
+    elif (interface['shortname'].endswith('NotificationSession') and
+        interface['shortname'][:-12] in index['package_catalog_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.BinNotificationSession'
     elif (interface['shortname'].endswith('HierarchySession') and
         interface['shortname'][:-16] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinHierarchySession'

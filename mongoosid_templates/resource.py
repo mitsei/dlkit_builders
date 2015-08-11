@@ -516,6 +516,77 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.alias_resources_template
         self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
 
+class ResourceNotificationSession:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..osid.sessions import OsidSession',
+        #'from ..primitives import Id',
+        #'from ..primitives import Type',
+        'from ..utilities import MongoClientValidated',
+        'from ..utilities import MongoListener',
+        #'from . import objects',
+    ]
+
+    init_template = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
+        self._catalog_class = objects.${cat_name}
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='${pkg_name}',
+            cat_name='${cat_name}',
+            cat_class=objects.${cat_name})
+        self._kwargs = kwargs
+        self.reliable = True
+        self._listener = MongoListener(
+            package_name = '${pkg_name}',
+            object_name = '${object_name},
+            receiver = kwargs['receiver'],
+            runtime = self._runtime,
+            listen_all = False)
+        self._listener.run()
+"""
+
+    reliable_resource_notifications_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.reliable_resource_notifications
+        self.reliable = True"""
+
+    unreliable_resource_notifications_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.unreliable_resource_notifications
+        self.reliable = False"""
+
+    register_for_new_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_new_resources
+        self._listener.listen_for['new'] = True"""
+
+    register_for_changed_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_changed_resources
+        self._listener.listen_for['changed'] = True"""
+
+    register_for_changed_resource_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_changed_resource
+        self._listener.listen_for['changed'] = ${arg0_name}"""
+
+    register_for_deleted_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_deleted_resources
+        self._listener.listen_for['deleted'] = True"""
+
+    register_for_deleted_resource_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_deleted_resource
+        self._listener.listen_for['deleted'] = ${arg0_name}"""
 
 class ResourceBinSession:
 
@@ -1014,6 +1085,26 @@ class BinAdminSession:
         # osid.resource.BinLookupSession.alias_bin_template
         # NEED TO FIGURE OUT HOW TO IMPLEMENT THIS SOMEDAY
         raise errors.Unimplemented()"""
+
+class BinNotificationSession:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..osid.sessions import OsidSession',
+        #'from ..primitives import Id',
+        #'from ..utilities import MongoClientValidated',
+        #'from . import objects',
+        #'from bson.objectid import ObjectId',
+    ]
+
+    init_template = """
+    _session_name = '${interface_name}'
+
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._kwargs = kwargs
+"""
+
 
 class BinHierarchySession:
 

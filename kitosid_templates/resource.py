@@ -294,37 +294,37 @@ class ResourceAdminSession:
     can_create_resources_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceLookupSession.can_create_resources_template
+        # osid.resource.ResourceAdminSession.can_create_resources
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     can_create_resource_with_record_types_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceAdminSession.can_create_resource_with_record_types_template
+        # osid.resource.ResourceAdminSession.can_create_resource_with_record_types
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resource_form_for_create_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
+        # osid.resource.ResourceAdminSession.get_resource_form_for_create
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     create_resource_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceAdminSession.create_resource_template
+        # osid.resource.ResourceAdminSession.create_resource
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     get_resource_form_for_update_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
+        # osid.resource.ResourceAdminSession.get_resource_form_for_update
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
 
     def get_${object_name_under}_form(self, *args, **kwargs):
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
+        # osid.resource.ResourceAdminSession.get_resource_form_for_update
         # This method might be a bit sketchy. Time will tell.
         if isinstance(args[-1], list) or '${object_name_under}_record_types' in kwargs:
             return self.get_${object_name_under}_form_for_create(*args, **kwargs)
@@ -334,14 +334,14 @@ class ResourceAdminSession:
     update_resource_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceAdminSession.update_resource_template
+        # osid.resource.ResourceAdminSession.update_resource
         # Note: The OSID spec does not require returning updated object
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
 
     def save_${object_name_under}(self, ${object_name_under}_form, *args, **kwargs):
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceAdminSession.update_resource_template
+        # osid.resource.ResourceAdminSession.update_resource
         if ${object_name_under}_form.is_for_update():
             return self.update_${object_name_under}(${object_name_under}_form, *args, **kwargs)
         else:
@@ -350,14 +350,68 @@ class ResourceAdminSession:
     delete_resource_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceAdminSession.delete_resource_template
+        # osid.resource.ResourceAdminSession.delete_resource
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     alias_resource_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
-        # osid.resource.ResourceAdminSession.alias_resources_template
+        # osid.resource.ResourceAdminSession.alias_resources
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+
+class ResourceNotificationSession:
+
+    init_template = """
+    def __init__(self, provider_session):
+        self._provider_session = provider_session
+"""
+
+    can_register_for_resource_notifications_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceNotificationSession.can_register_for_resource_notifications
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    reliable_resource_notifications_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    unreliable_resource_notifications_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        for session in self._provider_sessions:
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    acknowledge_resource_notification_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        for session in self._provider_sessions:
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    register_for_new_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        for session in self._provider_sessions:
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    register_for_changed_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        for session in self._provider_sessions:
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    register_for_changed_resource_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        for session in self._provider_sessions:
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    register_for_deleted_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        for session in self._provider_sessions:
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    register_for_deleted_resource_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        for session in self._provider_sessions:
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
 
 class ResourceBinSession:
 

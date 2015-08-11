@@ -283,12 +283,12 @@ class ResourceAdminSession:
 
     can_create_resources_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceLookupSession.can_create_resources_template
+        # osid.resource.ResourceAdminSession.can_create_resources
         return self._can('${func_name}')"""
 
     can_create_resource_with_record_types_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceAdminSession.can_create_resource_with_record_types_template
+        # osid.resource.ResourceAdminSession.can_create_resource_with_record_types
         # This would like to be a real implementation someday:
         if ${arg0_name} == None:
             raise NullArgument() # Just 'cause the spec says to :)
@@ -297,7 +297,7 @@ class ResourceAdminSession:
 
     get_resource_form_for_create_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
+        # osid.resource.ResourceAdminSession.get_resource_form_for_create
         if not self._can('create'):
             raise PermissionDenied()
         else:
@@ -305,7 +305,7 @@ class ResourceAdminSession:
 
     create_resource_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceAdminSession.create_resource_template
+        # osid.resource.ResourceAdminSession.create_resource
         if not self._can('create'):
             raise PermissionDenied()
         else:
@@ -313,7 +313,7 @@ class ResourceAdminSession:
 
     get_resource_form_for_update_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
+        # osid.resource.ResourceAdminSession.get_resource_form_for_update
         if not self._can('update'):
             raise PermissionDenied()
         else:
@@ -321,7 +321,7 @@ class ResourceAdminSession:
 
     update_resource_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceAdminSession.update_resource_template
+        # osid.resource.ResourceAdminSession.update_resource
         if not self._can('update'):
             raise PermissionDenied()
         else:
@@ -329,7 +329,7 @@ class ResourceAdminSession:
 
     delete_resource_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceAdminSession.delete_resource_template
+        # osid.resource.ResourceAdminSession.delete_resource
         if not self._can('delete'):
             raise PermissionDenied()
         else:
@@ -337,11 +337,75 @@ class ResourceAdminSession:
 
     alias_resource_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceAdminSession.alias_resources_template
+        # osid.resource.ResourceAdminSession.alias_resources
         if not self._can('alias'):
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
+class ResourceNotificationSession:
+
+    init_template = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name}.${object_name}'
+"""
+
+    can_register_for_resource_notifications_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceNotificationSession.can_register_for_resource_notifications
+        return self._can('${func_name}')"""
+
+    reliable_resource_notifications_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceNotificationSession.register_for_new_resources
+        self._provider_session.${method_name}()"""
+
+    unreliable_resource_notifications_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceNotificationSession.register_for_new_resources
+        self._provider_session.${method_name}()"""
+
+    register_for_new_resources_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceNotificationSession.register_for_new_resources
+        if not self._can('register'):
+            raise PermissionDenied()
+        else:
+            self._provider_session.${method_name}()"""
+
+    register_for_changed_resources_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceNotificationSession.register_for_changed_resources
+        if not self._can('register'):
+            raise PermissionDenied()
+        else:
+            self._provider_session.${method_name}()"""
+
+    register_for_changed_resource_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceNotificationSession.register_for_changed_resource
+        if not self._can('register'):
+            raise PermissionDenied()
+        else:
+            self._provider_session.${method_name}(${arg0_name})"""
+
+    register_for_deleted_resources_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceNotificationSession.register_for_deleted_resources
+        if not self._can('register'):
+            raise PermissionDenied()
+        else:
+            self._provider_session.${method_name}()"""
+
+    register_for_deleted_resource_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceNotificationSession.register_for_deleted_resource
+        if not self._can('register'):
+            raise PermissionDenied()
+        else:
+            self._provider_session.${method_name}(${arg0_name})"""
 
 
 class ResourceBinSession:

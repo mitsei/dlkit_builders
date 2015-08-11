@@ -171,6 +171,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             object_name = interface_name[:-12]
         elif init_pattern == 'resource.ResourceAdminSession':
             object_name = interface_name[:-12]
+        elif init_pattern == 'resource.ResourceNotificationSession':
+            object_name = interface_name[:-len('NotificationSession')]
         elif init_pattern == 'resource.ResourceBinSession':
             object_name = interface_name.replace(cat_name + 'Session', '')
         elif init_pattern == 'resource.ResourceBinAssignmentSession':

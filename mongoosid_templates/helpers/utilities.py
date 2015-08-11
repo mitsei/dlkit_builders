@@ -1,4 +1,5 @@
 """mongo utilities.py"""
+import threading
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure as PyMongoOperationFailed
 
@@ -179,3 +180,25 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
     if runtime is not None:
         manager.initialize(runtime)
     return manager
+    
+
+class MongoListener(threading.Thread):
+
+    def __init__(self, osid_package, osid_object, receiver, runtime, listen_all=False):
+        """Constructor"""
+        Thread.__init__(self)
+        self._db = osid_package
+        self._collection = osid_object
+        self._receiver = osid_receiver
+        self._listen_for = {
+            'new': listen_all,
+            'changed': listen_all,
+            'deleted': listen_all
+        }
+
+    def run(self):
+        collection = MongoClientValidated(self._db,
+                                          collection=self._collection,
+                                          runtime=self._runtime)
+
+        pass
