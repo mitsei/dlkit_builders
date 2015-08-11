@@ -1881,11 +1881,19 @@ class OsidObjectQuery:
     match_description = """
         self._match_display_text('description', description, string_match_type, match)"""
 
+    match_genus_type = """
+        self._add_match('genusTypeId', str(genus_type), match)
+    """
+
     match_any_description = """
         raise errors.Unimplemented()"""
 
     clear_description_terms = """
         self._clear_terms('description.text')"""
+
+    clear_genus_type_terms = """
+        self._clear_terms('genusTypeId')
+    """
 
 class OsidQueryInspector:
 
