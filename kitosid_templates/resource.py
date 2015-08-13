@@ -158,6 +158,46 @@ class ResourceManager:
             self._proxy,
             ${return_type_under}=session)"""
 
+    get_resource_notification_session_managertemplate = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_manager_template
+        if self._session_management != DISABLED:
+            self._get_provider_session(\'${return_type_under}\', *args, **kwargs)
+        return self"""
+
+    get_resource_notification_session_for_bin_managertemplate = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_for_bin_manager_template
+        if self._session_management != DISABLED:
+            self._get_provider_session(\'${return_type_under}\', *args, **kwargs)
+        return self"""
+
+    get_resource_notification_session_catalogtemplate = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_catalog_template
+        session_instance = self._instantiate_session('${method_name}', proxy=self._proxy, *args, **kwargs)
+        return ${cat_name}(
+            self._provider_manager,
+            session_instance.get_${cat_name_under}(),
+            self._proxy, ${method_session_name}=session_instance)"""
+
+    get_resource_notification_session_for_bin_catalogtemplate = """
+        \"\"\"Pass through to provider ${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_for_bin_catalog_template
+        if self._proxy:
+            session = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
+        else:
+            session = self._provider_manager.${method_name}(${args_kwargs_or_nothing})
+        return ${cat_name}(
+            self._provider_manager,
+            self.get_${cat_name_under}(*args, **kwargs),
+            self._proxy,
+            ${return_type_under}=session)"""
+
 
 class ResourceProxyManager:
 

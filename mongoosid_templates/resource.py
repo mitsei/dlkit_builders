@@ -77,6 +77,19 @@ class ResourceManager:
         ##
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
 
+    get_resource_notification_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        return ${return_module}.${return_type}(receiver=${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
+
+    get_resource_notification_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return ${return_module}.${return_type}(${arg1_name}, receiver=${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
+
 
 class ResourceProxyManager:
 
@@ -104,7 +117,20 @@ class ResourceProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime) # pylint: disable=no-member"""
+        return ${return_module}.${return_type}(${arg0_name}, proxy=proxy, self._runtime) # pylint: disable=no-member"""
+
+    get_resource_notification_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        return ${return_module}.${return_type}(receiver=${arg1_name}, proxy=proxy, runtime=self._runtime) # pylint: disable=no-member"""
+
+    get_resource_notification_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return ${return_module}.${return_type}(${arg1_name}, receiver=${arg0_name}, proxy=proxy, runtime=self._runtime) # pylint: disable=no-member"""
 
 
 class ResourceLookupSession:
@@ -541,11 +567,11 @@ class ResourceNotificationSession:
         self._kwargs = kwargs
         self.reliable = True
         self._listener = MongoListener(
-            package_name = '${pkg_name}',
-            object_name = '${object_name},
-            receiver = kwargs['receiver'],
-            runtime = self._runtime,
-            listen_all = False)
+            ns='${pkg_name}.${object_name},
+            receiver=kwargs['receiver'],
+            runtime=self._runtime,
+            object_name_plural=${object_name_plural_under}
+            listen_all=False)
         self._listener.run()
 """
 
@@ -558,6 +584,11 @@ class ResourceNotificationSession:
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.unreliable_resource_notifications
         self.reliable = False"""
+
+    acknowledge_notification_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.acknowledge_notification
+        pass"""
 
     register_for_new_resources_template = """
         # Implemented from template for
@@ -572,7 +603,10 @@ class ResourceNotificationSession:
     register_for_changed_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_changed_resource
-        self._listener.listen_for['changed'] = ${arg0_name}"""
+        if self._listener.listen_for['changed'] == False:
+            self._listener.listen_for['changed'] = []
+        if isinstance(self._listener.listen_for['changed'], list):
+            self._listener.listen_for['changed'].append(${arg0_name}.get_identifier())"""
 
     register_for_deleted_resources_template = """
         # Implemented from template for
@@ -582,7 +616,10 @@ class ResourceNotificationSession:
     register_for_deleted_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_deleted_resource
-        self._listener.listen_for['deleted'] = ${arg0_name}"""
+        if self._listener.listen_for['deleted'] == False:
+            self._listener.listen_for['deleted'] = []
+        if isinstance(self._listener.listen_for['deleted'], list):
+            self._listener.listen_for['deleted'].append(${arg0_name}.get_identifier())"""
 
 class ResourceBinSession:
 

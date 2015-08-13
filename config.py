@@ -154,6 +154,7 @@ sessions_to_implement = [
     'ResourceBinSession',
     'ResourceBinAssignmentSession',
     'ResourceAgentSession',
+    'ResourceNotificationSession',
     'ResourceAgentAssignmentSession',
     'BinLookupSession',
     'BinAdminSession',
