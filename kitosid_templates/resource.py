@@ -419,37 +419,30 @@ class ResourceNotificationSession:
 
     unreliable_resource_notifications_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        for session in self._provider_sessions:
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     acknowledge_resource_notification_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        for session in self._provider_sessions:
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     register_for_new_resources_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        for session in self._provider_sessions:
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     register_for_changed_resources_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        for session in self._provider_sessions:
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     register_for_changed_resource_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        for session in self._provider_sessions:
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     register_for_deleted_resources_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        for session in self._provider_sessions:
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     register_for_deleted_resource_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        for session in self._provider_sessions:
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
 

@@ -570,8 +570,8 @@ class ResourceNotificationSession:
             ns='${pkg_name}.${object_name},
             receiver=kwargs['receiver'],
             runtime=self._runtime,
-            object_name_plural=${object_name_plural_under}
-            listen_all=False)
+            authority=self._authority,
+            obj_name_plural=${object_name_plural_under})
         self._listener.run()
 """
 
@@ -593,33 +593,33 @@ class ResourceNotificationSession:
     register_for_new_resources_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_new_resources
-        self._listener.listen_for['new'] = True"""
+        self._listener._registry['i'] = True"""
 
     register_for_changed_resources_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_changed_resources
-        self._listener.listen_for['changed'] = True"""
+        self._listener._registry['u'] = True"""
 
     register_for_changed_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_changed_resource
-        if self._listener.listen_for['changed'] == False:
-            self._listener.listen_for['changed'] = []
-        if isinstance(self._listener.listen_for['changed'], list):
-            self._listener.listen_for['changed'].append(${arg0_name}.get_identifier())"""
+        if self._listener._registry['u'] == False:
+            self._listener._registry['u'] = []
+        if isinstance(self._listener._registry['u'], list):
+            self._listener._registry['u'].append(${arg0_name}.get_identifier())"""
 
     register_for_deleted_resources_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_deleted_resources
-        self._listener.listen_for['deleted'] = True"""
+        self._listener._registry['d'] = True"""
 
     register_for_deleted_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_deleted_resource
-        if self._listener.listen_for['deleted'] == False:
-            self._listener.listen_for['deleted'] = []
-        if isinstance(self._listener.listen_for['deleted'], list):
-            self._listener.listen_for['deleted'].append(${arg0_name}.get_identifier())"""
+        if self._listener._registry['d'] == False:
+            self._listener._registry['d'] = []
+        if isinstance(self._listener._registry['d'], list):
+            self._listener._registry['d'].append(${arg0_name}.get_identifier())"""
 
 class ResourceBinSession:
 

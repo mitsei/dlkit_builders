@@ -192,16 +192,17 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
 
 class MongoListener(threading.Thread):
 
-    def __init__(self, ns, receiver, runtime, listen_all=False):
+    def __init__(self, ns, receiver, runtime, authority, obj_name_plural):
         """Constructor"""
         Thread.__init__(self)
         self._ns = ns
         self._obj_name = ns.split('.')[-1]
         self._receiver = receiver
+        self._authority = authority
         self._registry = {
-            'i': listen_all,
-            'u': listen_all,
-            'd': listen_all
+            'i': False,
+            'u': False,
+            'd': False
             }
         if not MONGO_CLIENT.is_mongo_client_set() and runtime is not None:
             set_mongo_client()

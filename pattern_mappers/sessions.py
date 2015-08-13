@@ -2396,7 +2396,7 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=False,
-                    object_name=interface['shortname'].replace(index['NotificationSession'], '')))
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
 
 
         ##################################################################
@@ -2416,7 +2416,7 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=True,
-                    object_name=interface['shortname'].replace(index['NotificationSession'], '')))
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
 
         ##
         # ObjectNotificationSession methods that acknowledge notification.
@@ -2430,7 +2430,7 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=False,
-                    object_name=interface['shortname'].replace(index['NotificationSession'], ''),
+                    object_name=interface['shortname'].replace('NotificationSession', ''),
                     arg_count=1))
 
         ##
@@ -2445,7 +2445,7 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=False,
-                    object_name=interface['shortname'].replace(index['NotificationSession'], '')))
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
 
         ##
         # ObjectNotificationSession methods that register for a changed object.
@@ -2460,7 +2460,7 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=False,
-                    object_name=interface['shortname'].replace(index['NotificationSession'], ''),
+                    object_name=interface['shortname'].replace('NotificationSession', ''),
                     arg_count=1))
 
         ##
@@ -2475,7 +2475,7 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=False,
-                    object_name=interface['shortname'].replace(index['NotificationSession'], '')))
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
 
         ##
         # ObjectNotificationSession methods that register for a deleted object.
@@ -2490,7 +2490,7 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=False,
-                    object_name=interface['shortname'].replace(index['NotificationSession'], ''),
+                    object_name=interface['shortname'].replace('NotificationSession', ''),
                     arg_count=1))
 
         ##
@@ -2505,7 +2505,7 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=False,
-                    object_name=interface['shortname'].replace(index['NotificationSession'], '')))
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
 
 
         ##################################################################
