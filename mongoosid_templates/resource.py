@@ -80,7 +80,7 @@ class ResourceManager:
     get_resource_notification_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
-        return ${return_module}.${return_type}(receiver=${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
+        return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
 
     get_resource_notification_session_for_bin_template = """
         if not self.supports_${support_check}():
@@ -88,7 +88,7 @@ class ResourceManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return ${return_module}.${return_type}(${arg1_name}, receiver=${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
+        return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
 
 
 class ResourceProxyManager:
@@ -117,12 +117,12 @@ class ResourceProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return ${return_module}.${return_type}(${arg0_name}, proxy=proxy, self._runtime) # pylint: disable=no-member"""
+        return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime) # pylint: disable=no-member"""
 
     get_resource_notification_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
-        return ${return_module}.${return_type}(receiver=${arg1_name}, proxy=proxy, runtime=self._runtime) # pylint: disable=no-member"""
+        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
 
     get_resource_notification_session_for_bin_template = """
         if not self.supports_${support_check}():
@@ -130,7 +130,7 @@ class ResourceProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return ${return_module}.${return_type}(${arg1_name}, receiver=${arg0_name}, proxy=proxy, runtime=self._runtime) # pylint: disable=no-member"""
+        return ${return_module}.${return_type}(catalog_id=${arg1_name}, proxy=proxy, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
 
 
 class ResourceLookupSession:
@@ -567,28 +567,28 @@ class ResourceNotificationSession:
         self._kwargs = kwargs
         self.reliable = True
         self._listener = MongoListener(
-            ns='${pkg_name}.${object_name},
+            ns='${pkg_name}.${object_name}',
             receiver=kwargs['receiver'],
             runtime=self._runtime,
             authority=self._authority,
-            obj_name_plural=${object_name_plural_under})
-        self._listener.run()
+            obj_name_plural='${object_name_under_plural}')
+        self._listener.start() # This may want to go in the register methods
 """
 
     reliable_resource_notifications_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.reliable_resource_notifications
-        self.reliable = True"""
+        self._listener._reliable = True"""
 
     unreliable_resource_notifications_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.unreliable_resource_notifications
-        self.reliable = False"""
+        self._listener._reliable = False"""
 
     acknowledge_notification_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.acknowledge_notification
-        pass"""
+        self._listener.acknowledge_notification(notification_id)"""
 
     register_for_new_resources_template = """
         # Implemented from template for

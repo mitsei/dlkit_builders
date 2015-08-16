@@ -77,11 +77,11 @@ class ResourceManager:
 
     def _instantiate_session(self, method_name, proxy=None, *args, **kwargs):
         \"\"\"Instantiates a provider session\"\"\"
-        get_session = getattr(self._provider_manager, method_name)
+        session_class = getattr(self._provider_manager, method_name)
         if proxy is None:
-            return get_session(*args, **kwargs)
+            return session_class(*args, **kwargs)
         else:
-            return get_session(proxy=proxy, *args, **kwargs)
+            return session_class(proxy=proxy, *args, **kwargs)
 
     def initialize(self, runtime):
         \"\"\"OSID Manager initialize\"\"\"
@@ -138,7 +138,7 @@ class ResourceManager:
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_catalog_template
-        session_instance = self._instantiate_session('${method_name}', proxy=self._proxy, *args, **kwargs)
+        session_instance = self._instantiate_session(method_name='${method_name}', proxy=self._proxy, *args, **kwargs)
         return ${cat_name}(
             self._provider_manager,
             session_instance.get_${cat_name_under}(),
@@ -178,7 +178,7 @@ class ResourceManager:
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_catalog_template
-        session_instance = self._instantiate_session('${method_name}', proxy=self._proxy, *args, **kwargs)
+        session_instance = self._instantiate_session(method_name='${method_name}', proxy=self._proxy, *args, **kwargs)
         return ${cat_name}(
             self._provider_manager,
             session_instance.get_${cat_name_under}(),
