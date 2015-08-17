@@ -1658,28 +1658,30 @@ class OsidQuery:
         'import re',
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.primordium.locale.types.string import get_type_data',
+        'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
+        'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))',
         'from .. import utilities',
     ]
 
     init = """
-    def __init__(self):
+    def __init__(self, runtime):
         self._records = dict()
         # _load_records is in OsidExtensibleQuery:
         # _all_supported_record_type_ids comes from inheriting query object
         # THIS SHOULD BE RE-DONE:
         self._load_records(self._all_supported_record_type_ids)
+        self._runtime = runtime
         self._query_terms = {}
 
     def _get_string_match_value(self, string, string_match_type):
         \"\"\"Gets the match value\"\"\"
-        if string_match_type == Type(**get_type_data(\'EXACT\')):
+        if string_match_type == Type(**get_string_type_data(\'EXACT\')):
             return string
-        elif string_match_type == Type(**get_type_data(\'IGNORECASE\')):
+        elif string_match_type == Type(**get_string_type_data(\'IGNORECASE\')):
             return re.compile('^' + string, re.I)
-        elif string_match_type == Type(**get_type_data(\'WORD\')):
+        elif string_match_type == Type(**get_string_type_data(\'WORD\')):
             return re.compile('.*' + string + '.*')
-        elif string_match_type == Type(**get_type_data(\'WORDIGNORECASE\')):
+        elif string_match_type == Type(**get_string_type_data(\'WORDIGNORECASE\')):
             return re.compile('.*' + string + '.*', re.I)
 
     @utilities.arguments_not_none
@@ -1791,6 +1793,11 @@ class OsidQuery:
             pass
 """
 
+    match_keyword_args_template = {
+        1: 'DEFAULT_STRING_MATCH_TYPE',
+        2: True
+    }
+
     match_keyword = """
         #match_value = self._get_string_match_value(keyword, string_match_type)
         if not match:
@@ -1844,7 +1851,19 @@ class OsidObjectQuery:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Type',
+        'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
+        'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))'
     ]
+
+    init = """
+    def __init__(self, runtime):
+        OsidQuery.__init__(self, runtime)"""
+
+    match_display_name_arg_template = {
+        1: 'DEFAULT_STRING_MATCH_TYPE',
+        2: True
+    }
 
     match_display_name = """
         self._match_display_text('displayName', display_name, string_match_type, match)"""
@@ -1855,6 +1874,10 @@ class OsidObjectQuery:
     clear_display_name_terms = """
         self._clear_terms('displayName.text')"""
     
+    match_description_arg_template = {
+        1: 'DEFAULT_STRING_MATCH_TYPE',
+        2: True
+    }
     match_description = """
         self._match_display_text('description', description, string_match_type, match)"""
 

@@ -1445,3 +1445,77 @@ def map_catalog_node_patterns(interface, package, index):
                                 module_name = interface['category'],
                                 method_name = method['name']))
     return index
+
+
+def map_receiver_patterns(interface, package, index):
+
+    object_name = interface['shortname'][:-len('Receiver')]
+    index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceReceiver'
+
+    for method in interface['methods']:
+        var_name = method['name'].split('_', 1)[-1]
+
+        # Receiver methods that callback for new objects
+        # NOTE: This includes a hack to the arguments. Needs to be fixed
+        # When upgrading to RC6
+        if method['name'].startswith('new_'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceReceiver.new_resources',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              object_name = object_name,
+                              cat_name = index['package_catalog_caps'],
+                              arg0_name = 'notification_id',
+                              arg0_type_full = 'osid.id.Id',
+                              arg1_name = method['args'][0]['var_name'],
+                              arg1_type_full = method['args'][0]['arg_type']))
+
+        # Receiver methods that callback for new objects
+        # NOTE: This includes a hack to the arguments. Needs to be fixed
+        # When upgrading to RC6
+        elif method['name'].startswith('changed_'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceReceiver.changed_resources',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              object_name = object_name,
+                              cat_name = index['package_catalog_caps'],
+                              arg0_name = 'notification_id',
+                              arg0_type_full = 'osid.id.Id',
+                              arg1_name = method['args'][0]['var_name'],
+                              arg1_type_full = method['args'][0]['arg_type']))
+
+        # Receiver methods that callback for new objects
+        # NOTE: This includes a hack to the arguments. Needs to be fixed
+        # When upgrading to RC6
+        elif method['name'].startswith('deleted_'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceReceiver.deleted_resources',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              object_name = object_name,
+                              cat_name = index['package_catalog_caps'],
+                              arg0_name = 'notification_id',
+                              arg0_type_full = 'osid.id.Id',
+                              arg1_name = method['args'][0]['var_name'],
+                              arg1_type_full = method['args'][0]['arg_type']))
+
+        else:
+            # uncomment the following line to print all unknown node patterns
+#            print 'unknown receiver pattern:', interface['fullname'], method['name']
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = '',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name']))
+    return index

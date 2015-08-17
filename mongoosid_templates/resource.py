@@ -77,6 +77,19 @@ class ResourceManager:
         ##
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
 
+    get_resource_notification_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+
+    get_resource_notification_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+
 
 class ResourceProxyManager:
 
@@ -105,6 +118,19 @@ class ResourceProxyManager:
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
         return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime) # pylint: disable=no-member"""
+
+    get_resource_notification_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+
+    get_resource_notification_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return ${return_module}.${return_type}(catalog_id=${arg1_name}, proxy=proxy, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
 
 
 class ResourceLookupSession:
@@ -295,7 +321,7 @@ class ResourceQuerySession:
     get_resource_query_template = """
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resource_query_template
-        return queries.${return_type}()"""
+        return queries.${return_type}(runtime=self._runtime)"""
 
     get_resources_by_query_template = """
         # Implemented from template for
@@ -304,7 +330,8 @@ class ResourceQuerySession:
         collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        query_terms.update(self._${cat_name_under}_view_filter())
+        query_terms = {'$$and': [query_terms, self._${cat_name_under}_view_filter()]}
+        #query_terms.update(self._${cat_name_under}_view_filter())
         result = collection.find(query_terms).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime)"""
 
@@ -511,6 +538,88 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.alias_resources_template
         self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
 
+class ResourceNotificationSession:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..osid.sessions import OsidSession',
+        #'from ..primitives import Id',
+        #'from ..primitives import Type',
+        'from ..utilities import MongoClientValidated',
+        'from ..utilities import MongoListener',
+        #'from . import objects',
+    ]
+
+    init_template = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
+        self._catalog_class = objects.${cat_name}
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='${pkg_name}',
+            cat_name='${cat_name}',
+            cat_class=objects.${cat_name})
+        self._kwargs = kwargs
+        self.reliable = True
+        self._listener = MongoListener(
+            ns='${pkg_name}.${object_name}',
+            receiver=kwargs['receiver'],
+            runtime=self._runtime,
+            authority=self._authority,
+            obj_name_plural='${object_name_under_plural}')
+        self._listener.start() # This may want to go in the register methods
+"""
+
+    reliable_resource_notifications_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.reliable_resource_notifications
+        self._listener._reliable = True"""
+
+    unreliable_resource_notifications_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.unreliable_resource_notifications
+        self._listener._reliable = False"""
+
+    acknowledge_notification_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.acknowledge_notification
+        self._listener.acknowledge_notification(notification_id)"""
+
+    register_for_new_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_new_resources
+        self._listener._registry['i'] = True"""
+
+    register_for_changed_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_changed_resources
+        self._listener._registry['u'] = True"""
+
+    register_for_changed_resource_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_changed_resource
+        if self._listener._registry['u'] == False:
+            self._listener._registry['u'] = []
+        if isinstance(self._listener._registry['u'], list):
+            self._listener._registry['u'].append(${arg0_name}.get_identifier())"""
+
+    register_for_deleted_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_deleted_resources
+        self._listener._registry['d'] = True"""
+
+    register_for_deleted_resource_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_deleted_resource
+        if self._listener._registry['d'] == False:
+            self._listener._registry['d'] = []
+        if isinstance(self._listener._registry['d'], list):
+            self._listener._registry['d'].append(${arg0_name}.get_identifier())"""
 
 class ResourceBinSession:
 
@@ -564,7 +673,7 @@ class ResourceBinSession:
         ${object_name_under}_list = []
         for ${cat_name_under}_id in ${arg0_name}:
             ${object_name_under}_list += list(
-                self.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
+                get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
         return objects.${return_type}(${object_name_under}_list)"""
 
     get_bin_ids_by_resource_template = """
@@ -1006,6 +1115,26 @@ class BinAdminSession:
         # NEED TO FIGURE OUT HOW TO IMPLEMENT THIS SOMEDAY
         raise errors.Unimplemented()"""
 
+class BinNotificationSession:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..osid.sessions import OsidSession',
+        #'from ..primitives import Id',
+        #'from ..utilities import MongoClientValidated',
+        #'from . import objects',
+        #'from bson.objectid import ObjectId',
+    ]
+
+    init_template = """
+    _session_name = '${interface_name}'
+
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._kwargs = kwargs
+"""
+
+
 class BinHierarchySession:
 
     import_statements_pattern = [
@@ -1219,7 +1348,7 @@ class BinQuerySession:
     get_bin_query_template = """
         # Implemented from template for
         # osid.resource.BinQuerySession.get_bin_query_template
-        return queries.${return_type}()"""
+        return queries.${return_type}(runtime=self._runtime)"""
 
     get_bins_by_query_template = """
         # Implemented from template for
@@ -1298,7 +1427,7 @@ class ResourceQuery:
     ]
 
     init_template = """
-    def __init__(self):
+    def __init__(self, runtime):
         try:
             #pylint: disable=no-name-in-module
             from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
@@ -1308,7 +1437,7 @@ class ResourceQuery:
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidQuery.__init__(self)
+        osid_queries.OsidObjectQuery.__init__(self, runtime)
 """
 
     clear_group_terms_template = """
@@ -1498,7 +1627,7 @@ class BinQuery:
     ]
 
     init_template = """
-    def __init__(self):
+    def __init__(self, runtime):
         try:
             #pylint: disable=no-name-in-module
             from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
@@ -1508,7 +1637,7 @@ class BinQuery:
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidCatalogQuery.__init__(self)
+        osid_queries.OsidCatalogQuery.__init__(self, runtime)
 """
 
     clear_group_terms_template = """
