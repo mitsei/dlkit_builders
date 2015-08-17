@@ -1348,7 +1348,7 @@ class BinQuerySession:
     get_bin_query_template = """
         # Implemented from template for
         # osid.resource.BinQuerySession.get_bin_query_template
-        return queries.${return_type}()"""
+        return queries.${return_type}(runtime=self._runtime)"""
 
     get_bins_by_query_template = """
         # Implemented from template for
@@ -1627,7 +1627,7 @@ class BinQuery:
     ]
 
     init_template = """
-    def __init__(self):
+    def __init__(self, runtime):
         try:
             #pylint: disable=no-name-in-module
             from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
@@ -1637,7 +1637,7 @@ class BinQuery:
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidCatalogQuery.__init__(self)
+        osid_queries.OsidCatalogQuery.__init__(self, runtime)
 """
 
     clear_group_terms_template = """
