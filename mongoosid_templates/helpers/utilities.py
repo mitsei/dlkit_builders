@@ -210,7 +210,7 @@ class MongoListener(Thread):
             }
         if not MONGO_CLIENT.is_mongo_client_set() and runtime is not None:
             set_mongo_client(runtime)
-        cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find().sort('ts', DESCENDING)
+        cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find().sort('ts', DESCENDING).limit(-1)
         try:
             self.last_timestamp = cursor.next()['ts']
         except StopIteration:
@@ -228,7 +228,7 @@ class MongoListener(Thread):
                 if self.reliable:
                     self._notification_list.append(notification_id)
 
-    def acknowledge_notification(notification_id):
+    def acknowledge_notification(self, notification_id):
         """receipt of notification has been acknowledged"""
         if self.reliable:
             try:
@@ -241,6 +241,8 @@ class MongoListener(Thread):
         while True:
             cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find(
                 {'ts':{'$gt': self.last_timestamp}}, cursor_type=34) # tailable await data
+            # http://stackoverflow.com/questions/30401063/pymongo-tailing-oplog
+            cursor.add_option(8)  # oplog_replay
             for doc in cursor:
                 self.last_timestamp = doc['ts']
                 if doc['ns'] == self._ns:
