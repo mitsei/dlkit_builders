@@ -224,7 +224,7 @@ class MongoListener(Thread):
                 verb = VMAP[doc['op']]
                 object_id = Id(self._ns + ':' + str(doc['o']['_id']) + '@' + self._authority)
                 notification_id = Id(self._ns + 'Notification:' + str(ObjectId()) + '@' + self._authority)
-                getattr(self._receiver, '_'.join([verb, self._obj_name_plural]))([object_id], notification_id)
+                getattr(self._receiver, '_'.join([verb, self._obj_name_plural]))(notification_id, [object_id])
                 if self.reliable:
                     self._notification_list.append(notification_id)
 
@@ -240,9 +240,11 @@ class MongoListener(Thread):
         """main control loop for thread"""
         while True:
             cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find(
-                {'ts':{'$gt': self.last_timestamp}}, cursor_type=34) # tailable await data
+                {'ts':{'$gt': self.last_timestamp}})
             # http://stackoverflow.com/questions/30401063/pymongo-tailing-oplog
+            cursor.add_option(2)  # tailable
             cursor.add_option(8)  # oplog_replay
+            cursor.add_option(32)  # await data
             for doc in cursor:
                 self.last_timestamp = doc['ts']
                 if doc['ns'] == self._ns:

@@ -566,8 +566,16 @@ class ResourceNotificationSession:
             cat_class=objects.${cat_name})
         self._kwargs = kwargs
         self.reliable = True
+
+        db_prefix = ''
+        try:
+            db_prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
+            db_prefix = runtime.get_configuration().get_value_by_parameter(db_prefix_param_id).get_string_value()
+        except (AttributeError, KeyError, NotFound):
+            pass
+
         self._listener = MongoListener(
-            ns='${pkg_name}.${object_name}',
+            ns='{0}${pkg_name}.${object_name}'.format(db_prefix),
             receiver=kwargs['receiver'],
             runtime=self._runtime,
             authority=self._authority,
