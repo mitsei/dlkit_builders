@@ -20,6 +20,10 @@ VMAP = {
     'd': 'deleted'
 }
 
+class Filler(object):
+    pass
+
+
 def set_mongo_client(runtime):
     try:
         mongo_host_param_id = Id('parameter:mongoHostURI@mongo')
@@ -90,7 +94,10 @@ class MongoClientValidated(object):
         return self._mc.count()
 
     def delete_one(self, query):
-        result = self._mc.delete_one(query)
+        try:
+            result = self._mc.delete_one(query)
+        except TypeError:
+            result = self._mc.delete(query)
         if result is None or result.deleted_count == 0:
             raise NotFound(str(query) + ' returned None.')
         return result
@@ -108,7 +115,15 @@ class MongoClientValidated(object):
         return result
 
     def insert_one(self, doc):
-        result = self._mc.insert_one(doc)
+        try:
+            result = self._mc.insert_one(doc)
+        except TypeError:
+            # pymongo 2.8.1
+            result = self._mc.insert(doc)
+            if result is not None:
+                returned_object_id = result
+                result = Filler()
+                result.inserted_id = returned_object_id
         self._validate_write(result)
         return result
 
