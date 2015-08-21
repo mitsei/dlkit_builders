@@ -1812,7 +1812,6 @@ class OsidQuery:
         # Note: this currently ignores match argument
         match_value = self._get_string_match_value(keyword, string_match_type)
         for field_name in self._keyword_fields:
-            print 'FIELD NAME =', field_name
             if field_name not in self._keyword_terms:
                 self._keyword_terms[field_name] = {'$in': list()}
             self._keyword_terms[field_name]['$in'].append(match_value)"""
