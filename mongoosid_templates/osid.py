@@ -1672,6 +1672,16 @@ class OsidQuery:
         self._load_records(self._all_supported_record_type_ids)
         self._runtime = runtime
         self._query_terms = {}
+        self._keyword_terms = {}
+        self._keyword_fields = ['displayName.text', 'description.text']
+        try:
+            # Try to get additional keyword fields from the runtime, if available:
+            config = runtime.get_configuration()
+            parameter_id = Id('parameter:keywordFields@mongo')
+            additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
+            self._keyword_fields += additional_keyword_fields[self._namespace]
+        except (AttributeError, KeyError, errors.NotFound):
+            pass
 
     def _get_string_match_value(self, string, string_match_type):
         \"\"\"Gets the match value\"\"\"
@@ -1793,22 +1803,22 @@ class OsidQuery:
             pass
 """
 
-    match_keyword_args_template = {
+    match_keyword_arg_template = {
         1: 'DEFAULT_STRING_MATCH_TYPE',
         2: True
     }
 
     match_keyword = """
-        #match_value = self._get_string_match_value(keyword, string_match_type)
-        if not match:
-            #match_value = '-' + match_value
-            keyword = '-' + keyword
-        self._query_terms['$text'] = dict()
-        self._query_terms['$text']['$search'] = keyword #match_value
-        self._query_terms['$text']['$language'] = 'en' # this should come from the locale"""
+        # Note: this currently ignores match argument
+        match_value = self._get_string_match_value(keyword, string_match_type)
+        for field_name in self._keyword_fields:
+            print 'FIELD NAME =', field_name
+            if field_name not in self._keyword_terms:
+                self._keyword_terms[field_name] = {'$in': list()}
+            self._keyword_terms[field_name]['$in'].append(match_value)"""
 
     clear_keyword_terms = """
-        self._clear_terms('$text')"""
+        self._keyword_terms = {}"""
 
 class OsidIdentifiableQuery:
 

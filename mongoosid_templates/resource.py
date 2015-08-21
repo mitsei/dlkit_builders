@@ -326,11 +326,23 @@ class ResourceQuerySession:
     get_resources_by_query_template = """
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resources_by_query
-        query_terms = dict(${arg0_name}._query_terms)
+        #query_terms = dict(${arg0_name}._query_terms)
+        and_list = list()
+        or_list = list()
+        for term in ${arg0_name}._query_terms:
+            and_list.append({term: ${arg0_name}._query_terms[term]})
+        for term in ${arg0_name}._keyword_terms:
+            or_list.append({term: ${arg0_name}._keyword_terms[term]})
+        if or_list:
+            and_list.append({'$$or': or_list})
+        and_list.append(self._${cat_name_under}_view_filter())
+        if and_list:
+            query_terms = {'$$and': and_list}
         collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        query_terms = {'$$and': [query_terms, self._${cat_name_under}_view_filter()]}
+        print query_terms
+        #query_terms = {'$$and': [query_terms, self._${cat_name_under}_view_filter()]}
         #query_terms.update(self._${cat_name_under}_view_filter())
         result = collection.find(query_terms).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime)"""
@@ -1436,6 +1448,7 @@ class ResourceQuery:
 
     init_template = """
     def __init__(self, runtime):
+        self._namespace = '${pkg_name}.${object_name}'
         try:
             #pylint: disable=no-name-in-module
             from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
