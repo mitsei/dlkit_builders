@@ -1856,6 +1856,10 @@ class OsidExtensibleQuery:
         self._records[record_type_idstr] = record(self)
 """
 
+    match_record_type = """
+        self._add_match('recordTypeIds', str(record_type), match)
+    """
+
 class OsidObjectQuery:
 
     import_statements = [

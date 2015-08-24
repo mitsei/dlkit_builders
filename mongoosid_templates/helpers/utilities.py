@@ -60,25 +60,6 @@ class MongoClientValidated(object):
             except (AttributeError, KeyError, NotFound):
                 pass
 
-            text_index_fields = [('displayName.text', 'text'), ('description.text', 'text')]
-            try:
-                mongo_text_indexes_param_id = Id('parameter:textIndexes@mongo')
-                mongo_text_indexes = runtime.get_configuration().get_value_by_parameter(mongo_text_indexes_param_id).get_object_value()
-                namespace = '{0}.{1}'.format(db, collection)
-                if namespace in mongo_text_indexes:
-                    for field in mongo_text_indexes[namespace]:
-                        text_index_fields.append((field, 'text'))
-            except (AttributeError, KeyError, NotFound):
-                pass
-            try:
-                self._mc.create_index(text_index_fields)
-            except PyMongoOperationFailed:
-                current_indexes = self._mc.list_indexes()
-                text_index = [i['name'] for i in current_indexes
-                              if '_fts' in i['key'] and i['key']['_fts'] == 'text'][0]
-                self._mc.drop_index(text_index)
-                self._mc.create_index(text_index_fields)
-
     def _validate_write(self, result):
         try:
             if not result.acknowledged or result.inserted_id is None:
