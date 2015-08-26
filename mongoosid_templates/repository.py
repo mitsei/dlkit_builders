@@ -591,7 +591,8 @@ class CompositionForm:
         for object_id in child_ids:
             if not self._is_valid_id(object_id):
                 raise errors.InvalidArgument()
-            idstr_list.append(str(object_id))
+            if str(object_id) not in idstr_list:
+                idstr_list.append(str(object_id))
         self._my_map['childIds'] = idstr_list
 
     def clear_children(self):
