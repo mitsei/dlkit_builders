@@ -137,20 +137,20 @@ class BaseBuilder(Utilities):
 
     def _package_file(self, package):
         if isinstance(package, dict) and 'name' in package:
-            return self.package_maps + '/' + package['name'] + self._map_ext
+            return self.package_maps + '/' + self.first(package['name']) + self._map_ext
         else:
             return self.package_maps + '/' + package + self._map_ext
 
     def _package_interface_file(self, package):
         if isinstance(package, dict) and 'name' in package:
-            return self.interface_maps + '/' + package['name'] + self._map_ext
+            return self.interface_maps + '/' + self.first(package['name']) + self._map_ext
         else:
             # assume is package name string
             return self.interface_maps + '/' + package + self._map_ext
 
     def _package_pattern_file(self, package):
         if isinstance(package, dict):
-            return self.pattern_maps + '/' + package['name'] + self._map_ext
+            return self.pattern_maps + '/' + self.first(package['name']) + self._map_ext
         else:
             return self.pattern_maps + '/' + package + self._map_ext
 
