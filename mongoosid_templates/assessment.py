@@ -1314,6 +1314,11 @@ class AssessmentTakenQuery:
         self._add_match('takingAgentId', str(agent_id), bool(match))
     """
 
+class AssessmentQuery:
+    match_item_id = """
+        self._add_match('itemIds', str(item_id), match)
+    """
+
 
 class AssessmentSection:
     

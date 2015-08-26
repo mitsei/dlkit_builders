@@ -345,7 +345,8 @@ class AssetCompositionDesignSession:
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if 'assetIds' in composition:
-            composition['assetIds'].append(str(asset_id))
+            if str(asset_id) not in composition['assetIds']:
+                composition['assetIds'].append(str(asset_id))
         else:
             composition['assetIds'] = [str(asset_id)]
         collection.save(composition)"""

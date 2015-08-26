@@ -78,7 +78,11 @@ class MongoClientValidated(object):
         try:
             result = self._mc.delete_one(query)
         except TypeError:
-            result = self._mc.delete(query)
+            result = self._mc.remove(query)
+            if result is not None:
+                returned_object = result
+                result = Filler()
+                result.deleted_count = returned_object['n']
         if result is None or result.deleted_count == 0:
             raise NotFound(str(query) + ' returned None.')
         return result
