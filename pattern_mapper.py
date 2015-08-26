@@ -100,6 +100,8 @@ def map_patterns(package, index, base_package=None):
         catalog_name_under = 'no_catalog'
         object_names_caps = []
         object_names_under = []
+        containable_object_names_caps = []
+        containable_object_names_under = []
         cataloged_object_names_caps = []
         cataloged_object_names_under = []
         object_names_under_to_caps = OrderedDict()
@@ -113,6 +115,8 @@ def map_patterns(package, index, base_package=None):
         catalog_name_under = base_package['package_catalog_under']
         object_names_caps = base_package['package_objects_caps']
         object_names_under = base_package['package_objects_under']
+        containable_object_names_caps = base_package['package_containable_objects_caps']
+        containable_object_names_under = base_package['package_containable_objects_under']
         cataloged_object_names_caps = base_package['package_cataloged_objects_caps']
         cataloged_object_names_under = base_package['package_cataloged_objects_under']
         object_names_under_to_caps = base_package['package_objects_under_to_caps']
@@ -127,6 +131,9 @@ def map_patterns(package, index, base_package=None):
     index['impl_log']['sessions'] = OrderedDict()
 
     for interface in package['interfaces']:
+        if 'Containable' in interface['inherit_shortnames']:
+            append_caps(interface['shortname'], containable_object_names_caps)
+            append_under(interface['shortname'], containable_object_names_under)
         # Find all OsidObject names in this package
         if interface['category'] == 'objects':
             if 'OsidObject' in interface['inherit_shortnames']:
@@ -207,6 +214,8 @@ def map_patterns(package, index, base_package=None):
     # Now that we have the index, we can map things
     index['package_objects_caps'] = object_names_caps
     index['package_objects_under'] = object_names_under
+    index['package_containable_objects_caps'] = containable_object_names_caps
+    index['package_containable_objects_under'] = containable_object_names_under
     index['package_cataloged_objects_caps'] = cataloged_object_names_caps
     index['package_cataloged_objects_under'] = cataloged_object_names_under
     index['package_objects_under_to_caps'] = object_names_under_to_caps

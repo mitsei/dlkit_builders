@@ -163,6 +163,22 @@ class ResourceLookupSession:
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._kwargs = kwargs
+
+    def _view_filter(self):
+        \"\"\"
+        Returns the mongodb catalog filter for isolated or federated views.
+        
+        This also searches across all underlying ${cat_name_plural} in federated
+        ${cat_name_under} view. Real authz for controlling access to underlying
+        ${cat_name_under_plural} will need to be managed in an adapter above the
+        pay grade of this implementation.
+        
+        \"\"\"
+        if self._is_phantom_root_federated():
+            return {}
+        idstr_list = self._get_catalog_idstrs()
+        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
+                        {'assigned${cat_name}Ids': {'$$in': idstr_list}}]}
 """
 
     get_bin_id_template = """
@@ -309,6 +325,22 @@ class ResourceQuerySession:
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._kwargs = kwargs
+
+    def _view_filter(self):
+        \"\"\"
+        Returns the mongodb catalog filter for isolated or federated views.
+        
+        This also searches across all underlying ${cat_name_plural} in federated
+        ${cat_name_under} view. Real authz for controlling access to underlying
+        ${cat_name_under_plural} will need to be managed in an adapter above the
+        pay grade of this implementation.
+        
+        \"\"\"
+        if self._is_phantom_root_federated():
+            return {}
+        idstr_list = self._get_catalog_idstrs()
+        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
+                        {'assigned${cat_name}Ids': {'$$in': idstr_list}}]}
 """
 
     can_query_resources_template = """

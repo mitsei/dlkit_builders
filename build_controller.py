@@ -240,6 +240,7 @@ class PatternBuilder(XOsidMapper, BaseBuilder):
             if self._pattern_map_exists(package):
                 with open(self._package_pattern_file(package), 'r') as read_file:
                     base_package = json.load(read_file)
+                print base_package
 
                 self._make_impl_pattern_map(package=package,
                                             base_package=base_package)

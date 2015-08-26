@@ -195,23 +195,43 @@ class CompositionLookupSession:
         'UNSEQUESTERED = 1',
     ]
 
-    init = """
+    init_template = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        self._catalog_class = objects.Repository
-        self._session_name = 'CompositionLookupSession'
-        self._catalog_name = 'Repository'
+        self._catalog_class = objects.${cat_name}
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
             catalog_id,
             proxy,
             runtime,
-            db_name='repository',
-            cat_name='Repository',
-            cat_class=objects.Repository)
+            db_name='${pkg_name}',
+            cat_name='${cat_name}',
+            cat_class=objects.${cat_name})
+        self._kwargs = kwargs
         self._status_view = ACTIVE
         self._sequestered_view = SEQUESTERED
-        self._kwargs = kwargs
+
+    def _view_filter(self):
+        \"\"\"
+        Returns the mongodb catalog filter for isolated or federated views.
+        
+        This also searches across all underlying ${cat_name_plural} in federated
+        ${cat_name_under} view. Real authz for controlling access to underlying
+        ${cat_name_under_plural} will need to be managed in an adapter above the
+        pay grade of this implementation.
+        
+        \"\"\"
+        if self._is_phantom_root_federated():
+            view_filter = {}
+        else:
+            idstr_list = self._get_catalog_idstrs()
+            view_filter = {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
+                               {'assigned${cat_name}Ids': {'$$in': idstr_list}}]}
+        if self._sequestered_view == SEQUESTERED:
+            view_filter['sequestered'] = False
+        return view_filter
 """
 
     use_active_composition_view = """
@@ -221,10 +241,10 @@ class CompositionLookupSession:
         self._status_view = ANY_STATUS"""
 
     use_sequestered_composition_view = """
-        self._status_view = SEQUESTERED"""
+        self._sequestered_view = SEQUESTERED"""
 
     use_unsequestered_composition_view = """
-        self._status_view = UNSEQUESTERED"""
+        self._sequestered_view = UNSEQUESTERED"""
 
 
 class AssetCompositionSession:
