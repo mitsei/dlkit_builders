@@ -1,45 +1,97 @@
-
-from error_lists import session_errors
-
 class ObjectiveRequisiteSession:
 
-    import_statements_pattern = [
+    import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
         'from ..utilities import MongoClientValidated',
-        'from . import types',
         'from bson.objectid import ObjectId',
+        'from dlkit.mongo.types import Relationship',
         'UPDATED = True',
         'CREATED = True'
     ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveRequisiteSession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+    """
 
     get_requisite_objectives_template = """
         # Implemented from template for
         # osid.learning.ObjectiveRequisiteSession.get_requisite_objectives_template
         # NOTE: This implementation currently ignores plenary view
-        pass
-        collection = MongoClientValidated(self._db_prefix + 'relationship',
-                                          collection='Relationship',
-                                          runtime=self._runtime) ## Really! No we should use OSIDs
-        requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
-        result = collection.find({'$$and': {'sourceId': str(objective_id)}, 'genusType': str(requisite_type)},
-                                  {'destinationId': 1, '_id': 0})
-        catalog_id_list = []
-        for i in ${arg0_name}:
-            catalog_id_list.append(ObjectId(i.get_identifier()))
-        collection = self._db['Relationship']
-        ## I LEFT OFF HERE - THERE'S A WAY TO RETURN ONLY DEST IDS I THINK
-        result = collection.find({'_id': {'$$in': catalog_id_list}})
-        return objects.${return_type}(result)"""
+        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+        relm = self._get_provider_manager('RELATIONSHIP')
+        rls = relm.get_relationship_lookup_session()
+        rls.use_federated_family_view()
+        requisite_relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name},
+                                                                                 requisite_type)
+        destination_ids = [ObjectId(r.get_destination_id().identifier)
+                           for r in requisite_relationships]
+        collection = MongoClientValidated('learning',
+                                          collection='Objective',
+                                          runtime=self._runtime)
+        result = collection.find({'_id': {'$$in': destination_ids}})
+        return objects.${return_type}(result, runtime=self._runtime)"""
+
+    can_lookup_objective_prerequisites = """
+        return True
+    """
+
+    get_dependent_objectives_template = """
+        # Implemented from template for
+        # osid.learning.ObjectiveRequisiteSession.get_dependent_objectives_template
+        # NOTE: This implementation currently ignores plenary view
+        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+        relm = self._get_provider_manager('RELATIONSHIP')
+        rls = relm.get_relationship_lookup_session()
+        rls.use_federated_family_view()
+        requisite_relationships = rls.get_relationships_by_genus_type_for_destination(${arg0_name},
+                                                                                      requisite_type)
+        source_ids = [ObjectId(r.get_source_id().identifier)
+                      for r in requisite_relationships]
+        collection = MongoClientValidated('learning',
+                                          collection='Objective',
+                                          runtime=self._runtime)
+        result = collection.find({'_id': {'$$in': source_ids}})
+        return objects.${return_type}(result, runtime=self._runtime)
+    """
 
 
 class ObjectiveRequisiteAssignmentSession:
 
-    import_statements_pattern = [
+    import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
+        'from dlkit.mongo.types import Relationship'
     ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveRequisiteAssignmentSession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+    """
 
     assign_objective_requisite_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
@@ -47,11 +99,10 @@ class ObjectiveRequisiteAssignmentSession:
     ]
 
     assign_objective_requisite_template = """
-        requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
+        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
 
-
-        ras = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
-        rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name})
+        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
+        rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name}, [])
         rfc.set_display_name('Objective Requisite')
         rfc.set_description('An Objective Requisite created by the ObjectiveRequisiteAssignmentSession')
         rfc.set_genus_type(requisite_type)
@@ -60,14 +111,12 @@ class ObjectiveRequisiteAssignmentSession:
     unassign_objective_requisite_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
         'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}',
-        'from ..relationship.managers import RelationshipManager',
-        'from ..osid.osid_errors import NotFound, NullArgument, OperationFailed, PermissionDenied'
     ]
 
     unassign_objective_requisite_template = """
-        requisite_type = str(Id(**types.Relationship().get_type_data('REQUISITE')))
-        rls = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
-        ras = RelationshipManager().get_relationship_admin_session_for_objective_bank(self.get_objective_bank_id())
+        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+        rls = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
+        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
     """
 
 class ObjectiveAdminSession:
@@ -88,13 +137,13 @@ class ObjectiveAdminSession:
 
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${dependent_object_name}',
                                           runtime=self._runtime)
         if collection.find({'${object_name_mixed}Id': str(${arg0_name})}).count() != 0:
             raise errors.IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
 
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
@@ -113,13 +162,13 @@ class ActivityLookupSession:
         # Implemented from template for
         # osid.learning.ActivityLookupSession.get_activities_for_objective_template
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${arg0_object_mixed}Id': str(${arg0_name})},
-                 **self._bank_view_filter()))
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+                 **self._view_filter()))
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 
 class ActivityAdminSession:
@@ -150,7 +199,6 @@ class ActivityAdminSession:
                 ${cat_name_under}_id=self._catalog_id,
                 ${arg0_name}=${arg0_name},
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         else:
             obj_form = objects.${return_type}(
@@ -158,7 +206,6 @@ class ActivityAdminSession:
                 record_types=${arg1_name},
                 ${arg0_name}=${arg0_name},
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
@@ -244,3 +291,76 @@ class ActivityForm:
             raise errors.NoAccess()
         self._my_map['${var_name_singular_mixed}Ids'] = self._${var_name}_default"""
 
+
+class ObjectiveHierarchySession:
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveHierarchySession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+        self._kwargs = kwargs
+        hierarchy_mgr = self._get_provider_manager('HIERARCHY')
+        self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+            Id(authority='LEARNING',
+               namespace='CATALOG',
+               identifier='OBJECTIVE')
+        )
+    """
+
+
+class ObjectiveHierarchyDesignSession:
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveHierarchyDesignSession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+        self._kwargs = kwargs
+        hierarchy_mgr = self._get_provider_manager('HIERARCHY')
+        self._hierarchy_session = hierarchy_mgr.get_hierarchy_design_session_for_hierarchy(
+            Id(authority='LEARNING',
+               namespace='CATALOG',
+               identifier='OBJECTIVE')
+        )
+    """
+
+
+class ObjectiveSequencingSession:
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
+        'from dlkit.mongo.types import Relationship'
+    ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None):
+        self._catalog_class = objects.Objective
+        self._session_name = 'ObjectiveSequencingSession'
+        self._catalog_name = 'ObjectiveBank'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='learning',
+            cat_name='ObjectiveBank',
+            cat_class=objects.ObjectiveBank)
+        self._forms = dict()
+    """

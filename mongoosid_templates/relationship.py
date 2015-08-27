@@ -2,13 +2,13 @@ from .resource import ResourceAdminSession
 
 class RelationshipLookupSession:
 
-    potential_import_statements = [
+    import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-        'from ..primitives import DateTime'
+        'from ..primitives import DateTime',
         'from ..osid.sessions import OsidSession',
         'from ..utilities import MongoClientValidated',
-        'fro, ..utilities import overlap',
+        'from ..utilities import overlap',
         'from . import objects',
         'from bson.objectid import ObjectId',
         'DESCENDING = -1',
@@ -40,12 +40,12 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name})},
-                 **self._${cat_name_under}_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_for_source_on_date_template = """
@@ -61,13 +61,13 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   'genusTypeId': str(${arg1_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_source_on_date_template = """
@@ -83,12 +83,12 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${destination_name_mixed}Id': str(${arg0_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_for_destination_on_date_template = """
@@ -104,13 +104,13 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${destination_name_mixed}Id': str(${arg0_name}),
                   'genusTypeId': str(${arg1_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_destination_on_date_template = """
@@ -126,27 +126,27 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   '${destination_name_mixed}Id': str(${arg1_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_peers_template = """
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   '${destination_name_mixed}Id': str(${arg1_name}),
                   'genusTypeId': str(${arg2_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
 class RelationshipAdminSession:
@@ -182,7 +182,6 @@ class RelationshipAdminSession:
                 ${arg0_name}=${arg0_name},
                 ${arg1_name}=${arg1_name},
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         else:
             obj_form = objects.${return_type}(
@@ -191,7 +190,6 @@ class RelationshipAdminSession:
                 ${arg0_name}=${arg0_name},
                 ${arg1_name}=${arg1_name},
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED

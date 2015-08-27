@@ -77,6 +77,19 @@ class ResourceManager:
         ##
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
 
+    get_resource_notification_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+
+    get_resource_notification_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+
 
 class ResourceProxyManager:
 
@@ -105,6 +118,19 @@ class ResourceProxyManager:
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
         return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime) # pylint: disable=no-member"""
+
+    get_resource_notification_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+
+    get_resource_notification_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return ${return_module}.${return_type}(catalog_id=${arg1_name}, proxy=proxy, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
 
 
 class ResourceLookupSession:
@@ -174,47 +200,47 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.use_isolated_bin_view
         self._use_federated_catalog_view()
 
-    def _${cat_name_under}_view_filter(self):
-        \"\"\"
-        Returns the mongodb catalog filter for isolated or federated views.
-        
-        This also searches across all underlying ${cat_name_plural} in federated
-        ${cat_name_under} view. Real authz for controlling access to underlying
-        ${cat_name_plural_under} will need to be managed in an adapter above the
-        pay grade of this implementation.
-        
-        \"\"\"
-        if self._is_phantom_root_federated():
-            return {}
-        idstr_list = self._get_catalog_idstrs()
-        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-                        {'assignedCatalogIds': {'$$in': idstr_list}}]}"""
+    # def _${cat_name_under}_view_filter(self):
+    #     \"\"\"
+    #     Returns the mongodb catalog filter for isolated or federated views.
+    #     
+    #     This also searches across all underlying ${cat_name_plural} in federated
+    #     ${cat_name_under} view. Real authz for controlling access to underlying
+    #     ${cat_name_plural_under} will need to be managed in an adapter above the
+    #     pay grade of this implementation.
+    #     
+    #     \"\"\"
+    #     if self._is_phantom_root_federated():
+    #         return {}
+    #     idstr_list = self._get_catalog_idstrs()
+    #     return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
+    #                     {'assignedCatalogIds': {'$$in': idstr_list}}]}"""
 
     get_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resource
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find_one(
-            dict({'_id': ObjectId(self._get_id(${arg0_name}).get_identifier())},
-                 **self._${cat_name_under}_view_filter()))
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+            dict({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name}').get_identifier())},
+                 **self._view_filter()))
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
     get_resources_by_ids_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_ids
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         object_id_list = []
         for i in ${arg0_name}:
-            object_id_list.append(ObjectId(self._get_id(i).get_identifier()))
+            object_id_list.append(ObjectId(self._get_id(i, '${package_name}').get_identifier()))
         result = collection.find(
             dict({'_id': {'$$in': object_id_list}},
-                 **self._${cat_name_under}_view_filter()))
+                 **self._view_filter()))
         result = list(result)
         sorted_result = []
         for object_id in object_id_list:
@@ -228,12 +254,12 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
             dict({'genusTypeId': str(${arg0_name})},
-                 **self._${cat_name_under}_view_filter())).sort('_id', DESCENDING)
+                 **self._view_filter())).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime)"""
 
     get_resources_by_parent_genus_type_template = """
@@ -251,11 +277,11 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        result = collection.find(self._${cat_name_under}_view_filter()).sort('_id', DESCENDING)
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        result = collection.find(self._view_filter()).sort('_id', DESCENDING)
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 class ResourceQuerySession:
 
@@ -295,18 +321,29 @@ class ResourceQuerySession:
     get_resource_query_template = """
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resource_query_template
-        return queries.${return_type}()"""
+        return queries.${return_type}(runtime=self._runtime)"""
 
     get_resources_by_query_template = """
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resources_by_query
-        query_terms = dict(${arg0_name}._query_terms)
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        and_list = list()
+        or_list = list()
+        for term in ${arg0_name}._query_terms:
+            and_list.append({term: ${arg0_name}._query_terms[term]})
+        for term in ${arg0_name}._keyword_terms:
+            or_list.append({term: ${arg0_name}._keyword_terms[term]})
+        if or_list:
+            and_list.append({'$$or': or_list})
+        view_filter = self._view_filter()
+        if view_filter:
+            and_list.append(view_filter)
+        if and_list:
+            query_terms = {'$$and': and_list}
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        query_terms.update(self._${cat_name_under}_view_filter())
         result = collection.find(query_terms).sort('_id', DESCENDING)
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
@@ -370,14 +407,12 @@ class ResourceAdminSession:
         if ${arg0_name} == []:
             obj_form = objects.${return_type}(
                 ${cat_name_under}_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id())
         else:
             obj_form = objects.${return_type}(
                 ${cat_name_under}_id=self._catalog_id,
                 record_types=${arg0_name},
-                db_prefix=self._db_prefix,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id())
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
@@ -390,7 +425,7 @@ class ResourceAdminSession:
     create_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.create_resource_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -409,7 +444,6 @@ class ResourceAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
             collection.find_one({'_id': insert_result.inserted_id}),
-            db_prefix=self._db_prefix,
             runtime=self._runtime)
 
         return result"""
@@ -421,7 +455,7 @@ class ResourceAdminSession:
     get_resource_form_for_update_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -433,7 +467,7 @@ class ResourceAdminSession:
                 ${arg0_name} = self._get_${object_name_under}_id_with_enclosure(${arg0_name})
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        obj_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
+        obj_form = objects.${return_type}(result, runtime=self._runtime)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form
@@ -464,7 +498,7 @@ class ResourceAdminSession:
     update_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.update_resource_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -485,7 +519,6 @@ class ResourceAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.${return_type}(
             ${arg0_name}._my_map,
-            db_prefix=self._db_prefix,
             runtime=self._runtime)"""
 
     delete_resource_import_templates = [
@@ -495,14 +528,14 @@ class ResourceAdminSession:
     delete_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.delete_resource_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under}_map = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        objects.${object_name}(${object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        objects.${object_name}(${object_name_under}_map, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
     can_manage_asset_aliases_template = """
@@ -515,6 +548,96 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.alias_resources_template
         self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
 
+class ResourceNotificationSession:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..osid.sessions import OsidSession',
+        #'from ..primitives import Id',
+        #'from ..primitives import Type',
+        'from ..utilities import MongoClientValidated',
+        'from ..utilities import MongoListener',
+        #'from . import objects',
+    ]
+
+    init_template = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
+        self._catalog_class = objects.${cat_name}
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='${pkg_name}',
+            cat_name='${cat_name}',
+            cat_class=objects.${cat_name})
+        self._kwargs = kwargs
+        self.reliable = True
+
+        db_prefix = ''
+        try:
+            db_prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
+            db_prefix = runtime.get_configuration().get_value_by_parameter(db_prefix_param_id).get_string_value()
+        except (AttributeError, KeyError, NotFound):
+            pass
+
+        self._listener = MongoListener(
+            ns='{0}${pkg_name}.${object_name}'.format(db_prefix),
+            receiver=kwargs['receiver'],
+            runtime=self._runtime,
+            authority=self._authority,
+            obj_name_plural='${object_name_under_plural}')
+        self._listener.start() # This may want to go in the register methods
+"""
+
+    reliable_resource_notifications_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.reliable_resource_notifications
+        self._listener._reliable = True"""
+
+    unreliable_resource_notifications_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.unreliable_resource_notifications
+        self._listener._reliable = False"""
+
+    acknowledge_notification_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.acknowledge_notification
+        self._listener.acknowledge_notification(notification_id)"""
+
+    register_for_new_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_new_resources
+        self._listener._registry['i'] = True"""
+
+    register_for_changed_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_changed_resources
+        self._listener._registry['u'] = True"""
+
+    register_for_changed_resource_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_changed_resource
+        if self._listener._registry['u'] == False:
+            self._listener._registry['u'] = []
+        if isinstance(self._listener._registry['u'], list):
+            self._listener._registry['u'].append(${arg0_name}.get_identifier())"""
+
+    register_for_deleted_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_deleted_resources
+        self._listener._registry['d'] = True"""
+
+    register_for_deleted_resource_template = """
+        # Implemented from template for
+        # osid.resource.ResourceNotificationSession.register_for_deleted_resource
+        if self._listener._registry['d'] == False:
+            self._listener._registry['d'] = []
+        if isinstance(self._listener._registry['d'], list):
+            self._listener._registry['d'].append(${arg0_name}.get_identifier())"""
 
 class ResourceBinSession:
 
@@ -579,8 +702,8 @@ class ResourceBinSession:
         lookup_session.use_federated_${cat_name_under}_view()
         ${object_name_under} = lookup_session.get_${object_name_under}(${arg0_name})
         id_list = [Id(${object_name_under}._my_map['${cat_name_mixed}Id'])]
-        if 'assignedCatalogIds' in ${object_name_under}._my_map:
-            for idstr in ${object_name_under}._my_map['assignedCatalogIds']:
+        if 'assigned${cat_name}Ids' in ${object_name_under}._my_map:
+            for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
                 id_list.append(Id(idstr))
         return IdList(id_list)"""
 
@@ -648,7 +771,7 @@ class ResourceBinAssignmentSession:
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
-        self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
+        self._assign_object_to_catalog(${arg0_name}, ${arg1_name}, 'assigned${cat_name}Ids')"""
 
     unassign_resource_from_bin_template = """
         # Implemented from template for
@@ -656,7 +779,7 @@ class ResourceBinAssignmentSession:
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         cat = lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
-        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
+        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name}, 'assigned${cat_name}Ids')"""
 
 
 class ResourceAgentSession:
@@ -687,24 +810,23 @@ class ResourceAgentSession:
         return self.get_resource_by_agent(agent_id).get_id()"""
 
     get_resource_by_agent = """
-        collection = MongoClientValidated(self._db_prefix + 'resource',
+        collection = MongoClientValidated('resource',
                                           collection='Resource',
                                           runtime=self._runtime)
         result = collection.find_one(
             dict({'agentIds': {'$in': [str(agent_id)]}},
-                 **self._bin_view_filter()))
+                 **self._view_filter()))
         return objects.Resource(
             result,
-            db_prefix=self._db_prefix,
             runtime=self._runtime)"""
 
     get_agent_ids_by_resource = """
-        collection = MongoClientValidated(self._db_prefix + 'resource',
+        collection = MongoClientValidated('resource',
                                           collection='Resource',
                                           runtime=self._runtime)
         resource = collection.find_one(
             dict({'_id': ObjectId(resource_id.get_identifier())},
-                 **self._bin_view_filter()))
+                 **self._view_filter()))
         if 'agentIds' not in resource:
             result = IdList([])
         else:
@@ -739,7 +861,7 @@ class ResourceAgentAssignmentSession:
 
     assign_agent_to_resource = """
         # Should check for existence of Agent? We may mever manage them.
-        collection = MongoClientValidated(self._db_prefix + 'resource',
+        collection = MongoClientValidated('resource',
                                           collection='Resource',
                                           runtime=self._runtime)
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
@@ -758,7 +880,7 @@ class ResourceAgentAssignmentSession:
         collection.save(resource)"""
 
     unassign_agent_from_resource = """
-        collection = MongoClientValidated(self._db_prefix + 'resource',
+        collection = MongoClientValidated('resource',
                                           collection='Resource',
                                           runtime=self._runtime)
         resource = collection.find_one({'_id': ObjectId(resource_id.get_identifier())})
@@ -809,7 +931,7 @@ class BinLookupSession:
     get_bin_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bin
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${cat_name}',
                                           runtime=self._runtime)
         # Need to consider how to best deal with the "phantom root" catalog issue
@@ -821,7 +943,7 @@ class BinLookupSession:
             # Try creating an orchestrated ${cat_name}.  Let it raise errors.NotFound()
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
 
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
     get_bins_by_ids_template = """
         # Implemented from template for
@@ -831,24 +953,24 @@ class BinLookupSession:
         catalog_id_list = []
         for i in ${arg0_name}:
             catalog_id_list.append(ObjectId(i.get_identifier()))
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${cat_name}',
                                           runtime=self._runtime)
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 
     get_bins_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bins_template
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${cat_name}',
                                           runtime=self._runtime)
         result = collection.find().sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 class BinAdminSession:
 
@@ -898,13 +1020,11 @@ class BinAdminSession:
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
         if ${arg0_name} == []:
             result = objects.${return_type}(
-                db_prefix=self._db_prefix,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id())
         else:
             result = objects.${return_type}(
                 record_types=${arg0_name},
-                db_prefix=self._db_prefix,
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id())
         self._forms[result.get_id().get_identifier()] = not CREATED
@@ -917,7 +1037,7 @@ class BinAdminSession:
     create_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.create_bin_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${cat_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -936,7 +1056,6 @@ class BinAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
             collection.find_one({'_id': insert_result.inserted_id}),
-            db_prefix=self._db_prefix,
             runtime=self._runtime)
 
         return result"""
@@ -948,14 +1067,14 @@ class BinAdminSession:
     get_bin_form_for_update_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${cat_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        cat_form = objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
+        cat_form = objects.${return_type}(result, runtime=self._runtime)
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
 
         return cat_form"""
@@ -967,7 +1086,7 @@ class BinAdminSession:
     update_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.update_bin_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${cat_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -986,7 +1105,7 @@ class BinAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned
-        return objects.${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(${arg0_name}._my_map, runtime=self._runtime)"""
 
     delete_bin_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
@@ -995,13 +1114,13 @@ class BinAdminSession:
     delete_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.delete_bin_template
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${cat_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         for object_catalog in ${cataloged_object_caps_list}:
-            obj_collection = MongoClientValidated(self._db_prefix + '${package_name}',
+            obj_collection = MongoClientValidated('${package_name}',
                                                   collection=object_catalog,
                                                   runtime=self._runtime)
             if obj_collection.find({'${cat_name_mixed}Id': str(${arg0_name})}).count() != 0:
@@ -1013,6 +1132,26 @@ class BinAdminSession:
         # osid.resource.BinLookupSession.alias_bin_template
         # NEED TO FIGURE OUT HOW TO IMPLEMENT THIS SOMEDAY
         raise errors.Unimplemented()"""
+
+class BinNotificationSession:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..osid.sessions import OsidSession',
+        #'from ..primitives import Id',
+        #'from ..utilities import MongoClientValidated',
+        #'from . import objects',
+        #'from bson.objectid import ObjectId',
+    ]
+
+    init_template = """
+    _session_name = '${interface_name}'
+
+    def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession._init_catalog(self, proxy, runtime)
+        self._kwargs = kwargs
+"""
+
 
 class BinHierarchySession:
 
@@ -1138,7 +1277,11 @@ class BinHierarchySession:
     get_bin_nodes_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_bin_nodes
-        raise errors.Unimplemented()"""
+        return objects.${return_type}(self.get_${cat_name_under}_node_ids(
+            ${arg0_name}=${arg0_name},
+            ${arg1_name}=${arg1_name},
+            ${arg2_name}=${arg2_name},
+            ${arg3_name}=${arg3_name})._my_map, runtime=self._runtime, proxy=self._proxy)"""
 
 class BinHierarchyDesignSession:
 
@@ -1223,18 +1366,18 @@ class BinQuerySession:
     get_bin_query_template = """
         # Implemented from template for
         # osid.resource.BinQuerySession.get_bin_query_template
-        return queries.${return_type}()"""
+        return queries.${return_type}(runtime=self._runtime)"""
 
     get_bins_by_query_template = """
         # Implemented from template for
         # osid.resource.BinQuerySession.get_bins_by_query_template
         query_terms = dict(${arg0_name}._query_terms)
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${cat_name}',
                                           runtime=self._runtime)
         result = collection.find(query_terms).sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 class Resource:
 
@@ -1253,9 +1396,8 @@ class Resource:
         _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __init__(self, osid_object_map, db_prefix='', runtime=None):
+    def __init__(self, osid_object_map, runtime=None):
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._db_prefix = db_prefix
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
 ${instance_initers}
@@ -1303,7 +1445,8 @@ class ResourceQuery:
     ]
 
     init_template = """
-    def __init__(self):
+    def __init__(self, runtime):
+        self._namespace = '${pkg_name}.${object_name}'
         try:
             #pylint: disable=no-name-in-module
             from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
@@ -1313,7 +1456,7 @@ class ResourceQuery:
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidQuery.__init__(self)
+        osid_queries.OsidObjectQuery.__init__(self, runtime)
 """
 
     clear_group_terms_template = """
@@ -1337,9 +1480,8 @@ class ResourceForm:
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'
 
-    def __init__(self, osid_object_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
+    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
         osid_objects.OsidForm.__init__(self, runtime=runtime)
-        self._db_prefix = db_prefix
         self._kwargs = kwargs
         if 'catalog_id' in kwargs:
             self._catalog_id = kwargs['catalog_id']
@@ -1444,9 +1586,8 @@ class Bin:
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __init__(self, osid_catalog_map, db_prefix='', runtime=None):
+    def __init__(self, osid_catalog_map, runtime=None):
         osid_objects.OsidCatalog.__init__(self, osid_catalog_map, runtime)
-        self._db_prefix = db_prefix
         self._records = dict()
         # This check is here for transition purposes:
         try:
@@ -1471,9 +1612,8 @@ class BinForm:
         _record_type_data_sets = dict()
     _namespace = '${implpkg_name}.${object_name}'
 
-    def __init__(self, osid_catalog_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
+    def __init__(self, osid_catalog_map=None, record_types=None, runtime=None, **kwargs):
         osid_objects.OsidForm.__init__(self, runtime=runtime)
-        self._db_prefix = db_prefix
         self._kwargs = kwargs
         self._init_metadata(**kwargs)
         self._records = dict()
@@ -1506,7 +1646,7 @@ class BinQuery:
     ]
 
     init_template = """
-    def __init__(self):
+    def __init__(self, runtime):
         try:
             #pylint: disable=no-name-in-module
             from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
@@ -1516,8 +1656,61 @@ class BinQuery:
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidCatalogQuery.__init__(self)
+        osid_queries.OsidCatalogQuery.__init__(self, runtime)
 """
 
     clear_group_terms_template = """
         self._clear_terms('${var_name_mixed}')"""
+
+
+class BinNode:
+
+    import_statements_pattern = [
+        'from ..utilities import get_provider_manager',
+        'from dlkit.primordium.id.primitives import Id',
+    ]
+
+    init_template = """
+    def __init__(self, node_map, runtime=None, proxy=None, lookup_session=None):
+        osid_objects.OsidNode.__init__(self, node_map)
+        self._lookup_session = lookup_session
+        self._runtime = runtime
+        self._proxy = proxy
+
+    def get_object_node_map(self):
+        node_map = dict(self.get_${object_name_under}().get_object_map())
+        node_map['type'] = '${object_name}Node'
+        node_map['parentNodes'] = []
+        node_map['childNodes'] = []
+        for ${object_name_under}_node in self.get_parent_${object_name_under}_nodes():
+            node_map['parentNodes'].append(${object_name_under}_node.get_object_node_map())
+        for ${object_name_under}_node in self.get_child_${object_name_under}_nodes():
+            node_map['childNodes'].append(${object_name_under}_node.get_object_node_map())
+        return node_map
+"""
+
+    get_bin_template = """
+        if self._lookup_session is None:
+            mgr = get_provider_manager('${package_name_upper}', runtime=self._runtime, proxy=self._proxy)
+            self._lookup_session = mgr.get_${object_name_under}_lookup_session()
+        return self._lookup_session.get_${object_name_under}(Id(self._my_map['id']))"""
+
+    get_parent_bin_nodes_template = """
+        parent_${object_name_under}_nodes = []
+        for node in self._my_map['parentNodes']:
+            parent_${object_name_under}_nodes.append(${object_name}Node(
+                node._my_map,
+                runtime=self._runtime,
+                proxy=self._proxy,
+                lookup_session=self._lookup_session))
+        return ${return_type}(parent_${object_name_under}_nodes)"""
+
+    get_child_bin_nodes_template = """
+        parent_${object_name_under}_nodes = []
+        for node in self._my_map['childNodes']:
+            parent_${object_name_under}_nodes.append(${object_name}Node(
+                node._my_map,
+                runtime=self._runtime,
+                proxy=self._proxy,
+                lookup_session=self._lookup_session))
+        return ${return_type}(parent_${object_name_under}_nodes)"""

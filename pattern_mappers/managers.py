@@ -102,6 +102,45 @@ def map_manager_patterns(interface, package, index):
         ##################################################################
 
         ##
+        # ProxyManager methods to get a notification session with no catalog.
+        elif (method['name'].startswith('get') and 
+              method['name'].endswith('notification_session') and
+              method['return_type'].endswith('Session') and
+              'osid.proxy.Proxy' in method['arg_types']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = 'resource.ResourceProxyManager.get_resource_notification_session',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name'],
+                                var_name = method['name'][4:],
+                                support_check = method['name'][4:].split('_session')[0],
+                                arg0_name = method['args'][0]['var_name'],
+                                arg1_name = method['args'][1]['var_name'],
+                                return_type_full = method['return_type'],
+                                cat_name = index['package_catalog_caps']))
+
+        ##
+        # ProxyManager methods to get a notification session for catalog.
+        elif (method['name'].startswith('get') and 
+              method['name'].endswith('notification_session_for_' + index['package_catalog_under']) and
+              method['return_type'].endswith('Session') and
+              'osid.proxy.Proxy' in method['arg_types']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = 'resource.ResourceProxyManager.get_resource_notification_session_for_bin',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name'],
+                                var_name = method['name'][4:],
+                                support_check = method['name'][4:].split('_session')[0],
+                                arg0_name = method['args'][0]['var_name'],
+                                arg1_name = method['args'][1]['var_name'],
+                                arg2_name = method['args'][2]['var_name'],
+                                return_type_full = method['return_type'],
+                                cat_name = index['package_catalog_caps']))
+                                        
+        ##
         # ProxyManager methods to get a session.
         elif (method['name'].startswith('get') and 
               method['name'].endswith('session') and

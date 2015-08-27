@@ -5,9 +5,9 @@ from pattern_mappers.sessions import map_session_patterns
 from pattern_mappers.core import map_osid_patterns, map_type_patterns, map_id_patterns
 from pattern_mappers.data import map_object_form_data_patterns, map_object_data_patterns, map_admin_session_data_patterns
 from pattern_mappers.objects import map_object_form_patterns,\
-    map_object_patterns, map_list_patterns,\
+    map_object_patterns, map_list_patterns, map_receiver_patterns,\
     map_query_patterns, map_catalog_patterns,\
-    map_catalog_query_patterns
+    map_catalog_query_patterns, map_catalog_node_patterns
 
 
 def append_caps(value, caps_list):
@@ -100,6 +100,8 @@ def map_patterns(package, index, base_package=None):
         catalog_name_under = 'no_catalog'
         object_names_caps = []
         object_names_under = []
+        containable_object_names_caps = []
+        containable_object_names_under = []
         cataloged_object_names_caps = []
         cataloged_object_names_under = []
         object_names_under_to_caps = OrderedDict()
@@ -113,6 +115,8 @@ def map_patterns(package, index, base_package=None):
         catalog_name_under = base_package['package_catalog_under']
         object_names_caps = base_package['package_objects_caps']
         object_names_under = base_package['package_objects_under']
+        containable_object_names_caps = base_package['package_containable_objects_caps']
+        containable_object_names_under = base_package['package_containable_objects_under']
         cataloged_object_names_caps = base_package['package_cataloged_objects_caps']
         cataloged_object_names_under = base_package['package_cataloged_objects_under']
         object_names_under_to_caps = base_package['package_objects_under_to_caps']
@@ -127,6 +131,9 @@ def map_patterns(package, index, base_package=None):
     index['impl_log']['sessions'] = OrderedDict()
 
     for interface in package['interfaces']:
+        if 'Containable' in interface['inherit_shortnames']:
+            append_caps(interface['shortname'], containable_object_names_caps)
+            append_under(interface['shortname'], containable_object_names_under)
         # Find all OsidObject names in this package
         if interface['category'] == 'objects':
             if 'OsidObject' in interface['inherit_shortnames']:
@@ -207,6 +214,8 @@ def map_patterns(package, index, base_package=None):
     # Now that we have the index, we can map things
     index['package_objects_caps'] = object_names_caps
     index['package_objects_under'] = object_names_under
+    index['package_containable_objects_caps'] = containable_object_names_caps
+    index['package_containable_objects_under'] = containable_object_names_under
     index['package_cataloged_objects_caps'] = cataloged_object_names_caps
     index['package_cataloged_objects_under'] = cataloged_object_names_under
     index['package_objects_under_to_caps'] = object_names_under_to_caps
@@ -254,9 +263,14 @@ def map_patterns(package, index, base_package=None):
             map_query_patterns(interface, package, index)
         elif 'OsidList' in interface['inherit_shortnames']:
             map_list_patterns(interface, package, index)
+        elif 'OsidReceiver' in interface['inherit_shortnames']:
+            map_receiver_patterns(interface, package, index)
         elif 'OsidCatalog' in interface['inherit_shortnames']:
             map_catalog_patterns(interface, package, index)
         elif 'OsidCatalogQuery' in interface['inherit_shortnames']:
             map_catalog_query_patterns(interface, package, index)
+        elif ('OsidNode' in interface['inherit_shortnames'] and 
+                interface['shortname'][:-4] == index['package_catalog_caps']):
+            map_catalog_node_patterns(interface, package, index)
 
     return index

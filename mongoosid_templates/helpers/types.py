@@ -17,7 +17,7 @@ class NoneType(object):
     def __init__(self):
         self.type_set = {
             'None': self.none_types
-            }
+        }
 
     def get_type_data(self, name):
         """Return dictionary representation of type."""
@@ -29,9 +29,9 @@ class NoneType(object):
                 'domain': 'Generic Types',
                 'display_name': self.none_types[name] + ' Type',
                 'display_label': self.none_types[name],
-                'description': ('The ' +  self.none_types[name] +
+                'description': ('The ' + self.none_types[name] +
                                 ' Type. This type indicates that no type is specified.')
-                }
+            }
         except IndexError:
             raise NotFound('NoneType: ' + name)
 
@@ -46,7 +46,7 @@ class Genus(object):
     def __init__(self):
         self.type_set = {
             'Gen': self.generic_types
-            }
+        }
 
     def get_type_data(self, name):
         """Return dictionary representation of type."""
@@ -58,9 +58,9 @@ class Genus(object):
                 'domain': 'Generic Types',
                 'display_name': self.generic_types[name] + ' Generic Type',
                 'display_label': self.generic_types[name],
-                'description': ('The ' +  self.generic_types[name] +
+                'description': ('The ' + self.generic_types[name] +
                                 ' Type. This type has no symantic meaning.')
-                }
+            }
         except IndexError:
             raise NotFound('GenusType: ' + name)
 
@@ -95,3 +95,24 @@ class Format(object):
         else:
             raise NotFound('DEFAULT Format Type')
 
+
+class Relationship(object):
+    """Enumerator for Relationship Types"""
+
+    def __init__(self):
+        pass
+
+    def get_type_data(self, name):
+        """Return dictionary representation of type."""
+        try:
+            return {
+                'authority': 'dlkit',
+                'namespace': 'relationship.Relationship',
+                'identifier': name.lower(),
+                'domain': 'Generic Types',
+                'display_name': name.title() + ' Type',
+                'display_label': name.title(),
+                'description': ('The ' + name.title() + ' Type.')
+            }
+        except IndexError:
+            raise NotFound('RelationshipType: ' + name.title())

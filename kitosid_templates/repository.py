@@ -52,6 +52,8 @@ class AssetAdminSession:
 
 class CompositionLookupSession:
 
+    # Note: These should be templates.  But first add to pattern mappers
+
     use_active_composition_view = """
         \"\"\"Pass through to provider CompositionLookupSession.use_active_composition_view\"\"\"
         self._get_provider_session('composition_lookup_session').use_active_composition_view()"""

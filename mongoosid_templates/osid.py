@@ -422,7 +422,6 @@ class OsidSession:
     def __init__(self):
         self._proxy = None
         self._runtime = None
-        self._db_prefix = None
         self._catalog_identifier = None
         self._my_catalog_map = None
         self._catalog_id = None
@@ -437,17 +436,12 @@ class OsidSession:
         self._proxy = proxy
         self._runtime = runtime
         if runtime is not None:
-            prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
-            self._db_prefix = runtime.get_configuration().get_value_by_parameter(prefix_param_id).get_string_value()
-
             try:
                 authority_param_id = Id('parameter:authority@mongo')
                 self._authority = runtime.get_configuration().get_value_by_parameter(
                     authority_param_id).get_string_value()
             except (KeyError, errors.NotFound):
                 self._authority = 'ODL.MIT.EDU'
-        else:
-            self._db_prefix = ''
 
     def _init_catalog(self, proxy=None, runtime=None):
         \"\"\"Initialize this object as an OsidCatalog.\"\"\"
@@ -461,7 +455,7 @@ class OsidSession:
         if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
             self._catalog_identifier = catalog_id.get_identifier()
 
-            collection = MongoClientValidated(self._db_prefix + db_name,
+            collection = MongoClientValidated(db_name,
                                               collection=cat_name,
                                               runtime=self._runtime)
             try:
@@ -514,13 +508,13 @@ class OsidSession:
         try:
             foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
             foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
-            collection = MongoClientValidated(self._db_prefix + foreign_db_name,
+            collection = MongoClientValidated(foreign_db_name,
                                               collection=foreign_cat_name,
                                               runtime=self._runtime)
             collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())})
         except KeyError:
             raise errors.NotFound()
-        collection = MongoClientValidated(self._db_prefix + db_name,
+        collection = MongoClientValidated(db_name,
                                           collection=cat_name,
                                           runtime=self._runtime)
         catalog_map = {
@@ -544,16 +538,18 @@ class OsidSession:
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
         return get_provider_manager(osid, runtime=self._runtime, local=local)
 
-    def _get_id(self, id_):
+    def _get_id(self, id_, pkg_name):
         \"\"\"
         Returns the primary id given an alias.
 
         If the id provided is not in the alias table, it will simply be
         returned as is.
 
+        Only looks within the Id Alias namespace for the session package
+
         \"\"\"
-        collection = MongoClientValidated(self._db_prefix + 'id',
-                                          collection='Id',
+        collection = MongoClientValidated('id',
+                                          collection=pkg_name + 'Ids',
                                           runtime=self._runtime)
         try:
             result = collection.find_one({'aliasIds': {'$in': [str(id_)]}})
@@ -566,12 +562,12 @@ class OsidSession:
         \"\"\"Adds the given equivalent_id as an alias for primary_id if possible\"\"\"
         pkg_name = primary_id.get_identifier_namespace().split('.')[0]
         obj_name = primary_id.get_identifier_namespace().split('.')[1]
-        collection = MongoClientValidated(self._db_prefix + pkg_name,
+        collection = MongoClientValidated(pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
         collection.find_one({'_id': ObjectId(primary_id.get_identifier())}) # to raise NotFound
-        collection = MongoClientValidated(self._db_prefix + 'id',
-                                          collection='Id',
+        collection = MongoClientValidated('id',
+                                          collection=pkg_name + 'Ids',
                                           runtime=self._runtime)
         try:
             result = collection.find_one({'aliasIds': {'$in': [str(equivalent_id)]}})
@@ -643,31 +639,48 @@ class OsidSession:
             return {'startDate': {'$$lte': now}, 'endDate': {'$$gte': now}}
         return {}
 
-    def _assign_object_to_catalog(self, obj_id, cat_id):
+    def _view_filter(self):
+        \"\"\"
+        Returns the mongodb catalog filter for isolated or federated views.
+        
+        This also searches across all underlying catalogs in federated
+        catalog views. Real authz for controlling access to underlying
+        catalogs will need to be managed in an adapter above the
+        pay grade of this implementation.
+        
+        \"\"\"
+        if self._is_phantom_root_federated():
+            return {}
+        cat_name_mixed = self._catalog_name[0].lower() + self._catalog_name[1:]
+        idstr_list = self._get_catalog_idstrs()
+        return {'$or': [{cat_name_mixed + 'Id': {'$in': idstr_list}},
+                        {'assigned' + self._catalog_name + 'Ids': {'$in': idstr_list}}]}
+
+    def _assign_object_to_catalog(self, obj_id, cat_id, catalog_key):
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
         obj_name = obj_id.get_identifier_namespace().split('.')[1]
-        collection = MongoClientValidated(self._db_prefix + pkg_name,
+        collection = MongoClientValidated(pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
         obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
-        if 'assignedCatalogIds' in obj_map:
-            if str(cat_id) in obj_map['assignedCatalogIds']:
+        if catalog_key in obj_map:
+            if str(cat_id) in obj_map[catalog_key]:
                 raise errors.AlreadyExists()
             else:
-                obj_map['assignedCatalogIds'].append(str(cat_id))
+                obj_map[catalog_key].append(str(cat_id))
         else:
-            obj_map['assignedCatalogIds'] = [str(cat_id)]
+            obj_map[catalog_key] = [str(cat_id)]
         collection.save(obj_map)
 
-    def _unassign_object_from_catalog(self, obj_id, cat_id):
+    def _unassign_object_from_catalog(self, obj_id, cat_id, catalog_key):
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
         obj_name = obj_id.get_identifier_namespace().split('.')[1]
-        collection = MongoClientValidated(self._db_prefix + pkg_name,
+        collection = MongoClientValidated(pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
         obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
         try:
-            obj_map['assignedCatalogIds'].remove(str(cat_id))
+            obj_map[catalog_key].remove(str(cat_id))
         except (KeyError, ValueError):
             raise errors.NotFound()
         collection.save(obj_map)
@@ -916,6 +929,7 @@ class OsidForm:
         'from . import mdata_conf',
         'from .metadata import Metadata',
         'import uuid',
+        'from decimal import Decimal',
     ]
 
     init = """
@@ -1079,8 +1093,10 @@ class OsidForm:
 
     def _is_valid_decimal(self, inpt, metadata):
         \"\"\"Checks if input is a valid decimal value\"\"\"
-        if not isinstance(inpt, float):
+        if not (isinstance(inpt, float) or isinstance(inpt, Decimal)):
             return False
+        if not isinstance(inpt, Decimal):
+            inpt = Decimal(str(inpt))
         if metadata.get_minimum_decimal() and inpt < metadata.get_minimum_decimal():
             return False
         if metadata.get_maximum_decimal() and inpt > metadata.get_maximum_decimal():
@@ -1563,7 +1579,7 @@ class OsidList:
     ]
 
     init = """
-    def __init__(self, iter_object=None, db_prefix='', runtime=None):
+    def __init__(self, iter_object=None, runtime=None):
         if iter_object is None:
             iter_object = []
         if isinstance(iter_object, dict) or isinstance(iter_object, list):
@@ -1573,7 +1589,6 @@ class OsidList:
         else:
             self._count = None
         self._runtime = runtime
-        self._db_prefix = db_prefix
         self._iter_object = iter(iter_object)
 
     def __iter__(self):
@@ -1619,7 +1634,7 @@ class OsidList:
         except Exception:  # Need to specify exceptions here!
             raise errors.OperationFailed()
         if isinstance(next_object, dict):
-            next_object = object_class(next_object, db_prefix=self._db_prefix, runtime=self._runtime)
+            next_object = object_class(next_object, runtime=self._runtime)
         return next_object
 
     def next(self):
@@ -1660,28 +1675,40 @@ class OsidQuery:
         'import re',
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.primordium.locale.types.string import get_type_data',
+        'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
+        'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))',
         'from .. import utilities',
     ]
 
     init = """
-    def __init__(self):
+    def __init__(self, runtime):
         self._records = dict()
         # _load_records is in OsidExtensibleQuery:
         # _all_supported_record_type_ids comes from inheriting query object
         # THIS SHOULD BE RE-DONE:
         self._load_records(self._all_supported_record_type_ids)
+        self._runtime = runtime
         self._query_terms = {}
+        self._keyword_terms = {}
+        self._keyword_fields = ['displayName.text', 'description.text']
+        try:
+            # Try to get additional keyword fields from the runtime, if available:
+            config = runtime.get_configuration()
+            parameter_id = Id('parameter:keywordFields@mongo')
+            additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
+            self._keyword_fields += additional_keyword_fields[self._namespace]
+        except (AttributeError, KeyError, errors.NotFound):
+            pass
 
     def _get_string_match_value(self, string, string_match_type):
         \"\"\"Gets the match value\"\"\"
-        if string_match_type == Type(**get_type_data(\'EXACT\')):
+        if string_match_type == Type(**get_string_type_data(\'EXACT\')):
             return string
-        elif string_match_type == Type(**get_type_data(\'IGNORECASE\')):
+        elif string_match_type == Type(**get_string_type_data(\'IGNORECASE\')):
             return re.compile('^' + string, re.I)
-        elif string_match_type == Type(**get_type_data(\'WORD\')):
+        elif string_match_type == Type(**get_string_type_data(\'WORD\')):
             return re.compile('.*' + string + '.*')
-        elif string_match_type == Type(**get_type_data(\'WORDIGNORECASE\')):
+        elif string_match_type == Type(**get_string_type_data(\'WORDIGNORECASE\')):
             return re.compile('.*' + string + '.*', re.I)
 
     @utilities.arguments_not_none
@@ -1793,6 +1820,22 @@ class OsidQuery:
             pass
 """
 
+    match_keyword_arg_template = {
+        1: 'DEFAULT_STRING_MATCH_TYPE',
+        2: True
+    }
+
+    match_keyword = """
+        # Note: this currently ignores match argument
+        match_value = self._get_string_match_value(keyword, string_match_type)
+        for field_name in self._keyword_fields:
+            if field_name not in self._keyword_terms:
+                self._keyword_terms[field_name] = {'$in': list()}
+            self._keyword_terms[field_name]['$in'].append(match_value)"""
+
+    clear_keyword_terms = """
+        self._keyword_terms = {}"""
+
 class OsidIdentifiableQuery:
 
     import_statements = [
@@ -1830,11 +1873,27 @@ class OsidExtensibleQuery:
         self._records[record_type_idstr] = record(self)
 """
 
+    match_record_type = """
+        self._add_match('recordTypeIds', str(record_type), match)
+    """
+
 class OsidObjectQuery:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Type',
+        'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
+        'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))'
     ]
+
+    init = """
+    def __init__(self, runtime):
+        OsidQuery.__init__(self, runtime)"""
+
+    match_display_name_arg_template = {
+        1: 'DEFAULT_STRING_MATCH_TYPE',
+        2: True
+    }
 
     match_display_name = """
         self._match_display_text('displayName', display_name, string_match_type, match)"""
@@ -1845,14 +1904,26 @@ class OsidObjectQuery:
     clear_display_name_terms = """
         self._clear_terms('displayName.text')"""
     
+    match_description_arg_template = {
+        1: 'DEFAULT_STRING_MATCH_TYPE',
+        2: True
+    }
     match_description = """
         self._match_display_text('description', description, string_match_type, match)"""
+
+    match_genus_type = """
+        self._add_match('genusTypeId', str(genus_type), match)
+    """
 
     match_any_description = """
         raise errors.Unimplemented()"""
 
     clear_description_terms = """
         self._clear_terms('description.text')"""
+
+    clear_genus_type_terms = """
+        self._clear_terms('genusTypeId')
+    """
 
 class OsidQueryInspector:
 

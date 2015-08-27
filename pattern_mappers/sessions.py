@@ -2,11 +2,20 @@ from binder_helpers import make_twargs, camel_to_under, make_plural, remove_plur
 
 def map_session_patterns(interface, package, index):
     if (interface['shortname'].endswith('LookupSession') and
+        interface['shortname'][:-13] in index['package_containable_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'repository.CompositionLookupSession'
+    elif (interface['shortname'].endswith('QuerySession') and
+        interface['shortname'][:-13] in index['package_containable_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'repository.CompositionLookupSession'
+    elif (interface['shortname'].endswith('LookupSession') and
         interface['shortname'][:-13] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceLookupSession'
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'
+    elif (interface['shortname'].endswith('NotificationSession') and
+        interface['shortname'][:-len('NotificationSession')] in index['package_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceNotificationSession'
     elif interface['shortname'] == "RelationshipLookupSession":
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceLookupSession'
     elif (interface['shortname'].endswith('LookupSession') and
@@ -46,6 +55,9 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'].endswith('AdminSession') and
         interface['shortname'][:-12] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinAdminSession'
+    elif (interface['shortname'].endswith('NotificationSession') and
+        interface['shortname'][:-len('NotificationSession')] in index['package_catalog_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'resource.BinNotificationSession'
     elif (interface['shortname'].endswith('HierarchySession') and
         interface['shortname'][:-16] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinHierarchySession'
@@ -759,7 +771,8 @@ def map_session_patterns(interface, package, index):
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name'],
                               arg2_name = method['args'][2]['var_name'],
-                              arg3_name = method['args'][3]['var_name']))
+                              arg3_name = method['args'][3]['var_name'],
+                              cat_name = index['package_catalog_caps']))
 
 
 
@@ -2372,6 +2385,134 @@ def map_session_patterns(interface, package, index):
                     rtype=False, object_name=interface['shortname'][:-22], arg_count=1))
 
 
+        ##################################################################
+        ## Inspect this package's catalog notification methods.         ##
+        ##################################################################
+
+        ##
+        # CatalogNotificationSession methods that return an authorization hint.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'NotificationSession') and
+              method['name'].startswith('can_register_for_') and
+              method['return_type'] == 'boolean'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.BinNotificationSession.can_register_for_bin_notifications',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
+
+
+        ##################################################################
+        ## Inspect this package's object notification methods.          ##
+        ##################################################################
+
+        ##
+        # ObjectNotificationSession methods that return an authorization hint.
+        elif (interface['shortname'].endswith('NotificationSession') and
+              method['name'].startswith('can_register_for_') and
+              method['return_type'] == 'boolean'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceNotificationSession.can_register_for_resource_notifications',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
+
+        ##
+        # ObjectNotificationSession methods that acknowledge notification.
+        elif (interface['shortname'].endswith('NotificationSession') and
+              method['name'].startswith('acknowledge_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceNotificationSession.acknowledge_resource_notification',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=interface['shortname'].replace('NotificationSession', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectNotificationSession methods that register for a new object.
+        elif (interface['shortname'].endswith('NotificationSession') and
+              method['name'].startswith('register_for_new_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceNotificationSession.register_for_new_resources',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
+
+        ##
+        # ObjectNotificationSession methods that register for a changed object.
+        elif (interface['shortname'].endswith('NotificationSession') and
+              method['name'].startswith('register_for_changed_') and
+              len(method['args']) == 1):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceNotificationSession.register_for_changed_resource',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=interface['shortname'].replace('NotificationSession', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectNotificationSession methods that register changed objects.
+        elif (interface['shortname'].endswith('NotificationSession') and
+              method['name'].startswith('register_for_changed_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceNotificationSession.register_for_changed_resources',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
+
+        ##
+        # ObjectNotificationSession methods that register for a deleted object.
+        elif (interface['shortname'].endswith('NotificationSession') and
+              method['name'].startswith('register_for_deleted_') and
+              len(method['args']) == 1):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceNotificationSession.register_for_deleted_resource',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=interface['shortname'].replace('NotificationSession', ''),
+                    arg_count=1))
+
+        ##
+        # ObjectNotificationSession methods that register deleted objects.
+        elif (interface['shortname'].endswith('NotificationSession') and
+              method['name'].startswith('register_for_deleted_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceNotificationSession.register_for_deleted_resources',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=interface['shortname'].replace('NotificationSession', '')))
+
 
         ##################################################################
         ## Inspect this package's Object-Catalog methods.               ##
@@ -2604,7 +2745,7 @@ def map_session_patterns(interface, package, index):
 
 
         ##################################################################
-        ## Inspect this package's ObjectRequisiteSession methods.       ##
+        ## Inspect this package's HierarchyDesignSession methods.       ##
         ##################################################################
 
         ##
@@ -2812,6 +2953,31 @@ def map_session_patterns(interface, package, index):
                               method_name = method['name'],
                               cat_name = index['package_catalog_caps'],
                               var_name = 'isolated_view'))
+
+        ##
+        # Session methods that set reliable notifications.
+        elif method['name'].startswith('reliable'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceNotificationSession.reliable_resource_notifications',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              cat_name = index['package_catalog_caps'],
+                              var_name = 'reliable'))
+
+        ##
+        # Session methods that set unreliable notifications.
+        elif method['name'].startswith('unreliable'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceNotificationSession.unreliable_resource_notifications',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              cat_name = index['package_catalog_caps'],
+                              var_name = 'reliable'))
+
 
 
 

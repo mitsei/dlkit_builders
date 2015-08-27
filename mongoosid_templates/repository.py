@@ -75,7 +75,7 @@ class AssetAdminSession:
         # Implemented from template for
         # osid.repository.AssetAdminSession.create_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -98,14 +98,14 @@ class AssetAdminSession:
 
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         from .${return_module} import ${aggregated_object_name}
-        return ${return_type}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return ${return_type}(${arg0_name}._my_map, runtime=self._runtime)"""
 
     get_asset_content_form_for_update_template = """
         # Implemented from template for
         # osid.repository.AssetAdminSession.get_asset_content_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .${return_module} import ${return_type}
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -114,7 +114,7 @@ class AssetAdminSession:
         for sub_doc in document['${aggregated_objects_name_mixed}']: # There may be a MongoDB shortcut for this
             if sub_doc['_id'] == ObjectId(${arg0_name}.get_identifier()):
                 result = sub_doc
-        obj_form = ${return_type}(result, db_prefix=self._db_prefix, runtime=self._runtime)
+        obj_form = ${return_type}(result, runtime=self._runtime)
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
@@ -123,7 +123,7 @@ class AssetAdminSession:
         # Implemented from template for
         # osid.repository.AssetAdminSession.update_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -159,14 +159,14 @@ class AssetAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         from .objects import ${aggregated_object_name}
 
-        return ${aggregated_object_name}(${arg0_name}._my_map, db_prefix=self._db_prefix, runtime=self._runtime)"""
+        return ${aggregated_object_name}(${arg0_name}._my_map, runtime=self._runtime)"""
 
     delete_asset_content_template = """
         # Implemented from template for
         # osid.repository.AssetAdminSession.delete_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .objects import ${aggregated_object_name}
-        collection = MongoClientValidated(self._db_prefix + '${package_name}',
+        collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -182,7 +182,7 @@ class AssetAdminSession:
             found = True
         if not found:
             raise errors.OperationFailed()
-        ${aggregated_object_name}(${aggregated_object_name_under}_map, db_prefix=self._db_prefix, runtime=self._runtime)._delete()
+        ${aggregated_object_name}(${aggregated_object_name_under}_map, runtime=self._runtime)._delete()
         collection.save(${object_name_under})"""
 
 
@@ -195,23 +195,33 @@ class CompositionLookupSession:
         'UNSEQUESTERED = 1',
     ]
 
-    init = """
+    init_template = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        self._catalog_class = objects.Repository
-        self._session_name = 'CompositionLookupSession'
-        self._catalog_name = 'Repository'
+        self._catalog_class = objects.${cat_name}
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
             catalog_id,
             proxy,
             runtime,
-            db_name='repository',
-            cat_name='Repository',
-            cat_class=objects.Repository)
+            db_name='${pkg_name}',
+            cat_name='${cat_name}',
+            cat_class=objects.${cat_name})
+        self._kwargs = kwargs
         self._status_view = ACTIVE
         self._sequestered_view = SEQUESTERED
-        self._kwargs = kwargs
+
+    def _view_filter(self):
+        \"\"\"
+        Overrides OsidSession._view_filter to add sequestering filter.
+        
+        \"\"\"
+        view_filter = OsidSession._view_filter(self)
+        if self._sequestered_view == SEQUESTERED:
+            view_filter['sequestered'] = False
+        return view_filter
 """
 
     use_active_composition_view = """
@@ -221,10 +231,10 @@ class CompositionLookupSession:
         self._status_view = ANY_STATUS"""
 
     use_sequestered_composition_view = """
-        self._status_view = SEQUESTERED"""
+        self._sequestered_view = SEQUESTERED"""
 
     use_unsequestered_composition_view = """
-        self._status_view = UNSEQUESTERED"""
+        self._sequestered_view = UNSEQUESTERED"""
 
 
 class AssetCompositionSession:
@@ -251,12 +261,12 @@ class AssetCompositionSession:
 """
 
     get_composition_assets = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one(
             dict({'_id': ObjectId(composition_id.get_identifier())},
-                 **self._repository_view_filter()))
+                 **self._view_filter()))
         if 'assetIds' not in composition:
             raise errors.NotFound('no Assets are assigned to this Composition')
         asset_ids = []
@@ -268,13 +278,13 @@ class AssetCompositionSession:
         return als.get_assets_by_ids(asset_ids)"""
 
     get_compositions_by_asset = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         result = collection.find(
             dict({'assetIds': {'$in': [str(asset_id)]}},
-                 **self._repository_view_filter())).sort('_id', DESCENDING)
-        return objects.CompositionList(result, db_prefix=self._db_prefix, runtime=self._runtime)"""
+                 **self._view_filter())).sort('_id', DESCENDING)
+        return objects.CompositionList(result, runtime=self._runtime)"""
 
 
 class AssetCompositionDesignSession:
@@ -316,22 +326,23 @@ class AssetCompositionDesignSession:
                 mgr = self._get_provider_manager('REPOSITORY')
                 admin_session = mgr.get_asset_admin_session_for_repository(self._catalog_id)
                 asset_id = admin_session._get_asset_id_with_enclosure(asset_id)
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Asset',
                                           runtime=self._runtime)
         asset = collection.find_one({'_id': ObjectId(asset_id.get_identifier())})
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
         if 'assetIds' in composition:
-            composition['assetIds'].append(str(asset_id))
+            if str(asset_id) not in composition['assetIds']:
+                composition['assetIds'].append(str(asset_id))
         else:
             composition['assetIds'] = [str(asset_id)]
         collection.save(composition)"""
 
     move_asset_ahead = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
@@ -341,7 +352,7 @@ class AssetCompositionDesignSession:
         collection.save(composition)"""
 
     move_asset_behind = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
@@ -351,11 +362,11 @@ class AssetCompositionDesignSession:
         collection.save(composition)"""
 
     order_assets = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         if 'assetIds' not in composition:
@@ -364,7 +375,7 @@ class AssetCompositionDesignSession:
         collection.save(composition)"""
 
     remove_asset = """
-        collection = MongoClientValidated(self._db_prefix + 'repository',
+        collection = MongoClientValidated('repository',
                                           collection='Composition',
                                           runtime=self._runtime)
         composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
@@ -390,9 +401,8 @@ class Asset:
         _record_type_data_sets = {}
     _namespace = 'repository.Asset'
 
-    def __init__(self, osid_object_map, db_prefix='', runtime=None):
+    def __init__(self, osid_object_map, runtime=None):
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._db_prefix = db_prefix
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         if self.is_composition():
@@ -428,7 +438,7 @@ class Asset:
 
     get_asset_contents_template = """
         # Implemented from template for osid.repository.Asset.get_asset_contents_template
-        return ${aggregated_object_name}List(self._my_map['${var_name_plural_mixed}'], db_prefix=self._db_prefix, runtime=self._runtime)
+        return ${aggregated_object_name}List(self._my_map['${var_name_plural_mixed}'], runtime=self._runtime)
 
     def _delete(self):
         for ${aggregated_object_name_under} in self.get_${aggregated_objects_name_under}():
@@ -479,14 +489,14 @@ class AssetContent:
         return self._my_map['${var_name_mixed}']"""
 
     get_data = """
-        dbase = MongoClientValidated(self._db_prefix + 'repository',
+        dbase = MongoClientValidated('repository',
                                      runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
         return DataInputStream(filesys.get(self._my_map['data']))""" 
 
     additional_methods = """
     def _delete(self):
-        dbase = MongoClientValidated(self._db_prefix + 'repository',
+        dbase = MongoClientValidated('repository',
                                      runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
         if self._my_map['data'] and filesys.exists(self._my_map['data']):
@@ -516,7 +526,7 @@ class AssetContentForm:
     set_data = """
         if data is None:
             raise errors.NullArgument()
-        dbase = MongoClientValidated(self._db_prefix + 'repository',
+        dbase = MongoClientValidated('repository',
                                      runtime=self._runtime)
         filesys = gridfs.GridFS(dbase)
         self._my_map['data'] = filesys.put(data._my_data)
@@ -529,7 +539,7 @@ class AssetContentForm:
             raise errors.NoAccess()
         if self._my_map['data'] == self._data_default:
             pass
-        dbase = MongoClientValidated(self._db_prefix + 'repository',
+        dbase = MongoClientValidated('repository',
                                      runtime=self._runtime)
         filesys = gridfs.GridFS(dbase)
         filesys.delete(self._my_map['data'])
@@ -581,7 +591,8 @@ class CompositionForm:
         for object_id in child_ids:
             if not self._is_valid_id(object_id):
                 raise errors.InvalidArgument()
-            idstr_list.append(str(object_id))
+            if str(object_id) not in idstr_list:
+                idstr_list.append(str(object_id))
         self._my_map['childIds'] = idstr_list
 
     def clear_children(self):

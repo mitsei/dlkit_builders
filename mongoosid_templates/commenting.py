@@ -38,7 +38,6 @@ class CommentAdminSession:
                 ${arg0_name}=${arg0_name},
                 effective_agent_id=str(self.get_effective_agent_id()),
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         else:
             obj_form = objects.${return_type}(
@@ -47,7 +46,6 @@ class CommentAdminSession:
                 ${arg0_name}=${arg0_name},
                 effective_agent_id=self.get_effective_agent_id(),
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED

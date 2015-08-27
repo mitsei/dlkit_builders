@@ -163,12 +163,16 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             object_name = interface_name
         elif init_pattern == 'resource.BinForm':
             object_name = interface_name[:-4]
+        elif init_pattern == 'resource.BinNode':
+            object_name = interface_name[:-4]
         elif init_pattern == 'resource.ResourceLookupSession':
             object_name = interface_name[:-13]
         elif init_pattern == 'resource.ResourceQuerySession':
             object_name = interface_name[:-12]
         elif init_pattern == 'resource.ResourceAdminSession':
             object_name = interface_name[:-12]
+        elif init_pattern == 'resource.ResourceNotificationSession':
+            object_name = interface_name[:-len('NotificationSession')]
         elif init_pattern == 'resource.ResourceBinSession':
             object_name = interface_name.replace(cat_name + 'Session', '')
         elif init_pattern == 'resource.ResourceBinAssignmentSession':
@@ -176,6 +180,10 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
         elif init_pattern == 'commenting.CommentLookupSession':
             object_name = interface_name.replace('LookupSession', '')
         elif init_pattern == 'commenting.CommentQuerySession':
+            object_name = interface_name.replace('QuerySession', '')
+        elif init_pattern == 'repository.CompositionLookupSession':
+            object_name = interface_name.replace('LookupSession', '')
+        elif init_pattern == 'repository.CompositionQuerySession':
             object_name = interface_name.replace('QuerySession', '')
         elif init_pattern == 'resource.Resource':
             object_name = interface_name
@@ -873,11 +881,14 @@ DISABLED = -1"""
 
 
 def build_this_interface(package, interface, services=False):
-    exceptions = ['ObjectiveHierarchySession',
-                  'ObjectiveHierarchyDesignSession',
-                  'ObjectiveSequencingSession',
-                  'ObjectiveRequisiteSession',
-                  'ObjectiveRequisiteAssignmentSession',]
+    # exceptions = ['ObjectiveHierarchySession',
+    #               'ObjectiveHierarchyDesignSession',
+    #               'ObjectiveSequencingSession',
+    #               'ObjectiveRequisiteSession',
+    #               'ObjectiveRequisiteAssignmentSession',]
+
+    # exceptions = ['ObjectiveSequencingSession',]
+    exceptions = []
 
     excepted_osid_categories = ['properties',
                                 'query_inspectors',

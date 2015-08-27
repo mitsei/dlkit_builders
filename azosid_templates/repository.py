@@ -107,6 +107,8 @@ class AssetAdminSession:
 
 class CompositionLookupSession:
 
+    # Note: These should be templated some day. But first add to pattern mappers
+
     use_active_composition_view = """
         if not self._can('lookup'):
             raise PermissionDenied()

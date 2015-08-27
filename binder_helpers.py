@@ -360,7 +360,7 @@ def flagged_for_implementation(interface,
                 test = True
     return test
 
-def fix_bad_name(name):
+def fix_bad_name(name, optional_match_term=None):
     """
     Occasionally there are bad names of things in the osid spec.
     
@@ -371,7 +371,99 @@ def fix_bad_name(name):
         'set_base_on_grades': 'set_based_on_grades',
         'clear_lowest_score': 'clear_lowest_numeric_score',
         'clear_input_start_score_range': 'clear_input_score_start_range',
+        'osid.repository.CompositionSearchSession': 'osid.repository.CompositionQuerySession',
+        'osid.repository.CompositionQuerySession': 'osid.repository.CompositionQuerySession',
     }
-    if name in bad_names_map:
+
+    if optional_match_term == 'get_composition_query_session':
         name = bad_names_map[name]
+    else:
+        if name in bad_names_map:
+            name = bad_names_map[name]
     return name
+
+def add_missing_args(method, interface_name):
+    if (interface_name.endswith('Receiver') and
+            method['name'].split('_')[0] in ['new', 'changed', 'deleted'] and
+            len(method['args']) == 1):
+        method['args'] = ([{"arg_type": "osid.id.Id", 
+                            "var_name": "notification_id", 
+                            "array": False}] + method['args'])
+        method['arg_types'] = ['osid.id.Id'] + method['arg_types']
+        method['arg_doc'] = '        arg:    notification_id (osid.id.Id): the notification ``Id``\n' + method['arg_doc']
+        method['sphinx_param_doc'] = '        :param notification_id: the notification ``Id``\n        :type notification_id: ``osid.id.Id``\n' + method['sphinx_param_doc']
+    return method
+
+def add_missing_methods(interface):
+    if (interface['shortname'].endswith('NotificationSession') and
+            'acknowledge_' + camel_to_under(interface['shortname'][:len('Session')]) not in interface['method_names']):
+        object_name_under = camel_to_under(interface['shortname'][:-len('NotificationSession')])
+        interface['methods'] = (interface['methods'] + [{
+               'name': 'reliable_' + object_name_under + '_notifications', 
+               'doc': {
+                  'headline': 'Reliable notifications are desired.', 
+                  'body': '        In reliable mode, notifications are to be acknowledged using\n        ``acknowledge_item_notification()`` .'
+               }, 
+               'arg_doc': '', 
+               'return_doc': '', 
+               'error_doc': '', 
+               'sphinx_param_doc': '', 
+               'sphinx_return_doc': '', 
+               'sphinx_error_doc': '', 
+               'compliance_doc': '        *compliance: mandatory -- This method is must be implemented.*\n', 
+               'impl_notes_doc': '', 
+               'args': [], 
+               'arg_types': [], 
+               'return_type': '', 
+               'errors': {}
+            }, 
+            {
+               'name': 'unreliable_' + object_name_under + '_notifications', 
+               'doc': {
+                  'headline': 'Unreliable notifications are desired.', 
+                  'body': '        In unreliable mode, notifications do not need to be\n        acknowledged.'
+               }, 
+               'arg_doc': '', 
+               'return_doc': '', 
+               'error_doc': '', 
+               'sphinx_param_doc': '', 
+               'sphinx_return_doc': '', 
+               'sphinx_error_doc': '', 
+               'compliance_doc': '        *compliance: mandatory -- This method is must be implemented.*\n', 
+               'impl_notes_doc': '', 
+               'args': [], 
+               'arg_types': [], 
+               'return_type': '', 
+               'errors': {}
+            }, 
+            {
+               'name': 'acknowledge_' + object_name_under + '_notification', 
+               'doc': {
+                  'headline': 'Acknowledge an ' + object_name_under + ' notification.', 
+                  'body': ''
+               }, 
+               'arg_doc': '        arg:    notification_id (osid.id.Id): the ``Id`` of the\n                notification\n', 
+               'return_doc': '', 
+               'error_doc': '        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure', 
+               'sphinx_param_doc': '        :param notification_id: the ``Id`` of the notification\n        :type notification_id: ``osid.id.Id``\n', 
+               'sphinx_return_doc': '', 
+               'sphinx_error_doc': '        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure', 
+               'compliance_doc': '        *compliance: mandatory -- This method must be implemented.*\n', 
+               'impl_notes_doc': '', 
+               'args': [
+                  {
+                     'arg_type': 'osid.id.Id', 
+                     'var_name': 'notification_id', 
+                     'array': False
+                  }
+               ], 
+               'arg_types': [
+                  'osid.id.Id'
+               ], 
+               'return_type': '', 
+               'errors': {
+                  'OPERATION_FAILED': 'Operational', 
+                  'PERMISSION_DENIED': 'User'
+               }
+            }] 
+)

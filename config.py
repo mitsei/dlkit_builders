@@ -10,6 +10,7 @@ packages_to_implement = [
     'learning',
     'locale',
     'mapping',
+    'ontology',
     'osid',
     'proxy',
     'relationship',
@@ -49,6 +50,7 @@ sessions_to_implement = [
     'ItemLookupSession',
     'ItemQuerySession',
     'ItemAdminSession',
+    'ItemNotificationSession',
     'ItemBankSession',
     'ItemBankAssignmentSession',
     'AssessmentLookupSession',
@@ -89,11 +91,15 @@ sessions_to_implement = [
     'GradebookAdminSession',
     'GradeSystemLookupSession',
     'GradeSystemAdminSession',
+    'GradeSystemQuerySession',
     'GradeEntryLookupSession',
     'GradeEntryAdminSession',
+    'GradeEntryQuerySession',
     'GradebookColumnLookupSession',
     'GradebookColumnAdminSession',
     'GradebookColumnQuerySession',
+    'GradebookColumnCalculationLookupSession',
+    'GradebookColumnCalculationAdminSession',
     ### hierarchy service:
     'HierarchyLookupSession',
     'HierarchyAdminSession',
@@ -117,6 +123,8 @@ sessions_to_implement = [
     'ObjectiveBankAdminSession',
     'ObjectiveBankHierarchySession',
     'ObjectiveBankHierarchyDesignSession',
+    ## ontology service:
+    'SubjectHierarchyDesignSession',
     ### proxy service
     'ProxySession',
     ### relationship service
@@ -130,16 +138,19 @@ sessions_to_implement = [
     'AssetLookupSession',
     'AssetQuerySession',
     'AssetAdminSession',
+    'AssetNotificationSession',
     'AssetRepositorySession',
     'AssetRepositoryAssignmentSession',
     'AssetCompositionSession',
     'AssetCompositionDesignSession',
     'CompositionLookupSession',
     'CompositionAdminSession',
+    'CompositionQuerySession',
     'CompositionRepositorySession',
     'CompositionRepositoryAssignmentSession',
     'RepositoryLookupSession',
     'RepositoryAdminSession',
+    'RepositoryQuerySession',
     'RepositoryHierarchySession',
     'RepositoryHierarchyDesignSession',
     ## resource service
@@ -148,9 +159,11 @@ sessions_to_implement = [
     'ResourceBinSession',
     'ResourceBinAssignmentSession',
     'ResourceAgentSession',
+    'ResourceNotificationSession',
     'ResourceAgentAssignmentSession',
     'BinLookupSession',
     'BinAdminSession',
+    'BinQuerySession',
     'BinHierarchySession',
     'BinHierarchyDesignSession',
 ]
@@ -179,8 +192,10 @@ objects_to_implement = [
     'GradeEntry',
     'GradebookColumn',
     'GradebookColumnSummary',
+    'GradebookColumnCalculation',
     'Gradebook',
     ### hierarchy service
+    'Node',
     'Hierarchy',
     'HierarchyNode',
     ### id service
@@ -192,6 +207,8 @@ objects_to_implement = [
     ### locale service
     'Locale',
     'LocaleList',
+    ### ontology service
+    'Subject',
     ### proxy service
     'Proxy',
     'ProxyCondition',
@@ -218,4 +235,6 @@ variants_to_implement = [
     'QueryRecord',
     'QueryFormRecord',
     'List',
+    'Node',
+    'NodeList',
 ]

@@ -6,7 +6,8 @@ from collections import OrderedDict
 
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from binder_helpers import wrap_and_indent, reindent,\
-    camel_to_under, caps_under_to_camel, is_mixed_case, get_pkg_name
+    camel_to_under, caps_under_to_camel, is_mixed_case,\
+    get_pkg_name, add_missing_args, add_missing_methods
 
 
 EXAMPLE_PACKAGE = {
@@ -150,11 +151,13 @@ def interface_iterator(root):
             interface['doc']['body'] = '\n\n'.join(body.split('\n    \n'))
         if child.tag == (ns + 'method'):
             interface['method_names'].append(camel_to_under(child.get(ns + 'name')))
-            interface['methods'].append(method_iterator(child))
+            interface['methods'].append(add_missing_args(method_iterator(child), interface['shortname']))
+            #add_missing_args(method_iterator(child), interface['shortname'])
     
     interface['category'] = get_interface_category(
                                  interface['inherit_shortnames'],
                                  interface['shortname'])
+    add_missing_methods(interface)
     return interface
 
 def method_iterator(root):
@@ -219,8 +222,8 @@ def method_iterator(root):
                 if grand_child.tag == (ns + 'interfaceType'):
                     return_type = grand_child.get(ns + 'type')
                 if grand_child.tag == (ns + 'primitiveType'):
-                    return_type = grand_child.get(ns + 'type')           
-            method['return_type'] = return_type
+                    return_type = grand_child.get(ns + 'type')
+            method['return_type'] = fix_bad_name(return_type, method['name'])
             method['return_doc'] = make_return_doc(child)
             method['sphinx_return_doc'] = make_sphinx_return_doc(child)
         ##
