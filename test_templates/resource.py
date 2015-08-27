@@ -245,10 +245,10 @@ class ResourceQuerySession:
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        for num in [0, 1]:
+        for color in ['Red', 'Blue', 'Green', 'red']:
             create_form = cls.catalog.get_${object_name_under}_form_for_create([])
-            create_form.display_name = 'Test ${object_name} ' + str(num)
-            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            create_form.display_name = 'Test ${object_name} ' + color
+            create_form.description = 'Test ${object_name} for ${interface_name} tests, did I mention green'
             obj = cls.catalog.create_${object_name_under}(create_form)
             cls.${object_name_under}_list.append(obj)
             cls.${object_name_under}_ids.append(obj.ident)
@@ -266,13 +266,19 @@ class ResourceQuerySession:
 """
 
     can_query_resources_template = """
-        pass"""
+        self.assertTrue(isinstance(self.catalog.${method_name}(), bool))"""
 
     get_resource_query_template = """
-        pass"""
+        query = self.catalog.${method_name}()"""
 
     get_resources_by_query_template = """
-        pass"""
+        # Need to add some tests with string types
+        query = self.catalog.get_${object_name_under}_query()
+        query.match_display_name('red')
+        self.assertEqual(self.catalog.${method_name}(query).available(), 2)
+        query.clear_display_name_terms()
+        query.match_display_name('blue', match=False)
+        self.assertEqual(self.catalog.${method_name}(query).available(), 3)"""
 
 
 class ResourceAdminSession:
