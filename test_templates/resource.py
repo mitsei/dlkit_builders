@@ -330,6 +330,14 @@ class ResourceAdminSession:
     alias_resource_template = """
         pass"""
 
+class ResourceNotificationSession:
+
+    # Placeholder: still need to write a real ResourceNotificationSession tess
+    import_statements_pattern = ResourceLookupSession.import_statements_pattern
+
+    # Placeholder: still need to write a real ResourceNotificationSession tess
+    init_template = ResourceLookupSession.init_template
+
 class ResourceBinSession:
 
     import_statements_pattern = [

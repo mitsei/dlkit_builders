@@ -1,3 +1,4 @@
+from .resource import ResourceLookupSession
 
 class RepositoryProfile:
 
@@ -27,6 +28,12 @@ class AssetAdminSession:
 
 
 class CompositionLookupSession:
+
+    # Placeholder: still need to write a real CompositionLookupSession tests
+    import_statements_pattern = ResourceLookupSession.import_statements_pattern
+
+    # Placeholder: still need to write a real CompositionLookupSession tess
+    init_template = ResourceLookupSession.init_template
 
     use_active_composition_view = """
         self.catalog.use_active_composition_view()"""
