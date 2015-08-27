@@ -195,23 +195,33 @@ class CompositionLookupSession:
         'UNSEQUESTERED = 1',
     ]
 
-    init = """
+    init_template = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
-        self._catalog_class = objects.Repository
-        self._session_name = 'CompositionLookupSession'
-        self._catalog_name = 'Repository'
+        self._catalog_class = objects.${cat_name}
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
             catalog_id,
             proxy,
             runtime,
-            db_name='repository',
-            cat_name='Repository',
-            cat_class=objects.Repository)
+            db_name='${pkg_name}',
+            cat_name='${cat_name}',
+            cat_class=objects.${cat_name})
+        self._kwargs = kwargs
         self._status_view = ACTIVE
         self._sequestered_view = SEQUESTERED
-        self._kwargs = kwargs
+
+    def _view_filter(self):
+        \"\"\"
+        Overrides OsidSession._view_filter to add sequestering filter.
+        
+        \"\"\"
+        view_filter = OsidSession._view_filter(self)
+        if self._sequestered_view == SEQUESTERED:
+            view_filter['sequestered'] = False
+        return view_filter
 """
 
     use_active_composition_view = """
@@ -221,10 +231,10 @@ class CompositionLookupSession:
         self._status_view = ANY_STATUS"""
 
     use_sequestered_composition_view = """
-        self._status_view = SEQUESTERED"""
+        self._sequestered_view = SEQUESTERED"""
 
     use_unsequestered_composition_view = """
-        self._status_view = UNSEQUESTERED"""
+        self._sequestered_view = UNSEQUESTERED"""
 
 
 class AssetCompositionSession:
@@ -256,7 +266,7 @@ class AssetCompositionSession:
                                           runtime=self._runtime)
         composition = collection.find_one(
             dict({'_id': ObjectId(composition_id.get_identifier())},
-                 **self._repository_view_filter()))
+                 **self._view_filter()))
         if 'assetIds' not in composition:
             raise errors.NotFound('no Assets are assigned to this Composition')
         asset_ids = []
@@ -273,7 +283,7 @@ class AssetCompositionSession:
                                           runtime=self._runtime)
         result = collection.find(
             dict({'assetIds': {'$in': [str(asset_id)]}},
-                 **self._repository_view_filter())).sort('_id', DESCENDING)
+                 **self._view_filter())).sort('_id', DESCENDING)
         return objects.CompositionList(result, runtime=self._runtime)"""
 
 

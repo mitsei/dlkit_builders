@@ -750,7 +750,7 @@ class AssessmentTakenLookupSession:
         result = collection.find(
             dict({'assessmentOfferedId': str(assessment_offered_id),
                   'takingAgentId': str(resource_id)},
-                  **self._bank_view_filter())).sort('_id', DESCENDING)
+                  **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result, runtime=self._runtime)"""
 
     get_assessments_taken_for_assessment = """
@@ -759,7 +759,7 @@ class AssessmentTakenLookupSession:
                                           runtime=self._runtime)
         result = collection.find(
             dict({'assessmentId': str(assessment_id)},
-                 **self._bank_view_filter())).sort('_id', DESCENDING)
+                 **self._view_filter())).sort('_id', DESCENDING)
         assessments_offered = objects.AssessmentOfferedList(
             result,
             runtime=self._runtime)
@@ -773,7 +773,7 @@ class AssessmentTakenLookupSession:
 
         result = collection.find(
             dict({'assessmentOfferedId': {'$in':[ao_ids]}},
-                 **self._bank_view_filter())).sort('_id', DESCENDING)
+                 **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result,
                                            runtime=self._runtime)"""
 

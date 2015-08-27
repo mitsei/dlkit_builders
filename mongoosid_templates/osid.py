@@ -639,23 +639,40 @@ class OsidSession:
             return {'startDate': {'$$lte': now}, 'endDate': {'$$gte': now}}
         return {}
 
-    def _assign_object_to_catalog(self, obj_id, cat_id):
+    def _view_filter(self):
+        \"\"\"
+        Returns the mongodb catalog filter for isolated or federated views.
+        
+        This also searches across all underlying catalogs in federated
+        catalog views. Real authz for controlling access to underlying
+        catalogs will need to be managed in an adapter above the
+        pay grade of this implementation.
+        
+        \"\"\"
+        if self._is_phantom_root_federated():
+            return {}
+        cat_name_mixed = self._catalog_name[0].lower() + self._catalog_name[1:]
+        idstr_list = self._get_catalog_idstrs()
+        return {'$or': [{cat_name_mixed + 'Id': {'$in': idstr_list}},
+                        {'assigned' + self._catalog_name + 'Ids': {'$in': idstr_list}}]}
+
+    def _assign_object_to_catalog(self, obj_id, cat_id, catalog_key):
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
         obj_name = obj_id.get_identifier_namespace().split('.')[1]
         collection = MongoClientValidated(pkg_name,
                                           collection=obj_name,
                                           runtime=self._runtime)
         obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
-        if 'assignedCatalogIds' in obj_map:
-            if str(cat_id) in obj_map['assignedCatalogIds']:
+        if catalog_key in obj_map:
+            if str(cat_id) in obj_map[catalog_key]:
                 raise errors.AlreadyExists()
             else:
-                obj_map['assignedCatalogIds'].append(str(cat_id))
+                obj_map[catalog_key].append(str(cat_id))
         else:
-            obj_map['assignedCatalogIds'] = [str(cat_id)]
+            obj_map[catalog_key] = [str(cat_id)]
         collection.save(obj_map)
 
-    def _unassign_object_from_catalog(self, obj_id, cat_id):
+    def _unassign_object_from_catalog(self, obj_id, cat_id, catalog_key):
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
         obj_name = obj_id.get_identifier_namespace().split('.')[1]
         collection = MongoClientValidated(pkg_name,
@@ -663,7 +680,7 @@ class OsidSession:
                                           runtime=self._runtime)
         obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
         try:
-            obj_map['assignedCatalogIds'].remove(str(cat_id))
+            obj_map[catalog_key].remove(str(cat_id))
         except (KeyError, ValueError):
             raise errors.NotFound()
         collection.save(obj_map)

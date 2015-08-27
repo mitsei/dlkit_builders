@@ -1,3 +1,4 @@
+from .resource import ResourceLookupSession
 
 class RepositoryProfile:
 
@@ -28,6 +29,41 @@ class AssetAdminSession:
 
 class CompositionLookupSession:
 
+    import_statements_pattern = ResourceLookupSession.import_statements_pattern
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        cls.${object_name_under}_list = list()
+        cls.${object_name_under}_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        for num in [0, 1, 2, 3]:
+            create_form = cls.catalog.get_${object_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + str(num)
+            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            if num > 1:
+                create_form.sequestered = True
+            obj = cls.catalog.create_${object_name_under}(create_form)
+            cls.${object_name_under}_list.append(obj)
+            cls.${object_name_under}_ids.append(obj.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        #for obj in cls.catalog.get_${object_name_under_plural}():
+        #    cls.catalog.delete_${object_name_under}(obj.ident)
+        #for catalog in cls.catalogs:
+        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
+        for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
+            catalog.use_unsequestered_${object_name_under}_view()
+            for obj in catalog.get_${object_name_under_plural}():
+                catalog.delete_${object_name_under}(obj.ident)
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
+"""
+
     use_active_composition_view = """
         self.catalog.use_active_composition_view()"""
 
@@ -40,6 +76,44 @@ class CompositionLookupSession:
     use_unsequestered_composition_view = """
         self.catalog.use_unsequestered_composition_view()"""
 
+    get_composition = """
+        self.catalog.use_isolated_repository_view()
+        obj = self.catalog.get_composition(self.composition_list[0].ident)
+        self.assertEqual(obj.ident, self.composition_list[0].ident)
+        self.catalog.use_federated_repository_view()
+        obj = self.catalog.get_composition(self.composition_list[0].ident)
+        self.assertEqual(obj.ident, self.composition_list[0].ident)
+        self.catalog.use_sequestered_composition_view()
+        obj = self.catalog.get_composition(self.composition_list[1].ident)
+        with self.assertRaises(errors.NotFound):
+            obj = self.catalog.get_composition(self.composition_list[3].ident)
+"""
+
+    get_compositions = """
+        from dlkit.abstract_osid.repository.objects import CompositionList
+        objects = self.catalog.get_compositions()
+        self.assertTrue(isinstance(objects, CompositionList))
+        self.catalog.use_federated_repository_view()
+        self.catalog.use_unsequestered_composition_view()
+        self.assertEqual(self.catalog.get_compositions().available(), 4)
+        self.catalog.use_sequestered_composition_view()
+        self.assertEqual(self.catalog.get_compositions().available(), 2)"""
+
+class CompositionQuerySession:
+
+    get_compositions_by_query = """
+        cfu = self.catalog.get_composition_form_for_update(composition_list[3].ident)
+        cfu.set_sequestered(True)
+        self.catalog.update_composition(cfu)
+        query = self.catalog.get_composition_query()
+        query.match_display_name('red')
+        self.assertEqual(self.catalog.get_compositions_by_query(query).available(), 1)
+        query.clear_display_name_terms()
+        query.match_display_name('blue', match=False)
+        self.assertEqual(self.catalog.get_compositions_by_query(query).available(), 2)
+        cfu = self.catalog.get_composition_form_for_update(composition_list[3].ident)
+        cfu.set_sequestered(False)
+        self.catalog.update_composition(cfu)"""
 
 class CompositionAdminSession:
 

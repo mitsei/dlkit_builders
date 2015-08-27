@@ -167,7 +167,7 @@ class ActivityLookupSession:
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${arg0_object_mixed}Id': str(${arg0_name})},
-                 **self._bank_view_filter()))
+                 **self._view_filter()))
         return objects.${return_type}(result, runtime=self._runtime)"""
 
 

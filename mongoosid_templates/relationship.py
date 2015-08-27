@@ -2,13 +2,13 @@ from .resource import ResourceAdminSession
 
 class RelationshipLookupSession:
 
-    potential_import_statements = [
+    import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-        'from ..primitives import DateTime'
+        'from ..primitives import DateTime',
         'from ..osid.sessions import OsidSession',
         'from ..utilities import MongoClientValidated',
-        'fro, ..utilities import overlap',
+        'from ..utilities import overlap',
         'from . import objects',
         'from bson.objectid import ObjectId',
         'DESCENDING = -1',
@@ -31,7 +31,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_on_date
         ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}:
+        for ${object_name_under} in self.get_${object_name_plural_under}():
             if overlap(${arg0_name}, ${arg1_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
@@ -45,7 +45,7 @@ class RelationshipLookupSession:
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name})},
-                 **self._${cat_name_under}_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_for_source_on_date_template = """
@@ -67,7 +67,7 @@ class RelationshipLookupSession:
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   'genusTypeId': str(${arg1_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_source_on_date_template = """
@@ -88,7 +88,7 @@ class RelationshipLookupSession:
                                           runtime=self._runtime)
         result = collection.find(
             dict({'${destination_name_mixed}Id': str(${arg0_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_for_destination_on_date_template = """
@@ -110,7 +110,7 @@ class RelationshipLookupSession:
         result = collection.find(
             dict({'${destination_name_mixed}Id': str(${arg0_name}),
                   'genusTypeId': str(${arg1_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_destination_on_date_template = """
@@ -132,7 +132,7 @@ class RelationshipLookupSession:
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   '${destination_name_mixed}Id': str(${arg1_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
     get_relationships_by_genus_type_for_peers_template = """
@@ -146,7 +146,7 @@ class RelationshipLookupSession:
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   '${destination_name_mixed}Id': str(${arg1_name}),
                   'genusTypeId': str(${arg2_name})},
-                 **self._family_view_filter())).sort('_sort_id', ASCENDING)
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
 class RelationshipAdminSession:

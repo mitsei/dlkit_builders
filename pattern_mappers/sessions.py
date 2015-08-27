@@ -2,6 +2,12 @@ from binder_helpers import make_twargs, camel_to_under, make_plural, remove_plur
 
 def map_session_patterns(interface, package, index):
     if (interface['shortname'].endswith('LookupSession') and
+        interface['shortname'][:-13] in index['package_containable_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'repository.CompositionLookupSession'
+    elif (interface['shortname'].endswith('QuerySession') and
+        interface['shortname'][:-13] in index['package_containable_objects_caps']):
+        index[interface['shortname'] + '.init_pattern'] = 'repository.CompositionLookupSession'
+    elif (interface['shortname'].endswith('LookupSession') and
         interface['shortname'][:-13] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceLookupSession'
     elif (interface['shortname'].endswith('AdminSession') and
