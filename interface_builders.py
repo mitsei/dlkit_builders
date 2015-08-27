@@ -181,6 +181,10 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             object_name = interface_name.replace('LookupSession', '')
         elif init_pattern == 'commenting.CommentQuerySession':
             object_name = interface_name.replace('QuerySession', '')
+        elif init_pattern == 'repository.CompositionLookupSession':
+            object_name = interface_name.replace('LookupSession', '')
+        elif init_pattern == 'repository.CompositionQuerySession':
+            object_name = interface_name.replace('QuerySession', '')
         elif init_pattern == 'resource.Resource':
             object_name = interface_name
         elif init_pattern == 'resource.ResourceForm':

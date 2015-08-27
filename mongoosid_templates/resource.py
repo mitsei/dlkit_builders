@@ -163,22 +163,6 @@ class ResourceLookupSession:
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._kwargs = kwargs
-
-    def _view_filter(self):
-        \"\"\"
-        Returns the mongodb catalog filter for isolated or federated views.
-        
-        This also searches across all underlying ${cat_name_plural} in federated
-        ${cat_name_under} view. Real authz for controlling access to underlying
-        ${cat_name_under_plural} will need to be managed in an adapter above the
-        pay grade of this implementation.
-        
-        \"\"\"
-        if self._is_phantom_root_federated():
-            return {}
-        idstr_list = self._get_catalog_idstrs()
-        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-                        {'assigned${cat_name}Ids': {'$$in': idstr_list}}]}
 """
 
     get_bin_id_template = """
@@ -216,21 +200,21 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.use_isolated_bin_view
         self._use_federated_catalog_view()
 
-    def _${cat_name_under}_view_filter(self):
-        \"\"\"
-        Returns the mongodb catalog filter for isolated or federated views.
-        
-        This also searches across all underlying ${cat_name_plural} in federated
-        ${cat_name_under} view. Real authz for controlling access to underlying
-        ${cat_name_plural_under} will need to be managed in an adapter above the
-        pay grade of this implementation.
-        
-        \"\"\"
-        if self._is_phantom_root_federated():
-            return {}
-        idstr_list = self._get_catalog_idstrs()
-        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-                        {'assignedCatalogIds': {'$$in': idstr_list}}]}"""
+    # def _${cat_name_under}_view_filter(self):
+    #     \"\"\"
+    #     Returns the mongodb catalog filter for isolated or federated views.
+    #     
+    #     This also searches across all underlying ${cat_name_plural} in federated
+    #     ${cat_name_under} view. Real authz for controlling access to underlying
+    #     ${cat_name_plural_under} will need to be managed in an adapter above the
+    #     pay grade of this implementation.
+    #     
+    #     \"\"\"
+    #     if self._is_phantom_root_federated():
+    #         return {}
+    #     idstr_list = self._get_catalog_idstrs()
+    #     return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
+    #                     {'assignedCatalogIds': {'$$in': idstr_list}}]}"""
 
     get_resource_template = """
         # Implemented from template for
@@ -241,7 +225,7 @@ class ResourceLookupSession:
                                           runtime=self._runtime)
         result = collection.find_one(
             dict({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name}').get_identifier())},
-                 **self._${cat_name_under}_view_filter()))
+                 **self._view_filter()))
         return objects.${return_type}(result, runtime=self._runtime)"""
 
     get_resources_by_ids_template = """
@@ -256,7 +240,7 @@ class ResourceLookupSession:
             object_id_list.append(ObjectId(self._get_id(i, '${package_name}').get_identifier()))
         result = collection.find(
             dict({'_id': {'$$in': object_id_list}},
-                 **self._${cat_name_under}_view_filter()))
+                 **self._view_filter()))
         result = list(result)
         sorted_result = []
         for object_id in object_id_list:
@@ -275,7 +259,7 @@ class ResourceLookupSession:
                                           runtime=self._runtime)
         result = collection.find(
             dict({'genusTypeId': str(${arg0_name})},
-                 **self._${cat_name_under}_view_filter())).sort('_id', DESCENDING)
+                 **self._view_filter())).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime)"""
 
     get_resources_by_parent_genus_type_template = """
@@ -296,7 +280,7 @@ class ResourceLookupSession:
         collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        result = collection.find(self._${cat_name_under}_view_filter()).sort('_id', DESCENDING)
+        result = collection.find(self._view_filter()).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime)"""
 
 class ResourceQuerySession:
@@ -325,22 +309,6 @@ class ResourceQuerySession:
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._kwargs = kwargs
-
-    def _view_filter(self):
-        \"\"\"
-        Returns the mongodb catalog filter for isolated or federated views.
-        
-        This also searches across all underlying ${cat_name_plural} in federated
-        ${cat_name_under} view. Real authz for controlling access to underlying
-        ${cat_name_under_plural} will need to be managed in an adapter above the
-        pay grade of this implementation.
-        
-        \"\"\"
-        if self._is_phantom_root_federated():
-            return {}
-        idstr_list = self._get_catalog_idstrs()
-        return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-                        {'assigned${cat_name}Ids': {'$$in': idstr_list}}]}
 """
 
     can_query_resources_template = """
@@ -366,9 +334,9 @@ class ResourceQuerySession:
             or_list.append({term: ${arg0_name}._keyword_terms[term]})
         if or_list:
             and_list.append({'$$or': or_list})
-        view_filter = self._${cat_name_under}_view_filter()
+        view_filter = self._view_filter()
         if view_filter:
-            and_list.append(self._${cat_name_under}_view_filter())
+            and_list.append(view_filter)
         if and_list:
             query_terms = {'$$and': and_list}
         collection = MongoClientValidated('${package_name}',
@@ -734,8 +702,8 @@ class ResourceBinSession:
         lookup_session.use_federated_${cat_name_under}_view()
         ${object_name_under} = lookup_session.get_${object_name_under}(${arg0_name})
         id_list = [Id(${object_name_under}._my_map['${cat_name_mixed}Id'])]
-        if 'assignedCatalogIds' in ${object_name_under}._my_map:
-            for idstr in ${object_name_under}._my_map['assignedCatalogIds']:
+        if 'assigned${cat_name}Ids' in ${object_name_under}._my_map:
+            for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
                 id_list.append(Id(idstr))
         return IdList(id_list)"""
 
@@ -803,7 +771,7 @@ class ResourceBinAssignmentSession:
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
-        self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
+        self._assign_object_to_catalog(${arg0_name}, ${arg1_name}, 'assigned${cat_name}Ids')"""
 
     unassign_resource_from_bin_template = """
         # Implemented from template for
@@ -811,7 +779,7 @@ class ResourceBinAssignmentSession:
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         cat = lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
-        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
+        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name}, 'assigned${cat_name}Ids')"""
 
 
 class ResourceAgentSession:
@@ -847,7 +815,7 @@ class ResourceAgentSession:
                                           runtime=self._runtime)
         result = collection.find_one(
             dict({'agentIds': {'$in': [str(agent_id)]}},
-                 **self._bin_view_filter()))
+                 **self._view_filter()))
         return objects.Resource(
             result,
             runtime=self._runtime)"""
@@ -858,7 +826,7 @@ class ResourceAgentSession:
                                           runtime=self._runtime)
         resource = collection.find_one(
             dict({'_id': ObjectId(resource_id.get_identifier())},
-                 **self._bin_view_filter()))
+                 **self._view_filter()))
         if 'agentIds' not in resource:
             result = IdList([])
         else:

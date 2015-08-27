@@ -215,20 +215,10 @@ class CompositionLookupSession:
 
     def _view_filter(self):
         \"\"\"
-        Returns the mongodb catalog filter for isolated or federated views.
-        
-        This also searches across all underlying ${cat_name_plural} in federated
-        ${cat_name_under} view. Real authz for controlling access to underlying
-        ${cat_name_under_plural} will need to be managed in an adapter above the
-        pay grade of this implementation.
+        Overrides OsidSession._view_filter to add sequestering filter.
         
         \"\"\"
-        if self._is_phantom_root_federated():
-            view_filter = {}
-        else:
-            idstr_list = self._get_catalog_idstrs()
-            view_filter = {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-                               {'assigned${cat_name}Ids': {'$$in': idstr_list}}]}
+        view_filter = OsidSession._view_filter(self)
         if self._sequestered_view == SEQUESTERED:
             view_filter['sequestered'] = False
         return view_filter
@@ -276,7 +266,7 @@ class AssetCompositionSession:
                                           runtime=self._runtime)
         composition = collection.find_one(
             dict({'_id': ObjectId(composition_id.get_identifier())},
-                 **self._repository_view_filter()))
+                 **self._view_filter()))
         if 'assetIds' not in composition:
             raise errors.NotFound('no Assets are assigned to this Composition')
         asset_ids = []
@@ -293,7 +283,7 @@ class AssetCompositionSession:
                                           runtime=self._runtime)
         result = collection.find(
             dict({'assetIds': {'$in': [str(asset_id)]}},
-                 **self._repository_view_filter())).sort('_id', DESCENDING)
+                 **self._view_filter())).sort('_id', DESCENDING)
         return objects.CompositionList(result, runtime=self._runtime)"""
 
 
