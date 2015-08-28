@@ -136,11 +136,13 @@ class HierarchyTraversalSession:
     }
 
     get_nodes = """
+        # This impl ignores include_siblings, assumes false
         include_siblings = bool(include_siblings)
         parent_node_list = []
         child_node_list = []
         if ancestor_levels != 0:
-            pass # We'll figure this out later
+            for parent_id in self.get_parents(id_):
+                parent_node_list.append(self.get_nodes(parent_id, ancestor_levels-1, 0))
         if descendant_levels != 0:
             for child_id in self.get_children(id_):
                 child_node_list.append(self.get_nodes(child_id, 0, descendant_levels-1))
