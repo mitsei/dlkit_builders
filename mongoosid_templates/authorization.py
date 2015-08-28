@@ -25,6 +25,28 @@ class AuthorizationSession:
         self._object_view = COMPARATIVE
         self._catalog_view = ISOLATED
         self._kwargs = kwargs
+
+    def _get_qualifier_idstrs(self, qualifier_id):
+        try:
+            authority = qualifier_id.get_identifier().split('.')[0]
+            identifier = qualifier_id.get_identifier().split('.')[1]
+        except:
+            return [str(qualifier_id)]
+        hierarchy_mgr = self._get_provider_manager('HIERARCHY') # local=True ???
+        hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+            Id(authority=authority,
+               namespace='CATALOG',
+               identifier=identifier))
+        node = hierarchy_session.get_nodes(qualifier_id, 10, 0, False)
+        return self._get_ancestor_idstrs(node)
+
+    def _get_ancestor_idstrs(self, node):
+        if node.has_parents():
+            node_list = []
+            for parent_node in node:
+                node_list = node_list + self._get_ancestor_idstrs(parent_node)
+        else:
+            return [str(node.get_id())]
 """
 
     can_access_authorizations = """
@@ -37,9 +59,10 @@ class AuthorizationSession:
         # NOTE: For now this only checks basic authorizations. It should
         # to be extended to deal with Resources and QualifierHierarchies
         try:
-            collection.find_one({'agentId': str(agent_id),
-                                 'functionId': str(function_id),
-                                 'qualifierId': str(qualifier_id)})
+            collection.find_one(
+                {'agentId': str(agent_id),
+                 'functionId': str(function_id),
+                 'qualifierId': {'$in': self._get_qualifier_idstrs(qualifier_id)}})
         except errors.NotFound:
             return False
         else:
