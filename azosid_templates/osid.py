@@ -2,6 +2,14 @@
 
 class OsidProfile:
 
+    # This doesn't work for authz builders yet
+    import_statemenrs = [
+        'COMPARATIVE = 0',
+        'PLENARY = 1',
+        'FEDERATED = 0',
+        'ISOLATED = 1',
+    ]
+
     init = """
     def __init__(self, service_name, interface_name):
         self._provider_manager = None
@@ -134,6 +142,30 @@ class OsidSession:
             agent_id=self.get_effective_agent_id(),
             function_id=function_id,
             qualifier_id=qualifier_id)
+
+    def _use_comparative_object_view(self):
+        self._object_view = COMPARATIVE
+
+    def _use_plenary_object_view(self):
+        self._object_view = PLENARY
+
+    def _is_comparative_catalog_view(self):
+        return not bool(self._catalog_view)
+
+    def _is_plenary_catalog_view(self):
+        return bool(self._catalog_view)
+
+    def _use_federated_catalog_view(self):
+        self._catalog_view = FEDERATED
+
+    def _use_isolated_catalog_view(self):
+        self._catalog_view = ISOLATED
+
+    def _is_federated_catalog_view(self):
+        return not bool(self._catalog_view)
+
+    def _is_isolated_catalog_view(self):
+        return bool(self._catalog_view)
 """
 
     get_locale = """

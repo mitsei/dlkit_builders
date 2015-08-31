@@ -154,6 +154,8 @@ class ResourceLookupSession:
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name}.${object_name}'
+        self._use_federated_${cat_name_under}_view()
+        self._use_comparative_${object_name_under}_view()
 """
 
     get_bin_id_template = """
@@ -177,21 +179,25 @@ class ResourceLookupSession:
     use_comparative_resource_view_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.use_comparative_resource_view_template
+        self._use_comparative_object_view()
         self._provider_session.${method_name}()"""
 
     use_plenary_resource_view_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.use_plenary_resource_view_template
+        self._use_plenary_object_view()
         self._provider_session.${method_name}()"""
 
     use_federated_bin_view_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.use_federated_bin_view_template
+        self._use_federated_catalog_view()
         self._provider_session.${method_name}()"""
 
     use_isolated_bin_view_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.use_isolated_bin_view_template
+        self._use_isolated_catalog_view()
         self._provider_session.${method_name}()"""
 
     get_resource_template = """

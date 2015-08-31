@@ -826,6 +826,11 @@ DISABLED = -1"""
                 append('from ..osid.osid_errors import IllegalState, Unimplemented')
                 # Add the primitive import
                 append('from ..primitives import Id')
+                # Add the view constants
+                append('COMPARATIVE = 0')
+                append('PLENARY = 1')
+                append('FEDERATED = 0')
+                append('ISOLATED = 1')
             elif interface['category'] == 'managers':
                 if inherit_category != 'UNKNOWN_MODULE':
                     # Add the osid_error import
