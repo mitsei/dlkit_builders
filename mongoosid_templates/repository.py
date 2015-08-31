@@ -610,3 +610,16 @@ class CompositionForm:
 
     children = property(fset=set_children, fdel=clear_children)
 """
+
+class CompositionQuery:
+    match_containing_composition_id = """
+        self._add_match('_id', composition_id.identifier, match)
+    """
+
+    match_contained_composition_id = """
+        self._add_match('childIds', str(composition_id), match)
+    """
+
+    match_asset_id = """
+        self._add_match('assetIds', str(asset_id), match)
+    """
