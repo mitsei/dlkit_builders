@@ -691,7 +691,7 @@ class ResourceBinSession:
         ${object_name_under}_list = []
         for ${cat_name_under}_id in ${arg0_name}:
             ${object_name_under}_list += list(
-                get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
+                self.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
         return objects.${return_type}(${object_name_under}_list)"""
 
     get_bin_ids_by_resource_template = """
