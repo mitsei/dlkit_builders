@@ -1437,6 +1437,13 @@ ${instance_initers}
     get_resource_record_template = """
         return self._get_record(${arg0_name})"""
 
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if 'agentIds' in obj_map:
+            del obj_map['agentIds']
+        return osid_objects.OsidObject.get_object_map(self, obj_map)"""
+
 class ResourceQuery:
 
     import_statements_pattern = [
