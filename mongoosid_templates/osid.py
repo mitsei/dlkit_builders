@@ -777,11 +777,9 @@ class OsidObject:
         # The following is crappy. Should be over-ridden in the corresponding
         # object's get_object_map() methods instead:
         if self._namespace == 'repository.Asset':
-            obj_map['assetContents'] = []
-            obj_map['assetContent'] = [] # This is deprecated, switch to assetContents
-            for asset_content in self.get_asset_contents():
-                obj_map['assetContents'].append(asset_content.get_object_map())
-                obj_map['assetContent'].append(asset_content.get_object_map())
+            obj_map['assetContent'] = obj_map['assetContents'] = [ac.object_map
+                                                                  for ac in self.get_asset_contents()]
+            # note: assetContent is deprecated
         if self._namespace == 'resource.Resource':
             if 'agentIds' in obj_map:
                 del obj_map['agentIds']

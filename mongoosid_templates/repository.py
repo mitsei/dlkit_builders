@@ -237,6 +237,45 @@ class CompositionLookupSession:
         self._sequestered_view = UNSEQUESTERED"""
 
 
+class CompositionQuerySession:
+
+    import_statements = [
+        'ACTIVE = 0',
+        'ANY_STATUS = 1',
+        'SEQUESTERED = 0',
+        'UNSEQUESTERED = 1',
+    ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
+        self._catalog_class = objects.Repository
+        self._session_name = 'CompositionQuerySession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
+        self._kwargs = kwargs
+        self._status_view = ACTIVE
+        self._sequestered_view = SEQUESTERED
+
+    def _view_filter(self):
+        \"\"\"
+        Overrides OsidSession._view_filter to add sequestering filter.
+
+        \"\"\"
+        view_filter = OsidSession._view_filter(self)
+        if self._sequestered_view == SEQUESTERED:
+            view_filter['sequestered'] = False
+        return view_filter
+"""
+
+
 class AssetCompositionSession:
 
     import_statements = [
