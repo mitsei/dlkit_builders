@@ -38,6 +38,14 @@ class ResourceManager:
             raise NullArgument
         raise Unsupported()"""
 
+    get_resource_admin_session_template = get_resource_lookup_session_template
+
+    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
+
+    get_resource_notification_session_template = get_resource_lookup_session_template
+
+    get_resource_notification_session_for_bin_template = get_resource_lookup_session_for_bin_template
+
 
 class ResourceProxyManager:
 
@@ -57,3 +65,11 @@ class ResourceProxyManager:
         if ${arg0_name} is None or proxy is None:
             raise NullArgument
         raise Unsupported()"""
+
+    get_resource_admin_session_template = get_resource_lookup_session_template
+
+    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
+
+    get_resource_notification_session_template = get_resource_lookup_session_template
+
+    get_resource_notification_session_for_bin_template = get_resource_lookup_session_for_bin_template

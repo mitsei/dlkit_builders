@@ -834,7 +834,7 @@ DISABLED = -1"""
             elif interface['category'] == 'managers':
                 if inherit_category != 'UNKNOWN_MODULE':
                     # Add the osid_error import
-                    append('from ..osid.osid_errors import Unimplemented, OperationFailed')
+                    append('from ..osid.osid_errors import Unimplemented, Unsupported, OperationFailed')
                    # Add the session import
                     append('from . import sessions')
                     # Add the primitive import
@@ -844,7 +844,7 @@ DISABLED = -1"""
                     # Add the primitive import
                     append('from ..primitives import Id')
                     # Add the osid_error import
-                    append('from ..osid.osid_errors import PermissionDenied, NullArgument, Unimplemented')
+                    append('from ..osid.osid_errors import PermissionDenied, NullArgument, NotFound, Unsupported, Unimplemented')
 
         # Now also check for templated imports
         templated_imports = self.method_builder.get_methods_templated_imports(self._abc_pkg_name(package, abc=False),
@@ -1089,7 +1089,9 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
         mixed_singular = under_to_mixed(remove_plural(data_name))
 
         persisted_name = persisted_data[data_name]
-
+        if persisted_name == 'OsidCatalog':
+            initers += '        self._my_map[\'assigned{}Ids\'] = [str(kwargs[\'{}_id\'])]\n'.format(mixed_name,
+                                                                                                     data_name)
         if ((persisted_name == 'osid.id.Id' or
                 persisted_name == 'OsidCatalog') and
                 data_name in initialized_data):

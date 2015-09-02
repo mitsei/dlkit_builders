@@ -158,6 +158,14 @@ class ResourceManager:
             self._proxy,
             ${return_type_under}=session)"""
 
+    get_resource_admin_session_managertemplate = get_resource_lookup_session_managertemplate
+
+    get_resource_admin_session_for_bin_managertemplate = get_resource_lookup_session_for_bin_managertemplate
+
+    get_resource_admin_session_catalogtemplate = get_resource_lookup_session_catalogtemplate
+
+    get_resource_admin_session_for_bin_catalogtemplate = get_resource_lookup_session_for_bin_catalogtemplate
+
     get_resource_notification_session_managertemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -

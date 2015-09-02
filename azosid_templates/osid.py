@@ -11,10 +11,12 @@ class OsidProfile:
     ]
 
     init = """
-    def __init__(self, service_name, interface_name):
+    def __init__(self):
         self._provider_manager = None
-        self._authz_session = None
         self._my_runtime = None
+        self._authz_session = None
+        self._catalog_hierarchy_session = None
+        self._object_query_session = None
 """
 
     get_id = """
@@ -129,6 +131,8 @@ class OsidSession:
         self._proxy = proxy
         self._id_namespace = None
         self._qualifier_id = None
+        self._object_view = COMPARATIVE
+        self._catalog_view = FEDERATED
 
     def _can(self, func_name, qualifier_id=None):
         \"\"\"Tests if the named function is authorized with agent and qualifier.\"\"\"
@@ -149,10 +153,10 @@ class OsidSession:
     def _use_plenary_object_view(self):
         self._object_view = PLENARY
 
-    def _is_comparative_catalog_view(self):
+    def _is_comparative_object_view(self):
         return not bool(self._catalog_view)
 
-    def _is_plenary_catalog_view(self):
+    def _is_plenary_object_view(self):
         return bool(self._catalog_view)
 
     def _use_federated_catalog_view(self):

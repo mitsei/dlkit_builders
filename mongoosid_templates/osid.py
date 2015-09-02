@@ -394,7 +394,6 @@ class Operable:
         # Someday I'll have a real implementation, but for now I just:
         return False"""
 
-
 class OsidSession:
 
     import_statements = [
@@ -1836,17 +1835,27 @@ class OsidQuery:
     clear_keyword_terms = """
         self._keyword_terms = {}"""
 
-class OsidIdentifiableQuery:
+    match_any = """
+        # clean query objects should match everything
+        pass"""
+
+    clear_any_terms = """
+        # how and why do we do this?"""
+
+
+class IdentifiableQuery:
 
     import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
+        'from bson.objectid import ObjectId'
     ]
 
     match_id = """
-        self._add_match('id_', id_.get_identifier(), match)"""
-    
+        self._add_match('_id': ObjectId(id_.get_identifier()))"""
+
     clear_id_terms = """
-        self._clear_terms('id_')"""
+        self._clear_terms('_id')"""
+
+
 
 class OsidExtensibleQuery:
 

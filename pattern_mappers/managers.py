@@ -1,3 +1,6 @@
+
+LOOKUP_STYLE_SESSIONS = ['LookupSession', 'QuerySession']
+
 def map_manager_patterns(interface, package, index):
     if interface['shortname'].endswith('Profile'):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceProfile'
@@ -9,6 +12,13 @@ def map_manager_patterns(interface, package, index):
     for method in interface['methods']:
         
         index['impl_log']['managers'][interface['shortname']][method['name']] = ['mapped', 'unimplemented']
+        lookup_style = False
+        for session_type in LOOKUP_STYLE_SESSIONS:
+            if (method['return_type'].split('.')[-1].endswith(session_type) and
+                index['package_catalog_caps'] not in method['return_type'].split('.')[-1]):
+                lookup_style = True
+                object_name = method['return_type'][:-len(session_type)]
+
 
         ##################################################################
         ## First check this packages Profile methods.                   ##
@@ -141,13 +151,56 @@ def map_manager_patterns(interface, package, index):
                                 cat_name = index['package_catalog_caps']))
                                         
         ##
+        # ProxyManager methods to get an object lookup style session.
+        elif (lookup_style and 
+              method['name'].startswith('get') and 
+              method['name'].endswith('session') and
+              method['return_type'].endswith('Session') and
+              'osid.proxy.Proxy' in method['arg_types']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = 'resource.ResourceProxyManager.get_resource_lookup_session',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name'],
+                                var_name = method['name'][4:],
+                                support_check = method['name'][4:].split('_session')[0],
+                                arg0_name = method['args'][0]['var_name'],
+                                return_type_full = method['return_type'],
+                                object_name = object_name,
+                                cat_name = index['package_catalog_caps']))
+
+        ##
+        # ProxyManager methods to get an object lookup style session for catalog.
+        elif (lookup_style and
+              method['name'].startswith('get') and 
+              method['name'].endswith(index['package_catalog_under']) and
+              method['return_type'].endswith('Session') and
+              'osid.proxy.Proxy' in method['arg_types']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = 'resource.ResourceProxyManager.get_resource_lookup_session_for_bin',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name'],
+                                var_name = method['name'][4:],
+                                support_check = method['name'][4:].split('_session')[0],
+                                arg0_name = method['args'][0]['var_name'],
+                                arg0_type_full = method['args'][0]['arg_type'],
+                                arg1_name = method['args'][1]['var_name'],
+                                arg1_type_full = method['args'][1]['arg_type'],
+                                return_type_full = method['return_type'],
+                                object_name = object_name,
+                                cat_name = index['package_catalog_caps']))
+
+        ##
         # ProxyManager methods to get a session.
         elif (method['name'].startswith('get') and 
               method['name'].endswith('session') and
               method['return_type'].endswith('Session') and
               'osid.proxy.Proxy' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                  pattern = 'resource.ResourceProxyManager.get_resource_lookup_session',
+                  pattern = 'resource.ResourceProxyManager.get_resource_admin_session',
                   kwargs = dict(interface_name = interface['shortname'],
                                 package_name = package['name'],
                                 module_name = interface['category'],
@@ -165,7 +218,7 @@ def map_manager_patterns(interface, package, index):
               method['return_type'].endswith('Session') and
               'osid.proxy.Proxy' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                  pattern = 'resource.ResourceProxyManager.get_resource_lookup_session_for_bin',
+                  pattern = 'resource.ResourceProxyManager.get_resource_admin_session_for_bin',
                   kwargs = dict(interface_name = interface['shortname'],
                                 package_name = package['name'],
                                 module_name = interface['category'],
@@ -234,7 +287,7 @@ def map_manager_patterns(interface, package, index):
                                 cat_name = index['package_catalog_caps']))
 
         ##
-        # Manager methods to get a session for catalog.
+        # Manager methods to get a notification session for catalog.
         elif (method['name'].startswith('get') and 
               method['name'].endswith('notification_session_for_' + index['package_catalog_under']) and
               method['return_type'].endswith('Session')):
@@ -252,12 +305,49 @@ def map_manager_patterns(interface, package, index):
                                 cat_name = index['package_catalog_caps']))
                                         
         ##
-        # Manager methods to get a session with no catalog.
-        elif (method['name'].startswith('get') and 
+        # Manager methods to get an object lookup style session with no catalog.
+        elif (lookup_style and
+              method['name'].startswith('get') and 
               method['name'].endswith('session') and
               method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = 'resource.ResourceManager.get_resource_lookup_session',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name'],
+                                var_name = method['name'][4:],
+                                support_check = method['name'][4:].split('_session')[0],
+                                return_type_full = method['return_type'],
+                                object_name = object_name,
+                                cat_name = index['package_catalog_caps']))
+
+        ##
+        # Manager methods to get an object lookup style session for catalog.
+        elif (lookup_style and
+              method['name'].startswith('get') and 
+              method['name'].endswith(index['package_catalog_under']) and
+              method['return_type'].endswith('Session')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = 'resource.ResourceManager.get_resource_lookup_session_for_bin',
+                  kwargs = dict(interface_name = interface['shortname'],
+                                package_name = package['name'],
+                                module_name = interface['category'],
+                                method_name = method['name'],
+                                var_name = method['name'][4:],
+                                support_check = method['name'][4:].split('_session')[0],
+                                arg0_name = method['args'][0]['var_name'],
+                                return_type_full = method['return_type'],
+                                object_name = object_name,
+                                cat_name = index['package_catalog_caps']))
+                                        
+        ##
+        # Manager methods to get session with no catalog.
+        elif (method['name'].startswith('get') and 
+              method['name'].endswith('session') and
+              method['return_type'].endswith('Session')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                  pattern = 'resource.ResourceManager.get_resource_admin_session',
                   kwargs = dict(interface_name = interface['shortname'],
                                 package_name = package['name'],
                                 module_name = interface['category'],
@@ -273,7 +363,7 @@ def map_manager_patterns(interface, package, index):
               method['name'].endswith(index['package_catalog_under']) and
               method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                  pattern = 'resource.ResourceManager.get_resource_lookup_session_for_bin',
+                  pattern = 'resource.ResourceManager.get_resource_admin_session_for_bin',
                   kwargs = dict(interface_name = interface['shortname'],
                                 package_name = package['name'],
                                 module_name = interface['category'],

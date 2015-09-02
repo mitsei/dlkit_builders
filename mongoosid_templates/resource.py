@@ -77,6 +77,10 @@ class ResourceManager:
         ##
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
 
+    get_resource_admin_session_template = get_resource_lookup_session_template
+
+    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
+
     get_resource_notification_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
@@ -118,6 +122,10 @@ class ResourceProxyManager:
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
         return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime) # pylint: disable=no-member"""
+
+    get_resource_admin_session_template = get_resource_lookup_session_template
+
+    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
 
     get_resource_notification_session_template = """
         if not self.supports_${support_check}():
@@ -1461,6 +1469,13 @@ class ResourceQuery:
 
     clear_group_terms_template = """
         self._clear_terms('${var_name_mixed}')"""
+
+    match_bin_id_template = """
+        self._add_match('assigned${cat_name}Ids', ${arg0_name}, ${arg1_name})"""
+
+    clear_bin_id_terms_template = """
+        self._clear_terms('assigned${cat_name}Ids')"""
+
 
 class ResourceForm:
 

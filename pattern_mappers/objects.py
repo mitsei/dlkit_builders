@@ -1309,6 +1309,21 @@ def map_query_patterns(interface, package, index):
             pass
 
         ##
+        # Query methods that clear catalog id terms
+        elif (method['name'].endswith('_terms') and
+              var_name[:-6] == index['package_catalog_under'] + '_id' and
+              method['name'].startswith('clear_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceQuery.clear_bin_id_terms',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name[:-6],
+                              object_name = object_name,
+                              cat_name = index['package_catalog_caps']))
+
+        ##
         # Query methods that clear all terms (do we need one for each element type?)
         elif (method['name'].endswith('_terms') and
               var_name[:-6] in index[object_name + '.persisted_data'] and
@@ -1360,6 +1375,7 @@ def map_query_patterns(interface, package, index):
                               arg0_type_full = method['args'][0]['arg_type'],
                               arg1_name = method['args'][1]['var_name'],
                               arg1_type_full = method['args'][1]['arg_type'],
+                              cat_name = index['package_catalog_caps'],
                               object_name = object_name))
 
         else:
