@@ -767,6 +767,7 @@ class OsidObject:
         if obj_map is None:
             obj_map = dict(self._my_map)
         del obj_map['_id']
+        #my_idstr = str(self.get_id())
 
         # to handle over-ridden fields, like for enclosed assessments
         obj_map['displayName']['text'] = self.display_name.text
@@ -901,7 +902,7 @@ class OsidObject:
 
         obj_map.update(
             {'type': self._namespace.split('.')[-1],
-             'id': self.get_id()})
+             'id': str(self.get_id())})
         return obj_map
 
     object_map = property(get_object_map)
