@@ -1083,6 +1083,8 @@ class Item:
             obj_map['answers'].append(answer.get_object_map())
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
+    object_map = property(fget=get_object_map)
+
     def _delete(self):
         try:
             self.get_question()._delete()
