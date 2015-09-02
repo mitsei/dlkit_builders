@@ -1442,7 +1442,9 @@ ${instance_initers}
         obj_map = dict(self._my_map)
         if 'agentIds' in obj_map:
             del obj_map['agentIds']
-        return osid_objects.OsidObject.get_object_map(self, obj_map)"""
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
 
 class ResourceQuery:
 

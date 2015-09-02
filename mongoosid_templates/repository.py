@@ -493,7 +493,9 @@ class Asset:
         obj_map['assetContent'] = obj_map['assetContents'] = [ac.object_map
                                                               for ac in self.get_asset_contents()]
         # note: assetContent is deprecated
-        return osid_objects.OsidObject.get_object_map(self, obj_map)"""
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
 
 class AssetForm:
 
@@ -608,7 +610,9 @@ class Composition:
         obj_map = dict(self._my_map)
         if 'assetIds' in obj_map:
             del obj_map['assetIds']
-        return osid_objects.OsidObject.get_object_map(self, obj_map)"""
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
 
 class CompositionForm:
     # per Tom Coppeto. We are moving composition design to the CompositionForm

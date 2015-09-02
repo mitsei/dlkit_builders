@@ -1041,7 +1041,9 @@ class Question:
         obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
         obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
         obj_map['id'] = my_idstr
-        return obj_map"""
+        return obj_map
+
+    object_map = property(fget=get_object_map)"""
 
 class Answer:
 
@@ -1049,7 +1051,9 @@ class Answer:
     def get_object_map(self):
         obj_map = dict(self._my_map)
         del obj_map['itemId']
-        return osid_objects.OsidObject.get_object_map(self, obj_map)"""
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
 
 class Item:
     
@@ -1103,7 +1107,9 @@ class Assessment:
         obj_map = dict(self._my_map)
         if 'itemIds' in obj_map:
             del obj_map['itemIds']
-        return osid_objects.OsidObject.get_object_map(self, obj_map)"""
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
 
 
 class AssessmentOffered:
@@ -1161,7 +1167,9 @@ class AssessmentOffered:
             obj_map['displayName']['text'] = self.get_display_name().get_text()
         if obj_map['description']['text'] == '':
             obj_map['description']['text'] = self.get_description().get_text()
-        return obj_map"""
+        return obj_map
+
+    object_map = property(fget=get_object_map)"""
     
     has_start_time_template = """
         # Implemented from template for osid.assessment.AssessmentOffered.has_start_time_template
@@ -1282,7 +1290,9 @@ class AssessmentTaken:
             obj_map['displayName']['text'] = self.get_display_name().get_text()
         if obj_map['description']['text'] == '':
             obj_map['description']['text'] = self.get_description().get_text()
-        return obj_map"""
+        return obj_map
+
+    object_map = property(fget=get_object_map)"""
 
     
     get_taker_id = """
