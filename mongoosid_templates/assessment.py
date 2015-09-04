@@ -286,12 +286,18 @@ class AssessmentSession:
 
     def _get_question(self, item_idstr):
         \"\"\"Helper method for getting a Question object given an Id.\"\"\"
-        item_id = Id(item_idstr)
-        collection = MongoClientValidated('assessment',
-                                          collection='Item',
-                                          runtime=self._runtime)
-        item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        return objects.Question(item_map['question'], runtime=self._runtime)"""
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = mgr.get_item_lookup_session()
+        lookup_session.use_federated_bank_view()
+        return lookup_session.get_item(Id(item_idstr)).get_question()
+
+        # Old impl:
+        # item_id = Id(item_idstr)
+        # collection = MongoClientValidated('assessment',
+        #                                   collection='Item',
+        #                                   runtime=self._runtime)
+        # item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
+        # return objects.Question(item_map['question'], runtime=self._runtime)"""
     
     get_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
