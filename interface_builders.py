@@ -301,15 +301,225 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
 
         return ''
 
+    def _make_mdata(self, file_name):
+        with open(file_name, 'r') as read_file:
+            package = json.load(read_file)
+
+        if package['name'] not in managers_to_implement:
+            return
+
+        print "Building " + self._class + " for " + package['name']
+
+        self.patterns = self._patterns(package)
+
+        mdata = ''
+        import_str = '\"\"\"Mongo osid metadata configurations for ' + package['name'] + ' service.\"\"\"\n\n'
+        import_str += """
+from .. import types
+from ..primitives import Type
+DEFAULT_LANGUAGE_TYPE = Type(**types.Language().get_type_data('DEFAULT'))
+DEFAULT_SCRIPT_TYPE = Type(**types.Script().get_type_data('DEFAULT'))
+DEFAULT_FORMAT_TYPE = Type(**types.Format().get_type_data('DEFAULT'))
+DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data('DEFAULT'))"""
+
+        if self._root_dir is None:
+            ##
+            # Check if an app directory and abc osid subdirectory already exist.
+            # If not, create them  This code specifically splits out the osid
+            # packages in a Django app environment.  For other Python based
+            # implementations try using the subsequent, more generic code instead.
+            from django.core.management import call_command
+            if not os.path.exists(self._app_name(package)):
+                call_command('startapp', self._app_name(package))
+            if self._is('mongo'):
+                if not os.path.exists(self._app_name(package) + '/' +
+                                      self._abc_pkg_name(package['name'])):
+                    os.system('mkdir ' + self._app_name(package) + '/' +
+                              self._abc_pkg_name(package['name']))
+                    os.system('touch ' + self._app_name(package) + '/' +
+                              self._abc_pkg_name(package['name']) + '/__init__.py')
+        else:
+            # Check if a directory already exists for the abc osid.  If not,
+            # create one and initialize as a python package.
+            self._make_dir(self._app_name(package), python=True)
+            self._make_dir(self._abc_pkg_path(package), python=True)
+
+        ##
+        # The real work starts here.  Iterate through all interfaces to build
+        # all the model classes for this osid package.
+        for interface in package['interfaces']:
+            ##
+            # Check to see if this interface is meant to be implemented.
+            if package['name'] != 'osid' and not build_this_interface(package, interface):
+                continue
+
+            if (interface['shortname'] in self.patterns['package_objects_caps'] or
+                    interface['shortname'] in self.patterns['package_relationships_caps'] or
+                    interface['shortname'] == 'OsidObject' or
+                    interface['category'] == 'markers' or
+                    interface['shortname'] == self.patterns['package_catalog_caps']):
+                imports = []
+
+                impl_class = self._impl_class(package, interface)
+
+                ##
+                # Build all mdata maps, checking to see if there is a hand built
+                # mdata implementation available
+                if not hasattr(impl_class, 'mdata'):
+                    mdata_maps = self._make_mdata_maps(interface)
+                else:
+                    mdata_maps = getattr(impl_class, 'mdata')
+                ##
+                # Assemble complete mdata string to be saved as mdata.py
+                mdata = (mdata + '\n' + mdata_maps + '\n')
+
+                ##
+                # Finally, save the mdata to the appropriate mdata_conf.py file.
+                if mdata.strip() != '':
+                    with open(self._abc_module(package, 'mdata_conf'), 'wb') as write_file:
+                        write_file.write((import_str + '\n'.join(imports) + '\n\n' +
+                                         mdata).encode('utf-8'))
+
+    def _make_mdata_maps(self, interface):
+        from builders.mongoosid_templates import options
+        pd = interface['shortname'] + '.persisted_data'
+        rt = interface['shortname'] + '.return_types'
+        mdata = ''
+        if pd in self.patterns and self.patterns[pd] != {}:
+            for data_name in self.patterns[pd]:
+                if self.patterns[pd][data_name] == 'OsidCatalog':
+                    pass
+                elif (rt in self.patterns and
+                      data_name in self.patterns[rt] and
+                      self.patterns[rt][data_name] == 'osid.locale.DisplayText'):
+                    mdata += self._make_mdata_map(interface['shortname'],
+                                                  data_name,
+                                                  'DisplayText',
+                                                  options) + '\n'
+                else:
+                    mdata += self._make_mdata_map(interface['shortname'],
+                                                     data_name,
+                                                     self.patterns[pd][data_name],
+                                                     options) + '\n'
+        return mdata
+
+    def _make_mdata_map(self, interface_name, data_name, data_type, options):
+        mdata = ''
+        lead_in = camel_to_caps_under(interface_name) + '_' + data_name.upper() + ' = {'
+        lead_out = '\n}\n'
+
+        if data_type == 'boolean':
+            template = string.Template(options.COMMON_MDATA +
+                                       options.BOOLEAN_MDATA)
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'enter either true or false.',
+                'array': 'False'
+            })
+        elif data_type == 'string':
+            template = string.Template(options.COMMON_MDATA +
+                                       options.STRING_MDATA)
+            # In the following max_length may want to come from a configuration setting:
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'enter no more than 256 characters.',
+                'max_length': 256,
+                'array': 'False'
+            })
+        elif data_type == 'decimal':
+            template = string.Template(options.COMMON_MDATA +
+                                       options.DECIMAL_MDATA)
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'enter a decimal value.',
+                'array': 'False'
+            })
+        elif data_type == 'DisplayText':
+            template = string.Template(options.COMMON_MDATA +
+                                       options.DISPLAY_TEXT_MDATA)
+            # In the following max_length may want to come from a configuration setting:
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'enter no more than 256 characters.',
+                'max_length': 256,
+                'array': 'False'
+            })
+        elif data_type in ['osid.id.Id']:
+            template = string.Template(options.COMMON_MDATA +
+                                       options.ID_MDATA)
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'accepts an ' + data_type + ' object',
+                'syntax': data_type.split('.')[-1].upper(),
+                'id_type': data_type.split('.')[-1].lower(),
+                'array': 'False'
+            })
+        elif data_type in ['osid.type.Type']:
+            template = string.Template(options.COMMON_MDATA +
+                                       options.TYPE_MDATA)
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'accepts an ' + data_type + ' object',
+                'syntax': data_type.split('.')[-1].upper(),
+                'id_type': data_type.split('.')[-1].lower(),
+                'array': 'False'
+            })
+        elif data_type in ['osid.id.Id[]', 'osid.type.Type[]']:
+            template = string.Template(options.COMMON_MDATA +
+                                       options.ID_LIST_MDATA)
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'accepts an ' + data_type + ' object',
+                'syntax': data_type.split('.')[-1].strip('[]').upper(),
+                'id_type': data_type.split('.')[-1].strip('[]').lower(),
+                'array': 'True'
+            })
+        elif data_type in ['osid.calendaring.DateTime', 'timestamp']:
+            template = string.Template(options.COMMON_MDATA +
+                                       options.DATE_TIME_MDATA)
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'enter a valid datetime object.',
+                'array': 'False'
+            })
+        elif data_type == 'osid.calendaring.Duration':
+            template = string.Template(options.COMMON_MDATA +
+                                       options.DURATION_MDATA)
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'enter a valid duration object.',
+                'array': 'False'
+            })
+        elif data_type == 'osid.transport.DataInputStream':
+            template = string.Template(options.COMMON_MDATA +
+                                       options.OBJECT_MDATA)
+            mdata = template.substitute({
+                'element_identifier': data_name,
+                'element_label': ' '.join(data_name.split('_')),
+                'instructions': 'accepts a valid data input stream.',
+                'array': 'False'
+            })
+        if mdata:
+            mdata = (lead_in + mdata + lead_out)
+        return mdata
+
     def _make_osid(self, file_name):
         # This function expects a file containing a json representation of an
         # osid package that was prepared by the mapper.
         with open(file_name, 'r') as read_file:
             package = json.load(read_file)
 
-        if self._is('tests'):
-            if package['name'] not in packages_to_test:
-                return
+        if self._is('tests') and package['name'] not in packages_to_test:
+            return
         if package['name'] not in managers_to_implement:
             return
 
@@ -866,9 +1076,12 @@ DISABLED = -1"""
                     self.make_interface_map(xosid_file, package)
 
         for json_file in glob.glob(self.package_maps + '/*.json'):
-            self._make_osid(json_file)
+            if self._is('mdata'):
+                self._make_mdata(json_file)
+            else:
+                self._make_osid(json_file)
 
-        if not self._is('abc'):
+        if not self._is('abc') and not self._is('mdata'):
             # Copy general config and primitive files, etc into the
             # implementation root directory:
             for helper_file in glob.glob(self._template('helpers') + '/*.py'):

@@ -396,6 +396,10 @@ class Builder(Utilities):
         from mongobuilder import MongoBuilder
         MongoBuilder(build_dir=self.build_dir).make()
 
+    def mdata(self):
+        from mdatabuilder import MDataBuilder
+        MDataBuilder(build_dir=self.build_dir).make()
+
     def patterns(self):
         print "Creating pattern files"
         PatternBuilder().make_patterns()
@@ -482,6 +486,7 @@ if __name__ == '__main__':
             builder.patterns()
             builder.abc()
             builder.mongo()
+            builder.mdata()
             builder.services()
             builder.authz()
             builder.tests(True)
@@ -500,6 +505,9 @@ if __name__ == '__main__':
                 non_test_build = True
             if 'mongo' in sys.argv:
                 builder.mongo()
+                non_test_build = True
+            if 'mdata' in sys.argv:
+                builder.mdata()
                 non_test_build = True
             if 'services' in sys.argv:
                 builder.services()
