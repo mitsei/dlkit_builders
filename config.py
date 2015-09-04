@@ -21,6 +21,7 @@ packages_to_implement = [
 
 packages_to_test = [
     'assessment',
+    'authorization',
     'commenting',
     'grading',
     'learning',
@@ -73,6 +74,12 @@ sessions_to_implement = [
     'BankAdminSession',
     'BankHierarchySession',
     'BankHierarchyDesignSession',
+    ### authorization service:
+    'AuthorizationSession',
+    'AuthorizationLookupSession',
+    'AuthorizationAdminSession',
+    'VaultLookupSession',
+    'VaultAdminSession',
     ### commenting service:
     'CommentLookupSession',
     'CommentQuerySession',
@@ -176,6 +183,8 @@ objects_to_implement = [
     'Bank',
     ### authentication_process
     'Authentication',
+    ### authorization service:
+    'Authorization',
     ### commenting service:
     'Comment',
     'Book',
