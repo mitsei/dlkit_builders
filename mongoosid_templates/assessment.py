@@ -195,10 +195,9 @@ class AssessmentSession:
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT')
-        lookup_session = mgr.get_assessment_taken_lookup_session()
+        lookup_session = mgr.get_assessment_taken_lookup_session() # Should this be _for_bank?
         lookup_session.use_federated_bank_view()
-        return_object = lookup_session.get_assessment_taken(assessment_taken_id)
-        return return_object"""
+        return  lookup_session.get_assessment_taken(assessment_taken_id)"""
     
     is_assessment_section_complete = """
         return self.get_assessment_section(assessment_section_id).get_assessment_taken().has_ended()"""
