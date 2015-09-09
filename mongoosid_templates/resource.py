@@ -361,6 +361,7 @@ class ResourceSearchSession:
         'from ..utilities import MongoClientValidated',
         'from . import queries',
         'from . import searches',
+        'from bson.objectid import ObjectId',
         'DESCENDING = -1',
         'ASCENDING = 1'
     ]
@@ -397,6 +398,9 @@ class ResourceSearchSession:
             and_list.append({term: ${arg0_name}._query_terms[term]})
         for term in ${arg0_name}._keyword_terms:
             or_list.append({term: ${arg0_name}._keyword_terms[term]})
+        if ${arg1_name}._id_list is not None:
+            identifiers = [ObjectId(i.identifier) for i in ${arg1_name}._id_list]
+            and_list.append({'_id': {'$$in': identifiers}})
         if or_list:
             and_list.append({'$$or': or_list})
         view_filter = self._view_filter()
@@ -1559,10 +1563,14 @@ class ResourceSearch:
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
+        self._id_list = None
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
         osid_searches.OsidSearch.__init__(self, runtime)
 """
+
+    search_among_resources = """
+        self._id_list = resource_ids"""
 
 class ResourceSearchResults:
 
