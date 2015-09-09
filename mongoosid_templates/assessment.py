@@ -1552,7 +1552,7 @@ class ItemSearchResults:
     init = """
     def __init__(self, results, runtime):
         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
-        self._results = [r for r in results]
+        self._results = results
         self._runtime = runtime
         self.retrieved = False
 """

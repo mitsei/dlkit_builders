@@ -1605,7 +1605,7 @@ class OsidList:
         if isinstance(iter_object, dict) or isinstance(iter_object, list):
             self._count = len(iter_object)
         elif isinstance(iter_object, Cursor):
-            self._count = iter_object.count()
+            self._count = iter_object.count(True)
         else:
             self._count = None
         self._runtime = runtime
@@ -2098,8 +2098,8 @@ class OsidSearch:
             self._keyword_fields += additional_keyword_fields[self._namespace]
         except (AttributeError, KeyError, errors.NotFound):
             pass
-        self._limit_result_set_start = 0
-        self._limit_result_set_end = 0
+        self._limit_result_set_start = None
+        self._limit_result_set_end = None
 """
 
     limit_result_set = """
@@ -2122,3 +2122,12 @@ class OsidSearch:
     @property
     def end(self):
         return self._limit_result_set_end"""
+
+
+class OsidSearchResults:
+
+    import_statements = [
+    ]
+
+    get_result_size = """
+        return self._results.count(True)"""

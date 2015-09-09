@@ -407,7 +407,10 @@ class ResourceSearchSession:
         collection = MongoClientValidated('${package_name}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        result = collection.find(query_terms)[${arg1_name}.start:${arg1_name}.end]
+        if ${arg1_name}.start is not None and ${arg1_name}.end is not None:
+            result = collection.find(query_terms)[${arg1_name}.start:${arg1_name}.end]
+        else:
+            result = collection.find(query_terms)
         return searches.${return_type}(result, runtime=self._runtime)"""
 
 
@@ -1571,7 +1574,8 @@ class ResourceSearchResults:
     init = """
     def __init__(self, results, runtime):
         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
-        self._results = [r for r in results]
+        # self._results = [r for r in results]
+        self._results = results
         self._runtime = runtime
         self.retrieved = False
 """
