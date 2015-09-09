@@ -169,6 +169,8 @@ class InterfaceBuilder(Mapper, BaseBuilder, Templates, Utilities):
             object_name = interface_name[:-13]
         elif init_pattern == 'resource.ResourceQuerySession':
             object_name = interface_name[:-12]
+        elif init_pattern == 'resource.ResourceSearchSession':
+            object_name = interface_name.replace('SearchSession', '')
         elif init_pattern == 'resource.ResourceAdminSession':
             object_name = interface_name[:-12]
         elif init_pattern == 'resource.ResourceNotificationSession':
@@ -1103,11 +1105,14 @@ def build_this_interface(package, interface, services=False):
     # exceptions = ['ObjectiveSequencingSession',]
     exceptions = []
 
+    # excepted_osid_categories = ['properties',
+    #                             'query_inspectors',
+    #                             'receivers',
+    #                             'search_orders',
+    #                             'searches',]
     excepted_osid_categories = ['properties',
                                 'query_inspectors',
-                                'receivers',
-                                'search_orders',
-                                'searches',]
+                                'receivers']
 
     # Check to see if manager should be implemented (this should
     # probably be moved to binder_helpers.flagged_for_implementation)

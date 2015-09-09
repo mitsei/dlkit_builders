@@ -324,6 +324,21 @@ class ResourceQuerySession:
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
 
+class ResourceSearchSession:
+
+    get_resource_search_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceSearchSession.get_resource_search_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    get_resources_by_search_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceSearchSession.get_resources_by_search_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+
 class ResourceAdminSession:
 
     init_template = """

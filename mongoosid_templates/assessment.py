@@ -1517,3 +1517,55 @@ class ItemQuery:
     clear_learning_objective_id_terms = """
         self._clear_match('learningObjectiveIds')
     """
+
+class ItemSearch:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
+        'from dlkit.mongo.osid import searches as osid_searches',
+    ]
+
+    init = """
+    def __init__(self, runtime):
+        self._namespace = 'assessment.Item'
+        try:
+            #pylint: disable=no-name-in-module
+            from ..records.types import ITEM_RECORD_TYPES as record_type_data_sets
+        except (ImportError, AttributeError):
+            record_type_data_sets = {}
+        self._record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_searches.OsidSearch.__init__(self, runtime)
+"""
+
+class ItemSearchResults:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from . import objects',
+    ]
+
+    init = """
+    def __init__(self, results, runtime):
+        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+        self._results = [r for r in results]
+        self._runtime = runtime
+        self.retrieved = False
+"""
+
+    get_items = """
+        if self.retrieved:
+            raise errors.IllegalState('List has already been retrieved.')
+        self.retrieved = True
+        return objects.ItemList(self._results, runtime=self._runtime)"""
+
+
+class ItemSearchSession:
+
+    import_statements = [
+        'from . import searches',
+    ]

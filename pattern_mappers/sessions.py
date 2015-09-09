@@ -1503,7 +1503,7 @@ def map_session_patterns(interface, package, index):
               method['name'].startswith('get_') and
               method['name'].endswith('_by_search')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceSearchSession.get_resource_by_search',
+                pattern = 'resource.ResourceSearchSession.get_resources_by_search',
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],

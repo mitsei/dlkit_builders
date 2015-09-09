@@ -2076,4 +2076,49 @@ class OsidSearch:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.primordium.id.primitives import Id',
     ]
+
+    init = """
+    def __init__(self, runtime):
+        self._records = dict()
+        # _load_records is in OsidExtensibleQuery:
+        # _all_supported_record_type_ids comes from inheriting query object
+        # THIS SHOULD BE RE-DONE:
+        self._load_records(self._all_supported_record_type_ids)
+        self._runtime = runtime
+        self._query_terms = {}
+        self._keyword_terms = {}
+        self._keyword_fields = ['displayName.text', 'description.text']
+        try:
+            # Try to get additional keyword fields from the runtime, if available:
+            config = runtime.get_configuration()
+            parameter_id = Id('parameter:keywordFields@mongo')
+            additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
+            self._keyword_fields += additional_keyword_fields[self._namespace]
+        except (AttributeError, KeyError, errors.NotFound):
+            pass
+        self._limit_result_set_start = 0
+        self._limit_result_set_end = 0
+"""
+
+    limit_result_set = """
+        if not isinstance(start, int) or not isinstance(end, int):
+            raise errors.InvalidArgument('start and end arguments must be integers.')
+        if end <= start:
+            raise errors.InvalidArgument('End must be greater than start.')
+
+        # because Python is 0 indexed
+        # Spec says that passing in (1, 25) should include 25 entries (1 - 25)
+        # Python indices 0 - 24
+        # Python [#:##] stops before the last index, but does not include it
+        self._limit_result_set_start = start - 1
+        self._limit_result_set_end = end
+
+    @property
+    def start(self):
+        return self._limit_result_set_start
+
+    @property
+    def end(self):
+        return self._limit_result_set_end"""
