@@ -1686,8 +1686,11 @@ class OsidList:
             return 0  # Don't know what to do here"""
 
     skip = """
-        ### STILL NEED TO IMPLEMENT THIS ###
-        pass"""
+        try:
+            self._iter_object.skip(n)
+        except AttributeError:
+            for i in range(0, n):
+                self.next()"""
 
 class OsidQuery:
 
