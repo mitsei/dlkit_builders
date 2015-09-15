@@ -275,6 +275,13 @@ class CompositionQuerySession:
         return view_filter
 """
 
+    use_sequestered_composition_view = """
+        self._sequestered_view = SEQUESTERED"""
+
+    use_unsequestered_composition_view = """
+        self._sequestered_view = UNSEQUESTERED"""
+
+
 class CompositionSearchSession:
 
     import_statements = [
