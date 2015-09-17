@@ -591,7 +591,19 @@ class ResourceAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.${return_type}(
             ${arg0_name}._my_map,
-            runtime=self._runtime)"""
+            runtime=self._runtime)
+
+    @utilities.arguments_not_none
+    def duplicate_${object_name_under}(self, ${object_name_under}_id):
+        mgr = self._get_provider_manager('${package_name_upper}')
+        lookup_session = mgr._get_${object_name_under}_lookup_session()
+        lookup_session.set_federated_${cat_name_under}_view()
+        ${object_name_under} = lookup_session.get_${object_name_under}(${object_name_under}_id)
+        insert_result = collection.insert_one(${object_name_under}._my_map)
+        result = objects.${object_name}(
+            collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime)
+        return result"""
 
     delete_resource_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
