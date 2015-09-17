@@ -97,6 +97,16 @@ class GradeSystem:
         else:
             return Decimal(str(self._my_map['numericScoreIncrement']))"""
 
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        obj_map['grades'] = []
+        for grade in self.get_grades():
+            obj_map['grades'].append(grade.get_object_map())
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
+
 
 class GradeSystemForm:
 

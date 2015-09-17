@@ -5,6 +5,15 @@ class ResourceProfile:
     init_template = """
     def __init__(self, interface_name):
         osid_managers.OsidProfile.__init__(self)
+
+    def _get_hierarchy_session(self):
+        try:
+            return self._provider_manager.get_${cat_name_under}_hierarchy_session(
+                Id(authority='${pkg_name_upper}',
+                   namespace='CATALOG',
+                   identifier='${cat_name_upper}'))
+        except Unsupported:
+            return None
 """
 
     supports_visible_federation_template = """
@@ -34,26 +43,22 @@ class ResourceManager:
         parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl) # need to add version argument
-        try:
-            self._catalog_hierarchy_session = self._provider_manager.get_${cat_name_under}_hierarchy_session()
-        except Unsupported:
-            pass
 """    
 
     get_resource_lookup_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_template
-        if self._object_query_session is None:
         try:
-            self._object_query_session = self._provider_manager.get_${object_name_under}_query_session()
+            query_session = self._provider_manager.get_${object_name_under}_query_session()
+            query_session.use_federated_${cat_name_under}_view()
         except Unsupported:
-            pass
+            query_session = None
         try:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(),
-                self._authz_session,
-                self._catalog_hierarchy_session,
-                self._object_query_session)
+                self._get_authz_session(),
+                self._get_hierarchy_session(),
+                query_session)
         except AttributeError:
             raise OperationFailed('${return_type} not implemented in authz_adapter')"""
 
@@ -61,15 +66,16 @@ class ResourceManager:
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
         try:
-            self._object_query_session = self._provider_manager.get_${object_name_under}_query_session()
+            query_session = self._provider_manager.get_${object_name_under}_query_session_for_${cat_name_under}(${arg0_name})
+            query_session.use_federated_${cat_name_under}_view()
         except Unsupported:
-            pass
+            query_session = None
         try:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(${arg0_name}),
-                self._authz_session,
-                self._catalog_hierarchy_session,
-                self._object_query_session)
+                self._get_authz_session(),
+                self._get_hierarchy_session(),
+                query_session)
         except AttributeError:
             raise OperationFailed('${return_type} not implemented in authz_adapter')"""
 
@@ -79,7 +85,7 @@ class ResourceManager:
         try:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(),
-                self._authz_session)
+                self._get_authz_session())
         except AttributeError:
             raise OperationFailed('${return_type} not implemented in authz_adapter')"""
 
@@ -89,10 +95,9 @@ class ResourceManager:
         try:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(${arg0_name}),
-                self._authz_session)
+                self._get_authz_session())
         except AttributeError:
             raise OperationFailed('${return_type} not implemented in authz_adapter')"""
-
 
 
 class ResourceProxyManager:
@@ -107,26 +112,23 @@ class ResourceProxyManager:
         parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl) # need to add version argument
-        try:
-            self._catalog_hierarchy_session = self._provider_manager.get_${cat_name_under}_hierarchy_session()
-        except Unsupported:
-            pass
 """
 
     get_resource_lookup_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_template
         try:
-            self._object_query_session = self._provider_manager.get_${object_name_under}_query_session()
+            query_session = self._provider_manager.get_${object_name_under}_query_session(proxy)
+            query_session.use_federated_${cat_name_under}_view()
         except Unsupported:
-            pass
+            query_session = None
         try:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(proxy),
-                self._authz_session,
+                self._get_authz_session(),
                 proxy,
-                self._catalog_hierarchy_session,
-                self._object_query_session)
+                self._get_hierarchy_session(),
+                query_session)
         except AttributeError:
             raise OperationFailed('${return_type} not implemented in authz_adapter')"""
 
@@ -134,16 +136,17 @@ class ResourceProxyManager:
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
         try:
-            self._object_query_session = self._provider_manager.get_${object_name_under}_query_session()
+            query_session = self._provider_manager.get_${object_name_under}_query_session_for_${cat_name_under}(${arg0_name}, proxy)
+            query_session.use_federated_${cat_name_under}_view()
         except Unsupported:
-            pass
+            query_session = None
         try:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(${arg0_name}, proxy),
-                self._authz_session,
+                self._get_authz_session(),
                 proxy,
-                self._catalog_hierarchy_session,
-                self._object_query_session)
+                self._get_hierarchy_session(),
+                query_session)
         except AttributeError:
             raise OperationFailed('${return_type} not implemented in authz_adapter')"""
 
@@ -153,7 +156,7 @@ class ResourceProxyManager:
         try:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(proxy),
-                self._authz_session,
+                self._get_authz_session(),
                 proxy)
         except AttributeError:
             raise OperationFailed('${return_type} not implemented in authz_adapter')"""
@@ -164,7 +167,7 @@ class ResourceProxyManager:
         try:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(${arg0_name}, proxy),
-                self._authz_session,
+                self._get_authz_session(),
                 proxy)
         except AttributeError:
             raise OperationFailed('${return_type} not implemented in authz_adapter')"""
@@ -179,27 +182,26 @@ class ResourceLookupSession:
         self._query_session = query_session
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name}.${object_name}'
-        self._use_federated_${cat_name_under}_view()
-        self._use_comparative_${object_name_under}_view()
+        self.use_federated_${cat_name_under}_view()
+        self.use_comparative_${object_name_under}_view()
 
-    def _get_authorized_${cat_name_under}_ids(self, ${cat_name_under}_id=self._qualifier_id):
-        if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
-            ${cat_name_under}_id_list = []
-            for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
-                if self._can('lookup', child_${cat_name_under}_id):
-                    ${cat_name_under}_id_list = ${cat_name_under}_id_list + self._get_authorized_${cat_name_under}_ids()
-            return ${cat_name_under}_id_list
+    def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
+        if self._can('lookup', ${cat_name_under}_id):
+            return [] # Don't go further - assumes authorizations inherited
         else:
-            return []
+            unauth_list = [str(${cat_name_under}_id)]
+        if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
+            for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
+                unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
+        return unauth_list
     
     def _try_harder(self, query):
-        authorized_${cat_name_under}_list = self._get_authorized_${cat_name_under}_ids()
-        if authorized_${cat_name_under}_list:
-            for ${cat_name_under}_id in authorized_${cat_name_under}_list:
-                query.match_${cat_name_under}_id(${cat_name_under}_id)
-            return self._query_session.get_${object_name_under_plural}_by_query(query)
-        else:
-            raise PermissionDenied()     
+        if self._hierarchy_session is None or self._query_session is None:
+            raise PermissionDenied() # Should probably try to return empty result instead
+                                     # perhaps through a query.match_any(match = None)?
+        for ${cat_name_under}_id in self._get_unauth_${cat_name_under}_ids(self._qualifier_id):
+            query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        return self._query_session.get_${object_name_under_plural}_by_query(query)
 """
 
     get_bin_id_template = """
@@ -247,9 +249,9 @@ class ResourceLookupSession:
     get_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resource_template
-        if self._can('lookup')
+        if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self.is_plenary_object_view():
+        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
             raise PermissionDenied()
         else:
             query = self._query_session.get_${object_name_under}_query()
@@ -263,22 +265,22 @@ class ResourceLookupSession:
     get_resources_by_ids_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_ids_template
-        if self._can('lookup')
+        if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self.is_plenary_object_view():
+        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
             raise PermissionDenied()
         else:
             query = self._query_session.get_${object_name_under}_query()
-            for ${object_name_under}_id in (${arg0_name}:
+            for ${object_name_under}_id in (${arg0_name}):
                 query.match_id(${object_name_under}_id, match=True)
             return self._try_harder(query)"""
 
     get_resources_by_genus_type_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type_template
-        if self._can('lookup')
+        if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self.is_plenary_object_view():
+        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
             raise PermissionDenied()
         else:
             query = self._query_session.get_${object_name_under}_query()
@@ -288,9 +290,9 @@ class ResourceLookupSession:
     get_resources_by_parent_genus_type_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_parent_genus_type_template
-        if self._can('lookup')
+        if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self.is_plenary_object_view():
+        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
             raise PermissionDenied()
         else:
             query = self._query_session.get_${object_name_under}_query()
@@ -300,9 +302,9 @@ class ResourceLookupSession:
     get_resources_by_record_type_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_record_type_template
-        if self._can('lookup')
+        if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self.is_plenary_object_view():
+        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
             raise PermissionDenied()
         else:
             query = self._query_session.get_${object_name_under}_query()
@@ -312,9 +314,9 @@ class ResourceLookupSession:
     get_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_template
-        if self._can('lookup')
+        if self._can('lookup'):
             return self._provider_session.${method_name}()
-        elif self._is_isolated_catalog_view() or self.is_plenary_object_view():
+        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
             raise PermissionDenied()
         else:
             query = self._query_session.get_${object_name_under}_query()
@@ -330,33 +332,30 @@ class ResourceQuerySession:
         self._query_session = query_session
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name}.${object_name}'
-        self._use_federated_${cat_name_under}_view()
-        self._use_comparative_${object_name_under}_view()
+        self.use_federated_${cat_name_under}_view()
+        self.use_comparative_${object_name_under}_view()
 
-    def _get_authorized_${cat_name_under}_ids(self, ${cat_name_under}_id=self._qualifier_id):
+    def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
+        unauth_list = []
         if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
-            ${cat_name_under}_id_list = []
             for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
-                if self._can('lookup', child_${cat_name_under}_id):
-                    ${cat_name_under}_id_list = ${cat_name_under}_id_list + self._get_authorized_${cat_name_under}_ids()
-            return ${cat_name_under}_id_list
-        else:
-            return []
+                if not self._can('lookup', child_${cat_name_under}_id):
+                    unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
+        return unauth_list
     
     def _try_harder(self, query):
-        authorized_${cat_name_under}_list = self._get_authorized_${cat_name_under}_ids()
-        if authorized_${cat_name_under}_list:
-            for ${cat_name_under}_id in authorized_${cat_name_under}_list:
-                query.match_${cat_name_under}_id(${cat_name_under}_id)
-            return self._query_session.get_${object_name_under_plural}_by_query(query)
-        else:
-            raise PermissionDenied()     
+        if self._hierarchy_session is None or self._query_session is None:
+            raise PermissionDenied() # Should probably try to return empty result instead
+                                     # perhaps through a query.match_any(match = None)?
+        for ${cat_name_under}_id in self._get_unauth_${cat_name_under}_ids(self._qualifier_id):
+            query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        return self._query_session.get_${object_name_under_plural}_by_query(query)
 
     class ${object_name}QueryWrapper(QueryWrapper):
         \"\"\"Wrapper for ${object_name}Queries to overide match_${cat_name_under}_id method\"\"\"
 
         def match_${cat_name_under}_id(self, ${cat_name_under}_id, match=True):
-            self.cat_id_args_list.append('${cat_name_under}_id': ${cat_name_under}_id, 'match': match)
+            self.cat_id_args_list.append({'${cat_name_under}_id': ${cat_name_under}_id, 'match': match})
 """
 
     can_search_resources_template = """
@@ -382,7 +381,7 @@ class ResourceQuerySession:
         for kwargs in ${arg0_name}.cat_id_args_list:
             if self._can('lookup', kwargs['${cat_name_under}_id']):
                 ${arg0_name}._provider_query.match_${cat_name_under}_id(**kwargs)
-        if self._can('lookup')
+        if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
         elif self._is_isolated_catalog_view() or self.is_plenary_object_view():
             raise PermissionDenied()
@@ -530,7 +529,7 @@ class ResourceBinSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40ODL.MIT.EDU') # This needs to be done right
         self._id_namespace = '${pkg_name}.${object_name}${cat_name}'
 """
 
@@ -592,7 +591,7 @@ class ResourceBinAssignmentSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40ODL.MIT.EDU') # This needs to be done right
         self._id_namespace = '${pkg_name}.${object_name}${cat_name}'
 """
 
@@ -709,7 +708,8 @@ class BinLookupSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
+                                                                                  # Build from authority in config
         self._id_namespace = '${pkg_name}.${cat_name}'
 """
 
@@ -752,7 +752,8 @@ class BinAdminSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
+                                                                                  # Build from authority in config
         self._id_namespace = '${pkg_name}.${cat_name}'
 """
 
@@ -823,13 +824,14 @@ class BinHierarchySession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
+                                                                                  # Build from authority in config
         self._id_namespace = '${pkg_name}.${cat_name}'
 """
 
-    can_access_objective_bank_hierarchy_template = """
+    can_access_bin_hierarchy_template = """
         # Implemented from azosid template for -
-        # osid.resource.BinHierarchySession.can_access_objective_bank_hierarchy
+        # osid.resource.BinHierarchySession.can_access_bin_hierarchy
         return self._can('${func_name}')"""
 
     get_bin_hierarchy_id_template = """
@@ -971,8 +973,9 @@ class BinHierarchyDesignSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
-        self._id_namespace = '${pkg_name}.${cat_name}'
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
+                                                                                  # Build from authority in config
+        self._id_namespace = '${pkg_name}.${cat_name}' # should this be '${pkg_name}.${cat_name}Hierarchy' ?
 """
 
     can_modify_bin_hierarchy_template = """
@@ -1017,7 +1020,8 @@ class BinQuerySession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40dlkit.mit.edu') # This needs to be done right
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
+                                                                                  # Build from authority in config
         self._id_namespace = '${pkg_name}.${cat_name}'
 """
 

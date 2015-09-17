@@ -17,7 +17,7 @@ def map_manager_patterns(interface, package, index):
             if (method['return_type'].split('.')[-1].endswith(session_type) and
                 index['package_catalog_caps'] not in method['return_type'].split('.')[-1]):
                 lookup_style = True
-                object_name = method['return_type'][:-len(session_type)]
+                object_name = (method['return_type']).split('.')[-1][:-len(session_type)]
 
 
         ##################################################################

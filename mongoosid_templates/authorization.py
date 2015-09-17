@@ -22,42 +22,48 @@ class AuthorizationSession:
             db_name='authorization',
             cat_name='Vault',
             cat_class=objects.Vault)
-        self._object_view = COMPARATIVE
-        self._catalog_view = ISOLATED
         self._kwargs = kwargs
 
     def _get_qualifier_idstrs(self, qualifier_id):
         try:
-            authority = qualifier_id.get_identifier().split('.')[0]
-            identifier = qualifier_id.get_identifier().split('.')[1]
+            authority = qualifier_id.get_identifier_namespace().split('.')[0].upper()
+            identifier = qualifier_id.get_identifier_namespace().split('.')[1].upper()
         except:
             return [str(qualifier_id)]
+        root_qualifier_id = Id(
+            authority=qualifier_id.get_authority(),
+            namespace=qualifier_id.get_identifier_namespace(),
+            identifier='ROOT')
+        if qualifier_id.get_identifier() == 'ROOT':
+            return [str(root_qualifier_id)]
         hierarchy_mgr = self._get_provider_manager('HIERARCHY') # local=True ???
         hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
             Id(authority=authority,
                namespace='CATALOG',
                identifier=identifier))
         node = hierarchy_session.get_nodes(qualifier_id, 10, 0, False)
-        return self._get_ancestor_idstrs(node)
+        return self._get_ancestor_idstrs(node) + [str(root_qualifier_id)]
 
     def _get_ancestor_idstrs(self, node):
+        node_list = [str(node.get_id())]
         if node.has_parents():
-            node_list = []
-            for parent_node in node:
+            for parent_node in node.get_parents():
                 node_list = node_list + self._get_ancestor_idstrs(parent_node)
-        else:
-            return [str(node.get_id())]
+        return node_list
 """
 
     can_access_authorizations = """
         return True"""
 
     is_authorized = """
-        collection = MongoClientValidated(self._db_prefix + 'authorization',
+        collection = MongoClientValidated('authorization',
                                           collection='Authorization',
                                           runtime=self._runtime)
         # NOTE: For now this only checks basic authorizations. It should
         # to be extended to deal with Resources and QualifierHierarchies
+        #print 'AGENT ID=', str(agent_id)
+        #print '    FUNCTION ID=', str(function_id)
+        #print '    QUAL ID STRINGS=', self._get_qualifier_idstrs(qualifier_id)
         try:
             collection.find_one(
                 {'agentId': str(agent_id),
@@ -86,14 +92,13 @@ class AuthorizationAdminSession:
             if not isinstance(arg, ABCType):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if authorization_record_types == []:
-            ## WHY are we passing family_id = self._catalog_id below, seems redundant:
+            ## WHY are we passing vault_id = self._catalog_id below, seems redundant:
             obj_form = objects.AuthorizationForm(
                 vault_id=self._catalog_id,
                 agent_id=agent_id,
                 function_id=function_id,
                 qualifier_id=qualifier_id,
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         else:
             obj_form = objects.AuthorizationForm(
@@ -103,7 +108,6 @@ class AuthorizationAdminSession:
                 function_id=function_id,
                 qualifier_id=qualifier_id,
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
@@ -121,14 +125,13 @@ class AuthorizationAdminSession:
             if not isinstance(arg, ABCType):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if authorization_record_types == []:
-            ## WHY are we passing family_id = self._catalog_id below, seems redundant:
+            ## WHY are we passing vault_id = self._catalog_id below, seems redundant:
             obj_form = objects.AuthorizationForm(
                 vault_id=self._catalog_id,
                 resource_id=resource_id,
                 function_id=function_id,
                 qualifier_id=qualifier_id,
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         else:
             obj_form = objects.AuthorizationForm(
@@ -138,7 +141,6 @@ class AuthorizationAdminSession:
                 function_id=function_id,
                 qualifier_id=qualifier_id,
                 catalog_id=self._catalog_id,
-                db_prefix=self._db_prefix,
                 runtime=self._runtime)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
@@ -150,7 +152,7 @@ class AuthorizationForm:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-        'from . import objects',
+        'from ..osid import objects as osid_objects',
     ]
 
     init = """
@@ -161,10 +163,8 @@ class AuthorizationForm:
         _record_type_data_sets = dict()
     _namespace = 'authorization.Authorization'
 
-    def __init__(self, osid_object_map=None, record_types=None, db_prefix='', runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self)
-        self._runtime = runtime
-        self._db_prefix = db_prefix
+    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+        osid_objects.OsidForm.__init__(self, runtime=runtime)
         self._kwargs = kwargs
         if 'catalog_id' in kwargs:
             self._catalog_id = kwargs['catalog_id']
@@ -189,6 +189,7 @@ class AuthorizationForm:
     def _init_map(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_map(self)
         self._my_map['vaultId'] = str(kwargs['vault_id'])
+        self._my_map['assignedVaultIds'] = [str(kwargs['vault_id'])]
         self._my_map['functionId'] = str(kwargs['function_id'])
         self._my_map['qualifierId'] = str(kwargs['qualifier_id'])
         if 'agent_id' in kwargs:

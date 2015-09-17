@@ -80,6 +80,14 @@ class Comment:
         else:
             return osid_object"""
 
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        obj_map['commentingAgentId'] = str(self.get_commenting_agent_id())
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
+
 class CommentQuery:
 
     import_statements = [

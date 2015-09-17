@@ -78,6 +78,8 @@ sessions_to_implement = [
     'AuthorizationSession',
     'AuthorizationLookupSession',
     'AuthorizationAdminSession',
+    'VaultLookupSession',
+    'VaultAdminSession',
     ### commenting service:
     'CommentLookupSession',
     'CommentQuerySession',
@@ -129,6 +131,7 @@ sessions_to_implement = [
     'ProxySession',
     ### relationship service
     'RelationshipLookupSession',
+    'RelationshipQuerySession',
     'RelationshipAdminSession',
     'FamilyLookupSession',
     'FamilyAdminSession',
@@ -155,6 +158,7 @@ sessions_to_implement = [
     'RepositoryHierarchyDesignSession',
     ## resource service
     'ResourceLookupSession',
+    'ResourceQuerySession',
     'ResourceAdminSession',
     'ResourceBinSession',
     'ResourceBinAssignmentSession',
@@ -181,8 +185,9 @@ objects_to_implement = [
     'Bank',
     ### authentication_process:
     'Authentication',
-    ### authorization:
+    ### authorization service:
     'Authorization',
+    'Vault',
     ### commenting service:
     'Comment',
     'Book',
@@ -237,4 +242,5 @@ variants_to_implement = [
     'List',
     'Node',
     'NodeList',
+    'Search',
 ]

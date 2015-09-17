@@ -237,6 +237,45 @@ class CompositionLookupSession:
         self._sequestered_view = UNSEQUESTERED"""
 
 
+class CompositionQuerySession:
+
+    import_statements = [
+        'ACTIVE = 0',
+        'ANY_STATUS = 1',
+        'SEQUESTERED = 0',
+        'UNSEQUESTERED = 1',
+    ]
+
+    init = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
+        self._catalog_class = objects.Repository
+        self._session_name = 'CompositionQuerySession'
+        self._catalog_name = 'Repository'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='repository',
+            cat_name='Repository',
+            cat_class=objects.Repository)
+        self._kwargs = kwargs
+        self._status_view = ACTIVE
+        self._sequestered_view = SEQUESTERED
+
+    def _view_filter(self):
+        \"\"\"
+        Overrides OsidSession._view_filter to add sequestering filter.
+
+        \"\"\"
+        view_filter = OsidSession._view_filter(self)
+        if self._sequestered_view == SEQUESTERED:
+            view_filter['sequestered'] = False
+        return view_filter
+"""
+
+
 class AssetCompositionSession:
 
     import_statements = [
@@ -448,6 +487,15 @@ class Asset:
     is_composition = """
         return bool(self._my_map['compositionId'])"""
 
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        obj_map['assetContent'] = obj_map['assetContents'] = [ac.object_map
+                                                              for ac in self.get_asset_contents()]
+        # note: assetContent is deprecated
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
 
 class AssetForm:
 
@@ -556,6 +604,15 @@ class Composition:
 
     def get_child_ids(self):
         return self.get_children_ids()"""
+
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if 'assetIds' in obj_map:
+            del obj_map['assetIds']
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
 
 class CompositionForm:
     # per Tom Coppeto. We are moving composition design to the CompositionForm

@@ -652,8 +652,9 @@ class OsidSession:
             return {}
         cat_name_mixed = self._catalog_name[0].lower() + self._catalog_name[1:]
         idstr_list = self._get_catalog_idstrs()
-        return {'$or': [{cat_name_mixed + 'Id': {'$in': idstr_list}},
-                        {'assigned' + self._catalog_name + 'Ids': {'$in': idstr_list}}]}
+        return {'assigned' + self._catalog_name + 'Ids': {'$in': idstr_list}}
+        # return {'$or': [{cat_name_mixed + 'Id': {'$in': idstr_list}},
+        #                 {'assigned' + self._catalog_name + 'Ids': {'$in': idstr_list}}]}
 
     def _assign_object_to_catalog(self, obj_id, cat_id, catalog_key):
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
@@ -766,106 +767,125 @@ class OsidObject:
         if obj_map is None:
             obj_map = dict(self._my_map)
         del obj_map['_id']
-        my_idstr = str(self.get_id())
+        #my_idstr = str(self.get_id())
 
         # to handle over-ridden fields, like for enclosed assessments
         obj_map['displayName']['text'] = self.display_name.text
         obj_map['description']['text'] = self.description.text
         obj_map['genusTypeId'] = str(self.genus_type)
 
-        # The following is crappy. Should be over-ridden in the corresponding
-        # object's get_object_map() methods instead:
-        if self._namespace == 'repository.Asset':
-            obj_map['assetContents'] = []
-            obj_map['assetContent'] = [] # This is deprecated, switch to assetContents
-            for asset_content in self.get_asset_contents():
-                obj_map['assetContents'].append(asset_content.get_object_map())
-                obj_map['assetContent'].append(asset_content.get_object_map())
-        if self._namespace == 'resource.Resource':
-            if 'agentIds' in obj_map:
-                del obj_map['agentIds']
-        if self._namespace == 'repository.AssetContent':
-            if 'dbPrefix' in obj_map:
-                del obj_map['dbPrefix']
-        if self._namespace == 'repository.Composition':
-            if 'assetIds' in obj_map:
-                del obj_map['assetIds']
-        if self._namespace == 'assessment.Item':
-            if obj_map['question']:
-                obj_map['question'] = self.get_question().get_object_map()
-            obj_map['answers'] = []
-            for answer in self.get_answers():
-                obj_map['answers'].append(answer.get_object_map())
-        if self._namespace == 'assessment.Question':
-            my_idstr = obj_map['itemId']
-            del obj_map['itemId']
-            lo_ids = self.get_learning_objective_ids()
-            obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
-        if self._namespace == 'assessment.Answer':
-            del obj_map['itemId']
-        if self._namespace == 'commenting.Comment':
-            obj_map['commentingAgentId'] = str(self.get_commenting_agent_id())
-        if self._namespace == 'assessment.Assessment':
-            if 'itemIds' in obj_map:
-                del obj_map['itemIds']
-        if self._namespace == 'assessment.AssessmentOffered':
-            if obj_map['startTime'] is not None:
-                start_time = obj_map['startTime']
-                obj_map['startTime'] = dict()
-                obj_map['startTime']['year'] = start_time.year
-                obj_map['startTime']['month'] = start_time.month
-                obj_map['startTime']['day'] = start_time.day
-                obj_map['startTime']['hour'] = start_time.hour
-                obj_map['startTime']['minute'] = start_time.minute
-                obj_map['startTime']['second'] = start_time.second
-                obj_map['startTime']['microsecond'] = start_time.microsecond
-            if obj_map['deadline'] is not None:
-                deadline = obj_map['deadline']
-                obj_map['startTime'] = dict()
-                obj_map['startTime']['year'] = deadline.year
-                obj_map['startTime']['month'] = deadline.month
-                obj_map['startTime']['day'] = deadline.day
-                obj_map['startTime']['hour'] = deadline.hour
-                obj_map['startTime']['minute'] = deadline.minute
-                obj_map['startTime']['second'] = deadline.second
-                obj_map['startTime']['microsecond'] = deadline.microsecond
-            if obj_map['displayName']['text'] == '':
-                obj_map['displayName']['text'] = self.get_display_name().get_text()
-            if obj_map['description']['text'] == '':
-                obj_map['description']['text'] = self.get_description().get_text()
-        if self._namespace == 'assessment.AssessmentTaken':
-            if obj_map['actualStartTime'] is not None:
-                actual_start_time = obj_map['actualStartTime']
-                obj_map['actualStartTime'] = dict()
-                obj_map['actualStartTime']['year'] = actual_start_time.year
-                obj_map['actualStartTime']['month'] = actual_start_time.month
-                obj_map['actualStartTime']['day'] = actual_start_time.day
-                obj_map['actualStartTime']['hour'] = actual_start_time.hour
-                obj_map['actualStartTime']['minute'] = actual_start_time.minute
-                obj_map['actualStartTime']['second'] = actual_start_time.second
-                obj_map['actualStartTime']['microsecond'] = actual_start_time.microsecond
-            if obj_map['completionTime'] is not None:
-                completion_time = obj_map['completionTime']
-                obj_map['completionTime'] = dict()
-                obj_map['completionTime']['year'] = completion_time.year
-                obj_map['completionTime']['month'] = completion_time.month
-                obj_map['completionTime']['day'] = completion_time.day
-                obj_map['completionTime']['hour'] = completion_time.hour
-                obj_map['completionTime']['minute'] = completion_time.minute
-                obj_map['completionTime']['second'] = completion_time.second
-                obj_map['completionTime']['microsecond'] = completion_time.microsecond
-            if obj_map['displayName']['text'] == '':
-                obj_map['displayName']['text'] = self.get_display_name().get_text()
-            if obj_map['description']['text'] == '':
-                obj_map['description']['text'] = self.get_description().get_text()
-            if 'itemIds' in obj_map:
-                del obj_map['itemIds']
-            if 'responses' in obj_map:
-                del obj_map['responses']
-        if self._namespace == 'grading.GradeSystem':
-            obj_map['grades'] = []
-            for grade in self.get_grades():
-                obj_map['grades'].append(grade.object_map)
+        # This has moved to mongo.repository.Asset:
+        # if self._namespace == 'repository.Asset':
+        #     obj_map['assetContent'] = obj_map['assetContents'] = [ac.object_map
+        #                                                           for ac in self.get_asset_contents()]
+        #     # note: assetContent is deprecated
+            
+        # This has moved to mongo.resource.Resource:
+        # if self._namespace == 'resource.Resource':
+        #     if 'agentIds' in obj_map:
+        #         del obj_map['agentIds']
+        
+        # This was an old impl thing and has been removed:
+        # if self._namespace == 'repository.AssetContent':
+        #     if 'dbPrefix' in obj_map:
+        #         del obj_map['dbPrefix']
+
+        # This has moved to mongo.repository.Composition:
+        # if self._namespace == 'repository.Composition':
+        #     if 'assetIds' in obj_map:
+        #         del obj_map['assetIds']
+
+        # This has moved to mongo.assessment.Item:
+        # if self._namespace == 'assessment.Item':
+        #     if obj_map['question']:
+        #         obj_map['question'] = self.get_question().get_object_map()
+        #     obj_map['answers'] = []
+        #     for answer in self.get_answers():
+        #         obj_map['answers'].append(answer.get_object_map())
+
+        # This has moved to mongo.assessment.Question:
+        # if self._namespace == 'assessment.Question':
+        #     my_idstr = obj_map['itemId']
+        #     del obj_map['itemId']
+        #     lo_ids = self.get_learning_objective_ids()
+        #     obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
+
+        # This has moved to mongo.assessment.Answer:
+        # if self._namespace == 'assessment.Answer':
+        #     del obj_map['itemId']
+
+        # This has moved to mongo.commenting.Comment:
+        # if self._namespace == 'commenting.Comment':
+        #     obj_map['commentingAgentId'] = str(self.get_commenting_agent_id())
+
+        # This has moved to mongo.assessment.Assessment:
+        # if self._namespace == 'assessment.Assessment':
+        #     if 'itemIds' in obj_map:
+        #         del obj_map['itemIds']
+
+        # This has moved to mongo.assessment.AssessmentOffered:
+        # if self._namespace == 'assessment.AssessmentOffered':
+        #     if obj_map['startTime'] is not None:
+        #         start_time = obj_map['startTime']
+        #         obj_map['startTime'] = dict()
+        #         obj_map['startTime']['year'] = start_time.year
+        #         obj_map['startTime']['month'] = start_time.month
+        #         obj_map['startTime']['day'] = start_time.day
+        #         obj_map['startTime']['hour'] = start_time.hour
+        #         obj_map['startTime']['minute'] = start_time.minute
+        #         obj_map['startTime']['second'] = start_time.second
+        #         obj_map['startTime']['microsecond'] = start_time.microsecond
+        #     if obj_map['deadline'] is not None:
+        #         deadline = obj_map['deadline']
+        #         obj_map['startTime'] = dict()
+        #         obj_map['startTime']['year'] = deadline.year
+        #         obj_map['startTime']['month'] = deadline.month
+        #         obj_map['startTime']['day'] = deadline.day
+        #         obj_map['startTime']['hour'] = deadline.hour
+        #         obj_map['startTime']['minute'] = deadline.minute
+        #         obj_map['startTime']['second'] = deadline.second
+        #         obj_map['startTime']['microsecond'] = deadline.microsecond
+        #     if obj_map['displayName']['text'] == '':
+        #         obj_map['displayName']['text'] = self.get_display_name().get_text()
+        #     if obj_map['description']['text'] == '':
+        #         obj_map['description']['text'] = self.get_description().get_text()
+
+        # This has moved to mongo.assessment.AssessmentTaken:
+        # if self._namespace == 'assessment.AssessmentTaken':
+        #     if obj_map['actualStartTime'] is not None:
+        #         actual_start_time = obj_map['actualStartTime']
+        #         obj_map['actualStartTime'] = dict()
+        #         obj_map['actualStartTime']['year'] = actual_start_time.year
+        #         obj_map['actualStartTime']['month'] = actual_start_time.month
+        #         obj_map['actualStartTime']['day'] = actual_start_time.day
+        #         obj_map['actualStartTime']['hour'] = actual_start_time.hour
+        #         obj_map['actualStartTime']['minute'] = actual_start_time.minute
+        #         obj_map['actualStartTime']['second'] = actual_start_time.second
+        #         obj_map['actualStartTime']['microsecond'] = actual_start_time.microsecond
+        #     if obj_map['completionTime'] is not None:
+        #         completion_time = obj_map['completionTime']
+        #         obj_map['completionTime'] = dict()
+        #         obj_map['completionTime']['year'] = completion_time.year
+        #         obj_map['completionTime']['month'] = completion_time.month
+        #         obj_map['completionTime']['day'] = completion_time.day
+        #         obj_map['completionTime']['hour'] = completion_time.hour
+        #         obj_map['completionTime']['minute'] = completion_time.minute
+        #         obj_map['completionTime']['second'] = completion_time.second
+        #         obj_map['completionTime']['microsecond'] = completion_time.microsecond
+        #     if obj_map['displayName']['text'] == '':
+        #         obj_map['displayName']['text'] = self.get_display_name().get_text()
+        #     if obj_map['description']['text'] == '':
+        #         obj_map['description']['text'] = self.get_description().get_text()
+        #     if 'itemIds' in obj_map:
+        #         del obj_map['itemIds']
+        #     if 'responses' in obj_map:
+        #         del obj_map['responses']
+
+        # This has moved to mongo.grading.GradeSystem:
+        # if self._namespace == 'grading.GradeSystem':
+        #     obj_map['grades'] = []
+        #     for grade in self.get_grades():
+        #         obj_map['grades'].append(grade.object_map)
 
         try: # Need to implement records for catalogs one of these days
             for record in self._records:
@@ -875,13 +895,14 @@ class OsidObject:
                     pass
         except AttributeError:
             pass
-        
-        if 'assignedCatalogs' in obj_map:
-            del obj_map['assignedCatalogs']
+
+        # This is no longer needed:
+        # if 'assignedCatalogs' in obj_map:
+        #     del obj_map['assignedCatalogs']
 
         obj_map.update(
             {'type': self._namespace.split('.')[-1],
-             'id': my_idstr})
+             'id': str(self.get_id())})
         return obj_map
 
     object_map = property(get_object_map)
@@ -1998,9 +2019,21 @@ class Metadata:
 
 class OsidNode:
 
+    import_statements = [
+        'from dlkit.primordium.id.primitives import Id',
+    ]
+
     init = """
     def __init__(self, node_map):
         self._my_map = node_map
+
+    def get_id(self):
+        \"\"\"Override markers.identifiable.get_id\"\"\"
+        return Id(self._my_map['id'])
+
+    id_ = property(fget=get_id)
+
+    ident = property(fget=get_id)
 """
 
     is_root = """

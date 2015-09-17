@@ -2,7 +2,6 @@
 
 class OsidProfile:
 
-    # This doesn't work for authz builders yet
     import_statemenrs = [
         'COMPARATIVE = 0',
         'PLENARY = 1',
@@ -14,9 +13,25 @@ class OsidProfile:
     def __init__(self):
         self._provider_manager = None
         self._my_runtime = None
-        self._authz_session = None
-        self._catalog_hierarchy_session = None
-        self._object_query_session = None
+
+    def initialize(self, runtime):
+        if runtime is None:
+            raise NullArgument()
+        if self._my_runtime is not None:
+            raise IllegalState('this manager has already been initialized.')
+        self._my_runtime = runtime
+        #config = runtime.get_configuration()
+        #parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
+        #provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        #authz_manager = runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
+        #self._authz_session = authz_manager.get_authorization_session()
+
+    def _get_authz_session(self):
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        authz_manager = self._my_runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
+        return authz_manager.get_authorization_session() # what about vaults?
 """
 
     get_id = """
@@ -59,8 +74,15 @@ class OsidProfile:
         pass"""
 
 class OsidManager:
-    
+
+    init = """
+    def __init__(self):
+        OsidProfile.__init__(self)"""
+
     initialize = """
+        OsidProfile.initialize(self, runtime)"""
+
+    old_initialize_delete_me_soon = """
         if runtime is None:
             raise NullArgument()
         if self._my_runtime is not None:
@@ -70,11 +92,25 @@ class OsidManager:
         parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         authz_manager = runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
-        self._authz_session = authz_manager.get_authorization_session()"""
+        self._authz_session = authz_manager.get_authorization_session()
+
+    def _get_authz_session(self):
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        authz_manager = self._my_runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
+        return authz_manager.get_authorization_session() # what about vaults?"""
 
 class OsidProxyManager:
     
+    init = """
+    def __init__(self):
+        OsidProfile.__init__(self)"""
+
     initialize = """
+        OsidProfile.initialize(self, runtime)"""
+
+    old_initialize_delete_me_soon = """
         if runtime is None:
             raise NullArgument()
         if self._my_runtime is not None:
@@ -84,7 +120,14 @@ class OsidProxyManager:
         parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         authz_manager = runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
-        self._authz_session = authz_manager.get_authorization_session()"""
+        self._authz_session = authz_manager.get_authorization_session()
+
+    def _get_authz_session(self):
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        authz_manager = self._my_runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
+        return authz_manager.get_authorization_session() # what about vaults?"""
 
 
 class Identifiable:
@@ -139,7 +182,7 @@ class OsidSession:
         function_id = Id(
             identifier=func_name,
             namespace=self._id_namespace,
-            authority='birdland.mit.edu')
+            authority='ODL.MIT.EDU')
         if qualifier_id is None:
             qualifier_id = self._qualifier_id
         return self._authz_session.is_authorized(
@@ -154,10 +197,10 @@ class OsidSession:
         self._object_view = PLENARY
 
     def _is_comparative_object_view(self):
-        return not bool(self._catalog_view)
+        return not bool(self._object_view)
 
     def _is_plenary_object_view(self):
-        return bool(self._catalog_view)
+        return bool(self._object_view)
 
     def _use_federated_catalog_view(self):
         self._catalog_view = FEDERATED

@@ -206,7 +206,7 @@ class ResourceLookupSession:
     use_isolated_bin_view_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.use_isolated_bin_view
-        self._use_federated_catalog_view()
+        self._use_isolated_catalog_view()
 
     # def _${cat_name_under}_view_filter(self):
     #     \"\"\"
@@ -699,7 +699,7 @@ class ResourceBinSession:
         ${object_name_under}_list = []
         for ${cat_name_under}_id in ${arg0_name}:
             ${object_name_under}_list += list(
-                get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
+                self.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
         return objects.${return_type}(${object_name_under}_list)"""
 
     get_bin_ids_by_resource_template = """
@@ -1188,9 +1188,9 @@ class BinHierarchySession:
         )
 """
 
-    can_access_objective_bank_hierarchy_template = """
+    can_access_bin_hierarchy_template = """
         # Implemented from template for
-        # osid.resource.ResourceHierarchySession.can_access_objective_bank_hierarchy
+        # osid.resource.ResourceHierarchySession.can_access_bin_hierarchy
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
@@ -1445,6 +1445,15 @@ ${instance_initers}
     get_resource_record_template = """
         return self._get_record(${arg0_name})"""
 
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if 'agentIds' in obj_map:
+            del obj_map['agentIds']
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
+
 class ResourceQuery:
 
     import_statements_pattern = [
@@ -1471,7 +1480,7 @@ class ResourceQuery:
         self._clear_terms('${var_name_mixed}')"""
 
     match_bin_id_template = """
-        self._add_match('assigned${cat_name}Ids', ${arg0_name}, ${arg1_name})"""
+        self._add_match('assigned${cat_name}Ids', str(${arg0_name}), ${arg1_name})"""
 
     clear_bin_id_terms_template = """
         self._clear_terms('assigned${cat_name}Ids')"""

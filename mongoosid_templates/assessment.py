@@ -1032,7 +1032,28 @@ class Question:
                                           runtime=self._runtime)
         item_map = collection.find_one({'_id': ObjectId(Id(self._my_map['itemId']).get_identifier())})
         return IdList(item_map['learningObjectiveIds'])
-"""
+
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        my_idstr = obj_map['itemId']
+        del obj_map['itemId']
+        lo_ids = self.get_learning_objective_ids()
+        obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
+        obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
+        obj_map['id'] = my_idstr
+        return obj_map
+
+    object_map = property(fget=get_object_map)"""
+
+class Answer:
+
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        del obj_map['itemId']
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
 
 class Item:
     
@@ -1057,6 +1078,17 @@ class Item:
                 pass
         return config # SHould this method build a real OSID configuration instead?
     
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if obj_map['question']:
+            obj_map['question'] = self.get_question().get_object_map()
+        obj_map['answers'] = []
+        for answer in self.get_answers():
+            obj_map['answers'].append(answer.get_object_map())
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)
+
     def _delete(self):
         try:
             self.get_question()._delete()
@@ -1066,6 +1098,19 @@ class Item:
             for answer in self.get_answers():
                 answer._delete()
             osid_objects.OsidObject._delete(self)"""
+
+
+class Assessment:
+
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if 'itemIds' in obj_map:
+            del obj_map['itemIds']
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
+
 
 class AssessmentOffered:
     
@@ -1093,7 +1138,38 @@ class AssessmentOffered:
         if osid_objects.OsidObject.get_description(self).get_text():
             return osid_objects.OsidObject.get_description(self)
         else:
-            return self.get_assessment().get_description()"""
+            return self.get_assessment().get_description()
+
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if obj_map['startTime'] is not None:
+            start_time = obj_map['startTime']
+            obj_map['startTime'] = dict()
+            obj_map['startTime']['year'] = start_time.year
+            obj_map['startTime']['month'] = start_time.month
+            obj_map['startTime']['day'] = start_time.day
+            obj_map['startTime']['hour'] = start_time.hour
+            obj_map['startTime']['minute'] = start_time.minute
+            obj_map['startTime']['second'] = start_time.second
+            obj_map['startTime']['microsecond'] = start_time.microsecond
+        if obj_map['deadline'] is not None:
+            deadline = obj_map['deadline']
+            obj_map['startTime'] = dict()
+            obj_map['startTime']['year'] = deadline.year
+            obj_map['startTime']['month'] = deadline.month
+            obj_map['startTime']['day'] = deadline.day
+            obj_map['startTime']['hour'] = deadline.hour
+            obj_map['startTime']['minute'] = deadline.minute
+            obj_map['startTime']['second'] = deadline.second
+            obj_map['startTime']['microsecond'] = deadline.microsecond
+        obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
+        if obj_map['displayName']['text'] == '':
+            obj_map['displayName']['text'] = self.get_display_name().get_text()
+        if obj_map['description']['text'] == '':
+            obj_map['description']['text'] = self.get_description().get_text()
+        return obj_map
+
+    object_map = property(fget=get_object_map)"""
     
     has_start_time_template = """
         # Implemented from template for osid.assessment.AssessmentOffered.has_start_time_template
@@ -1181,7 +1257,43 @@ class AssessmentTaken:
         if OsidObject.get_description(self).get_text():
             return OsidObject.get_description(self)
         else:
-            return self.get_assessment_offered().get_description()"""
+            return self.get_assessment_offered().get_description()
+
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if obj_map['actualStartTime'] is not None:
+            actual_start_time = obj_map['actualStartTime']
+            obj_map['actualStartTime'] = dict()
+            obj_map['actualStartTime']['year'] = actual_start_time.year
+            obj_map['actualStartTime']['month'] = actual_start_time.month
+            obj_map['actualStartTime']['day'] = actual_start_time.day
+            obj_map['actualStartTime']['hour'] = actual_start_time.hour
+            obj_map['actualStartTime']['minute'] = actual_start_time.minute
+            obj_map['actualStartTime']['second'] = actual_start_time.second
+            obj_map['actualStartTime']['microsecond'] = actual_start_time.microsecond
+        if obj_map['completionTime'] is not None:
+            completion_time = obj_map['completionTime']
+            obj_map['completionTime'] = dict()
+            obj_map['completionTime']['year'] = completion_time.year
+            obj_map['completionTime']['month'] = completion_time.month
+            obj_map['completionTime']['day'] = completion_time.day
+            obj_map['completionTime']['hour'] = completion_time.hour
+            obj_map['completionTime']['minute'] = completion_time.minute
+            obj_map['completionTime']['second'] = completion_time.second
+            obj_map['completionTime']['microsecond'] = completion_time.microsecond
+        if 'itemIds' in obj_map:
+            del obj_map['itemIds']
+        if 'responses' in obj_map:
+            del obj_map['responses']
+        obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
+        if obj_map['displayName']['text'] == '':
+            obj_map['displayName']['text'] = self.get_display_name().get_text()
+        if obj_map['description']['text'] == '':
+            obj_map['description']['text'] = self.get_description().get_text()
+        return obj_map
+
+    object_map = property(fget=get_object_map)"""
+
     
     get_taker_id = """
         if self._my_map['takerId']:

@@ -845,6 +845,8 @@ DISABLED = -1"""
                     append('from ..primitives import Id')
                     # Add the osid_error import
                     append('from ..osid.osid_errors import PermissionDenied, NullArgument, NotFound, Unsupported, Unimplemented')
+                    # Add the QueryWrapper import
+                    append('from ..utilities import QueryWrapper')
 
         # Now also check for templated imports
         templated_imports = self.method_builder.get_methods_templated_imports(self._abc_pkg_name(package, abc=False),
@@ -931,7 +933,7 @@ def eq_methods(interface_name):
 """    def __eq__(self, other):
         if isinstance(other, """ + interface_name + """):
             return (
-                self.get_authority() == other.get_authority() and
+                self.get_authority().upper() == other.get_authority().upper() and
                 self.get_identifier_namespace() == other.get_identifier_namespace() and
                 self.get_identifier() == other.get_identifier()
             )
@@ -1086,11 +1088,12 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 
     for data_name in persisted_data:
         mixed_name = under_to_mixed(data_name)
+        caps_name = mixed_name.title()
         mixed_singular = under_to_mixed(remove_plural(data_name))
 
         persisted_name = persisted_data[data_name]
         if persisted_name == 'OsidCatalog':
-            initers += '        self._my_map[\'assigned{}Ids\'] = [str(kwargs[\'{}_id\'])]\n'.format(mixed_name,
+            initers += '        self._my_map[\'assigned{}Ids\'] = [str(kwargs[\'{}_id\'])]\n'.format(caps_name,
                                                                                                      data_name)
         if ((persisted_name == 'osid.id.Id' or
                 persisted_name == 'OsidCatalog') and
@@ -1201,7 +1204,7 @@ def str_methods():
         \"\"\"Provides serialized version of Id\"\"\"
         return self._escape(self._escape(self.get_identifier_namespace()) + ':' +
                             self._escape(self.get_identifier()) + '@' +
-                            self._escape(self.get_authority()))
+                            self._escape(self.get_authority().upper()))
 
     def _escape(self, string):
         \"\"\"Private method for escaping : and @\"\"\"
