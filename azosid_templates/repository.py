@@ -107,6 +107,12 @@ class AssetAdminSession:
 
 class CompositionLookupSession:
 
+    init = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = provider_session.get_repository_id()
+        self._id_namespace = 'repository.Composition'
+"""
     # Note: These should be templated some day. But first add to pattern mappers
 
     use_active_composition_view = """
@@ -132,6 +138,15 @@ class CompositionLookupSession:
             raise PermissionDenied()
         else:
             return self._provider_session.use_unsequestered_composition_view()"""
+
+class CompositionSearchSession:
+
+    init = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = provider_session.get_repository_id()
+        self._id_namespace = 'repository.Composition'
+"""
 
 class AssetCompositionSession:
 

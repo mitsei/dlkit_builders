@@ -195,10 +195,9 @@ class AssessmentSession:
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT')
-        lookup_session = mgr.get_assessment_taken_lookup_session()
+        lookup_session = mgr.get_assessment_taken_lookup_session() # Should this be _for_bank?
         lookup_session.use_federated_bank_view()
-        return_object = lookup_session.get_assessment_taken(assessment_taken_id)
-        return return_object"""
+        return  lookup_session.get_assessment_taken(assessment_taken_id)"""
     
     is_assessment_section_complete = """
         return self.get_assessment_section(assessment_section_id).get_assessment_taken().has_ended()"""
@@ -286,12 +285,18 @@ class AssessmentSession:
 
     def _get_question(self, item_idstr):
         \"\"\"Helper method for getting a Question object given an Id.\"\"\"
-        item_id = Id(item_idstr)
-        collection = MongoClientValidated('assessment',
-                                          collection='Item',
-                                          runtime=self._runtime)
-        item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        return objects.Question(item_map['question'], runtime=self._runtime)"""
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = mgr.get_item_lookup_session()
+        lookup_session.use_federated_bank_view()
+        return lookup_session.get_item(Id(item_idstr)).get_question()
+
+        # Old impl:
+        # item_id = Id(item_idstr)
+        # collection = MongoClientValidated('assessment',
+        #                                   collection='Item',
+        #                                   runtime=self._runtime)
+        # item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
+        # return objects.Question(item_map['question'], runtime=self._runtime)"""
     
     get_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
@@ -1512,3 +1517,58 @@ class ItemQuery:
     clear_learning_objective_id_terms = """
         self._clear_match('learningObjectiveIds')
     """
+
+class ItemSearch:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
+        'from dlkit.mongo.osid import searches as osid_searches',
+    ]
+
+    init = """
+    def __init__(self, runtime):
+        self._namespace = 'assessment.Item'
+        try:
+            #pylint: disable=no-name-in-module
+            from ..records.types import ITEM_RECORD_TYPES as record_type_data_sets
+        except (ImportError, AttributeError):
+            record_type_data_sets = {}
+        self._record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        self._id_list = None
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_searches.OsidSearch.__init__(self, runtime)
+"""
+    search_among_items = """
+        self._id_list = item_ids"""
+
+class ItemSearchResults:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from . import objects',
+    ]
+
+    init = """
+    def __init__(self, results, runtime):
+        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+        self._results = results
+        self._runtime = runtime
+        self.retrieved = False
+"""
+
+    get_items = """
+        if self.retrieved:
+            raise errors.IllegalState('List has already been retrieved.')
+        self.retrieved = True
+        return objects.ItemList(self._results, runtime=self._runtime)"""
+
+
+class ItemSearchSession:
+
+    import_statements = [
+        'from . import searches',
+    ]

@@ -326,6 +326,13 @@ class ResourceQuerySession:
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
+    can_search_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceQuerySession.can_search_resources
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
     get_resource_query_template = """
         # Implemented from template for
         # osid.resource.ResourceQuerySession.get_resource_query_template
@@ -352,6 +359,71 @@ class ResourceQuerySession:
                                           runtime=self._runtime)
         result = collection.find(query_terms).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime)"""
+
+
+class ResourceSearchSession:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..osid.sessions import OsidSession',
+        'from ..utilities import MongoClientValidated',
+        'from . import queries',
+        'from . import searches',
+        'from bson.objectid import ObjectId',
+        'DESCENDING = -1',
+        'ASCENDING = 1'
+    ]
+
+    init_template = """
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
+        self._catalog_class = objects.${cat_name}
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='${pkg_name}',
+            cat_name='${cat_name}',
+            cat_class=objects.${cat_name})
+        self._kwargs = kwargs
+"""
+
+    get_resource_search_template = """
+        # Implemented from template for
+        # osid.resource.ResourceSearchSession.get_resource_search_template
+        return searches.${return_type}(runtime=self._runtime)"""
+
+    get_resources_by_search_template = """
+        # Implemented from template for
+        # osid.resource.ResourceSearchSession.get_resources_by_search_template
+        # Copied from osid.resource.ResourceQuerySession.get_resources_by_query_template
+        and_list = list()
+        or_list = list()
+        for term in ${arg0_name}._query_terms:
+            and_list.append({term: ${arg0_name}._query_terms[term]})
+        for term in ${arg0_name}._keyword_terms:
+            or_list.append({term: ${arg0_name}._keyword_terms[term]})
+        if ${arg1_name}._id_list is not None:
+            identifiers = [ObjectId(i.identifier) for i in ${arg1_name}._id_list]
+            and_list.append({'_id': {'$$in': identifiers}})
+        if or_list:
+            and_list.append({'$$or': or_list})
+        view_filter = self._view_filter()
+        if view_filter:
+            and_list.append(view_filter)
+        if and_list:
+            query_terms = {'$$and': and_list}
+        collection = MongoClientValidated('${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
+        if ${arg1_name}.start is not None and ${arg1_name}.end is not None:
+            result = collection.find(query_terms)[${arg1_name}.start:${arg1_name}.end]
+        else:
+            result = collection.find(query_terms)
+        return searches.${return_type}(result, runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
@@ -589,7 +661,7 @@ class ResourceNotificationSession:
         try:
             db_prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
             db_prefix = runtime.get_configuration().get_value_by_parameter(db_prefix_param_id).get_string_value()
-        except (AttributeError, KeyError, NotFound):
+        except (AttributeError, KeyError, errors.NotFound):
             pass
 
         self._listener = MongoListener(
@@ -1487,6 +1559,57 @@ class ResourceQuery:
 
     clear_bin_id_terms_template = """
         self._clear_terms('assigned${cat_name}Ids')"""
+
+
+class ResourceSearch:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
+        'from dlkit.mongo.osid import searches as osid_searches',
+    ]
+
+    init = """
+    def __init__(self, runtime):
+        self._namespace = 'resource.Resource'
+        try:
+            #pylint: disable=no-name-in-module
+            from ..records.types import RESOURCE_RECORD_TYPES as record_type_data_sets
+        except (ImportError, AttributeError):
+            record_type_data_sets = {}
+        self._record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        self._id_list = None
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_searches.OsidSearch.__init__(self, runtime)
+"""
+
+    search_among_resources = """
+        self._id_list = resource_ids"""
+
+class ResourceSearchResults:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from . import objects',
+    ]
+
+    init = """
+    def __init__(self, results, runtime):
+        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+        # self._results = [r for r in results]
+        self._results = results
+        self._runtime = runtime
+        self.retrieved = False
+"""
+
+    get_resources = """
+        if self.retrieved:
+            raise errors.IllegalState('List has already been retrieved.')
+        self.retrieved = True
+        return objects.ResourceList(self._results, runtime=self._runtime)"""
 
 
 class ResourceForm:

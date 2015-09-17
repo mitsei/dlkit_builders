@@ -1491,7 +1491,7 @@ class OsidList:
         if isinstance(iter_object, dict) or isinstance(iter_object, list):
             self._count = len(iter_object)
         elif isinstance(iter_object, Cursor):
-            self._count = iter_object.count()
+            self._count = iter_object.count(True)
         else:
             self._count = None
         self._runtime = runtime
@@ -1572,8 +1572,11 @@ class OsidList:
             return 0  # Don't know what to do here"""
 
     skip = """
-        ### STILL NEED TO IMPLEMENT THIS ###
-        pass"""
+        try:
+            self._iter_object.skip(n)
+        except AttributeError:
+            for i in range(0, n):
+                self.next()"""
 
 class OsidQuery:
 
@@ -1743,14 +1746,22 @@ class OsidQuery:
         self._keyword_terms = {}"""
 
     match_any = """
-        # clean query objects should match everything
-        pass"""
+        match_key = '_id'
+        param = '$exists'
+        if match:
+            flag = 'true'
+        else:
+            flag = 'false'
+        if match_key in self._query_terms:
+            self._query_terms[match_key][param] = flag
+        else:
+            self._query_terms[match_key] = {param: flag}"""
 
     clear_any_terms = """
-        # how and why do we do this?"""
+        # How to implement this?"""
 
 
-class IdentifiableQuery:
+class OsidIdentifiableQuery:
 
     import_statements = [
         'from bson.objectid import ObjectId'
@@ -1984,4 +1995,58 @@ class OsidSearch:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.primordium.id.primitives import Id',
     ]
+
+    init = """
+    def __init__(self, runtime):
+        self._records = dict()
+        # _load_records is in OsidExtensibleQuery:
+        # _all_supported_record_type_ids comes from inheriting query object
+        # THIS SHOULD BE RE-DONE:
+        self._load_records(self._all_supported_record_type_ids)
+        self._runtime = runtime
+        self._query_terms = {}
+        self._keyword_terms = {}
+        self._keyword_fields = ['displayName.text', 'description.text']
+        try:
+            # Try to get additional keyword fields from the runtime, if available:
+            config = runtime.get_configuration()
+            parameter_id = Id('parameter:keywordFields@mongo')
+            additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
+            self._keyword_fields += additional_keyword_fields[self._namespace]
+        except (AttributeError, KeyError, errors.NotFound):
+            pass
+        self._limit_result_set_start = None
+        self._limit_result_set_end = None
+"""
+
+    limit_result_set = """
+        if not isinstance(start, int) or not isinstance(end, int):
+            raise errors.InvalidArgument('start and end arguments must be integers.')
+        if end <= start:
+            raise errors.InvalidArgument('End must be greater than start.')
+
+        # because Python is 0 indexed
+        # Spec says that passing in (1, 25) should include 25 entries (1 - 25)
+        # Python indices 0 - 24
+        # Python [#:##] stops before the last index, but does not include it
+        self._limit_result_set_start = start - 1
+        self._limit_result_set_end = end
+
+    @property
+    def start(self):
+        return self._limit_result_set_start
+
+    @property
+    def end(self):
+        return self._limit_result_set_end"""
+
+
+class OsidSearchResults:
+
+    import_statements = [
+    ]
+
+    get_result_size = """
+        return self._results.count(True)"""

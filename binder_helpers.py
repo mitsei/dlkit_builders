@@ -377,6 +377,9 @@ def fix_bad_name(name, optional_match_term=None):
 
     if optional_match_term == 'get_composition_query_session':
         name = bad_names_map[name]
+    elif optional_match_term in ['get_composition_search_session',
+                                 'get_composition_search_session_for_repository']:
+        name = 'osid.repository.CompositionSearchSession'
     else:
         if name in bad_names_map:
             name = bad_names_map[name]

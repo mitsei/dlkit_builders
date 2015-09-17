@@ -388,6 +388,28 @@ class ResourceQuerySession:
         else:
             return self._try_harder(${arg0_name})"""
 
+
+class ResourceSearchSession:
+
+    get_resource_search_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from azosid template for -
+        # osid.resource.ResourceSearchSession.get_resource_search_template
+        if not self._can('search'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}()"""
+
+    get_resources_by_search_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from azosid template for -
+        # osid.resource.ResourceSearchSession.get_resources_by_search_template
+        if not self._can('search'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
+
 class ResourceAdminSession:
 
     init_template = """

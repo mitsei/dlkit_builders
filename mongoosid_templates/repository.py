@@ -275,6 +275,11 @@ class CompositionQuerySession:
         return view_filter
 """
 
+class CompositionSearchSession:
+
+    import_statements = [
+        'from . import searches',
+    ]
 
 class AssetCompositionSession:
 
@@ -519,6 +524,61 @@ class AssetForm:
         self._my_map['${var_name_mixed}'] = dict(self._${var_name}_default)"""
 
 
+class AssetSearch:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
+        'from dlkit.mongo.osid import searches as osid_searches',
+    ]
+
+    init = """
+    def __init__(self, runtime):
+        self._namespace = 'repository.Asset'
+        try:
+            #pylint: disable=no-name-in-module
+            from ..records.types import ASSET_RECORD_TYPES as record_type_data_sets
+        except (ImportError, AttributeError):
+            record_type_data_sets = {}
+        self._record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        self._id_list = None
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_searches.OsidSearch.__init__(self, runtime)
+"""
+    search_among_assets = """
+        self._id_list = asset_ids"""
+
+class AssetSearchResults:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from . import objects',
+    ]
+
+    init = """
+    def __init__(self, results, runtime):
+        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+        self._results = results
+        self._runtime = runtime
+        self.retrieved = False
+"""
+
+    get_assets = """
+        if self.retrieved:
+            raise errors.IllegalState('List has already been retrieved.')
+        self.retrieved = True
+        return objects.AssetList(self._results, runtime=self._runtime)"""
+
+class AssetSearchSession:
+
+    import_statements = [
+        'from . import searches',
+    ]
+
+
 class AssetContent:
 
     import_statements = [
@@ -684,3 +744,53 @@ class CompositionQuery:
     match_asset_id = """
         self._add_match('assetIds', str(asset_id), match)
     """
+
+
+class CompositionSearch:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
+        'from dlkit.mongo.osid import searches as osid_searches',
+    ]
+
+    init = """
+    def __init__(self, runtime):
+        self._namespace = 'repository.Composition'
+        try:
+            #pylint: disable=no-name-in-module
+            from ..records.types import COMPOSITION_RECORD_TYPES as record_type_data_sets
+        except (ImportError, AttributeError):
+            record_type_data_sets = {}
+        self._record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        self._id_list = None
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_searches.OsidSearch.__init__(self, runtime)
+"""
+
+    search_among_compositions = """
+        self._id_list = composition_ids"""
+
+class CompositionSearchResults:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from . import objects',
+    ]
+
+    init = """
+    def __init__(self, results, runtime):
+        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+        self._results = results
+        self._runtime = runtime
+        self.retrieved = False
+"""
+
+    get_compositions = """
+        if self.retrieved:
+            raise errors.IllegalState('List has already been retrieved.')
+        self.retrieved = True
+        return objects.CompositionList(self._results, runtime=self._runtime)"""
