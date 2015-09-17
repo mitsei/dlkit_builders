@@ -598,8 +598,9 @@ class ResourceAdminSession:
         mgr = self._get_provider_manager('${package_name_upper}')
         lookup_session = mgr._get_${object_name_under}_lookup_session()
         lookup_session.set_federated_${cat_name_under}_view()
-        ${object_name_under} = lookup_session.get_${object_name_under}(${object_name_under}_id)
-        insert_result = collection.insert_one(${object_name_under}._my_map)
+        ${object_name_under}_map = dict(lookup_session.get_${object_name_under}(${object_name_under}_id)._my_map)
+        del ${object_name_under}_map['_id']
+        insert_result = collection.insert_one(${object_name_under}_map)
         result = objects.${object_name}(
             collection.find_one({'_id': insert_result.inserted_id}),
             runtime=self._runtime)
