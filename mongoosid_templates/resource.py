@@ -709,10 +709,9 @@ class ResourceBinSession:
         lookup_session = mgr.get_${object_name_under}_lookup_session()
         lookup_session.use_federated_${cat_name_under}_view()
         ${object_name_under} = lookup_session.get_${object_name_under}(${arg0_name})
-        id_list = [Id(${object_name_under}._my_map['${cat_name_mixed}Id'])]
-        if 'assigned${cat_name}Ids' in ${object_name_under}._my_map:
-            for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
-                id_list.append(Id(idstr))
+        id_list = []
+        for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
+            id_list.append(Id(idstr))
         return IdList(id_list)"""
 
     get_bins_by_resource_template = """
@@ -731,10 +730,10 @@ class ResourceBinAssignmentSession:
     ]
 
     init_template = """
-    _session_name = '${interface_name}'
-
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
         self._forms = dict()
         self._kwargs = kwargs
 """
@@ -779,7 +778,7 @@ class ResourceBinAssignmentSession:
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
-        self._assign_object_to_catalog(${arg0_name}, ${arg1_name}, 'assigned${cat_name}Ids')"""
+        self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
 
     unassign_resource_from_bin_template = """
         # Implemented from template for
@@ -787,7 +786,7 @@ class ResourceBinAssignmentSession:
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         cat = lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
-        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name}, 'assigned${cat_name}Ids')"""
+        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
 
 
 class ResourceAgentSession:
@@ -1396,6 +1395,9 @@ class Resource:
         '#import importlib',
     ]
 
+    # Note: self._catalog_name = '${cat_name_under}' below is currently 
+    # only for osid.OsidObject.get_object_map() setting the now deprecated
+    # ${cat_name}Id element and may be removed someday
     init_template = """
     try:
         #pylint: disable=no-name-in-module
@@ -1408,6 +1410,7 @@ class Resource:
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
+        self._catalog_name = '${cat_name_under}'
 ${instance_initers}
 
 """

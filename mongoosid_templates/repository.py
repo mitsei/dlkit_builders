@@ -433,6 +433,9 @@ class Asset:
         'from ..osid.markers import Extensible'
     ]
 
+    # Note: self._catalog_name = 'Repository' below is currently 
+    # only for osid.OsidObject.get_object_map() setting the now deprecated
+    # repositoryId element and may be removed someday
     init = """
     try:
         from ..records.types import ASSET_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
@@ -444,6 +447,7 @@ class Asset:
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
+        self._catalog_name = 'Repository'
         if self.is_composition():
             self._composition = self.get_composition()
 

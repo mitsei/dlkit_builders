@@ -451,6 +451,9 @@ class GradebookColumnSummary:
         'import numpy as np',
     ]
 
+    # Note: self._catalog_name = 'Gradebook below is currently 
+    # only for osid.OsidObject.get_object_map() setting the now deprecated
+    # gradebookId element and may be removed someday
     init = """
     try:
         #pylint: disable=no-name-in-module
@@ -463,6 +466,7 @@ class GradebookColumnSummary:
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
+        self._catalog_name = 'Gradebook'
 
         # Not set the entries to be included in the calculation
         self._entries = self._get_entries_for_calculation()

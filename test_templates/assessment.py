@@ -528,10 +528,11 @@ class AssessmentOfferedQuerySession:
         create_form.display_name = 'Test Assessment'
         create_form.description = 'Test Assessment for AssessmentOfferedLookupSession tests'
         cls.assessment = cls.catalog.create_assessment(create_form)
-        for num in [0, 1]:
+        for color in ['Red', 'Blue', 'Green', 'red']:
             create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
-            create_form.display_name = 'Test AssessmentOffered ' + str(num)
-            create_form.description = 'Test AssessmentOffered for AssessmentOfferedLookupSession tests'
+            create_form.display_name = 'Test AssessmentOffered ' + color
+            create_form.description = (
+                'Test AssessmentOffered for AssessmentOfferedQuerySession tests, did I mention green')
             obj = cls.catalog.create_assessment_offered(create_form)
             cls.assessment_offered_list.append(obj)
             cls.assessment_offered_ids.append(obj.ident)
@@ -571,10 +572,11 @@ class AssessmentTakenQuerySession:
         create_form.display_name = 'Test AssessmentOffered'
         create_form.description = 'Test AssessmentOffered for AssessmentOfferedLookupSession tests'
         cls.assessment_offered = cls.catalog.create_assessment_offered(create_form)
-        for num in [0, 1]:
+        for color in ['Red', 'Blue', 'Green', 'red']:
             create_form = cls.catalog.get_assessment_taken_form_for_create(cls.assessment_offered.ident, [])
-            create_form.display_name = 'Test AssessmentTaken ' + str(num)
-            create_form.description = 'Test AssessmentTaken for AssessmentTakenLookupSession tests'
+            create_form.display_name = 'Test AssessmentTaken ' + color
+            create_form.description = (
+                'Test AssessmentTaken for AssessmentTakenQuerySession tests, did I mention green')
             obj = cls.catalog.create_assessment_taken(create_form)
             cls.assessment_taken_list.append(obj)
             cls.assessment_taken_ids.append(obj.ident)

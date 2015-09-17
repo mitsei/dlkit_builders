@@ -188,7 +188,6 @@ class AuthorizationForm:
 
     def _init_map(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_map(self)
-        self._my_map['vaultId'] = str(kwargs['vault_id'])
         self._my_map['assignedVaultIds'] = [str(kwargs['vault_id'])]
         self._my_map['functionId'] = str(kwargs['function_id'])
         self._my_map['qualifierId'] = str(kwargs['qualifier_id'])

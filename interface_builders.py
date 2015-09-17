@@ -1095,8 +1095,10 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
         if persisted_name == 'OsidCatalog':
             initers += '        self._my_map[\'assigned{}Ids\'] = [str(kwargs[\'{}_id\'])]\n'.format(caps_name,
                                                                                                      data_name)
-        if ((persisted_name == 'osid.id.Id' or
-                persisted_name == 'OsidCatalog') and
+        # if ((persisted_name == 'osid.id.Id' or
+        #         persisted_name == 'OsidCatalog') and
+        #         data_name in initialized_data):
+        elif (persisted_name == 'osid.id.Id' and
                 data_name in initialized_data):
             initers += '        self._my_map[\'{}Id\'] = str(kwargs[\'{}_id\'])\n'.format(mixed_name,
                                                                                           data_name)

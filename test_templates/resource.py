@@ -248,7 +248,8 @@ class ResourceQuerySession:
         for color in ['Red', 'Blue', 'Green', 'red']:
             create_form = cls.catalog.get_${object_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + color
-            create_form.description = 'Test ${object_name} for ${interface_name} tests, did I mention green'
+            create_form.description = (
+                'Test ${object_name} for ${interface_name} tests, did I mention green')
             obj = cls.catalog.create_${object_name_under}(create_form)
             cls.${object_name_under}_list.append(obj)
             cls.${object_name_under}_ids.append(obj.ident)
