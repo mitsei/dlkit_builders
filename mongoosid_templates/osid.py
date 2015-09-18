@@ -500,7 +500,7 @@ class OsidSession:
             'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
             'recordTypeIds': [] # Could this somehow inherit source catalog records?
         }
-        return cat_class(catalog_map)
+        return cat_class(catalog_map, self._runtime)
 
     def _create_orchestrated_cat(self, foreign_catalog_id, db_name, cat_name):
         \"\"\"Creates a catalog in the current service orchestrated with a foreign service Id.\"\"\"
