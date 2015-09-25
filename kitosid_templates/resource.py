@@ -384,7 +384,12 @@ class ResourceAdminSession:
         if isinstance(args[-1], list) or '${object_name_under}_record_types' in kwargs:
             return self.get_${object_name_under}_form_for_create(*args, **kwargs)
         else:
-            return self.${method_name}(*args, **kwargs)"""
+            return self.${method_name}(*args, **kwargs)
+
+    def duplicate_${object_name_under}(self, ${object_name_under}_id):
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceAdminSession.get_resource_form_for_update
+        return self._get_provider_session('${interface_name_under}').duplicate_${object_name_under}(${object_name_under}_id)"""
 
     update_resource_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
