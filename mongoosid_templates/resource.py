@@ -605,7 +605,9 @@ class ResourceAdminSession:
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        ${object_name_under}_map = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+        ${object_name_under}_map = collection.find_one(
+            dict({'_id': ObjectId(${arg0_name}.get_identifier())},
+                 **self._view_filter()))
 
         objects.${object_name}(${object_name_under}_map, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
