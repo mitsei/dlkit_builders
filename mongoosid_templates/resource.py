@@ -553,7 +553,31 @@ class ResourceAdminSession:
             create_form = self.get_${object_name_under}_form_for_create([ENCLOSURE_RECORD_TYPE])
             create_form.set_enclosed_object(enclosure_id)
             ${object_name_under}_id = self.create_${object_name_under}(create_form).get_id()
-        return ${object_name_under}_id"""
+        return ${object_name_under}_id
+
+    @utilities.arguments_not_none
+    def duplicate_${object_name_under}(self, ${object_name_under}_id):
+        collection = MongoClientValidated('${package_name}',
+                                          collection='${object_name}',
+                                          runtime=self._runtime)
+        mgr = self._get_provider_manager('${package_name_upper}')
+        lookup_session = mgr.get_${object_name_under}_lookup_session()
+        lookup_session.use_federated_${cat_name_under}_view()
+        try:
+            lookup_session.use_unsequestered_${object_name_under}_view()
+        except AttributeError:
+            pass
+        ${object_name_under}_map = dict(lookup_session.get_${object_name_under}(${object_name_under}_id)._my_map)
+        del ${object_name_under}_map['_id']
+        if '${cat_name_lower}Id' in ${object_name_under}_map:
+            ${object_name_under}_map['${cat_name_lower}Id'] = str(self._catalog_id)
+        if 'assigned${cat_name}Ids' in ${object_name_under}_map:
+            ${object_name_under}_map['assigned${cat_name}Ids'] = [str(self._catalog_id)]
+        insert_result = collection.insert_one(${object_name_under}_map)
+        result = objects.${object_name}(
+            collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime)
+        return result"""
 
     update_resource_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
@@ -597,7 +621,9 @@ class ResourceAdminSession:
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        ${object_name_under}_map = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+        ${object_name_under}_map = collection.find_one(
+            dict({'_id': ObjectId(${arg0_name}.get_identifier())},
+                 **self._view_filter()))
 
         objects.${object_name}(${object_name_under}_map, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""

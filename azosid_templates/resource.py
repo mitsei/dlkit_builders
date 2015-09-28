@@ -457,7 +457,13 @@ class ResourceAdminSession:
         if not self._can('update'):
             raise PermissionDenied()
         else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+            return self._provider_session.${method_name}(${arg0_name})
+
+    def duplicate_${object_name_under}(self, ${object_name_under}_id):
+        if not self._can('update'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.duplicate_${object_name_under}(${arg0_name})"""
 
     update_resource_template = """
         # Implemented from azosid template for -

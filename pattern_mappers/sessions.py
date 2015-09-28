@@ -1932,6 +1932,7 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
+                              cat_name = index['package_catalog_caps'],
                               return_type_full = method['args'][0]['arg_type'][:-4],
                               arg0_name = method['args'][0]['var_name'],
                               arg0_type_full = method['args'][0]['arg_type']))
