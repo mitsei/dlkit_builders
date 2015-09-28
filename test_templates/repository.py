@@ -106,7 +106,7 @@ class CompositionQuerySession:
         cfu.set_sequestered(True)
         self.catalog.update_composition(cfu)
         query = self.catalog.get_composition_query()
-        query.match_display_name('red')
+        query.match_display_name('orange')
         self.assertEqual(self.catalog.get_compositions_by_query(query).available(), 1)
         query.clear_display_name_terms()
         query.match_display_name('blue', match=False)

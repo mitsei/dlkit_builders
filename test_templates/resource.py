@@ -245,7 +245,7 @@ class ResourceQuerySession:
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        for color in ['Red', 'Blue', 'Green', 'red']:
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
             create_form = cls.catalog.get_${object_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + color
             create_form.description = (
@@ -275,7 +275,7 @@ class ResourceQuerySession:
     get_resources_by_query_template = """
         # Need to add some tests with string types
         query = self.catalog.get_${object_name_under}_query()
-        query.match_display_name('red')
+        query.match_display_name('orange')
         self.assertEqual(self.catalog.${method_name}(query).available(), 2)
         query.clear_display_name_terms()
         query.match_display_name('blue', match=False)

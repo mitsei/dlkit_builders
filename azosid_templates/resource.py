@@ -60,7 +60,7 @@ class ResourceManager:
                 self._get_hierarchy_session(),
                 query_session)
         except AttributeError:
-            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
+            raise OperationFailed()"""
 
     get_resource_lookup_session_for_bin_template = """
         # Implemented from azosid template for -
@@ -77,7 +77,7 @@ class ResourceManager:
                 self._get_hierarchy_session(),
                 query_session)
         except AttributeError:
-            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
+            raise OperationFailed()"""
 
     get_resource_admin_session_template = """
         # Implemented from azosid template for -
@@ -87,7 +87,7 @@ class ResourceManager:
                 self._provider_manager.${method_name}(),
                 self._get_authz_session())
         except AttributeError:
-            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
+            raise OperationFailed()"""
 
     get_resource_admin_session_for_bin_template = """
         # Implemented from azosid template for -
@@ -97,7 +97,7 @@ class ResourceManager:
                 self._provider_manager.${method_name}(${arg0_name}),
                 self._get_authz_session())
         except AttributeError:
-            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
+            raise OperationFailed()"""
 
 
 class ResourceProxyManager:
@@ -130,7 +130,7 @@ class ResourceProxyManager:
                 self._get_hierarchy_session(),
                 query_session)
         except AttributeError:
-            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
+            raise OperationFailed()"""
 
     get_resource_lookup_session_for_bin_template = """
         # Implemented from azosid template for -
@@ -148,7 +148,7 @@ class ResourceProxyManager:
                 self._get_hierarchy_session(),
                 query_session)
         except AttributeError:
-            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
+            raise OperationFailed()"""
 
     get_resource_admin_session_template = """
         # Implemented from azosid template for -
@@ -159,7 +159,7 @@ class ResourceProxyManager:
                 self._get_authz_session(),
                 proxy)
         except AttributeError:
-            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
+            raise OperationFailed()"""
 
     get_resource_admin_session_for_bin_template = """
         # Implemented from azosid template for -
@@ -170,7 +170,7 @@ class ResourceProxyManager:
                 self._get_authz_session(),
                 proxy)
         except AttributeError:
-            raise OperationFailed('${return_type} not implemented in authz_adapter')"""
+            raise OperationFailed()"""
 
 
 class ResourceLookupSession:
@@ -194,7 +194,7 @@ class ResourceLookupSession:
             for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
                 unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
         return unauth_list
-    
+
     def _try_harder(self, query):
         if self._hierarchy_session is None or self._query_session is None:
             raise PermissionDenied() # Should probably try to return empty result instead
@@ -329,27 +329,28 @@ class ResourceQuerySession:
     def __init__(self, provider_session, authz_session, proxy=None, hierarchy_session=None, query_session=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._hierarchy_session = hierarchy_session
-        self._query_session = query_session
+        #self._query_session = query_session
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name}.${object_name}'
         self.use_federated_${cat_name_under}_view()
-        self.use_comparative_${object_name_under}_view()
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
-        unauth_list = []
+        if self._can('search', ${cat_name_under}_id):
+            return [] # Don't go further - assumes authorizations inherited
+        else:
+            unauth_list = [str(${cat_name_under}_id)]
         if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
             for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
-                if not self._can('lookup', child_${cat_name_under}_id):
-                    unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
+                unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
         return unauth_list
     
     def _try_harder(self, query):
-        if self._hierarchy_session is None or self._query_session is None:
+        if self._hierarchy_session is None:
             raise PermissionDenied() # Should probably try to return empty result instead
                                      # perhaps through a query.match_any(match = None)?
         for ${cat_name_under}_id in self._get_unauth_${cat_name_under}_ids(self._qualifier_id):
-            query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
-        return self._query_session.get_${object_name_under_plural}_by_query(query)
+            query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        return self._provider_session.get_${object_name_under_plural}_by_query(query)
 
     class ${object_name}QueryWrapper(QueryWrapper):
         \"\"\"Wrapper for ${object_name}Queries to overide match_${cat_name_under}_id method\"\"\"
@@ -367,8 +368,7 @@ class ResourceQuerySession:
         # Implemented from azosid template for -
         # osid.resource.ResourceQuerySession.get_resource_query_template
         if (not self._can('search') and 
-                (self._is_isolated_catalog_view() or self.is_plenary_object_view()) and
-                not self._get_authorized_${cat_name_under}_ids()):
+                self._is_isolated_catalog_view()):
             raise PermissionDenied()
         else:
             return self.${object_name}QueryWrapper(self._provider_session.${method_name}())"""
@@ -376,17 +376,19 @@ class ResourceQuerySession:
     get_resources_by_query_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceQuerySession.get_resources_by_query_template
-        if not hasattribute(${arg0_name}, 'cat_id_args_list'):
+        if not hasattr(${arg0_name}, 'cat_id_args_list'):
             raise Unsupported('${arg0_name} not from this session')
         for kwargs in ${arg0_name}.cat_id_args_list:
-            if self._can('lookup', kwargs['${cat_name_under}_id']):
+            if self._can('search', kwargs['${cat_name_under}_id']):
                 ${arg0_name}._provider_query.match_${cat_name_under}_id(**kwargs)
-        if self._can('lookup'):
+        if self._can('search'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self.is_plenary_object_view():
+        elif self._is_isolated_catalog_view():
             raise PermissionDenied()
         else:
-            return self._try_harder(${arg0_name})"""
+            result = self._try_harder(${arg0_name})
+            ${arg0_name}._provider_query.clear_${cat_name_under}_terms()
+            return result"""
 
 
 class ResourceSearchSession:

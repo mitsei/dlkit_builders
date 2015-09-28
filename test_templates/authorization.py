@@ -10,6 +10,7 @@ class AuthorizationSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.id.primitives import Id',
         'LOOKUP_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'lookup\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
+        'SEARCH_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'search\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
         'CREATE_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'create\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
         'DELETE_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'delete\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
         'CREATE_BIN_FUNCTION_ID = Id(**{\'identifier\': \'create\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
@@ -151,6 +152,19 @@ class AuthorizationSession:
             create_form = cls.authz_admin_session.get_authorization_form_for_create_for_agent(
                 AGENT_ID,
                 LOOKUP_RESOURCE_FUNCTION_ID,
+                cls.bin_id_list[num],
+                [])
+            create_form.display_name = 'Test Authorization ' + str(num)
+            create_form.description = 'Test Authorization for AuthorizationLookupSession tests'
+            authz = cls.authz_admin_session.create_authorization(create_form)
+            cls.authz_list.append(authz)
+            cls.authz_id_list.append(authz.ident)
+
+        # Set up Resource search authorizations for Jane
+        for num in [1, 5]:
+            create_form = cls.authz_admin_session.get_authorization_form_for_create_for_agent(
+                AGENT_ID,
+                SEARCH_RESOURCE_FUNCTION_ID,
                 cls.bin_id_list[num],
                 [])
             create_form.display_name = 'Test Authorization ' + str(num)

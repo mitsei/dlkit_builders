@@ -206,23 +206,7 @@ class ResourceLookupSession:
     use_isolated_bin_view_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.use_isolated_bin_view
-        self._use_isolated_catalog_view()
-
-    # def _${cat_name_under}_view_filter(self):
-    #     \"\"\"
-    #     Returns the mongodb catalog filter for isolated or federated views.
-    #     
-    #     This also searches across all underlying ${cat_name_plural} in federated
-    #     ${cat_name_under} view. Real authz for controlling access to underlying
-    #     ${cat_name_plural_under} will need to be managed in an adapter above the
-    #     pay grade of this implementation.
-    #     
-    #     \"\"\"
-    #     if self._is_phantom_root_federated():
-    #         return {}
-    #     idstr_list = self._get_catalog_idstrs()
-    #     return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-    #                     {'assignedCatalogIds': {'$$in': idstr_list}}]}"""
+        self._use_isolated_catalog_view()"""
 
     get_resource_template = """
         # Implemented from template for

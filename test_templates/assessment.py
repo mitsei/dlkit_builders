@@ -528,7 +528,7 @@ class AssessmentOfferedQuerySession:
         create_form.display_name = 'Test Assessment'
         create_form.description = 'Test Assessment for AssessmentOfferedLookupSession tests'
         cls.assessment = cls.catalog.create_assessment(create_form)
-        for color in ['Red', 'Blue', 'Green', 'red']:
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
             create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
             create_form.display_name = 'Test AssessmentOffered ' + color
             create_form.description = (
@@ -572,7 +572,7 @@ class AssessmentTakenQuerySession:
         create_form.display_name = 'Test AssessmentOffered'
         create_form.description = 'Test AssessmentOffered for AssessmentOfferedLookupSession tests'
         cls.assessment_offered = cls.catalog.create_assessment_offered(create_form)
-        for color in ['Red', 'Blue', 'Green', 'red']:
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
             create_form = cls.catalog.get_assessment_taken_form_for_create(cls.assessment_offered.ident, [])
             create_form.display_name = 'Test AssessmentTaken ' + color
             create_form.description = (

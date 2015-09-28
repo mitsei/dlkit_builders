@@ -1768,7 +1768,7 @@ class OsidIdentifiableQuery:
     ]
 
     match_id = """
-        self._add_match('_id': ObjectId(id_.get_identifier()))"""
+        self._add_match('_id', ObjectId(id_.get_identifier()))"""
 
     clear_id_terms = """
         self._clear_terms('_id')"""
