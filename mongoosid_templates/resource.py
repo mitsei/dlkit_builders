@@ -655,6 +655,7 @@ class ResourceNotificationSession:
         #'from ..primitives import Type',
         'from ..utilities import MongoClientValidated',
         'from ..utilities import MongoListener',
+        'from .. import MONGO_LISTENER'
         #'from . import objects',
     ]
 
@@ -672,70 +673,85 @@ class ResourceNotificationSession:
             db_name='${pkg_name}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
-        self._kwargs = kwargs
-        self.reliable = True
 
+        if not MONGO_LISTENER.is_alive():
+            MONGO_LISTENER.initialize(runtime)
+            MONGO_LISTENER.start()
+
+        self._receiver = kwargs['receiver']
         db_prefix = ''
         try:
             db_prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
             db_prefix = runtime.get_configuration().get_value_by_parameter(db_prefix_param_id).get_string_value()
         except (AttributeError, KeyError, errors.NotFound):
             pass
+        self._ns='{0}${pkg_name}.${object_name}'.format(db_prefix),
 
-        self._listener = MongoListener(
-            ns='{0}${pkg_name}.${object_name}'.format(db_prefix),
-            receiver=kwargs['receiver'],
-            runtime=self._runtime,
-            authority=self._authority,
-            obj_name_plural='${object_name_under_plural}')
-        self._listener.start() # This may want to go in the register methods
+        if self._ns not in MONGO_LISTENER.receivers:
+            MONGO_LISTENER.receivers[self._ns] = dict()
+        MONGO_LISTENER.receivers[self._ns][self._receiver] = {
+            'authority': self._authority,
+            'obj_name_plural': '${object_name_under_plural}',
+            'i': False,
+            'u': False,
+            'd': False,
+            'reliable': False,
+        }
+
+    def __del__(self):
+        \"\"\"Make sure the receiver is removed from the listener\"\"\"
+        del MONGO_LISTENER.receivers[self._ns][self._receiver]
+        super(${interface_name}, self).__del__()
 """
 
     reliable_resource_notifications_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.reliable_resource_notifications
-        self._listener._reliable = True"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = True"""
 
     unreliable_resource_notifications_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.unreliable_resource_notifications
-        self._listener._reliable = False"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = False"""
 
     acknowledge_notification_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.acknowledge_notification
-        self._listener.acknowledge_notification(notification_id)"""
+        try:
+            del MONGO_LISTENER.notifications[notification_id]
+        except KeyError:
+            pass"""
 
     register_for_new_resources_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_new_resources
-        self._listener._registry['i'] = True"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['i'] = True"""
 
     register_for_changed_resources_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_changed_resources
-        self._listener._registry['u'] = True"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = True"""
 
     register_for_changed_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_changed_resource
-        if self._listener._registry['u'] == False:
-            self._listener._registry['u'] = []
-        if isinstance(self._listener._registry['u'], list):
-            self._listener._registry['u'].append(${arg0_name}.get_identifier())"""
+        if MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] == False:
+            MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = []
+        if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['u'], list):
+            MONGO_LISTENER.receivers[self._ns][self._receiver]['u'].append(${arg0_name}.get_identifier())"""
 
     register_for_deleted_resources_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_deleted_resources
-        self._listener._registry['d'] = True"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = True"""
 
     register_for_deleted_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_deleted_resource
-        if self._listener._registry['d'] == False:
-            self._listener._registry['d'] = []
-        if isinstance(self._listener._registry['d'], list):
-            self._listener._registry['d'].append(${arg0_name}.get_identifier())"""
+        if MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] == False:
+            MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = []
+        if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['d'], list):
+            self.MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())"""
 
 class ResourceBinSession:
 

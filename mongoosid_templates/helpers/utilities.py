@@ -190,24 +190,23 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
     if runtime is not None:
         manager.initialize(runtime)
     return manager
-    
+
 
 class MongoListener(Thread):
     """A utility thread that listens for database changes for notification sessions"""
-    def __init__(self, ns, receiver, runtime, authority, obj_name_plural):
+
+    def __init__(self, wait_seconds=10, max_attempts=3):
         """Constructor"""
         Thread.__init__(self)
         self.setDaemon(True)
-        self.reliable = False
-        self._ns = ns
-        self._obj_name_plural = obj_name_plural
-        self._receiver = receiver
-        self._authority = authority
-        self._registry = {
-            'i': False,
-            'u': False,
-            'd': False
-            }
+        self._wait_period = datetime.timedelta(seconds=wait_seconds)
+        self._max_attempts = max_attempts
+        self.receivers = dict()
+
+    def initialize(self, runtime):
+        """Initialize this listener. Finds most recent timestamp"""
+        if self.is_alive():
+            raise IllegalState('notification thread is already initialized')
         if not MONGO_CLIENT.is_mongo_client_set() and runtime is not None:
             set_mongo_client(runtime)
         cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find().sort('ts', DESCENDING).limit(-1)
@@ -215,27 +214,43 @@ class MongoListener(Thread):
             self.last_timestamp = cursor.next()['ts']
         except StopIteration:
             self.last_timestamp = Timestamp(0, 0)
-        self._notification_list = list()
 
-    def _callback(self, doc):
-        """process the notification"""
-        if self._registry[doc['op']]:
-            if self._registry[doc['op']] is True or str(doc['o']['_id']) in self._registry[doc['op']]:
-                verb = VMAP[doc['op']]
-                object_id = Id(self._ns + ':' + str(doc['o']['_id']) + '@' + self._authority)
-                notification_id = Id(self._ns + 'Notification:' + str(ObjectId()) + '@' + self._authority)
-                getattr(self._receiver, '_'.join([verb, self._obj_name_plural]))(notification_id, [object_id])
-                if self.reliable:
-                    self._notification_list.append(notification_id)
+    def _notify_receiver(self, receiver, params, doc):
+        """Send notification to the receiver"""
+        verb = VMAP[doc['op']]
+        ns = doc['ns']
+        notification_id = Id(ns + 'Notification:' + str(ObjectId()) + '@' + params['authority'])
+        object_id = Id(ns + ':' + str(doc['o']['_id']) + '@' + params['authority'])
+        getattr(receiver, '_'.join([verb, params['obj_name_plural']]))(notification_id, [object_id])
 
-    def acknowledge_notification(self, notification_id):
-        """receipt of notification has been acknowledged"""
-        if self.reliable:
-            try:
-                self._notification_list.remove(notification_id)
-            except ValueError:
-                pass
-            
+    def _run_namespace(self, doc):
+        """Run through all receivers related to the doc's namespace"""
+        for receiver in self.receivers[doc['ns']]:
+            params = self.receivers[doc['ns']][receiver]
+            if params[doc['op']] is True or str(doc['o']['_id']) in params[doc['op']]:
+                self._notify_receiver(receiver, params, doc)
+                if params['reliable'] and self._max_attempts > 1:
+                    self.notifications[notification_id] = {
+                        'receiver': receiver,
+                        'params': dict(params),
+                        'doc': dict(doc),
+                        'ts': datetime.datetime.now(),
+                        'attempts': 1}
+
+    def _retry(self):
+        """Deal with unacknowledged notifications."""
+        for notification in self.notifications:
+            if datetime.datetime.now() > self.notifications[notification]['ts'] + self._wait_period:
+                self._notify_receiver(
+                    self.notifications[notification]['receiver'],
+                    self.notifications[notification]['params'],
+                    self.notifications[notification]['doc'])
+                if self.notifications[notification]['attempts'] >= self._max_attempts - 1:
+                    del self.notifications[notification]
+                else:
+                    self.notifications[notification]['ts'] = datetime.datetime.now()
+                    self.notifications[notification]['attempts'] + 1
+
     def run(self):
         """main control loop for thread"""
         while True:
@@ -245,8 +260,70 @@ class MongoListener(Thread):
             cursor.add_option(2)  # tailable
             cursor.add_option(8)  # oplog_replay
             cursor.add_option(32)  # await data
+            self._retry()
             for doc in cursor:
                 self.last_timestamp = doc['ts']
-                if doc['ns'] == self._ns:
-                    self._callback(doc)
+                if doc['ns'] in self._receivers:
+                    self._run_namespace(doc)
             time.sleep(1)
+
+
+
+# class OLDMongoListener(Thread):
+#     """A utility thread that listens for database changes for notification sessions"""
+#     def __init__(self, ns, receiver, runtime, authority, obj_name_plural):
+#         """Constructor"""
+#         Thread.__init__(self)
+#         self.setDaemon(True)
+#         self.reliable = False
+#         self._ns = ns
+#         self._obj_name_plural = obj_name_plural
+#         self._receiver = receiver
+#         self._authority = authority
+#         self._registry = {
+#             'i': False,
+#             'u': False,
+#             'd': False
+#             }
+#         if not MONGO_CLIENT.is_mongo_client_set() and runtime is not None:
+#             set_mongo_client(runtime)
+#         cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find().sort('ts', DESCENDING).limit(-1)
+#         try:
+#             self.last_timestamp = cursor.next()['ts']
+#         except StopIteration:
+#             self.last_timestamp = Timestamp(0, 0)
+#         self._notification_list = list()
+# 
+#     def _callback(self, doc):
+#         """process the notification"""
+#         if self._registry[doc['op']]:
+#             if self._registry[doc['op']] is True or str(doc['o']['_id']) in self._registry[doc['op']]:
+#                 verb = VMAP[doc['op']]
+#                 object_id = Id(self._ns + ':' + str(doc['o']['_id']) + '@' + self._authority)
+#                 notification_id = Id(self._ns + 'Notification:' + str(ObjectId()) + '@' + self._authority)
+#                 getattr(self._receiver, '_'.join([verb, self._obj_name_plural]))(notification_id, [object_id])
+#                 if self.reliable:
+#                     self._notification_list.append(notification_id)
+# 
+#     def acknowledge_notification(self, notification_id):
+#         """receipt of notification has been acknowledged"""
+#         if self.reliable:
+#             try:
+#                 self._notification_list.remove(notification_id)
+#             except ValueError:
+#                 pass
+#             
+#     def run(self):
+#         """main control loop for thread"""
+#         while True:
+#             cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find(
+#                 {'ts':{'$gt': self.last_timestamp}})
+#             # http://stackoverflow.com/questions/30401063/pymongo-tailing-oplog
+#             cursor.add_option(2)  # tailable
+#             cursor.add_option(8)  # oplog_replay
+#             cursor.add_option(32)  # await data
+#             for doc in cursor:
+#                 self.last_timestamp = doc['ts']
+#                 if doc['ns'] == self._ns:
+#                     self._callback(doc)
+#             time.sleep(1)
