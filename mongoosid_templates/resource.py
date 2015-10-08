@@ -654,7 +654,7 @@ class ResourceNotificationSession:
         #'from ..primitives import Id',
         #'from ..primitives import Type',
         'from ..utilities import MongoClientValidated',
-        'from ..utilities import MongoListener',
+        #'from ..utilities import MongoListener',
         'from .. import MONGO_LISTENER'
         #'from . import objects',
     ]
@@ -685,7 +685,7 @@ class ResourceNotificationSession:
             db_prefix = runtime.get_configuration().get_value_by_parameter(db_prefix_param_id).get_string_value()
         except (AttributeError, KeyError, errors.NotFound):
             pass
-        self._ns='{0}${pkg_name}.${object_name}'.format(db_prefix),
+        self._ns='{0}${pkg_name}.${object_name}'.format(db_prefix)
 
         if self._ns not in MONGO_LISTENER.receivers:
             MONGO_LISTENER.receivers[self._ns] = dict()
