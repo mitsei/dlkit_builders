@@ -64,11 +64,11 @@ class RepositoryProxyManager:
 class AssetAdminSession:
 
     import_statements_pattern = [
-    'from dlkit.abstract_osid.osid import errors',
-    'from bson.objectid import ObjectId',
-    'from ..utilities import MongoClientValidated',
-    'CREATED = True'
-    'UPDATED = True',
+        'from dlkit.abstract_osid.osid import errors',
+        'from bson.objectid import ObjectId',
+        'from ..utilities import MongoClientValidated',
+        'CREATED = True'
+        'UPDATED = True',
     ]
 
     create_asset_content_template = """
