@@ -1,42 +1,111 @@
+from config import managers_to_implement
 
-import time
-import os
-import json
-import string
-from config import *
-from binder_helpers import camel_to_under, flagged_for_implementation
-from binder_helpers import make_plural, fix_reserved_word
-from abcbinder_settings import XOSIDNAMESPACEURI as ns
-from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
-from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
-from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
-from abcbinder_settings import XOSIDFILESUFFIX as xosid_suffix
-from abcbinder_settings import ABCROOTPACKAGE as abc_root_pkg
-from abcbinder_settings import ABCPREFIX as abc_prefix
-from abcbinder_settings import ABCSUFFIX as abc_suffix
-from abcbinder_settings import MAINDOCINDENTSTR as main_doc_indent
-from abcbinder_settings import ENCODING as utf_code
-from kitdocbuilder_settings import ABCROOTPACKAGE as abc_root_pkg
-from kitdocbuilder_settings import APPNAMEPREFIX as app_prefix
-from kitdocbuilder_settings import APPNAMESUFFIX as app_suffix
-from kitdocbuilder_settings import SOURCEDIR as doc_root_pkg
-from kitdocbuilder_settings import PACKAGEPREFIX as pkg_prefix
-from kitdocbuilder_settings import PACKAGESUFFIX as pkg_suffix
-from kitdocbuilder_settings import TEMPLATEDIR as template_dir
+from build_controller import BaseBuilder
+from interface_builders import InterfaceBuilder
 
-excluded_packages = ['grading', 'hierarchy', 'proxy', 'relationship', 'resource', 'type']
 
-##
-# This is the entry point for making django-based python classes for
-# the osids. It processes all of the osid maps in the package maps
-# directory.
-def make_kitdocs(build_abc = False, re_index = False, re_map = False):
-    from abcbinder import make_abcosids
-    if build_abc:
-        make_abcosids(re_index, re_map)
-    for json_file in os.listdir(pkg_maps_dir):
-        if json_file.endswith('.json'):
-            make_kitdoc(pkg_maps_dir + '/' + json_file)
+class KitSourceBuilder(BaseBuilder):
+    def __init__(self, build_dir=None, *args, **kwargs):
+        super(KitSourceBuilder, self).__init__(*args, **kwargs)
+        if build_dir is None:
+            build_dir = self._abs_path
+        self._build_dir = build_dir
+        self._root_dir = self._build_dir + '/source'
+        self._template_dir = self._abs_path + '/builders/kitosid_templates'
+
+        self._excluded_packages = ['proxy', 'type']
+
+        self.interface_builder = InterfaceBuilder('doc_source',
+                                                  self._root_dir,
+                                                  self._template_dir)
+
+    def _empty_modules_dict(self):
+        module = dict(manager=dict(imports=[], body=''),
+                      services=dict(imports=[], body=''),
+                      service_managers=dict(imports=[], body=''),
+                      catalog=dict(imports=[], body=''),
+                      properties=dict(imports=[], body=''),
+                      objects=dict(imports=[], body=''),
+                      queries=dict(imports=[], body=''),
+                      query_inspectors=dict(imports=[], body=''),
+                      searches=dict(imports=[], body=''),
+                      search_orders=dict(imports=[], body=''),
+                      rules=dict(imports=[], body=''),
+                      metadata=dict(imports=[], body=''),
+                      receivers=dict(imports=[], body=''),
+                      sessions=dict(imports=[], body=''),
+                      managers=dict(imports=[], body=''),
+                      records=dict(imports=[], body=''),
+                      primitives=dict(imports=[], body=''),
+                      markers=dict(imports=[], body=''),
+                      others_please_move=dict(imports=[], body=''))
+        module[self.patterns['package_catalog_under']] = dict(imports=[], body='')
+        return module
+
+    def _patterns(self):
+        patterns = self._load_patterns_file()
+        for inf in self.package['interfaces']:
+            patterns[self._is_session(inf, 'manager')] = self._is_manager_session(inf,
+                                                                                  patterns,
+                                                                                  self.package['name'])
+            patterns[self._is_session(inf, 'catalog')] = self._is_catalog_session(inf,
+                                                                                  patterns,
+                                                                                  self.package['name'])
+        return patterns
+
+    def _update_module_imports(self, modules, interface):
+        module_name = interface['category']
+        if (interface['category'] != 'sessions' and
+                'OsidProfile' not in interface['inherit_shortnames']):
+
+            if ('OsidManager' in interface['inherit_shortnames'] or
+                    'OsidProxyManager' in interface['inherit_shortnames']):
+                module_name = 'service_managers'
+                currentmodule_str = '.. currentmodule:: dlkit.services.' + self.package['name']
+                automodule_str = '.. automodule:: dlkit.services.' + self.package['name']
+            elif interface['shortname'] == self.patterns['package_catalog_caps']:
+                module_name = self.patterns['package_catalog_under']
+                currentmodule_str = '.. currentmodule:: dlkit.services.' + self.package['name']
+                automodule_str = ''
+            else:
+                module_name = interface['category']
+                currentmodule_str = ('.. currentmodule:: dlkit.' +
+                                     self.package['name'] + '.' + module_name)
+                automodule_str = ('.. automodule:: dlkit.' +
+                                     self.package['name'] + '.' + module_name)
+
+            self.append(modules[module_name]['imports'], currentmodule_str)
+            self.append(modules[module_name]['imports'], automodule_str)
+
+            module_title = '\n' + ' '.join(module_name.split('_')).title() + '\n'
+            module_title += '=' * len(module_name)
+
+            self.append(modules[module_name]['imports'], module_title)
+
+    def build_this_interface(self, interface):
+        excepted_osid_categories = ['properties',
+                                    'query_inspectors',
+                                    'receivers',
+                                    'search_orders',
+                                    'searches',]
+
+        manager_to_impl = (interface['category'] == 'managers' and
+                           self.package['name'] in managers_to_implement)
+
+        return (interface['category'] not in excepted_osid_categories and
+                manager_to_impl and not
+                interface['shortname'].endswith('ProxyManager'))
+
+    def make(self):
+        self.interface_builder.make_osids()
+
+    def write_license_file(self):
+        with open(self._abc_module('summary', extension='rst'), 'w') as write_file:
+            write_file.write(('Summary\n=======\n\n' +
+                              '.. currentmodule:: dlkit.services.' +
+                              self.package['name'] + '\n' +
+                              '.. automodule:: dlkit.services.' +
+                              self.package['name'] + '\n').encode('utf-8'))
 
 ##
 # This function expects a file containing a json representation of an

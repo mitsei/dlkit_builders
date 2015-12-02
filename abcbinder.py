@@ -9,7 +9,7 @@ from mappers import Mapper
 # from djbuilder_settings import APPNAMESUFFIX as app_suffix
 
 
-class ABCBuilder(Mapper, BaseBuilder):
+class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
     def __init__(self, build_dir=None, *args, **kwargs):
         super(ABCBuilder, self).__init__(*args, **kwargs)
         if build_dir is None:
@@ -18,11 +18,42 @@ class ABCBuilder(Mapper, BaseBuilder):
         self._root_dir = build_dir + '/abstract_osid'
         self._make_dir(self._root_dir)
 
-        self.interface_builder = InterfaceBuilder('abc',
-                                                  self._root_dir)
+        self._class = 'abc'
+
+        # self.interface_builder = InterfaceBuilder('abc',
+        #                                           self._root_dir)
 
     def make(self):
-        self.interface_builder.make_osids(build_abc=True)
+        self.make_osids(build_abc=True)
+
+    def module_header(self, module):
+        return ('\"\"\"Implementations of ' + self.package['name'] +
+                ' abstract base class ' + module + '.\"\"\"\n' +
+                '# pylint: disable=invalid-name\n' +
+                '#     Method names comply with OSID specification.\n' +
+                '# pylint: disable=no-init\n' +
+                '#     Abstract classes do not define __init__.\n' +
+                '# pylint: disable=too-few-public-methods\n' +
+                '#     Some interfaces are specified as \'markers\' and include no methods.\n' +
+                '# pylint: disable=too-many-public-methods\n' +
+                '#     Number of methods are defined in specification\n' +
+                '# pylint: disable=too-many-ancestors\n' +
+                '#     Inheritance defined in specification\n' +
+                '# pylint: disable=too-many-arguments\n' +
+                '#     Argument signature defined in specification.\n' +
+                '# pylint: disable=duplicate-code\n' +
+                '#     All apparent duplicates have been inspected. They aren\'t.\n' +
+                'import abc\n')
+
+    def write_license_file(self):
+        with open(self._abc_module('license'), 'w') as write_file:
+            write_file.write((self._utf_code + '\"\"\"' +
+                              self.package['title'] + '\n' +
+                              self.package['name'] + ' version ' +
+                              self.package['version'] + '\n\n' +
+                              self.package['copyright'] + '\n\n' +
+                              self.package['license'] + '\n\n\"\"\"').encode('utf-8') +
+                             '\n')
 
 
 

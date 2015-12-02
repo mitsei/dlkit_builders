@@ -51,7 +51,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         method_doc += self._dind + '\"\"\"'
         return method_doc
 
-    def _get_method_context(self, package_name, method, interface, patterns):
+    def _get_method_context(self, method, interface, patterns):
         """Get the method context vars, to be used in the template"""
         from interface_builders import is_manager_session
 
@@ -61,8 +61,10 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 arg_number + '_type': arg_type,
                 arg_number + '_type_under': camel_to_under(arg_type),
                 arg_number + '_type_mixed': camel_to_mixed(arg_type),
-                arg_number + '_abcapp_name': self._app_name(get_pkg_name(arg_type_full.strip('[]')), abstract=True),
-                arg_number + '_abcpkg_name': self._abc_pkg_name(get_pkg_name(arg_type_full.strip('[]')), abc=False),
+                arg_number + '_abcapp_name': self._app_name(package_name=get_pkg_name(arg_type_full.strip('[]')),
+                                                            abstract=True),
+                arg_number + '_abcpkg_name': self._abc_pkg_name(package_name=get_pkg_name(arg_type_full.strip('[]')),
+                                                                abc=False),
                 arg_number + '_module': self.get_interface_module(
                     get_pkg_name(arg_type_full),
                     arg_type)
@@ -82,19 +84,19 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         if 'package_name' in context:
             # Add keyword arguments to template kwargs that are particular
             # to the mongo implementation
-            context['app_name'] = self._app_name(context['package_name'])
-            context['implpkg_name'] = self._abc_pkg_name(context['package_name'], abc=False)
-            context['abcapp_name'] = self._app_name(context['package_name'])
-            context['abcpkg_name'] = self._abc_pkg_name(context['package_name'], abc=False)
+            context['app_name'] = self._app_name()
+            context['implpkg_name'] = self._abc_pkg_name(abc=False)
+            context['abcapp_name'] = self._app_name()
+            context['abcpkg_name'] = self._abc_pkg_name(abc=False)
             context['interface_name_under'] = camel_to_under(context['interface_name'])
             context['interface_name_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
-            context['package_name_caps'] = package_name.title()
-            context['package_name_upper'] = package_name.upper()
+            context['package_name_caps'] = self.package['name'].title()
+            context['package_name_upper'] = self.package['name'].upper()
 
             if method['args']:
-                 context['args_kwargs_or_nothing'] = '*args, **kwargs'
+                context['args_kwargs_or_nothing'] = '*args, **kwargs'
             else:
-                 context['args_kwargs_or_nothing'] = ''
+                context['args_kwargs_or_nothing'] = ''
 
             if context['interface_name_under'].endswith('_session'):
                 context['session_shortname_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
@@ -121,8 +123,9 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     get_pkg_name(context['return_type_full']),
                     context['return_type_full'].split('.')[-1])
             if 'return_pkg' in context:
-                context['return_app_name'] = self._app_name(context['return_pkg'])
-                context['return_implpkg_name'] = self._abc_pkg_name(context['return_pkg'], abc=False)
+                context['return_app_name'] = self._app_name(package_name=context['return_pkg'])
+                context['return_implpkg_name'] = self._abc_pkg_name(package_name=context['return_pkg'],
+                                                                    abc=False)
                 context['return_pkg_title'] = context['return_pkg'].title()
                 context['return_pkg_caps'] = context['return_pkg'].upper()
             if 'return_cat_name' in context:
@@ -132,8 +135,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['object_name_mixed'] = under_to_mixed(context['object_name_under'])
                 # Might want to add creating kwargs['object_name' from this as well]
             if 'object_name' in context and 'package_name' in context:
-                context['object_app_name'] = self._app_name(context['package_name'])
-                context['object_implpkg_name'] = self._abc_pkg_name(context['package_name'], abc=False)
+                context['object_app_name'] = self._app_name()
+                context['object_implpkg_name'] = self._abc_pkg_name(abc=False)
                 context['object_module'] = self.get_interface_module('package_name', 'object_name')
             if 'var_name' in context:
                 context['var_name_upper'] = context['var_name'].upper()
@@ -196,7 +199,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['method_session_name'] = context['method_name'].replace('get_', '')
 
             # Special one for services test builder:
-            if is_manager_session(interface, patterns, package_name):
+            if is_manager_session(interface, patterns, self.package['name']):
                 context['svc_mgr_or_catalog'] = 'svc_mgr'
             else:
                 context['svc_mgr_or_catalog'] = 'catalog'
@@ -205,11 +208,11 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         #print interface['shortname'], method['name']
         return context
 
-    def _make_method(self, method, package_name, interface, patterns):
+    def _make_method(self, method, interface, patterns):
         if self._is('abc'):
             decorator = self._ind + '@abc.abstractmethod'
             args = ['self']
-            method_impl = self._make_method_impl(method, package_name, interface, patterns)
+            method_impl = self._make_method_impl(method, interface, patterns)
 
             for arg in method['args']:
                 args.append(arg['var_name'])
@@ -228,13 +231,12 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             args = ['self']
             decorator = ''
             method_sig = ''
-            method_impl = self._make_method_impl(method, package_name, interface, patterns)
+            method_impl = self._make_method_impl(method, interface, patterns)
 
             if self._is('mongo'):
-                if self.extra_templates_exists(package_name, method, interface, patterns, '_arg_template'):
-                    arg_context = self._get_method_context(package_name, method, interface, patterns)
+                if self.extra_templates_exists(method, interface, patterns, '_arg_template'):
+                    arg_context = self._get_method_context(method, interface, patterns)
                     arg_default_map = self.get_arg_default_map(arg_context,
-                                                               package_name,
                                                                method,
                                                                interface,
                                                                patterns)
@@ -314,7 +316,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 else:
                     return method_sig + '\n' + method_doc + '\n' + method_impl
 
-    def _make_method_impl(self, method, package_name, interface, patterns):
+    def _make_method_impl(self, method, interface, patterns):
         def stripn(_string):
             return _string.strip('\n')
 
@@ -341,7 +343,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             if interface_sn + '.' + method_n in patterns:
                 pattern = patterns[interface_sn + '.' + method_n]['pattern']
 
-            impl_class = self._load_impl_class(package_name, interface_sn)
+            impl_class = self._load_impl_class(interface_sn)
 
             template_class = None
             if pattern:
@@ -361,7 +363,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                         getattr(impl_class, method_n) is None):
                     raise SkipMethod()
 
-            context = self._get_method_context(package_name, method, interface, patterns)
+            context = self._get_method_context(method, interface, patterns)
 
             template_name = self.last(pattern) + '_template'
 
@@ -440,15 +442,15 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
                 continue
 
-            if self.extra_templates_exists(package_name, method, interface, patterns, '_import_templates'):
-                arg_context = self._get_method_context(package_name, method, interface, patterns)
+            if self.extra_templates_exists(method, interface, patterns, '_import_templates'):
+                arg_context = self._get_method_context(method, interface, patterns)
                 imports += self.get_templated_imports(arg_context, package_name, method, interface, patterns)
             else:
                 continue
 
         return imports
 
-    def make_methods(self, package_name, interface, patterns):
+    def make_methods(self, interface, patterns, package_name=None):
         body = []
 
         for method in interface['methods']:
@@ -462,11 +464,11 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     method['name'] = 'get_assessment_items'
 
             if ((self._is('mongo') or self._is('services') or self._is('authz') or self._is('tests')) and
-                    not build_this_method(package_name, interface, method)):
+                    not build_this_method(self.package['name'], interface, method)):
                 continue
 
             try:
-                body.append(self._make_method(method, package_name, interface, patterns))
+                body.append(self._make_method(method, interface, patterns))
             except SkipMethod:
                 # Only expected from kitosid / services builder
                 pass
