@@ -53,8 +53,6 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
     def _get_method_context(self, method, interface, patterns):
         """Get the method context vars, to be used in the template"""
-        from interface_builders import is_manager_session
-
         def construct_arg_context(arg_number, arg_type_full):
             arg_type = self.last(arg_type_full).strip('[]')
             arg_context = {
@@ -199,7 +197,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['method_session_name'] = context['method_name'].replace('get_', '')
 
             # Special one for services test builder:
-            if is_manager_session(interface, patterns, self.package['name']):
+            if self._is_manager_session(interface, patterns, self.package['name']):
                 context['svc_mgr_or_catalog'] = 'svc_mgr'
             else:
                 context['svc_mgr_or_catalog'] = 'catalog'

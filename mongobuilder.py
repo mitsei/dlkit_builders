@@ -101,7 +101,7 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
         self.make_osids()
 
     def module_header(self, module):
-        return ('\"\"\"Mongodb implementations of ' + self.package['name'] + ' ' + module + '.\"\"\"\n' +
+        return ('\"\"\"Mongodb implementations of ' + self.package['name'] + ' ' + module + '.\"\"\"\n\n' +
                 '# pylint: disable=no-init\n' +
                 '#     Numerous classes don\'t require __init__.\n' +
                 '# pylint: disable=too-many-public-methods,too-few-public-methods\n' +

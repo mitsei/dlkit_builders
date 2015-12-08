@@ -13,12 +13,8 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
 
         self._class = 'authz'
 
-        # self.interface_builder = InterfaceBuilder('authz',
-        #                                           self._root_dir,
-        #                                           self._template_dir)
-
     def build_this_interface(self, interface):
-        return (self.package['name'] in ['proxy'] or not
+        return (self.package['name'] not in ['proxy'] and
                 (interface['category'] in ['sessions', 'managers'] or
                 interface['shortname'] in ['Sourceable']))
 
