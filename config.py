@@ -103,6 +103,7 @@ sessions_to_implement = [
     'HierarchyDesignSession',
     ### learning service:
     'ObjectiveLookupSession',
+    'ObjectiveQuerySession',
     'ObjectiveAdminSession',
     'ObjectiveObjectiveBankSession',
     'ObjectiveObjectiveBankAssignmentSession',
