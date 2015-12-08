@@ -137,8 +137,97 @@ class BaseBuilder(Utilities):
                                         module,
                                         extension)
 
+    def _abc_package_imports(self, interface):
+        def package_interface():
+            return self._abc_pkg_name(package_name=self.package['name'] + '_' + interface['category'])
+
+        if self.package['name'] != 'osid' and interface['category'] == 'managers':
+            import_str = 'from dlkit.manager_impls.{} import {} as {}'.format(self._abc_pkg_name(),
+                                                                              interface['category'],
+                                                                              package_interface())
+        else:
+            import_str = 'from {}.{} import {} as abc_{}'.format(self._app_name(abstract=True),
+                                                                 self._abc_pkg_name(),
+                                                                 interface['category'],
+                                                                 package_interface())
+
+        return import_str
+
     def _abc_pkg_path(self, abc=True):
         return self._app_name() + '/' + self._abc_pkg_name(abc)
+
+    def _additional_methods(self, interface):
+        additional_methods = ''
+        # Look for additional methods defined in class patterns. These
+        # need to be coded in the impl_class as a string with the
+        # attribute name 'additional_methods_pattern'
+        additional_methods += self._get_extra_patterns(interface['shortname'],
+                                                       'additional_methods_pattern',
+                                                       default='')
+
+        # Here we further inspect the impl_class to identify any additional
+        # hand built methods to be included at the end of the class definition. These
+        # need to be coded in the impl_class as a string with the
+        # attribute name 'additional_methods'
+        impl_class = self._impl_class(interface)
+        if hasattr(impl_class, 'additional_methods'):
+            additional_methods += getattr(impl_class, 'additional_methods')
+
+        return additional_methods
+
+    def _append_inherited_imports(self, imports, interface):
+        # Iterate through any inherited interfaces and check if an import statement is
+        # required and append to the appropriate module's import list.
+        inherit_category = 'UNKNOWN_MODULE'
+        for i in interface['inheritance']:
+            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+            if (i['pkg_name'] == self.package['name'] and
+                    inherit_category == interface['category']):
+                pass
+            else:
+                if self._is('services') and i['pkg_name'] != self.package['name']:
+                    import_str = 'from . import {0}'.format(i['pkg_name'])
+
+                if not self._is('services'):
+                    import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(
+                                                                             self._app_name(package_name=i['pkg_name'])),
+                                                                             self._abc_pkg_name(package_name=i['pkg_name'],
+                                                                                                abc=False),
+                                                                             inherit_category)
+
+                if inherit_category != 'UNKNOWN_MODULE':
+                    self.append(imports, import_str)
+        return inherit_category
+
+    def _append_pattern_imports(self, imports, interface):
+        # Check to see if there are any additional inheritances required
+        # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
+        # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
+        impl_class = self._impl_class(interface)
+
+        # Here we further inspect the impl_class to identify any additional
+        # hand built import statements to be loaded at the module level. These
+        # need to be coded in the impl_class as a list of strings with the
+        # attribute name 'import_statements'
+        if hasattr(impl_class, 'import_statements'):
+            for import_str in getattr(impl_class, 'import_statements'):
+                self.append(imports, import_str)
+
+        # Look for module import statements defined in class patterns. These
+        # need to be coded in the class pattern as a list of strings with the
+        # attribute name 'import_statements_pattern'
+        for import_str in self._get_extra_patterns(interface['shortname'],
+                                                   'import_statements_pattern',
+                                                   default=[]):
+            self.append(imports, import_str)
+
+    def _append_templated_imports(self, imports, interface):
+        # Now also check for templated imports
+        templated_imports = self.get_methods_templated_imports(self._abc_pkg_name(abc=False),
+                                                               interface,
+                                                               self.patterns)
+        for imp in templated_imports:
+            self.append(imports, imp)
 
     def _build_this_interface(self, interface):
         exceptions = []
@@ -264,6 +353,34 @@ class BaseBuilder(Utilities):
         with open(self._package_pattern_file(), 'r') as read_file:
             return json.load(read_file)
 
+    def _order_module_imports(self, imports):
+        # does not separate built-in libraries from third-party libraries
+        docstrings = [imp for imp in imports if '"""' in imp or imp.startswith('#')]
+        full_imports = [imp for imp in imports if imp.startswith('import ')]
+        local_imports = [imp for imp in imports if imp.startswith('from .') or imp.startswith('from dlkit')]
+        constants = [imp for imp in imports if 'import' not in imp and imp not in docstrings]
+        partial_third_party_imports = [imp for imp in imports
+                                       if imp not in full_imports and
+                                       imp not in local_imports and
+                                       imp not in constants and
+                                       imp not in docstrings and
+                                       imp.strip() != '']
+
+        newline = ['\n']
+
+        full_imports.sort()
+        local_imports.sort()
+        partial_third_party_imports.sort()
+
+        import_lists = [docstrings, full_imports, partial_third_party_imports, local_imports, constants]
+
+        results = []
+        for import_list in import_lists:
+            if len(import_list) > 0:
+                results += import_list + newline
+
+        return results
+
     def _package_file(self, package):
         if isinstance(package, dict) and 'name' in package:
             return self.package_maps + '/' + self.first(package['name']) + self._map_ext
@@ -293,12 +410,33 @@ class BaseBuilder(Utilities):
         # Get the pattern map for this osid package.
         return self._load_patterns_file()
 
+    def _update_module_imports(self, modules, interface):
+        pass
+
+    def _write_module_string(self, write_file, module):
+        write_file.write('{0}\n\n\n{1}'.format('\n'.join(self._order_module_imports(module['imports'])),
+                                               module['body']).encode('utf-8'))
+
     def build_this_interface(self, interface):
         pass
 
+    def class_doc(self, interface):
+        # Inspect the class doc string for headline + body and create
+        # appropriate doc string style. Trying to conform to PEP 257 as
+        # much as the source osid doc will allow.
+        if interface['doc']['body'].strip() == '':
+            class_doc = '{0}\"\"\"{1}\"\"\"'.format(self._ind,
+                                                    self._wrap(interface['doc']['headline']))
+        else:
+            class_doc = '{0}\"\"\"{1}\n\n{2}\n\n{3}\"\"\"'.format(self._ind,
+                                                                  self._wrap(interface['doc']['headline']),
+                                                                  self._wrap(interface['doc']['body']),
+                                                                  self._ind)
+        return class_doc
+
     def class_sig(self, interface, inheritance):
-        return 'class {}{}:'.format(interface['shortname'],
-                                    inheritance)
+        return 'class {0}{1}:'.format(interface['shortname'],
+                                      inheritance)
 
     @property
     def interface_maps(self):
@@ -307,6 +445,22 @@ class BaseBuilder(Utilities):
     @interface_maps.setter
     def interface_maps(self, interface_maps_dir):
         self._interface_maps_dir = self._make_dir(interface_maps_dir)
+
+    def module_body(self, interface):
+        inheritance = self._get_class_inheritance(interface)
+        init_methods = self._make_init_methods(interface)
+        methods = self.make_methods(interface,
+                                    self.patterns)
+        additional_methods = self._additional_methods(interface)
+
+        if additional_methods:
+            methods += '\n' + additional_methods
+
+        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                 self._wrap(self.class_doc(interface)),
+                                                 self._wrap(init_methods),
+                                                 methods)
+        return body
 
     def module_header(self, module):
         return ''
@@ -352,8 +506,26 @@ class BaseBuilder(Utilities):
                            + interface_shortname + '\' not found.')
         return category
 
+    def update_module_body(self, modules, interface):
+        modules[interface['category']]['body'] += self.module_body(interface)
+
     def write_license_file(self):
         pass
+
+    def write_modules(self, modules):
+        # Finally, iterate through the completed package module structure and
+        # write out both the import statements and class definitions to the
+        # appropriate module for this package.
+        for module in modules:
+            if module == 'records' and self.package['name'] != 'osid':
+                module_name = 'record_templates'
+            else:
+                module_name = module
+
+            if modules[module]['body'].strip() != '':
+                with open(self._abc_module(module_name), 'wb') as write_file:
+                    self._write_module_string(write_file,
+                                              modules[module])
 
     def write_profile_file(self):
         pass
@@ -541,6 +713,10 @@ class Builder(Utilities):
         from azbuilder import AZBuilder
         AZBuilder(build_dir=self.build_dir).make()
 
+    def docs(self):
+        from kitdocsourcebuilder import KitSourceBuilder
+        KitSourceBuilder(build_dir=self.build_dir).make()
+
     def map(self):
         """map all the xosid files"""
         from mappers import Mapper
@@ -672,4 +848,6 @@ if __name__ == '__main__':
                 non_test_build = True
             if 'tests' in sys.argv:
                 builder.tests(non_test_build)
+            if 'docs' in sys.argv:
+                builder.docs()
     sys.exit(0)

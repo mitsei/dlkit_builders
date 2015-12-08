@@ -94,6 +94,16 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
                                         'release_str': profile['RELEASEDATE'],
                                         'supports_str': profile['SUPPORTS']})
 
+    def _update_module_imports(self, modules, interface):
+        imports = modules[interface['category']]['imports']
+
+        self.append(imports, self._abc_package_imports(interface))
+        self._append_inherited_imports(imports, interface)
+        self._append_pattern_imports(imports, interface)
+        # add the none-argument check import if not already present
+        self.append(imports, 'from .. import utilities')
+        self._append_templated_imports(imports, interface)
+
     def build_this_interface(self, interface):
         return self._build_this_interface(interface)
 

@@ -49,6 +49,50 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                                                                                   self.package['name'])
         return patterns
 
+    def _update_module_imports(self, modules, interface):
+        imports = modules[self.package['name']]['imports']
+
+        self.append(imports, self._abc_package_imports(interface))
+        self._append_inherited_imports(imports, interface)
+
+        # Don't forget the OsidSession inheritance:
+        if (('OsidManager' in interface['inherit_shortnames'] or
+                interface['shortname'] == self.patterns['package_catalog_caps']) and
+                self.package['name'] != 'osid'):
+            self.append(imports, 'from . import osid')
+
+        # And don't forget the osid_error import:
+        import_str = 'from .osid_errors import Unimplemented, IllegalState'
+        self.append(imports, import_str)
+
+        self._append_templated_imports(imports, interface)
+
+        # get inherited imports for services
+        new_imports = []
+        if 'OsidManager' in interface['inherit_shortnames']:
+            new_methods, new_imports = self._grab_service_methods(self._is_manager_session)
+        # Add all the appropriate catalog related session methods to the catalog interface
+        elif interface['shortname'] == self.patterns['package_catalog_caps']:
+            new_methods, new_imports = self._grab_service_methods(self._is_catalog_session)
+
+        for imp in new_imports:
+            self.append(imports, imp)
+
+    def _write_module_string(self, write_file, module):
+        constant_declarations = """
+
+DEFAULT = 0
+COMPARATIVE = 0
+PLENARY = 1
+FEDERATED = 0
+ISOLATED = 1
+AUTOMATIC = 0
+MANDATORY = 1
+DISABLED = -1"""
+        write_file.write('{0}{1}\n\n\n{2}'.format('\n'.join(self._order_module_imports(module['imports'])),
+                                                  constant_declarations,
+                                                  module['body']).encode('utf-8'))
+
     def build_this_interface(self, interface):
         # only build managers and catalogs
         basic_build = self._build_this_interface(interface)
@@ -60,8 +104,42 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                              interface['shortname'] in catalogs)
         return basic_build and is_manager_or_cat
 
+    def class_doc(self, interface):
+        return ('{0}\"\"\"{1} convenience adapter ' +
+                'including related Session methods."\"\"').format(self._ind,
+                                                                  interface['shortname'])
+
     def make(self):
         self.make_osids()
+
+    def module_body(self, interface):
+        additional_methods = self._additional_methods(interface)
+        inheritance = self._get_class_inheritance(interface)
+        init_methods = self._make_init_methods(interface)
+        methods = self.make_methods(interface,
+                                    self.patterns)
+
+        # Add all the appropriate manager related session methods to the manager interface
+        # Add all the appropriate catalog related session methods to the catalog interface
+        if 'OsidManager' in interface['inherit_shortnames']:
+            new_methods, new_imports = self._grab_service_methods(self._is_manager_session)
+            methods += new_methods
+        # Add all the appropriate catalog related session methods to the catalog interface
+        elif interface['shortname'] == self.patterns['package_catalog_caps']:
+            new_methods, new_imports = self._grab_service_methods(self._is_catalog_session)
+            methods += new_methods
+
+        if not init_methods.strip() and not methods.strip():
+            init_methods = '{0}pass'.format(self._ind)
+
+        if additional_methods:
+            methods += '\n' + additional_methods
+
+        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                 self._wrap(self.class_doc(interface)),
+                                                 self._wrap(init_methods),
+                                                 methods)
+        return body
 
     def module_header(self, module):
         return ('\"\"\"DLKit Services implementations of ' + self.package['name'] + ' service.\"\"\"\n' +
@@ -77,3 +155,7 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                 '#     to catch unimplemented methods.\n' +
                 '# pylint: disable=super-init-not-called\n' +
                 '#     it just isn\'t.\n')
+
+    def update_module_body(self, modules, interface):
+        modules[self.package['name']]['body'] += self.module_body(interface)
+

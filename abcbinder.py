@@ -20,11 +20,25 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
         self._class = 'abc'
 
-        # self.interface_builder = InterfaceBuilder('abc',
-        #                                           self._root_dir)
+    def _additional_methods(self, interface):
+        additional_methods = ''
+        # Add the equality methods to Ids and Types:
+        if interface['shortname'] in ['Id', 'Type']:
+            additional_methods += eq_methods(interface['shortname'])
+            additional_methods += str_methods()
+
+        return additional_methods
 
     def make(self):
         self.make_osids(build_abc=True)
+
+    def module_body(self, interface):
+        inheritance = self._get_class_inheritance(interface)
+        return '{0}\n{1}\n{2}__metaclass__ = abc.ABCMeta\n\n{3}\n{4}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                                                   self.class_doc(interface),
+                                                                                   self._ind,
+                                                                                   self._additional_methods(interface),
+                                                                                   self.make_methods(interface, None))
 
     def module_header(self, module):
         return ('\"\"\"Implementations of ' + self.package['name'] +
@@ -56,4 +70,40 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
                              '\n')
 
 
+def eq_methods(interface_name):
+    return (
+"""    def __eq__(self, other):
+        if isinstance(other, """ + interface_name + """):
+            return (
+                self.get_authority() == other.get_authority() and
+                self.get_identifier_namespace() == other.get_identifier_namespace() and
+                self.get_identifier() == other.get_identifier()
+            )
+        return NotImplemented
 
+    def __ne__(self, other):
+        result = self.__eq__(other)
+        if result is NotImplemented:
+            return result
+        return not result
+
+""")
+
+
+def str_methods():
+    return (
+"""    def __str__(self):
+        \"\"\"Provides serialized version of Id\"\"\"
+        return self._escape(self._escape(self.get_identifier_namespace()) + ':' +
+                            self._escape(self.get_identifier()) + '@' +
+                            self._escape(self.get_authority()))
+
+    def _escape(self, string):
+        \"\"\"Private method for escaping : and @\"\"\"
+        return string.replace("%", "%25").replace(":", "%3A").replace("@", "%40")
+
+    def _unescape(self, string):
+        \"\"\"Private method for un-escaping : and @\"\"\"
+        return string.replace("%40", "@").replace("%3A", ":").replace("%25", "%")
+
+""")

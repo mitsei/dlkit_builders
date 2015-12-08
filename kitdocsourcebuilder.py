@@ -54,32 +54,30 @@ class KitSourceBuilder(BaseBuilder):
         return patterns
 
     def _update_module_imports(self, modules, interface):
-        module_name = interface['category']
         if (interface['category'] != 'sessions' and
                 'OsidProfile' not in interface['inherit_shortnames']):
-
-            if ('OsidManager' in interface['inherit_shortnames'] or
-                    'OsidProxyManager' in interface['inherit_shortnames']):
+            package = self.package['name']
+            if any(sn in interface['inherit_shortnames']
+                   for sn in ['OsidManager', 'OsidProxyManager']):
                 module_name = 'service_managers'
-                currentmodule_str = '.. currentmodule:: dlkit.services.' + self.package['name']
-                automodule_str = '.. automodule:: dlkit.services.' + self.package['name']
+                currentmodule_str = '.. currentmodule:: dlkit.services.{0}'.format(package)
+                automodule_str = '.. automodule:: dlkit.services.{0}'.format(package)
             elif interface['shortname'] == self.patterns['package_catalog_caps']:
                 module_name = self.patterns['package_catalog_under']
-                currentmodule_str = '.. currentmodule:: dlkit.services.' + self.package['name']
+                currentmodule_str = '.. currentmodule:: dlkit.services.{0}'.format(package)
                 automodule_str = ''
             else:
                 module_name = interface['category']
-                currentmodule_str = ('.. currentmodule:: dlkit.' +
-                                     self.package['name'] + '.' + module_name)
-                automodule_str = ('.. automodule:: dlkit.' +
-                                     self.package['name'] + '.' + module_name)
+                currentmodule_str = '.. currentmodule:: dlkit.{0}.{1}'.format(package,
+                                                                              module_name)
+                automodule_str = '.. automodule:: dlkit.{0}.{1}'.format(package,
+                                                                        module_name)
+
+            module_title = '\n{0}\n{1}'.format(' '.join(module_name.split('_')).title(),
+                                               '=' * len(module_name))
 
             self.append(modules[module_name]['imports'], currentmodule_str)
             self.append(modules[module_name]['imports'], automodule_str)
-
-            module_title = '\n' + ' '.join(module_name.split('_')).title() + '\n'
-            module_title += '=' * len(module_name)
-
             self.append(modules[module_name]['imports'], module_title)
 
     def build_this_interface(self, interface):
