@@ -265,7 +265,7 @@ class GradeEntryForm:
         self._my_map['score'] = self._score_default
         self._my_map['gradingAgentId'] = ''
         self._my_map['gradebookColumnId'] = str(kwargs['gradebook_column_id'])
-        self._my_map['gradebookId'] = str(kwargs['gradebook_id'])
+        self._my_map['assignedGradebookIds'] = [str(kwargs['gradebook_id'])]
         self._my_map['derived'] = False
         self._my_map['timeGraded'] = None
         self._my_map['overriddenCalculatedEntryId'] = '' # This will soon do something different
@@ -477,7 +477,7 @@ class GradebookColumnSummary:
         mgr = self._get_provider_manager('Grading')
         if not mgr.supports_gradebook_column_lookup():
             raise errors.OperationFailed('Grading does not support GradebookColumn lookup')
-        gradebook_id = Id(self._my_map['gradebookId'])
+        gradebook_id = Id(self._my_map['assignedGradebookIds'][0])
         lookup_session = mgr.get_grade_entry_lookup_session_for_gradebook(gradebook_id)
         entries = lookup_session.get_grade_entries_for_gradebook_column(self.get_gradebook_column_id())
         return [e for e in entries if not e.is_ignored_for_calculations()]

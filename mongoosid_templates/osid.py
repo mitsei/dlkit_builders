@@ -775,7 +775,11 @@ class OsidObject:
         obj_map['description']['text'] = self.description.text
         obj_map['genusTypeId'] = str(self.genus_type)
         # Note: The following should be deprecated:
-        obj_map[self._catalog_name.under() + 'Id'] = obj_map['assigned' + self._catalog_name + 'Ids'][0]
+        try:
+            obj_map[self._catalog_name.lower() + 'Id'] = obj_map['assigned' + self._catalog_name.title() + 'Ids'][0]
+        except AttributeError:
+            # catalogs do not have this attribute
+            pass
 
         try: # Need to implement records for catalogs one of these days
             for record in self._records:

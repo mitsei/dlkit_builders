@@ -92,7 +92,8 @@ class AssetAdminSession:
         ${arg0_name}._my_map['_id'] = ObjectId()
         ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_mixed}Id']).get_identifier()
         ${object_name_under} = collection.find_one(
-            {'$$and': [{'_id': ObjectId(${object_name_under}_id)}, {'${cat_name_mixed}Id': str(self._catalog_id)}]})
+            {'$$and': [{'_id': ObjectId(${object_name_under}_id)},
+                       {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
         ${object_name_under}['${aggregated_objects_name_mixed}'].append(${arg0_name}._my_map)
         result = collection.save(${object_name_under})
 
@@ -139,7 +140,8 @@ class AssetAdminSession:
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_under}Id']).get_identifier()
         ${object_name_under} = collection.find_one(
-            {'$$and': [{'_id': ObjectId(${object_name_under}_id)}, {'${cat_name_mixed}Id': str(self._catalog_id)}]})
+            {'$$and': [{'_id': ObjectId(${object_name_under}_id)},
+                       {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
         index = 0
         found = False
         for i in ${object_name_under}['${aggregated_objects_name_mixed}']:

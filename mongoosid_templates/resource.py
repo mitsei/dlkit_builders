@@ -1212,7 +1212,7 @@ class BinAdminSession:
             obj_collection = MongoClientValidated('${package_name}',
                                                   collection=object_catalog,
                                                   runtime=self._runtime)
-            if obj_collection.find({'${cat_name_mixed}Id': str(${arg0_name})}).count() != 0:
+            if obj_collection.find({'assigned${cat_name}Ids': {'$$in': [str(${arg0_name})]}}).count() != 0:
                 raise errors.IllegalState('catalog is not empty')
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
