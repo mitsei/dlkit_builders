@@ -116,8 +116,7 @@ DISABLED = -1"""
         additional_methods = self._additional_methods(interface)
         inheritance = self._get_class_inheritance(interface)
         init_methods = self._make_init_methods(interface)
-        methods = self.make_methods(interface,
-                                    self.patterns)
+        methods = self.make_methods(interface, self.patterns)
 
         # Add all the appropriate manager related session methods to the manager interface
         # Add all the appropriate catalog related session methods to the catalog interface

@@ -449,8 +449,7 @@ class BaseBuilder(Utilities):
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
         init_methods = self._make_init_methods(interface)
-        methods = self.make_methods(interface,
-                                    self.patterns)
+        methods = self.make_methods(interface, self.patterns)
         additional_methods = self._additional_methods(interface)
 
         if additional_methods:
