@@ -1515,8 +1515,24 @@ class ItemQuery:
     """
 
     clear_learning_objective_id_terms = """
-        self._clear_match('learningObjectiveIds')
+        self._clear_terms('learningObjectiveIds')
     """
+
+    match_any_learning_objective = """
+        match_key = 'learningObjectiveIds'
+        param = '$exists'
+        if match:
+            flag = 'true'
+        else:
+            flag = 'false'
+        if match_key in self._query_terms:
+            self._query_terms[match_key][param] = flag
+        else:
+            self._query_terms[match_key] = {param: flag}
+        self._query_terms[match_key]['$nin'] = [[], ['']]"""
+
+    clear_learning_objective_terms = """
+        self._clear_terms('learningObjectiveIds')"""
 
 class ItemSearch:
 

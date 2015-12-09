@@ -64,11 +64,11 @@ class RepositoryProxyManager:
 class AssetAdminSession:
 
     import_statements_pattern = [
-    'from dlkit.abstract_osid.osid import errors',
-    'from bson.objectid import ObjectId',
-    'from ..utilities import MongoClientValidated',
-    'CREATED = True'
-    'UPDATED = True',
+        'from dlkit.abstract_osid.osid import errors',
+        'from bson.objectid import ObjectId',
+        'from ..utilities import MongoClientValidated',
+        'CREATED = True'
+        'UPDATED = True',
     ]
 
     create_asset_content_template = """
@@ -801,3 +801,17 @@ class CompositionSearchResults:
             raise errors.IllegalState('List has already been retrieved.')
         self.retrieved = True
         return objects.CompositionList(self._results, runtime=self._runtime)"""
+
+class CompositionRepositorySession:
+    get_repository_ids_by_composition = """
+        mgr = self._get_provider_manager('REPOSITORY', local=True)
+        lookup_session = mgr.get_composition_lookup_session()
+        lookup_session.use_federated_repository_view()
+        lookup_session.use_unsequestered_composition_view()
+        composition = lookup_session.get_composition(composition_id)
+        id_list = [Id(composition._my_map['repositoryId'])]
+        if 'assignedRepositoryIds' in composition._my_map:
+            for idstr in composition._my_map['assignedRepositoryIds']:
+                id_list.append(Id(idstr))
+        return IdList(id_list)"""
+

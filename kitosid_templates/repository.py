@@ -63,12 +63,14 @@ class CompositionLookupSession:
         self._get_provider_session('composition_lookup_session').use_any_status_composition_view()"""
 
     use_sequestered_composition_view = """
-        \"\"\"Pass through to provider CompositionLookupSession.use_sequestered_composition_view\"\"\"
-        self._get_provider_session('composition_lookup_session').use_sequestered_composition_view()"""
+        \"\"\"Pass through to provider CompositionLookup/QuerySession.use_sequestered_composition_view\"\"\"
+        self._get_provider_session('composition_lookup_session').use_sequestered_composition_view()
+        self._get_provider_session('composition_query_session').use_sequestered_composition_view()"""
 
     use_unsequestered_composition_view = """
-        \"\"\"Pass through to provider CompositionLookupSession.use_unsequestered_composition_view\"\"\"
-        self._get_provider_session('composition_lookup_session').use_unsequestered_composition_view()"""
+        \"\"\"Pass through to provider CompositionLookup/QuerySession.use_unsequestered_composition_view\"\"\"
+        self._get_provider_session('composition_lookup_session').use_unsequestered_composition_view()
+        self._get_provider_session('composition_query_session').use_unsequestered_composition_view()"""
 
 class AssetCompositionSession:
 
