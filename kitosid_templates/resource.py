@@ -39,41 +39,42 @@ class ResourceManager:
         self._provider_manager = None
         self._provider_sessions = dict()
         self._session_management = AUTOMATIC
-        self._views = dict()
+        self._${cat_name_under}_view = DEFAULT
         osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
 
-    def _get_view(self, view):
-        \"\"\"Gets the currently set view\"\"\"
-        if view in self._views:
-            return self._views[view]
-        else:
-            self._views[view] = DEFAULT
-            return DEFAULT
+    # def _get_view(self, view):
+    #     \"\"\"Gets the currently set view\"\"\"
+    #     if view in self._views:
+    #         return self._views[view]
+    #     else:
+    #         self._views[view] = DEFAULT
+    #         return DEFAULT
 
-    def _get_provider_session(self, session, proxy=None):
+    def _set_${cat_name_under}_view(self, session):
+        \"\"\"Sets the underlying ${cat_name_under} view to match current view\"\"\"
+        if self._${cat_name_under}_view == COMPARATIVE:
+            try:
+                session.use_comparative_${cat_name_under}_view()
+            except AttributeError:
+                pass
+        else:
+            try:
+                session.use_plenary_${cat_name_under}_view()
+            except AttributeError:
+                pass
+
+    def _get_provider_session(self, session_name, proxy=None):
         \"\"\"Gets the session for the provider\"\"\"
         if self._proxy is None:
             self._proxy = proxy
-        if session in self._provider_sessions:
-            return self._provider_sessions[session]
+        if session_name in self._provider_sessions:
+            return self._provider_sessions[session_name]
         else:
-            session_instance = self._instantiate_session('get_' + session, self._proxy)
-            ## DO WE NEED THESE VIEW INITERS???
-            if '${cat_name_under}_view' not in self._views:
-                self._views['${cat_name_under}_view'] = DEFAULT
-            if self._views['${cat_name_under}_view'] == COMPARATIVE:
-                try:
-                    session_instance.use_comparative_${cat_name_under}_view()
-                except AttributeError:
-                    pass
-            else:
-                try:
-                    session_instance.use_plenary_${cat_name_under}_view()
-                except AttributeError:
-                    pass
+            session = self._instantiate_session('get_' + session_name, self._proxy)
+            self._set_${cat_name_under}_view(session)
             if self._session_management != DISABLED:
-                self._provider_sessions[session] = session_instance
-            return session_instance
+                self._provider_sessions[session_name] = session
+            return session
 
     def _instantiate_session(self, method_name, proxy=None, *args, **kwargs):
         \"\"\"Instantiates a provider session\"\"\"
@@ -138,11 +139,11 @@ class ResourceManager:
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_catalog_template
-        session_instance = self._instantiate_session(method_name='${method_name}', proxy=self._proxy, *args, **kwargs)
+        session = self._instantiate_session(method_name='${method_name}', proxy=self._proxy, *args, **kwargs)
         return ${cat_name}(
             self._provider_manager,
-            session_instance.get_${cat_name_under}(),
-            self._proxy, ${method_session_name}=session_instance)"""
+            session.get_${cat_name_under}(),
+            self._proxy, ${method_session_name}=session)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
@@ -157,6 +158,14 @@ class ResourceManager:
             self.get_${cat_name_under}(*args, **kwargs),
             self._proxy,
             ${return_type_under}=session)"""
+
+    get_resource_admin_session_managertemplate = get_resource_lookup_session_managertemplate
+
+    get_resource_admin_session_for_bin_managertemplate = get_resource_lookup_session_for_bin_managertemplate
+
+    get_resource_admin_session_catalogtemplate = get_resource_lookup_session_catalogtemplate
+
+    get_resource_admin_session_for_bin_catalogtemplate = get_resource_lookup_session_for_bin_catalogtemplate
 
     get_resource_notification_session_managertemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
@@ -178,11 +187,11 @@ class ResourceManager:
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_catalog_template
-        session_instance = self._instantiate_session(method_name='${method_name}', proxy=self._proxy, *args, **kwargs)
+        session = self._instantiate_session(method_name='${method_name}', proxy=self._proxy, *args, **kwargs)
         return ${cat_name}(
             self._provider_manager,
-            session_instance.get_${cat_name_under}(),
-            self._proxy, ${method_session_name}=session_instance)"""
+            session.get_${cat_name_under}(),
+            self._proxy, ${method_session_name}=session)"""
 
     get_resource_notification_session_for_bin_catalogtemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
@@ -233,37 +242,37 @@ class ResourceLookupSession:
 
     use_comparative_resource_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        self._views['${object_name_under}_view'] = COMPARATIVE
+        self._object_views['${object_name_under}'] = COMPARATIVE
         for session in self._provider_sessions:
             try:
-                self._provider_sessions[session].use_comparative_${object_name_under}_view()
+                self._provider_sessions[session].${method_name}()
             except AttributeError:
                 pass"""
 
     use_plenary_resource_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        self._views[\'${object_name_under}_view\'] = PLENARY
+        self._object_views[\'${object_name_under}\'] = PLENARY
         for session in self._provider_sessions:
             try:
-                self._provider_sessions[session].use_plenary_${object_name_under}_view()
+                self._provider_sessions[session].${method_name}()
             except AttributeError:
                 pass"""
 
     use_federated_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        self._views[\'${cat_name_under}_view\'] = FEDERATED
+        self._${cat_name_under}_view = FEDERATED
         for session in self._provider_sessions:
             try:
-                self._provider_sessions[session].use_federated_${cat_name_under}_view()
+                self._provider_sessions[session].${method_name}()
             except AttributeError:
                 pass"""
 
     use_isolated_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        self._views[\'${cat_name_under}_view\'] = ISOLATED
+        self._${cat_name_under}_view = ISOLATED
         for session in self._provider_sessions:
             try:
-                self._provider_sessions[session].use_isolated_${cat_name_under}_view()
+                self._provider_sessions[session].${method_name}()
             except AttributeError:
                 pass"""
 
@@ -605,7 +614,7 @@ class BinLookupSession:
 
     use_comparative_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        self._views[\'${cat_name_under}_view\'] = COMPARATIVE
+        self._${cat_name_under}_view = COMPARATIVE
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_comparative_${cat_name_under}_view()
@@ -614,7 +623,7 @@ class BinLookupSession:
 
     use_plenary_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        self._views[\'${cat_name_under}_view\'] = PLENARY
+        self._${cat_name_under}_view = PLENARY
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_plenary_${cat_name_under}_view()
@@ -967,7 +976,6 @@ class ResourceList:
 class Bin:
 
     init_template = """
-    ##
     # WILL THIS EVER BE CALLED DIRECTLY - OUTSIDE OF A MANAGER?
     def __init__(self, provider_manager, catalog, proxy, **kwargs):
         self._provider_manager = provider_manager
@@ -977,26 +985,51 @@ class Bin:
         self._catalog_id = catalog.get_id()
         self._provider_sessions = kwargs
         self._session_management = AUTOMATIC
-        self._views = dict()
+        self._${cat_name_under}_view = DEFAULT
+        self._object_views = dict()
 
-    def _get_provider_session(self, session):
-        \"\"\"Returns the requested provider session."\"\"
-        if session in self._provider_sessions:
-            return self._provider_sessions[session]
+    def _set_${cat_name_under}_view(self, session):
+        \"\"\"Sets the underlying ${cat_name_under} view to match current view\"\"\"
+        if self._${cat_name_under}_view == FEDERATED:
+            try:
+                session.use_federated_${cat_name_under}_view()
+            except AttributeError:
+                pass
         else:
-            session_class = getattr(self._provider_manager, 'get_' + session + '_for_${cat_name_under}')
-            if self._proxy is None:
-                session_instance = session_class(self._catalog.get_id())
+            try:
+                session.use_isolated_${cat_name_under}_view()
+            except AttributeError:
+                pass
+
+    def _set_object_view(self, session):
+        \"\"\"Sets the underlying object views to match current view\"\"\"
+        for obj_name in self._object_views:
+            if self._object_views[obj_name] == PLENARY:
+                try:
+                    getattr(session, 'use_plenary_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
             else:
-                session_instance = session_class(self._catalog.get_id(), self._proxy)
-            if '${cat_name_under}_view' in self._views:
-                if self._views['${cat_name_under}_view'] == FEDERATED:
-                    session_instance.use_federated_${cat_name_under}_view()
-                else:
-                    session_instance.use_isolated_${cat_name_under}_view()
+                try:
+                    getattr(session, 'use_comparative_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+
+    def _get_provider_session(self, session_name):
+        \"\"\"Returns the requested provider session."\"\"
+        if session_name in self._provider_sessions:
+            return self._provider_sessions[session_name]
+        else:
+            session_class = getattr(self._provider_manager, 'get_' + session_name + '_for_${cat_name_under}')
+            if self._proxy is None:
+                session = session_class(self._catalog.get_id())
+            else:
+                session = session_class(self._catalog.get_id(), self._proxy)
+            self._set_${cat_name_under}_view(session)
+            self._set_object_view(session)
             if self._session_management != DISABLED:
-                self._provider_sessions[session] = session_instance
-            return session_instance
+                self._provider_sessions[session_name] = session
+            return session
 
     def get_${cat_name_under}_id(self):
         \"\"\"Gets the Id of this ${cat_name_under}."\"\"

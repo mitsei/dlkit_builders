@@ -373,7 +373,6 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                         template_name = self.last(pattern) + '_managertemplate'
                     elif patterns[method_n[4:].split('_for_')[0] + '.is_catalog_session']:
                         template_name = self.last(pattern) + '_catalogtemplate'
-
             # Check if there is a 'by hand' implementation available for this method
             if (impl_class and
                     hasattr(impl_class, method_n)):

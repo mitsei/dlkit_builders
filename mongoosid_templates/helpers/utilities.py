@@ -14,11 +14,11 @@ from importlib import import_module
 
 from . import MONGO_CLIENT
 
-VMAP = {
-    'i': 'new',
-    'u': 'changed',
-    'd': 'deleted'
-}
+# VMAP = {
+#     'i': 'new',
+#     'u': 'changed',
+#     'd': 'deleted'
+# }
 
 class Filler(object):
     pass
@@ -190,63 +190,63 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
     if runtime is not None:
         manager.initialize(runtime)
     return manager
-    
 
-class MongoListener(Thread):
-    """A utility thread that listens for database changes for notification sessions"""
-    def __init__(self, ns, receiver, runtime, authority, obj_name_plural):
-        """Constructor"""
-        Thread.__init__(self)
-        self.setDaemon(True)
-        self.reliable = False
-        self._ns = ns
-        self._obj_name_plural = obj_name_plural
-        self._receiver = receiver
-        self._authority = authority
-        self._registry = {
-            'i': False,
-            'u': False,
-            'd': False
-            }
-        if not MONGO_CLIENT.is_mongo_client_set() and runtime is not None:
-            set_mongo_client(runtime)
-        cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find().sort('ts', DESCENDING).limit(-1)
-        try:
-            self.last_timestamp = cursor.next()['ts']
-        except StopIteration:
-            self.last_timestamp = Timestamp(0, 0)
-        self._notification_list = list()
 
-    def _callback(self, doc):
-        """process the notification"""
-        if self._registry[doc['op']]:
-            if self._registry[doc['op']] is True or str(doc['o']['_id']) in self._registry[doc['op']]:
-                verb = VMAP[doc['op']]
-                object_id = Id(self._ns + ':' + str(doc['o']['_id']) + '@' + self._authority)
-                notification_id = Id(self._ns + 'Notification:' + str(ObjectId()) + '@' + self._authority)
-                getattr(self._receiver, '_'.join([verb, self._obj_name_plural]))(notification_id, [object_id])
-                if self.reliable:
-                    self._notification_list.append(notification_id)
-
-    def acknowledge_notification(self, notification_id):
-        """receipt of notification has been acknowledged"""
-        if self.reliable:
-            try:
-                self._notification_list.remove(notification_id)
-            except ValueError:
-                pass
-            
-    def run(self):
-        """main control loop for thread"""
-        while True:
-            cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find(
-                {'ts':{'$gt': self.last_timestamp}})
-            # http://stackoverflow.com/questions/30401063/pymongo-tailing-oplog
-            cursor.add_option(2)  # tailable
-            cursor.add_option(8)  # oplog_replay
-            cursor.add_option(32)  # await data
-            for doc in cursor:
-                self.last_timestamp = doc['ts']
-                if doc['ns'] == self._ns:
-                    self._callback(doc)
-            time.sleep(1)
+# class OLDMongoListener(Thread):
+#     """A utility thread that listens for database changes for notification sessions"""
+#     def __init__(self, ns, receiver, runtime, authority, obj_name_plural):
+#         """Constructor"""
+#         Thread.__init__(self)
+#         self.setDaemon(True)
+#         self.reliable = False
+#         self._ns = ns
+#         self._obj_name_plural = obj_name_plural
+#         self._receiver = receiver
+#         self._authority = authority
+#         self._registry = {
+#             'i': False,
+#             'u': False,
+#             'd': False
+#             }
+#         if not MONGO_CLIENT.is_mongo_client_set() and runtime is not None:
+#             set_mongo_client(runtime)
+#         cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find().sort('ts', DESCENDING).limit(-1)
+#         try:
+#             self.last_timestamp = cursor.next()['ts']
+#         except StopIteration:
+#             self.last_timestamp = Timestamp(0, 0)
+#         self._notification_list = list()
+# 
+#     def _callback(self, doc):
+#         """process the notification"""
+#         if self._registry[doc['op']]:
+#             if self._registry[doc['op']] is True or str(doc['o']['_id']) in self._registry[doc['op']]:
+#                 verb = VMAP[doc['op']]
+#                 object_id = Id(self._ns + ':' + str(doc['o']['_id']) + '@' + self._authority)
+#                 notification_id = Id(self._ns + 'Notification:' + str(ObjectId()) + '@' + self._authority)
+#                 getattr(self._receiver, '_'.join([verb, self._obj_name_plural]))(notification_id, [object_id])
+#                 if self.reliable:
+#                     self._notification_list.append(notification_id)
+# 
+#     def acknowledge_notification(self, notification_id):
+#         """receipt of notification has been acknowledged"""
+#         if self.reliable:
+#             try:
+#                 self._notification_list.remove(notification_id)
+#             except ValueError:
+#                 pass
+#             
+#     def run(self):
+#         """main control loop for thread"""
+#         while True:
+#             cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find(
+#                 {'ts':{'$gt': self.last_timestamp}})
+#             # http://stackoverflow.com/questions/30401063/pymongo-tailing-oplog
+#             cursor.add_option(2)  # tailable
+#             cursor.add_option(8)  # oplog_replay
+#             cursor.add_option(32)  # await data
+#             for doc in cursor:
+#                 self.last_timestamp = doc['ts']
+#                 if doc['ns'] == self._ns:
+#                     self._callback(doc)
+#             time.sleep(1)

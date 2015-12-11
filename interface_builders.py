@@ -472,12 +472,17 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 
     for data_name in persisted_data:
         mixed_name = under_to_mixed(data_name)
+        caps_name = mixed_name.title()
         mixed_singular = under_to_mixed(remove_plural(data_name))
 
         persisted_name = persisted_data[data_name]
-
-        if ((persisted_name == 'osid.id.Id' or
-                persisted_name == 'OsidCatalog') and
+        if persisted_name == 'OsidCatalog':
+            initers += '        self._my_map[\'assigned{}Ids\'] = [str(kwargs[\'{}_id\'])]\n'.format(caps_name,
+                                                                                                     data_name)
+        # if ((persisted_name == 'osid.id.Id' or
+        #         persisted_name == 'OsidCatalog') and
+        #         data_name in initialized_data):
+        elif (persisted_name == 'osid.id.Id' and
                 data_name in initialized_data):
             initers += '        self._my_map[\'{}Id\'] = str(kwargs[\'{}_id\'])\n'.format(mixed_name,
                                                                                           data_name)
@@ -536,5 +541,4 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 # Return the associated class name for a ProxyManager given a Manager name
 def proxy_manager_name(string_):
     return string_.split('Manager')[0] + 'ProxyManager'
-
 

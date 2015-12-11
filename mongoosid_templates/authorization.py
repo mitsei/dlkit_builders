@@ -1,185 +1,198 @@
 
 class AuthorizationSession:
 
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
+        'from ..osid.sessions import OsidSession',
+        'from ..utilities import MongoClientValidated',
+        'from . import objects',
+    ]
+
     init = """
-    _session_name = 'AuthorizationSession'
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        self._catalog_class = objects.Vault
+        self._session_name = 'AuthorizationSession'
+        self._catalog_name = 'Vault'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='authorization',
+            cat_name='Vault',
+            cat_class=objects.Vault)
+        self._kwargs = kwargs
+
+    def _get_qualifier_idstrs(self, qualifier_id):
+        try:
+            authority = qualifier_id.get_identifier_namespace().split('.')[0].upper()
+            identifier = qualifier_id.get_identifier_namespace().split('.')[1].upper()
+        except:
+            return [str(qualifier_id)]
+        root_qualifier_id = Id(
+            authority=qualifier_id.get_authority(),
+            namespace=qualifier_id.get_identifier_namespace(),
+            identifier='ROOT')
+        if qualifier_id.get_identifier() == 'ROOT':
+            return [str(root_qualifier_id)]
+        hierarchy_mgr = self._get_provider_manager('HIERARCHY') # local=True ???
+        hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+            Id(authority=authority,
+               namespace='CATALOG',
+               identifier=identifier))
+        node = hierarchy_session.get_nodes(qualifier_id, 10, 0, False)
+        return self._get_ancestor_idstrs(node) + [str(root_qualifier_id)]
+
+    def _get_ancestor_idstrs(self, node):
+        node_list = [str(node.get_id())]
+        if node.has_parents():
+            for parent_node in node.get_parents():
+                node_list = node_list + self._get_ancestor_idstrs(parent_node)
+        return node_list
 """
 
+    can_access_authorizations = """
+        return True"""
+
     is_authorized = """
-        from .models import Authorization as AuthorizationModel
-        from .osid_errors import NotFound, NullArgument, InvalidArgument, OperationFailed, PermissionDenied
+        collection = MongoClientValidated('authorization',
+                                          collection='Authorization',
+                                          runtime=self._runtime)
+        # NOTE: For now this only checks basic authorizations. It should
+        # to be extended to deal with Resources and QualifierHierarchies
+        #print 'AGENT ID=', str(agent_id)
+        #print '    FUNCTION ID=', str(function_id)
+        #print '    QUAL ID STRINGS=', self._get_qualifier_idstrs(qualifier_id)
+        try:
+            collection.find_one(
+                {'agentId': str(agent_id),
+                 'functionId': str(function_id),
+                 'qualifierId': {'$in': self._get_qualifier_idstrs(qualifier_id)}})
+        except errors.NotFound:
+            return False
+        else:
+            return True"""
 
-        return bool(
-            AuthorizationModel.objects.filter(
-                agent_authority = agent_id.get_authority(),
-                agent_namespace = agent_id.get_identifier_namespace(),
-                agent_identifier = agent_id.get_identifier(),
-                function_authority = function_id.get_authority(),
-                function_namespace = function_id.get_identifier_namespace(),
-                function_identifier = function_id.get_identifier(),
-                qualifier_authority = qualifier_id.get_authority(),
-                qualifier_namespace = qualifier_id.get_identifier_namespace(),
-                qualifier_identifier = qualifier_id.get_identifier()
-            )
-        )
-        """
+class AuthorizationAdminSession:
 
-class Authorization:
+    import_statements = [
+        'from dlkit.abstract_osid.id.primitives import Id as ABCId',
+        'from dlkit.abstract_osid.type.primitives import Type as ABCType',
+]
 
-    model = """
-    from collections import OrderedDict
-    from ..osid.models import OsidObject
-    options = OsidObject.options
-    moptions = OsidObject.moptions
-    options['resource_authority'] = {
-        'verbose_name': 'resource authority',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['resource_namespace'] = {
-        'verbose_name': 'resource namespace',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['resource_identifier'] = {
-        'verbose_name': 'resource identifier',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 64,
-        'choices': OrderedDict(),
-    }
-    options['trust_authority'] = {
-        'verbose_name': 'trust authority',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['trust_namespace'] = {
-        'verbose_name': 'trust namespace',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['trust_identifier'] = {
-        'verbose_name': 'trust identifier',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 64,
-        'choices': OrderedDict(),
-    }
-    options['agent_authority'] = {
-        'verbose_name': 'agent authority',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['agent_namespace'] = {
-        'verbose_name': 'agent namespace',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['agent_identifier'] = {
-        'verbose_name': 'agent identifier',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 64,
-        'choices': OrderedDict(),
-    }
-    options['function_authority'] = {
-        'verbose_name': 'function authority',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['function_namespace'] = {
-        'verbose_name': 'function namespace',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['function_identifier'] = {
-        'verbose_name': 'function identifier',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 64,
-        'choices': OrderedDict(),
-    }
-    options['qualifier_authority'] = {
-        'verbose_name': 'qualifier authority',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['qualifier_namespace'] = {
-        'verbose_name': 'qualifier namespace',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 128,
-        'choices': OrderedDict(),
-    }
-    options['qualifier_identifier'] = {
-        'verbose_name': 'qualifier identifier',
-        'help_text': '',
-        'blank': True,
-        'editable': True,
-        'default': '',
-        'max_length': 64,
-        'choices': OrderedDict(),
-    }
+    get_authorization_form_for_create_for_agent = """
+        if not isinstance(agent_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        if not isinstance(function_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        if not isinstance(qualifier_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        for arg in authorization_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
+        if authorization_record_types == []:
+            ## WHY are we passing vault_id = self._catalog_id below, seems redundant:
+            obj_form = objects.AuthorizationForm(
+                vault_id=self._catalog_id,
+                agent_id=agent_id,
+                function_id=function_id,
+                qualifier_id=qualifier_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime)
+        else:
+            obj_form = objects.AuthorizationForm(
+                vault_id=self._catalog_id,
+                record_types=relationship_record_types,
+                agent_id=agent_id,
+                function_id=function_id,
+                qualifier_id=qualifier_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime)
+        obj_form._for_update = False
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
+        return obj_form
+"""
 
-    resource_authority = models.CharField(**options['resource_authority'])
-    resource_namespace = models.CharField(**options['resource_namespace'])
-    resource_identifier = models.CharField(**options['resource_identifier'])
-    trust_authority = models.CharField(**options['trust_authority'])
-    trust_namespace = models.CharField(**options['trust_namespace'])
-    trust_identifier = models.CharField(**options['trust_identifier'])
-    agent_authority = models.CharField(**options['agent_authority'])
-    agent_namespace = models.CharField(**options['agent_namespace'])
-    agent_identifier = models.CharField(**options['agent_identifier'])
-    function_authority = models.CharField(**options['function_authority'])
-    function_namespace = models.CharField(**options['function_namespace'])
-    function_identifier = models.CharField(**options['function_identifier'])
-    qualifier_authority = models.CharField(**options['qualifier_authority'])
-    qualifier_namespace = models.CharField(**options['qualifier_namespace'])
-    qualifier_identifier = models.CharField(**options['qualifier_identifier'])
+    get_authorization_form_for_create_for_resource = """
+        if not isinstance(resource_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        if not isinstance(function_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        if not isinstance(qualifier_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        for arg in authorization_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
+        if authorization_record_types == []:
+            ## WHY are we passing vault_id = self._catalog_id below, seems redundant:
+            obj_form = objects.AuthorizationForm(
+                vault_id=self._catalog_id,
+                resource_id=resource_id,
+                function_id=function_id,
+                qualifier_id=qualifier_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime)
+        else:
+            obj_form = objects.AuthorizationForm(
+                vault_id=self._catalog_id,
+                record_types=relationship_record_types,
+                resource_id=resource_id,
+                function_id=function_id,
+                qualifier_id=qualifier_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime)
+        obj_form._for_update = False
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
+        return obj_form
+"""
+
+
+class AuthorizationForm:
+
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..osid import objects as osid_objects',
+    ]
+
+    init = """
+    try:
+        #pylint: disable=no-name-in-module
+        from ..records.types import AUTHORIZATION_RECORD_TYPES as _record_type_data_sets
+    except (ImportError, AttributeError):
+        _record_type_data_sets = dict()
+    _namespace = 'authorization.Authorization'
+
+    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+        osid_objects.OsidForm.__init__(self, runtime=runtime)
+        self._kwargs = kwargs
+        if 'catalog_id' in kwargs:
+            self._catalog_id = kwargs['catalog_id']
+        self._init_metadata(**kwargs)
+        self._records = dict()
+        self._supported_record_type_ids = []
+        if osid_object_map is not None:
+            self._for_update = True
+            self._my_map = osid_object_map
+            self._load_records(osid_object_map['recordTypeIds'])
+        else:
+            self._my_map = {}
+            self._for_update = False
+            self._init_map(**kwargs)
+            if record_types is not None:
+                self._init_records(record_types)
+        self._supported_record_type_ids = self._my_map['recordTypeIds']
+
+    def _init_metadata(self, **kwargs):
+        osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
+
+    def _init_map(self, **kwargs):
+        osid_objects.OsidRelationshipForm._init_map(self)
+        self._my_map['assignedVaultIds'] = [str(kwargs['vault_id'])]
+        self._my_map['functionId'] = str(kwargs['function_id'])
+        self._my_map['qualifierId'] = str(kwargs['qualifier_id'])
+        if 'agent_id' in kwargs:
+            self._my_map['agentId'] = str(kwargs['agent_id'])
+        if 'resource_id' in kwargs:
+            self._my_map['resourceId'] = str(kwargs['resource_id'])
 """

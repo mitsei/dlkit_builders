@@ -1309,6 +1309,21 @@ def map_query_patterns(interface, package, index):
             pass
 
         ##
+        # Query methods that clear catalog id terms
+        elif (method['name'].endswith('_terms') and
+              var_name[:-6] == index['package_catalog_under'] + '_id' and
+              method['name'].startswith('clear_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceQuery.clear_bin_id_terms',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name[:-6],
+                              object_name = object_name,
+                              cat_name = index['package_catalog_caps']))
+
+        ##
         # Query methods that clear all terms (do we need one for each element type?)
         elif (method['name'].endswith('_terms') and
               var_name[:-6] in index[object_name + '.persisted_data'] and
@@ -1324,7 +1339,7 @@ def map_query_patterns(interface, package, index):
                               return_type_full = method['return_type']))
 
         ##
-        # Query methods that query on a DateTime range
+        # Query methods that query on a DateTime range - DOES THIS WORK??
         elif (var_name in index[object_name + '.persisted_data'] and
               method['name'].startswith('match_') and
               index[object_name + '.persisted_data'][var_name] in ['osid.calendaring.DateTime', 'timestamp'] and
@@ -1340,8 +1355,28 @@ def map_query_patterns(interface, package, index):
                               arg0_type_full = method['args'][0]['arg_type'],
                               arg1_name = method['args'][1]['var_name'],
                               arg1_type_full = method['args'][1]['arg_type'],
+                              arg2_name = method['args'][2]['var_name'],
+                              arg2_type_full = method['args'][2]['arg_type'],
                               object_name = object_name,
                               return_type_full = method['return_type']))
+
+        ##
+        # Query methods that match a catalog Id
+        elif (method['name'] == 'match_' + index['package_catalog_under'] + '_id' and
+              len(method['args']) == 2):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceQuery.match_bin_id',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              arg0_name = method['args'][0]['var_name'],
+                              arg0_type_full = method['args'][0]['arg_type'],
+                              arg1_name = method['args'][1]['var_name'],
+                              arg1_type_full = method['args'][1]['arg_type'],
+                              cat_name = index['package_catalog_caps'],
+                              object_name = object_name))
 
         else:
             # uncomment the following line to print all unknown object patterns

@@ -21,6 +21,7 @@ packages_to_implement = [
 
 packages_to_test = [
     'assessment',
+    'authorization',
     'commenting',
     'grading',
     'learning',
@@ -74,6 +75,12 @@ sessions_to_implement = [
     'BankAdminSession',
     'BankHierarchySession',
     'BankHierarchyDesignSession',
+    ### authorization service:
+    'AuthorizationSession',
+    'AuthorizationLookupSession',
+    'AuthorizationAdminSession',
+    'VaultLookupSession',
+    'VaultAdminSession',
     ### commenting service:
     'CommentLookupSession',
     'CommentQuerySession',
@@ -126,6 +133,7 @@ sessions_to_implement = [
     'ProxySession',
     ### relationship service
     'RelationshipLookupSession',
+    'RelationshipQuerySession',
     'RelationshipAdminSession',
     'FamilyLookupSession',
     'FamilyAdminSession',
@@ -180,8 +188,11 @@ objects_to_implement = [
     'AssessmentTaken',
     'Response',
     'Bank',
-    ### authentication_process
+    ### authentication_process:
     'Authentication',
+    ### authorization service:
+    'Authorization',
+    'Vault',
     ### commenting service:
     'Comment',
     'Book',
@@ -240,4 +251,5 @@ variants_to_implement = [
     'List',
     'Node',
     'NodeList',
+    'Search',
 ]
