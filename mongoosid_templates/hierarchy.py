@@ -5,7 +5,8 @@ class HierarchyTraversalSession:
         'from ..primitives import Id',
         'from ..primitives import Type',
         'from ..osid.sessions import OsidSession',
-        'from ..osid.objects import OsidNode',
+        #'from ..osid.objects import OsidNode',
+        'from . import objects',
         'from ..id.objects import IdList',
     ]
 
@@ -36,7 +37,8 @@ class HierarchyTraversalSession:
 
     def _get_catalog_hierarchy_id(self, catalog_id, proxy, runtime):
         \"\"\"Gets the catalog hierarchy\"\"\"
-        seed_str = catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000'
+        seed_str = str(catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000')
+                  #^^^ make sure its not a unicode type
         ident = Id(authority=self._authority,
                    namespace='hierarchy.Hierarchy',
                    identifier=str(ObjectId(seed_str[:12])))
@@ -136,21 +138,23 @@ class HierarchyTraversalSession:
     }
 
     get_nodes = """
+        # This impl ignores include_siblings, assumes false
         include_siblings = bool(include_siblings)
         parent_node_list = []
         child_node_list = []
         if ancestor_levels != 0:
-            pass # We'll figure this out later
+            for parent_id in self.get_parents(id_):
+                parent_node_list.append(self.get_nodes(parent_id, ancestor_levels-1, 0))
         if descendant_levels != 0:
             for child_id in self.get_children(id_):
                 child_node_list.append(self.get_nodes(child_id, 0, descendant_levels-1))
-        return OsidNode({'type': 'OsidNode',
-                         'id': str(id_),
-                         'childNodes': child_node_list,
-                         'parentNodes': parent_node_list,
-                         'root': not self.has_parents(id_),
-                         'leaf': not self.has_children(id_),
-                         'sequestered': False})
+        return objects.Node({'type': 'OsidNode',
+                             'id': str(id_),
+                             'childNodes': child_node_list,
+                             'parentNodes': parent_node_list,
+                             'root': not self.has_parents(id_),
+                             'leaf': not self.has_children(id_),
+                             'sequestered': False})
 """
 
 class HierarchyDesignSession:
@@ -313,8 +317,18 @@ class Hierarchy:
         'from dlkit.abstract_osid.osid import errors',
     ]
 
+
 class HierarchyQuery:
 
     import_statements = [
         'from ..osid.osid_errors import Unimplemented',
     ]
+
+
+class Node:
+    
+    get_parents = """
+        return NodeList(self._my_map['parentNodes'])"""
+
+    get_children = """
+        return NodeList(self._my_map['childNodes'])"""

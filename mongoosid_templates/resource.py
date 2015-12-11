@@ -77,6 +77,10 @@ class ResourceManager:
         ##
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
 
+    get_resource_admin_session_template = get_resource_lookup_session_template
+
+    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
+
     get_resource_notification_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
@@ -118,6 +122,10 @@ class ResourceProxyManager:
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
         return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime) # pylint: disable=no-member"""
+
+    get_resource_admin_session_template = get_resource_lookup_session_template
+
+    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
 
     get_resource_notification_session_template = """
         if not self.supports_${support_check}():
@@ -198,23 +206,7 @@ class ResourceLookupSession:
     use_isolated_bin_view_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.use_isolated_bin_view
-        self._use_federated_catalog_view()
-
-    # def _${cat_name_under}_view_filter(self):
-    #     \"\"\"
-    #     Returns the mongodb catalog filter for isolated or federated views.
-    #     
-    #     This also searches across all underlying ${cat_name_plural} in federated
-    #     ${cat_name_under} view. Real authz for controlling access to underlying
-    #     ${cat_name_plural_under} will need to be managed in an adapter above the
-    #     pay grade of this implementation.
-    #     
-    #     \"\"\"
-    #     if self._is_phantom_root_federated():
-    #         return {}
-    #     idstr_list = self._get_catalog_idstrs()
-    #     return {'$$or': [{'${cat_name_mixed}Id': {'$$in': idstr_list}},
-    #                     {'assignedCatalogIds': {'$$in': idstr_list}}]}"""
+        self._use_isolated_catalog_view()"""
 
     get_resource_template = """
         # Implemented from template for
@@ -815,10 +807,9 @@ class ResourceBinSession:
         lookup_session = mgr.get_${object_name_under}_lookup_session()
         lookup_session.use_federated_${cat_name_under}_view()
         ${object_name_under} = lookup_session.get_${object_name_under}(${arg0_name})
-        id_list = [Id(${object_name_under}._my_map['${cat_name_mixed}Id'])]
-        if 'assigned${cat_name}Ids' in ${object_name_under}._my_map:
-            for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
-                id_list.append(Id(idstr))
+        id_list = []
+        for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
+            id_list.append(Id(idstr))
         return IdList(id_list)"""
 
     get_bins_by_resource_template = """
@@ -837,10 +828,10 @@ class ResourceBinAssignmentSession:
     ]
 
     init_template = """
-    _session_name = '${interface_name}'
-
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
+        self._session_name = '${interface_name}'
+        self._catalog_name = '${cat_name}'
         self._forms = dict()
         self._kwargs = kwargs
 """
@@ -885,7 +876,7 @@ class ResourceBinAssignmentSession:
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
-        self._assign_object_to_catalog(${arg0_name}, ${arg1_name}, 'assigned${cat_name}Ids')"""
+        self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
 
     unassign_resource_from_bin_template = """
         # Implemented from template for
@@ -893,7 +884,7 @@ class ResourceBinAssignmentSession:
         mgr = self._get_provider_manager('${package_name_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         cat = lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
-        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name}, 'assigned${cat_name}Ids')"""
+        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
 
 
 class ResourceAgentSession:
@@ -1237,7 +1228,7 @@ class BinAdminSession:
             obj_collection = MongoClientValidated('${package_name}',
                                                   collection=object_catalog,
                                                   runtime=self._runtime)
-            if obj_collection.find({'${cat_name_mixed}Id': str(${arg0_name})}).count() != 0:
+            if obj_collection.find({'assigned${cat_name}Ids': {'$$in': [str(${arg0_name})]}}).count() != 0:
                 raise errors.IllegalState('catalog is not empty')
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
@@ -1294,9 +1285,9 @@ class BinHierarchySession:
         )
 """
 
-    can_access_objective_bank_hierarchy_template = """
+    can_access_bin_hierarchy_template = """
         # Implemented from template for
-        # osid.resource.ResourceHierarchySession.can_access_objective_bank_hierarchy
+        # osid.resource.ResourceHierarchySession.can_access_bin_hierarchy
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
@@ -1502,6 +1493,9 @@ class Resource:
         '#import importlib',
     ]
 
+    # Note: self._catalog_name = '${cat_name_under}' below is currently 
+    # only for osid.OsidObject.get_object_map() setting the now deprecated
+    # ${cat_name}Id element and may be removed someday
     init_template = """
     try:
         #pylint: disable=no-name-in-module
@@ -1514,6 +1508,7 @@ class Resource:
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
+        self._catalog_name = '${cat_name_under}'
 ${instance_initers}
 
 """
@@ -1585,6 +1580,12 @@ class ResourceQuery:
     clear_group_terms_template = """
         self._clear_terms('${var_name_mixed}')"""
 
+    match_bin_id_template = """
+        self._add_match('assigned${cat_name}Ids', str(${arg0_name}), ${arg1_name})"""
+
+    clear_bin_id_terms_template = """
+        self._clear_terms('assigned${cat_name}Ids')"""
+
 
 class ResourceSearch:
 
@@ -1635,6 +1636,7 @@ class ResourceSearchResults:
             raise errors.IllegalState('List has already been retrieved.')
         self.retrieved = True
         return objects.ResourceList(self._results, runtime=self._runtime)"""
+
 
 class ResourceForm:
 

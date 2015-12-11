@@ -102,16 +102,16 @@ class CompositionLookupSession:
 class CompositionQuerySession:
 
     get_compositions_by_query = """
-        cfu = self.catalog.get_composition_form_for_update(composition_list[3].ident)
+        cfu = self.catalog.get_composition_form_for_update(self.composition_list[3].ident)
         cfu.set_sequestered(True)
         self.catalog.update_composition(cfu)
         query = self.catalog.get_composition_query()
-        query.match_display_name('red')
+        query.match_display_name('orange')
         self.assertEqual(self.catalog.get_compositions_by_query(query).available(), 1)
         query.clear_display_name_terms()
         query.match_display_name('blue', match=False)
         self.assertEqual(self.catalog.get_compositions_by_query(query).available(), 2)
-        cfu = self.catalog.get_composition_form_for_update(composition_list[3].ident)
+        cfu = self.catalog.get_composition_form_for_update(self.composition_list[3].ident)
         cfu.set_sequestered(False)
         self.catalog.update_composition(cfu)"""
 

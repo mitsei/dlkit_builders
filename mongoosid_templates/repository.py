@@ -64,11 +64,11 @@ class RepositoryProxyManager:
 class AssetAdminSession:
 
     import_statements_pattern = [
-    'from dlkit.abstract_osid.osid import errors',
-    'from bson.objectid import ObjectId',
-    'from ..utilities import MongoClientValidated',
-    'CREATED = True'
-    'UPDATED = True',
+        'from dlkit.abstract_osid.osid import errors',
+        'from bson.objectid import ObjectId',
+        'from ..utilities import MongoClientValidated',
+        'CREATED = True'
+        'UPDATED = True',
     ]
 
     create_asset_content_template = """
@@ -92,7 +92,8 @@ class AssetAdminSession:
         ${arg0_name}._my_map['_id'] = ObjectId()
         ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_mixed}Id']).get_identifier()
         ${object_name_under} = collection.find_one(
-            {'$$and': [{'_id': ObjectId(${object_name_under}_id)}, {'${cat_name_mixed}Id': str(self._catalog_id)}]})
+            {'$$and': [{'_id': ObjectId(${object_name_under}_id)},
+                       {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
         ${object_name_under}['${aggregated_objects_name_mixed}'].append(${arg0_name}._my_map)
         result = collection.save(${object_name_under})
 
@@ -139,7 +140,8 @@ class AssetAdminSession:
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_under}Id']).get_identifier()
         ${object_name_under} = collection.find_one(
-            {'$$and': [{'_id': ObjectId(${object_name_under}_id)}, {'${cat_name_mixed}Id': str(self._catalog_id)}]})
+            {'$$and': [{'_id': ObjectId(${object_name_under}_id)},
+                       {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
         index = 0
         found = False
         for i in ${object_name_under}['${aggregated_objects_name_mixed}']:
@@ -445,6 +447,9 @@ class Asset:
         'from ..osid.markers import Extensible'
     ]
 
+    # Note: self._catalog_name = 'Repository' below is currently 
+    # only for osid.OsidObject.get_object_map() setting the now deprecated
+    # repositoryId element and may be removed someday
     init = """
     try:
         from ..records.types import ASSET_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
@@ -456,6 +461,7 @@ class Asset:
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
+        self._catalog_name = 'Repository'
         if self.is_composition():
             self._composition = self.get_composition()
 
@@ -797,3 +803,17 @@ class CompositionSearchResults:
             raise errors.IllegalState('List has already been retrieved.')
         self.retrieved = True
         return objects.CompositionList(self._results, runtime=self._runtime)"""
+
+class CompositionRepositorySession:
+    get_repository_ids_by_composition = """
+        mgr = self._get_provider_manager('REPOSITORY', local=True)
+        lookup_session = mgr.get_composition_lookup_session()
+        lookup_session.use_federated_repository_view()
+        lookup_session.use_unsequestered_composition_view()
+        composition = lookup_session.get_composition(composition_id)
+        id_list = [Id(composition._my_map['repositoryId'])]
+        if 'assignedRepositoryIds' in composition._my_map:
+            for idstr in composition._my_map['assignedRepositoryIds']:
+                id_list.append(Id(idstr))
+        return IdList(id_list)"""
+

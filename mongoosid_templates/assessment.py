@@ -649,7 +649,7 @@ class ItemAdminSession:
         item_id = Id(question_form._my_map['itemId']).get_identifier()
         question_form._my_map['_id'] = ObjectId(item_id)
         item = collection.find_one({'$and': [{'_id': ObjectId(item_id)},
-                                             {'bankId': str(self._catalog_id)}]})
+                                             {'assigned' + self._catalog_name + 'Ids': {'$in': [str(self._catalog_id)]}}]})
         # set the name in the question, so it can be shown to students
         question_form._my_map['displayName']['text'] = item['displayName']['text']
         question_form._my_map['description']['text'] = item['description']['text']
@@ -697,7 +697,8 @@ class ItemAdminSession:
         if not question_form.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         item_id = Id(question_form._my_map['itemId']).get_identifier()
-        item = collection.find_one({'$and': [{'_id': ObjectId(item_id)}, {'bankId': str(self._catalog_id)}]})
+        item = collection.find_one({'$and': [{'_id': ObjectId(item_id)},
+                                   {'assigned' + self._catalog_name + 'Ids': {'$in': [str(self._catalog_id)]}}]})
         item['question'] = question_form._my_map
         try:
             collection.save(item)
@@ -872,9 +873,9 @@ class AssessmentTakenAdminSession:
         try:
             if assessment_offered.has_max_attempts():
                 max_attempts = assessment_offered.get_max_attempts()
-                num_takens = collection.find({'assessmentOfferedId': str(assessment_offered.get_id()),
-                                              'takingAgentId': str(self.get_effective_agent_id()),
-                                              'bankId': str(self._catalog_id)}).count()
+                num_takens = collection.find({'$and': [{'assessmentOfferedId': str(assessment_offered.get_id())},
+                                                       {'takingAgentId': str(self.get_effective_agent_id())},
+                                                       {'assigned' + self._catalog_name + 'Ids': {'$in': [str(self._catalog_id)]}}]}).count()
                 if num_takens >= max_attempts:
                     raise errors.PermissionDenied('exceeded max attempts')
         except AttributeError:
@@ -1515,8 +1516,24 @@ class ItemQuery:
     """
 
     clear_learning_objective_id_terms = """
-        self._clear_match('learningObjectiveIds')
+        self._clear_terms('learningObjectiveIds')
     """
+
+    match_any_learning_objective = """
+        match_key = 'learningObjectiveIds'
+        param = '$exists'
+        if match:
+            flag = 'true'
+        else:
+            flag = 'false'
+        if match_key in self._query_terms:
+            self._query_terms[match_key][param] = flag
+        else:
+            self._query_terms[match_key] = {param: flag}
+        self._query_terms[match_key]['$nin'] = [[], ['']]"""
+
+    clear_learning_objective_terms = """
+        self._clear_terms('learningObjectiveIds')"""
 
 class ItemSearch:
 

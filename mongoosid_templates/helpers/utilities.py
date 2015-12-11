@@ -176,7 +176,7 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
         try:
             # Try to get the manager from the runtime, if available:
             config = runtime.get_configuration()
-            parameter_id = Id('parameter:repositoryProviderImpl@mongo')
+            parameter_id = Id('parameter:' + osid.lower() + 'ProviderImpl@mongo')
             impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
             return runtime.get_manager(osid, impl_name) # What about ProxyManagers?
         except (AttributeError, KeyError, NotFound):
