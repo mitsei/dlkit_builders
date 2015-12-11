@@ -132,18 +132,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             write_file.write(toc_str)
 
     def build_this_interface(self, interface):
-        excepted_osid_categories = ['properties',
-                                    'query_inspectors',
-                                    'receivers',
-                                    'search_orders',
-                                    'searches',]
-
-        manager_to_impl = (interface['category'] == 'managers' and
-                           self.package['name'] in managers_to_implement)
-
-        return ((interface['category'] not in excepted_osid_categories and
-                 manager_to_impl and not
-                 interface['shortname'].endswith('ProxyManager')) or
+        return (not interface['shortname'].endswith('ProxyManager') and
                 self._build_this_interface(interface))
 
     def make(self):
@@ -214,8 +203,13 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         # write out both the import statements and class definitions to the
         # appropriate module for this package.
         for module in modules:
-            if modules[module]['body'].strip() != '':
-                with open(self._abc_module('_'.join(module.split('.')),
-                                           extension='rst'), 'w') as write_file:
-                    write_file.write('{0}\n\n\n{1}'.format('\n'.join(modules[module]['imports']),
-                                                           modules[module]['body']).encode('utf-8'))
+
+            # don't know why have to explicitly blacklist these in the
+            # new doc builder...these were automagically not generated
+            # in the original version
+            if module not in ['managers', 'sessions']:
+                if modules[module]['body'].strip() != '':
+                    with open(self._abc_module('_'.join(module.split('.')),
+                                               extension='rst'), 'w') as write_file:
+                        write_file.write('{0}\n\n\n{1}'.format('\n'.join(modules[module]['imports']),
+                                                               modules[module]['body']).encode('utf-8'))

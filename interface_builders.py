@@ -61,6 +61,8 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         elif self.package['name'] != 'osid' and interface['category'] == 'managers':
             inheritance = []
             last_inheritance = [get_full_interface_class()]
+        elif self._is('doc_dlkit'):
+            inheritance = []
         else:
             inheritance = ['abc_' + get_full_interface_class()]
 
@@ -99,7 +101,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             if hasattr(impl_class, 'inheritance'):
                 inheritance += getattr(impl_class, 'inheritance')
 
-        if self._is('services'):
+        if self._in(['services', 'doc_dlkit']):
             # Don't forget the OsidSession inheritance:
             if (('OsidManager' in interface['inherit_shortnames'] or
                     interface['shortname'] == self.patterns['package_catalog_caps']) and
@@ -286,7 +288,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             # Check if a directory already exists for the abc osid.  If not,
             # create one and initialize as a python package.
             self._make_dir(self._app_name(), python=True)
-            if self._in(['mongo', 'authz', 'tests', 'doc_source']):
+            if self._in(['mongo', 'authz', 'tests', 'doc_source', 'doc_dlkit']):
                 self._make_dir(self._abc_pkg_path(), python=True)
 
     def _make_init_methods(self, interface):

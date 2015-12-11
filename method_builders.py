@@ -207,8 +207,11 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         return context
 
     def _make_method(self, method, interface, patterns):
-        if self._is('abc'):
-            decorator = self._ind + '@abc.abstractmethod'
+        if self._in(['abc', 'doc_dlkit']):
+            if self._is('abc'):
+                decorator = self._ind + '@abc.abstractmethod'
+            else:
+                decorator = ''
             args = ['self']
             method_impl = self._make_method_impl(method, interface, patterns)
 
@@ -225,7 +228,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     self._wrap(method_sig) + '\n' +
                     self._wrap(method_doc) + '\n' +
                     self._wrap(method_impl))
-        elif self._is('mongo') or self._is('services') or self._is('authz') or self._is('tests'):
+        elif self._in(['mongo', 'services', 'authz', 'tests', 'doc_dlkit']):
             args = ['self']
             decorator = ''
             method_sig = ''
@@ -318,7 +321,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         def stripn(_string):
             return _string.strip('\n')
 
-        if self._is('abc'):
+        if self._in(['abc', 'doc_dlkit']):
             if method['return_type'].strip():
                 return '{}return # {}'.format(self._dind,
                                               method['return_type'])
@@ -449,12 +452,11 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
     def make_methods(self, interface, patterns, package_name=None):
         body = []
-
         for method in interface['methods']:
             if self._is('mongo') or self._is('tests'):
                 if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
                     method['name'] = 'read_to_buffer'
-            elif self._is('services'):
+            elif self._in(['services', 'doc_dlkit']):
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentResultsSession':
                     method['name'] = 'get_taken_items'
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentBasicAuthoringSession':

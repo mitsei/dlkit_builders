@@ -1,30 +1,173 @@
+from config import managers_to_implement
 
-import time
-import os
-import json
-import string
-from .config import *
-from binder_helpers import camel_to_under, flagged_for_implementation
-from binder_helpers import make_plural, fix_reserved_word, under_to_caps
-from abcbinder_settings import XOSIDNAMESPACEURI as ns
-from abcbinder_settings import XOSIDDIRECTORY as xosid_dir
-from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
-from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
-from abcbinder_settings import XOSIDFILESUFFIX as xosid_suffix
-from abcbinder_settings import ABCROOTPACKAGE as abc_root_pkg
-from abcbinder_settings import ABCPREFIX as abc_prefix
-from abcbinder_settings import ABCSUFFIX as abc_suffix
-from abcbinder_settings import MAINDOCINDENTSTR as main_doc_indent
-from abcbinder_settings import ENCODING as utf_code
-from kitdocbuilder_settings import ABCROOTPACKAGE as abc_root_pkg
-from kitdocbuilder_settings import APPNAMEPREFIX as app_prefix
-from kitdocbuilder_settings import APPNAMESUFFIX as app_suffix
-from kitdocbuilder_settings import PACKAGENAME as doc_root_pkg
-from kitdocbuilder_settings import PACKAGEPREFIX as pkg_prefix
-from kitdocbuilder_settings import PACKAGESUFFIX as pkg_suffix
-from kitdocbuilder_settings import TEMPLATEDIR as template_dir
+from binder_helpers import camel_to_list
+from build_controller import BaseBuilder
+from interface_builders import InterfaceBuilder
 
-excluded_packages = ['grading', 'hierarchy', 'proxy', 'relationship', 'resource']
+
+class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
+    def __init__(self, build_dir=None, *args, **kwargs):
+        super(KitDocDLKitBuilder, self).__init__(*args, **kwargs)
+        if build_dir is None:
+            build_dir = self._abs_path
+        self._build_dir = build_dir
+        self._root_dir = self._build_dir + '/dlkit'
+        self._template_dir = self._abs_path + '/builders/kitosid_templates'
+
+        self._excluded_packages = ['proxy', 'type']
+
+        self._class = 'doc_dlkit'
+
+    def _append_inherited_imports(self, imports, interface):
+        # Iterate through any inherited interfaces and check if an import statement is
+        # required and append to the appropriate module's import list.
+        inherit_category = 'UNKNOWN_MODULE'
+        for i in interface['inheritance']:
+            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+            if (i['pkg_name'] == self.package['name'] and
+                    inherit_category == interface['category']):
+                pass
+            else:
+                import_str = 'from ..{0} import {1} as {0}_{1}'.format(self._abc_pkg_name(package_name=i['pkg_name'],
+                                                                                          abc=False),
+                                                                       inherit_category)
+
+                if inherit_category != 'UNKNOWN_MODULE':
+                    self.append(imports, import_str)
+        return inherit_category
+
+    def _get_class_inheritance(self, interface):
+        inheritance = []
+
+        # Iterate through any inherited interfaces and build the inheritance
+        # list for this interface. Also, check if an import statement is
+        # required and append to the appropriate module's import list.
+        for i in interface['inheritance']:
+            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+
+            if i['pkg_name'] == self.package['name'] and inherit_category == interface['category']:
+                inheritance.append(i['name'])
+            else:
+                inheritance.append(i['pkg_name'] + '_' +
+                                   inherit_category + '.' + i['name'])
+
+        # Don't forget the OsidSession inheritance:
+        if (('OsidManager' in interface['inherit_shortnames'] or
+                interface['shortname'] == self.patterns['package_catalog_caps']) and
+                self.package['name'] != 'osid'):
+            inheritance.insert(1, 'osid_sessions.OsidSession')
+
+        if inheritance:
+            inheritance = '({})'.format(', '.join(inheritance))
+        else:
+            inheritance = ''
+
+        return inheritance
+
+    def _empty_modules_dict(self):
+        module = dict(manager=dict(imports=[], body=''),
+                      services=dict(imports=[], body=''),
+                      service_managers=dict(imports=[], body=''),
+                      catalog=dict(imports=[], body=''),
+                      properties=dict(imports=[], body=''),
+                      objects=dict(imports=[], body=''),
+                      queries=dict(imports=[], body=''),
+                      query_inspectors=dict(imports=[], body=''),
+                      searches=dict(imports=[], body=''),
+                      search_orders=dict(imports=[], body=''),
+                      rules=dict(imports=[], body=''),
+                      metadata=dict(imports=[], body=''),
+                      receivers=dict(imports=[], body=''),
+                      sessions=dict(imports=[], body=''),
+                      managers=dict(imports=[], body=''),
+                      records=dict(imports=[], body=''),
+                      primitives=dict(imports=[], body=''),
+                      markers=dict(imports=[], body=''),
+                      others_please_move=dict(imports=[], body=''))
+        module[self.package['name']] = dict(imports=[], body='')
+        return module
+
+    def _make_method(self, method, interface, patterns):
+        args = ['self']
+        method_impl = self._make_method_impl(method, interface, patterns)
+
+        for arg in method['args']:
+            args.append(arg['var_name'])
+
+        method_sig = '{}def {}({}):'.format(self._ind,
+                                            method['name'],
+                                            ', '.join(args))
+
+        method_doc = self._build_method_doc(method)
+
+        return (self._wrap(method_sig) + '\n' +
+                self._wrap(method_doc) + '\n' +
+                self._wrap(method_impl))
+
+    def _update_module_imports(self, modules, interface):
+        imports = modules[interface['category']]['imports']
+        pkg_imports = modules[self.package['name']]['imports']
+
+        self._append_inherited_imports(imports, interface)
+        self._append_inherited_imports(pkg_imports, interface)
+
+        # Don't forget the OsidSession inheritance:
+        if (('OsidManager' in interface['inherit_shortnames'] or
+                interface['shortname'] == self.patterns['package_catalog_caps']) and
+                self.package['name'] != 'osid'):
+            self.append(imports, 'from ..osid import sessions as osid_sessions')
+            self.append(pkg_imports, 'from ..osid import sessions as osid_sessions')
+
+    def build_this_interface(self, interface):
+        return (not interface['shortname'].endswith('ProxyManager') and
+                self._build_this_interface(interface))
+
+    def make(self):
+        self.make_osids(build_abc=False)
+
+    def module_body(self, interface):
+        inheritance = self._get_class_inheritance(interface)
+        return '{0}\n{1}\n{2}{3}\n{4}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                    self.class_doc(interface),
+                                                    self._ind,
+                                                    self._additional_methods(interface),
+                                                    self.make_methods(interface, None))
+
+    def update_module_body(self, modules, interface):
+        modules[interface['category']]['body'] += self.module_body(interface)
+        modules[self.package['name']]['body'] += self.module_body(interface)
+
+    def write_license_file(self):
+        with open(self._abc_module('license'), 'w') as write_file:
+            write_file.write((self._utf_code + '\"\"\"' +
+                              self.package['title'] + '\n' +
+                              self.package['name'] + ' version ' +
+                              self.package['version'] + '\n\n' +
+                              self.package['copyright'] + '\n\n' +
+                              self.package['license'] + '\n\n\"\"\"').encode('utf-8') +
+                             '\n')
+
+    def write_modules(self, modules):
+        summary = u'{0}\"\"\"{1}\n{2} version {3}\n\n{4}\n\n\"\"\"\n'.format(self._utf_code,
+                                                                             self.package['title'],
+                                                                             self.package['name'],
+                                                                             self.package['version'],
+                                                                             self.package['summary']).encode('utf-8')
+        ##
+        # Finally, iterate through the completed package module structure and
+        # write out both the import statements and class definitions to the
+        # appropriate module for this package.
+        for module in modules:
+            if modules[module]['body'].strip() != '':
+                with open(self._abc_module(module), 'w') as write_file:
+                    write_file.write('{0}\n\n\n{1}'.format('\n'.join(modules[module]['imports']),
+                                                            modules[module]['body']).decode('utf-8').encode('utf-8'))
+                with open('{0}/services/{1}.py'.format(self._app_name(),
+                                                       self.package['name']), 'w') as write_file:
+                    write_file.write('{0}{1}\n\n\n{2}'.format(summary,
+                                                              '\n'.join(modules[self.package['name']]['imports']),
+                                                              modules[self.package['name']]['body']).decode('utf-8').encode('utf-8'))
+
 
 ##
 # This is the entry point for making django-based python classes for
