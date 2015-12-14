@@ -27,8 +27,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         return self._class == str(desired_type)
 
     def _build_method_doc(self, method):
-        if self._is('abc'):
-           detail_docs = filter(None, [method['sphinx_param_doc'].strip('\n'),
+        if self._in(['abc', 'doc_dlkit']):
+            detail_docs = filter(None, [method['sphinx_param_doc'].strip('\n'),
                                         method['sphinx_return_doc'].strip('\n'),
                                         method['sphinx_error_doc'].strip('\n') + '\n',
                                         method['compliance_doc'].strip('\n'),
@@ -228,7 +228,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     self._wrap(method_sig) + '\n' +
                     self._wrap(method_doc) + '\n' +
                     self._wrap(method_impl))
-        elif self._in(['mongo', 'services', 'authz', 'tests', 'doc_dlkit']):
+        elif self._in(['mongo', 'services', 'authz', 'tests']):
             args = ['self']
             decorator = ''
             method_sig = ''
@@ -453,7 +453,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
     def make_methods(self, interface, patterns, package_name=None):
         body = []
         for method in interface['methods']:
-            if self._is('mongo') or self._is('tests'):
+            if self._in(['mongo', 'tests']):
                 if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
                     method['name'] = 'read_to_buffer'
             elif self._in(['services', 'doc_dlkit']):
@@ -462,8 +462,10 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentBasicAuthoringSession':
                     method['name'] = 'get_assessment_items'
 
-            if ((self._is('mongo') or self._is('services') or self._is('authz') or self._is('tests')) and
+            if (self._in(['mongo', 'services', 'authz', 'tests']) and
                     not build_this_method(self.package['name'], interface, method)):
+                continue
+            if self._is('doc_dlkit') and not self.build_this_method(interface, method):
                 continue
 
             try:

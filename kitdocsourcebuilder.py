@@ -21,6 +21,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
     def _empty_modules_dict(self):
         module = dict(manager=dict(imports=[], body=''),
                       services=dict(imports=[], body=''),
+                      service_catalog=dict(imports=[], body=''),
                       service_managers=dict(imports=[], body=''),
                       catalog=dict(imports=[], body=''),
                       properties=dict(imports=[], body=''),
@@ -41,7 +42,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         module[self.patterns['package_catalog_under']] = dict(imports=[], body='')
         return module
 
-    def _grab_service_methods(self, type_check_method):
+    def _grab_service_methods(self, type_check_method, catalog=None):
         self.patterns['implemented_view_methods'] = []
         methods = ''
         for inf in self.package['interfaces']:
@@ -56,10 +57,10 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
                                                                     '-' * len(full_header),
                                                                     self.make_methods(inf,
                                                                                       self.patterns,
-                                                                                      inf['shortname']))
+                                                                                      inf['shortname'],
+                                                                                      service_catalog=catalog))
 
         return methods
-
 
     def _patterns(self):
         patterns = self._load_patterns_file()
@@ -73,52 +74,46 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         return patterns
 
     def _update_module_imports(self, modules, interface):
-        if (interface['category'] != 'sessions' and
-                'OsidProfile' not in interface['inherit_shortnames']):
-            package = self.package['name']
-            if any(sn in interface['inherit_shortnames']
-                   for sn in ['OsidManager', 'OsidProxyManager']):
-                module_name = 'service_managers'
-                currentmodule_str = '.. currentmodule:: dlkit.services.{0}'.format(package)
-                automodule_str = '.. automodule:: dlkit.services.{0}'.format(package)
+        package = self.package['name']
+        if any(sn in interface['inherit_shortnames']
+               for sn in ['OsidManager', 'OsidProxyManager']):
+            module_name = 'service_managers'
+            currentmodule_str = '.. currentmodule:: dlkit.services.{0}'.format(package)
+            automodule_str = '.. automodule:: dlkit.services.{0}'.format(package)
 
-            elif interface['shortname'] == self.patterns['package_catalog_caps']:
-                module_name = self.patterns['package_catalog_under']
-                currentmodule_str = '.. currentmodule:: dlkit.services.{0}'.format(package)
-                automodule_str = ''
-
-            else:
-                module_name = interface['category']
-                currentmodule_str = '.. currentmodule:: dlkit.{0}.{1}'.format(package,
-                                                                              module_name)
-                automodule_str = '.. automodule:: dlkit.{0}.{1}'.format(package,
-                                                                        module_name)
-
-            module_title = '\n{0}\n{1}'.format(' '.join(module_name.split('_')).title(),
-                                               '=' * len(module_name))
-
-            self.append(modules[module_name]['imports'], currentmodule_str)
-            self.append(modules[module_name]['imports'], automodule_str)
-            self.append(modules[module_name]['imports'], module_title)
-
-            self._module_name = module_name
+        elif interface['shortname'] == self.patterns['package_catalog_caps']:
+            module_name = 'service_catalog'
+            currentmodule_str = '.. currentmodule:: dlkit.services.{0}'.format(package)
+            automodule_str = ''
         else:
-            self._module_name = interface['category']
+            module_name = interface['category']
+            currentmodule_str = '.. currentmodule:: dlkit.{0}.{1}'.format(package,
+                                                                          module_name)
+            automodule_str = '.. automodule:: dlkit.{0}.{1}'.format(package,
+                                                                    module_name)
+
+        module_title = '\n{0}\n{1}'.format(' '.join(module_name.split('_')).title(),
+                                           '=' * len(module_name))
+
+        self.append(modules[module_name]['imports'], currentmodule_str)
+        self.append(modules[module_name]['imports'], automodule_str)
+        self.append(modules[module_name]['imports'], module_title)
+
+        self._module_name = module_name
 
     def _write_toc(self, modules):
         toc_str = '{0}\n{1}'.format(self.package['name'].title(),
                                     '=' * len(self.package['name']))
 
         toc_str = '{0}\n\n.. toctree::\n   :maxdepth: 2\n\n   summary\n   service_managers\n'.format(toc_str)
-        toc_str = '{0}   {1}\n'.format(toc_str,
-                                       self.patterns['package_catalog_under'])
 
         for module in modules:
             if ('_'.join(module.split('.')) not in [
                     'service_managers',
                     self.patterns['package_catalog_under'],
                     'records',
-                    'rules'] and
+                    'rules',
+                    'no_catalog'] and
                     modules[module]['body'].strip() != ''):
                 toc_str = '{0}   {1}\n'.format(toc_str,
                                                '_'.join(module.split('.')))
@@ -132,13 +127,12 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             write_file.write(toc_str)
 
     def build_this_interface(self, interface):
-        return (not interface['shortname'].endswith('ProxyManager') and
-                self._build_this_interface(interface))
+        return self._build_this_interface(interface)
 
     def make(self):
         self.make_osids()
 
-    def make_methods(self, interface, patterns, package_name=None):
+    def make_methods(self, interface, patterns, package_name=None, service_catalog=None):
         body = []
         for method in interface['methods']:
             ##
@@ -148,6 +142,8 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
                      '_session' in method['name']):
                 if package_name is None:
                     class_name = interface['shortname']
+                elif service_catalog is not None:
+                    class_name = service_catalog
                 else:
                     class_name = package_name
                 ##
@@ -166,6 +162,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
                 # And finally all the methods:
                 else:
                     automethod_str = '   .. automethod:: ' + class_name + '.' + method['name']
+
                 if automethod_str not in body:
                     body.append(automethod_str)
         return '\n\n'.join(body)
@@ -178,9 +175,12 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
                                                                                   sn)
         body = '{0}{1}\n\n'.format(body,
                                    self.make_methods(interface, self.patterns))
-        body = '{0}{1}{2}\n\n'.format(body,
-                                      self._grab_service_methods(self._is_manager_session),
-                                      self._grab_service_methods(self._is_catalog_session))
+        if any(i in interface['inherit_shortnames']
+               for i in ['OsidManager', 'OsidProxyManager', 'OsidCatalog']):
+            catalog = sn
+            body = '{0}{1}{2}\n\n'.format(body,
+                                          self._grab_service_methods(self._is_manager_session, catalog=catalog),
+                                          self._grab_service_methods(self._is_catalog_session, catalog=catalog))
 
         return body
 
@@ -203,13 +203,8 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         # write out both the import statements and class definitions to the
         # appropriate module for this package.
         for module in modules:
-
-            # don't know why have to explicitly blacklist these in the
-            # new doc builder...these were automagically not generated
-            # in the original version
-            if module not in ['managers', 'sessions']:
-                if modules[module]['body'].strip() != '':
-                    with open(self._abc_module('_'.join(module.split('.')),
-                                               extension='rst'), 'w') as write_file:
-                        write_file.write('{0}\n\n\n{1}'.format('\n'.join(modules[module]['imports']),
-                                                               modules[module]['body']).encode('utf-8'))
+            if modules[module]['body'].strip() != '':
+                with open(self._abc_module('_'.join(module.split('.')),
+                                           extension='rst'), 'w') as write_file:
+                    write_file.write('{0}\n\n\n{1}'.format('\n'.join(modules[module]['imports']),
+                                                           modules[module]['body']).encode('utf-8'))

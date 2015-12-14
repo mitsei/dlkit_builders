@@ -1,4 +1,4 @@
-from config import managers_to_implement
+from config import managers_to_implement, sessions_to_implement
 
 from binder_helpers import camel_to_list
 from build_controller import BaseBuilder
@@ -36,6 +36,40 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
                     self.append(imports, import_str)
         return inherit_category
 
+    def _build_as_service_interface(self, interface):
+        # only build managers and catalogs
+        basic_build = self._build_this_interface(interface)
+        managers = ['managers', 'markers']
+        catalogs = ['OsidSession', 'OsidObject', 'OsidCatalog', 'OsidList']
+        catalogs += [self.patterns['package_catalog_caps']]
+        catalogs += [self.patterns['package_catalog_caps'] + 'List']
+        is_manager_or_cat = (interface['category'] in managers or
+                             interface['shortname'] in catalogs)
+        return basic_build and is_manager_or_cat
+
+    def _empty_modules_dict(self):
+        module = dict(manager=dict(imports=[], body=''),
+                      services=dict(imports=[], body=''),
+                      service_managers=dict(imports=[], body=''),
+                      catalog=dict(imports=[], body=''),
+                      properties=dict(imports=[], body=''),
+                      objects=dict(imports=[], body=''),
+                      queries=dict(imports=[], body=''),
+                      query_inspectors=dict(imports=[], body=''),
+                      searches=dict(imports=[], body=''),
+                      search_orders=dict(imports=[], body=''),
+                      rules=dict(imports=[], body=''),
+                      metadata=dict(imports=[], body=''),
+                      receivers=dict(imports=[], body=''),
+                      sessions=dict(imports=[], body=''),
+                      managers=dict(imports=[], body=''),
+                      records=dict(imports=[], body=''),
+                      primitives=dict(imports=[], body=''),
+                      markers=dict(imports=[], body=''),
+                      others_please_move=dict(imports=[], body=''))
+        module[self.package['name']] = dict(imports=[], body='')
+        return module
+
     def _get_class_inheritance(self, interface):
         inheritance = []
 
@@ -64,29 +98,6 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
 
         return inheritance
 
-    def _empty_modules_dict(self):
-        module = dict(manager=dict(imports=[], body=''),
-                      services=dict(imports=[], body=''),
-                      service_managers=dict(imports=[], body=''),
-                      catalog=dict(imports=[], body=''),
-                      properties=dict(imports=[], body=''),
-                      objects=dict(imports=[], body=''),
-                      queries=dict(imports=[], body=''),
-                      query_inspectors=dict(imports=[], body=''),
-                      searches=dict(imports=[], body=''),
-                      search_orders=dict(imports=[], body=''),
-                      rules=dict(imports=[], body=''),
-                      metadata=dict(imports=[], body=''),
-                      receivers=dict(imports=[], body=''),
-                      sessions=dict(imports=[], body=''),
-                      managers=dict(imports=[], body=''),
-                      records=dict(imports=[], body=''),
-                      primitives=dict(imports=[], body=''),
-                      markers=dict(imports=[], body=''),
-                      others_please_move=dict(imports=[], body=''))
-        module[self.package['name']] = dict(imports=[], body='')
-        return module
-
     def _make_method(self, method, interface, patterns):
         args = ['self']
         method_impl = self._make_method_impl(method, interface, patterns)
@@ -104,6 +115,35 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
                 self._wrap(method_doc) + '\n' +
                 self._wrap(method_impl))
 
+    def _services_module_body(self, interface):
+        additional_methods = self._additional_methods(interface)
+        inheritance = self._get_class_inheritance(interface)
+        init_methods = self._make_init_methods(interface)
+        methods = self.make_methods(interface, self.patterns)
+        body = ''
+
+        # Add all the appropriate manager related session methods to the manager interface
+        # Add all the appropriate catalog related session methods to the catalog interface
+        if any(m in interface['inherit_shortnames'] for m in ['OsidManager', 'OsidProfile']):
+            new_methods, new_imports = self._grab_service_methods(self._is_manager_session)
+            methods += new_methods
+        # Add all the appropriate catalog related session methods to the catalog interface
+        elif interface['shortname'] == self.patterns['package_catalog_caps']:
+            new_methods, new_imports = self._grab_service_methods(self._is_catalog_session)
+            methods += new_methods
+
+        if not init_methods.strip() and not methods.strip():
+            init_methods = '{0}pass'.format(self._ind)
+
+        if additional_methods:
+            methods += '\n' + additional_methods
+
+        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                 self._wrap(self.class_doc(interface)),
+                                                 self._wrap(init_methods),
+                                                 methods)
+        return body
+
     def _update_module_imports(self, modules, interface):
         imports = modules[interface['category']]['imports']
         pkg_imports = modules[self.package['name']]['imports']
@@ -119,23 +159,27 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
             self.append(pkg_imports, 'from ..osid import sessions as osid_sessions')
 
     def build_this_interface(self, interface):
+        # return True
         return (not interface['shortname'].endswith('ProxyManager') and
                 self._build_this_interface(interface))
+
+    def build_this_method(self, interface, method):
+        return True
 
     def make(self):
         self.make_osids(build_abc=False)
 
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
-        return '{0}\n{1}\n{2}{3}\n{4}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                    self.class_doc(interface),
-                                                    self._ind,
-                                                    self._additional_methods(interface),
-                                                    self.make_methods(interface, None))
+        return '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                 self.class_doc(interface),
+                                                 self._additional_methods(interface),
+                                                 self.make_methods(interface, None))
 
     def update_module_body(self, modules, interface):
         modules[interface['category']]['body'] += self.module_body(interface)
-        modules[self.package['name']]['body'] += self.module_body(interface)
+        if self._build_as_service_interface(interface):
+            modules[self.package['name']]['body'] += self._services_module_body(interface)
 
     def write_license_file(self):
         with open(self._abc_module('license'), 'w') as write_file:
@@ -158,10 +202,10 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
         # write out both the import statements and class definitions to the
         # appropriate module for this package.
         for module in modules:
-            if modules[module]['body'].strip() != '':
+            if modules[module]['body'] is not None and modules[module]['body'].strip() != '':
                 with open(self._abc_module(module), 'w') as write_file:
                     write_file.write('{0}\n\n\n{1}'.format('\n'.join(modules[module]['imports']),
-                                                            modules[module]['body']).decode('utf-8').encode('utf-8'))
+                                                           modules[module]['body']).decode('utf-8').encode('utf-8'))
                 with open('{0}/services/{1}.py'.format(self._app_name(),
                                                        self.package['name']), 'w') as write_file:
                     write_file.write('{0}{1}\n\n\n{2}'.format(summary,
