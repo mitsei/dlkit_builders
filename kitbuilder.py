@@ -158,3 +158,18 @@ DISABLED = -1"""
     def update_module_body(self, modules, interface):
         modules[self.package['name']]['body'] += self.module_body(interface)
 
+    def write_modules(self, modules):
+        # Finally, iterate through the completed package module structure and
+        # write out both the import statements and class definitions to the
+        # appropriate module for this package.
+        for module in modules:
+            if module == 'records' and self.package['name'] != 'osid':
+                module_name = 'record_templates'
+            else:
+                module_name = module
+
+            if modules[module]['body'].strip() != '':
+                with open('{0}/{1}.py'.format(self._app_name(),
+                                              self.package['name']), 'w') as write_file:
+                    self._write_module_string(write_file,
+                                              modules[module])

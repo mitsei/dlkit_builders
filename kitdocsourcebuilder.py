@@ -73,6 +73,50 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
 
         return methods
 
+    # Determine if the interface represents a catalog related session
+    def _is_catalog_session(self, interface, patterns, package_name):
+        is_catalog_session = False
+        if package_name in ['type', 'proxy']:
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('GradebookColumn')):
+            is_catalog_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'HierarchySession')):
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                not interface['shortname'].startswith(patterns['package_catalog_caps'])):
+            is_catalog_session = True
+        return is_catalog_session
+
+    # Determine if the interface represents a manager related session
+    def _is_manager_session(self, interface, patterns, package_name):
+        is_manager_session = False
+        if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('GradebookColumn')):
+            is_manager_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith(patterns['package_catalog_caps'])):
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('Resource')):
+            is_manager_session = True
+        return is_manager_session
+    
     def _patterns(self):
         patterns = self._load_patterns_file()
         for inf in self.package['interfaces']:

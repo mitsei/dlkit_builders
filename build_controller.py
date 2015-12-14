@@ -180,6 +180,7 @@ class BaseBuilder(Utilities):
         # required and append to the appropriate module's import list.
         inherit_category = 'UNKNOWN_MODULE'
         for i in interface['inheritance']:
+            import_str = ''
             inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
             if (i['pkg_name'] == self.package['name'] and
                     inherit_category == interface['category']):
@@ -321,9 +322,6 @@ class BaseBuilder(Utilities):
                 interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
             is_catalog_session = False
         elif (interface['category'] == 'sessions' and
-                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'HierarchySession')):
-            is_catalog_session = False
-        elif (interface['category'] == 'sessions' and
                 not interface['shortname'].startswith(patterns['package_catalog_caps'])):
             is_catalog_session = True
         return is_catalog_session
@@ -344,9 +342,6 @@ class BaseBuilder(Utilities):
             is_manager_session = True
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].startswith(patterns['package_catalog_caps'])):
-            is_manager_session = True
-        elif (interface['category'] == 'sessions' and
-                interface['shortname'].startswith('Resource')):
             is_manager_session = True
         return is_manager_session
 
