@@ -124,7 +124,8 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
 
         # Add all the appropriate manager related session methods to the manager interface
         # Add all the appropriate catalog related session methods to the catalog interface
-        if any(m in interface['inherit_shortnames'] for m in ['OsidManager', 'OsidProfile']):
+        if any(m in interface['inherit_shortnames']
+               for m in ['OsidManager', 'OsidProxyManager', 'OsidProfile']):
             new_methods, new_imports = self._grab_service_methods(self._is_manager_session)
             methods += new_methods
         # Add all the appropriate catalog related session methods to the catalog interface
@@ -160,8 +161,7 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
 
     def build_this_interface(self, interface):
         # return True
-        return (not interface['shortname'].endswith('ProxyManager') and
-                self._build_this_interface(interface))
+        return self._build_this_interface(interface)
 
     def build_this_method(self, interface, method):
         return True

@@ -42,6 +42,17 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         module[self.patterns['package_catalog_under']] = dict(imports=[], body='')
         return module
 
+    def _get_simple_module_body(self, interface):
+        sn = interface['shortname']
+        header = ' '.join(camel_to_list(sn))
+        body = '{0}\n{1}\n\n.. autoclass:: {2}\n   :show-inheritance:\n\n'.format(header,
+                                                                                  '-' * len(header),
+                                                                                  sn)
+        body = '{0}{1}\n\n'.format(body,
+                                   self.make_methods(interface, self.patterns))
+
+        return body
+
     def _grab_service_methods(self, type_check_method, catalog=None):
         self.patterns['implemented_view_methods'] = []
         methods = ''
@@ -120,7 +131,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
 
         if 'records' in modules and modules['records']['body'].strip() != '':
             toc_str = '{0}   records\n'.format(toc_str)
-        if 'rules' in modules and modules['records']['body'].strip() != '':
+        if 'rules' in modules and modules['rules']['body'].strip() != '':
             toc_str = '{0}   rules\n'.format(toc_str)
 
         with open(self._abc_module('toc', extension='rst'), 'w') as write_file:
@@ -135,36 +146,31 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
     def make_methods(self, interface, patterns, package_name=None, service_catalog=None):
         body = []
         for method in interface['methods']:
+            if package_name is None:
+                class_name = interface['shortname']
+            elif service_catalog is not None:
+                class_name = service_catalog
+            else:
+                class_name = package_name
             ##
-            # Don't include Manager methods that get sessions:
-            if not (('OsidManager' in interface['inherit_shortnames'] or
-                     'OsidProxyManager' in interface['inherit_shortnames']) and
-                     '_session' in method['name']):
-                if package_name is None:
-                    class_name = interface['shortname']
-                elif service_catalog is not None:
-                    class_name = service_catalog
-                else:
-                    class_name = package_name
-                ##
-                # Here is where we check for the Python properties stuff:
-                if method['name'] == 'get_id':
-                    automethod_str = '   .. autoattribute:: ' + class_name + '.ident'
-                elif method['name'] == 'get_identifier_namespace':
-                    automethod_str = '   .. autoattribute:: ' + class_name + '.namespace'
-                elif method['name'].startswith('get_') and method['args'] == []:
-                    automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][4:]
-                elif method['name'].startswith('set_') and len(method['args']) == 1:
-                    automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][4:]
-                elif method['name'].startswith('clear_') and method['args'] == []:
-                    automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][6:]
-                ##
-                # And finally all the methods:
-                else:
-                    automethod_str = '   .. automethod:: ' + class_name + '.' + method['name']
+            # Here is where we check for the Python properties stuff:
+            if method['name'] == 'get_id':
+                automethod_str = '   .. autoattribute:: ' + class_name + '.ident'
+            elif method['name'] == 'get_identifier_namespace':
+                automethod_str = '   .. autoattribute:: ' + class_name + '.namespace'
+            elif method['name'].startswith('get_') and method['args'] == []:
+                automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][4:]
+            elif method['name'].startswith('set_') and len(method['args']) == 1:
+                automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][4:]
+            elif method['name'].startswith('clear_') and method['args'] == []:
+                automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][6:]
+            ##
+            # And finally all the methods:
+            else:
+                automethod_str = '   .. automethod:: ' + class_name + '.' + method['name']
 
-                if automethod_str not in body:
-                    body.append(automethod_str)
+            if automethod_str not in body:
+                body.append(automethod_str)
         return '\n\n'.join(body)
 
     def module_body(self, interface):
@@ -176,16 +182,22 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         body = '{0}{1}\n\n'.format(body,
                                    self.make_methods(interface, self.patterns))
         if any(i in interface['inherit_shortnames']
-               for i in ['OsidManager', 'OsidProxyManager', 'OsidCatalog']):
+               for i in ['OsidManager', 'OsidProxyManager']):
             catalog = sn
-            body = '{0}{1}{2}\n\n'.format(body,
-                                          self._grab_service_methods(self._is_manager_session, catalog=catalog),
-                                          self._grab_service_methods(self._is_catalog_session, catalog=catalog))
+            body = '{0}{1}\n\n'.format(body,
+                                       self._grab_service_methods(self._is_manager_session, catalog=catalog))
+        elif any(i in interface['inherit_shortnames']
+                 for i in ['OsidCatalog']):
+            catalog = sn
+            body = '{0}{1}\n\n'.format(body,
+                                       self._grab_service_methods(self._is_catalog_session, catalog=catalog))
 
         return body
 
     def update_module_body(self, modules, interface):
         modules[self._module_name]['body'] += self.module_body(interface)
+        if self._module_name in ['service_managers', 'service_catalog']:
+            modules[interface['category']]['body'] += self._get_simple_module_body(interface)
 
     def write_license_file(self):
         with open(self._abc_module('summary', extension='rst'), 'w') as write_file:
