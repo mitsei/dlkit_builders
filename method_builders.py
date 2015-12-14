@@ -456,7 +456,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             if self._in(['mongo', 'tests']):
                 if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
                     method['name'] = 'read_to_buffer'
-            elif self._in(['services', 'doc_dlkit']):
+            elif self._in(['services']):
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentResultsSession':
                     method['name'] = 'get_taken_items'
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentBasicAuthoringSession':

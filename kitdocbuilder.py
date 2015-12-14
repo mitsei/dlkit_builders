@@ -1,8 +1,10 @@
 from config import managers_to_implement, sessions_to_implement
 
-from binder_helpers import camel_to_list
+from binder_helpers import camel_to_list, SkipMethod
 from build_controller import BaseBuilder
 from interface_builders import InterfaceBuilder
+from method_builders import argless_clear, argless_get,\
+    simple_property, set_and_del_property, one_arg_set
 
 
 class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
@@ -98,6 +100,23 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
 
         return inheritance
 
+    def _grab_service_methods(self, type_check_method):
+        self.patterns['implemented_view_methods'] = []
+        inherited_imports = []
+        methods = ''
+        for inf in self.package['interfaces']:
+            # Check to see if this interface is meant to be implemented.
+            if self.package['name'] != 'osid' and not self._flagged_for_implementation(inf):
+                continue
+
+            if type_check_method(inf, self.patterns, self.package['name']):
+                methods += '\n##\n# The following methods are from {}\n\n'.format(inf['fullname'])
+                methods += self._make_service_methods(inf) + '\n\n'
+                inherited_imports = self.get_methods_templated_imports(self._abc_pkg_name(abc=False),
+                                                                       inf,
+                                                                       self.patterns)
+        return methods, inherited_imports
+
     def _make_method(self, method, interface, patterns):
         args = ['self']
         method_impl = self._make_method_impl(method, interface, patterns)
@@ -115,11 +134,51 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
                 self._wrap(method_doc) + '\n' +
                 self._wrap(method_impl))
 
+    def _make_service_methods(self, interface):
+        body = []
+        for method in interface['methods']:
+            if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentResultsSession':
+                method['name'] = 'get_taken_items'
+            if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentBasicAuthoringSession':
+                method['name'] = 'get_assessment_items'
+
+            if not self.build_this_method(interface, method):
+                continue
+
+            try:
+                body.append(self._make_method(method, interface, self.patterns))
+            except SkipMethod:
+                # Only expected from kitosid / services builder
+                pass
+            else:
+                # Here is where we add the Python properties stuff:
+                if argless_get(method):
+                    body.append(simple_property('get', method))
+                elif one_arg_set(method):
+                    if (simple_property('del', method)) in body:
+                        body.remove(simple_property('del', method))
+                        body.append(set_and_del_property(method))
+                    else:
+                        body.append(simple_property('set', method))
+                elif argless_clear(method):
+                    if (simple_property('set', method)) in body:
+                        body.remove(simple_property('set', method))
+                        body.append(set_and_del_property(method))
+                    else:
+                        body.append(simple_property('del', method))
+
+                if method['name'] == 'get_id':
+                        body.append(simple_property('get', method, 'ident'))
+                if method['name'] == 'get_identifier_namespace':
+                        body.append(simple_property('get', method, 'namespace'))
+
+        return '\n\n'.join(body)
+
     def _services_module_body(self, interface):
         additional_methods = self._additional_methods(interface)
         inheritance = self._get_class_inheritance(interface)
         init_methods = self._make_init_methods(interface)
-        methods = self.make_methods(interface, self.patterns)
+        methods = self._make_service_methods(interface)
         body = ''
 
         # Add all the appropriate manager related session methods to the manager interface

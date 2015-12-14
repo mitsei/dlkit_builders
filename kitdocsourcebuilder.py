@@ -159,7 +159,18 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             elif method['name'] == 'get_identifier_namespace':
                 automethod_str = '   .. autoattribute:: ' + class_name + '.namespace'
             elif method['name'].startswith('get_') and method['args'] == []:
-                automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][4:]
+                if method['name'] in ['get_copyright', 'get_license']:
+                    automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][4:] + '_'
+                else:
+                    automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][4:]
+            elif method['name'] == 'get_items' and len(method['args']) == 1:
+                if method['args'][0]['var_name'] == 'assessment_id':
+                    method_name = 'get_assessment_items'
+                elif method['args'][0]['var_name'] == 'taken_id':
+                    method_name = 'get_taken_items'
+                else:
+                    raise Exception
+                automethod_str = '   .. automethod:: ' + class_name + '.' + method_name
             elif method['name'].startswith('set_') and len(method['args']) == 1:
                 automethod_str = '   .. autoattribute:: ' + class_name + '.' + method['name'][4:]
             elif method['name'].startswith('clear_') and method['args'] == []:
