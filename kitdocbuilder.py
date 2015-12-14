@@ -242,7 +242,7 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
         if additional_methods:
             methods += '\n' + additional_methods
 
-        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
+        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self._wrap(self.class_sig(interface, inheritance)),
                                                  self._wrap(self.class_doc(interface)),
                                                  self._wrap(init_methods),
                                                  methods)
@@ -275,7 +275,7 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
         return '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                 self.class_doc(interface),
+                                                 self._wrap(self.class_doc(interface)),
                                                  self._additional_methods(interface),
                                                  self.make_methods(interface, None))
 
@@ -296,10 +296,10 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
 
     def write_modules(self, modules):
         summary = u'{0}\"\"\"{1}\n{2} version {3}\n\n{4}\n\n\"\"\"\n'.format(self._utf_code,
-                                                                             self.package['title'],
-                                                                             self.package['name'],
-                                                                             self.package['version'],
-                                                                             self.package['summary']).encode('utf-8')
+                                                                             self._wrap(self.package['title']),
+                                                                             self._wrap(self.package['name']),
+                                                                             self._wrap(self.package['version']),
+                                                                             self._wrap(self.package['summary'])).encode('utf-8')
         ##
         # Finally, iterate through the completed package module structure and
         # write out both the import statements and class definitions to the

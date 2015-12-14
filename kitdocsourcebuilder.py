@@ -116,7 +116,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
                 interface['shortname'].startswith('Resource')):
             is_manager_session = True
         return is_manager_session
-    
+
     def _patterns(self):
         patterns = self._load_patterns_file()
         for inf in self.package['interfaces']:
