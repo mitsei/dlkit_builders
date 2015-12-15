@@ -52,7 +52,8 @@ class Utilities(object):
 
     def _wrap(self, text):
         def _get_wrapper(new_spacing=4):
-            return textwrap.TextWrapper(subsequent_indent=(new_spacing + 4)*' ', width=120)
+            return textwrap.TextWrapper(subsequent_indent=(new_spacing + 4)*' ', width=100)
+
         result = []
         new_paragraph = False
         previous_line = ''
@@ -82,15 +83,16 @@ class Utilities(object):
                         wrapper = _get_wrapper(spacing + 4)
                         new_line = (spacing + 4) * ' ' + '\n'.join(wrapper.wrap(line))
             else:
-                wrapper = _get_wrapper()
+                spacing = len(line) - len(line[:].lstrip(' '))
+                wrapper = _get_wrapper(spacing)
                 new_line = '\n'.join(wrapper.wrap(line))
 
-            if line.strip() == '':
+            if line[:].strip() == '':
                 new_paragraph = False
             else:
                 new_paragraph = True
 
-            if new_line.strip() != '':
+            if new_line[:].strip() != '':
                 result.append(new_line)
             else:
                 result.append('\n')

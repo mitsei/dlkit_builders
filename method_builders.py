@@ -234,7 +234,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             method_sig = ''
             method_impl = self._make_method_impl(method, interface, patterns)
 
-            if self._is('mongo'):
+            if self._in(['mongo']):
                 if self.extra_templates_exists(method, interface, patterns, '_arg_template'):
                     arg_context = self._get_method_context(method, interface, patterns)
                     arg_default_map = self.get_arg_default_map(arg_context,
@@ -309,7 +309,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                                                                                   self._wrap(method['doc']['body']),
                                                                                   self._wrap('\n'.join(detail_docs)))
 
-            if self._is('services') or self._is('authz'):
+            if self._in(['services', 'authz']):
                 return method_sig + '\n' + method_impl
             else:
                 if len(args) > 1:
