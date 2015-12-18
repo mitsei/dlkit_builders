@@ -52,7 +52,7 @@ class Utilities(object):
 
     def _wrap(self, text):
         def _get_wrapper(new_spacing=4):
-            return textwrap.TextWrapper(subsequent_indent=(new_spacing + 4)*' ', width=100)
+            return textwrap.TextWrapper(subsequent_indent=(new_spacing + 4)*' ', width=120)
 
         result = []
         new_paragraph = False
