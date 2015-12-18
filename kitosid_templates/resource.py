@@ -40,7 +40,8 @@ class ResourceManager:
         self._provider_sessions = dict()
         self._session_management = AUTOMATIC
         self._${cat_name_under}_view = DEFAULT
-        osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
+        # This is to initialize self._proxy
+        osid.OsidSession.__init__(self, proxy)
 
     # def _get_view(self, view):
     #     \"\"\"Gets the currently set view\"\"\"
