@@ -13,6 +13,10 @@ import textwrap
 from collections import OrderedDict
 from importlib import import_module
 
+from binder_helpers import camel_to_under
+from config import sessions_to_implement, managers_to_implement,\
+    objects_to_implement, variants_to_implement
+
 from pattern_mapper import map_patterns
 from xosid_mapper import XOsidMapper
 
@@ -47,11 +51,59 @@ class Utilities(object):
         return target_dir
 
     def _wrap(self, text):
+        def _get_wrapper(new_spacing=4):
+            return textwrap.TextWrapper(subsequent_indent=(new_spacing + 4)*' ', width=120)
+
         result = []
-        wrapper = textwrap.TextWrapper(subsequent_indent=8*' ', width=120)
+        new_paragraph = False
+        previous_line = ''
         for line in text.splitlines():
-            result.append('\n'.join(wrapper.wrap(line)))
+            if new_paragraph:
+                if previous_line[:].strip()[0] == '#':
+                    spacing = previous_line[:].split('#')[0]
+                    wrapper = _get_wrapper(len(spacing))
+                    new_line = spacing + '\n'.join(wrapper.wrap(line.strip()))
+                elif line[:].strip() != '' and line[:].lstrip(' ')[0] == '*':
+                    wrapper = _get_wrapper()
+                    new_line = '\n'.join(wrapper.wrap(line))
+                else:
+                    spacing = len(line) - len(line[:].lstrip(' '))
+                    previous_spacing = len(previous_line) - len(previous_line[:].lstrip(' '))
+                    if spacing != 0 and previous_spacing != 0:
+                        wrapper = _get_wrapper(spacing)
+                        new_line = '\n'.join(wrapper.wrap(line))
+                    elif spacing < previous_spacing and spacing != 0:
+                        wrapper = _get_wrapper(previous_spacing)
+                        new_line = previous_spacing * ' ' + '\n'.join(wrapper.wrap(line.lstrip(' ')))
+                    elif previous_spacing == 0 and spacing != 0:
+                        # already indented
+                        wrapper = _get_wrapper(spacing)
+                        new_line = '\n'.join(wrapper.wrap(line))
+                    else:
+                        wrapper = _get_wrapper(spacing + 4)
+                        new_line = (spacing + 4) * ' ' + '\n'.join(wrapper.wrap(line))
+            else:
+                spacing = len(line) - len(line[:].lstrip(' '))
+                wrapper = _get_wrapper(spacing)
+                new_line = '\n'.join(wrapper.wrap(line))
+
+            if line[:].strip() == '':
+                new_paragraph = False
+            else:
+                new_paragraph = True
+
+            if new_line[:].strip() != '':
+                result.append(new_line)
+            else:
+                result.append('\n')
+
+            previous_line = new_line
+
         return '\n'.join(result)
+
+    def append(self, iterator, item):
+        if item not in iterator:
+            iterator.append(item)
 
     def first(self, package_path, char='.'):
         """a lot of builder patterns refer to the first item in a
@@ -76,6 +128,7 @@ class BaseBuilder(Utilities):
         self._interface_maps_dir = None
         self._map_ext = '.json'
         self._abs_path = ABS_PATH
+        self.package = None
 
         self._app_prefix = ''
         self._abc_prefix = ''
@@ -85,6 +138,7 @@ class BaseBuilder(Utilities):
         self._pkg_suffix = ''
         self._root_dir = None
         self._class = None
+        self._utf_code = '# -*- coding: utf-8 -*-\n'
 
         self.package_maps = package_maps_dir
         self.pattern_maps = pattern_maps_dir
@@ -95,15 +149,18 @@ class BaseBuilder(Utilities):
     # by prepending and appending the appropriate suffixes and prefixes. Note
     # that the django app_name() function is included to support building of
     # the abc osids into a Django project environment.
-    def _abc_pkg_name(self, string, abc=True):
-        if isinstance(string, dict):
-            string = string['name']
-        if abc:
-            return self._abc_prefix + '_'.join(string.split('.')) + self._abc_suffix
-        else:
-            return self._pkg_prefix + '_'.join(string.split('.')) + self._pkg_suffix
+    def _abc_pkg_name(self, abc=True, package_name=None):
+        if package_name is None:
+            package_name = self.package['name']
 
-    def _app_name(self, package, abstract=False):
+        if abc:
+            return self._abc_prefix + '_'.join(package_name.split('.')) + self._abc_suffix
+        else:
+            return self._pkg_prefix + '_'.join(package_name.split('.')) + self._pkg_suffix
+
+    def _app_name(self, abstract=False, package_name=None):
+        if package_name is None:
+            package_name = self.package['name']
         if abstract:
             if self._is('services'):
                 return '..abstract_osid'
@@ -112,28 +169,262 @@ class BaseBuilder(Utilities):
         elif self._root_dir is not None:
             return self._root_dir
         else:
-            if isinstance(package, dict):
-                return self._app_prefix + package['name'] + self._app_suffix
-            else:
-                return self._app_prefix + package + self._app_suffix
+            return self._app_prefix + package_name + self._app_suffix
 
-    def _abc_module(self, package, module, abc=True, test=False):
+    def _abc_module(self, module, abc=True, test=False, extension='py'):
         if test:
-            return self._abc_pkg_path(package, abc) + '/test_' + module + '.py'
+            return '{0}/test_{1}.{2}'.format(self._abc_pkg_path(abc),
+                                             module,
+                                             extension)
         else:
-            return self._abc_pkg_path(package, abc) + '/' + module + '.py'
+            return '{0}/{1}.{2}'.format(self._abc_pkg_path(abc),
+                                        module,
+                                        extension)
 
-    def _abc_pkg_path(self, package, abc=True):
-        return self._app_name(package) + '/' + self._abc_pkg_name(package['name'], abc)
+    def _abc_package_imports(self, interface):
+        def package_interface():
+            return self._abc_pkg_name(package_name=self.package['name'] + '_' + interface['category'])
 
-    def _is(self, desired_type):
-        return self._class == str(desired_type)
+        if self.package['name'] != 'osid' and interface['category'] == 'managers':
+            import_str = 'from dlkit.manager_impls.{} import {} as {}'.format(self._abc_pkg_name(),
+                                                                              interface['category'],
+                                                                              package_interface())
+        else:
+            import_str = 'from {}.{} import {} as abc_{}'.format(self._app_name(abstract=True),
+                                                                 self._abc_pkg_name(),
+                                                                 interface['category'],
+                                                                 package_interface())
+
+        return import_str
+
+    def _abc_pkg_path(self, abc=True):
+        return self._app_name() + '/' + self._abc_pkg_name(abc)
+
+    def _additional_methods(self, interface):
+        additional_methods = ''
+        # Look for additional methods defined in class patterns. These
+        # need to be coded in the impl_class as a string with the
+        # attribute name 'additional_methods_pattern'
+        additional_methods += self._get_extra_patterns(interface['shortname'],
+                                                       'additional_methods_pattern',
+                                                       default='')
+
+        # Here we further inspect the impl_class to identify any additional
+        # hand built methods to be included at the end of the class definition. These
+        # need to be coded in the impl_class as a string with the
+        # attribute name 'additional_methods'
+        impl_class = self._impl_class(interface)
+        if hasattr(impl_class, 'additional_methods'):
+            additional_methods += getattr(impl_class, 'additional_methods')
+
+        return additional_methods
+
+    def _append_inherited_imports(self, imports, interface):
+        # Iterate through any inherited interfaces and check if an import statement is
+        # required and append to the appropriate module's import list.
+        inherit_category = 'UNKNOWN_MODULE'
+        for i in interface['inheritance']:
+            import_str = ''
+            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+            if (i['pkg_name'] == self.package['name'] and
+                    inherit_category == interface['category']):
+                pass
+            else:
+                if self._is('services') and i['pkg_name'] != self.package['name']:
+                    import_str = 'from . import {0}'.format(i['pkg_name'])
+
+                if not self._is('services'):
+                    import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(
+                                                                             self._app_name(package_name=i['pkg_name'])),
+                                                                             self._abc_pkg_name(package_name=i['pkg_name'],
+                                                                                                abc=False),
+                                                                             inherit_category)
+
+                if inherit_category != 'UNKNOWN_MODULE':
+                    self.append(imports, import_str)
+        return inherit_category
+
+    def _append_pattern_imports(self, imports, interface):
+        # Check to see if there are any additional inheritances required
+        # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
+        # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
+        impl_class = self._impl_class(interface)
+
+        # Here we further inspect the impl_class to identify any additional
+        # hand built import statements to be loaded at the module level. These
+        # need to be coded in the impl_class as a list of strings with the
+        # attribute name 'import_statements'
+        if hasattr(impl_class, 'import_statements'):
+            for import_str in getattr(impl_class, 'import_statements'):
+                self.append(imports, import_str)
+
+        # Look for module import statements defined in class patterns. These
+        # need to be coded in the class pattern as a list of strings with the
+        # attribute name 'import_statements_pattern'
+        for import_str in self._get_extra_patterns(interface['shortname'],
+                                                   'import_statements_pattern',
+                                                   default=[]):
+            self.append(imports, import_str)
+
+    def _append_templated_imports(self, imports, interface):
+        # Now also check for templated imports
+        templated_imports = self.get_methods_templated_imports(self._abc_pkg_name(abc=False),
+                                                               interface,
+                                                               self.patterns)
+        for imp in templated_imports:
+            self.append(imports, imp)
+
+    def _build_this_interface(self, interface):
+        exceptions = []
+        excepted_osid_categories = ['properties',
+                                    'query_inspectors',
+                                    'receivers']
+
+        # Check to see if manager should be implemented (this should
+        # probably be moved to binder_helpers.flagged_for_implementation)
+        if (interface['category'] == 'managers' and
+                self.package['name'] not in managers_to_implement):
+            return False
+
+        # Check to see if this interface is meant to be implemented.
+        if (self.package['name'] != 'osid' and
+                interface['category'] not in excepted_osid_categories):
+            if self._flagged_for_implementation(interface):
+                if interface['shortname'] in exceptions:
+                    return False
+            else:
+                return False
+
+        if interface['category'] in excepted_osid_categories:
+            return False
+
+        return True
+
+    def _empty_modules_dict(self):
+        return dict(manager=dict(imports=[], body=''),  # for kitosids only
+                    catalog=dict(imports=[], body=''),  # for kitosids only
+                    properties=dict(imports=[], body=''),
+                    objects=dict(imports=[], body=''),
+                    queries=dict(imports=[], body=''),
+                    query_inspectors=dict(imports=[], body=''),
+                    searches=dict(imports=[], body=''),
+                    search_orders=dict(imports=[], body=''),
+                    rules=dict(imports=[], body=''),
+                    metadata=dict(imports=[], body=''),
+                    receivers=dict(imports=[], body=''),
+                    sessions=dict(imports=[], body=''),
+                    managers=dict(imports=[], body=''),
+                    records=dict(imports=[], body=''),
+                    primitives=dict(imports=[], body=''),
+                    markers=dict(imports=[], body=''),
+                    others_please_move=dict(imports=[], body=''))
+
+    def _flagged_for_implementation(self, interface):
+        """
+        Check if this interface is meant to be implemented.
+
+        """
+        test = False
+        if interface['category'] == 'managers':
+            test = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'] in sessions_to_implement):
+            test = True
+        elif interface['shortname'] in objects_to_implement:
+            test = True
+        else:
+            for variant in variants_to_implement:
+                if (interface['shortname'].endswith(variant) and
+                        interface['shortname'][:-len(variant)] in objects_to_implement):
+                    test = True
+        return test
 
     def _import_path(self, path, limited=True):
         if limited:
             return '.'.join(remove_abs_path(path).split('/')[-2::])
         else:
             return '.'.join(remove_abs_path(path).split('/'))
+
+    def _in(self, desired_types_list):
+        return self._class in desired_types_list
+
+    def _is(self, desired_type):
+        return self._class == str(desired_type)
+
+    # Determine if the interface represents a catalog related session
+    def _is_catalog_session(self, interface, patterns, package_name):
+        is_catalog_session = False
+        if package_name in ['type', 'proxy']:
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('GradebookColumn')):
+            is_catalog_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                not interface['shortname'].startswith(patterns['package_catalog_caps'])):
+            is_catalog_session = True
+        return is_catalog_session
+
+    # Determine if the interface represents a manager related session
+    def _is_manager_session(self, interface, patterns, package_name):
+        is_manager_session = False
+        if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('GradebookColumn')):
+            is_manager_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith(patterns['package_catalog_caps'])):
+            is_manager_session = True
+        return is_manager_session
+
+    def _is_session(self, interface, type_):
+        return '{}.is_{}_session'.format(camel_to_under(interface['shortname']),
+                                         type_)
+
+    def _load_patterns_file(self):
+        # Get the pattern map for this osid package.
+        with open(self._package_pattern_file(), 'r') as read_file:
+            return json.load(read_file)
+
+    def _order_module_imports(self, imports):
+        # does not separate built-in libraries from third-party libraries
+        docstrings = [imp for imp in imports if '"""' in imp or imp.startswith('#')]
+        full_imports = [imp for imp in imports if imp.startswith('import ')]
+        local_imports = [imp for imp in imports if imp.startswith('from .') or imp.startswith('from dlkit')]
+        constants = [imp for imp in imports if 'import' not in imp and imp not in docstrings]
+        partial_third_party_imports = [imp for imp in imports
+                                       if imp not in full_imports and
+                                       imp not in local_imports and
+                                       imp not in constants and
+                                       imp not in docstrings and
+                                       imp.strip() != '']
+
+        newline = ['\n']
+
+        full_imports.sort()
+        local_imports.sort()
+        partial_third_party_imports.sort()
+
+        import_lists = [docstrings, full_imports, partial_third_party_imports, local_imports, constants]
+
+        results = []
+        for import_list in import_lists:
+            if len(import_list) > 0:
+                results += import_list + newline
+
+        return results
 
     def _package_file(self, package):
         if isinstance(package, dict) and 'name' in package:
@@ -148,7 +439,10 @@ class BaseBuilder(Utilities):
             # assume is package name string
             return self.interface_maps + '/' + package + self._map_ext
 
-    def _package_pattern_file(self, package):
+    def _package_pattern_file(self, package=None):
+        if package is None:
+            package = self.package
+
         if isinstance(package, dict):
             return self.pattern_maps + '/' + self.first(package['name']) + self._map_ext
         else:
@@ -157,6 +451,38 @@ class BaseBuilder(Utilities):
     def _pattern_map_exists(self, package):
         return self.first(package['name']) + self._map_ext in os.listdir(self.pattern_maps)
 
+    def _patterns(self):
+        # Get the pattern map for this osid package.
+        return self._load_patterns_file()
+
+    def _update_module_imports(self, modules, interface):
+        pass
+
+    def _write_module_string(self, write_file, module):
+        write_file.write('{0}\n\n\n{1}'.format('\n'.join(self._order_module_imports(module['imports'])),
+                                               module['body']).encode('utf-8'))
+
+    def build_this_interface(self, interface):
+        pass
+
+    def class_doc(self, interface):
+        # Inspect the class doc string for headline + body and create
+        # appropriate doc string style. Trying to conform to PEP 257 as
+        # much as the source osid doc will allow.
+        if interface['doc']['body'].strip() == '':
+            class_doc = '{0}\"\"\"{1}\"\"\"'.format(self._ind,
+                                                    self._wrap(interface['doc']['headline']))
+        else:
+            class_doc = '{0}\"\"\"{1}\n\n{2}\n\n{3}\"\"\"'.format(self._ind,
+                                                                  self._wrap(interface['doc']['headline']),
+                                                                  self._wrap(interface['doc']['body']),
+                                                                  self._ind)
+        return class_doc
+
+    def class_sig(self, interface, inheritance):
+        return 'class {0}{1}:'.format(interface['shortname'],
+                                      inheritance)
+
     @property
     def interface_maps(self):
         return self._interface_maps_dir
@@ -164,6 +490,24 @@ class BaseBuilder(Utilities):
     @interface_maps.setter
     def interface_maps(self, interface_maps_dir):
         self._interface_maps_dir = self._make_dir(interface_maps_dir)
+
+    def module_body(self, interface):
+        inheritance = self._get_class_inheritance(interface)
+        init_methods = self._make_init_methods(interface)
+        methods = self.make_methods(interface, self.patterns)
+        additional_methods = self._additional_methods(interface)
+
+        if additional_methods:
+            methods += '\n' + additional_methods
+
+        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                 self._wrap(self.class_doc(interface)),
+                                                 self._wrap(init_methods),
+                                                 methods)
+        return body
+
+    def module_header(self, module):
+        return ''
 
     @property
     def package_maps(self):
@@ -206,6 +550,30 @@ class BaseBuilder(Utilities):
                            + interface_shortname + '\' not found.')
         return category
 
+    def update_module_body(self, modules, interface):
+        modules[interface['category']]['body'] += self.module_body(interface)
+
+    def write_license_file(self):
+        pass
+
+    def write_modules(self, modules):
+        # Finally, iterate through the completed package module structure and
+        # write out both the import statements and class definitions to the
+        # appropriate module for this package.
+        for module in modules:
+            if module == 'records' and self.package['name'] != 'osid':
+                module_name = 'record_templates'
+            else:
+                module_name = module
+
+            if modules[module]['body'].strip() != '':
+                with open(self._abc_module(module_name), 'wb') as write_file:
+                    self._write_module_string(write_file,
+                                              modules[module])
+
+    def write_profile_file(self):
+        pass
+
 
 class PatternBuilder(XOsidMapper, BaseBuilder):
     def _make_impl_pattern_map(self, file_name=None, package=None, **kwargs):
@@ -215,7 +583,7 @@ class PatternBuilder(XOsidMapper, BaseBuilder):
         pattern_index = OrderedDict()
         if package is not None:
             pattern_index = map_patterns(package, pattern_index, **kwargs)
-            with open(self._package_pattern_file(package), 'w') as write_file:
+            with open(self._package_pattern_file(package=package), 'w') as write_file:
                 json.dump(pattern_index, write_file, indent=3)
         return True
 
@@ -253,14 +621,15 @@ class PatternBuilder(XOsidMapper, BaseBuilder):
 class Templates(Utilities):
     def __init__(self, template_dir=None, *args, **kwargs):
         self._template_dir = template_dir
+        self.package = None
 
         if template_dir is not None:
             self._make_dir(template_dir)
         super(Templates, self).__init__()
 
-    def _get_templates(self, package_name, interface, method, patterns, template_extension):
+    def _get_templates(self, interface, method, patterns, template_extension):
         """get the extra templates for specified method name"""
-        impl_class = self._load_impl_class(package_name, interface['shortname'])
+        impl_class = self._load_impl_class(interface['shortname'])
         templates_obj = None
         template_name = method['name'] + template_extension
         interface_dot_name = interface['shortname'] + '.' + method['name']
@@ -283,11 +652,13 @@ class Templates(Utilities):
 
         return templates_obj
 
-    def _impl_class(self, package, interface):
-        return self._load_impl_class(package['name'], interface['shortname'])
+    def _impl_class(self, interface):
+        return self._load_impl_class(interface['shortname'])
 
-    def _load_impl_class(self, package_name, interface_name):
-    # Try loading hand-built implementations class for this interface
+    def _load_impl_class(self, interface_name, package_name=None):
+        # Try loading hand-built implementations class for this interface
+        if package_name is None:
+            package_name = self.package['name']
         impl_class = None
         try:
             if ABS_PATH not in sys.path:
@@ -310,12 +681,12 @@ class Templates(Utilities):
     def _template(self, directory):
         return self._template_dir + '/' + directory
 
-    def extra_templates_exists(self, package_name, method, interface, patterns, template_extension):
+    def extra_templates_exists(self, method, interface, patterns, template_extension):
         """checks if an argument template with default values
          exists for the given method"""
 
         # first check for non-templated methods, if they have arg_default_template
-        impl_class = self._load_impl_class(package_name, interface['shortname'])
+        impl_class = self._load_impl_class(interface['shortname'])
         if (impl_class and
                 hasattr(impl_class, method['name'] + template_extension)):
             return True
@@ -334,10 +705,10 @@ class Templates(Utilities):
                             return True
         return False
 
-    def get_arg_default_map(self, arg_context, package_name, method, interface, patterns):
+    def get_arg_default_map(self, arg_context, method, interface, patterns):
         """gets an argument template and maps the keys to the actual arg names"""
         arg_map = {}
-        arg_template = self._get_templates(package_name, interface, method, patterns, '_arg_template')
+        arg_template = self._get_templates(interface, method, patterns, '_arg_template')
 
         if arg_template is not None:
             arg_list = arg_context['arg_list'].split(',')
@@ -353,7 +724,7 @@ class Templates(Utilities):
         """gets an import template and maps the keys to the actual arg names.
         Returns a list of imports..."""
         imports = []
-        import_templates = self._get_templates(package_name, interface, method, patterns, '_import_templates')
+        import_templates = self._get_templates(interface, method, patterns, '_import_templates')
         if import_templates is not None:
             for item in import_templates:
                 template = string.Template(item)
@@ -385,6 +756,12 @@ class Builder(Utilities):
     def authz(self):
         from azbuilder import AZBuilder
         AZBuilder(build_dir=self.build_dir).make()
+
+    def docs(self):
+        from kitdocsourcebuilder import KitSourceBuilder
+        from kitdocbuilder import KitDocDLKitBuilder
+        KitSourceBuilder(build_dir=self.build_dir).make()
+        KitDocDLKitBuilder(build_dir=self.build_dir).make()
 
     def map(self):
         """map all the xosid files"""
@@ -517,4 +894,6 @@ if __name__ == '__main__':
                 non_test_build = True
             if 'tests' in sys.argv:
                 builder.tests(non_test_build)
+            if 'docs' in sys.argv:
+                builder.docs()
     sys.exit(0)
