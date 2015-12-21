@@ -40,7 +40,6 @@ class TypeManager:
             else: 
                 self._provider_sessions[session] = get_session()
             return self._provider_sessions[session]
-
 """
 
     get_type_lookup_session = """
@@ -66,8 +65,7 @@ class TypeLookupSession:
 
     init_template = """
     def __init__(self, provider_session):
-        self._provider_session = provider_session
-"""
+        self._provider_session = provider_session"""
 
     can_lookup_types = """
         \"\"\"Pass through to provider method\"\"\"
@@ -182,8 +180,7 @@ class TypeAdminSession:
 
     init_template = """
     def __init__(self, provider_session):
-        self._provider_session = provider_session
-"""
+        self._provider_session = provider_session"""
 
     can_create_types = """
         \"\"\"Pass through to provider method\"\"\"

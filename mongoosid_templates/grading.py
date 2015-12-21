@@ -180,15 +180,12 @@ class GradeEntryForm:
     ]
 
     init = """
-    try:
-        #pylint: disable=no-name-in-module
-        from ..records.types import GRADE_ENTRY_RECORD_TYPES as _record_type_data_sets
-    except (ImportError, AttributeError):
-        _record_type_data_sets = dict()
+    _record_type_data_sets = {}
     _namespace = 'grading.GradeEntry'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
         osid_objects.OsidForm.__init__(self, runtime=runtime)
+        self._record_type_data_sets = self._get_registry('GRADE_ENTRY_RECORD_TYPES')
         self._kwargs = kwargs
         self._effective_agent_id = kwargs['effective_agent_id']
 
@@ -455,15 +452,12 @@ class GradebookColumnSummary:
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # gradebookId element and may be removed someday
     init = """
-    try:
-        #pylint: disable=no-name-in-module
-        from ..records.types import GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES as _record_type_data_sets
-    except (ImportError, AttributeError):
-        _record_type_data_sets = {}
+    _record_type_data_sets = {}
     _namespace = 'grading.GradebookColumnSummary'
 
     def __init__(self, osid_object_map, runtime=None):
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
+        self._record_type_data_sets = self._get_registry('GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES')
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         self._catalog_name = 'Gradebook'
@@ -488,30 +482,23 @@ class GradebookColumnSummary:
         if self.get_gradebook_column().get_grade_system().is_based_on_grades():
             return [e.get_grade().get_output_score() for e in self._entries if e.is_graded()]
         else:
-            return [e.get_score() for e in self._entries if e.is_graded()]
-    """
+            return [e.get_score() for e in self._entries if e.is_graded()]"""
 
     get_mean = """
-        return np.mean(self._entry_scores)
-    """
+        return np.mean(self._entry_scores)"""
 
     get_median = """
-        return np.median(self._entry_scores)
-    """
+        return np.median(self._entry_scores)"""
 
     get_mode = """
         # http://stackoverflow.com/questions/10797819/finding-the-mode-of-a-list-in-python
-        return max(set(self._entry_scores), key=self._entry_scores.count)
-    """
+        return max(set(self._entry_scores), key=self._entry_scores.count)"""
 
     get_rms = """
-        return np.sqrt(np.mean(np.square(self._entry_scores)))
-    """
+        return np.sqrt(np.mean(np.square(self._entry_scores)))"""
 
     get_standard_deviation = """
-        return np.std(self._entry_scores)
-    """
+        return np.std(self._entry_scores)"""
 
     get_sum = """
-        return sum(self._entry_scores)
-    """
+        return sum(self._entry_scores)"""

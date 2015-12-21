@@ -38,5 +38,4 @@ class Agent:
     # Override get_description method to return something
     def get_description(self):
         from ..locale.primitives import DisplayText
-        return DisplayText('the agent Id for ' + self.get_display_name().get_text())
-"""
+        return DisplayText('the agent Id for ' + self.get_display_name().get_text())"""

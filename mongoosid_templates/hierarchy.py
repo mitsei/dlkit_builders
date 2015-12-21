@@ -38,7 +38,6 @@ class HierarchyTraversalSession:
     def _get_catalog_hierarchy_id(self, catalog_id, proxy, runtime):
         \"\"\"Gets the catalog hierarchy\"\"\"
         seed_str = str(catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000')
-                  #^^^ make sure its not a unicode type
         ident = Id(authority=self._authority,
                    namespace='hierarchy.Hierarchy',
                    identifier=str(ObjectId(seed_str[:12])))
@@ -75,8 +74,7 @@ class HierarchyTraversalSession:
                                        display_name=display_name,
                                        display_label=display_label,
                                        description=description,
-                                       domain=domain)
-"""
+                                       domain=domain)"""
 
     can_access_hierarchy = """
         # NOTE: It is expected that real authentication hints will be
@@ -154,8 +152,7 @@ class HierarchyTraversalSession:
                              'parentNodes': parent_node_list,
                              'root': not self.has_parents(id_),
                              'leaf': not self.has_children(id_),
-                             'sequestered': False})
-"""
+                             'sequestered': False})"""
 
 class HierarchyDesignSession:
 
@@ -229,8 +226,7 @@ class HierarchyDesignSession:
                                        display_name=display_name,
                                        display_label=display_label,
                                        description=description,
-                                       domain=domain)
-"""
+                                       domain=domain)"""
 
     can_modify_hierarchy = """
         # NOTE: It is expected that real authentication hints will be
@@ -270,8 +266,7 @@ class HierarchyDesignSession:
         if results.available() == 0:
             raise errors.NotFound()
         for r in results:
-            self._ras.delete_relationship(r.get_id())
-        """
+            self._ras.delete_relationship(r.get_id())"""
 
     additional_methods = """
     def _adopt_orphans(self, negligent_parent_id):
@@ -287,8 +282,7 @@ class HierarchyDesignSession:
         rfc.set_display_name('Implicit Root to ' + str(id_) + ' Parent-Child Relationship')
         rfc.set_description(self._relationship_type.get_display_name().get_text() + ' relationship for implicit root and child: ' + str(id_))
         rfc.set_genus_type(self._relationship_type)
-        self._ras.create_relationship(rfc)
-"""
+        self._ras.create_relationship(rfc)"""
 
 class HierarchyAdminSession:
     import_statements = [

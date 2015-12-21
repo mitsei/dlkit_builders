@@ -72,8 +72,7 @@ class AssessmentSession:
             db_name='assessment',
             cat_name='Bank',
             cat_class=objects.Bank)
-        self._forms = dict()
-"""
+        self._forms = dict()"""
     
     can_take_assessments = """
         # NOTE: It is expected that real authentication hints will be
@@ -566,7 +565,6 @@ class AssessmentSession:
         else:
             raise errors.IllegalState()"""
 
-    
     is_answer_available = """
         # Note: we need more settings elsewhere to indicate answer available conditions
         # This makes the simple assumption that answers are available only when
@@ -912,8 +910,7 @@ class AssessmentBasicAuthoringSession:
             db_name='assessment',
             cat_name='Bank',
             cat_class=objects.Bank)
-        self._forms = dict()
-"""
+        self._forms = dict()"""
     
     can_author_assessments = """
         # NOTE: It is expected that real authentication hints will be
@@ -1208,8 +1205,7 @@ class AssessmentOfferedForm:
                 ${arg0_name},
                 self.get_${var_name}_metadata()):
             raise errors.InvalidArgument()
-        self._my_map['${var_name_mixed}'] = ${arg0_name}
-"""
+        self._my_map['${var_name_mixed}'] = ${arg0_name}"""
     
     # This looks just like the generic one. Need to find in the pattern?
     clear_start_time_template = """
@@ -1255,7 +1251,7 @@ class AssessmentTaken:
             return OsidObject.get_display_name(self)
         else:
             return self.get_assessment_offered().get_display_name()
-    
+
     def get_description(self):
         # Overrides osid.objects.OsidObject.get_description to default to AssessmentOffered's
         # description if none has been authored for this AssessmentTaken
@@ -1300,7 +1296,6 @@ class AssessmentTaken:
 
     object_map = property(fget=get_object_map)"""
 
-    
     get_taker_id = """
         if self._my_map['takerId']:
             return Id(self._my_map['takerId'])
@@ -1429,13 +1424,11 @@ class AssessmentTakenForm:
 
 class AssessmentTakenQuery:
     match_taking_agent_id = """
-        self._add_match('takingAgentId', str(agent_id), bool(match))
-    """
+        self._add_match('takingAgentId', str(agent_id), bool(match))"""
 
 class AssessmentQuery:
     match_item_id = """
-        self._add_match('itemIds', str(item_id), match)
-    """
+        self._add_match('itemIds', str(item_id), match)"""
 
 
 class AssessmentSection:
@@ -1491,8 +1484,7 @@ class Response:
             try:
                 return getattr(self._my_answer, name)
             except:
-                raise
-"""
+                raise"""
     
     get_item_id = """
         return Id(self._my_answer._my_map['itemId'])"""
@@ -1512,12 +1504,10 @@ class Response:
 class ItemQuery:
 
     match_learning_objective_id = """
-        self._add_match('learningObjectiveIds', str(objective_id), bool(match))
-    """
+        self._add_match('learningObjectiveIds', str(objective_id), bool(match))"""
 
     clear_learning_objective_id_terms = """
-        self._clear_terms('learningObjectiveIds')
-    """
+        self._clear_terms('learningObjectiveIds')"""
 
     match_any_learning_objective = """
         match_key = 'learningObjectiveIds'
@@ -1546,19 +1536,15 @@ class ItemSearch:
     init = """
     def __init__(self, runtime):
         self._namespace = 'assessment.Item'
-        try:
-            #pylint: disable=no-name-in-module
-            from ..records.types import ITEM_RECORD_TYPES as record_type_data_sets
-        except (ImportError, AttributeError):
-            record_type_data_sets = {}
+        self._runtime = runtime
+        record_type_data_sets = self._get_registry('ITEM_RECORD_TYPES')
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         self._id_list = None
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)
-"""
+        osid_searches.OsidSearch.__init__(self, runtime)"""
     search_among_items = """
         self._id_list = item_ids"""
 
@@ -1574,8 +1560,7 @@ class ItemSearchResults:
         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
         self._results = results
         self._runtime = runtime
-        self.retrieved = False
-"""
+        self.retrieved = False"""
 
     get_items = """
         if self.retrieved:

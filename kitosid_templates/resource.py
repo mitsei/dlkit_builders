@@ -4,8 +4,7 @@ class ResourceProfile:
     
     init_template = """
     def __init__(self):
-        self._provider_manager = None
-"""
+        self._provider_manager = None"""
 
     supports_visible_federation_template = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
@@ -117,8 +116,7 @@ class ResourceManager:
     def disable_session_management(self):
         \"\"\"Session state will never be saved\"\"\"
         self._session_management = DISABLED
-        self.close_sessions()
-"""
+        self.close_sessions()"""
 
     get_resource_lookup_session_managertemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
@@ -228,8 +226,7 @@ class ResourceLookupSession:
 
     init_template = """
     def __init__(self, provider_session):
-        self._provider_session = provider_session
-"""
+        self._provider_session = provider_session"""
 
     get_bin_id_template = None
 
@@ -353,8 +350,7 @@ class ResourceAdminSession:
 
     init_template = """
     def __init__(self, provider_session):
-        self._provider_session = provider_session
-"""
+        self._provider_session = provider_session"""
 
     can_create_resources_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
@@ -434,8 +430,7 @@ class ResourceNotificationSession:
 
     init_template = """
     def __init__(self, provider_session):
-        self._provider_session = provider_session
-"""
+        self._provider_session = provider_session"""
 
     can_register_for_resource_notifications_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
@@ -480,8 +475,7 @@ class ResourceBinSession:
 
     init_template = """
     def __init__(self, provider_session):
-        self._provider_session = provider_session
-"""
+        self._provider_session = provider_session"""
 
     can_lookup_resource_bin_mappings_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
@@ -530,8 +524,7 @@ class ResourceBinAssignmentSession:
 
     init_template = """
     def __init__(self, provider_session):
-        self._provider_session = provider_session
-"""
+        self._provider_session = provider_session"""
 
     can_assign_resources_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
@@ -574,8 +567,7 @@ class ResourceAgentSession:
 
     init_template = """
     def __init__(self, provider_session):
-        self._provider_session = provider_session
-"""
+        self._provider_session = provider_session"""
 
     get_resource_id_by_agent = """
         return self._get_provider_session('resource_agent_session').get_resource_id_by_agent(*args, **kwargs)"""
@@ -594,8 +586,7 @@ class ResourceAgentAssignmentSession:
 
     init_template = """
     def __init__(self, provider_session):
-        self._provider_session = provider_session
-"""
+        self._provider_session = provider_session"""
 
     can_assign_agents = """
         return self._get_provider_session('resource_agent_assignment_session').can_assign_agents()"""
@@ -947,14 +938,14 @@ class ResourceList:
             raise IllegalState('no more elements available in this list')
         else:
             return next_item
-            
+
     def next(self):
         \"\"\"next method for enumerator\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resource
         next_item = osid.OsidList.next(self)
         return next_item"""
-            
+
     get_next_resources_template = """
         \"\"\"gets next n objects from list\"\"\"
         # Implemented from kitosid template for -
@@ -1074,6 +1065,5 @@ class Bin:
     def disable_session_management(self):
         \"\"\"Session state will never be saved."\"\"
         self._session_management = DISABLED
-        self.close_sessions()
-"""
+        self.close_sessions()"""
 

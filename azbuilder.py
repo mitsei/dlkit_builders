@@ -17,6 +17,7 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
         imports = modules[interface['category']]['imports']
 
         self.append(imports, self._abc_package_imports(interface))
+        self._append_pattern_imports(imports, interface)
         inherit_category = self._append_inherited_imports(imports, interface)
 
         package = self.package['name']

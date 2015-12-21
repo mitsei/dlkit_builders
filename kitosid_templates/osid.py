@@ -4,8 +4,7 @@ class OsidProfile:
 
     init = """
     def __init__(self):
-        self._provider_manager = None
-"""
+        self._provider_manager = None"""
 
     get_id = """
         pass"""
@@ -53,8 +52,7 @@ class Identifiable:
 
     init = """
     def __init__(self, osid_object): # I will never be called :(
-        self._osid_object = osid_object
-"""
+        self._osid_object = osid_object"""
 
     get_id = """
         return self._osid_object.get_id()
@@ -71,8 +69,7 @@ class Extensible:
 
     init = """
     def __init__(self, osid_object): # I will never be called :(
-        self._osid_object = osid_object
-"""
+        self._osid_object = osid_object"""
 
     get_record_types = """
         return self._osid_object.get_record_types()"""
@@ -85,8 +82,7 @@ class Browsable:
 
     init = """
     def __init__(self, osid_object): # I will never be called :(
-        self._osid_object = osid_object
-"""
+        self._osid_object = osid_object"""
 
     get_properties = """
         return self._osid_object.get_properties()"""
@@ -99,8 +95,7 @@ class Sourceable:
 
     init = """
     def __init__(self, osid_object): # I will never be called :(
-        self._osid_object = osid_object
-"""
+        self._osid_object = osid_object"""
 
     get_provider_id = """
         return self._osid_object.get_provider_id()"""
@@ -132,8 +127,7 @@ class OsidSession:
     ISOLATED = 1
 
     def __init__(self, proxy):
-        self._proxy = proxy
-"""
+        self._proxy = proxy"""
 
     get_locale = """
         pass"""
@@ -191,8 +185,7 @@ class OsidObject:
 
     init = """
     def __init__(self, osid_object):
-        self._osid_object = osid_object
-"""
+        self._osid_object = osid_object"""
 
     get_display_name = """
         return self._osid_object.get_display_name()"""
@@ -232,8 +225,7 @@ class OsidList:
         return next_object
 
     def len(self):
-        return self.available()
-"""
+        return self.available()"""
 
     has_next = """
         if self._count != None:

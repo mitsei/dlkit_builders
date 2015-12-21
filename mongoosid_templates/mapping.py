@@ -5,8 +5,7 @@ class SpatialUnit:
                        bounding_coordinates = None):
 
         self._center_coordinate = center_coordinate
-        self._bounding_coordinates = bounding_coordinates
-"""
+        self._bounding_coordinates = bounding_coordinates"""
 
     get_center_coordinate = """
         return self._center_coordinate"""
@@ -26,8 +25,7 @@ class Coordinate:
         self._coordinate_type = coordinate_type
         self._values = values
         self._uncertainty_minus = uncertainty_minus
-        self._uncertainty_plus = uncertainty_plus
-"""
+        self._uncertainty_plus = uncertainty_plus"""
 
     get_coordinate_type = """
         return self._coordinate_type"""

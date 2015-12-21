@@ -1,6 +1,9 @@
 # resource templates for az_osid
 
 class ResourceProfile:
+    import_statements_pattern = [
+        "from ..osid.osid_errors import Unsupported"
+    ]
 
     init_template = """
     def __init__(self, interface_name):
@@ -32,6 +35,9 @@ class ResourceProfile:
         return self._provider_manager.${method_name}()"""
 
 class ResourceManager:
+    import_statements_pattern = [
+        "from ..osid.osid_errors import Unsupported"
+    ]
 
     init_template = """
     def __init__(self):
@@ -101,6 +107,9 @@ class ResourceManager:
 
 
 class ResourceProxyManager:
+    import_statements_pattern = [
+        "from ..osid.osid_errors import Unsupported"
+    ]
 
     init_template = """
     def __init__(self):
@@ -174,6 +183,9 @@ class ResourceProxyManager:
 
 
 class ResourceLookupSession:
+    import_statements_pattern = [
+        "from ..osid.osid_errors import NotFound"
+    ]
 
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
@@ -203,8 +215,9 @@ class ResourceLookupSession:
 
     def _try_harder(self, query):
         if self._hierarchy_session is None or self._query_session is None:
-            raise PermissionDenied() # Should probably try to return empty result instead
-                                     # perhaps through a query.match_any(match = None)?
+            # Should probably try to return empty result instead
+            # perhaps through a query.match_any(match = None)?
+            raise PermissionDenied()
         for ${cat_name_under}_id in self._get_unauth_${cat_name_under}_ids(self._qualifier_id):
             query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
         return self._query_session.get_${object_name_under_plural}_by_query(query)
@@ -330,6 +343,10 @@ class ResourceLookupSession:
             return self._try_harder(query)"""
 
 class ResourceQuerySession:
+    import_statements_pattern = [
+        'from ..utilities import QueryWrapper',
+        'from ..osid.osid_errors import Unsupported'
+    ]
 
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
@@ -354,14 +371,15 @@ class ResourceQuerySession:
     
     def _try_harder(self, query):
         if self._hierarchy_session is None:
-            raise PermissionDenied() # Should probably try to return empty result instead
-                                     # perhaps through a query.match_any(match = None)?
+            # Should probably try to return empty result instead
+            # perhaps through a query.match_any(match = None)?
+            raise PermissionDenied()
         for ${cat_name_under}_id in self._get_unauth_${cat_name_under}_ids(self._qualifier_id):
             query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
         return self._provider_session.get_${object_name_under_plural}_by_query(query)
 
     class ${object_name}QueryWrapper(QueryWrapper):
-        \"\"\"Wrapper for ${object_name}Queries to overide match_${cat_name_under}_id method\"\"\"
+        \"\"\"Wrapper for ${object_name}Queries to override match_${cat_name_under}_id method\"\"\"
 
         def match_${cat_name_under}_id(self, ${cat_name_under}_id, match=True):
             self.cat_id_args_list.append({'${cat_name_under}_id': ${cat_name_under}_id, 'match': match})
@@ -746,8 +764,9 @@ class BinLookupSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
-                                                                                  # Build from authority in config
+        # This needs to be done right
+        # Build from authority in config
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
         self._id_namespace = '${pkg_name}.${cat_name}'
 """
 
@@ -790,8 +809,9 @@ class BinAdminSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
-                                                                                  # Build from authority in config
+        # This needs to be done right
+        # Build from authority in config
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
         self._id_namespace = '${pkg_name}.${cat_name}'
 """
 
@@ -862,8 +882,9 @@ class BinHierarchySession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
-                                                                                  # Build from authority in config
+        # This needs to be done right
+        # Build from authority in config
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
         self._id_namespace = '${pkg_name}.${cat_name}'
 """
 
@@ -1011,8 +1032,9 @@ class BinHierarchyDesignSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
-                                                                                  # Build from authority in config
+        # This needs to be done right
+        # Build from authority in config
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
         self._id_namespace = '${pkg_name}.${cat_name}' # should this be '${pkg_name}.${cat_name}Hierarchy' ?
 """
 
@@ -1058,8 +1080,9 @@ class BinQuerySession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This needs to be done right
-                                                                                  # Build from authority in config
+        # This needs to be done right
+        # Build from authority in config
+        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
         self._id_namespace = '${pkg_name}.${cat_name}'
 """
 

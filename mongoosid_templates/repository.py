@@ -33,8 +33,7 @@ class RepositoryManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return sessions.AssetCompositionDesignSession(repository_id, runtime=self._runtime) # pylint: disable=no-member
-"""
+        return sessions.AssetCompositionDesignSession(repository_id, runtime=self._runtime) # pylint: disable=no-member"""
 
 class RepositoryProxyManager:
     # This is here temporarily until Tom adds missing methods to RepositoryProxyManager
@@ -58,8 +57,7 @@ class RepositoryProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return sessions.AssetCompositionDesignSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member
-"""
+        return sessions.AssetCompositionDesignSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member"""
 
 class AssetAdminSession:
 
@@ -223,8 +221,7 @@ class CompositionLookupSession:
         view_filter = OsidSession._view_filter(self)
         if self._sequestered_view == SEQUESTERED:
             view_filter['sequestered'] = False
-        return view_filter
-"""
+        return view_filter"""
 
     use_active_composition_view = """
         self._status_view = ACTIVE"""
@@ -274,8 +271,7 @@ class CompositionQuerySession:
         view_filter = OsidSession._view_filter(self)
         if self._sequestered_view == SEQUESTERED:
             view_filter['sequestered'] = False
-        return view_filter
-"""
+        return view_filter"""
 
     use_sequestered_composition_view = """
         self._sequestered_view = SEQUESTERED"""
@@ -310,8 +306,7 @@ class AssetCompositionSession:
             db_name='repository',
             cat_name='Repository',
             cat_class=objects.Repository)
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     get_composition_assets = """
         collection = MongoClientValidated('repository',
@@ -360,8 +355,7 @@ class AssetCompositionDesignSession:
             db_name='repository',
             cat_name='Repository',
             cat_class=objects.Repository)
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     can_compose_assets = """
         return True"""
@@ -451,14 +445,12 @@ class Asset:
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # repositoryId element and may be removed someday
     init = """
-    try:
-        from ..records.types import ASSET_RECORD_TYPES as _record_type_data_sets #pylint: disable=no-name-in-module
-    except (ImportError, AttributeError):
-        _record_type_data_sets = {}
+    _record_type_data_sets = {}
     _namespace = 'repository.Asset'
 
     def __init__(self, osid_object_map, runtime=None):
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
+        self._record_type_data_sets = self._get_registry('ASSET_RECORD_TYPES')
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         self._catalog_name = 'Repository'
@@ -471,9 +463,7 @@ class Asset:
                 return self._composition[name]
             except AttributeError:
                 raise AttributeError()
-        #HOW TO PASS TO EXTENSIBLE!!!!
-"""
-
+        #HOW TO PASS TO EXTENSIBLE!!!!"""
 
     get_title_template = """
         # Implemented from template for osid.repository.Asset.get_title_template
@@ -544,19 +534,15 @@ class AssetSearch:
     init = """
     def __init__(self, runtime):
         self._namespace = 'repository.Asset'
-        try:
-            #pylint: disable=no-name-in-module
-            from ..records.types import ASSET_RECORD_TYPES as record_type_data_sets
-        except (ImportError, AttributeError):
-            record_type_data_sets = {}
+        record_type_data_sets = self._get_registry('ASSET_RECORD_TYPES')
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         self._id_list = None
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)
-"""
+        osid_searches.OsidSearch.__init__(self, runtime)"""
+
     search_among_assets = """
         self._id_list = asset_ids"""
 
@@ -572,8 +558,7 @@ class AssetSearchResults:
         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
         self._results = results
         self._runtime = runtime
-        self.retrieved = False
-"""
+        self.retrieved = False"""
 
     get_assets = """
         if self.retrieved:
@@ -738,21 +723,17 @@ class CompositionForm:
             raise errors.NoAccess()
         self._my_map['childIds'] = self._children_default
 
-    children = property(fset=set_children, fdel=clear_children)
-"""
+    children = property(fset=set_children, fdel=clear_children)"""
 
 class CompositionQuery:
     match_containing_composition_id = """
-        self._add_match('_id', composition_id.identifier, match)
-    """
+        self._add_match('_id', composition_id.identifier, match)"""
 
     match_contained_composition_id = """
-        self._add_match('childIds', str(composition_id), match)
-    """
+        self._add_match('childIds', str(composition_id), match)"""
 
     match_asset_id = """
-        self._add_match('assetIds', str(asset_id), match)
-    """
+        self._add_match('assetIds', str(asset_id), match)"""
 
 
 class CompositionSearch:
@@ -766,19 +747,14 @@ class CompositionSearch:
     init = """
     def __init__(self, runtime):
         self._namespace = 'repository.Composition'
-        try:
-            #pylint: disable=no-name-in-module
-            from ..records.types import COMPOSITION_RECORD_TYPES as record_type_data_sets
-        except (ImportError, AttributeError):
-            record_type_data_sets = {}
+        record_type_data_sets = self._get_registry('COMPOSITION_RECORD_TYPES')
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         self._id_list = None
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)
-"""
+        osid_searches.OsidSearch.__init__(self, runtime)"""
 
     search_among_compositions = """
         self._id_list = composition_ids"""
@@ -795,8 +771,7 @@ class CompositionSearchResults:
         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
         self._results = results
         self._runtime = runtime
-        self.retrieved = False
-"""
+        self.retrieved = False"""
 
     get_compositions = """
         if self.retrieved:

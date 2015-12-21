@@ -27,12 +27,10 @@ class OsidProfile:
             except (AttributeError, KeyError, errors.NotFound):
                 MONGO_CLIENT.set_mongo_client(MongoClient())
             else:
-                MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))
-"""
+                MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))"""
 
     get_id = """
-        return Id(**profile.ID)
-        """
+        return Id(**profile.ID)"""
 
     get_display_name = """
         return DisplayText(
@@ -121,8 +119,7 @@ class OsidManager:
 
     init = """
     def __init__(self):
-        OsidProfile.__init__(self)
-"""
+        OsidProfile.__init__(self)"""
     
     initialize = """
         OsidProfile._initialize_manager(self, runtime)"""
@@ -135,8 +132,7 @@ class OsidProxyManager:
 
     init = """
     def __init__(self):
-        OsidProfile.__init__(self)
-"""
+        OsidProfile.__init__(self)"""
     
     initialize = """
         OsidProfile._initialize_manager(self, runtime)"""
@@ -231,6 +227,16 @@ class Extensible:
                     pass
         raise AttributeError()
 
+    def _get_registry(self, entry):
+        # get from the runtime
+        try:
+            records_location_param_id = Id('parameter:recordsRegistry@mongo')
+            registry = self._runtime.get_configuration().get_value_by_parameter(
+                records_location_param_id).get_string_value()
+            return import_module(registry).__dict__.get(entry, {})
+        except (ImportError, AttributeError, KeyError, errors.NotFound):
+            return {}
+
     def _get_record(self, record_type):
         \"\"\"Get the record string type value given the record_type.\"\"\"
         if not self.has_record_type(record_type):
@@ -294,8 +300,7 @@ class Temporal:
 
     init = """
     def __init__(self):
-        self._my_map = {}
-"""
+        self._my_map = {}"""
 
     is_effective = """
         now = DateTime.now()
@@ -327,8 +332,7 @@ class Containable:
 
     init = """
     def __init__(self):
-        self._my_map = {}
-"""
+        self._my_map = {}"""
 
     is_sequestered = """
         return self._my_map['sequestered']"""
@@ -479,7 +483,7 @@ class OsidSession:
                 'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
                 'recordTypeIds': [] # Could this somehow inherit source catalog records?
             }
-        self._catalog = cat_class(self._my_catalog_map)
+        self._catalog = cat_class(self._my_catalog_map, runtime=self._runtime)
         self._catalog._authority = self._authority  # there should be a better way...
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
@@ -687,8 +691,7 @@ class OsidSession:
             obj_map[catalog_key].remove(str(cat_id))
         except (KeyError, ValueError):
             raise errors.NotFound()
-        collection.save(obj_map)
-"""
+        collection.save(obj_map)"""
 
     get_locale = """
         #from ..locale.objects import Locale
@@ -795,8 +798,7 @@ class OsidObject:
              'id': str(self.get_id())})
         return obj_map
 
-    object_map = property(get_object_map)
-"""
+    object_map = property(get_object_map)"""
 
     get_display_name = """
         return DisplayText(self._my_map['displayName'])"""
@@ -1056,8 +1058,7 @@ class OsidForm:
                 pass
         if set_results is not None and inpt in set_results:
             return True
-        return False
-"""
+        return False"""
 
     is_for_update = """
         return self._for_update"""
@@ -1109,19 +1110,19 @@ class OsidExtensibleForm:
     ]
 
     init = """
-    def _get_record(self, recordType):
+    def _get_record(self, record_type):
         \"\"\"This overrides _get_record in osid.Extensible.
 
         Perhaps we should leverage it somehow?
 
         \"\"\"
-        if not self.has_record_type(recordType):
+        if not self.has_record_type(record_type):
             raise errors.Unsupported()
-        if str(recordType) not in self._records: # Currently this should never be True
-            self._init_record(str(recordType))
-            if str(recordType) not in self._my_map['recordTypeIds']: # nor this
-                self._my_map['recordTypeIds'].append(str(recordType))
-        return self._records[str(recordType)]
+        if str(record_type) not in self._records: # Currently this should never be True
+            self._init_record(str(record_type))
+            if str(record_type) not in self._my_map['recordTypeIds']: # nor this
+                self._my_map['recordTypeIds'].append(str(record_type))
+        return self._records[str(record_type)]
 
     def _init_record(self, record_type_idstr):
         \"\"\"Override this from osid.Extensible because Forms use a different
@@ -1129,8 +1130,7 @@ class OsidExtensibleForm:
         record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
         module = importlib.import_module(record_type_data['module_path'])
         record = getattr(module, record_type_data['form_record_class_name'])
-        self._records[record_type_idstr] = record(self)
-"""
+        self._records[record_type_idstr] = record(self)"""
 
 class OsidTemporalForm:
 
@@ -1164,8 +1164,7 @@ class OsidTemporalForm:
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
         self._my_map['startDate'] = self._start_date_metadata['default_date_time_values'][0]
-        self._my_map['endDate'] = self._end_date_metadata['default_date_time_values'][0]
-"""
+        self._my_map['endDate'] = self._end_date_metadata['default_date_time_values'][0]"""
 
     get_start_date_metadata = """
         metadata = dict(self._start_date_metadata)
@@ -1233,8 +1232,7 @@ class OsidContainableForm:
         self._sequestered = self._sequestered_default
 
     def _init_map(self):
-        self._my_map['sequestered'] = self._sequestered_default
-"""
+        self._my_map['sequestered'] = self._sequestered_default"""
 
     get_sequestered_metadata = """
         return Metadata(**self._sequestered_metadata)"""
@@ -1305,8 +1303,7 @@ class OsidSourceableForm:
         else:
             self._my_map['providerId'] = self._provider_default
         self._my_map['brandingIds'] = self._branding_default
-        self._my_map['license'] = dict(self._license_default)
-"""
+        self._my_map['license'] = dict(self._license_default)"""
 
     get_provider_metadata = """
         metadata = dict(self._provider_metadata)
@@ -1418,8 +1415,7 @@ class OsidObjectForm:
         self._my_map['displayName'] = dict(self._display_name_metadata['default_string_values'][0])
         self._my_map['description'] = dict(self._description_metadata['default_string_values'][0])
         self._my_map['genusTypeId'] = self._genus_type_metadata['default_type_values'][0]
-        self._my_map['recordTypeIds'] = []
-"""
+        self._my_map['recordTypeIds'] = []"""
 
     get_display_name_metadata = """
         return Metadata(**self._display_name_metadata)"""
@@ -1480,8 +1476,7 @@ class OsidRelationshipForm:
 
     def _init_map(self, **kwargs):
         OsidObjectForm._init_map(self, **kwargs)
-        OsidTemporalForm._init_map(self, **kwargs)
-"""
+        OsidTemporalForm._init_map(self, **kwargs)"""
 
 class OsidList:
     import_statements = [
@@ -1556,8 +1551,7 @@ class OsidList:
 
     def len(self):
         \"\"\"Returns number of available elements\"\"\"
-        return self.available()
-"""
+        return self.available()"""
 
     has_next = """
         if self._count != None:
@@ -1730,8 +1724,7 @@ class OsidQuery:
             if self._query_terms[match_key] == {}:
                 del self._query_terms[match_key]
         except KeyError:
-            pass
-"""
+            pass"""
 
     match_keyword_arg_template = {
         1: 'DEFAULT_STRING_MATCH_TYPE',
@@ -1801,12 +1794,10 @@ class OsidExtensibleQuery:
         record_type_data = self._all_supported_record_type_data_sets[Id(record_type_idstr).get_identifier()]
         module = importlib.import_module(record_type_data['module_path'])
         record = getattr(module, record_type_data['query_record_class_name'])
-        self._records[record_type_idstr] = record(self)
-"""
+        self._records[record_type_idstr] = record(self)"""
 
     match_record_type = """
-        self._add_match('recordTypeIds', str(record_type), match)
-    """
+        self._add_match('recordTypeIds', str(record_type), match)"""
 
 class OsidObjectQuery:
 
@@ -1843,8 +1834,7 @@ class OsidObjectQuery:
         self._match_display_text('description', description, string_match_type, match)"""
 
     match_genus_type = """
-        self._add_match('genusTypeId', str(genus_type), match)
-    """
+        self._add_match('genusTypeId', str(genus_type), match)"""
 
     match_any_description = """
         raise errors.Unimplemented()"""
@@ -1853,8 +1843,7 @@ class OsidObjectQuery:
         self._clear_terms('description.text')"""
 
     clear_genus_type_terms = """
-        self._clear_terms('genusTypeId')
-    """
+        self._clear_terms('genusTypeId')"""
 
 class OsidQueryInspector:
 
@@ -1875,8 +1864,7 @@ class OsidRecord:
                 yield attr
 
     def __getitem__(self, item):
-        return getattr(self, item)
-"""
+        return getattr(self, item)"""
 
     implements_record_type = """
         return record_type.get_identifier() in self._implemented_record_type_identifiers"""
@@ -1890,8 +1878,7 @@ class Metadata:
 
     init = """
     def __init__(self, **kwargs):
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     get_element_id_template = """
         # Implemented from template for osid.Metadata.get_element_id_template
@@ -1934,8 +1921,7 @@ class OsidNode:
 
     id_ = property(fget=get_id)
 
-    ident = property(fget=get_id)
-"""
+    ident = property(fget=get_id)"""
 
     is_root = """
         return self._my_map['root']"""
@@ -1972,8 +1958,7 @@ class OsidNode:
             node_map['parentNodes'].append(node.get_node_map())
         for node in self._my_map['childNodes']:
             node_map['childNodes'].append(node.get_node_map())
-        return node_map
-"""
+        return node_map"""
 
 class Property:
 
@@ -2022,8 +2007,7 @@ class OsidSearch:
         except (AttributeError, KeyError, errors.NotFound):
             pass
         self._limit_result_set_start = None
-        self._limit_result_set_end = None
-"""
+        self._limit_result_set_end = None"""
 
     limit_result_set = """
         if not isinstance(start, int) or not isinstance(end, int):

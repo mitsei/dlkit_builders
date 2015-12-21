@@ -60,8 +60,7 @@ class ResourceManager:
 
     init_template = """
     def __init__(self):
-        osid_managers.OsidManager.__init__(self)
-"""
+        osid_managers.OsidManager.__init__(self)"""
 
 
     get_resource_lookup_session_template = """
@@ -107,8 +106,7 @@ class ResourceProxyManager:
 
     init_template = """
     def __init__(self):
-        osid_managers.OsidProxyManager.__init__(self)
-"""
+        osid_managers.OsidProxyManager.__init__(self)"""
 
     get_resource_lookup_session_template = """
         if not self.supports_${support_check}():
@@ -170,8 +168,7 @@ class ResourceLookupSession:
             db_name='${pkg_name}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     get_bin_id_template = """
         # Implemented from template for osid.resource.ResourceLookupSession.get_bin_id
@@ -300,8 +297,7 @@ class ResourceQuerySession:
             db_name='${pkg_name}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     can_query_resources_template = """
         # Implemented from template for
@@ -372,8 +368,7 @@ class ResourceSearchSession:
             db_name='${pkg_name}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     get_resource_search_template = """
         # Implemented from template for
@@ -441,8 +436,7 @@ class ResourceAdminSession:
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._forms = dict()
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     can_create_resources_template = """
         # Implemented from template for
@@ -693,8 +687,7 @@ class ResourceNotificationSession:
     def __del__(self):
         \"\"\"Make sure the receiver is removed from the listener\"\"\"
         del MONGO_LISTENER.receivers[self._ns][self._receiver]
-        super(${interface_name}, self).__del__()
-"""
+        super(${interface_name}, self).__del__()"""
 
     reliable_resource_notifications_template = """
         # Implemented from template for
@@ -757,8 +750,7 @@ class ResourceBinSession:
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
         self._catalog_view = COMPARATIVE
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     can_lookup_resource_bin_mappings_template = """
         # Implemented from template for
@@ -833,8 +825,7 @@ class ResourceBinAssignmentSession:
         self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         self._forms = dict()
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     can_assign_resources_template = """
         # Implemented from template for
@@ -908,8 +899,7 @@ class ResourceAgentSession:
             db_name='assessment',
             cat_name='Bin',
             cat_class=objects.Bin)
-        self._forms = dict()
-"""
+        self._forms = dict()"""
 
     get_resource_id_by_agent = """
         return self.get_resource_by_agent(agent_id).get_id()"""
@@ -961,8 +951,7 @@ class ResourceAgentAssignmentSession:
             db_name='assessment',
             cat_name='Bin',
             cat_class=objects.Bin)
-        self._forms = dict()
-"""
+        self._forms = dict()"""
 
     assign_agent_to_resource = """
         # Should check for existence of Agent? We may mever manage them.
@@ -1020,8 +1009,7 @@ class BinLookupSession:
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
         self._catalog_view = COMPARATIVE
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     use_comparative_bin_view_template = """
         # Implemented from template for
@@ -1096,8 +1084,7 @@ class BinAdminSession:
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
         self._forms = dict()
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     can_create_bins_template = """
         # Implemented from template for
@@ -1254,8 +1241,7 @@ class BinNotificationSession:
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
 
 class BinHierarchySession:
@@ -1282,8 +1268,7 @@ class BinHierarchySession:
             Id(authority='${pkg_name_upper}',
                namespace='CATALOG',
                identifier='${cat_name_upper}')
-        )
-"""
+        )"""
 
     can_access_bin_hierarchy_template = """
         # Implemented from template for
@@ -1411,8 +1396,7 @@ class BinHierarchyDesignSession:
             Id(authority='${pkg_name_upper}',
                namespace='CATALOG',
                identifier='${cat_name_upper}')
-        )
-"""
+        )"""
 
     can_modify_bin_hierarchy_template = """
         # Implemented from template for
@@ -1458,8 +1442,7 @@ class BinQuerySession:
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
         self._forms = dict()
-        self._kwargs = kwargs
-"""
+        self._kwargs = kwargs"""
 
     can_query_bins_template = """
         # Implemented from template for
@@ -1497,21 +1480,16 @@ class Resource:
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # ${cat_name}Id element and may be removed someday
     init_template = """
-    try:
-        #pylint: disable=no-name-in-module
-        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
-    except (ImportError, AttributeError):
-        _record_type_data_sets = {}
+    _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, osid_object_map, runtime=None):
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
+        self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         self._catalog_name = '${cat_name_under}'
-${instance_initers}
-
-"""
+${instance_initers}"""
 
     is_group_template = """
         # Implemented from template for osid.resource.Resource.is_group_template
@@ -1565,17 +1543,13 @@ class ResourceQuery:
     init_template = """
     def __init__(self, runtime):
         self._namespace = '${pkg_name}.${object_name}'
-        try:
-            #pylint: disable=no-name-in-module
-            from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
-        except (ImportError, AttributeError):
-            record_type_data_sets = {}
+        self._runtime = runtime
+        record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidObjectQuery.__init__(self, runtime)
-"""
+        osid_queries.OsidObjectQuery.__init__(self, runtime)"""
 
     clear_group_terms_template = """
         self._clear_terms('${var_name_mixed}')"""
@@ -1598,19 +1572,15 @@ class ResourceSearch:
     init = """
     def __init__(self, runtime):
         self._namespace = 'resource.Resource'
-        try:
-            #pylint: disable=no-name-in-module
-            from ..records.types import RESOURCE_RECORD_TYPES as record_type_data_sets
-        except (ImportError, AttributeError):
-            record_type_data_sets = {}
+        self._runtime = runtime
+        record_type_data_sets = self._get_registry('RESOURCE_RECORD_TYPES')
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         self._id_list = None
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)
-"""
+        osid_searches.OsidSearch.__init__(self, runtime)"""
 
     search_among_resources = """
         self._id_list = resource_ids"""
@@ -1628,8 +1598,7 @@ class ResourceSearchResults:
         # self._results = [r for r in results]
         self._results = results
         self._runtime = runtime
-        self.retrieved = False
-"""
+        self.retrieved = False"""
 
     get_resources = """
         if self.retrieved:
@@ -1649,15 +1618,12 @@ class ResourceForm:
     ]
 
     init_template = """
-    try:
-        #pylint: disable=no-name-in-module
-        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
-    except (ImportError, AttributeError):
-        _record_type_data_sets = dict()
+    _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
         osid_objects.OsidForm.__init__(self, runtime=runtime)
+        self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
         self._kwargs = kwargs
         if 'catalog_id' in kwargs:
             self._catalog_id = kwargs['catalog_id']
@@ -1680,8 +1646,7 @@ class ResourceForm:
         ${init_object}._init_metadata(self, **kwargs)${metadata_super_initers}${metadata_initers}
     def _init_map(self, **kwargs):
         ${init_object}._init_map(self)
-${map_super_initers}${persisted_initers}
-"""
+${map_super_initers}${persisted_initers}"""
 
     get_group_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
@@ -1755,23 +1720,19 @@ class Bin:
     ]
 
     init_template = """
-    try:
-        #pylint: disable=no-name-in-module
-        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
-    except (ImportError, AttributeError):
-        _record_type_data_sets = dict()
+    _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, osid_catalog_map, runtime=None):
         osid_objects.OsidCatalog.__init__(self, osid_catalog_map, runtime)
+        self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
         self._records = dict()
         # This check is here for transition purposes:
         try:
             self._load_records(osid_catalog_map['recordTypeIds'])
         except KeyError:
             print 'KeyError: recordTypeIds key not found in ', self._my_map['displayName']['text']
-            self._load_records([]) # In place for transition purposes
-"""
+            self._load_records([]) # In place for transition purposes"""
 
 class BinForm:
 
@@ -1781,15 +1742,12 @@ class BinForm:
     ]
 
     init_template = """
-    try:
-        #pylint: disable=no-name-in-module
-        from ..records.types import ${object_name_upper}_RECORD_TYPES as _record_type_data_sets
-    except (ImportError, AttributeError):
-        _record_type_data_sets = dict()
+    _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_catalog_map=None, record_types=None, runtime=None, **kwargs):
         osid_objects.OsidForm.__init__(self, runtime=runtime)
+        self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
         self._kwargs = kwargs
         self._init_metadata(**kwargs)
         self._records = dict()
@@ -1811,8 +1769,7 @@ class BinForm:
 
     def _init_map(self, **kwargs):
         osid_objects.OsidObjectForm._init_map(self)
-        osid_objects.OsidSourceableForm._init_map(self, **kwargs)
-"""
+        osid_objects.OsidSourceableForm._init_map(self, **kwargs)"""
 
 
 class BinQuery:
@@ -1823,17 +1780,13 @@ class BinQuery:
 
     init_template = """
     def __init__(self, runtime):
-        try:
-            #pylint: disable=no-name-in-module
-            from ..records.types import ${object_name_upper}_RECORD_TYPES as record_type_data_sets
-        except (ImportError, AttributeError):
-            record_type_data_sets = {}
+        self._runtime = runtime
+        record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidCatalogQuery.__init__(self, runtime)
-"""
+        osid_queries.OsidCatalogQuery.__init__(self, runtime)"""
 
     clear_group_terms_template = """
         self._clear_terms('${var_name_mixed}')"""
@@ -1862,8 +1815,7 @@ class BinNode:
             node_map['parentNodes'].append(${object_name_under}_node.get_object_node_map())
         for ${object_name_under}_node in self.get_child_${object_name_under}_nodes():
             node_map['childNodes'].append(${object_name_under}_node.get_object_node_map())
-        return node_map
-"""
+        return node_map"""
 
     get_bin_template = """
         if self._lookup_session is None:

@@ -57,8 +57,7 @@ class TypeLookupSession:
         from dlkit.abstract_osid.osid import errors
         OsidSession.__init__(self, *args, **kwargs)
         client = MongoClient()
-        self._db = client['type']
-"""
+        self._db = client['type']"""
 
     can_lookup_types = """
         return True"""
@@ -90,8 +89,7 @@ class TypeAdminSession:
         OsidSession.__init__(self, *args, **kwargs)
         self._forms = dict()
         client = MongoClient()
-        self._db = client['type']
-    """
+        self._db = client['type']"""
 
     can_create_types = """
         return True"""
@@ -201,8 +199,7 @@ class TypeAdminSession:
         if result['err'] is not None:
             raise errors.OperationFailed()
         if result['n'] == 0:
-            raise errors.NotFound()
-"""
+            raise errors.NotFound()"""
 
 class TypeForm:
 
@@ -225,7 +222,6 @@ class TypeForm:
         self._my_map['description']['text'] = type_.get_description().get_text()
         self._my_map['domain']['text'] = type_.get_domain().get_text()
         self._for_update = update
-        
 
     def _init_metadata(self):
         from . import mdata_conf
@@ -258,8 +254,7 @@ class TypeForm:
         self._my_map['displayName'] = self._display_name_metadata['default_string_values'][0]
         self._my_map['displayLabel'] = self._display_label_metadata['default_string_values'][0]
         self._my_map['description'] = self._description_metadata['default_string_values'][0]
-        self._my_map['domain'] = self._domain_metadata['default_string_values'][0]
-"""
+        self._my_map['domain'] = self._domain_metadata['default_string_values'][0]"""
 
     get_display_name_metadata = """
         from ..osid.metadata import Metadata
@@ -385,8 +380,7 @@ class Type:
         return {'text': string,
                 'languageTypeId': language_type_str,
                 'scriptTypeId': script_type_str,
-                'formatTypeId': format_type_str}
-"""
+                'formatTypeId': format_type_str}"""
 
     get_authority = """
         return self._my_map['authority']"""
@@ -437,8 +431,7 @@ class OldObsoleteTypeCanBeDeleted:
             self._description = description
             self._domain = domain
         else:
-            raise errors.NullArgument()
-"""
+            raise errors.NullArgument()"""
 
     get_authority = """
         return self._authority"""

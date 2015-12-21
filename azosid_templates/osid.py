@@ -2,7 +2,7 @@
 
 class OsidProfile:
 
-    import_statemenrs = [
+    import_statements = [
         'COMPARATIVE = 0',
         'PLENARY = 1',
         'FEDERATED = 0',
@@ -166,6 +166,12 @@ class Operable:
 
 
 class OsidSession:
+    import_statements = [
+        'COMPARATIVE = 0',
+        'PLENARY = 1',
+        'FEDERATED = 0',
+        'ISOLATED = 1',
+    ]
 
     init = """
     def __init__(self, provider_session, authz_session, proxy=None):

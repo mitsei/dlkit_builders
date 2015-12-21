@@ -156,15 +156,12 @@ class AuthorizationForm:
     ]
 
     init = """
-    try:
-        #pylint: disable=no-name-in-module
-        from ..records.types import AUTHORIZATION_RECORD_TYPES as _record_type_data_sets
-    except (ImportError, AttributeError):
-        _record_type_data_sets = dict()
+    _record_type_data_sets = dict()
     _namespace = 'authorization.Authorization'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
         osid_objects.OsidForm.__init__(self, runtime=runtime)
+        self._record_type_data_sets = self._get_registry('AUTHORIZATION_RECORD_TYPES')
         self._kwargs = kwargs
         if 'catalog_id' in kwargs:
             self._catalog_id = kwargs['catalog_id']
@@ -194,5 +191,4 @@ class AuthorizationForm:
         if 'agent_id' in kwargs:
             self._my_map['agentId'] = str(kwargs['agent_id'])
         if 'resource_id' in kwargs:
-            self._my_map['resourceId'] = str(kwargs['resource_id'])
-"""
+            self._my_map['resourceId'] = str(kwargs['resource_id'])"""

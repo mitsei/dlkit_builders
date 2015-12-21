@@ -18,8 +18,7 @@ class AssessmentManager:
     def get_assessment_taken_admin_session_for_bank(self, *args, **kwargs):
         \"\"\"Pass through to provider method\"\"\"
         session = self._provider_manager.get_assessment_taken_admin_session_for_bank(*args, **kwargs)
-        return Bank(self._provider_manager, session.get_bank(), self._proxy, assessment_taken_admin_session = session)
-    """
+        return Bank(self._provider_manager, session.get_bank(), self._proxy, assessment_taken_admin_session = session)"""
 
 class AssessmentSession:
 

@@ -24,8 +24,7 @@ class ObjectiveRequisiteSession:
             db_name='learning',
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
-        self._forms = dict()
-    """
+        self._forms = dict()"""
 
     get_requisite_objectives_template = """
         # Implemented from template for
@@ -46,8 +45,7 @@ class ObjectiveRequisiteSession:
         return objects.${return_type}(result, runtime=self._runtime)"""
 
     can_lookup_objective_prerequisites = """
-        return True
-    """
+        return True"""
 
     get_dependent_objectives_template = """
         # Implemented from template for
@@ -65,8 +63,7 @@ class ObjectiveRequisiteSession:
                                           collection='Objective',
                                           runtime=self._runtime)
         result = collection.find({'_id': {'$$in': source_ids}})
-        return objects.${return_type}(result, runtime=self._runtime)
-    """
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 
 class ObjectiveRequisiteAssignmentSession:
@@ -90,8 +87,7 @@ class ObjectiveRequisiteAssignmentSession:
             db_name='learning',
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
-        self._forms = dict()
-    """
+        self._forms = dict()"""
 
     assign_objective_requisite_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
@@ -116,8 +112,7 @@ class ObjectiveRequisiteAssignmentSession:
     unassign_objective_requisite_template = """
         requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
         rls = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
-        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
-    """
+        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())"""
 
 class ObjectiveAdminSession:
 
@@ -313,8 +308,7 @@ class ObjectiveHierarchySession:
             Id(authority='LEARNING',
                namespace='CATALOG',
                identifier='OBJECTIVE')
-        )
-    """
+        )"""
 
 
 class ObjectiveHierarchyDesignSession:
@@ -338,8 +332,7 @@ class ObjectiveHierarchyDesignSession:
             Id(authority='LEARNING',
                namespace='CATALOG',
                identifier='OBJECTIVE')
-        )
-    """
+        )"""
 
 
 class ObjectiveSequencingSession:
@@ -362,5 +355,4 @@ class ObjectiveSequencingSession:
             db_name='learning',
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
-        self._forms = dict()
-    """
+        self._forms = dict()"""

@@ -5,8 +5,7 @@ class Id:
     def __init__(self, authority, namespace, identifier):
         self._authority = authority
         self._namespace = namespace
-        self._identifier = identifier
-"""
+        self._identifier = identifier"""
 
     get_authority = """
         return self._authority"""

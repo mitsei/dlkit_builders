@@ -21,8 +21,7 @@ class LoggingSession:
         lm = self._get_provider_manager('LOGGING')
         self._leas = lm.get_log_entry_admin_session_for_log_book(self._catalog_id)
         self._lels = lm.get_log_entry_lookup_session_for_log_book(self._catalog_id)
-        self._content_types = lm.get_content_types()
-"""
+        self._content_types = lm.get_content_types()"""
 
     can_log = """
         # NOTE: It is expected that real authentication hints will be 

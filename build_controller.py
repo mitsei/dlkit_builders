@@ -92,10 +92,11 @@ class Utilities(object):
             else:
                 new_paragraph = True
 
-            if new_line[:].strip() != '':
-                result.append(new_line)
-            else:
-                result.append('\n')
+            # if new_line[:].strip() != '':
+            #     result.append(new_line)
+            # else:
+            #     result.append('\n')
+            result.append(new_line)
 
             previous_line = new_line
 

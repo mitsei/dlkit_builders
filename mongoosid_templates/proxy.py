@@ -5,15 +5,13 @@ class ProxyManager:
 
     init = """
     def __init__(self):
-        osid_managers.OsidManager.__init__(self)
-"""
+        osid_managers.OsidManager.__init__(self)"""
 
 class ProxyProxyManager:
 
     init = """
     def __init__(self):
-        osid_managers.OsidProxyManager.__init__(self)
-"""
+        osid_managers.OsidProxyManager.__init__(self)"""
 
 class ProxySession:
 
@@ -62,8 +60,7 @@ class Proxy:
         self._effective_date = effective_date
         self._effective_clock_rate = effective_clock_rate
         self._locale = locale
-        self._format_type = format_type
-"""
+        self._format_type = format_type"""
 
     has_authentication = """
         return bool(self._authentication)"""
@@ -125,8 +122,7 @@ class ProxyCondition:
         self._currency_type = None
         self._unit_system_type = None
         self._format_type = None
-        self._http_request = None
-"""
+        self._http_request = None"""
 
     set_effective_agent_id = """
         self._effective_agent_id = agent_id"""
