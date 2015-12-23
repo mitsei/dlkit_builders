@@ -13,6 +13,38 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
 
         self._class = 'tests'
 
+    def _build_method_doc(self, method):
+        return '{0}\"\"\"Tests {1}\"\"\"'.format(self._dind,
+                                                 method['name'])
+
+    def _clean_up_impl(self, impl, interface, method):
+        if impl == '':
+            impl = '{}pass'.format(self._dind)
+        else:
+            context = self._get_method_context(method, interface)
+            interface_sn = interface['shortname']
+            method_n = method['name']
+            interface_cat = interface['category']
+
+            if (interface_cat in self.patterns['impl_log'] and
+                    interface_sn in self.patterns['impl_log'][interface_cat]):
+                self.patterns['impl_log'][context['module_name']][interface_sn][method_n][1] = 'implemented'
+        return impl
+
+    def _get_method_sig(self, method, interface):
+        args = self._get_method_args(method, interface)
+        method_impl = self._make_method_impl(method, interface)
+        method_sig = '{}def test_{}({}):'.format(self._ind,
+                                                 method['name'],
+                                                 ', '.join(args))
+
+        if method_impl == '{}pass'.format(self._dind):
+            method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
+                                                                               method_sig)
+        else:
+            method_sig = ''
+        return method_sig
+
     def _update_module_imports(self, modules, interface):
         imports = modules[interface['category']]['imports']
         self.append(imports, 'import unittest')

@@ -14,6 +14,16 @@ class OsidProfile:
         self._runtime = None
         self._config = None
 
+    def _get_registry(self, entry):
+        # get from the runtime
+        try:
+            records_location_param_id = Id('parameter:recordsRegistry@mongo')
+            registry = self._runtime.get_configuration().get_value_by_parameter(
+                records_location_param_id).get_string_value()
+            return import_module(registry).__dict__.get(entry, {})
+        except (ImportError, AttributeError, KeyError, errors.NotFound):
+            return {}
+
     def _initialize_manager(self, runtime):
         \"\"\"Sets the runtime, configuration and mongo client\"\"\"
         if self._runtime is not None:
@@ -27,7 +37,8 @@ class OsidProfile:
             except (AttributeError, KeyError, errors.NotFound):
                 MONGO_CLIENT.set_mongo_client(MongoClient())
             else:
-                MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))"""
+                MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))
+"""
 
     get_id = """
         return Id(**profile.ID)"""

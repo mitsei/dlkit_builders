@@ -13,6 +13,26 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
 
         self._class = 'authz'
 
+    def _clean_up_impl(self, impl, interface, method):
+        if impl == '':
+            impl = '{}raise Unimplemented()'.format(self._dind)
+        return impl
+
+    def _compile_method(self, args, decorator, method_sig, method_doc, method_impl):
+        return method_sig + '\n' + method_impl
+
+    def _get_method_args(self, method, interface):
+        args = ['self']
+        args += [a['var_name'] for a in method['args']]
+        return args
+
+    def _get_method_sig(self, method, interface):
+        args = self._get_method_args(method, interface)
+        method_sig = '{}def {}({}):'.format(self._ind,
+                                            method['name'],
+                                            ', '.join(args))
+        return method_sig
+
     def _update_module_imports(self, modules, interface):
         imports = modules[interface['category']]['imports']
 

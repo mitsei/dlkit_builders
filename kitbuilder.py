@@ -1,4 +1,5 @@
 from build_controller import BaseBuilder
+from binder_helpers import SkipMethod
 from interface_builders import InterfaceBuilder
 
 
@@ -13,9 +14,28 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
 
         self._class = 'services'
 
-        # self.interface_builder = InterfaceBuilder('services',
-        #                                           self._root_dir,
-        #                                           self._template_dir)
+    def _clean_up_impl(self, impl, interface, method):
+        un_impl_doc = '{}\"\"\"Pass through to provider unimplemented\"\"\"\n'.format(self._dind)
+
+        if impl == '' and method['args']:
+            impl = ('{}{}raise Unimplemented(\'Unimplemented in dlkit.services - ' +
+                    'args=\' + str(args) + \', kwargs=\' + str(kwargs))').format(un_impl_doc,
+                                                                                 self._dind)
+        elif impl == '' and not method['args']:
+            impl = '{}{}raise Unimplemented(\'Unimplemented in dlkit.services\')'.format(un_impl_doc,
+                                                                                         self._dind)
+        return impl
+
+    def _compile_method(self, args, decorator, method_sig, method_doc, method_impl):
+        return method_sig + '\n' + method_impl
+
+    def _confirm_build_method(self, impl_class, method_name):
+        # Check if this method is marked to be skipped (the assumption
+        # is that it will be implemented elsewhere, perhaps in an init.)
+        if (impl_class and
+                hasattr(impl_class, method_name) and
+                getattr(impl_class, method_name) is None):
+            raise SkipMethod()
 
     def _empty_modules_dict(self):
         module = dict(manager=dict(imports=[], body=''),  # for kitosids only
@@ -38,16 +58,59 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
         module[self.package['name']] = dict(imports=[], body='')
         return module
 
+    def _get_method_args(self, method, interface):
+        args = ['self']
+        args += [a['var_name'] for a in method['args']]
+        return args
+
+    def _get_method_sig(self, method, interface):
+        # The following method sig builder specifically creates the arguments.  It
+        # is the one used by most of the other builders.
+        interface_name = interface['shortname']
+        if interface_name.endswith('List') or method['name'] == 'initialize':
+            args = self._get_method_args(method, interface)
+            method_sig = '{}def {}({}):'.format(self._ind,
+                                                method['name'],
+                                                ', '.join(args))
+        # The following method sig builder uses *args, **kwargs for all methods. It is used
+        # by the dlkit builder to pass arguments in the blind.
+        elif (method['args'] or interface_name.endswith('Manager') and
+                not 'Runtime' in interface_name):
+            method_sig = '{}def {}(self, *args, **kwargs):'.format(self._ind,
+                                                                   method['name'])
+        else:
+            method_sig = '{}def {}(self):'.format(self._ind,
+                                                  method['name'])
+        return method_sig
+
+    def _get_template_name(self, pattern, interface_name, method_name):
+        template_name = self.last(pattern) + '_template'
+        if interface_name.endswith('ProxyManager'):
+            pass
+        elif interface_name.endswith('Manager') and 'session' in method_name:
+            if self.patterns[method_name[4:].split('_for_')[0] + '.is_manager_session']:
+                template_name = self.last(pattern) + '_managertemplate'
+            elif self.patterns[method_name[4:].split('_for_')[0] + '.is_catalog_session']:
+                template_name = self.last(pattern) + '_catalogtemplate'
+        return template_name
+
     def _patterns(self):
         patterns = self._load_patterns_file()
         for inf in self.package['interfaces']:
             patterns[self._is_session(inf, 'manager')] = self._is_manager_session(inf,
-                                                                                  patterns,
-                                                                                  self.package['name'])
+                                                                                  self.package['name'],
+                                                                                  patterns=patterns)
             patterns[self._is_session(inf, 'catalog')] = self._is_catalog_session(inf,
-                                                                                  patterns,
-                                                                                  self.package['name'])
+                                                                                  self.package['name'],
+                                                                                  patterns=patterns)
         return patterns
+
+    def _update_implemented_view_methods(self, method_name):
+        if ('implemented_view_methods' in self.patterns and
+                method_name in self.patterns['implemented_view_methods']):
+            raise SkipMethod()
+        elif 'implemented_view_methods' in self.patterns:
+            self.patterns['implemented_view_methods'].append(method_name)
 
     def _update_module_imports(self, modules, interface):
         imports = modules[self.package['name']]['imports']
@@ -116,7 +179,7 @@ DISABLED = -1"""
         additional_methods = self._additional_methods(interface)
         inheritance = self._get_class_inheritance(interface)
         init_methods = self._make_init_methods(interface)
-        methods = self.make_methods(interface, self.patterns)
+        methods = self.make_methods(interface)
 
         # Add all the appropriate manager related session methods to the manager interface
         # Add all the appropriate catalog related session methods to the catalog interface

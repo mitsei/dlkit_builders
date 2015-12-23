@@ -92,11 +92,12 @@ class Utilities(object):
             else:
                 new_paragraph = True
 
-            # if new_line[:].strip() != '':
-            #     result.append(new_line)
-            # else:
-            #     result.append('\n')
-            result.append(new_line)
+
+            if new_line[:].strip() != '':
+                result.append(new_line)
+            else:
+                result.append('\n')
+            # result.append(new_line)
 
             previous_line = new_line
 
@@ -270,8 +271,7 @@ class BaseBuilder(Utilities):
     def _append_templated_imports(self, imports, interface):
         # Now also check for templated imports
         templated_imports = self.get_methods_templated_imports(self._abc_pkg_name(abc=False),
-                                                               interface,
-                                                               self.patterns)
+                                                               interface)
         for imp in templated_imports:
             self.append(imports, imp)
 
@@ -353,7 +353,9 @@ class BaseBuilder(Utilities):
         return self._class == str(desired_type)
 
     # Determine if the interface represents a catalog related session
-    def _is_catalog_session(self, interface, patterns, package_name):
+    def _is_catalog_session(self, interface, package_name, patterns=None):
+        if patterns is None:
+            patterns = self.patterns
         is_catalog_session = False
         if package_name in ['type', 'proxy']:
             is_catalog_session = False
@@ -372,7 +374,10 @@ class BaseBuilder(Utilities):
         return is_catalog_session
 
     # Determine if the interface represents a manager related session
-    def _is_manager_session(self, interface, patterns, package_name):
+    def _is_manager_session(self, interface, package_name, patterns=None):
+        if patterns is None:
+            patterns = self.patterns
+
         is_manager_session = False
         if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
             is_manager_session = True
@@ -495,7 +500,7 @@ class BaseBuilder(Utilities):
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
         init_methods = self._make_init_methods(interface)
-        methods = self.make_methods(interface, self.patterns)
+        methods = self.make_methods(interface)
         additional_methods = self._additional_methods(interface)
 
         if additional_methods:
@@ -628,7 +633,7 @@ class Templates(Utilities):
             self._make_dir(template_dir)
         super(Templates, self).__init__()
 
-    def _get_templates(self, interface, method, patterns, template_extension):
+    def _get_templates(self, interface, method, template_extension):
         """get the extra templates for specified method name"""
         impl_class = self._load_impl_class(interface['shortname'])
         templates_obj = None
@@ -638,8 +643,8 @@ class Templates(Utilities):
         if (impl_class and
                 hasattr(impl_class, template_name)):
             templates_obj = getattr(impl_class, template_name)
-        elif interface_dot_name in patterns:
-            pattern = patterns[interface_dot_name]['pattern']
+        elif interface_dot_name in self.patterns:
+            pattern = self.patterns[interface_dot_name]['pattern']
             try:
                 templates = import_module(self._package_templates(self.first(pattern)))
             except ImportError:
@@ -682,7 +687,7 @@ class Templates(Utilities):
     def _template(self, directory):
         return self._template_dir + '/' + directory
 
-    def extra_templates_exists(self, method, interface, patterns, template_extension):
+    def extra_templates_exists(self, method, interface, template_extension):
         """checks if an argument template with default values
          exists for the given method"""
 
@@ -692,8 +697,8 @@ class Templates(Utilities):
                 hasattr(impl_class, method['name'] + template_extension)):
             return True
         # now check if it is a templated method.
-        elif interface['shortname'] + '.' + method['name'] in patterns:
-            pattern = patterns[interface['shortname'] + '.' + method['name']]['pattern']
+        elif interface['shortname'] + '.' + method['name'] in self.patterns:
+            pattern = self.patterns[interface['shortname'] + '.' + method['name']]['pattern']
             if pattern != '':
                 try:
                     templates = import_module(self._package_templates(self.first(pattern)))
@@ -706,10 +711,10 @@ class Templates(Utilities):
                             return True
         return False
 
-    def get_arg_default_map(self, arg_context, method, interface, patterns):
+    def get_arg_default_map(self, arg_context, method, interface):
         """gets an argument template and maps the keys to the actual arg names"""
         arg_map = {}
-        arg_template = self._get_templates(interface, method, patterns, '_arg_template')
+        arg_template = self._get_templates(interface, method, '_arg_template')
 
         if arg_template is not None:
             arg_list = arg_context['arg_list'].split(',')
@@ -721,11 +726,11 @@ class Templates(Utilities):
 
         return arg_map
 
-    def get_templated_imports(self, arg_context, package_name, method, interface, patterns):
+    def get_templated_imports(self, arg_context, package_name, method, interface):
         """gets an import template and maps the keys to the actual arg names.
         Returns a list of imports..."""
         imports = []
-        import_templates = self._get_templates(interface, method, patterns, '_import_templates')
+        import_templates = self._get_templates(interface, method, '_import_templates')
         if import_templates is not None:
             for item in import_templates:
                 template = string.Template(item)

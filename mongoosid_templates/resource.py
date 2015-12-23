@@ -22,11 +22,7 @@ class ResourceProfile:
     get_resource_record_types_template = """
         # Implemented from template for
         # osid.resource.ResourceProfile.get_resource_record_types_template
-        try:
-            from ..records import types
-            record_type_maps = types.${object_name_upper}_RECORD_TYPES # pylint: disable=no-member
-        except (ImportError, AttributeError):
-            return TypeList([])
+        record_type_maps = self._get_registry('${object_name_upper}_RECORD_TYPES')
         record_types = []
         for record_type_map in record_type_maps:
             record_types.append(Type(**record_type_maps[record_type_map]))
@@ -35,11 +31,7 @@ class ResourceProfile:
     supports_resource_record_type_template = """
         # Implemented from template for
         # osid.resource.ResourceProfile.supports_resource_record_type_template
-        try:
-            from ..records import types
-            record_type_maps = types.${object_name_upper}_RECORD_TYPES # pylint: disable=no-member
-        except (ImportError, AttributeError):
-            return False
+        record_type_maps = self._get_registry('${object_name_upper}_RECORD_TYPES')
         supports = False
         for record_type_map in record_type_maps:
             if (${arg0_name}.get_authority() == record_type_maps[record_type_map]['authority'] and
@@ -66,7 +58,8 @@ class ResourceManager:
     get_resource_lookup_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
-        return ${return_module}.${return_type}(runtime=self._runtime) # pylint: disable=no-member"""
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(runtime=self._runtime)"""
 
     get_resource_lookup_session_for_bin_template = """
         if not self.supports_${support_check}():
@@ -74,7 +67,8 @@ class ResourceManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime) # pylint: disable=no-member"""
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)"""
 
     get_resource_admin_session_template = get_resource_lookup_session_template
 
@@ -83,7 +77,8 @@ class ResourceManager:
     get_resource_notification_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
-        return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name})"""
 
     get_resource_notification_session_for_bin_template = """
         if not self.supports_${support_check}():
@@ -91,7 +86,8 @@ class ResourceManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name})"""
 
 
 class ResourceProxyManager:
@@ -111,7 +107,8 @@ class ResourceProxyManager:
     get_resource_lookup_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
-        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime) # pylint: disable=no-member"""
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime)"""
 
     get_resource_lookup_session_for_bin_template = """
         if not self.supports_${support_check}():
@@ -119,7 +116,8 @@ class ResourceProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime) # pylint: disable=no-member"""
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime)"""
 
     get_resource_admin_session_template = get_resource_lookup_session_template
 
@@ -128,7 +126,8 @@ class ResourceProxyManager:
     get_resource_notification_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
-        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime, receiver=${arg0_name})"""
 
     get_resource_notification_session_for_bin_template = """
         if not self.supports_${support_check}():
@@ -136,7 +135,8 @@ class ResourceProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return ${return_module}.${return_type}(catalog_id=${arg1_name}, proxy=proxy, runtime=self._runtime, receiver=${arg0_name}) # pylint: disable=no-member"""
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(catalog_id=${arg1_name}, proxy=proxy, runtime=self._runtime, receiver=${arg0_name})"""
 
 
 class ResourceLookupSession:

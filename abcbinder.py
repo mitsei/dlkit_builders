@@ -29,6 +29,42 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
         return additional_methods
 
+    def _get_method_args(self, method, interface):
+        args = ['self']
+        args += [a['var_name'] for a in method['args']]
+        return args
+
+    @staticmethod
+    def _get_method_doc(method):
+        return filter(None, [method['sphinx_param_doc'].strip('\n'),
+                             method['sphinx_return_doc'].strip('\n'),
+                             method['sphinx_error_doc'].strip('\n') + '\n',
+                             method['compliance_doc'].strip('\n'),
+                             method['impl_notes_doc'].strip('\n')])
+
+    def _make_method(self, method, interface):
+        decorator = self._ind + '@abc.abstractmethod'
+        args = self._get_method_args(method, interface)
+        method_impl = self._make_method_impl(method, interface)
+
+        method_sig = '{0}def {1}({2}):'.format(self._ind,
+                                               method['name'],
+                                               ', '.join(args))
+
+        method_doc = self._build_method_doc(method)
+
+        return (decorator + '\n' +
+                self._wrap(method_sig) + '\n' +
+                self._wrap(method_doc) + '\n' +
+                self._wrap(method_impl))
+
+    def _make_method_impl(self, method, interface):
+        if method['return_type'].strip():
+            return '{}return # {}'.format(self._dind,
+                                          method['return_type'])
+        else:
+            return '{}pass'.format(self._dind)
+
     def make(self):
         self.make_osids(build_abc=True)
 
@@ -38,7 +74,7 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
                                                                                    self.class_doc(interface),
                                                                                    self._ind,
                                                                                    self._additional_methods(interface),
-                                                                                   self.make_methods(interface, None))
+                                                                                   self.make_methods(interface))
 
     def module_header(self, module):
         return ('\"\"\"Implementations of ' + self.package['name'] +

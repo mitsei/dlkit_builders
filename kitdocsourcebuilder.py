@@ -45,6 +45,23 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         module[self.patterns['package_catalog_under']] = dict(imports=[], body='')
         return module
 
+    def _get_method_args(self, method, interface):
+        args = []
+        if self.extra_templates_exists(method, interface, '_arg_template'):
+            arg_context = self._get_method_context(method, interface)
+            arg_default_map = self.get_arg_default_map(arg_context,
+                                                       method,
+                                                       interface)
+        else:
+            arg_default_map = {}
+
+        for arg in method['args']:
+            if arg['var_name'] in arg_default_map:
+                args.append(arg['var_name'] + '=' + arg_default_map[arg['var_name']])
+            else:
+                args.append(arg['var_name'])
+        return args
+
     def _get_simple_module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
         sn = interface['shortname']
@@ -74,14 +91,15 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
                 methods += '\n\n{0} Methods\n{1}\n\n{2}\n\n'.format(header,
                                                                     '-' * len(full_header),
                                                                     self.make_methods(inf,
-                                                                                      self.patterns,
                                                                                       inf['shortname'],
                                                                                       service_catalog=catalog))
 
         return methods
 
     # Determine if the interface represents a catalog related session
-    def _is_catalog_session(self, interface, patterns, package_name):
+    def _is_catalog_session(self, interface, package_name, patterns=None):
+        if patterns is None:
+            patterns = self.patterns
         is_catalog_session = False
         if package_name in ['type', 'proxy']:
             is_catalog_session = False
@@ -103,7 +121,9 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         return is_catalog_session
 
     # Determine if the interface represents a manager related session
-    def _is_manager_session(self, interface, patterns, package_name):
+    def _is_manager_session(self, interface, package_name, patterns=None):
+        if patterns is None:
+            patterns = self.patterns
         is_manager_session = False
         if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
             is_manager_session = True
@@ -124,33 +144,14 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             is_manager_session = True
         return is_manager_session
 
-    def _make_method(self, method, interface, patterns, service_catalog=None):
-        args = []
-
-        if self.extra_templates_exists(method, interface, patterns, '_arg_template'):
-            arg_context = self._get_method_context(method, interface, patterns)
-            arg_default_map = self.get_arg_default_map(arg_context,
-                                                       method,
-                                                       interface,
-                                                       patterns)
-        else:
-            arg_default_map = {}
-
-        for arg in method['args']:
-            if arg['var_name'] in arg_default_map:
-                args.append(arg['var_name'] + '=' + arg_default_map[arg['var_name']])
-            else:
-                args.append(arg['var_name'])
+    def _make_method(self, method, interface, service_catalog=None):
+        args = self._get_method_args(method, interface)
 
         method_sig = '    .. py:method:: {1}({2}):'.format(self._ind,
                                                            method['name'],
                                                            ', '.join(args))
 
-        detail_docs = filter(None, [method['arg_doc'].strip('\n'),
-                                    method['return_doc'].strip('\n'),
-                                    method['error_doc'].strip('\n'),
-                                    method['compliance_doc'].strip('\n'),
-                                    method['impl_notes_doc'].strip('\n')])
+        detail_docs = self._get_method_doc(method)
 
         if method['doc']['body'].strip() == '' and not detail_docs:
             method_doc = self._wrap('{0}{1}'.format(self._dind,
@@ -176,11 +177,11 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         patterns = self._load_patterns_file()
         for inf in self.package['interfaces']:
             patterns[self._is_session(inf, 'manager')] = self._is_manager_session(inf,
-                                                                                  patterns,
-                                                                                  self.package['name'])
+                                                                                  self.package['name'],
+                                                                                  patterns=patterns)
             patterns[self._is_session(inf, 'catalog')] = self._is_catalog_session(inf,
-                                                                                  patterns,
-                                                                                  self.package['name'])
+                                                                                  self.package['name'],
+                                                                                  patterns=patterns)
         return patterns
 
     def _update_module_imports(self, modules, interface):
@@ -303,7 +304,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
     #             body.append(automethod_str)
     #     return '\n\n'.join(body)
 
-    def make_methods(self, interface, patterns, package_name=None, service_catalog=None):
+    def make_methods(self, interface, package_name=None, service_catalog=None):
         body = []
         for method in interface['methods']:
             if (method['name'] == 'get_items' and
@@ -315,7 +316,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
                     service_catalog is not None):
                 method['name'] = 'get_assessment_items'
 
-            body.append(self._make_method(method, interface, patterns, service_catalog))
+            body.append(self._make_method(method, interface, service_catalog))
             # Here is where we add the Python properties stuff:
             if argless_get(method):
                 body.append(simple_property('get', method, service_catalog=service_catalog))

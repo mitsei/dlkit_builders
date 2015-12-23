@@ -22,6 +22,46 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
 
         self._class = 'mongo'
 
+    def _clean_up_impl(self, impl, interface, method):
+        if impl == '':
+            impl = '{}raise errors.Unimplemented()'.format(self._dind)
+        else:
+            context = self._get_method_context(method, interface)
+            interface_sn = interface['shortname']
+            method_n = method['name']
+            interface_cat = interface['category']
+            if (interface_cat in self.patterns['impl_log'] and
+                    interface_sn in self.patterns['impl_log'][interface_cat]):
+                self.patterns['impl_log'][context['module_name']][interface_sn][method_n][1] = 'implemented'
+        return impl
+
+    def _get_method_args(self, method, interface):
+        args = ['self']
+        if self.extra_templates_exists(method, interface, '_arg_template'):
+            arg_context = self._get_method_context(method, interface)
+            arg_default_map = self.get_arg_default_map(arg_context,
+                                                       method,
+                                                       interface)
+        else:
+            arg_default_map = {}
+
+        for arg in method['args']:
+            if arg['var_name'] in arg_default_map:
+                args.append(arg['var_name'] + '=' + arg_default_map[arg['var_name']])
+            else:
+                args.append(arg['var_name'])
+        return args
+
+    def _get_method_decorator(self, method):
+        return '{0}@utilities.arguments_not_none'.format(self._ind)
+
+    def _get_method_sig(self, method, interface):
+        args = self._get_method_args(method, interface)
+        method_sig = '{0}def {1}({2}):'.format(self._ind,
+                                               method['name'],
+                                               ', '.join(args))
+        return method_sig
+
     def _make_profile_py(self):
         """create the profile.py file for this package"""
         profile = {

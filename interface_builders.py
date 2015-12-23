@@ -264,12 +264,11 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             if self.package['name'] != 'osid' and not self._flagged_for_implementation(inf):
                 continue
 
-            if type_check_method(inf, self.patterns, self.package['name']):
+            if type_check_method(inf, self.package['name']):
                 methods += '\n##\n# The following methods are from {}\n\n'.format(inf['fullname'])
-                methods += self.make_methods(inf, self.patterns) + '\n\n'
+                methods += self.make_methods(inf) + '\n\n'
                 inherited_imports = self.get_methods_templated_imports(self._abc_pkg_name(abc=False),
-                                                                       inf,
-                                                                       self.patterns)
+                                                                       inf)
         return methods, inherited_imports
 
     def _initialize_directories(self):

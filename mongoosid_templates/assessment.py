@@ -663,7 +663,6 @@ class ItemAdminSession:
             item['question'] = question_form._my_map
         else:
             item['question'] = question_form._my_map # Let's just assume we can overwrite it
-            #raise errors.AlreadyExists()
         collection.save(item)
         self._forms[question_form.get_id().get_identifier()] = CREATED
         return objects.Question(question_form._my_map, runtime=self._runtime)"""
