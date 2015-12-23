@@ -57,6 +57,7 @@ class AssessmentSession:
         'from ..osid.sessions import OsidSession',
         'from ..utilities import MongoClientValidated',
         'SUBMITTED = True',
+        'from importlib import import_module',
     ]
     
     init = """
@@ -322,10 +323,7 @@ class AssessmentSession:
         ##
         # This is a little hack to get the answer record types from the Item's
         # Question record types. Should really get it from item genus types somehow:
-        try:
-            from ..records.types import ANSWER_RECORD_TYPES as record_type_data_sets
-        except (ImportError, AttributeError):
-            record_type_data_sets = dict()
+        record_type_data_sets = self._get_registry('ANSWER_RECORD_TYPES')
         collection = MongoClientValidated('assessment',
                                           collection='Item',
                                           runtime=self._runtime)
@@ -346,7 +344,17 @@ class AssessmentSession:
             runtime=self._runtime)
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
-        return obj_form"""
+        return obj_form
+
+    def _get_registry(self, entry):
+        # get from the runtime
+        try:
+            records_location_param_id = Id('parameter:recordsRegistry@mongo')
+            registry = self._runtime.get_configuration().get_value_by_parameter(
+                records_location_param_id).get_string_value()
+            return import_module(registry).__dict__.get(entry, {})
+        except (ImportError, AttributeError, KeyError, errors.NotFound):
+            return {}"""
 
     submit_response_import_templates = [
         'from ...abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
@@ -1453,10 +1461,7 @@ class Response:
     ]
     
     init = """
-    try:
-        from ..records.types import RESPONSE_RECORD_TYPES as _record_type_data_sets
-    except ImportError, AttributeError:
-        _record_type_data_sets = dict()
+    _record_type_data_sets = {}
     _namespace = 'assessment.Response'
     
     def __init__(self, answer, **kwargs):
@@ -1464,6 +1469,7 @@ class Response:
         self._records = dict()
         # Consider that responses may want to have their own records separate
         # from the enclosed Answer records:
+        self._record_type_data_sets = self._get_registry('RESPONSE_RECORD_TYPES')
         response_map = answer.object_map
         self._load_records(response_map['recordTypeIds'])
     
