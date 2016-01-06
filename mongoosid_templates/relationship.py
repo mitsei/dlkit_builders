@@ -2,7 +2,7 @@ from .resource import ResourceAdminSession
 
 class RelationshipLookupSession:
 
-    import_statements = [
+    import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..primitives import DateTime',

@@ -120,8 +120,11 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
 
         return inheritance
 
-    def _get_extra_patterns(self, interface_name, import_statement, default=None):
-        if interface_name + '.init_pattern' in self.patterns:
+    def _get_extra_patterns(self, interface, import_statement='', default=None):
+        if default is None:
+            default = []
+        if isinstance(interface, basestring) and interface + '.init_pattern' in self.patterns:
+            interface_name = interface
             init_pattern = self.patterns[interface_name + '.init_pattern']
             try:
                 templates = import_module(self._package_templates(self.first(init_pattern)))
@@ -131,6 +134,27 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                         return getattr(template_class, import_statement)
             except ImportError:
                 return default
+        elif isinstance(interface, dict):
+            template_imports = []
+            for method in interface['methods']:
+                pattern = self._get_pattern(method, interface)
+
+                template_class = None
+                if pattern:
+                    try:
+                        templates = import_module(self._package_templates(self.first(pattern)))
+                    except ImportError:
+                        pass
+                    else:
+                        if hasattr(templates, pattern.split('.')[-2]):
+                            template_class = getattr(templates, pattern.split('.')[-2])
+
+                # Check if there is a 'by hand' implementation available for this method
+                imports = 'import_statements_pattern'
+                if (template_class and
+                        hasattr(template_class, imports)):
+                    template_imports += getattr(template_class, imports)
+            return template_imports
         return default
 
     def _get_init_context(self, init_pattern, interface):

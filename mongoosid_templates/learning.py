@@ -97,7 +97,9 @@ class ObjectiveRequisiteAssignmentSession:
     assign_objective_requisite_template = """
         requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
 
-        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
+        ras = self._get_provider_manager(
+            'RELATIONSHIP').get_relationship_admin_session_for_family(
+            self.get_objective_bank_id())
         rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name}, [])
         rfc.set_display_name('Objective Requisite')
         rfc.set_description('An Objective Requisite created by the ObjectiveRequisiteAssignmentSession')
@@ -111,8 +113,12 @@ class ObjectiveRequisiteAssignmentSession:
 
     unassign_objective_requisite_template = """
         requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
-        rls = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())
-        ras = self._get_provider_manager('RELATIONSHIP').get_relationship_admin_session_for_family(self.get_objective_bank_id())"""
+        rls = self._get_provider_manager(
+            'RELATIONSHIP').get_relationship_admin_session_for_family(
+            self.get_objective_bank_id())
+        ras = self._get_provider_manager(
+            'RELATIONSHIP').get_relationship_admin_session_for_family(
+            self.get_objective_bank_id())"""
 
 class ObjectiveAdminSession:
 

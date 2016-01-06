@@ -263,8 +263,7 @@ class BaseBuilder(Utilities):
         # Look for module import statements defined in class patterns. These
         # need to be coded in the class pattern as a list of strings with the
         # attribute name 'import_statements_pattern'
-        for import_str in self._get_extra_patterns(interface['shortname'],
-                                                   'import_statements_pattern',
+        for import_str in self._get_extra_patterns(interface,
                                                    default=[]):
             self.append(imports, import_str)
 

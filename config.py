@@ -127,6 +127,8 @@ sessions_to_implement = [
     'ObjectiveBankAdminSession',
     'ObjectiveBankHierarchySession',
     'ObjectiveBankHierarchyDesignSession',
+    'ProficiencyLookupSession',
+    'ProficiencyAdminSession',
     ## ontology service:
     'SubjectHierarchyDesignSession',
     ### proxy service
@@ -214,6 +216,7 @@ objects_to_implement = [
     'Objective',
     'Activity',
     'ObjectiveBank',
+    'Proficiency',
     ### locale service
     'Locale',
     'LocaleList',

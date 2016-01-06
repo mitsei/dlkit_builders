@@ -20,7 +20,7 @@ class SubjectHierarchyDesignSession:
         return True"""
 
     remove_child_subject_template = """
-       # Implemented from template for
+        # Implemented from template for
         # osid.ontology.SubjectHierarchyDesignSession.remove_child_subject_template
         return self._hierarchy_session.remove_child(id_=${arg0_name}, child_id=${arg1_name})"""
 
