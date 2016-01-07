@@ -52,7 +52,7 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_source_on_date
         ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_for_${source_name}():
+        for ${object_name_under} in self.get_${object_name_plural_under}_for_${source_name}(${arg0_name}):
             if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""

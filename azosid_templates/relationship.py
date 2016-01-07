@@ -30,3 +30,13 @@ class RelationshipLookupSession:
         else:
             return self._provider_session.${method_name}(${arg0_name})"""
 
+    get_relationships_for_source_on_date_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from azosid template for -
+        # osid.relationship.RelationshipLookupSession.get_relationships_for_source_on_date_template
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name}, ${arg2_name})"""
+
+

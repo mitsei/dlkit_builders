@@ -667,7 +667,7 @@ class OsidSession:
             return {}
         cat_name_mixed = self._catalog_name[0].lower() + self._catalog_name[1:]
         idstr_list = self._get_catalog_idstrs()
-        return {'assigned' + self._catalog_name + 'Ids': {'$in': idstr_list}}
+        return {'assigned' + utilities.format_catalog(self._catalog_name) + 'Ids': {'$in': idstr_list}}
         # return {'$or': [{cat_name_mixed + 'Id': {'$in': idstr_list}},
         #                 {'assigned' + self._catalog_name + 'Ids': {'$in': idstr_list}}]}
 
@@ -790,7 +790,9 @@ class OsidObject:
         obj_map['genusTypeId'] = str(self.genus_type)
         # Note: The following should be deprecated:
         try:
-            obj_map[self._catalog_name.lower() + 'Id'] = obj_map['assigned' + self._catalog_name.title() + 'Ids'][0]
+            obj_map[utilities.format_catalog(
+                self._catalog_name).lower() + 'Id'] = obj_map['assigned' + utilities.format_catalog(
+                self._catalog_name) + 'Ids'][0]
         except AttributeError:
             # catalogs do not have this attribute
             pass
