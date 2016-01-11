@@ -362,3 +362,11 @@ class ObjectiveSequencingSession:
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
         self._forms = dict()"""
+
+class ProficiencyForm:
+    set_level = """
+        if self.get_level_metadata().is_read_only():
+            raise errors.NoAccess()
+        if not self._is_valid_id(grade):
+            raise errors.InvalidArgument()
+        self._my_map['level'] = str(grade)"""
