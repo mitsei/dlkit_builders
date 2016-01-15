@@ -524,6 +524,8 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
         elif persisted_name in plural_data_types:
             initers += '        self._my_map[\'{}Ids\'] = self._{}_default\n'.format(mixed_singular,
                                                                                      data_name)
+        elif persisted_name in ['osid.grading.Grade'] and data_name == 'level':  # fix bug with ProficiencyForm
+            initers += "        self._my_map['level'] = self._level_metadata['default_id_values'][0]\n"
 
     for data_name in aggregate_data:
         mixed_name = under_to_mixed(data_name)

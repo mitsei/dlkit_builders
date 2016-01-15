@@ -311,7 +311,8 @@ class Temporal:
 
     init = """
     def __init__(self):
-        self._my_map = {}"""
+        self._my_map = {}
+"""
 
     is_effective = """
         now = DateTime.now()
@@ -320,24 +321,24 @@ class Temporal:
     get_start_date = """
         sdate = self._my_map['startDate']
         return DateTime(
-            sdate['year'],
-            sdate['month'],
-            sdate['day'],
-            sdate['hour'],
-            sdate['minute'],
-            sdate['second'],
-            sdate['microsecond'])"""
+            sdate.year,
+            sdate.month,
+            sdate.day,
+            sdate.hour,
+            sdate.minute,
+            sdate.second,
+            sdate.microsecond)"""
 
     get_end_date = """
         edate = self._my_map['endDate']
         return DateTime(
-            edate['year'],
-            edate['month'],
-            edate['day'],
-            edate['hour'],
-            edate['minute'],
-            edate['second'],
-            edate['microsecond'])"""
+            edate.year,
+            edate.month,
+            edate.day,
+            edate.hour,
+            edate.minute,
+            edate.second,
+            edate.microsecond)"""
 
 class Containable:
 
@@ -1166,18 +1167,22 @@ class OsidTemporalForm:
                              namespace=self._namespace,
                              identifier='start_date')}
         self._start_date_metadata.update(mdata_conf.START_DATE)
-        self._start_date_metadata.update({'default_date_time_values': [self._get_date_map(datetime.datetime.now())]})
+        self._start_date_metadata.update({'default_date_time_values': [datetime.datetime.now()]})
         self._end_date_metadata = {
             'element_id': Id(authority=self._authority,
                              namespace=self._namespace,
                              identifier='end_date')}
         self._end_date_metadata.update(mdata_conf.END_DATE)
+        self._end_date_metadata.update({
+            'default_date_time_values': [datetime.datetime.now() + datetime.timedelta(weeks=9999)]
+        })
 
     def _init_map(self):
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
         self._my_map['startDate'] = self._start_date_metadata['default_date_time_values'][0]
-        self._my_map['endDate'] = self._end_date_metadata['default_date_time_values'][0]"""
+        self._my_map['endDate'] = self._end_date_metadata['default_date_time_values'][0]
+"""
 
     get_start_date_metadata = """
         metadata = dict(self._start_date_metadata)
@@ -1189,7 +1194,8 @@ class OsidTemporalForm:
             raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_start_date_metadata()):
             raise errors.InvalidArgument()
-        self._my_map['startDate'] = self._get_date_map(date)"""
+        #self._my_map['startDate'] = self._get_date_map(date)
+        self._my_map['startDate'] = date"""
 
     clear_start_date = """
         if (self.get_start_date_metadata().is_read_only() or
@@ -1207,7 +1213,8 @@ class OsidTemporalForm:
             raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_end_date_metadata()):
             raise errors.InvalidArgument()
-        self._my_map['endDate'] = self._get_date_map(date)"""
+        #self._my_map['endDate'] = self._get_date_map(date)
+        self._my_map['endDate'] = date"""
 
     clear_end_date = """
         if (self.get_end_date_metadata().is_read_only() or
@@ -2051,3 +2058,45 @@ class OsidSearchResults:
 
     get_result_size = """
         return self._results.count(True)"""
+
+
+class OsidTemporalQuery:
+    import_statements = [
+
+    ]
+
+    match_date = """
+        if match:
+            if to < from_:
+                raise errors.InvalidArgument('end date must be >= start date when match = True')
+            self._query_terms['startDate'] = {
+                '$gte': from_
+            }
+            self._query_terms['endDate'] = {
+                '$lte': to
+            }
+        else:
+            raise errors.InvalidArgument('match = False not currently supported')"""
+
+    match_start_date = """
+        if match:
+            if end < start:
+                raise errors.InvalidArgument('end date must be >= start date when match = True')
+            self._query_terms['startDate'] = {
+                '$gte': start,
+                '$lte': end
+            }
+        else:
+            raise errors.InvalidArgument('match = False not currently supported')"""
+
+    match_end_date = """
+        if match:
+            if end < start:
+                raise errors.InvalidArgument('end date must be >= start date when match = True')
+            self._query_terms['endDate'] = {
+                '$gte': start,
+                '$lte': end
+            }
+        else:
+            raise errors.InvalidArgument('match = False not currently supported')"""
+

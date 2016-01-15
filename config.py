@@ -129,6 +129,7 @@ sessions_to_implement = [
     'ObjectiveBankHierarchyDesignSession',
     'ProficiencyLookupSession',
     'ProficiencyAdminSession',
+    'ProficiencyQuerySession',
     ## ontology service:
     'SubjectHierarchyDesignSession',
     ### proxy service

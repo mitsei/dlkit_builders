@@ -1549,7 +1549,8 @@ class ResourceQuery:
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidObjectQuery.__init__(self, runtime)"""
+        osid_queries.OsidObjectQuery.__init__(self, runtime)
+"""
 
     clear_group_terms_template = """
         self._clear_terms('${var_name_mixed}')"""

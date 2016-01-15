@@ -38,3 +38,4 @@ class ActivityAdminSession:
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+

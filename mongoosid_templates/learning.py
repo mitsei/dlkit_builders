@@ -370,3 +370,74 @@ class ProficiencyForm:
         if not self._is_valid_id(grade):
             raise errors.InvalidArgument()
         self._my_map['level'] = str(grade)"""
+
+class ProficiencyQuery:
+    init = """
+    def __init__(self, runtime):
+        self._namespace = '${pkg_name}.${object_name}'
+        self._runtime = runtime
+        record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidObjectQuery.__init__(self, runtime)
+"""
+
+    match_level_id = """
+        if not isinstance(grade_id, Id):
+            raise errors.InvalidArgument()
+        self._add_match('level', str(grade_id), match)"""
+
+    match_completion = """
+        try:
+            start = float(start)
+        except ValueError:
+            raise errors.InvalidArgument('Invalid start value')
+        try:
+            end = float(end)
+        except ValueError:
+            raise errors.InvalidArgument('Invalid end value')
+        if match:
+            if end < start:
+                raise errors.InvalidArgument('end value must be >= start value when match = True')
+            self._query_terms['completion'] = {
+                '$gte': start,
+                '$lte': end
+            }
+        else:
+            raise errors.InvalidArgument('match = False not currently supported')"""
+
+    match_resource_id = """
+        if not isinstance(resource_id, Id):
+            raise errors.InvalidArgument()
+        self._add_match('resourceId', str(resource_id), match)"""
+
+class Proficiency:
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if obj_map['startDate'] is not None:
+            actual_start_date = obj_map['startDate']
+            obj_map['startDate'] = dict()
+            obj_map['startDate']['year'] = actual_start_date.year
+            obj_map['startDate']['month'] = actual_start_date.month
+            obj_map['startDate']['day'] = actual_start_date.day
+            obj_map['startDate']['hour'] = actual_start_date.hour
+            obj_map['startDate']['minute'] = actual_start_date.minute
+            obj_map['startDate']['second'] = actual_start_date.second
+            obj_map['startDate']['microsecond'] = actual_start_date.microsecond
+        if obj_map['endDate'] is not None:
+            actual_end_date = obj_map['endDate']
+            obj_map['endDate'] = dict()
+            obj_map['endDate']['year'] = actual_end_date.year
+            obj_map['endDate']['month'] = actual_end_date.month
+            obj_map['endDate']['day'] = actual_end_date.day
+            obj_map['endDate']['hour'] = actual_end_date.hour
+            obj_map['endDate']['minute'] = actual_end_date.minute
+            obj_map['endDate']['second'] = actual_end_date.second
+            obj_map['endDate']['microsecond'] = actual_end_date.microsecond
+
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)"""
