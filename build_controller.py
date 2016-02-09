@@ -764,9 +764,9 @@ class Builder(Utilities):
 
     def docs(self):
         from kitdocsourcebuilder import KitSourceBuilder
-        from kitdocbuilder import KitDocDLKitBuilder
+        # from kitdocbuilder import KitDocDLKitBuilder
         KitSourceBuilder(build_dir=self.build_dir).make()
-        KitDocDLKitBuilder(build_dir=self.build_dir).make()
+        # KitDocDLKitBuilder(build_dir=self.build_dir).make()
 
     def map(self):
         """map all the xosid files"""
@@ -872,6 +872,7 @@ if __name__ == '__main__':
             builder.services()
             builder.authz()
             builder.tests(True)
+            builder.docs()
         else:
             # need to do these in a specific order, regardless of how
             # they are passed in.

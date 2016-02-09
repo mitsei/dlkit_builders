@@ -8,14 +8,14 @@ from interface_builders import InterfaceBuilder
 from method_builders import argless_get, argless_clear, one_arg_set, strip_prefixes
 
 
-class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
+class OsidSourceBuilder(InterfaceBuilder, BaseBuilder):
     def __init__(self, build_dir=None, *args, **kwargs):
-        super(KitSourceBuilder, self).__init__(*args, **kwargs)
+        super(OsidSourceBuilder, self).__init__(*args, **kwargs)
         if build_dir is None:
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/source'
-        self._template_dir = self._abs_path + '/builders/kitosid_templates'
+        self._template_dir = self._abs_path + '/builders/mongoosid_templates'
 
         self._excluded_packages = ['proxy', 'type']
 
@@ -24,6 +24,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
     def _empty_modules_dict(self):
         module = dict(manager=dict(imports=[], body=''),
                       services=dict(imports=[], body=''),
+                      service_catalog=dict(imports=[], body=''),
                       service_managers=dict(imports=[], body=''),
                       catalog=dict(imports=[], body=''),
                       properties=dict(imports=[], body=''),
@@ -84,7 +85,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             if self.package['name'] != 'osid' and not self._flagged_for_implementation(inf):
                 continue
 
-            if type_check_method(inf, self.package['name'], patterns=self.patterns):
+            if type_check_method(inf, self.patterns, self.package['name']):
                 header = ' '.join(camel_to_list(inf['fullname'])[1:-1])
                 full_header = '{0} Methods'.format(header)
                 methods += '\n\n{0} Methods\n{1}\n\n{2}\n\n'.format(header,
@@ -100,9 +101,22 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         if patterns is None:
             patterns = self.patterns
         is_catalog_session = False
-        if (interface['category'] == 'sessions' and
-            not interface['shortname'].startswith(patterns['package_catalog_caps']) and
-            package_name not in ['type']):
+        if package_name in ['type', 'proxy']:
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('GradebookColumn')):
+            is_catalog_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'HierarchySession')):
+            is_catalog_session = False
+        elif (interface['category'] == 'sessions' and
+                not interface['shortname'].startswith(patterns['package_catalog_caps'])):
             is_catalog_session = True
         return is_catalog_session
 
@@ -111,42 +125,53 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         if patterns is None:
             patterns = self.patterns
         is_manager_session = False
-
-        if package_name in ['type']:
+        if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
             is_manager_session = True
         elif (interface['category'] == 'sessions' and
-            interface['shortname'].startswith(patterns['package_catalog_caps'])):
+                interface['shortname'].startswith('GradebookColumn')):
+            is_manager_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith(patterns['package_catalog_caps'])):
+            is_manager_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('Resource')):
             is_manager_session = True
         return is_manager_session
 
     def _make_method(self, method, interface, service_catalog=None):
-        if service_catalog is None:
-            class_name = interface['shortname']
+        args = self._get_method_args(method, interface)
+
+        method_sig = '    .. py:method:: {1}({2}):'.format(self._ind,
+                                                           method['name'],
+                                                           ', '.join(args))
+
+        detail_docs = self._get_method_doc(method)
+
+        if method['doc']['body'].strip() == '' and not detail_docs:
+            method_doc = self._wrap('{0}{1}'.format(self._dind,
+                                                    self._wrap(method['doc']['headline'])))
+        elif method['doc']['body'].strip() == '':
+            method_doc = '{0}\n\n{1}\n\n'.format(self._wrap('{0}{1}'.format(self._dind,
+                                                                            method['doc']['headline'])),
+                                                 self._wrap(format_module_docstring('\n'.join(detail_docs))))
         else:
-            class_name = service_catalog
-        method_name = method['name']
-        method_sig = ''
+            method_doc = '{0}\n\n{1}\n\n{2}\n\n'.format(self._wrap('{0}{1}'.format(self._dind,
+                                                                            method['doc']['headline'])),
+                                                        self._wrap(method['doc']['body']),
+                                                        self._wrap(
+                                                            format_module_docstring('\n'.join(detail_docs))))
 
-        if not (('OsidManager' in interface['inherit_shortnames'] or
-                 'OsidProxyManager' in interface['inherit_shortnames']) and
-                 '_session' in method_name):
-            if method_name == 'get_id':
-                method_sig = '   .. autoattribute:: ' + class_name + '.ident'
-            elif method_name == 'get_identifier_namespace':
-                method_sig = '   .. autoattribute:: ' + class_name + '.namespace'
-            elif method_name.startswith('get_') and method['args'] == []:
-                method_sig = '   .. autoattribute:: ' + class_name + '.' + method_name[4:]
-            elif method_name.startswith('set_') and len(method['args']) == 1:
-                method_sig = '   .. autoattribute:: ' + class_name + '.' + method_name[4:]
-            elif method_name.startswith('clear_') and method['args'] == []:
-                method_sig = '   .. autoattribute:: ' + class_name + '.' + method_name[6:]
-            ##
-            # And finally all the methods:
-            else:
-                method_sig = '   .. automethod:: {0}.{1}'.format(class_name,
-                                                                 method_name)
-
-        return method_sig
+        if service_catalog is None:
+            return '{0}\n{1}:noindex:\n'.format(method_sig,
+                                                self._dind)
+        else:
+            return method_sig + '\n' + method_doc + '\n'
 
     def _patterns(self):
         patterns = self._load_patterns_file()
@@ -162,13 +187,13 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
     def _update_module_imports(self, modules, interface):
         package = self.package['name']
         if any(sn in interface['inherit_shortnames']
-               for sn in ['OsidManager', 'OsidProxyManager', 'OsidProfile']):
+               for sn in ['OsidManager', 'OsidProxyManager']):
             module_name = 'service_managers'
             currentmodule_str = '.. currentmodule:: dlkit.services.{0}'.format(package)
             automodule_str = '.. automodule:: dlkit.services.{0}'.format(package)
 
         elif interface['shortname'] == self.patterns['package_catalog_caps']:
-            module_name = self.patterns['package_catalog_under']
+            module_name = 'service_catalog'
             currentmodule_str = '.. currentmodule:: dlkit.services.{0}'.format(package)
             automodule_str = ''
         else:
@@ -181,8 +206,8 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         module_title = '\n{0}\n{1}'.format(' '.join(module_name.split('_')).title(),
                                            '=' * len(module_name))
 
-        self.append(modules[module_name]['imports'], currentmodule_str)
-        self.append(modules[module_name]['imports'], automodule_str)
+        # self.append(modules[module_name]['imports'], currentmodule_str)
+        # self.append(modules[module_name]['imports'], automodule_str)
         self.append(modules[module_name]['imports'], module_title)
 
         self._module_name = module_name
@@ -191,8 +216,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         toc_str = '{0}\n{1}'.format(self.package['name'].title(),
                                     '=' * len(self.package['name']))
 
-        toc_str = '{0}\n\n.. toctree::\n   :maxdepth: 2\n\n   summary\n   service_managers\n   {1}\n'.format(toc_str,
-                                                                                                             self.patterns['package_catalog_under'])
+        toc_str = '{0}\n\n.. toctree::\n   :maxdepth: 2\n\n   summary\n   service_managers\n'.format(toc_str)
 
         for module in modules:
             if ('_'.join(module.split('.')) not in [
@@ -214,37 +238,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             write_file.write(toc_str)
 
     def build_this_interface(self, interface):
-        exceptions = []
-        excepted_osid_categories = ['properties',
-                                    'query_inspectors',
-                                    'receivers',
-                                    'search_orders',
-                                    'searches']
-
-        # Check to see if manager should be implemented (this should
-        # probably be moved to binder_helpers.flagged_for_implementation)
-        if (interface['category'] == 'managers' and
-                self.package['name'] not in managers_to_implement):
-            return False
-
-        # Check to see if this interface is meant to be implemented.
-        if (self.package['name'] != 'osid' and
-                interface['category'] not in excepted_osid_categories):
-            if self._flagged_for_implementation(interface):
-                if interface['shortname'] in exceptions:
-                    return False
-                if interface['shortname'].endswith('ProxyManager'):
-                    return False
-            else:
-                return False
-
-        if interface['category'] in excepted_osid_categories:
-            return False
-
-        if (interface['category'] in ['sessions', 'managers']):
-            return False
-
-        return True
+        return self._build_this_interface(interface)
 
     def class_doc(self, interface):
         # Inspect the class doc string for headline + body and create
@@ -313,23 +307,51 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
     def make_methods(self, interface, package_name=None, service_catalog=None):
         body = []
         for method in interface['methods']:
-            method_sig = self._make_method(method, interface, service_catalog)
-            if method_sig != '':
-                self.append(body, method_sig)
+            if (method['name'] == 'get_items' and
+                    interface['shortname'] == 'AssessmentResultsSession' and
+                    service_catalog is not None):
+                method['name'] = 'get_taken_items'
+            if (method['name'] == 'get_items' and
+                    interface['shortname'] == 'AssessmentBasicAuthoringSession' and
+                    service_catalog is not None):
+                method['name'] = 'get_assessment_items'
+
+            body.append(self._make_method(method, interface, service_catalog))
+            # Here is where we add the Python properties stuff:
+            if argless_get(method):
+                body.append(simple_property('get', method, service_catalog=service_catalog))
+            elif one_arg_set(method):
+                if (simple_property('del', method, service_catalog=service_catalog)) in body:
+                    body.remove(simple_property('del', method, service_catalog=service_catalog))
+                    body.append(set_and_del_property(method, service_catalog=service_catalog))
+                else:
+                    body.append(simple_property('set', method, service_catalog=service_catalog))
+            elif argless_clear(method):
+                if (simple_property('set', method, service_catalog=service_catalog)) in body:
+                    body.remove(simple_property('set', method, service_catalog=service_catalog))
+                    body.append(set_and_del_property(method, service_catalog=service_catalog))
+                else:
+                    body.append(simple_property('del', method, service_catalog=service_catalog))
+
+            if method['name'] == 'get_id':
+                    body.append(simple_property('get', method, 'ident', service_catalog=service_catalog))
+            if method['name'] == 'get_identifier_namespace':
+                    body.append(simple_property('get', method, 'namespace', service_catalog=service_catalog))
 
         return '\n\n'.join(body)
 
     def module_body(self, interface):
+        inheritance = self._get_class_inheritance(interface)
         sn = interface['shortname']
         header = ' '.join(camel_to_list(sn))
-        body = '{0}\n{1}\n\n.. autoclass:: {2}\n   :show-inheritance:\n\n'.format(header,
-                                                                                  '-' * len(header),
-                                                                                  sn)
-        # body = '{0}\n{1}\n\n.. py:class:: {2}{3}\n{4}\n\n'.format(header,
-        #                                                           '-' * len(header),
-        #                                                           sn,
-        #                                                           inheritance,
-        #                                                           self._wrap(self.class_doc(interface)))
+        # body = '{0}\n{1}\n\n.. autoclass:: {2}\n   :show-inheritance:\n\n'.format(header,
+        #                                                                           '-' * len(header),
+        #                                                                           sn)
+        body = '{0}\n{1}\n\n.. py:class:: {2}{3}\n{4}\n\n'.format(header,
+                                                                  '-' * len(header),
+                                                                  sn,
+                                                                  inheritance,
+                                                                  self._wrap(self.class_doc(interface)))
 
         body = '{0}{1}\n\n'.format(body,
                                    self.make_methods(interface, self.patterns))
@@ -348,7 +370,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
 
     def update_module_body(self, modules, interface):
         modules[self._module_name]['body'] += self.module_body(interface)
-        if self._module_name in ['service_managers', self.patterns['package_catalog_under']]:
+        if self._module_name in ['service_managers', 'service_catalog']:
             modules[interface['category']]['body'] += self._get_simple_module_body(interface)
 
     def write_license_file(self):
