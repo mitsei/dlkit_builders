@@ -786,7 +786,7 @@ class CompositionRepositorySession:
         lookup_session.use_federated_repository_view()
         lookup_session.use_unsequestered_composition_view()
         composition = lookup_session.get_composition(composition_id)
-        id_list = [Id(composition._my_map['repositoryId'])]
+        id_list = []
         if 'assignedRepositoryIds' in composition._my_map:
             for idstr in composition._my_map['assignedRepositoryIds']:
                 id_list.append(Id(idstr))
