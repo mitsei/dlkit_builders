@@ -1,8 +1,8 @@
 import re
 
-from config import managers_to_implement
+from config import managers_to_implement, sessions_to_implement
 
-from binder_helpers import camel_to_list, fix_reserved_word
+from binder_helpers import camel_to_list, fix_reserved_word, under_to_caps
 from build_controller import BaseBuilder
 from interface_builders import InterfaceBuilder
 from method_builders import argless_get, argless_clear, one_arg_set, strip_prefixes
@@ -135,11 +135,11 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             elif method_name == 'get_identifier_namespace':
                 method_sig = '   .. autoattribute:: ' + class_name + '.namespace'
             elif method_name.startswith('get_') and method['args'] == []:
-                method_sig = '   .. autoattribute:: ' + class_name + '.' + method_name[4:]
+                method_sig = '   .. autoattribute:: ' + class_name + '.' + fix_reserved_word(method_name[4:])
             elif method_name.startswith('set_') and len(method['args']) == 1:
-                method_sig = '   .. autoattribute:: ' + class_name + '.' + method_name[4:]
+                method_sig = '   .. autoattribute:: ' + class_name + '.' + fix_reserved_word(method_name[4:])
             elif method_name.startswith('clear_') and method['args'] == []:
-                method_sig = '   .. autoattribute:: ' + class_name + '.' + method_name[6:]
+                method_sig = '   .. autoattribute:: ' + class_name + '.' + fix_reserved_word(method_name[6:])
             ##
             # And finally all the methods:
             else:
@@ -191,8 +191,11 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         toc_str = '{0}\n{1}'.format(self.package['name'].title(),
                                     '=' * len(self.package['name']))
 
-        toc_str = '{0}\n\n.. toctree::\n   :maxdepth: 2\n\n   summary\n   service_managers\n   {1}\n'.format(toc_str,
-                                                                                                             self.patterns['package_catalog_under'])
+        toc_str = '{0}\n\n.. toctree::\n   :maxdepth: 2\n\n   summary\n   service_managers\n'.format(toc_str)
+
+        if self.patterns['package_catalog_under'] != 'no_catalog':
+            toc_str = '{0}   {1}\n'.format(toc_str,
+                                           self.patterns['package_catalog_under'])
 
         for module in modules:
             if ('_'.join(module.split('.')) not in [
@@ -200,6 +203,8 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
                     self.patterns['package_catalog_under'],
                     'records',
                     'rules',
+                    'managers',
+                    'sessions',
                     'no_catalog'] and
                     modules[module]['body'].strip() != ''):
                 toc_str = '{0}   {1}\n'.format(toc_str,
@@ -241,10 +246,28 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         if interface['category'] in excepted_osid_categories:
             return False
 
-        if (interface['category'] in ['sessions', 'managers']):
-            return False
+        # if (interface['category'] in ['sessions', 'managers']):
+        #     return False
 
         return True
+
+    def build_this_method(self, interface, method):
+        build_me = True
+        package_name = self.package['name']
+
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Profile') and
+                method['name'].startswith('supports_') and
+                under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
+            build_me = False
+
+        if (('OsidManager' in interface['inherit_shortnames'] or
+                 'OsidProxyManager' in interface['inherit_shortnames']) and
+                 '_session' in method['name']):
+            build_me = False
+
+        return build_me
 
     def class_doc(self, interface):
         # Inspect the class doc string for headline + body and create
@@ -313,6 +336,9 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
     def make_methods(self, interface, package_name=None, service_catalog=None):
         body = []
         for method in interface['methods']:
+            if not self.build_this_method(interface, method):
+                continue
+
             method_sig = self._make_method(method, interface, service_catalog)
             if method_sig != '':
                 self.append(body, method_sig)
@@ -367,7 +393,8 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         # write out both the import statements and class definitions to the
         # appropriate module for this package.
         for module in modules:
-            if modules[module]['body'].strip() != '':
+            if (modules[module]['body'].strip() != '' and
+                    module not in ['sessions', 'managers']):
                 with open(self._abc_module('_'.join(module.split('.')),
                                            extension='rst'), 'w') as write_file:
                     write_file.write('{0}\n\n\n{1}'.format('\n'.join(modules[module]['imports']),

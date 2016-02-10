@@ -311,7 +311,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             # Check if a directory already exists for the abc osid.  If not,
             # create one and initialize as a python package.
             self._make_dir(self._app_name(), python=True)
-            if self._in(['mongo', 'authz', 'tests', 'doc_source', 'doc_dlkit']):
+            if self._in(['abc', 'mongo', 'authz', 'tests', 'doc_source', 'doc_dlkit']):
                 self._make_dir(self._abc_pkg_path(), python=True)
 
     def _make_init_methods(self, interface):

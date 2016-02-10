@@ -1,6 +1,6 @@
 from config import managers_to_implement, sessions_to_implement
 
-from binder_helpers import camel_to_list, SkipMethod
+from binder_helpers import camel_to_list, SkipMethod, under_to_caps
 from build_controller import BaseBuilder
 from interface_builders import InterfaceBuilder
 from method_builders import argless_clear, argless_get,\
@@ -123,61 +123,42 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
             if self.package['name'] != 'osid' and not self._flagged_for_implementation(inf):
                 continue
 
-            if type_check_method(inf, self.patterns, self.package['name']):
+            if type_check_method(inf, self.package['name'], patterns=self.patterns):
                 methods += '\n##\n# The following methods are from {}\n\n'.format(inf['fullname'])
                 methods += self._make_service_methods(inf) + '\n\n'
                 inherited_imports = self.get_methods_templated_imports(self._abc_pkg_name(abc=False),
-                                                                       inf,
-                                                                       self.patterns)
+                                                                       inf)
         return methods, inherited_imports
 
     # Determine if the interface represents a catalog related session
-    def _is_catalog_session(self, interface, patterns, package_name):
+    def _is_catalog_session(self, interface, package_name, patterns=None):
+        if patterns is None:
+            patterns = self.patterns
         is_catalog_session = False
-        if package_name in ['type', 'proxy']:
-            is_catalog_session = False
-        elif (interface['category'] == 'sessions' and
-                interface['shortname'].startswith('GradebookColumn')):
-            is_catalog_session = True
-        elif (interface['category'] == 'sessions' and
-                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
-            is_catalog_session = False
-        elif (interface['category'] == 'sessions' and
-                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
-            is_catalog_session = False
-        elif (interface['category'] == 'sessions' and
-                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'HierarchySession')):
-            is_catalog_session = False
-        elif (interface['category'] == 'sessions' and
-                not interface['shortname'].startswith(patterns['package_catalog_caps'])):
+        if (interface['category'] == 'sessions' and
+                not interface['shortname'].startswith(patterns['package_catalog_caps']) and
+                package_name not in ['type']):
             is_catalog_session = True
         return is_catalog_session
 
     # Determine if the interface represents a manager related session
-    def _is_manager_session(self, interface, patterns, package_name):
+    def _is_manager_session(self, interface, package_name, patterns=None):
+        if patterns is None:
+            patterns = self.patterns
+
         is_manager_session = False
-        if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
-            is_manager_session = True
-        elif (interface['category'] == 'sessions' and
-                interface['shortname'].startswith('GradebookColumn')):
-            is_manager_session = False
-        elif (interface['category'] == 'sessions' and
-                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
-            is_manager_session = True
-        elif (interface['category'] == 'sessions' and
-                interface['shortname'].endswith(patterns['package_catalog_caps'] + 'AssignmentSession')):
+        if package_name in ['type']:
             is_manager_session = True
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].startswith(patterns['package_catalog_caps'])):
             is_manager_session = True
-        elif (interface['category'] == 'sessions' and
-                interface['shortname'].startswith('Resource')):
-            is_manager_session = True
         return is_manager_session
 
-    def _make_method(self, method, interface, patterns):
+    def _make_method(self, method, interface, patterns=None):
+        if patterns is None:
+            patterns = self.patterns
         args = self._get_method_args(method, interface, patterns)
-        method_impl = self._make_method_impl(method, interface, patterns)
+        method_impl = self._make_method_impl(method, interface)
 
         method_sig = '{}def {}({}):'.format(self._ind,
                                             method['name'],
@@ -185,11 +166,11 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
 
         method_doc = self._build_method_doc(method)
 
-        return (self._wrap(method_sig) + '\n' +
-                self._wrap(method_doc) + '\n' +
-                self._wrap(method_impl))
+        return (method_sig + '\n' +
+                method_doc + '\n' +
+                method_impl)
 
-    def _make_method_impl(self, method, interface, patterns):
+    def _make_method_impl(self, method, interface):
         if method['return_type'].strip():
             return '{}return # {}'.format(self._dind,
                                           method['return_type'])
@@ -260,9 +241,9 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
         if additional_methods:
             methods += '\n' + additional_methods
 
-        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self._wrap(self.class_sig(interface, inheritance)),
-                                                 self._wrap(self.class_doc(interface)),
-                                                 self._wrap(init_methods),
+        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                 self.class_doc(interface),
+                                                 init_methods,
                                                  methods)
         return body
 
@@ -285,7 +266,26 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
         return self._build_this_interface(interface)
 
     def build_this_method(self, interface, method):
-        return True
+        package_name = self.package['name']
+        build_me = True
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Manager') and
+                method['name'].startswith('get') and
+                'session' in method['name']):
+                # method['return_type'].split('.')[-1] not in sessions_to_implement):
+            build_me = False
+        if (interface['category'] == 'managers' and
+                package_name != 'osid' and
+                interface['shortname'].endswith('Profile') and
+                method['name'].startswith('supports_') and
+                under_to_caps(method['name'][9:]) + 'Session' not in sessions_to_implement):
+            build_me = False
+        # if (interface['category'] == 'sessions' and
+        #         (method['name'] == 'get_' + self.patterns['package_catalog_under'] + '_id' or
+        #          method['name'] == 'get_' + self.patterns['package_catalog_under'])):
+        #     build_me = False
+        return build_me
 
     def make(self):
         self.make_osids(build_abc=False)
@@ -293,7 +293,7 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
         return '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                 self._wrap(self.class_doc(interface)),
+                                                 self.class_doc(interface),
                                                  self._additional_methods(interface),
                                                  self.make_methods(interface))
 
@@ -314,10 +314,10 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
 
     def write_modules(self, modules):
         summary = u'{0}\"\"\"{1}\n{2} version {3}\n\n{4}\n\n\"\"\"\n'.format(self._utf_code,
-                                                                             self._wrap(self.package['title']),
-                                                                             self._wrap(self.package['name']),
-                                                                             self._wrap(self.package['version']),
-                                                                             self._wrap(self.package['summary'])).encode('utf-8')
+                                                                             self.package['title'],
+                                                                             self.package['name'],
+                                                                             self.package['version'],
+                                                                             self.package['summary']).encode('utf-8')
         ##
         # Finally, iterate through the completed package module structure and
         # write out both the import statements and class definitions to the
