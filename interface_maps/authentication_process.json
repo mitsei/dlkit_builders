@@ -1,0 +1,18 @@
+{
+   "authentication.process.AuthenticationProcessProfile": "managers", 
+   "authentication.process.AuthenticationProcessManager": "managers", 
+   "authentication.process.AuthenticationProcessProxyManager": "managers", 
+   "authentication.process.AuthenticationAcquisitionSession": "sessions", 
+   "authentication.process.AuthenticationValidationSession": "sessions", 
+   "authentication.process.TrustLookupSession": "sessions", 
+   "authentication.process.CircleOfTrustSession": "sessions", 
+   "authentication.process.Authentication": "objects", 
+   "authentication.process.AuthenticationRecord": "records", 
+   "authentication.process.AuthenticationInput": "rules", 
+   "authentication.process.AuthenticationInputRecord": "records", 
+   "authentication.process.Challenge": "objects", 
+   "authentication.process.ChallengeRecord": "records", 
+   "authentication.process.Trust": "objects", 
+   "authentication.process.TrustRecord": "records", 
+   "authentication.process.TrustList": "objects"
+}

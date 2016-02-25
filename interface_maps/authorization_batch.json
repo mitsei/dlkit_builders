@@ -1,0 +1,23 @@
+{
+   "authorization.batch.AuthorizationBatchProfile": "managers", 
+   "authorization.batch.AuthorizationBatchManager": "managers", 
+   "authorization.batch.AuthorizationBatchProxyManager": "managers", 
+   "authorization.batch.AuthorizationBatchAdminSession": "sessions", 
+   "authorization.batch.FunctionBatchAdminSession": "sessions", 
+   "authorization.batch.QualifierBatchAdminSession": "sessions", 
+   "authorization.batch.VaultBatchAdminSession": "sessions", 
+   "authorization.batch.AuthorizationAgentPeer": "objects", 
+   "authorization.batch.AuthorizationAgentPeerList": "objects", 
+   "authorization.batch.AuthorizationResourcePeer": "objects", 
+   "authorization.batch.AuthorizationResourcePeerList": "objects", 
+   "authorization.batch.AuthorizationTrustPeer": "objects", 
+   "authorization.batch.AuthorizationTrustPeerList": "objects", 
+   "authorization.batch.AuthorizationBatchForm": "others_please_move", 
+   "authorization.batch.AuthorizationBatchFormList": "objects", 
+   "authorization.batch.FunctionBatchForm": "others_please_move", 
+   "authorization.batch.FunctionBatchFormList": "objects", 
+   "authorization.batch.QualifierBatchForm": "others_please_move", 
+   "authorization.batch.QualifierBatchFormList": "objects", 
+   "authorization.batch.VaultBatchForm": "others_please_move", 
+   "authorization.batch.VaultBatchFormList": "objects"
+}

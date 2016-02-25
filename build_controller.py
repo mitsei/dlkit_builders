@@ -117,6 +117,10 @@ class Utilities(object):
         dot-separated path"""
         return package_path.split(char)[-1]
 
+    @staticmethod
+    def replace(path, original='.', desired='_'):
+        return path.replace(original, desired)
+
 
 class BaseBuilder(Utilities):
     """base builder with some shared items, like package_maps dir, etc."""
@@ -433,23 +437,26 @@ class BaseBuilder(Utilities):
 
     def _package_file(self, package):
         if isinstance(package, dict) and 'name' in package:
-            return self.package_maps + '/' + self.first(package['name']) + self._map_ext
+            return self.package_maps + '/' + self.replace(package['name']) + self._map_ext
         else:
             return self.package_maps + '/' + package + self._map_ext
 
     def _package_interface_file(self, package):
         if isinstance(package, dict) and 'name' in package:
-            return self.interface_maps + '/' + self.first(package['name']) + self._map_ext
+            return self.interface_maps + '/' + self.replace(package['name']) + self._map_ext
         else:
             # assume is package name string
             return self.interface_maps + '/' + package + self._map_ext
 
-    def _package_pattern_file(self, package=None):
+    def _package_pattern_file(self, package=None, base=False):
         if package is None:
             package = self.package
 
         if isinstance(package, dict):
-            return self.pattern_maps + '/' + self.first(package['name']) + self._map_ext
+            if base:
+                return self.pattern_maps + '/' + self.first(package['name']) + self._map_ext
+            else:
+                return self.pattern_maps + '/' + self.replace(package['name']) + self._map_ext
         else:
             return self.pattern_maps + '/' + package + self._map_ext
 
@@ -531,7 +538,7 @@ class BaseBuilder(Utilities):
         self._pattern_maps_dir = self._make_dir(pattern_maps_dir)
 
     def grab_osid_name(self, xosid_filepath):
-        return xosid_filepath.split('/')[-1].split('.')[-2]
+        return xosid_filepath.split('/')[-1].replace('osid.', '').replace('.xosid', '').replace('.', '_')
 
     def get_interface_module(self, pkg_name, interface_shortname, report_error=False):
         """This function returns the category, or 'module' for the interface in question
@@ -611,14 +618,14 @@ class PatternBuilder(XOsidMapper, BaseBuilder):
 
         for package in sub_packages:
             if self._pattern_map_exists(package):
-                with open(self._package_pattern_file(package), 'r') as read_file:
+                with open(self._package_pattern_file(package, base=True), 'r') as read_file:
                     base_package = json.load(read_file)
 
                 self._make_impl_pattern_map(package=package,
                                             base_package=base_package)
             else:
                 print 'Could not find pattern map' + \
-                      self.first(package['name']) + \
+                      self.replace(package['name']) + \
                       'required for processing package' + \
                       package['name']
 

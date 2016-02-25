@@ -65,6 +65,9 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
         else:
             return '{}pass'.format(self._dind)
 
+    def build_this_interface(self, interface):
+        return True
+
     def make(self):
         self.make_osids(build_abc=True)
 

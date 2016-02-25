@@ -1,6 +1,7 @@
 
 packages_to_implement = [
     'assessment',
+    'assessment.authoring',
     'authentication.process',
     'authorization',
     'commenting',
@@ -16,11 +17,13 @@ packages_to_implement = [
     'relationship',
     'repository',
     'resource',
+    'rules',
     'type',
 ]
 
 packages_to_test = [
     'assessment',
+    'assessment.authoring',
     'authorization',
     'commenting',
     'grading',
@@ -31,6 +34,7 @@ packages_to_test = [
 
 managers_to_implement = [
     'assessment',
+    'assessment.authoring',
     'authorization',
     'commenting',
     'grading',
@@ -75,6 +79,11 @@ sessions_to_implement = [
     'BankAdminSession',
     'BankHierarchySession',
     'BankHierarchyDesignSession',
+    ### assessment authoring:
+    'AssessmentPartLookupSession',
+    'AssessmentPartAdminSession',
+    'SequenceRuleLookupSession',
+    'SequenceRuleAdminSession',
     ### authorization service:
     'AuthorizationSession',
     'AuthorizationLookupSession',
@@ -191,6 +200,9 @@ objects_to_implement = [
     'AssessmentTaken',
     'Response',
     'Bank',
+    ### assessment authoring service:
+    'AssessmentPart',
+    'SequenceRule',
     ### authentication_process:
     'Authentication',
     ### authorization service:
