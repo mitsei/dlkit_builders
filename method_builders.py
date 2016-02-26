@@ -86,7 +86,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             context['abcpkg_name'] = self._abc_pkg_name(abc=False)
             context['interface_name_under'] = camel_to_under(context['interface_name'])
             context['interface_name_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
-            context['package_name_caps'] = self.package['name'].title()
+            context['package_name_caps'] = self.replace(self.package['name'].title(), desired='')
             context['package_name_upper'] = self.package['name'].upper()
 
             if method['args']:

@@ -117,6 +117,7 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
 
         self.append(imports, self._abc_package_imports(interface))
         self._append_inherited_imports(imports, interface)
+        self._append_pattern_imports(imports, interface)
 
         # Don't forget the OsidSession inheritance:
         if (('OsidManager' in interface['inherit_shortnames'] or
@@ -233,6 +234,6 @@ DISABLED = -1"""
 
             if modules[module]['body'].strip() != '':
                 with open('{0}/{1}.py'.format(self._app_name(),
-                                              self.package['name']), 'w') as write_file:
+                                              self.replace(self.package['name'])), 'w') as write_file:
                     self._write_module_string(write_file,
                                               modules[module])

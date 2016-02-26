@@ -13,7 +13,8 @@ class RepositoryManager:
         config = self._my_runtime.get_configuration()
         parameter_id = Id('parameter:repositoryProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        self._provider_manager = runtime.get_manager('REPOSITORY', provider_impl) # need to add version argument
+        self._provider_manager = runtime.get_manager('REPOSITORY', provider_impl)
+        # need to add version argument
 
     def get_asset_composition_session_for_repository(self, repository_id, proxy):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
@@ -47,7 +48,8 @@ class RepositoryProxyManager:
         config = self._my_runtime.get_configuration()
         parameter_id = Id('parameter:repositoryProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        self._provider_manager = runtime.get_proxy_manager('REPOSITORY', provider_impl) # need to add version argument
+        self._provider_manager = runtime.get_proxy_manager('REPOSITORY', provider_impl)
+        # need to add version argument
 
     def get_asset_composition_session_for_repository(self, repository_id, proxy):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec

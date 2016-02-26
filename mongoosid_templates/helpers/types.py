@@ -23,7 +23,7 @@ class NoneType(object):
         """Return dictionary representation of type."""
         try:
             return {
-                'authority': 'dlkit.mit.edu',
+                'authority': 'DLKIT.MIT.EDU',
                 'namespace': 'NoneType',
                 'identifier': name,
                 'domain': 'Generic Types',
@@ -52,7 +52,7 @@ class Genus(object):
         """Return dictionary representation of type."""
         try:
             return {
-                'authority': 'dlkit.mit.edu',
+                'authority': 'DLKIT.MIT.EDU',
                 'namespace': 'GenusType',
                 'identifier': name,
                 'domain': 'Generic Types',
@@ -106,7 +106,7 @@ class Relationship(object):
         """Return dictionary representation of type."""
         try:
             return {
-                'authority': 'dlkit',
+                'authority': 'DLKIT',
                 'namespace': 'relationship.Relationship',
                 'identifier': name.lower(),
                 'domain': 'Generic Types',
