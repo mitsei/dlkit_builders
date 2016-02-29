@@ -32,6 +32,8 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
         import_str = self.module_header('')
         self._initialize_directories()
 
+        mdata_definitions = []
+
         ##
         # The real work starts here.  Iterate through all interfaces to build
         # all the model classes for this osid package.
@@ -46,8 +48,6 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                     interface['shortname'] == 'OsidObject' or
                     interface['category'] == 'markers' or
                     interface['shortname'] == self.patterns['package_catalog_caps']):
-                imports = []
-
                 impl_class = self._impl_class(interface)
 
                 ##
@@ -59,14 +59,16 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                     mdata_maps = getattr(impl_class, 'mdata')
                 ##
                 # Assemble complete mdata string to be saved as mdata.py
-                mdata = '\n{1}\n'.format(mdata_maps)
+                mdata = '\n{0}\n'.format(mdata_maps)
 
                 ##
                 # Finally, save the mdata to the appropriate mdata_conf.py file.
                 if mdata.strip() != '':
-                    with open(self._abc_module('mdata_conf'), 'wb') as write_file:
-                        write_file.write((import_str + '\n'.join(imports) + '\n\n' +
-                                         mdata).encode('utf-8'))
+                    mdata_definitions.append(mdata)
+
+        with open(self._abc_module('mdata_conf'), 'wb') as write_file:
+            write_file.write((import_str + '\n\n' +
+                             '\n'.join(mdata_definitions)).encode('utf-8'))
 
     def _make_mdata_maps(self, interface):
         from builders.mongoosid_templates import options
@@ -173,9 +175,9 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
             mdata = construct_data(options.OBJECT_MDATA, ctxt)
 
         if mdata is not None:
-            return '{0}_{1} = {{2}\n}\n'.format(camel_to_caps_under(interface_name),
-                                                data_name.upper(),
-                                                mdata)
+            return '{0}_{1} = {{{2}\n}}\n'.format(camel_to_caps_under(interface_name),
+                                                  data_name.upper(),
+                                                  mdata)
         else:
             return ''
 
@@ -184,9 +186,9 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
 
     def module_header(self, module):
         return ('\"\"\"Mongo osid metadata configurations for ' + self.package['name'] + ' service.\"\"\"\n\n' +
-                '\"\"\"\nfrom .. import types\n' +
+                'from .. import types\n' +
                 'from ..primitives import Type\n' +
                 'DEFAULT_LANGUAGE_TYPE = Type(**types.Language().get_type_data("DEFAULT"))\n' +
                 'DEFAULT_SCRIPT_TYPE = Type(**types.Script().get_type_data("DEFAULT"))\n' +
                 'DEFAULT_FORMAT_TYPE = Type(**types.Format().get_type_data("DEFAULT"))\n' +
-                'DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data("DEFAULT"))\"\"\"\n')
+                'DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data("DEFAULT"))\n')

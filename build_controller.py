@@ -92,7 +92,6 @@ class Utilities(object):
             else:
                 new_paragraph = True
 
-
             if new_line[:].strip() != '':
                 result.append(new_line)
             else:
@@ -160,9 +159,9 @@ class BaseBuilder(Utilities):
             package_name = self.package['name']
 
         if abc:
-            return self._abc_prefix + '_'.join(package_name.split('.')) + self._abc_suffix
+            return self._abc_prefix + self.replace(package_name) + self._abc_suffix
         else:
-            return self._pkg_prefix + '_'.join(package_name.split('.')) + self._pkg_suffix
+            return self._pkg_prefix + self.replace(package_name) + self._pkg_suffix
 
     def _app_name(self, abstract=False, package_name=None):
         if package_name is None:
@@ -579,7 +578,8 @@ class BaseBuilder(Utilities):
                 module_name = module
 
             if modules[module]['body'].strip() != '':
-                with open(self._abc_module(module_name), 'wb') as write_file:
+                mode = 'wb'
+                with open(self._abc_module(module_name), mode) as write_file:
                     self._write_module_string(write_file,
                                               modules[module])
 
@@ -591,8 +591,11 @@ class PatternBuilder(XOsidMapper, BaseBuilder):
     def _make_impl_pattern_map(self, file_name=None, package=None, **kwargs):
         if package is None:
             package = self.map_xosid(file_name)
+
         self._make_dir(self.pattern_maps)
+
         pattern_index = OrderedDict()
+
         if package is not None:
             pattern_index = map_patterns(package, pattern_index, **kwargs)
             with open(self._package_pattern_file(package=package), 'w') as write_file:
@@ -625,7 +628,7 @@ class PatternBuilder(XOsidMapper, BaseBuilder):
                                             base_package=base_package)
             else:
                 print 'Could not find pattern map' + \
-                      self.replace(package['name']) + \
+                      self.first(package['name']) + \
                       'required for processing package' + \
                       package['name']
 
@@ -686,9 +689,9 @@ class Templates(Utilities):
     def _package_templates(self, package):
         local_template_dir = remove_abs_path(self._template_dir)
         if isinstance(package, dict) and 'name' in package:
-            return '.'.join(local_template_dir.split('/')) + '.' + self.replace(package['name'])
+            return '.'.join(local_template_dir.split('/')) + '.' + self.first(package['name'])
         else:
-            return '.'.join(local_template_dir.split('/')) + '.' + self.replace(package)
+            return '.'.join(local_template_dir.split('/')) + '.' + self.first(package)
 
     def _template(self, directory):
         return self._template_dir + '/' + directory

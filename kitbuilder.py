@@ -1,3 +1,5 @@
+import json
+
 from build_controller import BaseBuilder
 from binder_helpers import SkipMethod
 from interface_builders import InterfaceBuilder
@@ -83,6 +85,10 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                                                   method['name'])
         return method_sig
 
+    def _get_sub_package_methods(self):
+        # check the packages directory for related sub-packages
+        return []
+
     def _get_template_name(self, pattern, interface_name, method_name):
         template_name = self.last(pattern) + '_template'
         if interface_name.endswith('ProxyManager'):
@@ -93,6 +99,13 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
             elif self.patterns[method_name[4:].split('_for_')[0] + '.is_catalog_session']:
                 template_name = self.last(pattern) + '_catalogtemplate'
         return template_name
+
+    def _package_to_be_implemented(self):
+        # don't build sub-packages separately...make them as part of the
+        # main, base package
+        if len(self.package['name'].split('.')) > 1:
+            return False
+        return True
 
     def _patterns(self):
         patterns = self._load_patterns_file()
@@ -198,6 +211,8 @@ DISABLED = -1"""
         if additional_methods:
             methods += '\n' + additional_methods
 
+        methods += self._get_sub_package_methods()
+
         body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
                                                  self._wrap(self.class_doc(interface)),
                                                  self._wrap(init_methods),
@@ -234,6 +249,6 @@ DISABLED = -1"""
 
             if modules[module]['body'].strip() != '':
                 with open('{0}/{1}.py'.format(self._app_name(),
-                                              self.replace(self.package['name'])), 'w') as write_file:
+                                              self.first(self.package['name'])), 'w') as write_file:
                     self._write_module_string(write_file,
                                               modules[module])

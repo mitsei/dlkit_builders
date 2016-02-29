@@ -91,7 +91,7 @@ class ResourceManager:
             raise IllegalState('Manager has already been initialized')
         self._runtime = runtime
         config = runtime.get_configuration()
-        parameter_id = Id('parameter:${pkg_name}ProviderImpl@dlkit_service')
+        parameter_id = Id('parameter:${pkg_name_replaced}ProviderImpl@dlkit_service')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         if self._proxy is None:
             # need to add version argument

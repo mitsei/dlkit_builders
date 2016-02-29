@@ -41,8 +41,7 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
         if method_impl == '{}pass'.format(self._dind):
             method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
                                                                                method_sig)
-        else:
-            method_sig = ''
+
         return method_sig
 
     def _update_module_imports(self, modules, interface):
@@ -59,6 +58,9 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
         self._append_pattern_imports(imports, interface)
         self._append_templated_imports(imports, interface)
 
+    def _wrap(self, text):
+        return text
+
     def _write_module_string(self, write_file, module):
         write_file.write('{0}\n\n\n{1}'.format('\n'.join(module['imports']),
                                                module['body']).encode('utf-8'))
@@ -70,7 +72,7 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
         return '{0}\"\"\"Tests for {1}\"\"\"'.format(self._ind,
                                                      interface['shortname'])
 
-    def class_sign(self, interface, inheritance):
+    def class_sig(self, interface, inheritance):
         return 'class Test{}{}:'.format(interface['shortname'],
                                         inheritance)
 
@@ -80,3 +82,18 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
     def module_header(self, module):
         return '\"\"\"Unit tests of {0} {1}.\"\"\"\n'.format(self.package['name'],
                                                              module)
+
+    def write_modules(self, modules):
+        # Finally, iterate through the completed package module structure and
+        # write out both the import statements and class definitions to the
+        # appropriate module for this package.
+        for module in modules:
+            if module == 'records' and self.package['name'] != 'osid':
+                module_name = 'record_templates'
+            else:
+                module_name = module
+
+            if modules[module]['body'].strip() != '':
+                with open(self._abc_module(module_name, test=True), 'wb') as write_file:
+                    self._write_module_string(write_file,
+                                              modules[module])

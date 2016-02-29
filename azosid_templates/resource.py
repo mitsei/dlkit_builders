@@ -46,7 +46,7 @@ class ResourceManager:
     def initialize(self, runtime):
         osid_managers.OsidManager.initialize(self, runtime)
         config = self._my_runtime.get_configuration()
-        parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
+        parameter_id = Id('parameter:${pkg_name_replaced}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl)
         # need to add version argument
@@ -119,7 +119,7 @@ class ResourceProxyManager:
     def initialize(self, runtime):
         osid_managers.OsidProxyManager.initialize(self, runtime)
         config = self._my_runtime.get_configuration()
-        parameter_id = Id('parameter:${pkg_name}ProviderImpl@authz_adapter')
+        parameter_id = Id('parameter:${pkg_name_replaced}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl)
         # need to add version argument

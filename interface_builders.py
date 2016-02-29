@@ -255,8 +255,10 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 'implpkg_name': self._abc_pkg_name(abc=False),
                 'kitpkg_name': self._abc_pkg_name(abc=False),
                 'pkg_name': self.package['name'],
-                'pkg_name_caps': self.replace(self.package['name'].title(), desired=''),
-                'pkg_name_upper': self.replace(self.package['name']).upper(),
+                'pkg_name_caps': self.first(self.package['name']).title(),
+                'pkg_name_replaced': self.replace(self.package['name']),
+                'pkg_name_replaced_upper': self.replace(self.package['name']).upper(),
+                'pkg_name_upper': self.first(self.package['name']).upper(),
                 'interface_name': interface_name,
                 'proxy_interface_name': proxy_manager_name(interface_name),
                 'interface_name_title': interface_name.title(),
@@ -341,6 +343,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
     def _make_osid(self, file_name):
         # This function expects a file containing a json representation of an
         # osid package that was prepared by the mapper.
+        # for sub-packages, append them to a base package file...
         with open(file_name, 'r') as read_file:
             self.package = json.load(read_file)
 
