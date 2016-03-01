@@ -34,13 +34,13 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
 
     def _copy_package_helpers(self):
         if not self._is('abc'):
-            package_helper_dir = self._template(self.package['name'] + '_helpers')
+            package_helper_dir = self._template(self.replace(self.package['name']) + '_helpers')
             for helper_file in glob.glob(package_helper_dir + '/*.py'):
                 if self._is('services'):
                     shutil.copy(helper_file, self._root_dir)
                 else:
                     package_dir = '{0}/{1}/'.format(self._root_dir,
-                                                    self.package['name'])
+                                                    self.replace(self.package['name']))
                     self._make_dir(package_dir)
                     shutil.copy(helper_file, package_dir)
 

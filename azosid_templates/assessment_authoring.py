@@ -23,6 +23,14 @@ class AssessmentPartLookupSession:
         else:
             return self._provider_session.can_lookup_assessment_parts()"""
 
+    use_unsequestered_assessment_part_view = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentPartLookupSession.use_unsequestered_assessment_part_view
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.use_unsequestered_assessment_part_view()"""
+
 
 class AssessmentPartAdminSession:
     get_assessment_part_form_for_create_for_assessment = """

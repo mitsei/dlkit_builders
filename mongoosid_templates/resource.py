@@ -165,7 +165,7 @@ class ResourceLookupSession:
             catalog_id,
             proxy,
             runtime,
-            db_name='${pkg_name}',
+            db_name='${pkg_name_replaced}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._kwargs = kwargs"""
@@ -209,11 +209,11 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resource
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find_one(
-            dict({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name}').get_identifier())},
+            dict({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name_replace}').get_identifier())},
                  **self._view_filter()))
         return objects.${return_type}(result, runtime=self._runtime)"""
 
@@ -221,12 +221,12 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_ids
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         object_id_list = []
         for i in ${arg0_name}:
-            object_id_list.append(ObjectId(self._get_id(i, '${package_name}').get_identifier()))
+            object_id_list.append(ObjectId(self._get_id(i, '${package_name_replace}').get_identifier()))
         result = collection.find(
             dict({'_id': {'$$in': object_id_list}},
                  **self._view_filter()))
@@ -243,7 +243,7 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(
@@ -266,7 +266,7 @@ class ResourceLookupSession:
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(self._view_filter()).sort('_id', DESCENDING)
@@ -294,7 +294,7 @@ class ResourceQuerySession:
             catalog_id,
             proxy,
             runtime,
-            db_name='${pkg_name}',
+            db_name='${pkg_name_replaced}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._kwargs = kwargs"""
@@ -334,7 +334,7 @@ class ResourceQuerySession:
             and_list.append(view_filter)
         if and_list:
             query_terms = {'$$and': and_list}
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(query_terms).sort('_id', DESCENDING)
@@ -365,7 +365,7 @@ class ResourceSearchSession:
             catalog_id,
             proxy,
             runtime,
-            db_name='${pkg_name}',
+            db_name='${pkg_name_replaced}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._kwargs = kwargs"""
@@ -395,7 +395,7 @@ class ResourceSearchSession:
             and_list.append(view_filter)
         if and_list:
             query_terms = {'$$and': and_list}
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if ${arg1_name}.start is not None and ${arg1_name}.end is not None:
@@ -432,7 +432,7 @@ class ResourceAdminSession:
             catalog_id,
             proxy,
             runtime,
-            db_name='${pkg_name}',
+            db_name='${pkg_name_replaced}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._forms = dict()
@@ -483,7 +483,7 @@ class ResourceAdminSession:
     create_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.create_resource_template
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -513,12 +513,12 @@ class ResourceAdminSession:
     get_resource_form_for_update_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        if ${arg0_name}.get_identifier_namespace() != '${package_name}.${object_name}':
+        if ${arg0_name}.get_identifier_namespace() != '${package_name_replace}.${object_name}':
             if ${arg0_name}.get_authority() != self._authority:
                 raise errors.InvalidArgument()
             else:
@@ -551,10 +551,10 @@ class ResourceAdminSession:
 
     @utilities.arguments_not_none
     def duplicate_${object_name_under}(self, ${object_name_under}_id):
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        mgr = self._get_provider_manager('${package_name_upper}')
+        mgr = self._get_provider_manager('${package_name_replace_upper}')
         lookup_session = mgr.get_${object_name_under}_lookup_session()
         lookup_session.use_federated_${cat_name_under}_view()
         try:
@@ -580,7 +580,7 @@ class ResourceAdminSession:
     update_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.update_resource_template
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -610,7 +610,7 @@ class ResourceAdminSession:
     delete_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceAdminSession.delete_resource_template
-        collection = MongoClientValidated('${package_name}',
+        collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
@@ -656,7 +656,7 @@ class ResourceNotificationSession:
             catalog_id,
             proxy,
             runtime,
-            db_name='${pkg_name}',
+            db_name='${pkg_name_replaced}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
 
@@ -671,7 +671,7 @@ class ResourceNotificationSession:
             db_prefix = runtime.get_configuration().get_value_by_parameter(db_prefix_param_id).get_string_value()
         except (AttributeError, KeyError, errors.NotFound):
             pass
-        self._ns='{0}${pkg_name}.${object_name}'.format(db_prefix)
+        self._ns='{0}${pkg_name_replaced}.${object_name}'.format(db_prefix)
 
         if self._ns not in MONGO_LISTENER.receivers:
             MONGO_LISTENER.receivers[self._ns] = dict()
@@ -770,7 +770,7 @@ class ResourceBinSession:
     get_resources_by_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceBinSession.get_resources_by_bin
-        mgr = self._get_provider_manager('${package_name_upper}')
+        mgr = self._get_provider_manager('${package_name_replace_upper}')
         lookup_session = mgr.get_${object_name_under}_lookup_session_for_${cat_name_under}(${arg0_name})
         lookup_session.use_isolated_${cat_name_under}_view()
         return lookup_session.get_${object_name_plural_under}()"""
@@ -795,7 +795,7 @@ class ResourceBinSession:
     get_bin_ids_by_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceBinSession.get_bin_ids_by_resource
-        mgr = self._get_provider_manager('${package_name_upper}', local=True)
+        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${object_name_under}_lookup_session()
         lookup_session.use_federated_${cat_name_under}_view()
         ${object_name_under} = lookup_session.get_${object_name_under}(${arg0_name})
@@ -807,7 +807,7 @@ class ResourceBinSession:
     get_bins_by_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceBinSession.get_bins_by_resource
-        mgr = self._get_provider_manager('${package_name_upper}')
+        mgr = self._get_provider_manager('${package_name_replace_upper}')
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         return lookup_session.get_${cat_name_plural_under}_by_ids(
             self.get_${cat_name_under}_ids_by_${object_name_under}(${arg0_name}))"""
@@ -847,7 +847,7 @@ class ResourceBinAssignmentSession:
         # Implemented from template for
         # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids
         # This will likely be overridden by an authorization adapter
-        mgr = self._get_provider_manager('${package_name_upper}', local=True)
+        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         ${object_name_plural_under} = lookup_session.get_${cat_name_plural_under}()
         id_list = []
@@ -864,7 +864,7 @@ class ResourceBinAssignmentSession:
     assign_resource_to_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
-        mgr = self._get_provider_manager('${package_name_upper}', local=True)
+        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
         self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
@@ -872,7 +872,7 @@ class ResourceBinAssignmentSession:
     unassign_resource_from_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceBinAssignmentSession.unassign_resource_from_bin
-        mgr = self._get_provider_manager('${package_name_upper}', local=True)
+        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session()
         cat = lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
         self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
@@ -1542,7 +1542,7 @@ class ResourceQuery:
 
     init_template = """
     def __init__(self, runtime):
-        self._namespace = '${pkg_name}.${object_name}'
+        self._namespace = '${pkg_name_replaced}.${object_name}'
         self._runtime = runtime
         record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
         self._all_supported_record_type_data_sets = record_type_data_sets

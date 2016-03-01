@@ -89,6 +89,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             context['package_name_caps'] = self.replace(self.package['name'].title(), desired='')
             context['package_name_upper'] = self.package['name'].upper()
             context['package_name_replace'] = self.replace(self.package['name'])
+            context['package_name_replace_upper'] = self.replace(self.package['name']).upper()
 
             if method['args']:
                 context['args_kwargs_or_nothing'] = '*args, **kwargs'

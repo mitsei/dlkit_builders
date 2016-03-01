@@ -46,6 +46,20 @@ ASSESSMENT_PART_ALLOCATED_TIME = {
     'date_time_set': [],
 }
 
+ASSESSMENT_PART_WEIGHT = {
+    'element_label': 'assessment part weight',
+    'instructions': 'enter an integer value.',
+    'required': False,
+    'read_only': False,
+    'linked': False,
+    'array': False,
+    'default_integer_values': [None],
+    'syntax': 'INTEGER',
+    'minimum_integer': 0,
+    'maximum_integer': 100,
+    'integer_set': [],
+}
+
 
 
 

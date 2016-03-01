@@ -206,7 +206,7 @@ class CompositionLookupSession:
             catalog_id,
             proxy,
             runtime,
-            db_name='${pkg_name}',
+            db_name='${pkg_name_replaced}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._kwargs = kwargs
@@ -221,7 +221,8 @@ class CompositionLookupSession:
         view_filter = OsidSession._view_filter(self)
         if self._sequestered_view == SEQUESTERED:
             view_filter['sequestered'] = False
-        return view_filter"""
+        return view_filter
+"""
 
     use_active_composition_view = """
         self._status_view = ACTIVE"""
@@ -229,10 +230,14 @@ class CompositionLookupSession:
     use_any_status_composition_view = """
         self._status_view = ANY_STATUS"""
 
-    use_sequestered_composition_view = """
+    use_sequestered_composition_view_template = """
+        # Implemented from template for
+        # osid.repository.CompositionLookupSession.use_sequestered_composition_view_template
         self._sequestered_view = SEQUESTERED"""
 
-    use_unsequestered_composition_view = """
+    use_unsequestered_composition_view_template = """
+        # Implemented from template for
+        # osid.repository.CompositionLookupSession.use_unsequestered_composition_view_template
         self._sequestered_view = UNSEQUESTERED"""
 
 

@@ -73,7 +73,6 @@ def map_session_patterns(interface, package, index):
         
         index['impl_log']['sessions'][interface['shortname']][method['name']] = ['mapped', 'unimplemented']
 
-
         ##################################################################
         ## Inspect this package's CatalogLookupSession methods.         ##
         ##################################################################
@@ -1261,8 +1260,8 @@ def map_session_patterns(interface, package, index):
 
         ##################################################################
         ## Inspect this package's ObjectLookupSession methods.  This    ##
-        ## and many of the following fuctions will also find common     ##
-        ## patterns that also occur in Catalog, Relationahsip and other ##
+        ## and many of the following functions will also find common     ##
+        ## patterns that also occur in Catalog, Relationship and other ##
         ## session's methods                                            ##
         ##################################################################
 
@@ -1439,7 +1438,35 @@ def map_session_patterns(interface, package, index):
                               arg0_type_full = method['args'][0]['arg_type'],
                               arg0_object = index['package_objects_under_to_caps'][remove_plural(method['name'].split('_for_')[1])]))
 
+        ##
+        # ObjectLookupSession methods that configure sequestered state
+        elif (interface['shortname'].endswith('LookupSession') and
+              method['name'].startswith('use_') and
+              method['name'].endswith('_view') and
+              '_sequestered_' in method['name']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.CompositionLookupSession.use_sequestered_composition_view',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              object_name = interface['shortname'][:-13],
+                              cat_name = index['package_catalog_caps']))
 
+        ##
+        # ObjectLookupSession methods that configure unsequestered state
+        elif (interface['shortname'].endswith('LookupSession') and
+              method['name'].startswith('use_') and
+              method['name'].endswith('_view') and
+              '_unsequestered_' in method['name']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.CompositionLookupSession.use_unsequestered_composition_view',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              object_name = interface['shortname'][:-13],
+                              cat_name = index['package_catalog_caps']))
 
         ##################################################################
         ## Inspect this package's ObjectQuerySession methods.           ##
@@ -1653,11 +1680,11 @@ def map_session_patterns(interface, package, index):
         # id of one other package object is included as the first parameter.
         elif (interface['shortname'].endswith('AdminSession') and
             method['name'].startswith('get_') and
-            method['name'].endswith('_form_for_create') and
+            '_form_for_create' in method['name'] and  # this allows for the AssessmentPart forms
             len(method['args']) == 2 and 
             method['args'][0]['arg_type'] == 'osid.id.Id' and
             method['args'][0]['var_name'].split('_')[0] in index['package_objects_under']):
-            object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
+            object_name = index['package_objects_under_to_caps'][method['name'][4:method['name'].index('_form_')]]
             #print 'ActivityAdminSession.get_activity_form_for_create', [method['args'][0]['var_name'][:-3]]
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'learning.ActivityAdminSession.get_activity_form_for_create',
@@ -1813,10 +1840,10 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that create objects.
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('create_') and
-            method['name'][7:] == camel_to_under((method['return_type']).split('.')[-1]) and
-            len(method['args']) > 0):
+              interface['shortname'][:-12] != index['package_catalog_caps'] and
+              method['name'].startswith('create_') and
+              camel_to_under((method['return_type']).split('.')[-1]) in method['name'][7:] and
+              len(method['args']) > 0):
             
             # This is to deal with an error in the OSID RC3 build:
             if method['name'] == 'create_assessment_offered':
@@ -1846,7 +1873,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('AdminSession') and
             interface['shortname'][:-12] != index['package_catalog_caps'] and
             method['name'].startswith('get_') and
-            method['name'].endswith('_form_for_update') and
+            '_form_for_update' in method['name'] and
             len(method['args']) == 1 and 
             method['args'][0]['arg_type'] == 'osid.id.Id' and
             method['name'][4:-16] != camel_to_under(interface['shortname'][:-12]) and
@@ -1923,7 +1950,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('AdminSession') and
             interface['shortname'][:-12] != index['package_catalog_caps'] and
             method['name'].startswith('update_') and
-            camel_to_under((method['arg_types'][0]).split('.')[-1]) == 
+            camel_to_under((method['arg_types'][0]).split('.')[-1]) ==
                         method['name'][7:] + '_form'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceAdminSession.update_resource',
@@ -1936,6 +1963,24 @@ def map_session_patterns(interface, package, index):
                               return_type_full = method['args'][0]['arg_type'][:-4],
                               arg0_name = method['args'][0]['var_name'],
                               arg0_type_full = method['args'][0]['arg_type']))
+        ##
+        # Exception for AssessmentPartAdminSession (ticket# 314)
+        elif (interface['shortname'].endswith('AdminSession') and
+            interface['shortname'][:-12] != index['package_catalog_caps'] and
+            method['name'].startswith('update_') and
+            camel_to_under((method['arg_types'][1]).split('.')[-1]) ==
+                        method['name'][7:] + '_form'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceAdminSession.update_resource',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              object_name = interface['shortname'][:-12],
+                              cat_name = index['package_catalog_caps'],
+                              return_type_full = method['args'][1]['arg_type'][:-4],
+                              arg0_name = method['args'][1]['var_name'],
+                              arg0_type_full = method['args'][1]['arg_type']))
 
         ##
         # ObjectAdminSession methods that delete objects that are dependencies for 
