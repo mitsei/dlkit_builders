@@ -675,4 +675,3 @@ class Response:
     
     get_response_record = """
         pass"""
-

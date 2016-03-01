@@ -630,7 +630,10 @@ class BinLookupSession:
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bin
-        return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}), self._proxy)"""
+        return ${cat_name}(self._provider_manager,
+                           self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}),
+                           self._proxy,
+                           runtime=self._runtime)"""
 
     get_bins_by_ids_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
@@ -705,7 +708,10 @@ class BinAdminSession:
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.create_bin
-        return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}), self._proxy)"""
+        return ${cat_name}(self._provider_manager,
+                           self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}),
+                           self._proxy,
+                           runtime=self._runtime)"""
 
     get_bin_form_for_update_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
@@ -728,7 +734,10 @@ class BinAdminSession:
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.update_bin
         # OSID spec does not require returning updated catalog
-        return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}), self._proxy)
+        return ${cat_name}(self._provider_manager,
+                           self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}),
+                           self._proxy,
+                           runtime=self._runtime)
 
     def save_${cat_name_under}(self, ${cat_name_under}_form, *args, **kwargs):
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
@@ -979,6 +988,10 @@ class Bin:
         self._session_management = AUTOMATIC
         self._${cat_name_under}_view = DEFAULT
         self._object_views = dict()
+
+        # for the sub-package impls
+        if 'runtime' in kwargs:
+            self._runtime = kwargs['runtime']
 
     def _set_${cat_name_under}_view(self, session):
         \"\"\"Sets the underlying ${cat_name_under} view to match current view\"\"\"

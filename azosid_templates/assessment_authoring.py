@@ -5,7 +5,7 @@ class AssessmentPartLookupSession:
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_lookup_session').get_assessment_part(*args, **kwargs)"""
+            return self._provider_session.get_assessment_part(assessment_part_id)"""
 
     get_assessment_parts = """
         # Implemented from azosid template for -
@@ -13,7 +13,7 @@ class AssessmentPartLookupSession:
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_lookup_session').get_assessment_parts(*args, **kwargs)"""
+            return self._provider_session.get_assessment_parts()"""
 
     can_lookup_assessment_parts = """
         # Implemented from azosid template for -
@@ -21,7 +21,7 @@ class AssessmentPartLookupSession:
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_lookup_session').can_lookup_assessment_parts(*args, **kwargs)"""
+            return self._provider_session.can_lookup_assessment_parts()"""
 
 
 class AssessmentPartAdminSession:
@@ -31,7 +31,8 @@ class AssessmentPartAdminSession:
         if not self._can('create'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment(*args, **kwargs)"""
+            return self._provider_session.get_assessment_part_form_for_create_for_assessment(assessment_id,
+                                                                                             assessment_part_record_types)"""
 
     get_assessment_part_form_for_create_for_assessment_part = """
         # Implemented from azosid template for -
@@ -39,7 +40,8 @@ class AssessmentPartAdminSession:
         if not self._can('create'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment_part(*args, **kwargs)"""
+            return self._provider_session.get_assessment_part_form_for_create_for_assessment_part(assessment_part_id,
+                                                                                                  assessment_part_record_types)"""
 
     get_assessment_part_form_for_update = """
         # Implemented from azosid template for -
@@ -47,7 +49,7 @@ class AssessmentPartAdminSession:
         if not self._can('update'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').get_assessment_part_form_for_update(*args, **kwargs)"""
+            return self._provider_session.get_assessment_part_form_for_update(assessment_part_id)"""
 
     create_assessment_part_for_assessment = """
         # Implemented from azosid template for -
@@ -55,7 +57,7 @@ class AssessmentPartAdminSession:
         if not self._can('create'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').create_assessment_part_for_assessment(*args, **kwargs)"""
+            return self._provider_session.create_assessment_part_for_assessment(assessment_part_form)"""
 
     create_assessment_part_for_assessment_part = """
         # Implemented from azosid template for -
@@ -63,7 +65,7 @@ class AssessmentPartAdminSession:
         if not self._can('create'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').create_assessment_part_for_assessment_part(*args, **kwargs)"""
+            return self._provider_session.create_assessment_part_for_assessment_part(assessment_part_form)"""
 
     update_assessment_part = """
         # Implemented from azosid template for -
@@ -71,7 +73,7 @@ class AssessmentPartAdminSession:
         if not self._can('update'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').update_assessment_part(*args, **kwargs)"""
+            return self._provider_session.update_assessment_part(assessment_part_form)"""
 
     delete_assessment_part = """
         # Implemented from azosid template for -
@@ -79,7 +81,7 @@ class AssessmentPartAdminSession:
         if not self._can('delete'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').delete_assessment_part(*args, **kwargs)"""
+            return self._provider_session.delete_assessment_part(assessment_part_id)"""
 
     can_create_assessment_parts = """
         # Implemented from azosid template for -
@@ -87,7 +89,7 @@ class AssessmentPartAdminSession:
         if not self._can('create'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').can_create_assessment_parts(*args, **kwargs)"""
+            return self._provider_session.can_create_assessment_parts()"""
 
     can_delete_assessment_parts = """
         # Implemented from azosid template for -
@@ -95,7 +97,7 @@ class AssessmentPartAdminSession:
         if not self._can('delete'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').can_delete_assessment_parts(*args, **kwargs)"""
+            return self._provider_session.can_delete_assessment_parts()"""
 
     can_update_assessment_parts = """
         # Implemented from azosid template for -
@@ -103,7 +105,7 @@ class AssessmentPartAdminSession:
         if not self._can('update'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('assessment_part_admin_session').can_update_assessment_parts(*args, **kwargs)"""
+            return self._provider_session.can_update_assessment_parts()"""
 
 
 class SequenceRuleAdminSession:
@@ -113,7 +115,7 @@ class SequenceRuleAdminSession:
         if not self._can('create'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_admin_session').can_create_sequence_rule(*args, **kwargs)"""
+            return self._provider_session.can_create_sequence_rule()"""
 
     can_delete_sequence_rules = """
         # Implemented from azosid template for -
@@ -121,7 +123,7 @@ class SequenceRuleAdminSession:
         if not self._can('delete'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_admin_session').can_delete_sequence_rules(*args, **kwargs)"""
+            return self._provider_session.can_delete_sequence_rules()"""
 
     can_update_sequence_rules = """
         # Implemented from azosid template for -
@@ -129,7 +131,7 @@ class SequenceRuleAdminSession:
         if not self._can('update'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_admin_session').can_update_sequence_rules(*args, **kwargs)"""
+            return self._provider_session.can_update_sequence_rules()"""
 
     create_sequence_rule = """
         # Implemented from azosid template for -
@@ -137,7 +139,7 @@ class SequenceRuleAdminSession:
         if not self._can('create'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_admin_session').create_sequence_rule(*args, **kwargs)"""
+            return self._provider_session.create_sequence_rule(sequence_rule_form)"""
 
     delete_sequence_rule = """
         # Implemented from azosid template for -
@@ -145,7 +147,7 @@ class SequenceRuleAdminSession:
         if not self._can('delete'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_admin_session').delete_sequence_rule(*args, **kwargs)"""
+            return self._provider_session.delete_sequence_rule(sequence_rule_id)"""
 
     get_sequence_rule_form_for_create = """
         # Implemented from azosid template for -
@@ -153,7 +155,9 @@ class SequenceRuleAdminSession:
         if not self._can('create'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_admin_session').get_sequence_rule_form_for_create(*args, **kwargs)"""
+            return self._provider_session.get_sequence_rule_form_for_create(assessment_part_id,
+                                                                            next_assessment_part_id,
+                                                                            sequence_rule_record_types)"""
 
     get_sequence_rule_form_for_update = """
         # Implemented from azosid template for -
@@ -161,7 +165,7 @@ class SequenceRuleAdminSession:
         if not self._can('update'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_admin_session').get_sequence_rule_form_for_update(*args, **kwargs)"""
+            return self._provider_session.get_sequence_rule_form_for_update(sequence_rule_id)"""
 
 
 class SequenceRuleLookupSession:
@@ -171,7 +175,7 @@ class SequenceRuleLookupSession:
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_lookup_session').can_lookup_sequence_rules(*args, **kwargs)"""
+            return self._provider_session.can_lookup_sequence_rules()"""
 
     get_sequence_rule = """
         # Implemented from azosid template for -
@@ -179,7 +183,7 @@ class SequenceRuleLookupSession:
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_lookup_session').get_sequence_rule(*args, **kwargs)"""
+            return self._provider_session.get_sequence_rule(sequence_rule_id)"""
 
     get_sequence_rules = """
         # Implemented from azosid template for -
@@ -187,6 +191,6 @@ class SequenceRuleLookupSession:
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._get_provider_session('sequence_rule_lookup_session').get_sequence_rules(*args, **kwargs)"""
+            return self._provider_session.get_sequence_rules()"""
 
 

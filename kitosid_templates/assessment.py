@@ -229,100 +229,227 @@ class AssessmentTakenLookupSession:
 class AssessmentPartLookupSession:
     get_assessment_part = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_lookup_session').get_assessment_part(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_part(*args, **kwargs)"""
 
     get_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_lookup_session').get_assessment_parts(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts()"""
 
     can_lookup_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_lookup_session').can_lookup_assessment_parts()"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').can_lookup_assessment_parts()"""
 
 
 class AssessmentPartAdminSession:
     get_assessment_part_form_for_create_for_assessment = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment(*args, **kwargs)"""
 
     get_assessment_part_form_for_create_for_assessment_part = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment_part(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment_part(*args, **kwargs)"""
 
     get_assessment_part_form_for_update = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').get_assessment_part_form_for_update(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').get_assessment_part_form_for_update(*args, **kwargs)"""
 
     create_assessment_part_for_assessment = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').create_assessment_part_for_assessment(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').create_assessment_part_for_assessment(*args, **kwargs)"""
 
     create_assessment_part_for_assessment_part = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').create_assessment_part_for_assessment_part(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').create_assessment_part_for_assessment_part(*args, **kwargs)"""
 
     update_assessment_part = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').update_assessment_part(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').update_assessment_part(*args, **kwargs)"""
 
     delete_assessment_part = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').delete_assessment_part(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').delete_assessment_part(*args, **kwargs)"""
 
     can_create_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').can_create_assessment_parts()"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').can_create_assessment_parts()"""
 
     can_delete_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').can_delete_assessment_parts()"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').can_delete_assessment_parts()"""
 
     can_update_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').can_update_assessment_parts()"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').can_update_assessment_parts()"""
 
 
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').can_create_sequence_rule()"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_admin_session').can_create_sequence_rule()"""
 
     can_delete_sequence_rules = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').can_delete_sequence_rules()"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_admin_session').can_delete_sequence_rules()"""
 
     can_update_sequence_rules = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').can_update_sequence_rules()"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_admin_session').can_update_sequence_rules()"""
 
     create_sequence_rule = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').create_sequence_rule(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_admin_session').create_sequence_rule(*args, **kwargs)"""
 
     delete_sequence_rule = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').delete_sequence_rule(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_admin_session').delete_sequence_rule(*args, **kwargs)"""
 
     get_sequence_rule_form_for_create = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').get_sequence_rule_form_for_create(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_admin_session').get_sequence_rule_form_for_create(*args, **kwargs)"""
 
     get_sequence_rule_form_for_update = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').get_sequence_rule_form_for_update(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_admin_session').get_sequence_rule_form_for_update(*args, **kwargs)"""
 
 
 class SequenceRuleLookupSession:
     can_lookup_sequence_rules = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_lookup_session').can_lookup_sequence_rules()"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_lookup_session').can_lookup_sequence_rules()"""
 
     get_sequence_rule = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_lookup_session').get_sequence_rule(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_lookup_session').get_sequence_rule(*args, **kwargs)"""
 
     get_sequence_rules = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_lookup_session').get_sequence_rules(*args, **kwargs)"""
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_lookup_session').get_sequence_rules()"""
 
+
+class Bank:
+    import_statements = [
+        'from dlkit.primordium.id.primitives import Id'
+    ]
+
+    init = """
+    def __init__(self, provider_manager, catalog, proxy, **kwargs):
+        self._provider_manager = provider_manager
+        self._catalog = catalog
+        osid.OsidObject.__init__(self, self._catalog) # This is to initialize self._object
+        osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
+        self._catalog_id = catalog.get_id()
+        self._provider_sessions = kwargs
+        self._session_management = AUTOMATIC
+        self._bank_view = DEFAULT
+        self._object_views = dict()
+
+        # for the sub-package impls
+        if 'runtime' in kwargs:
+            self._runtime = kwargs['runtime']
+
+    def _set_bank_view(self, session):
+        \"\"\"Sets the underlying bank view to match current view\"\"\"
+        if self._bank_view == FEDERATED:
+            try:
+                session.use_federated_bank_view()
+            except AttributeError:
+                pass
+        else:
+            try:
+                session.use_isolated_bank_view()
+            except AttributeError:
+                pass
+
+
+    def _set_object_view(self, session):
+        \"\"\"Sets the underlying object views to match current view\"\"\"
+        for obj_name in self._object_views:
+            if self._object_views[obj_name] == PLENARY:
+                try:
+                    getattr(session, 'use_plenary_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+            else:
+                try:
+                    getattr(session, 'use_comparative_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+
+
+    def _get_provider_session(self, session_name):
+        \"\"\"Returns the requested provider session.\"\"\"
+        if session_name in self._provider_sessions:
+            return self._provider_sessions[session_name]
+        else:
+            session_class = getattr(self._provider_manager, 'get_' + session_name + '_for_bank')
+            if self._proxy is None:
+                session = session_class(self._catalog.get_id())
+            else:
+                session = session_class(self._catalog.get_id(), self._proxy)
+            self._set_bank_view(session)
+            self._set_object_view(session)
+            if self._session_management != DISABLED:
+                self._provider_sessions[session_name] = session
+            return session
+
+    def _get_sub_package_provider_manager(self, sub_package):
+        config = self._runtime.get_configuration()
+        parameter_id = Id('parameter:{0}ProviderImpl@dlkit_service'.format(sub_package))
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        if self._proxy is None:
+            # need to add version argument
+            return self._runtime.get_manager(sub_package.upper(), provider_impl)
+        else:
+            # need to add version argument
+            return self._runtime.get_proxy_manager(sub_package.upper(), provider_impl)
+
+    def _get_sub_package_provider_session(self, sub_package, session_name, proxy=None):
+        \"\"\"Gets the session from a sub-package\"\"\"
+        if self._proxy is None:
+            self._proxy = proxy
+        if session_name in self._provider_sessions:
+            return self._provider_sessions[session_name]
+        else:
+            manager = self._get_sub_package_provider_manager(sub_package)
+            session = self._instantiate_session('get_' + session_name,
+                                                proxy=self._proxy,
+                                                manager=manager)
+            self._set_bank_view(session)
+            if self._session_management != DISABLED:
+                self._provider_sessions[session_name] = session
+            return session
+
+    def _instantiate_session(self, method_name, proxy=None, manager=None, *args, **kwargs):
+        \"\"\"Instantiates a provider session\"\"\"
+        if manager is None:
+            manager = self._provider_manager
+
+        session_class = getattr(manager, method_name)
+        if proxy is None:
+            return session_class(*args, **kwargs)
+        else:
+            return session_class(proxy=proxy, *args, **kwargs)"""
 

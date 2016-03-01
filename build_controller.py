@@ -689,9 +689,9 @@ class Templates(Utilities):
     def _package_templates(self, package):
         local_template_dir = remove_abs_path(self._template_dir)
         if isinstance(package, dict) and 'name' in package:
-            return '.'.join(local_template_dir.split('/')) + '.' + self.first(package['name'])
+            return '.'.join(local_template_dir.split('/')) + '.' + self.replace(package['name'])
         else:
-            return '.'.join(local_template_dir.split('/')) + '.' + self.first(package)
+            return '.'.join(local_template_dir.split('/')) + '.' + self.replace(package)
 
     def _template(self, directory):
         return self._template_dir + '/' + directory

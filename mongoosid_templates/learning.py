@@ -233,9 +233,9 @@ class Activity:
 
     get_objective_template = """
         # Implemented from template for osid.learning.Activity.get_objective
-        mgr = self._get_provider_manager('${return_pkg_caps}')
+        mgr = self._get_provider_manager('${return_pkg_replace_caps}')
         if not mgr.supports_${return_type_under}_lookup():
-            raise errors.OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
+            raise errors.OperationFailed('${return_pkg_replace_title} does not support ${return_type} lookup')
         lookup_session = mgr.get_${return_type_under}_lookup_session()
         lookup_session.use_federated_${return_cat_name_under}_view()
         return lookup_session.get_${return_type_under}(self.get_${var_name}_id())"""

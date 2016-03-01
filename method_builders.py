@@ -88,6 +88,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             context['interface_name_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
             context['package_name_caps'] = self.replace(self.package['name'].title(), desired='')
             context['package_name_upper'] = self.package['name'].upper()
+            context['package_name_replace'] = self.replace(self.package['name'])
 
             if method['args']:
                 context['args_kwargs_or_nothing'] = '*args, **kwargs'
@@ -124,6 +125,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                                                                     abc=False)
                 context['return_pkg_title'] = context['return_pkg'].title()
                 context['return_pkg_caps'] = context['return_pkg'].upper()
+                context['return_pkg_replace_caps'] = self.replace(context['return_pkg'].upper())
+                context['return_pkg_replace_title'] = self.replace(context['return_pkg'].title())
             if 'return_cat_name' in context:
                 context['return_cat_name_under'] = camel_to_under(context['return_cat_name'])
             if 'object_name_under' in context:
