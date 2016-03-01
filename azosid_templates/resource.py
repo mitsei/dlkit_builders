@@ -12,7 +12,7 @@ class ResourceProfile:
     def _get_hierarchy_session(self):
         try:
             return self._provider_manager.get_${cat_name_under}_hierarchy_session(
-                Id(authority='${pkg_name_upper}',
+                Id(authority='${pkg_name_replaced_upper}',
                    namespace='CATALOG',
                    identifier='${cat_name_upper}'))
         except Unsupported:
@@ -41,14 +41,14 @@ class ResourceManager:
 
     init_template = """
     def __init__(self):
-        ${pkg_name_caps}Profile.__init__(self)
+        ${pkg_name_replaced_caps}Profile.__init__(self)
 
     def initialize(self, runtime):
         osid_managers.OsidManager.initialize(self, runtime)
         config = self._my_runtime.get_configuration()
         parameter_id = Id('parameter:${pkg_name_replaced}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl)
+        self._provider_manager = runtime.get_manager('${pkg_name_replaced_upper}', provider_impl)
         # need to add version argument
 """    
 
@@ -114,14 +114,14 @@ class ResourceProxyManager:
 
     init_template = """
     def __init__(self):
-        ${pkg_name_caps}Profile.__init__(self, '${interface_name}')
+        ${pkg_name_replaced_caps}Profile.__init__(self, '${interface_name}')
 
     def initialize(self, runtime):
         osid_managers.OsidProxyManager.initialize(self, runtime)
         config = self._my_runtime.get_configuration()
         parameter_id = Id('parameter:${pkg_name_replaced}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        self._provider_manager = runtime.get_proxy_manager('${pkg_name_upper}', provider_impl)
+        self._provider_manager = runtime.get_proxy_manager('${pkg_name_replaced_upper}', provider_impl)
         # need to add version argument
 """
 
@@ -201,7 +201,7 @@ class ResourceLookupSession:
         else:
             self._query_session = None
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
-        self._id_namespace = '${pkg_name}.${object_name}'
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
         self.use_comparative_${object_name_under}_view()
 
@@ -358,7 +358,7 @@ class ResourceQuerySession:
         else:
             self._hierarchy_session = None
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
-        self._id_namespace = '${pkg_name}.${object_name}'
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
@@ -446,7 +446,7 @@ class ResourceAdminSession:
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
-        self._id_namespace = '${pkg_name}.${object_name}'
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
 """
 
     can_create_resources_template = """
@@ -523,7 +523,7 @@ class ResourceNotificationSession:
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
-        self._id_namespace = '${pkg_name}.${object_name}'
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
 """
 
     can_register_for_resource_notifications_template = """
@@ -588,7 +588,7 @@ class ResourceBinSession:
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = Id('authorization.Qualifier%3AROOT%40ODL.MIT.EDU') # This needs to be done right
-        self._id_namespace = '${pkg_name}.${object_name}${cat_name}'
+        self._id_namespace = '${pkg_name_replaced}.${object_name}${cat_name}'
 """
 
     can_lookup_resource_bin_mappings_template = """
@@ -650,7 +650,7 @@ class ResourceBinAssignmentSession:
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         self._qualifier_id = Id('authorization.Qualifier%3AROOT%40ODL.MIT.EDU') # This needs to be done right
-        self._id_namespace = '${pkg_name}.${object_name}${cat_name}'
+        self._id_namespace = '${pkg_name_replaced}.${object_name}${cat_name}'
 """
 
     can_assign_resources_template = """
@@ -661,7 +661,7 @@ class ResourceBinAssignmentSession:
     can_assign_resources_to_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinAssignmentSession.can_assign_resources_to_bin
-        return self._can('${func_name}', qualifier_id=bin_id)"""
+        return self._can('${func_name}', qualifier_id=${arg0_name})"""
 
     get_assignable_bin_ids_template = """
         # Implemented from azosid template for -
@@ -768,8 +768,8 @@ class BinLookupSession:
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         # This needs to be done right
         # Build from authority in config
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
-        self._id_namespace = '${pkg_name}.${cat_name}'
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
+        self._id_namespace = '${pkg_name_replaced}.${cat_name}'
 """
 
     use_comparative_bin_view_template = """
@@ -813,8 +813,8 @@ class BinAdminSession:
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         # This needs to be done right
         # Build from authority in config
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
-        self._id_namespace = '${pkg_name}.${cat_name}'
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
+        self._id_namespace = '${pkg_name_replaced}.${cat_name}'
 """
 
     can_create_bins_template = """
@@ -886,8 +886,8 @@ class BinHierarchySession:
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         # This needs to be done right
         # Build from authority in config
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
-        self._id_namespace = '${pkg_name}.${cat_name}'
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
+        self._id_namespace = '${pkg_name_replaced}.${cat_name}'
 """
 
     can_access_bin_hierarchy_template = """
@@ -1036,8 +1036,9 @@ class BinHierarchyDesignSession:
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         # This needs to be done right
         # Build from authority in config
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
-        self._id_namespace = '${pkg_name}.${cat_name}' # should this be '${pkg_name}.${cat_name}Hierarchy' ?
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
+        self._id_namespace = '${pkg_name_replaced}.${cat_name}'
+        # should this be '${pkg_name}.${cat_name}Hierarchy' ?
 """
 
     can_modify_bin_hierarchy_template = """
@@ -1084,8 +1085,8 @@ class BinQuerySession:
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         # This needs to be done right
         # Build from authority in config
-        self._qualifier_id = Id('${pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
-        self._id_namespace = '${pkg_name}.${cat_name}'
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
+        self._id_namespace = '${pkg_name_replaced}.${cat_name}'
 """
 
     can_search_bins_template = """

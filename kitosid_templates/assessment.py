@@ -237,7 +237,7 @@ class AssessmentPartLookupSession:
 
     can_lookup_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_lookup_session').can_lookup_assessment_parts(*args, **kwargs)"""
+        return self._get_provider_session('assessment_part_lookup_session').can_lookup_assessment_parts()"""
 
 
 class AssessmentPartAdminSession:
@@ -271,29 +271,29 @@ class AssessmentPartAdminSession:
 
     can_create_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').can_create_assessment_parts(*args, **kwargs)"""
+        return self._get_provider_session('assessment_part_admin_session').can_create_assessment_parts()"""
 
     can_delete_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').can_delete_assessment_parts(*args, **kwargs)"""
+        return self._get_provider_session('assessment_part_admin_session').can_delete_assessment_parts()"""
 
     can_update_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('assessment_part_admin_session').can_update_assessment_parts(*args, **kwargs)"""
+        return self._get_provider_session('assessment_part_admin_session').can_update_assessment_parts()"""
 
 
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').can_create_sequence_rule(*args, **kwargs)"""
+        return self._get_provider_session('sequence_rule_admin_session').can_create_sequence_rule()"""
 
     can_delete_sequence_rules = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').can_delete_sequence_rules(*args, **kwargs)"""
+        return self._get_provider_session('sequence_rule_admin_session').can_delete_sequence_rules()"""
 
     can_update_sequence_rules = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_admin_session').can_update_sequence_rules(*args, **kwargs)"""
+        return self._get_provider_session('sequence_rule_admin_session').can_update_sequence_rules()"""
 
     create_sequence_rule = """
         \"\"\"Pass through to provider method\"\"\"
@@ -315,7 +315,7 @@ class SequenceRuleAdminSession:
 class SequenceRuleLookupSession:
     can_lookup_sequence_rules = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('sequence_rule_lookup_session').can_lookup_sequence_rules(*args, **kwargs)"""
+        return self._get_provider_session('sequence_rule_lookup_session').can_lookup_sequence_rules()"""
 
     get_sequence_rule = """
         \"\"\"Pass through to provider method\"\"\"
