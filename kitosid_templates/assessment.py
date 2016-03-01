@@ -224,3 +224,105 @@ class AssessmentTakenLookupSession:
     get_assessments_taken_for_taker_and_assessment_offered = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_provider_session('assessment_taken_lookup_session').get_assessments_taken_for_taker_and_assessment_offered(*args, **kwargs)"""
+
+
+class AssessmentPartLookupSession:
+    get_assessment_part = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_lookup_session').get_assessment_part(*args, **kwargs)"""
+
+    get_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_lookup_session').get_assessment_parts(*args, **kwargs)"""
+
+    can_lookup_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_lookup_session').can_lookup_assessment_parts(*args, **kwargs)"""
+
+
+class AssessmentPartAdminSession:
+    get_assessment_part_form_for_create_for_assessment = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment(*args, **kwargs)"""
+
+    get_assessment_part_form_for_create_for_assessment_part = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment_part(*args, **kwargs)"""
+
+    get_assessment_part_form_for_update = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').get_assessment_part_form_for_update(*args, **kwargs)"""
+
+    create_assessment_part_for_assessment = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').create_assessment_part_for_assessment(*args, **kwargs)"""
+
+    create_assessment_part_for_assessment_part = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').create_assessment_part_for_assessment_part(*args, **kwargs)"""
+
+    update_assessment_part = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').update_assessment_part(*args, **kwargs)"""
+
+    delete_assessment_part = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').delete_assessment_part(*args, **kwargs)"""
+
+    can_create_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').can_create_assessment_parts(*args, **kwargs)"""
+
+    can_delete_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').can_delete_assessment_parts(*args, **kwargs)"""
+
+    can_update_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_part_admin_session').can_update_assessment_parts(*args, **kwargs)"""
+
+
+class SequenceRuleAdminSession:
+    can_create_sequence_rule = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_admin_session').can_create_sequence_rule(*args, **kwargs)"""
+
+    can_delete_sequence_rules = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_admin_session').can_delete_sequence_rules(*args, **kwargs)"""
+
+    can_update_sequence_rules = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_admin_session').can_update_sequence_rules(*args, **kwargs)"""
+
+    create_sequence_rule = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_admin_session').create_sequence_rule(*args, **kwargs)"""
+
+    delete_sequence_rule = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_admin_session').delete_sequence_rule(*args, **kwargs)"""
+
+    get_sequence_rule_form_for_create = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_admin_session').get_sequence_rule_form_for_create(*args, **kwargs)"""
+
+    get_sequence_rule_form_for_update = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_admin_session').get_sequence_rule_form_for_update(*args, **kwargs)"""
+
+
+class SequenceRuleLookupSession:
+    can_lookup_sequence_rules = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_lookup_session').can_lookup_sequence_rules(*args, **kwargs)"""
+
+    get_sequence_rule = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_lookup_session').get_sequence_rule(*args, **kwargs)"""
+
+    get_sequence_rules = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('sequence_rule_lookup_session').get_sequence_rules(*args, **kwargs)"""
+
+

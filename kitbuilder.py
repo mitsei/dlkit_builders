@@ -1,4 +1,7 @@
+import glob
 import json
+
+import inflection
 
 from build_controller import BaseBuilder
 from binder_helpers import SkipMethod
@@ -85,9 +88,34 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                                                   method['name'])
         return method_sig
 
-    def _get_sub_package_methods(self):
-        # check the packages directory for related sub-packages
+    def _get_sub_package_imports(self, interface):
+        # get the imports from sub-packages
         return []
+
+    def _get_sub_package_methods(self, interface):
+        # check the packages directory for related sub-packages
+        sub_package_methods = ''
+        current_package = self.package['name']
+
+        for json_file in glob.glob(self._package_directory()):
+            sub_package_prefix = '{}_'.format(current_package)
+            if sub_package_prefix in json_file:
+                with open(json_file, 'r') as read_file:
+                    sub_package = json.load(read_file)
+                    for inf in sub_package['interfaces']:
+                        self.patterns = self._update_patterns_with_manager_catalog_flags(self.patterns,
+                                                                                         inf,
+                                                                                         sub_package)
+
+                    for sub_inf in sub_package['interfaces']:
+                        sub_interface_name = sub_inf['shortname']
+                        if self._is_matching_interface(interface, sub_inf):
+                            sub_package_methods += '\n\n{}##Implemented from {} - {}\n'.format(self._ind,
+                                                                                               sub_package['name'],
+                                                                                               sub_interface_name)
+                            sub_package_methods += self.make_methods(sub_inf)
+
+        return sub_package_methods
 
     def _get_template_name(self, pattern, interface_name, method_name):
         template_name = self.last(pattern) + '_template'
@@ -100,6 +128,49 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                 template_name = self.last(pattern) + '_catalogtemplate'
         return template_name
 
+    @staticmethod
+    def _is_matching_interface(potential_parent, potential_child):
+        parent_name = potential_parent['shortname']
+        child_name = potential_child['shortname']
+
+        if potential_parent['category'] == 'managers':
+            parent_parts = inflection.underscore(parent_name).split('_')
+            num_parent_parts = len(parent_parts)
+            child_parts = inflection.underscore(child_name).split('_')
+            num_child_parts = len(child_parts)
+
+            if num_child_parts <= num_parent_parts:
+                return False
+
+            num_matches = 0
+            for part in parent_parts:
+                if part in child_parts:
+                    num_matches += 1
+
+            if num_matches == num_parent_parts:
+                return True
+            else:
+                return False
+        else:
+            # catalog / objects
+            # check if potential_parent['shortname'].lower() has a corresponding
+            # get_X method in potential_child['methods']
+            catalog = potential_parent['shortname'].lower()
+            get_catalog_method = 'get_{}'.format(catalog)
+            child_methods = [m['name'] for m in potential_child['methods']]
+            if get_catalog_method in child_methods:
+                return True
+            else:
+                return False
+
+    def _package_directory(self):
+        if self.package_maps[-1] != '/':
+            directory = self.package_maps + '/*.json'
+        else:
+            directory = self.package_maps + '*.json'
+
+        return directory
+
     def _package_to_be_implemented(self):
         # don't build sub-packages separately...make them as part of the
         # main, base package
@@ -110,12 +181,9 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
     def _patterns(self):
         patterns = self._load_patterns_file()
         for inf in self.package['interfaces']:
-            patterns[self._is_session(inf, 'manager')] = self._is_manager_session(inf,
-                                                                                  self.package['name'],
-                                                                                  patterns=patterns)
-            patterns[self._is_session(inf, 'catalog')] = self._is_catalog_session(inf,
-                                                                                  self.package['name'],
-                                                                                  patterns=patterns)
+            patterns = self._update_patterns_with_manager_catalog_flags(patterns,
+                                                                        inf,
+                                                                        self.package)
         return patterns
 
     def _update_implemented_view_methods(self, method_name):
@@ -152,8 +220,19 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
         elif interface['shortname'] == self.patterns['package_catalog_caps']:
             new_methods, new_imports = self._grab_service_methods(self._is_catalog_session)
 
+        new_imports += self._get_sub_package_imports(interface)
+
         for imp in new_imports:
             self.append(imports, imp)
+
+    def _update_patterns_with_manager_catalog_flags(self, patterns, inf, package):
+        patterns[self._is_session(inf, 'manager')] = self._is_manager_session(inf,
+                                                                              package['name'],
+                                                                              patterns=patterns)
+        patterns[self._is_session(inf, 'catalog')] = self._is_catalog_session(inf,
+                                                                              package['name'],
+                                                                              patterns=patterns)
+        return patterns
 
     def _write_module_string(self, write_file, module):
         constant_declarations = """
@@ -211,7 +290,7 @@ DISABLED = -1"""
         if additional_methods:
             methods += '\n' + additional_methods
 
-        methods += self._get_sub_package_methods()
+        methods += self._get_sub_package_methods(interface)
 
         body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
                                                  self._wrap(self.class_doc(interface)),
