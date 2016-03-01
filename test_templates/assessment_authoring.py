@@ -57,4 +57,18 @@ class AssessmentPartLookupSession:
             cls.catalog.delete_assessment_part(obj.ident)
         cls.catalog.delete_assessment(cls.assessment.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)
+
+    def test_get_assessment_id(self):
+        \"\"\"tests get_assessment_id\"\"\"
+        self.assertEqual(str(self.assessment_part_list[0].get_assessment_id()),
+                         str(self.assessment.ident))
+
+    def test_get_assessment(self):
+        \"\"\"tests get_assessment\"\"\"
+        self.assertEqual(self.assessment_part_list[0].get_assessment().object_map,
+                         self.assessment.object_map)
 """
+
+    get_bank_id = """
+        # this should not be here...
+        pass"""

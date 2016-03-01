@@ -1022,7 +1022,7 @@ def map_object_patterns(interface, package, index):
                               object_name = object_name,
                               return_type_full = method['return_type']))
 
-        ## THIS ONE SHOULD NEVER GET CALLED.  SHOULD BE CAUGHT IN THE RELATIOSHIP ONES ABOVE
+        ## THIS ONE SHOULD NEVER GET CALLED.  SHOULD BE CAUGHT IN THE RELATIONSHIP ONES ABOVE
         # Object methods that get the osid.id.Id of a persisted object that
         # appears to be an initialized data element like a relationship source 
         # or destination. 

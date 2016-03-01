@@ -15,6 +15,38 @@ class AssessmentPartLookupSession:
         else:
             return self._provider_session.get_assessment_parts()"""
 
+    get_assessment_parts_by_genus_type = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentPartLookupSession.get_assessment_parts_by_genus_type
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessment_parts_by_genus_type(assessment_part_genus_type)"""
+
+    get_assessment_parts_by_ids = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentPartLookupSession.get_assessment_parts_by_ids
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessment_parts_by_ids(assessment_part_ids)"""
+
+    get_assessment_parts_by_parent_genus_type = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentPartLookupSession.get_assessment_parts_by_parent_genus_type
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessment_parts_by_parent_genus_type(assessment_genus_type)"""
+
+    get_assessment_parts_by_record_type = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentPartLookupSession.get_assessment_parts_by_record_type
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessment_parts_by_record_type(assessment_part_record_type)"""
+
     can_lookup_assessment_parts = """
         # Implemented from azosid template for -
         # osid.assessment_authoring.AssessmentPartLookupSession.can_lookup_assessment_parts
@@ -22,6 +54,22 @@ class AssessmentPartLookupSession:
             raise PermissionDenied()
         else:
             return self._provider_session.can_lookup_assessment_parts()"""
+
+    use_comparative_assessment_part_view = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentPartLookupSession.use_comparative_assessment_part_view
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.use_comparative_assessment_part_view()"""
+
+    use_plenary_assessment_part_view = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentPartLookupSession.use_plenary_assessment_part_view
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.use_plenary_assessment_part_view()"""
 
     use_unsequestered_assessment_part_view = """
         # Implemented from azosid template for -
@@ -31,8 +79,16 @@ class AssessmentPartLookupSession:
         else:
             return self._provider_session.use_unsequestered_assessment_part_view()"""
 
-
 class AssessmentPartAdminSession:
+    alias_assessment_part = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentPartAdminSession.alias_assessment_part
+        if not self._can('update'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.alias_assessment_part(assessment_part_id,
+                                                                alias_id)"""
+
     get_assessment_part_form_for_create_for_assessment = """
         # Implemented from azosid template for -
         # osid.assessment_authoring.AssessmentPartAdminSession.get_assessment_part_form_for_create_for_assessment
@@ -201,4 +257,35 @@ class SequenceRuleLookupSession:
         else:
             return self._provider_session.get_sequence_rules()"""
 
+
+class AssessmentAuthoringProfile:
+    import_statements_pattern = [
+        "from ..osid.osid_errors import Unsupported"
+    ]
+
+    init = """
+    def __init__(self, interface_name):
+        osid_managers.OsidProfile.__init__(self)
+
+    def _get_hierarchy_session(self):
+        try:
+            base_package_mgr = self._get_base_package_provider_manager('assessment')
+            return base_package_mgr.get_bank_hierarchy_session(
+                Id(authority='ASSESSMENT',
+                   namespace='CATALOG',
+                   identifier='BANK'))
+        except Unsupported:
+            return None
+
+    def _get_base_package_provider_manager(self, base_package):
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:{0}ProviderImpl@dlkit_service'.format(base_package))
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        try:
+            # need to add version argument
+            return self._my_runtime.get_proxy_manager(base_package.upper(), provider_impl)
+        except AttributeError:
+            # need to add version argument
+            return self._my_runtime.get_manager(base_package.upper(), provider_impl)
+"""
 

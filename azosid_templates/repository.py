@@ -109,8 +109,10 @@ class AssetAdminSession:
 
 class CompositionLookupSession:
 
-    init = """
+    init_template = """
     def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
+        # Implemented from azosid template for -
+        # osid.composition.CompositionLookupSession.__init__
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
         if 'hierarchy_session' in kwargs:
             self._hierarchy_session = kwargs['hierarchy_session']
@@ -121,8 +123,8 @@ class CompositionLookupSession:
         else:
             self._query_session = None
 
-        self._qualifier_id = provider_session.get_repository_id()
-        self._id_namespace = 'repository.Composition'
+        self._qualifier_id = provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
 """
     # Note: These should be templated some day. But first add to pattern mappers
 
@@ -138,17 +140,21 @@ class CompositionLookupSession:
         else:
             return self._provider_session.use_any_status_composition_view()"""
 
-    use_sequestered_composition_view = """
+    use_sequestered_composition_view_template = """
+        # Implemented from azosid template for -
+        # osid.composition.CompositionLookupSession.use_sequestered_composition_view_template
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._provider_session.use_sequestered_composition_view()"""
+            return self._provider_session.${method_name}()"""
 
-    use_unsequestered_composition_view = """
+    use_unsequestered_composition_view_template = """
+        # Implemented from azosid template for -
+        # osid.composition.CompositionLookupSession.use_unsequestered_composition_view_template
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._provider_session.use_unsequestered_composition_view()"""
+            return self._provider_session.${method_name}()"""
 
 class CompositionSearchSession:
 

@@ -76,6 +76,33 @@ class ResourceManager:
                 self._provider_sessions[session_name] = session
             return session
 
+    def _get_sub_package_provider_manager(self, sub_package):
+        config = self._runtime.get_configuration()
+        parameter_id = Id('parameter:{0}ProviderImpl@dlkit_service'.format(sub_package))
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        if self._proxy is None:
+            # need to add version argument
+            return self._runtime.get_manager(sub_package.upper(), provider_impl)
+        else:
+            # need to add version argument
+            return self._runtime.get_proxy_manager(sub_package.upper(), provider_impl)
+
+    def _get_sub_package_provider_session(self, sub_package, session_name, proxy=None):
+        \"\"\"Gets the session from a sub-package\"\"\"
+        if self._proxy is None:
+            self._proxy = proxy
+        if session_name in self._provider_sessions:
+            return self._provider_sessions[session_name]
+        else:
+            manager = self._get_sub_package_provider_manager(sub_package)
+            session = self._instantiate_session('get_' + session_name,
+                                                proxy=self._proxy,
+                                                manager=manager)
+            self._set_bank_view(session)
+            if self._session_management != DISABLED:
+                self._provider_sessions[session_name] = session
+            return session
+
     def _instantiate_session(self, method_name, proxy=None, *args, **kwargs):
         \"\"\"Instantiates a provider session\"\"\"
         session_class = getattr(self._provider_manager, method_name)

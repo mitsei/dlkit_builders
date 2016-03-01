@@ -11,7 +11,7 @@ def map_session_patterns(interface, package, index):
         interface['shortname'][:-13] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceLookupSession'
     elif (interface['shortname'].endswith('AdminSession') and
-        interface['shortname'][:-12] in index['package_objects_caps']):
+            interface['shortname'][:-12] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceAdminSession'
     elif (interface['shortname'].endswith('NotificationSession') and
         interface['shortname'][:-len('NotificationSession')] in index['package_objects_caps']):
@@ -1714,7 +1714,7 @@ def map_session_patterns(interface, package, index):
             #print 'FOUND INITIALIZED DATA in', interface['shortname'], method['name']
 
         ##
-        # ObjectAdminSession get_x_form_for_create methods that draw relatioships between two 
+        # ObjectAdminSession get_x_form_for_create methods that draw relationships between two
         # osid objects where two object ids are included as the first two parameters.
         elif (interface['shortname'].endswith('AdminSession') and
             method['name'][4:-16] in index['package_relationships_under'] and

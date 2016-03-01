@@ -258,11 +258,11 @@ def map_admin_session_data_patterns(interface, package, index):
         # id of one other package object is included as the first parameter.
         elif (interface['shortname'].endswith('AdminSession') and
             method['name'].startswith('get_') and
-            method['name'].endswith('_form_for_create') and
+            '_form_for_create' in method['name'] and
             len(method['args']) == 2 and 
             method['args'][0]['arg_type'] == 'osid.id.Id' and
             method['args'][0]['var_name'].split('_')[0] in index['package_objects_under']):
-            object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
+            object_name = index['package_objects_under_to_caps'][method['name'][4:method['name'].index('_form_')]]
             ##
             # Record that we have found initialized and persisted data
             index[object_name + '.initialized_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']
@@ -287,7 +287,7 @@ def map_admin_session_data_patterns(interface, package, index):
         # So we might need to check for the case where such a getter is included.
         elif (interface['shortname'].endswith('AdminSession') and
             method['name'].startswith('get_') and
-            method['name'].endswith('_form_for_create') and
+            '_form_for_create' in method['name'] and
             len(method['args']) == 2 and 
             method['args'][0]['arg_type'] == 'osid.id.Id'):
             #object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
@@ -310,7 +310,7 @@ def map_admin_session_data_patterns(interface, package, index):
 
 
         ##
-        # ObjectAdminSession get_x_form_for_create methods that draw relatioships between two 
+        # ObjectAdminSession get_x_form_for_create methods that draw relationships between two
         # osid objects where two object ids are included as the first two parameters.
         elif (interface['shortname'].endswith('AdminSession') and
             method['name'].startswith('get_') and

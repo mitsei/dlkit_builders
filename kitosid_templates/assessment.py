@@ -237,10 +237,40 @@ class AssessmentPartLookupSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_lookup_session').get_assessment_parts()"""
 
+    get_assessment_parts_by_genus_type = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts_by_genus_type(*args, **kwargs)"""
+
+    get_assessment_parts_by_ids = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts_by_ids(*args, **kwargs)"""
+
+    get_assessment_parts_by_parent_genus_type = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts_by_parent_genus_type(*args, **kwargs)"""
+
+    get_assessment_parts_by_record_type = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts_by_record_type(*args, **kwargs)"""
+
     can_lookup_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_lookup_session').can_lookup_assessment_parts()"""
+
+    use_comparative_assessment_part_view = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').use_comparative_assessment_part_view()"""
+
+    use_plenary_assessment_part_view = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').use_plenary_assessment_part_view()"""
 
     use_unsequestered_assessment_part_view = """
         \"\"\"Pass through to provider method\"\"\"
@@ -249,6 +279,11 @@ class AssessmentPartLookupSession:
 
 
 class AssessmentPartAdminSession:
+    alias_assessment_part = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').alias_assessment_part(*args, **kwargs)"""
+
     get_assessment_part_form_for_create_for_assessment = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
@@ -388,7 +423,6 @@ class Bank:
             except AttributeError:
                 pass
 
-
     def _set_object_view(self, session):
         \"\"\"Sets the underlying object views to match current view\"\"\"
         for obj_name in self._object_views:
@@ -402,7 +436,6 @@ class Bank:
                     getattr(session, 'use_comparative_' + obj_name + '_view')()
                 except AttributeError:
                     pass
-
 
     def _get_provider_session(self, session_name):
         \"\"\"Returns the requested provider session.\"\"\"
@@ -456,5 +489,13 @@ class Bank:
         if proxy is None:
             return session_class(*args, **kwargs)
         else:
-            return session_class(proxy=proxy, *args, **kwargs)"""
+            return session_class(proxy=proxy, *args, **kwargs)
+
+    def __getattr__(self, name):
+        if '_catalog' in self.__dict__:
+            try:
+                return self._catalog[name]
+            except AttributeError:
+                pass
+        raise AttributeError"""
 
