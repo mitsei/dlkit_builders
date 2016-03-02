@@ -289,3 +289,64 @@ class AssessmentAuthoringProfile:
             return self._my_runtime.get_manager(base_package.upper(), provider_impl)
 """
 
+    get_assessment_part_record_types = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.get_assessment_part_record_types
+        return self._provider_manager.get_assessment_part_record_types()
+
+    assessment_part_record_types = property(fget=get_assessment_part_record_types)"""
+
+    get_assessment_part_search_record_types = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.get_assessment_part_search_record_types
+        return self._provider_manager.get_assessment_part_search_record_types()
+
+    assessment_part_search_record_types = property(fget=get_assessment_part_search_record_types)"""
+
+    get_sequence_rule_enabler_record_types = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.get_sequence_rule_enabler_record_types
+        return self._provider_manager.get_sequence_rule_enabler_record_types()
+
+    sequence_rule_enabler_record_types = property(fget=get_sequence_rule_enabler_record_types)"""
+
+    get_sequence_rule_enabler_search_record_types = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.get_sequence_rule_enabler_search_record_types
+        return self._provider_manager.get_sequence_rule_enabler_search_record_types()
+
+    sequence_rule_enabler_search_record_types = property(fget=get_sequence_rule_enabler_search_record_types)"""
+
+    get_sequence_rule_record_types = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.get_sequence_rule_record_types
+        return self._provider_manager.get_sequence_rule_record_types()
+
+    sequence_rule_record_types = property(fget=get_sequence_rule_record_types)"""
+
+    get_sequence_rule_search_record_types = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.get_sequence_rule_search_record_types
+        return self._provider_manager.get_sequence_rule_search_record_types()
+
+    sequence_rule_search_record_types = property(fget=get_sequence_rule_search_record_types)"""
+
+    supports_assessment_part_admin = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.supports_assessment_part_admin
+        return self._provider_manager.supports_assessment_part_admin()"""
+
+    supports_assessment_part_lookup = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.supports_assessment_part_lookup
+        return self._provider_manager.supports_assessment_part_lookup()"""
+
+    supports_sequence_rule_admin = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.supports_sequence_rule_admin
+        return self._provider_manager.supports_sequence_rule_admin()"""
+
+    supports_sequence_rule_lookup = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.supports_sequence_rule_lookup
+        return self._provider_manager.supports_sequence_rule_lookup()"""

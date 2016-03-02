@@ -20,6 +20,48 @@ class AssessmentManager:
         session = self._provider_manager.get_assessment_taken_admin_session_for_bank(*args, **kwargs)
         return Bank(self._provider_manager, session.get_bank(), self._proxy, assessment_taken_admin_session = session)"""
 
+class AssessmentAuthoringProfile:
+    get_assessment_part_record_types = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_record_types()"""
+
+    get_assessment_part_search_record_types = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_search_record_types()"""
+
+    get_sequence_rule_enabler_record_types = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_enabler_record_types()"""
+
+    get_sequence_rule_enabler_search_record_types = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_enabler_search_record_types()"""
+
+    get_sequence_rule_record_types = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_record_types()"""
+
+    get_sequence_rule_search_record_types = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_search_record_types()"""
+
+    supports_assessment_part_admin = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_admin()"""
+
+    supports_assessment_part_lookup = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_lookup()"""
+
+    supports_sequence_rule_admin = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_sequence_rule_admin()"""
+
+    supports_sequence_rule_lookup = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_sequence_rule_lookup()"""
+
+
 class AssessmentSession:
 
     can_take_assessments = """
@@ -498,4 +540,3 @@ class Bank:
             except AttributeError:
                 pass
         raise AttributeError"""
-
