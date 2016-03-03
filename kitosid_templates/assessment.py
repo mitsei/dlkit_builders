@@ -529,10 +529,46 @@ class Bank:
         else:
             return session_class(proxy=proxy, *args, **kwargs)
 
+    def get_bank_id(self):
+        \"\"\"Gets the Id of this bank."\"\"
+        return self._catalog_id
+
+    def get_bank(self):
+        \"\"\"Strange little method to assure conformance for inherited Sessions."\"\"
+        return self
+
+    def get_objective_hierarchy_id(self):
+        \"\"\"WHAT am I doing here?\"\"\"
+        return self._catalog_id
+
+    def get_objective_hierarchy(self):
+        \"\"\"WHAT am I doing here?\"\"\"
+        return self
+
     def __getattr__(self, name):
         if '_catalog' in self.__dict__:
             try:
                 return self._catalog[name]
             except AttributeError:
                 pass
-        raise AttributeError"""
+        raise AttributeError
+
+    def close_sessions(self):
+        \"\"\"Close all sessions currently being managed by this Manager to save memory."\"\"
+        if self._session_management != MANDATORY:
+            self._provider_sessions = dict()
+        raise IllegalState()
+
+    def use_automatic_session_management(self):
+        \"\"\"Session state will be saved until closed by consumers."\"\"
+        self._session_management = AUTOMATIC
+
+    def use_mandatory_session_management(self):
+        \"\"\"Session state will always be saved and can not be closed by consumers."\"\"
+        # Session state will be saved and can not be closed by consumers
+        self._session_management = MANDATORY
+
+    def disable_session_management(self):
+        \"\"\"Session state will never be saved."\"\"
+        self._session_management = DISABLED
+        self.close_sessions()"""
