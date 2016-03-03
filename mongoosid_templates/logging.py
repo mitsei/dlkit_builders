@@ -6,21 +6,21 @@ class LoggingSession:
     import_statements = [
         'from ..primitives import *',
         'from dlkit.abstract_osid.osid import errors',
-        'from . import objects'
+        'from . import objects',
         'from ..osid.sessions import OsidSession'
         ]
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
-        self._catalog_class = objects.LogBook
+        self._catalog_class = objects.Log
         self._session_name = 'LoggingSession'
-        self._catalog_name = 'LogBook'
-        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='logging', cat_name='LogBook', cat_class=objects.LogBook)
+        self._catalog_name = 'Log'
+        OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='logging', cat_name='Log', cat_class=objects.Log)
         self._forms = dict()
         lm = self._get_provider_manager('LOGGING')
-        self._leas = lm.get_log_entry_admin_session_for_log_book(self._catalog_id)
-        self._lels = lm.get_log_entry_lookup_session_for_log_book(self._catalog_id)
+        self._leas = lm.get_log_entry_admin_session_for_log(self._catalog_id)
+        self._lels = lm.get_log_entry_lookup_session_for_log(self._catalog_id)
         self._content_types = lm.get_content_types()"""
 
     can_log = """
@@ -29,7 +29,7 @@ class LoggingSession:
         return True"""
 
     log = """
-        if not contentType in self._content_types:
+        if not content_type in self._content_types:
             raise errors.Unsupported()
         lefc = self._leas.get_content_form_for_create([])
         lefc.set_timestamp(DateTime.now())"""

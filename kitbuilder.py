@@ -186,7 +186,11 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                                                                         self.package)
         return patterns
 
-    def _update_implemented_view_methods(self, method_name):
+    def _update_implemented_view_methods(self, method, interface):
+        if interface['shortname'] == 'LoggingSession' and method['name'] == 'get_log_id':
+            # we want this to build, no matter what
+            return
+        method_name = method['name']
         if ('implemented_view_methods' in self.patterns and
                 method_name in self.patterns['implemented_view_methods']):
             raise SkipMethod()

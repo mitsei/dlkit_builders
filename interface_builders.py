@@ -290,7 +290,6 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             # Check to see if this interface is meant to be implemented.
             if self.package['name'] != 'osid' and not self._flagged_for_implementation(inf):
                 continue
-
             if type_check_method(inf, self.package['name']):
                 methods += '\n##\n# The following methods are from {}\n\n'.format(inf['fullname'])
                 methods += self.make_methods(inf) + '\n\n'

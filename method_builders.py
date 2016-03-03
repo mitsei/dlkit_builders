@@ -249,7 +249,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         interface_sn = interface['shortname']
         method_n = method['name']
 
-        self._update_implemented_view_methods(method_n)
+        self._update_implemented_view_methods(method, interface)
 
         pattern = self._get_pattern(method, interface)
         impl_class = self._load_impl_class(interface_sn)
@@ -287,7 +287,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
         return self._clean_up_impl(impl, interface, method)
 
-    def _update_implemented_view_methods(self, method_name):
+    def _update_implemented_view_methods(self, method, interface):
         pass
 
     def get_methods_templated_imports(self, package_name, interface):

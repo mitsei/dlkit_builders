@@ -10,6 +10,7 @@ packages_to_implement = [
     'id',
     'learning',
     'locale',
+    'logging',
     'mapping',
     'ontology',
     'osid',
@@ -28,6 +29,7 @@ packages_to_test = [
     'commenting',
     'grading',
     'learning',
+    'logging',
     'repository',
     'resource',
 ]
@@ -40,6 +42,7 @@ managers_to_implement = [
     'grading',
     'hierarchy',
     'learning',
+    'logging',
     'osid',
     'proxy',
     'relationship',
@@ -139,6 +142,13 @@ sessions_to_implement = [
     'ProficiencyLookupSession',
     'ProficiencyAdminSession',
     'ProficiencyQuerySession',
+    ## logging service:
+    'LoggingSession',
+    'LogEntryLookupSession',
+    'LogEntryAdminSession',
+    'LogEntryQuerySession',
+    'LogLookupSession',
+    'LogAdminSession',
     ## ontology service:
     'SubjectHierarchyDesignSession',
     ### proxy service
@@ -233,6 +243,9 @@ objects_to_implement = [
     ### locale service
     'Locale',
     'LocaleList',
+    ### logging service
+    'Log',
+    'LogEntry',
     ### ontology service
     'Subject',
     ### proxy service

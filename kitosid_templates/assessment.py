@@ -448,10 +448,6 @@ class Bank:
         self._bank_view = DEFAULT
         self._object_views = dict()
 
-        # for the sub-package impls
-        if 'runtime' in kwargs:
-            self._runtime = kwargs['runtime']
-
     def _set_bank_view(self, session):
         \"\"\"Sets the underlying bank view to match current view\"\"\"
         if self._bank_view == FEDERATED:
@@ -496,15 +492,15 @@ class Bank:
             return session
 
     def _get_sub_package_provider_manager(self, sub_package):
-        config = self._runtime.get_configuration()
+        config = self._catalog._runtime.get_configuration()
         parameter_id = Id('parameter:{0}ProviderImpl@dlkit_service'.format(sub_package))
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         if self._proxy is None:
             # need to add version argument
-            return self._runtime.get_manager(sub_package.upper(), provider_impl)
+            return self._catalog._runtime.get_manager(sub_package.upper(), provider_impl)
         else:
             # need to add version argument
-            return self._runtime.get_proxy_manager(sub_package.upper(), provider_impl)
+            return self._catalog._runtime.get_proxy_manager(sub_package.upper(), provider_impl)
 
     def _get_sub_package_provider_session(self, sub_package, session_name, proxy=None):
         \"\"\"Gets the session from a sub-package\"\"\"

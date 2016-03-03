@@ -161,10 +161,10 @@ _singular_to_plural = {
     'hierarchy': 'hierarchies',
     'Query': 'Queries',
     'query': 'queries',
-    'Entry': 'Entries',
-    'entry': 'entries',
     'GradeEntry': 'GradeEntries',
     'grade_entry': 'grade_entries',
+    'log_entry': 'log_entries',
+    'LogEntry': 'LogEntries'
 }
 
 _plural_to_singular = {v: k for k, v in _singular_to_plural.items()}
@@ -469,4 +469,25 @@ def add_missing_methods(interface):
                   'PERMISSION_DENIED': 'User'
                }
             }] 
-)
+        )
+    elif interface['shortname'] == 'LoggingProfile':
+        interface['method_names'].append('supports_log_entry_admin')
+        interface['methods'].append({
+           "name": "supports_log_entry_admin",
+           "doc": {
+              "headline": "Tests if log entry admin is supported.",
+              "body": ""
+           },
+           "arg_doc": "",
+           "return_doc": "        return: (boolean) - ``true`` if log entry admin is supported,\n                ``false`` otherwise",
+           "error_doc": "",
+           "sphinx_param_doc": "",
+           "sphinx_return_doc": "        :return: ``true`` if log entry admin is supported, ``false`` otherwise\n        :rtype: ``boolean``",
+           "sphinx_error_doc": "",
+           "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n",
+           "impl_notes_doc": "",
+           "args": [],
+           "arg_types": [],
+           "return_type": "boolean",
+           "errors": {}
+        })

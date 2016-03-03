@@ -365,6 +365,9 @@ class BaseBuilder(Utilities):
                 interface['shortname'].startswith('GradebookColumn')):
             is_catalog_session = True
         elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('LogEntry')):
+            is_catalog_session = True
+        elif (interface['category'] == 'sessions' and
                 interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
             is_catalog_session = False
         elif (interface['category'] == 'sessions' and
@@ -385,6 +388,9 @@ class BaseBuilder(Utilities):
             is_manager_session = True
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].startswith('GradebookColumn')):
+            is_manager_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('LogEntry')):
             is_manager_session = False
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
