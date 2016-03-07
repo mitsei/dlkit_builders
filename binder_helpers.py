@@ -70,7 +70,7 @@ def wrap_and_indent(text, iIndent = '', sIndent = None, width = 72):
     wrapper.drop_whitespace = True
     return wrapper.fill(textwrap.dedent(text.strip()))
 
-def fix_reserved_word(word):
+def fix_reserved_word(word, is_module=False):
     """
     Replaces words that may be problematic
     
@@ -80,12 +80,14 @@ def fix_reserved_word(word):
     osid things that are reserved word they can be dealt with here.
     
     """
-    if word == 'logging':
-        word = 'logging' # Still deciding this
-    if keyword.iskeyword(word):
-        word += '_'
-    elif word in ['id', 'type', 'str', 'max', 'input', 'license', 'copyright', 'credits', 'help']:
-        word += '_'
+    if is_module:
+        if word == 'logging':
+            word = 'logging_' # Still deciding this
+    else:
+        if keyword.iskeyword(word):
+            word += '_'
+        elif word in ['id', 'type', 'str', 'max', 'input', 'license', 'copyright', 'credits', 'help']:
+            word += '_'
     return word
 
 ##

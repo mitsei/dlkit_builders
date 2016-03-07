@@ -81,7 +81,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             # Add keyword arguments to template kwargs that are particular
             # to the mongo implementation
             context['app_name'] = self._app_name()
-            context['implpkg_name'] = self._abc_pkg_name(abc=False)
+            context['implpkg_name'] = self._abc_pkg_name(abc=False, reserved_word=False)
             context['abcapp_name'] = self._app_name()
             context['abcpkg_name'] = self._abc_pkg_name(abc=False)
             context['interface_name_under'] = camel_to_under(context['interface_name'])
@@ -362,7 +362,6 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                             body.append(simple_property('get', method, 'ident'))
                     if method['name'] == 'get_identifier_namespace':
                             body.append(simple_property('get', method, 'namespace'))
-
         return '\n\n'.join(body)
 
 

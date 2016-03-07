@@ -5,7 +5,8 @@ import shutil
 import string
 
 from binder_helpers import under_to_mixed, camel_to_mixed,\
-    remove_plural, camel_to_under, make_plural, camel_to_caps_under
+    remove_plural, camel_to_under, make_plural, camel_to_caps_under,\
+    fix_reserved_word
 from build_controller import Utilities, BaseBuilder, Templates
 from config import managers_to_implement, packages_to_test
 from method_builders import MethodBuilder
@@ -40,13 +41,13 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                     shutil.copy(helper_file, self._root_dir)
                 else:
                     package_dir = '{0}/{1}/'.format(self._root_dir,
-                                                    self.replace(self.package['name']))
+                                                    fix_reserved_word(self.replace(self.package['name']), is_module=True))
                     self._make_dir(package_dir)
                     shutil.copy(helper_file, package_dir)
 
     def _get_class_inheritance(self, interface):
         def get_full_interface_class():
-            return (self._abc_pkg_name(abc=self._is('abc')) + '_' +
+            return (self._abc_pkg_name(abc=self._is('abc'), reserved_word=False) + '_' +
                     interface['category'] + '.' +
                     interface['shortname'])
 
@@ -252,7 +253,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             svc_mgr_or_catalog = 'catalog'
 
         return {'app_name': self._app_name(),
-                'implpkg_name': self._abc_pkg_name(abc=False),
+                'implpkg_name': self._abc_pkg_name(abc=False, reserved_word=False),
                 'kitpkg_name': self._abc_pkg_name(abc=False),
                 'pkg_name': self.package['name'],
                 'pkg_name_caps': self.first(self.package['name']).title(),
@@ -321,7 +322,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         init_pattern = ''
 
         impl_class = self._load_impl_class(interface['shortname'],
-                                           package_name=self._abc_pkg_name(abc=False))
+                                           package_name=self._abc_pkg_name(abc=False, reserved_word=False))
         if hasattr(impl_class, 'init'):
             return getattr(impl_class, 'init') + '\n'
         elif interface['shortname'] + '.init_pattern' in self.patterns:

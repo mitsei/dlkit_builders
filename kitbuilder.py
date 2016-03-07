@@ -4,7 +4,7 @@ import json
 import inflection
 
 from build_controller import BaseBuilder
-from binder_helpers import SkipMethod
+from binder_helpers import SkipMethod, fix_reserved_word
 from interface_builders import InterfaceBuilder
 
 
@@ -332,6 +332,6 @@ DISABLED = -1"""
 
             if modules[module]['body'].strip() != '':
                 with open('{0}/{1}.py'.format(self._app_name(),
-                                              self.first(self.package['name'])), 'w') as write_file:
+                                              fix_reserved_word(self.first(self.package['name']), is_module=True)), 'w') as write_file:
                     self._write_module_string(write_file,
                                               modules[module])

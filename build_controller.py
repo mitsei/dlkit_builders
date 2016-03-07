@@ -13,7 +13,7 @@ import textwrap
 from collections import OrderedDict
 from importlib import import_module
 
-from binder_helpers import camel_to_under
+from binder_helpers import camel_to_under, fix_reserved_word
 from config import sessions_to_implement, managers_to_implement,\
     objects_to_implement, variants_to_implement
 
@@ -154,14 +154,19 @@ class BaseBuilder(Utilities):
     # by prepending and appending the appropriate suffixes and prefixes. Note
     # that the django app_name() function is included to support building of
     # the abc osids into a Django project environment.
-    def _abc_pkg_name(self, abc=True, package_name=None):
+    def _abc_pkg_name(self, abc=True, package_name=None, reserved_word=True):
         if package_name is None:
             package_name = self.package['name']
 
-        if abc:
-            return self._abc_prefix + self.replace(package_name) + self._abc_suffix
+        if reserved_word:
+            pkg = fix_reserved_word(self.replace(package_name), is_module=True)
         else:
-            return self._pkg_prefix + self.replace(package_name) + self._pkg_suffix
+            pkg = self.replace(package_name)
+
+        if abc:
+            return self._abc_prefix + pkg + self._abc_suffix
+        else:
+            return self._pkg_prefix + pkg + self._pkg_suffix
 
     def _app_name(self, abstract=False, package_name=None):
         if package_name is None:
