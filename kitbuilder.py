@@ -187,7 +187,8 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
         return patterns
 
     def _update_implemented_view_methods(self, method, interface):
-        if interface['shortname'] == 'LoggingSession' and method['name'] == 'get_log_id':
+        if ((interface['shortname'] == 'LoggingSession' and method['name'] == 'get_log_id') or
+                (interface['shortname'] == 'LoggingSession' and method['name'] == 'get_log')):
             # we want this to build, no matter what
             return
         method_name = method['name']
