@@ -51,56 +51,57 @@ class Utilities(object):
         return target_dir
 
     def _wrap(self, text):
-        def _get_wrapper(new_spacing=4):
-            return textwrap.TextWrapper(subsequent_indent=(new_spacing + 4)*' ', width=120)
-
-        result = []
-        new_paragraph = False
-        previous_line = ''
-        for line in text.splitlines():
-            if new_paragraph:
-                if previous_line[:].strip()[0] == '#':
-                    spacing = previous_line[:].split('#')[0]
-                    wrapper = _get_wrapper(len(spacing))
-                    new_line = spacing + '\n'.join(wrapper.wrap(line.strip()))
-                elif line[:].strip() != '' and line[:].lstrip(' ')[0] == '*':
-                    wrapper = _get_wrapper()
-                    new_line = '\n'.join(wrapper.wrap(line))
-                else:
-                    spacing = len(line) - len(line[:].lstrip(' '))
-                    previous_spacing = len(previous_line) - len(previous_line[:].lstrip(' '))
-                    if spacing != 0 and previous_spacing != 0:
-                        wrapper = _get_wrapper(spacing)
-                        new_line = '\n'.join(wrapper.wrap(line))
-                    elif spacing < previous_spacing and spacing != 0:
-                        wrapper = _get_wrapper(previous_spacing)
-                        new_line = previous_spacing * ' ' + '\n'.join(wrapper.wrap(line.lstrip(' ')))
-                    elif previous_spacing == 0 and spacing != 0:
-                        # already indented
-                        wrapper = _get_wrapper(spacing)
-                        new_line = '\n'.join(wrapper.wrap(line))
-                    else:
-                        wrapper = _get_wrapper(spacing + 4)
-                        new_line = (spacing + 4) * ' ' + '\n'.join(wrapper.wrap(line))
-            else:
-                spacing = len(line) - len(line[:].lstrip(' '))
-                wrapper = _get_wrapper(spacing)
-                new_line = '\n'.join(wrapper.wrap(line))
-
-            if line[:].strip() == '':
-                new_paragraph = False
-            else:
-                new_paragraph = True
-
-            if new_line[:].strip() != '':
-                result.append(new_line)
-            else:
-                result.append('\n')
-            # result.append(new_line)
-
-            previous_line = new_line
-
-        return '\n'.join(result)
+        return text
+        # def _get_wrapper(new_spacing=4):
+        #     return textwrap.TextWrapper(subsequent_indent=(new_spacing + 4)*' ', width=120)
+        #
+        # result = []
+        # new_paragraph = False
+        # previous_line = ''
+        # for line in text.splitlines():
+        #     if new_paragraph:
+        #         if previous_line[:].strip()[0] == '#':
+        #             spacing = previous_line[:].split('#')[0]
+        #             wrapper = _get_wrapper(len(spacing))
+        #             new_line = spacing + '\n'.join(wrapper.wrap(line.strip()))
+        #         elif line[:].strip() != '' and line[:].lstrip(' ')[0] == '*':
+        #             wrapper = _get_wrapper()
+        #             new_line = '\n'.join(wrapper.wrap(line))
+        #         else:
+        #             spacing = len(line) - len(line[:].lstrip(' '))
+        #             previous_spacing = len(previous_line) - len(previous_line[:].lstrip(' '))
+        #             if spacing != 0 and previous_spacing != 0:
+        #                 wrapper = _get_wrapper(spacing)
+        #                 new_line = '\n'.join(wrapper.wrap(line))
+        #             elif spacing < previous_spacing and spacing != 0:
+        #                 wrapper = _get_wrapper(previous_spacing)
+        #                 new_line = previous_spacing * ' ' + '\n'.join(wrapper.wrap(line.lstrip(' ')))
+        #             elif previous_spacing == 0 and spacing != 0:
+        #                 # already indented
+        #                 wrapper = _get_wrapper(spacing)
+        #                 new_line = '\n'.join(wrapper.wrap(line))
+        #             else:
+        #                 wrapper = _get_wrapper(spacing + 4)
+        #                 new_line = (spacing + 4) * ' ' + '\n'.join(wrapper.wrap(line))
+        #     else:
+        #         spacing = len(line) - len(line[:].lstrip(' '))
+        #         wrapper = _get_wrapper(spacing)
+        #         new_line = '\n'.join(wrapper.wrap(line))
+        #
+        #     if line[:].strip() == '':
+        #         new_paragraph = False
+        #     else:
+        #         new_paragraph = True
+        #
+        #     if new_line[:].strip() != '':
+        #         result.append(new_line)
+        #     else:
+        #         result.append('\n')
+        #     # result.append(new_line)
+        #
+        #     previous_line = new_line
+        #
+        # return '\n'.join(result)
 
     def append(self, iterator, item):
         if item not in iterator:
