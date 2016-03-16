@@ -413,6 +413,11 @@ class ProficiencyQuery:
             raise errors.InvalidArgument()
         self._add_match('resourceId', str(resource_id), match)"""
 
+    match_objective_id = """
+        if not isinstance(objective_id, Id):
+            raise errors.InvalidArgument()
+        self._add_match('objectiveId', str(objective_id), match)"""
+
 class Proficiency:
     additional_methods = """
     def get_object_map(self):
