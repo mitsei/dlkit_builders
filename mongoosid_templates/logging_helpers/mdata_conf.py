@@ -38,7 +38,7 @@ LOG_ENTRY_TIMESTAMP = {
     'read_only': False,
     'linked': False,
     'array': False,
-    'default_date_time_values': [DEFAULT_DATETIME],
+    'default_date_time_values': [None],
     'syntax': 'DATETIME',
     'date_time_set': [],
 }
