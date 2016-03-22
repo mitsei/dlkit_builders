@@ -544,7 +544,11 @@ class ResourceBinSession:
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceBinSession.get_bins_by_resource
-        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+        catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
+        cat_list = []
+        for cat in catalogs:
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._proxy))
+        return ${cat_name}List(cat_list)"""
 
 
 class ResourceBinAssignmentSession:
