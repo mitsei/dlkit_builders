@@ -33,7 +33,14 @@ def map_object_form_data_patterns(interface, package, index):
         if (method['name'].startswith('set_') and
             len(method['args']) == 1):
             index[interface['shortname'][:-4] + '.arg_detail'][method['name'].split('_', 1)[1]] = method['args']
-            index[interface['shortname'][:-4] + '.persisted_data'][method['name'].split('_', 1)[1]] = method['args'][0]['arg_type']
+
+            if ('Proficiency' in interface['shortname'] and
+                    'level' in method['name'] and
+                    'osid.grading.Grade' == method['args'][0]['arg_type']):
+                # to fix error in OSID spec
+                index[interface['shortname'][:-4] + '.persisted_data'][method['name'].split('_', 1)[1]] = 'osid.id.Id'
+            else:
+                index[interface['shortname'][:-4] + '.persisted_data'][method['name'].split('_', 1)[1]] = method['args'][0]['arg_type']
 
         ##
         # Get all data elements that have adder methods in an ObjectForm
@@ -348,4 +355,5 @@ def map_admin_session_data_patterns(interface, package, index):
                 del index[object_name + '.instance_data'][method['args'][1]['var_name'][:-3]]
             ## Uncomment following line to see where this initilization pattern is found:
             #print 'FOUND INITIALIZED DATA in', interface['shortname'], method['name']
+
 

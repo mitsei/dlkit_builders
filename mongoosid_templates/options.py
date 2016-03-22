@@ -70,6 +70,13 @@ ID_LIST_MDATA = """
     'syntax': '${syntax}',
     '${id_type}_set': [],"""
 
+INTEGER_MDATA = """
+    'default_integer_value': [None],
+    'syntax': 'INTEGER',
+    'minimum_integer': None,
+    'maximum_integer': None,
+    integer_set': []"""
+
 TYPE_MDATA = """
     'default_${id_type}_values': ['NoneType%3ANONE%40dlkit.mit.edu'],
     'syntax': '${syntax}',

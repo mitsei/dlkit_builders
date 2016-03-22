@@ -3,6 +3,7 @@ import string
 
 from binder_helpers import camel_to_caps_under
 from build_controller import BaseBuilder
+from config import managers_to_implement, packages_to_test
 from interface_builders import InterfaceBuilder
 
 
@@ -118,6 +119,12 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                 'array': 'False'
             })
             mdata = construct_data(options.STRING_MDATA, ctxt)
+        elif data_type in ['cardinal', 'integer']:
+            ctxt.update({
+                'instructions': 'enter an integer value',
+                'array': False
+            })
+            mdata = construct_data(options.INTEGER_MDATA, ctxt)
         elif data_type == 'decimal':
             ctxt.update({
                 'instructions': 'enter a decimal value.',
@@ -180,6 +187,18 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                                                   mdata)
         else:
             return ''
+
+    def _package_to_be_implemented(self):
+        if self._is('tests') and self.package['name'] not in packages_to_test:
+            return False
+
+        if self.package['name'] not in managers_to_implement:
+            return False
+
+        if self.package['name'] == 'osid':
+            return False
+
+        return True
 
     def make(self):
         self.make_osids()
