@@ -2904,6 +2904,171 @@ def map_session_patterns(interface, package, index):
                 kwargs = make_twargs(index, package, interface, method, 
                     rtype=False, object_name=interface['shortname'][:-26], arg_count=2))
 
+        ######################################################################
+        ## Inspect this package's ContainableObjectObjectSession methods.   ##
+        ######################################################################
+
+        ##
+        # ContainableObjectObjectSession methods that return an authorization hint.
+        # This is extra kludgy due to inconsistency in OSID spec session naming
+        elif (interface['shortname'] in ['AssetCompositionSession', 'AssessmentPartItemSession'] and
+              method['name'].startswith('can_access_') and
+              method['return_type'] == 'boolean'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetCompositionDesignSession.can_access_asset_compositions',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=get_containable_object_object_name(index, interface['shortname']),
+                    containable_object_name=get_containable_object_name(index, interface['shortname'])))
+
+        ##
+        # ContainableObjectObjectSession methods that get containable objects by objects.
+        # This is extra kludgy due to inconsistency in OSID spec session naming
+        elif (interface['shortname'] in ['AssetCompositionSession', 'AssessmentPartItemSession'] and
+              method['name'].startswith('get_') and
+              '_by_' in method['name']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetCompositionSession.get_compositions_by_asset',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=method['name'].split('_')[3].title(),
+                    containable_object_name=remove_plural(method['name'].split('_')[1]).title(),
+                    arg_count=1))
+
+        ##
+        # ContainableObjectObjectSession methods that get objects from a containable objects.
+        # This is extra kludgy due to inconsistency in OSID spec session naming
+        elif (interface['shortname'] in ['AssetCompositionSession', 'AssessmentPartItemSession'] and
+              method['name'].startswith('get_') and
+              method['name'].split('_')[1] in index['package_containable_objects_under']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetCompositionSession.get_composition_assets',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=method['name'].split('_')[2].title(),
+                    containable_object_name=method['name'].split('_')[1].title(),
+                    arg_count=1))
+
+
+        ##########################################################################
+        ## Inspect this package's ContainableObjectObjectDesignSession methods. ##
+        ##########################################################################
+
+        ##
+        # ContainableObjectObjectDesignSession methods that return an authorization hint.
+        # This is extra kludgy due to inconsistency in OSID spec session naming
+        elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
+              method['name'].startswith('can_') and
+              method['return_type'] == 'boolean'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetCompositionDesignSession.can_compose_assets',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method,
+                    rtype=True,
+                    object_name=get_containable_object_object_name(index, interface['shortname']),
+                    containable_object_name=get_containable_object_name(index, interface['shortname'])))
+
+        ##
+        # ContainableObjectObjectDesignSession methods that add an object.
+        # This is extra kludgy due to inconsistency in OSID spec session naming
+        elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
+              method['name'].startswith('add_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetCompositionDesignSession.add_asset',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=method['name'].split('_')[-1].title(),
+                    containable_object_name=get_containable_object_name(index, interface['shortname']),
+                    arg_count=2))
+
+        ##
+        # ContainableObjectObjectDesignSession methods that move an object ahead.
+        # This is extra kludgy due to inconsistency in OSID spec session naming
+        elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
+              method['name'].startswith('move_') and
+              method['name'].endswith('_ahead')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetCompositionDesignSession.move_asset_ahead',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=method['name'].split('_')[1].title(),
+                    containable_object_name=get_containable_object_name(index, interface['shortname']),
+                    arg_count=3))
+
+        ##
+        # ContainableObjectObjectDesignSession methods that move an object behind.
+        # This is extra kludgy due to inconsistency in OSID spec session naming
+        elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
+              method['name'].startswith('move_') and
+              method['name'].endswith('_behind')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetCompositionDesignSession.move_asset_behind',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=method['name'].split('_')[1].title(),
+                    containable_object_name=get_containable_object_name(index, interface['shortname']),
+                    arg_count=3))
+
+        ##
+        # ContainableObjectObjectDesignSession methods that order objects.
+        # This is extra kludgy due to inconsistency in OSID spec session naming
+        elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
+              method['name'].startswith('order_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetCompositionDesignSession.order_assets',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=remove_plural(method['name'].split('_')[-1]).title(),
+                    containable_object_name=get_containable_object_name(index, interface['shortname']),
+                    arg_count=2))
+
+        ##
+        # ContainableObjectObjectDesignSession methods that removes an object.
+        # This is extra kludgy due to inconsistency in OSID spec session naming
+        elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
+              method['name'].startswith('remove_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.AssetCompositionDesignSession.remove_asset',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=True,
+                    object_name=method['name'].split('_')[-1].title(),
+                    containable_object_name=get_containable_object_name(index, interface['shortname']),
+                    arg_count=2))
 
 
         ##################################################################
@@ -3044,3 +3209,17 @@ def map_session_patterns(interface, package, index):
                                 method_name = method['name']))  
             index['impl_log']['sessions'][interface['shortname']][method['name']][0] = 'unmapped'
     return index
+
+def get_containable_object_name(index, session_name):
+    """Find the containable object name given an index and Session name"""
+    for name in index['package_containable_objects_caps']:
+        if name in session_name:
+            return name
+    return "UNKNOWN"
+
+def get_containable_object_object_name(index, session_name):
+    """Find the target object name of a containable object given an index and Session name"""
+    for name in index['package_objects_caps']:
+        if name in session_name:
+            return name
+    return "UNKNOWN"

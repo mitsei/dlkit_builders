@@ -292,7 +292,7 @@ def proxy_manager_name(string):
 class SkipMethod(Exception):
     pass
 
-def make_twargs(index, package, interface, method, rtype=True, object_name=None, arg_count=0):
+def make_twargs(index, package, interface, method, rtype=True, object_name=None, containable_object_name=None, arg_count=0):
     twargs = dict()
     twargs['interface_name'] = interface['shortname']
     twargs['package_name'] = package['name']
@@ -301,6 +301,8 @@ def make_twargs(index, package, interface, method, rtype=True, object_name=None,
     twargs['cat_name'] = index['package_catalog_caps']
     if object_name is not None:
         twargs['object_name'] = object_name
+    if containable_object_name is not None:
+        twargs['containable_object_name'] = containable_object_name
     if rtype:
         twargs['return_type_full'] = method['return_type']
     n = 0

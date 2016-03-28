@@ -85,6 +85,8 @@ sessions_to_implement = [
     ### assessment authoring:
     'AssessmentPartLookupSession',
     'AssessmentPartAdminSession',
+    'AssessmentPartItemSession',
+    'AssessmentPartItemDesignSession',
     'SequenceRuleLookupSession',
     'SequenceRuleAdminSession',
     ### authorization service:
