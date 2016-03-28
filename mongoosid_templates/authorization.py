@@ -103,7 +103,7 @@ class AuthorizationAdminSession:
         else:
             obj_form = objects.AuthorizationForm(
                 vault_id=self._catalog_id,
-                record_types=relationship_record_types,
+                record_types=authorization_record_types,
                 agent_id=agent_id,
                 function_id=function_id,
                 qualifier_id=qualifier_id,
@@ -136,7 +136,7 @@ class AuthorizationAdminSession:
         else:
             obj_form = objects.AuthorizationForm(
                 vault_id=self._catalog_id,
-                record_types=relationship_record_types,
+                record_types=authorization_record_types,
                 resource_id=resource_id,
                 function_id=function_id,
                 qualifier_id=qualifier_id,

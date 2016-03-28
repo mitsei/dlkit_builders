@@ -1732,7 +1732,7 @@ class Bin:
         try:
             self._load_records(osid_catalog_map['recordTypeIds'])
         except KeyError:
-            print 'KeyError: recordTypeIds key not found in ', self._my_map['displayName']['text']
+            #print 'KeyError: recordTypeIds key not found in ', self._my_map['displayName']['text']
             self._load_records([]) # In place for transition purposes"""
 
 class BinForm:
