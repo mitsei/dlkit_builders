@@ -91,6 +91,7 @@ sessions_to_implement = [
     'AuthorizationSession',
     'AuthorizationLookupSession',
     'AuthorizationAdminSession',
+    'AuthorizationQuerySession',
     'VaultLookupSession',
     'VaultAdminSession',
     ### commenting service:

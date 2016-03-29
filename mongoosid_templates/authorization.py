@@ -192,3 +192,30 @@ class AuthorizationForm:
             self._my_map['agentId'] = str(kwargs['agent_id'])
         if 'resource_id' in kwargs:
             self._my_map['resourceId'] = str(kwargs['resource_id'])"""
+
+
+class AuthorizationQuery:
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init = """
+    def __init__(self, runtime):
+        self._namespace = 'authorization.Authorization'
+        self._runtime = runtime
+        record_type_data_sets = self._get_registry('AUTHORIZATION_RECORD_TYPES')
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidObjectQuery.__init__(self, runtime)
+"""
+
+    match_agent_id = """
+        self._add_match('agentId', str(agent_id), bool(match))"""
+
+    match_function_id = """
+        self._add_match('functionId', str(function_id), bool(match))"""
+
+    match_qualifier_id = """
+        self._add_match('qualifierId', str(qualifier_id), bool(match))"""
