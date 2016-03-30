@@ -3,6 +3,7 @@ packages_to_implement = [
     'assessment',
     'assessment.authoring',
     'authentication.process',
+    'authentication',
     'authorization',
     'commenting',
     'grading',
@@ -37,6 +38,8 @@ packages_to_test = [
 managers_to_implement = [
     'assessment',
     'assessment.authoring',
+    'authentication.process',
+    'authentication',
     'authorization',
     'commenting',
     'grading',
@@ -218,6 +221,8 @@ objects_to_implement = [
     'SequenceRule',
     ### authentication_process:
     'Authentication',
+    ### authentication:
+    'Agent',
     ### authorization service:
     'Authorization',
     'Vault',
