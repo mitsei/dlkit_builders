@@ -16,11 +16,11 @@ class Authentication:
     get_agent_id = """
         if self._django_user is not None:
             return Id(identifier=self._django_user.get_username(),
-                      namespace='osid.agent.Agent',
+                      namespace='agent.Agent',
                       authority='MIT-OEIT')
         else:
             return Id(identifier='MC3GUE$T@MIT.EDU',
-                      namespace='osid.agent.Agent',
+                      namespace='agent.Agent',
                       authority='MIT-OEIT')"""
 
     get_agent = """
