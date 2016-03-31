@@ -147,7 +147,6 @@ class AuthorizationAdminSession:
         return obj_form
 """
 
-
 class AuthorizationForm:
 
     import_statements = [
@@ -219,3 +218,12 @@ class AuthorizationQuery:
 
     match_qualifier_id = """
         self._add_match('qualifierId', str(qualifier_id), bool(match))"""
+
+class VaultLookupSession:
+    get_vaults_by_genus_type = """
+        collection = MongoClientValidated('authorization',
+                                          collection='Vault',
+                                          runtime=self._runtime)
+        result = collection.find({'genusTypeId': {'$in': [str(vault_genus_type)]}}).sort('_id', DESCENDING)
+
+        return objects.VaultList(result, runtime=self._runtime)"""

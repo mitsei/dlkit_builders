@@ -259,7 +259,8 @@ def map_patterns(package, index, base_package=None):
               'OsidRule' in interface['inherit_shortnames'] or
               'OsidRelationship' in interface['inherit_shortnames']):
             map_object_patterns(interface, package, index)
-        elif 'OsidObjectQuery' in interface['inherit_shortnames']:
+        elif any(q in interface['inherit_shortnames']
+                 for q in ['OsidObjectQuery', 'OsidRelationshipQuery']):
             map_query_patterns(interface, package, index)
         elif 'OsidList' in interface['inherit_shortnames']:
             map_list_patterns(interface, package, index)
