@@ -65,6 +65,12 @@ def map_session_patterns(interface, package, index):
         interface['shortname'] != 'HierarchyDesignSession' and
         interface['shortname'][:-22] in index['package_catalog_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinHierarchyDesignSession'
+    # The next two are oddly explicit due to an inconsistency in the OSID spec:
+    elif (interface['shortname'] in ['AssetCompositionSession', 'AssessmentPartItemSession']):
+        index[interface['shortname'] + '.init_pattern'] = 'repository.AssetCompositionSession'
+    elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession']):
+        index[interface['shortname'] + '.init_pattern'] = 'repository.AssetCompositionDesignSession'
+
 
     for method in interface['methods']:
         # Uncomment the following line to see which session raised an error.
@@ -2915,7 +2921,7 @@ def map_session_patterns(interface, package, index):
               method['name'].startswith('can_access_') and
               method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'repository.AssetCompositionDesignSession.can_access_asset_compositions',
+                pattern = 'repository.AssetCompositionSession.can_access_asset_compositions',
                 kwargs = make_twargs(
                     index,
                     package,
@@ -2939,8 +2945,8 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=True,
-                    object_name=method['name'].split('_')[3].title(),
-                    containable_object_name=remove_plural(method['name'].split('_')[1]).title(),
+                    object_name=get_containable_object_object_name(index, interface['shortname']),
+                    containable_object_name=get_containable_object_name(index, interface['shortname']),
                     arg_count=1))
 
         ##
@@ -2948,7 +2954,7 @@ def map_session_patterns(interface, package, index):
         # This is extra kludgy due to inconsistency in OSID spec session naming
         elif (interface['shortname'] in ['AssetCompositionSession', 'AssessmentPartItemSession'] and
               method['name'].startswith('get_') and
-              method['name'].split('_')[1] in index['package_containable_objects_under']):
+              is_containable_name_in_method_name(index, method['name'])):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetCompositionSession.get_composition_assets',
                 kwargs = make_twargs(
@@ -2957,8 +2963,8 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=True,
-                    object_name=method['name'].split('_')[2].title(),
-                    containable_object_name=method['name'].split('_')[1].title(),
+                    object_name=get_containable_object_object_name(index, interface['shortname']),
+                    containable_object_name=get_containable_object_name(index, interface['shortname']),
                     arg_count=1))
 
 
@@ -2998,6 +3004,7 @@ def map_session_patterns(interface, package, index):
                     rtype=False,
                     object_name=method['name'].split('_')[-1].title(),
                     containable_object_name=get_containable_object_name(index, interface['shortname']),
+                    object_namespace = index['package_object_namespace_table'][method['name'].split('_')[-1].title()],
                     arg_count=2))
 
         ##
@@ -3223,3 +3230,9 @@ def get_containable_object_object_name(index, session_name):
         if name in session_name:
             return name
     return "UNKNOWN"
+
+def is_containable_name_in_method_name(index, method_name):
+    for containable_name in index['package_containable_objects_under']:
+        if containable_name in method_name:
+            return True
+    return False

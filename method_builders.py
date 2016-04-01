@@ -151,9 +151,21 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['return_type_list_object'] = context['return_type'][:-4]
                 context['return_type_list_object_under'] = camel_to_under(context['return_type_list_object'])
                 context['return_type_list_object_plural_under'] = make_plural(context['return_type_list_object_under'])
+            if ('containable_object_name' in context and
+                    not 'containable_object_name_under' in context and
+                    not 'containable_object_name_upper' in context):
+                context['containable_object_name_under'] = camel_to_under(context['containable_object_name'])
+                context['containable_object_name_mixed'] = camel_to_mixed(context['containable_object_name'])
+                context['containable_object_name_upper'] = camel_to_under(context['containable_object_name']).upper()
+            if 'object_namespace' in context:
+                context['object_package_name'] = '.'.join(context['object_namespace'].split('.')[:-1])
+                context['object_package_name_replace'] = '_'.join(context['object_package_name'].split('.'))
+                context['object_package_name_replace_upper'] = context['object_package_name_replace'].upper()
+                context['object_namespace_replace'] = '_'.join(context['object_namespace'].split('.'))
             if ('object_name' in context and
                     not 'object_name_under' in context and
                     not 'object_name_upper' in context):
+                context['object_name_plural'] = make_plural(context['object_name'])
                 context['object_name_under'] = camel_to_under(context['object_name'])
                 context['object_name_mixed'] = camel_to_mixed(context['object_name'])
                 context['object_name_upper'] = camel_to_under(context['object_name']).upper()

@@ -98,6 +98,7 @@ def map_patterns(package, index, base_package=None):
     if base_package is None:
         catalog_name_caps = 'NoCatalog'
         catalog_name_under = 'no_catalog'
+        object_namespace_table = OrderedDict()
         object_names_caps = []
         object_names_under = []
         containable_object_names_caps = []
@@ -113,6 +114,7 @@ def map_patterns(package, index, base_package=None):
     else:
         catalog_name_caps = base_package['package_catalog_caps']
         catalog_name_under = base_package['package_catalog_under']
+        object_namespace_table = base_package['package_object_namespace_table']
         object_names_caps = base_package['package_objects_caps']
         object_names_under = base_package['package_objects_under']
         containable_object_names_caps = base_package['package_containable_objects_caps']
@@ -136,6 +138,7 @@ def map_patterns(package, index, base_package=None):
             append_under(interface['shortname'], containable_object_names_under)
         # Find all OsidObject names in this package
         if interface['category'] == 'objects':
+            object_namespace_table[interface['shortname']] = interface['fullname'][5:]
             if 'OsidObject' in interface['inherit_shortnames']:
                 append_caps(interface['shortname'], object_names_caps)
                 append_under(interface['shortname'], object_names_under)
@@ -212,6 +215,7 @@ def map_patterns(package, index, base_package=None):
             append_under(interface['shortname'][:-13], cataloged_object_names_under)
 
     # Now that we have the index, we can map things
+    index['package_object_namespace_table'] = object_namespace_table
     index['package_objects_caps'] = object_names_caps
     index['package_objects_under'] = object_names_under
     index['package_containable_objects_caps'] = containable_object_names_caps
