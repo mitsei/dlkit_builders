@@ -5,7 +5,7 @@ def map_session_patterns(interface, package, index):
         interface['shortname'][:-13] in index['package_containable_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'repository.CompositionLookupSession'
     elif (interface['shortname'].endswith('QuerySession') and
-        interface['shortname'][:-13] in index['package_containable_objects_caps']):
+        interface['shortname'][:-12] in index['package_containable_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'repository.CompositionLookupSession'
     elif (interface['shortname'].endswith('LookupSession') and
         interface['shortname'][:-13] in index['package_objects_caps']):
@@ -1523,6 +1523,36 @@ def map_session_patterns(interface, package, index):
                               object_name = interface['shortname'][:-12],
                               cat_name = index['package_catalog_caps'],
                               return_type_full = method['return_type']))
+
+        ##
+        # ObjectQuerySession methods that configure sequestered state
+        elif (interface['shortname'].endswith('QuerySession') and
+              method['name'].startswith('use_') and
+              method['name'].endswith('_view') and
+              '_sequestered_' in method['name']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.CompositionLookupSession.use_sequestered_composition_view',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              object_name = interface['shortname'][:-13],
+                              cat_name = index['package_catalog_caps']))
+
+        ##
+        # ObjectQuerySession methods that configure unsequestered state
+        elif (interface['shortname'].endswith('QuerySession') and
+              method['name'].startswith('use_') and
+              method['name'].endswith('_view') and
+              '_unsequestered_' in method['name']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.CompositionLookupSession.use_unsequestered_composition_view',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              object_name = interface['shortname'][:-13],
+                              cat_name = index['package_catalog_caps']))
 
 
 
@@ -3195,6 +3225,32 @@ def map_session_patterns(interface, package, index):
                               method_name = method['name'],
                               cat_name = index['package_catalog_caps'],
                               var_name = 'reliable'))
+
+        ##
+        # Session methods that set active operable view.
+        elif method['name'].startswith('use_active_'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.CompositionLookupSession.use_active_composition_view',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              cat_name = index['package_catalog_caps'],
+                              object_name_under = method['name'].split('_active_')[1][:-5],
+                              var_name = 'active'))
+
+        ##
+        # Session methods that set any status operable view.
+        elif method['name'].startswith('use_any_status'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'repository.CompositionLookupSession.use_any_status_composition_view',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              cat_name = index['package_catalog_caps'],
+                              object_name_under = method['name'].split('_any_status_')[1][:-5],
+                              var_name = 'any_status'))
 
 
 

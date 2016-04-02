@@ -1016,6 +1016,8 @@ class Bin:
         self._session_management = AUTOMATIC
         self._${cat_name_under}_view = DEFAULT
         self._object_views = dict()
+        self._operable_views = dict()
+        self._containable_views = dict()
 
     def _set_${cat_name_under}_view(self, session):
         \"\"\"Sets the underlying ${cat_name_under} view to match current view\"\"\"
@@ -1041,6 +1043,34 @@ class Bin:
             else:
                 try:
                     getattr(session, 'use_comparative_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+
+    def _set_operable_view(self, session):
+        \"\"\"Sets the underlying operable views to match current view\"\"\"
+        for obj_name in self._operable_views:
+            if self._operable_views[obj_name] == ACTIVE:
+                try:
+                    getattr(session, 'use_active_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+            else:
+                try:
+                    getattr(session, 'use_any_status_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+
+    def _set_containable_view(self, session):
+        \"\"\"Sets the underlying containable views to match current view\"\"\"
+        for obj_name in self._containable_views:
+            if self._containable_views[obj_name] == SEQUIESTERED:
+                try:
+                    getattr(session, 'use_sequestered_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+            else:
+                try:
+                    getattr(session, 'use_unsequestered_' + obj_name + '_view')()
                 except AttributeError:
                     pass
 

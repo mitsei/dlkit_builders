@@ -52,63 +52,81 @@ class AssetAdminSession:
 
 class CompositionLookupSession:
 
-    # Note: These should be templates.  But first add to pattern mappers
+    # Note: These should follow other view patterns.
 
-    use_active_composition_view = """
-        \"\"\"Pass through to provider CompositionLookupSession.use_active_composition_view\"\"\"
-        self._get_provider_session('composition_lookup_session').use_active_composition_view()"""
+    use_active_composition_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        self._operable_views['${object_name_under}'] = ACTIVE
+        for session in self._provider_sessions:
+            try:
+                self._provider_sessions[session].${method_name}()
+            except AttributeError:
+                pass"""
 
-    use_any_status_composition_view = """
-        \"\"\"Pass through to provider CompositionLookupSession.use_any_status_composition_view\"\"\"
-        self._get_provider_session('composition_lookup_session').use_any_status_composition_view()"""
+    use_any_status_composition_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        self._operable_views['${object_name_under}'] = ANY_STATUS
+        for session in self._provider_sessions:
+            try:
+                self._provider_sessions[session].${method_name}()
+            except AttributeError:
+                pass"""
 
-    use_sequestered_composition_view = """
-        \"\"\"Pass through to provider CompositionLookup/QuerySession.use_sequestered_composition_view\"\"\"
-        self._get_provider_session('composition_lookup_session').use_sequestered_composition_view()
-        self._get_provider_session('composition_query_session').use_sequestered_composition_view()"""
+    use_sequestered_composition_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        self._containable_views['${object_name_under}'] = SEQUESTERED
+        for session in self._provider_sessions:
+            try:
+                self._provider_sessions[session].${method_name}()
+            except AttributeError:
+                pass"""
 
-    use_unsequestered_composition_view = """
-        \"\"\"Pass through to provider CompositionLookup/QuerySession.use_unsequestered_composition_view\"\"\"
-        self._get_provider_session('composition_lookup_session').use_unsequestered_composition_view()
-        self._get_provider_session('composition_query_session').use_unsequestered_composition_view()"""
+    use_unsequestered_composition_view_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        self._containable_views['${object_name_under}'] = UNSEQUESTERED
+        for session in self._provider_sessions:
+            try:
+                self._provider_sessions[session].${method_name}()
+            except AttributeError:
+                pass"""
 
 class AssetCompositionSession:
 
-    can_access_asset_compositions = """
-        \"\"\"Pass through to provider AssetCompositionSession.can_access_asset_compositions\"\"\"
-        self._get_provider_session('asset_composition_session').can_access_asset_compositions()"""
+    can_access_asset_compositions_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
-    get_composition_assets = """
-        \"\"\"Pass through to provider AssetCompositionSession.get_composition_assets\"\"\"
-        return self._get_provider_session('asset_composition_session').get_composition_assets(*args, **kwargs)"""
+    get_composition_assets_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
-    get_compositions_by_asset = """
-        \"\"\"Pass through to provider AssetCompositionSession.get_compositions_by_asset\"\"\"
-        return self._get_provider_session('asset_composition_session').get_compositions_by_asset(*args, **kwargs)"""
+    get_compositions_by_asset_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
 
 class AssetCompositionDesignSession:
 
-    can_compose_assets = """
-        \"\"\"Pass through to provider AssetCompositionDesignSession.can_compose_assets\"\"\"
-        self._get_provider_session('asset_composition_design_session').can_compose_assets()"""
+    can_compose_assets_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
-    add_asset = """
-        \"\"\"Pass through to provider AssetCompositionDesignSession.add_asset\"\"\"
-        self._get_provider_session('asset_composition_design_session').add_asset(*args, **kwargs)"""
+    add_asset_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
-    move_asset_ahead = """
-        \"\"\"Pass through to provider AssetCompositionDesignSession.move_asset_ahead\"\"\"
-        self._get_provider_session('asset_composition_design_session').move_asset_ahead(*args, **kwargs)"""
+    move_asset_ahead_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
-    move_asset_behind = """
-        \"\"\"Pass through to provider AssetCompositionDesignSession.move_asset_behind\"\"\"
-        self._get_provider_session('asset_composition_design_session').move_asset_behind(*args, **kwargs)"""
+    move_asset_behind_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
-    order_assets = """
-        \"\"\"Pass through to provider AssetCompositionDesignSession.order_assets\"\"\"
-        self._get_provider_session('asset_composition_design_session').order_assets(*args, **kwargs)"""
+    order_assets_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
-    remove_asset = """
-        \"\"\"Pass through to provider AssetCompositionDesignSession.remove_asset\"\"\"
-        self._get_provider_session('asset_composition_design_session').remove_asset(*args, **kwargs)"""
+    remove_asset_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""

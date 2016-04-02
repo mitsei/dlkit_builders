@@ -224,10 +224,14 @@ class CompositionLookupSession:
         return view_filter
 """
 
-    use_active_composition_view = """
+    use_active_composition_view_template = """
+        # Implemented from template for
+        # osid.repository.CompositionLookupSession.use_active_composition_view_template
         self._status_view = ACTIVE"""
 
-    use_any_status_composition_view = """
+    use_any_status_composition_view_template = """
+        # Implemented from template for
+        # osid.repository.CompositionLookupSession.use_any_status_composition_view_template
         self._status_view = ANY_STATUS"""
 
     use_sequestered_composition_view_template = """
@@ -250,7 +254,7 @@ class CompositionQuerySession:
         'UNSEQUESTERED = 1',
     ]
 
-    init = """
+    old_init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.Repository
@@ -278,10 +282,10 @@ class CompositionQuerySession:
             view_filter['sequestered'] = False
         return view_filter"""
 
-    use_sequestered_composition_view = """
+    old_use_sequestered_composition_view = """ #NOW TEMPLATED FROM LOOKUP SESSION
         self._sequestered_view = SEQUESTERED"""
 
-    use_unsequestered_composition_view = """
+    old_use_unsequestered_composition_view = """ #NOW TEMPLATED LOOKUP SESSION
         self._sequestered_view = UNSEQUESTERED"""
 
 

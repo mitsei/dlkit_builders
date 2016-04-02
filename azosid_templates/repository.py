@@ -126,35 +126,26 @@ class CompositionLookupSession:
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
 """
-    # Note: These should be templated some day. But first add to pattern mappers
 
-    use_active_composition_view = """
-        if not self._can('lookup'):
-            raise PermissionDenied()
-        else:
-            return self._provider_session.use_active_composition_view()"""
+    use_active_composition_view_template = """
+        # Implemented from azosid template for -
+        # osid.composition.CompositionLookupSession.use_active_composition_view
+        return self._provider_session.${method_name}()"""
 
-    use_any_status_composition_view = """
-        if not self._can('lookup'):
-            raise PermissionDenied()
-        else:
-            return self._provider_session.use_any_status_composition_view()"""
+    use_any_status_composition_view_template = """
+        # Implemented from azosid template for -
+        # osid.composition.CompositionLookupSession.use_any_status_composition_view
+        return self._provider_session.${method_name}()"""
 
     use_sequestered_composition_view_template = """
         # Implemented from azosid template for -
         # osid.composition.CompositionLookupSession.use_sequestered_composition_view_template
-        if not self._can('lookup'):
-            raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}()"""
+        return self._provider_session.${method_name}()"""
 
     use_unsequestered_composition_view_template = """
         # Implemented from azosid template for -
         # osid.composition.CompositionLookupSession.use_unsequestered_composition_view_template
-        if not self._can('lookup'):
-            raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}()"""
+        return self._provider_session.${method_name}()"""
 
 class CompositionSearchSession:
 
