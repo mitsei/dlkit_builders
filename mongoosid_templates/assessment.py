@@ -1579,3 +1579,16 @@ class ItemSearchSession:
     import_statements = [
         'from . import searches',
     ]
+
+class BankQuery:
+    import_statements = [
+        'from bson import ObjectId'
+    ]
+
+    match_ancestor_bank_id = """
+        # matches when the bank_id param is an ancestor of
+        # any bank
+        bank_descendants = self._get_descendant_catalog_ids(bank_id)
+        identifiers = [ObjectId(i.identifier) for i in bank_descendants]
+        self._query_terms['_id'] = {'$in': identifiers}
+        """
