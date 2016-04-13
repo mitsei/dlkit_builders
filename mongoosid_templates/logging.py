@@ -127,7 +127,6 @@ class LogEntryForm:
                 self._namespace,
                 'timestamp')}
         self._timestamp_metadata.update(mdata_conf.LOG_ENTRY_TIMESTAMP)
-        print mdata_conf.LOG_ENTRY_TIMESTAMP
         self._agent_metadata = {
             'element_id': Id(
                 self._authority,
@@ -135,16 +134,7 @@ class LogEntryForm:
                 'agent')}
         self._agent_metadata.update(mdata_conf.LOG_ENTRY_AGENT)
         self._priority_default = self._priority_metadata['default_type_values'][0]
-        print self._timestamp_metadata
-        self._timestamp_default = {
-            'year': datetime.datetime.now().year,
-            'month': datetime.datetime.now().month,
-            'day': datetime.datetime.now().day,
-            'hour': datetime.datetime.now().hour,
-            'minute': datetime.datetime.now().minute,
-            'second': datetime.datetime.now().second,
-            'microsecond': datetime.datetime.now().microsecond,
-        }
+        self._timestamp_default = datetime.datetime.now()
         self._agent_default = self._agent_metadata['default_id_values'][0]
 
     def _init_map(self, **kwargs):
