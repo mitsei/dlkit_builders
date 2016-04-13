@@ -1,4 +1,5 @@
 import json
+import os
 import string
 
 from binder_helpers import camel_to_caps_under
@@ -14,7 +15,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/mongo'
-        self._template_dir = self._abs_path + '/builders/package_maps'
+        self._template_dir = self._abs_path + '/builders/mdata_templates'
 
         self._class = 'mdata'
 
@@ -66,6 +67,19 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                 # Finally, save the mdata to the appropriate mdata_conf.py file.
                 if mdata.strip() != '':
                     mdata_definitions.append(mdata)
+
+        # check template directory to see if there is an override
+        if os.path.isfile('{0}/{1}.py'.format(self._template_dir,
+                                              self.replace(self.package['name']))):
+            mocked_interface = {
+                'shortname': self.package['name'].title()
+            }
+            impl_class = self._impl_class(mocked_interface)
+            if hasattr(impl_class, 'import_statements'):
+                for import_statement in getattr(impl_class, 'import_statements'):
+                    import_str += '\n{0}'.format(import_statement)
+            if hasattr(impl_class, 'init'):
+                import_str += '\n\n{0}'.format(getattr(impl_class, 'init'))
 
         with open(self._abc_module('mdata_conf'), 'wb') as write_file:
             write_file.write((import_str + '\n\n' +
@@ -181,6 +195,18 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
             })
             mdata = construct_data(options.OBJECT_MDATA, ctxt)
 
+        # check template directory to see if there is an override
+        if os.path.isfile('{0}/{1}.py'.format(self._template_dir,
+                                              self.replace(self.package['name']))):
+            mocked_interface = {
+                'shortname': self.package['name'].title()
+            }
+            impl_class = self._impl_class(mocked_interface)
+            mdata_name = '{0}_{1}'.format(camel_to_caps_under(interface_name),
+                                          data_name.upper())
+            if hasattr(impl_class, mdata_name):
+                mdata = getattr(impl_class, mdata_name)
+
         if mdata is not None:
             return '{0}_{1} = {{{2}\n}}\n'.format(camel_to_caps_under(interface_name),
                                                   data_name.upper(),
@@ -195,7 +221,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
         if self.package['name'] not in managers_to_implement:
             return False
 
-        if self.package['name'] == 'osid':
+        if self.package['name'] in ['type', 'osid']:
             return False
 
         return True

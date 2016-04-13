@@ -369,7 +369,14 @@ class ProficiencyForm:
             raise errors.NoAccess()
         if not self._is_valid_id(grade):
             raise errors.InvalidArgument()
-        self._my_map['level'] = str(grade)"""
+        self._my_map['level'] = str(grade)
+
+    def set_level_id(self, grade_id):
+        if self.get_level_metadata().is_read_only():
+            raise errors.NoAccess()
+        if not self._is_valid_id(grade_id):
+            raise errors.InvalidArgument()
+        self._my_map['levelId'] = str(grade_id)"""
 
 class ProficiencyQuery:
     init = """
@@ -387,7 +394,7 @@ class ProficiencyQuery:
     match_level_id = """
         if not isinstance(grade_id, Id):
             raise errors.InvalidArgument()
-        self._add_match('level', str(grade_id), match)"""
+        self._add_match('levelId', str(grade_id), match)"""
 
     match_completion = """
         try:

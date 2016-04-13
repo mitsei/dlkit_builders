@@ -1776,18 +1776,34 @@ class BinForm:
 class BinQuery:
 
     import_statements_pattern = [
-        'from ..primitives import Id'
+        'from ..primitives import Id',
+        'from ..id.objects import IdList'
     ]
 
     init_template = """
     def __init__(self, runtime):
         self._runtime = runtime
-        record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
+        record_type_data_sets = self._get_registry('${cat_name_upper}_RECORD_TYPES')
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidCatalogQuery.__init__(self, runtime)"""
+        osid_queries.OsidCatalogQuery.__init__(self, runtime)
+
+    def _get_descendant_catalog_ids(self, catalog_id):
+        hm = self._get_provider_manager('HIERARCHY')
+        hts = hm.get_hierarchy_traversal_session_for_hierarchy(
+            Id(authority='${pkg_name_upper}',
+               namespace='CATALOG',
+               identifier='${cat_name_upper}')
+        )
+        descendants = []
+        if hts.has_children(catalog_id):
+            for child_id in hts.get_children(catalog_id):
+                descendants += list(self._get_descendant_catalog_ids(child_id))
+                descendants.append(child_id)
+        return IdList(descendants)
+"""
 
     clear_group_terms_template = """
         self._clear_terms('${var_name_mixed}')"""

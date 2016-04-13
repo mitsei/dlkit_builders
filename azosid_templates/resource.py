@@ -587,7 +587,7 @@ class ResourceBinSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40ODL.MIT.EDU') # This needs to be done right
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This could be better
         self._id_namespace = '${pkg_name_replaced}.${object_name}${cat_name}'
 """
 
@@ -649,7 +649,7 @@ class ResourceBinAssignmentSession:
     init_template = """
     def __init__(self, provider_session, authz_session, proxy=None):
         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = Id('authorization.Qualifier%3AROOT%40ODL.MIT.EDU') # This needs to be done right
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This could be better
         self._id_namespace = '${pkg_name_replaced}.${object_name}${cat_name}'
 """
 

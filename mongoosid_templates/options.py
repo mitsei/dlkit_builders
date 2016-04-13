@@ -75,7 +75,7 @@ INTEGER_MDATA = """
     'syntax': 'INTEGER',
     'minimum_integer': None,
     'maximum_integer': None,
-    integer_set': []"""
+    'integer_set': []"""
 
 TYPE_MDATA = """
     'default_${id_type}_values': ['NoneType%3ANONE%40dlkit.mit.edu'],
