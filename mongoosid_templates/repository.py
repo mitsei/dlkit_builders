@@ -374,7 +374,7 @@ class AssetCompositionSession:
         if '${object_name_mixed}Ids' not in ${containable_object_name_under}:
             raise errors.NotFound('no ${object_name_plural} are assigned to this ${containable_object_name}')
         ${object_name_under}_ids = []
-        for idstr in ${containable_object_name_under}['${object_name_mixed}']:
+        for idstr in ${containable_object_name_under}['${object_name_mixed}Ids']:
             ${object_name_under}_ids.append(Id(idstr))
         mgr = self._get_provider_manager('${package_name_replace_upper}')
         lookup_session = mgr.get_${object_name_under}_lookup_session()
@@ -399,7 +399,7 @@ class AssetCompositionSession:
         result = collection.find(
             dict({'${object_name_mixed}Ids': {'$$in': [str(${object_name_under}_id)]}},
                  **self._view_filter())).sort('_id', DESCENDING)
-        return objects.${return_type}List(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)"""
 
 
 class AssetCompositionDesignSession:
@@ -499,9 +499,9 @@ class AssetCompositionDesignSession:
         collection = MongoClientValidated('${package_name_replace}',
                                           collection='${containable_object_name}',
                                           runtime=self._runtime)
-        ${containable_object_name_under} = collection.find_one({'_id': ObjectId({containable_object_name_under}_id.get_identifier())})
-        if '${object_name_mixed}' in {containable_object_name_under}:
-            if str(${object_name_under}_id) not in ${containable_object_name}['${object_name_mixed}Ids']:
+        ${containable_object_name_under} = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
+        if '${object_name_mixed}Ids' in ${containable_object_name_under}:
+            if str(${object_name_under}_id) not in ${containable_object_name_under}['${object_name_mixed}Ids']:
                 ${containable_object_name_under}['${object_name_mixed}Ids'].append(str(${object_name_under}_id))
         else:
             ${containable_object_name_under}['${object_name_mixed}Ids'] = [str(${object_name_under}_id)]
