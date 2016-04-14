@@ -806,6 +806,15 @@ class BinLookupSession:
         else:
             return self._provider_session.${method_name}()"""
 
+    get_bins_by_genus_type_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinLookupSession.get_bins_by_genus_type_template
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.${method_name}(${arg0_name})"""
+
+
 class BinAdminSession:
 
     init_template = """
