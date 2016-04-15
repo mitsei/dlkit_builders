@@ -895,12 +895,11 @@ class AssessmentTakenAdminSession:
 class AssessmentBasicAuthoringSession:
     
     import_statements = [
-        'from bson.objectid import ObjectId',
+        #'from bson.objectid import ObjectId',
         'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
+        #'from ..primitives import Id',
         'from . import objects',
         'from ..osid.sessions import OsidSession',
-        'from ..utilities import MongoClientValidated'
     ]
     
     init = """
@@ -917,7 +916,29 @@ class AssessmentBasicAuthoringSession:
             db_name='assessment',
             cat_name='Bank',
             cat_class=objects.Bank)
-        self._forms = dict()"""
+        mgr = self._get_provider_manager('ASSESSMENT)
+        self._assessment_lookup_session = mgr.get_item_lookup_session()
+        self._assessment_lookup_session.use_federated_bank_view()
+        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+        self._part_admin_session = mgr.get_assessment_part_admin_session(self._catalog_id)
+        self._part_lookup_session = mgr.get_assessment_part_lookup_session(self._catalog_id)
+        self._part_item_session = mgr.get_assessment_part_item_session(self._catalog_id)
+        self._part_item_design_session = mgr.get_assessment_part_item_design_session(self._catalog_id)
+        self._part_lookup_session.use_isolated_bank_view()
+        self._part_item_session.use_isolated_bank_view()
+
+    def _get_first_part_id(self, assessment_id):
+        \"\"\"\This implemenation assumes that all items are assigned to the first assessment part"\"\"
+        parts = self._part_lookup_session.get_assessment_parts_for_assessment(assessment_id)
+        if parts.available() != 0:
+            return parts.next().get_id()
+        assessment = self._assessment_lookup_session.get_assessment(assessment_id)
+        part_form = part_admin_session.get_assessment_part_form_for_assessment(assessment_id, [])
+        part_form.set_display_name(assessment.get_display_name + ' Default Part')
+        part_form.set_weight(100)
+        # Should we set allocated time?  Should we sequester it?
+        return part_admin_session.create_assessment_part_for_assessment(part_form).get_id()
+        """
     
     can_author_assessments = """
         # NOTE: It is expected that real authentication hints will be
@@ -925,94 +946,19 @@ class AssessmentBasicAuthoringSession:
         return True"""
     
     get_items = """
-        collection = MongoClientValidated('assessment',
-                                          collection='Assessment',
-                                          runtime=self._runtime)
-        assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-        if 'itemIds' not in assessment or assessment['itemIds'] == []:
-            return objects.ItemList([], runtime=self._runtime)
-
-        collection = MongoClientValidated('assessment',
-                                          collection='Item',
-                                          runtime=self._runtime)
-        item_list = []
-
-        # This appears to assume that all the Items exist. Need to consider this further:
-        for i in assessment['itemIds']:
-            item_list.append(collection.find_one({'_id': ObjectId(Id(i).get_identifier())}))
-        return objects.ItemList(item_list, runtime=self._runtime)"""
+        return self._part_item_session.get_items(self._get_first_part_id)"""
     
     add_item = """
-        # make sure the item exists, first
-        collection = MongoClientValidated('assessment',
-                                          collection='Item',
-                                          runtime=self._runtime)
-        collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-
-        collection = MongoClientValidated('assessment',
-                                          collection='Assessment',
-                                          runtime=self._runtime)
-        assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-
-        if 'itemIds' not in assessment:
-            assessment['itemIds'] = [str(item_id)]
-        else:
-            assessment['itemIds'].append(str(item_id))
-        collection.save(assessment)"""
+        self._part_item_design_session.add_item(item_id, self._get_first_part_id(assessment_id))"""
     
     remove_item = """
-        collection = MongoClientValidated('assessment',
-                                          collection='Assessment',
-                                          runtime=self._runtime)
-        assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-
-        try:
-            assessment['itemIds'].remove(str(item_id))
-        except (KeyError, ValueError):
-            raise errors.NotFound('item_id not found on assessment')
-        collection.save(assessment)"""
+        self._part_item_design_session.remove_item(item_id, self._get_first_part_id(assessment_id))"""
     
     move_item = """
-        collection = MongoClientValidated('assessment',
-                                          collection='Assessment',
-                                          runtime=self._runtime)
-        assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-
-        try:
-            p_index = assessment['itemIds'].index(str(preceeding_item_id))
-        except (KeyError, ValueError):
-            raise errors.NotFound('preceeding_item_id not associated with assessment')
-
-        try:
-            assessment['itemIds'].remove(str(item_id))
-        except ValueError:
-            raise errors.NotFound('item_id not associated with assessment')
-        assessment['itemIds'].insert(str(item_id), p_index + 1)
-        collection.save(assessment)"""
+        self._part_item_design_session.move_item_behind(item_id, preceeding_item_id, self._get_first_part_id(assessment_id))"""
     
     order_items = """
-        ## STILL NOT DONE???
-        # Currently this implementation assumes that all item_ids are
-        # included in the argument list. The case where a subset is provided
-        # will be implemented later, but this covers the primary case
-        # that we will see from a RESTful consumer.
-        collection = MongoClientValidated('assessment',
-                                          collection='Assessment',
-                                          runtime=self._runtime)
-        assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-
-        try:
-            if len(assessment['itemIds']) != len(item_ids):
-                raise errors.OperationFailed('number of items does not match those in assessment')
-        except KeyError:
-            raise errors.NotFound('no items were found for this assessment_id')
-        item_id_list = []
-        for i in item_ids:
-            if str(i) not in assessment['itemIds']:
-                raise errors.OperationFailed('one or more items are not associated with this assessment')
-            item_id_list.append(str(i))
-        assessment['itemIds'] = item_id_list
-        collection.save(assessment)"""
+        self._part_item_design_session.order_items(item_ids, self._get_first_part_id(assessment_id))"""
 
 
 class Question:
