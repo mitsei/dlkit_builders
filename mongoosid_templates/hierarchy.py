@@ -204,7 +204,7 @@ class HierarchyDesignSession:
         hfc = has.get_hierarchy_form_for_create([])
         hfc.set_display_name(catalog_id.get_authority() + ' ' + catalog_id.get_identifier() + ' Hierarchy')
         hfc.set_description('Catalog hierarchy for ' + catalog_id.get_authority() + ' ' + catalog_id.get_identifier())
-        hfc.set_genus_type(Type(authority='dlkit',
+        hfc.set_genus_type(Type(authority='DLKIT',
                                 namespace='hierarchy.Hierarchy',
                                 identifier=catalog_id.get_identifier()))
         # This next tricks require serious inside knowledge:
@@ -220,7 +220,7 @@ class HierarchyDesignSession:
             display_label = display_name
         if description is None:
             description = 'Relationship Type for ' + display_name
-        self._relationship_type = Type(authority='dlkit',
+        self._relationship_type = Type(authority='DLKIT',
                                        namespace='relationship.Relationship',
                                        identifier=type_identifier,
                                        display_name=display_name,
