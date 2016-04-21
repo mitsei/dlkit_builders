@@ -167,6 +167,45 @@ class CompositionLookupSession:
         # osid.composition.CompositionLookupSession.use_unsequestered_composition_view_template
         return self._provider_session.${method_name}()"""
 
+class CompositionQuerySession:
+    init = """
+    def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
+        # Implemented from azosid template for -
+        # osid.composition.CompositionLookupSession.__init__
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        if 'hierarchy_session' in kwargs:
+            self._hierarchy_session = kwargs['hierarchy_session']
+        else:
+            self._hierarchy_session = None
+        if 'query_session' in kwargs:
+            self._query_session = kwargs['query_session']
+        else:
+            self._query_session = None
+        self._qualifier_id = provider_session.get_repository_id()
+        self._id_namespace = 'repository.Composition'
+        self.use_federated_repository_view()
+
+    def _get_unauth_repository_ids(self, repository_id):
+        if self._can('lookup', repository_id):
+            return [] # Don't go further - assumes authorizations inherited
+        else:
+            unauth_list = [str(repository_id)]
+        if self._hierarchy_session.has_child_repositories(repository_id):
+            for child_repository_id in self._hierarchy_session.get_child_repository_ids(repository_id):
+                unauth_list = unauth_list + self._get_unauth_repository_ids(child_repository_id)
+        return unauth_list
+
+    def _try_harder(self, query):
+        if self._hierarchy_session is None or self._query_session is None:
+            # Should probably try to return empty result instead
+            # perhaps through a query.match_any(match = None)?
+            raise PermissionDenied()
+        for repository_id in self._get_unauth_repository_ids(self._qualifier_id):
+            query.match_repository_id(repository_id, match=False)
+        return self._query_session.get_compositions_by_query(query)
+"""
+
+
 class CompositionSearchSession:
 
     init = """
