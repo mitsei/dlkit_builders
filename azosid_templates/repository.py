@@ -203,6 +203,13 @@ class CompositionQuerySession:
         for repository_id in self._get_unauth_repository_ids(self._qualifier_id):
             query.match_repository_id(repository_id, match=False)
         return self._query_session.get_compositions_by_query(query)
+
+    class CompositionQueryWrapper(QueryWrapper):
+        \"\"\"Wrapper for CompositionQueries to override match_repository_id method\"\"\"
+
+        def match_repository_id(self, repository_id, match=True):
+            self.cat_id_args_list.append({'repository_id': repository_id, 'match': match})
+
 """
 
 
