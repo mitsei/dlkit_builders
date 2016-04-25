@@ -193,3 +193,8 @@ def overlap(start1, end1, start2, end2):
 
     """
     return not (end1 < start2 or end2 < start1)
+
+
+class OsidListList(list):
+    """A morker class for initializing OsidLists with a list of other OsidLists"""
+    pass

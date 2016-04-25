@@ -99,32 +99,35 @@ class AssessmentSession:
             collection.save(assessment_taken_map)
         else:
             raise errors.IllegalState()"""
-    
+
+    ## DONE:
     requires_synchronous_sections = """
-        # NOTE: For now we are not really dealing with sections. Re-implement when we do.
-        return False"""
+        return self._get_assessment_taken(assessment_taken_id).get_assessment_offered().are_sections_sequential()"""
     
     get_first_assessment_section = """
+        # Could this be implemented using get_next_assessment_section?
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         if not assessment_taken.has_started() or assessment_taken.has_ended():
             raise errors.IllegalState()
         if 'actualStartTime' not in assessment_taken._my_map:
             assessment_taken._my_map['actualStartTime'] = None
         assessment_taken_map = assessment_taken._my_map
-        if 'actualStartTime' not in assessment_taken_map or assessment_taken_map['actualStartTime'] is None:
+        if  assessment_taken_map['actualStartTime'] is None:
             # perhaps put everything here in a separate helper method
-            collection = MongoClientValidated('assessment',
-                                              collection='Assessment',
-                                              runtime=self._runtime)
-            assessment_id = assessment_taken.get_assessment_offered().get_assessment_id()
-            assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
-            if 'itemIds' not in assessment:
+            #collection = MongoClientValidated('assessment',
+            #                                  collection='Assessment',
+            #                                  runtime=self._runtime)
+            mgr = self._get_provider_manager('ASSESSMENT')
+            assessment = mgr.get_assessment_lookup_session().get_assessment(
+                assessment_taken.get_assessment_offered().get_assessment_id())
+            if 'itemIds' not in assessment._my_map:
                 item_ids = [] # But will this EVER be the case?
             else:
-                item_ids = assessment['itemIds']
+                item_ids = assessment.my_map['itemIds']
             assessment_taken_map['synchronousResponses'] = bool(
                 assessment_taken.get_assessment_offered().are_items_sequential())
             assessment_taken_map['actualStartTime'] = DateTime.now()
+            #### NOW WE HAVE TO THINK ABOUT GETTING THE FIRST PART
             assessment_taken_map['itemIds'] = item_ids
             assessment_taken_map['responses'] = dict()
             for item_idstr in item_ids:
@@ -197,7 +200,7 @@ class AssessmentSession:
         mgr = self._get_provider_manager('ASSESSMENT')
         lookup_session = mgr.get_assessment_taken_lookup_session() # Should this be _for_bank?
         lookup_session.use_federated_bank_view()
-        return  lookup_session.get_assessment_taken(assessment_taken_id)"""
+        return lookup_session.get_assessment_taken(assessment_taken_id)"""
     
     is_assessment_section_complete = """
         return self.get_assessment_section(assessment_section_id).get_assessment_taken().has_ended()"""
@@ -928,7 +931,7 @@ class AssessmentBasicAuthoringSession:
         self._part_item_session.use_isolated_bank_view()
 
     def _get_first_part_id(self, assessment_id):
-        \"\"\"\This implemenation assumes that all items are assigned to the first assessment part"\"\"
+        \"\"\"\This session implemenation assumes  all items are assigned to the first assessment part"\"\"
         parts = self._part_lookup_session.get_assessment_parts_for_assessment(assessment_id)
         if parts.available() != 0:
             return parts.next().get_id()
@@ -1059,6 +1062,19 @@ class Item:
 class Assessment:
 
     additional_methods = """
+
+    def are_items_sequential():
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        return False
+
+    def are_items_shuffled():
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        return False
+
+    def uses_simple_section_sequencing():
+        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
+        return False
+
     def get_object_map(self):
         obj_map = dict(self._my_map)
         if 'itemIds' in obj_map:
@@ -1147,6 +1163,29 @@ class AssessmentOffered:
         if not bool(self._my_map['${var_name_mixed}']):
             raise errors.IllegalState()
         return Duration(**self._my_map['${var_name_mixed}'])"""
+
+    are_items_sequential = """
+        if self._my_map['itemsSequential'] is None:
+            return self.get_assessment().are_items_sequential()
+        return bool(self._my_map['itemsSequential'])"""
+
+    are_items_shuffled = """
+        if self._my_map['itemsShuffled'] is None:
+            return self.get_assessment().are_items_shuffled()
+        return bool(self._my_map['itemsShuffled'])"""
+
+    additional_methods = """
+    def are_sections_sequential()
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
+            return True
+        return True
+
+    def are_sections_shuffled()
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
+            return False
+        return False"""
 
 class AssessmentOfferedForm:
     
@@ -1385,18 +1424,54 @@ class AssessmentQuery:
 
 
 class AssessmentSection:
-    
+
+    init = """
+    _record_type_data_sets = {}
+    _namespace = 'assessment.AssessmentSection'
+
+    def __init__(self, osid_object_map, runtime=None):
+        osid_objects.OsidObject.__init__(self, assessment_part_id, osid_object_map, runtime)
+        self._record_type_data_sets = self._get_registry('ASSESSMENT_SECTION_RECORD_TYPES')
+        self._records = dict()
+        self._load_records(osid_object_map['recordTypeIds'])
+        self._assessment_part_id = assessment_part # The id of the Part that spawned this Section
+        self._catalog_name = 'bank'
+"""
+
     has_allocated_time = """
-        return self.get_assessment_taken().get_assessment_offered().has_duration()"""
+        return bool(self._get_assessment_part().get_allocated_time())"""
     
     get_allocated_time = """
-        return self.get_assessment_taken().get_assessment_offered().get_duration()"""
+        return self._get_assessment_part().get_allocated_time()"""
     
     are_items_sequential = """
-        return self.get_assessment_taken().get_assessment_offered().are_items_sequential()"""
+        return self._get_assessment_part().are_items_sequential()"""
     
     are_items_shuffled = """
-        return self.get_assessment_taken().get_assessment_offered().are_items_shuffled()"""
+        return self._get_assessment_part().are_items_shuffled()"""
+
+    additional_methods = """
+    def _get_authoring_manager(self):
+        if self._authoring_manager is None:
+            self._authoring_manager = self._get_provider_manager('ASSESSMENT_AUTHORING', Local)
+
+    def _get_assessment_part(self):
+        mgr = self._get_authoring_manager
+        if not mgr.supports_assessment_part_lookup():
+            raise errors.OperationFailed('Assessment.Authoring does not support AssessmentPartItem')
+        lookup_session = mgr.get_assessment_part_lookup_session()
+        lookup_session.use_federated_bank_view()
+        return lookup_session.get_assessment_part(self._assessment_part_id)
+
+    def _get_items(self, part_id=self._assessment_part_id):
+        if self.are_items_sequential():
+            raise errors.IllegalState('Items can only be accessed one-at-a-time.') # Should this return special ItemList?
+        mgr = self._get_authoring_manager
+        if not mgr.supports_assessment_part_lookup():
+            raise errors.OperationFailed('Assessment.Authoring does not support AssessmentPartLookup')
+        part_item_session = mgr.get_assessment_part_lookup_session()
+        part_item_session.use_federated_bank_view()
+        return part_item_session.get_assessment_part_items(part_id)"""
 
 class Response:
     

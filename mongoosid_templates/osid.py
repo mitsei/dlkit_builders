@@ -1501,13 +1501,20 @@ class OsidRelationshipForm:
 class OsidList:
     import_statements = [
         'from pymongo.cursor import Cursor',
+        'from ..utilities import OsidListList',
+        'import itertools'
     ]
 
     init = """
     def __init__(self, iter_object=None, runtime=None):
         if iter_object is None:
             iter_object = []
-        if isinstance(iter_object, dict) or isinstance(iter_object, list):
+        if isinstance(iter_object, OsidListList):
+            self._count = 0
+            for osid_list in iter_object:
+                self._count += osid_list.available()
+            iter_object = itertools.chain(*iter_object)
+        elif isinstance(iter_object, dict) or isinstance(iter_object, list):
             self._count = len(iter_object)
         elif isinstance(iter_object, Cursor):
             self._count = iter_object.count(True)

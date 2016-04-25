@@ -20,6 +20,18 @@ class AssessmentPartAdminSession:
         'UNSEQUESTERED = 1',
     ]
 
+class AssessmentPart:
+    
+    additional_methods = """
+    def are_items_sequential()
+        \"\"\"This can be overwridden by a record extension\"\"\"
+        return True
+
+    def are_items_shuffled()
+        \"\"\"This can be overwridden by a record extension\"\"\"
+        return False"""
+
+
 class AssessmentPartForm:
     init = """
     _record_type_data_sets = {}
@@ -77,6 +89,8 @@ class AssessmentPartForm:
         self._assessment_part_default = self._assessment_part_metadata['default_id_values'][0]
         self._assessment_default = self._assessment_metadata['default_id_values'][0]
         self._allocated_time_default = self._allocated_time_metadata['default_duration_values'][0]
+        self._items_sequential_default = None
+        self._items_shuffled_default = None
 
     def _init_map(self, **kwargs):
         osid_objects.OsidObjectForm._init_map(self)
@@ -91,4 +105,14 @@ class AssessmentPartForm:
         else:
             self._my_map['assessmentId'] = self._assessment_default
         self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]
-        self._my_map['allocatedTime'] = self._allocated_time_default"""
+        self._my_map['allocatedTime'] = self._allocated_time_default
+        self._my_map[itemsSequential'] = self._items_sequential_default
+        self._my_map[itemsShuffled'] = self._items_shuffled_default"""
+
+    # Need to add metadata as well
+    additional_methods = """
+        def set_items_sequential(self, sequential):
+            self._my_map['itemsSequential'] = sequential
+
+        def set_items_sequential(self, shuffled):
+            self._my_map['itemsShuffled'] = shuffled"""
