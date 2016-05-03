@@ -159,31 +159,33 @@ class AuthorizationForm:
     _namespace = 'authorization.Authorization'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self, runtime=runtime)
         self._record_type_data_sets = self._get_registry('AUTHORIZATION_RECORD_TYPES')
-        self._kwargs = kwargs
-        if 'catalog_id' in kwargs:
-            self._catalog_id = kwargs['catalog_id']
+        osid_objects.OsidRelationshipForm.__init__(
+            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+        self._mdata = dict(default_mdata.AUTHORIZATION) # Don't know if we need default mdata for this
         self._init_metadata(**kwargs)
-        self._records = dict()
-        self._supported_record_type_ids = []
-        if osid_object_map is not None:
-            self._for_update = True
-            self._my_map = osid_object_map
-            self._load_records(osid_object_map['recordTypeIds'])
-        else:
-            self._my_map = {}
-            self._for_update = False
+
+        # self._records = dict()
+        # self._supported_record_type_ids = []
+        # if osid_object_map is not None:
+        #     self._for_update = True
+        #     self._my_map = osid_object_map
+        #     self._load_records(osid_object_map['recordTypeIds'])
+        # else:
+        #     self._my_map = {}
+        #     self._for_update = False
+        #     self._init_map(**kwargs)
+
+        if not self.is_for_update():
             self._init_map(**kwargs)
-            if record_types is not None:
-                self._init_records(record_types)
-        self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_metadata(self, **kwargs):
+        \"\"\"Initialize form metadata\"\"\"
         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
 
-    def _init_map(self, **kwargs):
-        osid_objects.OsidRelationshipForm._init_map(self)
+    def _init_map(self, record_types=None, **kwargs):
+        \"\"\"Initialize form map\"\"\"
+        osid_objects.OsidRelationshipForm._init_map(self, record_types=record_types)
         self._my_map['assignedVaultIds'] = [str(kwargs['vault_id'])]
         self._my_map['functionId'] = str(kwargs['function_id'])
         self._my_map['qualifierId'] = str(kwargs['qualifier_id'])

@@ -1627,7 +1627,7 @@ class ResourceForm:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.metadata import Metadata',
-        'from . import mdata_conf'
+        'from . import default_mdata'
     ]
 
     init_template = """
@@ -1635,41 +1635,43 @@ class ResourceForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self, runtime=runtime)
         self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
-        self._kwargs = kwargs
-        if 'catalog_id' in kwargs:
-            self._catalog_id = kwargs['catalog_id']
+        ${init_object}.__init__(
+            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+        self._mdata = dict(default_mdata.${object_name_caps_under})
         self._init_metadata(**kwargs)
-        self._records = dict()
-        self._supported_record_type_ids = []
-        if osid_object_map is not None:
-            self._for_update = True
-            self._my_map = osid_object_map
-            self._load_records(osid_object_map['recordTypeIds'])
-        else:
-            self._my_map = {}
-            self._for_update = False
+
+        #self._records = dict() # This should be set in OsidExtensibleForm now
+        #self._supported_record_type_ids = [] # This should be set in OsidExtensibleForm now
+        #if osid_object_map is not None:
+        #    self._for_update = True
+        #    self._my_map = osid_object_map
+        #    self._load_records(osid_object_map['recordTypeIds'])
+        #else:
+        #    self._my_map = {}
+        #    self._for_update = False
+        #    self._init_map(**kwargs)
+
+        if not self.is_for_update():
             self._init_map(**kwargs)
-            if record_types is not None:
-                self._init_records(record_types)
-        self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_metadata(self, **kwargs):
-        ${init_object}._init_metadata(self, **kwargs)${metadata_super_initers}${metadata_initers}
-    def _init_map(self, **kwargs):
-        ${init_object}._init_map(self)
-${map_super_initers}${persisted_initers}"""
+        \"\"\"Initialize form metadata\"\"\"
+${metadata_super_initers}        ${init_object}._init_metadata(self, **kwargs)
+${metadata_initers}    def _init_map(self, record_types=None, **kwargs):
+        \"\"\"Initialize form map\"\"\"
+${map_super_initers}        ${init_object}._init_map(self, record_types=record_types)
+${persisted_initers}"""
 
     get_group_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
-        metadata = dict(self._${var_name}_metadata)
+        metadata = dict(self._mdata['${var_name}'])
         metadata.update({'existing_${var_name}_values': self._my_map['${var_name_mixed}']})
         return Metadata(**metadata)"""
 
     get_avatar_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
-        metadata = dict(self._${var_name}_metadata)
+        metadata = dict(self._mdata['${var_name}'])
         metadata.update({'existing_${var_name}_values': self._my_map['${var_name_mixed}Id']})
         return Metadata(**metadata)"""
 
@@ -1759,30 +1761,36 @@ class BinForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_catalog_map=None, record_types=None, runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self, runtime=runtime)
         self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
-        self._kwargs = kwargs
+        osid_objects.OsidCatalogForm.__init__(
+            self, osid_catalog_map=osid_catalog_map, record_types=record_types, runtime=runtime, **kwargs)
+        self._mdata = dict(default_mdata.${object_name_caps_under})
         self._init_metadata(**kwargs)
-        self._records = dict()
-        if osid_catalog_map is not None:
-            self._for_update = True
-            self._my_map = osid_catalog_map
-            self._load_records(osid_catalog_map['recordTypeIds'])
-        else:
-            self._my_map = {}
-            self._for_update = False
+        
+        # self._records = dict()
+        # if osid_catalog_map is not None:
+        #     self._for_update = True
+        #     self._my_map = osid_catalog_map
+        #     self._load_records(osid_catalog_map['recordTypeIds'])
+        # else:
+        #     self._my_map = {}
+        #     self._for_update = False
+        #     self._init_map(**kwargs)
+
+        if not self.is_for_update():
             self._init_map(**kwargs)
             if record_types is not None:
                 self._init_records(record_types)
         self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_metadata(self, **kwargs):
-        osid_objects.OsidObjectForm._init_metadata(self)
-        osid_objects.OsidSourceableForm._init_metadata(self)
+        \"\"\"Initialize form metadata\"\"\"
+        osid_objects.OsidCatalogForm._init_metadata(self)
 
     def _init_map(self, **kwargs):
-        osid_objects.OsidObjectForm._init_map(self)
-        osid_objects.OsidSourceableForm._init_map(self, **kwargs)"""
+        \"\"\"Initialize form map\"\"\"
+        osid_objects.OsidCatalogForm._init_map(self)
+"""
 
 
 class BinQuery:

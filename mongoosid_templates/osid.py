@@ -203,7 +203,6 @@ class Extensible:
     ]  
 
     init = """
-
     def __init__(self):
         self._records = None
         self._supported_record_type_ids = None
@@ -852,7 +851,7 @@ class OsidForm:
     import_statements = [
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
-        'from . import mdata_conf',
+        'from . import default_mdata',
         'from .metadata import Metadata',
         'import uuid',
         'from decimal import Decimal',
@@ -864,26 +863,36 @@ class OsidForm:
 
     _namespace = 'mongo.OsidForm'
 
-    def __init__(self, runtime=None):
+    def __init__(self, runtime=None, **kwargs):
         self._identifier = str(uuid.uuid4())
+        self._mdata = None
         self._for_update = None
         self._runtime = runtime
+        self._kwargs = kwargs
         if runtime is not None:
             self._set_authority(runtime=runtime)
+        if 'mdata' in kwargs:
+            self._mdata.update(kwargs['mdata'])
+        if 'catalog_id' in kwargs:
+            self._catalog_id = kwargs['catalog_id']
 
     def _init_metadata(self):
         \"\"\"Initialize OsidObjectForm metadata.\"\"\"
 
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
-        self._journal_comment_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='display_name')}
-        self._journal_comment_metadata.update(mdata_conf.JOURNAL_COMMENT)
-        self._journal_comment_default = dict(self._journal_comment_metadata['default_string_values'][0])
-        self._journal_comment = self._journal_comment_default
+        self._mdata.update(dict(default_mdata.OSID_FORM))
+        for element_name in self._mdata:
+            self._mdata[element_name].update(
+                'element_id': Id(
+                    self._authority,
+                    self._namespace,
+                    element_name))
+        self._journal_comment_default = self._mdata['journal_comment']['default_string_values'][0]
         self._validation_messages = {}
+
+    def _init_map(self):
+        self._journal_comment = self._journal_comment_default
 
     def get_id(self):
         \"\"\" Override get_id as implemented in Identifiable.
@@ -1124,6 +1133,16 @@ class OsidExtensibleForm:
     ]
 
     init = """
+    def __init__(self):
+        self._records = dict()
+        self._supported_record_type_ids = []
+
+    def _init_map(self, record_types):
+        self._my_map['recordTypeIds'] = []
+        if record_types is not None:
+            self._init_records(record_types)
+        self._supported_record_type_ids = self._my_map['recordTypeIds']
+
     def _get_record(self, record_type):
         \"\"\"This overrides _get_record in osid.Extensible.
 
@@ -1152,40 +1171,34 @@ class OsidTemporalForm:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'import datetime',
-        'from . import mdata_conf',
+        'from . import default_mdata',
         'from .metadata import Metadata',
         ]
 
     init = """
     _namespace = "mongo.OsidTemporalForm"
 
+    def __init__(self):
+        self._mdata = None
+
     def _init_metadata(self, **kwargs):
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
-        self._start_date_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='start_date')}
-        self._start_date_metadata.update(mdata_conf.START_DATE)
-        self._start_date_metadata.update({'default_date_time_values': [datetime.datetime.now()]})
-        self._end_date_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='end_date')}
-        self._end_date_metadata.update(mdata_conf.END_DATE)
-        self._end_date_metadata.update({
+        self._mdata.update(dict(default_mdata.OSID_TEMPORAL))
+        self._mdata['start_date'].update({'default_date_time_values': [datetime.datetime.now()]})
+        self._mdata['end_date'].update({
             'default_date_time_values': [datetime.datetime.now() + datetime.timedelta(weeks=9999)]
         })
 
     def _init_map(self):
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
-        self._my_map['startDate'] = self._start_date_metadata['default_date_time_values'][0]
-        self._my_map['endDate'] = self._end_date_metadata['default_date_time_values'][0]
+        self._my_map['startDate'] = self._mdata['start_date']['default_date_time_values'][0]
+        self._my_map['endDate'] = self._mdata['end_date']['default_date_time_values'][0]
 """
 
     get_start_date_metadata = """
-        metadata = dict(self._start_date_metadata)
+        metadata = dict(self._mdata['start_date'])
         metadata.update({'existing_date_time_values': self._my_map['startDate']})
         return Metadata(**metadata)"""
 
@@ -1201,10 +1214,10 @@ class OsidTemporalForm:
         if (self.get_start_date_metadata().is_read_only() or
                 self.get_start_date_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['startDate'] = self.get_start_date_metadata['default_date_time_values'][0]"""
+        self._my_map['startDate'] = self._mdata['start_date']['default_date_time_values'][0]"""
 
     get_end_date_metadata = """
-        metadata = dict(self._end_date_metadata)
+        metadata = dict(self._mdata['end_date'])
         metadata.update({'existing_date_time_values': self._my_map['endDate']})
         return Metadata(**metadata)"""
 
@@ -1220,9 +1233,10 @@ class OsidTemporalForm:
         if (self.get_end_date_metadata().is_read_only() or
                 self.get_end_date_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['endDate'] = self.get_end_date_metadata['default_date_time_values'][0]"""
+        self._my_map['endDate'] = self._mdata['end_date']['default_date_time_values'][0]"""
 
     additional_methods = """
+    # This should go in a utility module:
     def _get_date_map(self, date):
         return {
             'year': date.year,
@@ -1238,17 +1252,13 @@ class OsidContainableForm:
 
     init = """
     def __init__(self):
-        self._sequestered_metadata = None
+        self._mdata = None
         self._sequestered_default = None
         self._sequestered = None
 
     def _init_metadata(self):
-        self._sequestered_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='sequestered')}
-        self._sequestered_metadata.update(mdata_conf.SEQUESTERED)
-        self._sequestered_default = False
+        self._mdata.update(dict(default_mdata.OSID_CONTAINABLE))
+        self._sequestered_default = self._mdata['default_boolean_value'][0]
         self._sequestered = self._sequestered_default
 
     def _init_map(self):
@@ -1277,35 +1287,19 @@ class OsidSourceableForm:
 
     init = """
     def __init__(self):
-        self._provider_metadata = None
+        self._mdata = None
         self._provider_default = None
-        self._branding_metadata = None
         self._branding_default = None
-        self._license_metadata = None
         self._license_default = None
-        self._catalog_id = None
+        self._catalog_id = None  # Why is this here?
 
     def _init_metadata(self):
-        self._provider_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='provider')}
-        self._provider_metadata.update(mdata_conf.PROVIDER)
-        self._provider_default = self._provider_metadata['default_id_values'][0]
-
-        self._branding_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='branding')}
-        self._branding_metadata.update(mdata_conf.BRANDING)
-        self._branding_default = self._branding_metadata['default_id_values']
-
-        self._license_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='license')}
-        self._license_metadata.update(mdata_conf.LICENSE)
-        self._license_default = self._license_metadata['default_string_values'][0]
+        # pylint: disable=attribute-defined-outside-init
+        # this method is called from descendent __init__
+        self._mdata.update(dict(default_mdata.OSID_SOURCEABLE))
+        self._provider_default = self._mdata['provider']['default_id_values'][0]
+        self._branding_default = self._mdata['branding']['default_id_values']
+        self._license_default = self._mdata['license']['default_string_values'][0]
 
     def _init_map(self, **kwargs):
         if 'effective_agent_id' in kwargs:
@@ -1383,62 +1377,82 @@ class OsidSourceableForm:
         self._my_map['license'] = dict(self._license_default)"""
 
 
+class OsidFederateableForm:
+
+    init = """
+    def __init__(self):
+        pass"""
+
+class OsidOperableForm:
+
+    init = """
+    def __init__(self):
+        # Need to implement someday
+        pass
+
+    def _init_metadata(self):
+        # Need to implement someday
+        pass
+
+    def _init_map(self):
+        # Need to implement someday
+        pass
+"""
+
+
 class OsidObjectForm:
 
     #inheritance = ['OsidObject']
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-        'from . import mdata_conf',
+        'from . import default_mdata',
         'from .metadata import Metadata',
     ]
 
     init = """
     _namespace = "mongo.OsidObjectForm"
 
-    ## In the real world this will never get called:
-    def __init__(self, osid_object_map=None):
-        OsidForm.__init__(self)
+    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+        self._display_name_default = None
+        self._description_default = None
+        self._genus_type_default = None
+        OsidExtensibleForm.__init__(self)
+        OsidForm.__init__(self, runtime=runtime, **kwargs)
         self._init_metadata()
         if osid_object_map is not None:
-            self._my_map = osid_object_map
             self._for_update = True
+            self._my_map = osid_object_map
+            self._load_records(osid_object_map['recordTypeIds'])
         else:
-            self._my_map = {}
             self._for_update = False
-            self._init_map()
+            self._my_map = {}
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize metadata for form\"\"\"
+        self._mdata.update(dict(default_mdata.OSID_OBJECT))
         OsidForm._init_metadata(self)
-        self._display_name_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='display_name')}
-        self._display_name_metadata.update(mdata_conf.DISPLAY_NAME)
         if 'default_display_name' in kwargs:
-            self._display_name_metadata['default_string_values'][0]['text'] = kwargs['default_display_name']
-        self._description_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='description')}
-        self._description_metadata.update(mdata_conf.DESCRIPTION)
-        self._genus_type_metadata = {
-            'element_id': Id(authority=self._authority,
-                             namespace=self._namespace,
-                             identifier='description')}
+            self._mdata['display_name']['default_string_values'][0]['text'] = kwargs['default_display_name']
         if 'default_description' in kwargs:
-            self._description_metadata['default_string_values'][0]['text'] = kwargs['default_description']
-        self._genus_type_metadata.update(mdata_conf.GENUS_TYPE)
+            self._mdata['description']['default_string_values'][0]['text'] = kwargs['default_description']
+        self._display_name_default = dict(self._mdata['display_name']['default_string_values'][0])
+        self._description_default = dict(self._mdata['description']['default_string_values'][0])
+        self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
 
-    def _init_map(self):
-        self._my_map['displayName'] = dict(self._display_name_metadata['default_string_values'][0])
-        self._my_map['description'] = dict(self._description_metadata['default_string_values'][0])
-        self._my_map['genusTypeId'] = self._genus_type_metadata['default_type_values'][0]
-        self._my_map['recordTypeIds'] = []"""
+    def _init_map(self, record_types=None):
+        \"\"\"Initialize map for form\"\"\"
+        OsidForm._init_map(self, record_types=None)
+        self._my_map['displayName'] = dict(self._display_name_default)
+        self._my_map['description'] = dict(self._description_default)
+        self._my_map['genusTypeId'] = self._genus_type_default
+        OsidExtensibleForm._init_map(self, record_types)
+"""
 
     get_display_name_metadata = """
-        return Metadata(**self._display_name_metadata)"""
+        metadata = dict(self._mdata['display_name'])
+        metadata.update({'existing_string_values': self._my_map['display_name']['text']})
+        return Metadata(**metadata)"""
 
     set_display_name = """
         if self.get_display_name_metadata().is_read_only():
@@ -1452,10 +1466,12 @@ class OsidObjectForm:
         if (self.get_display_name_metadata().is_read_only() or
                 self.get_display_name_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['displayName'] = dict(self._display_name_metadata['default_object_values'][0])"""
+        self._my_map['displayName'] = dict(self._display_name_default)"""
 
     get_description_metadata = """
-        return Metadata(**self._description_metadata)"""
+        metadata = dict(self._mdata['description'])
+        metadata.update({'existing_string_values': self._my_map['description']['text']})
+        return Metadata(**metadata)"""
 
     set_description = """
         if self.get_description_metadata().is_read_only():
@@ -1469,10 +1485,12 @@ class OsidObjectForm:
         if (self.get_description_metadata().is_read_only() or
                 self.get_description_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['description'] = dict(self._description_metadata['default_object_values'][0])"""
+        self._my_map['description'] = dict(self._description_default)"""
 
     get_genus_type_metadata = """
-        return Metadata(**self._genus_type_metadata)"""
+        metadata = dict(self._mdata['genus_type'])
+        metadata.update({'existing_string_values': self._my_map['genus_type']})
+        return Metadata(**metadata)"""
 
     set_genus_type = """
         if self.get_genus_type_metadata().is_read_only():
@@ -1485,18 +1503,44 @@ class OsidObjectForm:
         if (self.get_genus_type_metadata().is_read_only() or
                 self.get_genus_type_metadata().is_required()):
             raise errors.NoAccess()
-        self._my_map['genusTypeId'] = self._genus_type_metadata['default_type_values'][0]"""
+        self._my_map['genusTypeId'] = self._genus_type_default"""
 
 class OsidRelationshipForm:
 
     init = """
+    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+        OsidTemporalForm.__init__(self)
+        OsidObjectForm.__init__(
+            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+
     def _init_metadata(self, **kwargs):
-        OsidObjectForm._init_metadata(self, **kwargs)
         OsidTemporalForm._init_metadata(self, **kwargs)
+        OsidObjectForm._init_metadata(self, **kwargs)
 
     def _init_map(self, **kwargs):
+        OsidTemporalForm._init_map(self, **kwargs)
+        OsidObjectForm._init_map(self, record_types=record_types, **kwargs)"""
+
+
+class OsidCatalogForm:
+    
+    init = """
+    def __init__(self, osid_catalog_map=None, record_types=None, runtime=None, **kwargs):
+        OsidSourceableForm.__init__(self)
+        OsidFederateableForm.__init__(self)
+        OsidObjectForm.__init__(
+            self, osid_object_map=osid_catalog_map, record_types=record_types, runtime=runtime, **kwargs)
+
+    def _init_metadata(self, **kwargs):
+        OsidSourceableForm._init_metadata(self, **kwargs)
+        OsidFederateableForm._init_metadata(self, **kwargs)
+        OsidObjectForm._init_metadata(self, **kwargs)
+
+    def _init_map(self, **kwargs):
+        OsidSourceableForm._init_map(self, **kwargs)
+        OsidFederateableForm._init_map(self, **kwargs)
         OsidObjectForm._init_map(self, **kwargs)
-        OsidTemporalForm._init_map(self, **kwargs)"""
+"""
 
 class OsidList:
     import_statements = [

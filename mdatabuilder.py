@@ -2,7 +2,7 @@ import json
 import os
 import string
 
-from binder_helpers import camel_to_caps_under
+from binder_helpers import camel_to_under, camel_to_caps_under
 from build_controller import BaseBuilder
 from config import managers_to_implement, packages_to_test
 from interface_builders import InterfaceBuilder
@@ -81,7 +81,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
             if hasattr(impl_class, 'init'):
                 import_str += '\n\n{0}'.format(getattr(impl_class, 'init'))
 
-        with open(self._abc_module('mdata_conf'), 'wb') as write_file:
+        with open(self._abc_module('default_mdata'), 'wb') as write_file:
             write_file.write((import_str + '\n\n' +
                              '\n'.join(mdata_definitions)).encode('utf-8'))
 
@@ -89,7 +89,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
         from builders.mongoosid_templates import options
         pd = interface['shortname'] + '.persisted_data'
         rt = interface['shortname'] + '.return_types'
-        mdata = ''
+        mdata = camel_to_caps_under(interface['shortname']) + ' = {\n'
         if pd in self.patterns and self.patterns[pd] != {}:
             for data_name in self.patterns[pd]:
                 if self.patterns[pd][data_name] == 'OsidCatalog':
@@ -100,13 +100,13 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                     mdata += self._make_mdata_map(interface['shortname'],
                                                   data_name,
                                                   'DisplayText',
-                                                  options) + '\n'
+                                                  options) #+ '\n'
                 else:
                     mdata += self._make_mdata_map(interface['shortname'],
                                                   data_name,
                                                   self.patterns[pd][data_name],
-                                                  options) + '\n'
-        return mdata
+                                                  options) #+ '\n'
+        return mdata + '}'
 
     def _make_mdata_map(self, interface_name, data_name, data_type, options):
         def construct_data(opt, context):
@@ -208,9 +208,8 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                 mdata = getattr(impl_class, mdata_name)
 
         if mdata is not None:
-            return '{0}_{1} = {{{2}\n}}\n'.format(camel_to_caps_under(interface_name),
-                                                  data_name.upper(),
-                                                  mdata)
+            return '    \'{0}\': {{{1}\n    }},\n'.format(data_name,
+                                                     mdata)
         else:
             return ''
 

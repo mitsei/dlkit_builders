@@ -93,52 +93,34 @@ class LogEntryForm:
 
     init = """
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self, runtime=runtime)
         self._record_type_data_sets = self._get_registry('LOG_ENTRY_RECORD_TYPES')
-        self._kwargs = kwargs
-        if 'catalog_id' in kwargs:
-            self._catalog_id = kwargs['catalog_id']
+        osid_objects.OsidObjectForm.__init__(
+            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+        self._mdata = dict(default_mdata.LOG_ENTRY)
         self._init_metadata(**kwargs)
-        self._records = dict()
-        self._supported_record_type_ids = []
-        if osid_object_map is not None:
-            self._for_update = True
-            self._my_map = osid_object_map
-            self._load_records(osid_object_map['recordTypeIds'])
-        else:
-            self._my_map = {}
-            self._for_update = False
+        
+        # self._records = dict()
+        # self._supported_record_type_ids = []
+        # if osid_object_map is not None:
+        #     self._for_update = True
+        #     self._my_map = osid_object_map
+        #     self._load_records(osid_object_map['recordTypeIds'])
+        # else:
+        #     self._my_map = {}
+        #     self._for_update = False
+        #     self._init_map(**kwargs)
+
+        if not self.is_for_update():
             self._init_map(**kwargs)
-            if record_types is not None:
-                self._init_records(record_types)
-        self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
-        self._priority_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'priority')}
-        self._priority_metadata.update(mdata_conf.LOG_ENTRY_PRIORITY)
-        self._timestamp_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'timestamp')}
-        self._timestamp_metadata.update(mdata_conf.LOG_ENTRY_TIMESTAMP)
-        self._agent_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'agent')}
-        self._agent_metadata.update(mdata_conf.LOG_ENTRY_AGENT)
-        self._priority_default = self._priority_metadata['default_type_values'][0]
+        self._priority_default = self._mdata['priority']['default_type_values'][0]
         self._timestamp_default = datetime.datetime.now()
-        self._agent_default = self._agent_metadata['default_id_values'][0]
+        self._agent_default = self._mdata['agent']['default_id_values'][0]
 
     def _init_map(self, **kwargs):
-        osid_objects.OsidObjectForm._init_map(self)
+        osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         self._my_map['priorityId'] = self._priority_default
         self._my_map['timestamp'] = self._timestamp_default
         self._my_map['assignedLogIds'] = [str(kwargs['log_id'])]
