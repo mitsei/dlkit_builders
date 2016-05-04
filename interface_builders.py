@@ -136,6 +136,19 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             except ImportError:
                 return default
         elif isinstance(interface, dict):
+            interface_name = interface['shortname']
+            import_statement = 'import_statements_pattern'
+            if interface_name + '.init_pattern' in self.patterns:
+                init_pattern = self.patterns[interface_name + '.init_pattern']
+                try:
+                    templates = import_module(self._package_templates(self.first(init_pattern)))
+                    if hasattr(templates, self.last(init_pattern)):
+                        template_class = getattr(templates, self.last(init_pattern))
+                        if hasattr(template_class, import_statement):
+                            return getattr(template_class, import_statement)
+                except ImportError:
+                    return default
+
             template_imports = []
             for method in interface['methods']:
                 pattern = self._get_pattern(method, interface)
