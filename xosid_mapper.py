@@ -4,7 +4,7 @@
 # the patterns in this example structure:
 from collections import OrderedDict
 
-from abcbinder_settings import XOSIDNAMESPACEURI as ns
+
 from binder_helpers import wrap_and_indent, reindent,\
     camel_to_under, caps_under_to_camel, is_mixed_case,\
     get_pkg_name, add_missing_args, add_missing_methods
@@ -60,9 +60,10 @@ OSID_ERRORS = ['ALREADY_EXISTS', 'NOT_FOUND', 'PERMISSION_DENIED',
                'INVALID_METHOD', 'NO_ACCESS', 'NULL_ARGUMENT', 
                'UNIMPLEMENTED', 'UNSUPPORTED']
 
+XOSID_NS = '{urn:inet:osid.org:schemas/osid/3}'
 
 class XOsidMapper(object):
-    def __init__(self, indent_str='', xosid_ns='{urn:inet:osid.org:schemas/osid/3}', *args, **kwargs):
+    def __init__(self, indent_str='', xosid_ns=XOSID_NS, *args, **kwargs):
         self._indent_str = indent_str
         self._xosid_ns = xosid_ns
         super(XOsidMapper, self).__init__(*args, **kwargs)
@@ -118,8 +119,8 @@ class XOsidMapper(object):
 
 def interface_iterator(root):
     interface = OrderedDict()    
-    interface['fullname'] = root.get(ns + 'name')
-    interface['shortname'] = root.get(ns + 'name').split('.')[-1]
+    interface['fullname'] = root.get(XOSID_NS + 'name')
+    interface['shortname'] = root.get(XOSID_NS + 'name').split('.')[-1]
 
     ##
     # Initialize the various dictionary elements so as to assure that there
@@ -136,21 +137,21 @@ def interface_iterator(root):
     interface['methods'] = []
     
     for child in root:
-        if child.tag == (ns + 'implements'):
-            if child.get(ns + 'interface'):
-                interface['inherit_fullnames'].append(child.get(ns + 'interface'))
-                interface['inherit_shortnames'].append(child.get(ns + 'interface').split('.')[-1])
-                interface['inherit_pkg_names'].append(child.get(ns + 'interface').split('.')[-2])
-                interface['inheritance'].append({'name': child.get(ns + 'interface').split('.')[-1], 
-                                                 'pkg_name': get_pkg_name(child.get(ns + 'interface'))})
-#                                                 'pkg_name': child.get(ns + 'interface').split('.')[-2]})
-        if child.tag == (ns + 'description'):
+        if child.tag == (XOSID_NS + 'implements'):
+            if child.get(XOSID_NS + 'interface'):
+                interface['inherit_fullnames'].append(child.get(XOSID_NS + 'interface'))
+                interface['inherit_shortnames'].append(child.get(XOSID_NS + 'interface').split('.')[-1])
+                interface['inherit_pkg_names'].append(child.get(XOSID_NS + 'interface').split('.')[-2])
+                interface['inheritance'].append({'name': child.get(XOSID_NS + 'interface').split('.')[-1], 
+                                                 'pkg_name': get_pkg_name(child.get(XOSID_NS + 'interface'))})
+#                                                 'pkg_name': child.get(XOSID_NS + 'interface').split('.')[-2]})
+        if child.tag == (XOSID_NS + 'description'):
             interface['doc'] = parse_docstring(process_text(child, '    '), '    ')
             # Clean trailing whitespace issues:
             body = interface['doc']['body']
             interface['doc']['body'] = '\n\n'.join(body.split('\n    \n'))
-        if child.tag == (ns + 'method'):
-            interface['method_names'].append(camel_to_under(child.get(ns + 'name')))
+        if child.tag == (XOSID_NS + 'method'):
+            interface['method_names'].append(camel_to_under(child.get(XOSID_NS + 'name')))
             interface['methods'].append(add_missing_args(method_iterator(child), interface['shortname']))
             #add_missing_args(method_iterator(child), interface['shortname'])
     
@@ -164,7 +165,7 @@ def method_iterator(root):
     from binder_helpers import fix_reserved_word, camel_to_under, fix_bad_name
 
     method = OrderedDict()
-    method['name'] = fix_bad_name(camel_to_under(root.get(ns + 'name')))
+    method['name'] = fix_bad_name(camel_to_under(root.get(XOSID_NS + 'name')))
 
     ##
     # Initialize the various dictionary elements so as to assure that there
@@ -188,24 +189,24 @@ def method_iterator(root):
     for child in root:
         ##
         # Process main method documentation:
-        if child.tag == (ns + 'description'):
+        if child.tag == (XOSID_NS + 'description'):
             method['doc'] = parse_docstring(process_text(child, '        '),
                                                                 '        ')
             body = method['doc']['body']
             method['doc']['body'] = '\n\n'.join(body.split('\n        \n'))
         ##
         # Process parameter info into args dictionary and doc:
-        if child.tag == (ns + 'parameter'):
-            param = fix_reserved_word(camel_to_under(child.get(ns + 'name')))
+        if child.tag == (XOSID_NS + 'parameter'):
+            param = fix_reserved_word(camel_to_under(child.get(XOSID_NS + 'name')))
             array = False
             for grand_child in child:
-                if grand_child.tag == (ns + 'interfaceType'):
-                    param_type = grand_child.get(ns + 'type')
-                    if grand_child.get(ns + 'array') == 'true':
+                if grand_child.tag == (XOSID_NS + 'interfaceType'):
+                    param_type = grand_child.get(XOSID_NS + 'type')
+                    if grand_child.get(XOSID_NS + 'array') == 'true':
                         array = True
-                if grand_child.tag == (ns + 'primitiveType'):
-                    param_type = grand_child.get(ns + 'type')
-                    if grand_child.get(ns + 'array') == 'true':
+                if grand_child.tag == (XOSID_NS + 'primitiveType'):
+                    param_type = grand_child.get(XOSID_NS + 'type')
+                    if grand_child.get(XOSID_NS + 'array') == 'true':
                         array = True
             if array == True:
                 param_type = param_type + '[]'
@@ -217,12 +218,12 @@ def method_iterator(root):
             method['sphinx_param_doc'] = method['sphinx_param_doc'] + make_sphinx_param_doc(child)
         ##
         # Process return info into return type and doc:
-        if child.tag == (ns + 'return'):
+        if child.tag == (XOSID_NS + 'return'):
             for grand_child in child:
-                if grand_child.tag == (ns + 'interfaceType'):
-                    return_type = grand_child.get(ns + 'type')
-                if grand_child.tag == (ns + 'primitiveType'):
-                    return_type = grand_child.get(ns + 'type')
+                if grand_child.tag == (XOSID_NS + 'interfaceType'):
+                    return_type = grand_child.get(XOSID_NS + 'type')
+                if grand_child.tag == (XOSID_NS + 'primitiveType'):
+                    return_type = grand_child.get(XOSID_NS + 'type')
             method['return_type'] = fix_bad_name(return_type, method['name'])
             method['return_doc'] = make_return_doc(child)
             method['sphinx_return_doc'] = make_sphinx_return_doc(child)
@@ -230,8 +231,8 @@ def method_iterator(root):
         # Process error info into error doc. Note that at this time I
         # am not parsing the exceptions.  I have not found a need to do 
         # this as of yet.
-        if child.tag == (ns + 'error'):
-            method['errors'][child.get(ns + 'type')] = child.get(ns + 'category')
+        if child.tag == (XOSID_NS + 'error'):
+            method['errors'][child.get(XOSID_NS + 'type')] = child.get(XOSID_NS + 'category')
             if method['error_doc']:
                 method['error_doc'] = method['error_doc'] + '\n'
             if method['sphinx_error_doc']:
@@ -240,11 +241,11 @@ def method_iterator(root):
             method['sphinx_error_doc'] = method['sphinx_error_doc'] + make_sphinx_error_doc(child)
         ##
         # Process compliance info into compliance doc.
-        if child.tag == (ns + 'compliance'):
+        if child.tag == (XOSID_NS + 'compliance'):
             method['compliance_doc'] = make_compliance_doc(child)
         ##
         # Process implementation notes into impl notes doc.
-        if child.tag == (ns + 'implNotes'):
+        if child.tag == (XOSID_NS + 'implNotes'):
             method['impl_notes_doc'] = make_implnotes_doc(child)
 
     return method
@@ -254,21 +255,21 @@ def method_iterator(root):
 # regarding method parameters.
 def make_param_doc(root):
     from binder_helpers import wrap_and_indent, camel_to_under
-    paramStr = 'arg:    ' + camel_to_under(root.get(ns + 'name'))
+    paramStr = 'arg:    ' + camel_to_under(root.get(XOSID_NS + 'name'))
     for child in root:
-        if child.tag == (ns + 'interfaceType'):
-            paramStr = paramStr + ' (' + child.get(ns + 'type')
-            if child.get(ns + 'array') == 'true':
+        if child.tag == (XOSID_NS + 'interfaceType'):
+            paramStr = paramStr + ' (' + child.get(XOSID_NS + 'type')
+            if child.get(XOSID_NS + 'array') == 'true':
                 paramStr = paramStr + '[]): '
             else:
                 paramStr = paramStr + '): '
-        if child.tag == (ns + 'primitiveType'):
-            paramStr = paramStr + ' (' + child.get(ns + 'type')
-            if child.get(ns + 'array') == 'true':
+        if child.tag == (XOSID_NS + 'primitiveType'):
+            paramStr = paramStr + ' (' + child.get(XOSID_NS + 'type')
+            if child.get(XOSID_NS + 'array') == 'true':
                 paramStr = paramStr + '[]): '
             else:
                 paramStr = paramStr + '): '
-        if child.tag == (ns + 'description'):
+        if child.tag == (XOSID_NS + 'description'):
             paramStr = paramStr + process_text(child, '', '')
     return wrap_and_indent(paramStr.strip(),
                            '        ',
@@ -279,22 +280,22 @@ def make_param_doc(root):
 # strings regarding method parameters.
 def make_sphinx_param_doc(root):
     from binder_helpers import wrap_and_indent, camel_to_under
-    paramStr = ':param ' + camel_to_under(root.get(ns + 'name')) + ': '
-    typeStr = ':type ' + camel_to_under(root.get(ns + 'name')) + ': '
+    paramStr = ':param ' + camel_to_under(root.get(XOSID_NS + 'name')) + ': '
+    typeStr = ':type ' + camel_to_under(root.get(XOSID_NS + 'name')) + ': '
     for child in root:
-        if child.tag == (ns + 'interfaceType'):
-            typeStr = typeStr + '``' + child.get(ns + 'type')
-            if child.get(ns + 'array') == 'true':
+        if child.tag == (XOSID_NS + 'interfaceType'):
+            typeStr = typeStr + '``' + child.get(XOSID_NS + 'type')
+            if child.get(XOSID_NS + 'array') == 'true':
                 typeStr = typeStr + '[]``'
             else:
                 typeStr = typeStr + '``'
-        if child.tag == (ns + 'primitiveType'):
-            typeStr = typeStr + '``' + child.get(ns + 'type')
-            if child.get(ns + 'array') == 'true':
+        if child.tag == (XOSID_NS + 'primitiveType'):
+            typeStr = typeStr + '``' + child.get(XOSID_NS + 'type')
+            if child.get(XOSID_NS + 'array') == 'true':
                 typeStr = typeStr + '[]``'
             else:
                 typeStr = typeStr + '``'
-        if child.tag == (ns + 'description'):
+        if child.tag == (XOSID_NS + 'description'):
             paramStr = paramStr + process_text(child, '', '', width = 200)
     return '        ' + paramStr.strip() + '\n        ' + typeStr.strip() + '\n'
 
@@ -306,11 +307,11 @@ def make_return_doc(root):
     from binder_helpers import wrap_and_indent
     return_str = 'return: '
     for child in root:
-        if child.tag == (ns + 'interfaceType'):
-            return_str = return_str + '(' + child.get(ns + 'type') + ') - '
-        if child.tag == (ns + 'primitiveType'):
-            return_str = return_str + '(' + child.get(ns + 'type') + ') - '
-        if child.tag == (ns + 'description'):
+        if child.tag == (XOSID_NS + 'interfaceType'):
+            return_str = return_str + '(' + child.get(XOSID_NS + 'type') + ') - '
+        if child.tag == (XOSID_NS + 'primitiveType'):
+            return_str = return_str + '(' + child.get(XOSID_NS + 'type') + ') - '
+        if child.tag == (XOSID_NS + 'description'):
             return_str = return_str + process_text(child, '', '')
             return wrap_and_indent(return_str.strip(),
                                    '        ',
@@ -323,11 +324,11 @@ def make_sphinx_return_doc(root):
     return_str = ':return: '
     returnTypeStr = ':rtype: '
     for child in root:
-        if child.tag == (ns + 'interfaceType'):
-            returnTypeStr = returnTypeStr + '``' + child.get(ns + 'type') + '``'
-        if child.tag == (ns + 'primitiveType'):
-            returnTypeStr = returnTypeStr + '``' + child.get(ns + 'type') + '``'
-        if child.tag == (ns + 'description'):
+        if child.tag == (XOSID_NS + 'interfaceType'):
+            returnTypeStr = returnTypeStr + '``' + child.get(XOSID_NS + 'type') + '``'
+        if child.tag == (XOSID_NS + 'primitiveType'):
+            returnTypeStr = returnTypeStr + '``' + child.get(XOSID_NS + 'type') + '``'
+        if child.tag == (XOSID_NS + 'description'):
             return_str = return_str + process_text(child, '', '', width = 200)
     return ('        ' + return_str.strip() + '\n        ' + returnTypeStr.strip())
 
@@ -336,9 +337,9 @@ def make_sphinx_return_doc(root):
 # regarding the possible exceptions raised by this method.
 def make_error_doc(root):
     from binder_helpers import wrap_and_indent, caps_under_to_camel
-    errorStr = 'raise:  ' + caps_under_to_camel(root.get(ns + 'type')) + ' - '
+    errorStr = 'raise:  ' + caps_under_to_camel(root.get(XOSID_NS + 'type')) + ' - '
     for child in root:
-        if child.tag == (ns + 'description'):
+        if child.tag == (XOSID_NS + 'description'):
             errorStr = errorStr + process_text(child, '', '')
     return wrap_and_indent(errorStr.strip(),
                            '        ',
@@ -349,9 +350,9 @@ def make_error_doc(root):
 # strings regarding the possible exceptions raised by this method.
 def make_sphinx_error_doc(root):
     from binder_helpers import caps_under_to_camel
-    errorStr = ':raise: ``' + caps_under_to_camel(root.get(ns + 'type')) + '`` -- '
+    errorStr = ':raise: ``' + caps_under_to_camel(root.get(XOSID_NS + 'type')) + '`` -- '
     for child in root:
-        if child.tag == (ns + 'description'):
+        if child.tag == (XOSID_NS + 'description'):
             errorStr = errorStr + process_text(child, '', '', width = 200)
     return '        ' + errorStr.strip()
 
@@ -360,9 +361,9 @@ def make_sphinx_error_doc(root):
 # regarding the compliance required for this method.
 def make_compliance_doc(root):
     from binder_helpers import wrap_and_indent
-    compStr = '*compliance: ' + root.get(ns + 'type') + ' -- '
+    compStr = '*compliance: ' + root.get(XOSID_NS + 'type') + ' -- '
     for child in root:
-        if child.tag == (ns + 'description'):
+        if child.tag == (XOSID_NS + 'description'):
             compStr = compStr + process_text(child, '', '', width = 200) + '*'
     return wrap_and_indent(compStr.strip(),
                            '        ',
@@ -395,16 +396,16 @@ def process_text(root,
     make_str = ''
     iter_str = ' '.join(root.text.split())
     for child in root:
-        if child.tag == (ns + 'copyrightSymbol'):
+        if child.tag == (XOSID_NS + 'copyrightSymbol'):
             iter_str = iter_str + ' (c) ' + ' '.join(child.tail.split()) + ' '
-        if child.tag == (ns + 'pbreak'):
+        if child.tag == (XOSID_NS + 'pbreak'):
             make_str = (make_str + wrap_and_indent(iter_str, 
                         i_indent, s_indent, width)) + '\n' + i_indent +'\n'
             iter_str = ' '.join(child.tail.split())
-        if child.tag == (ns + 'heading'):
+        if child.tag == (XOSID_NS + 'heading'):
             iter_str += ' '.join(str(child.text).split())
             iter_str += ' '.join(str(child.tail).split())
-        if child.tag == (ns + 'token'):
+        if child.tag == (XOSID_NS + 'token'):
             if is_mixed_case(str(child.text).strip()):
                 if len(str(child.text).split('.')) > 1:
                     segments = str(child.text).split('.')
@@ -426,13 +427,13 @@ def process_text(root,
             else:
                 iter_str = iter_str + ' ``' + ' '.join(str(converted_text).split()) + '`` '
             iter_str = iter_str + '' + ' '.join(str(child.tail).split()) + ''
-        if child.tag == (ns + 'code'):
+        if child.tag == (XOSID_NS + 'code'):
             make_str = (make_str + wrap_and_indent(iter_str,
                                         i_indent, s_indent, width)).strip() + '\n'
             iter_str = reindent(child.text.strip(), i_indent + '  ')
             make_str = make_str + iter_str + i_indent + '\n'
             iter_str = ' '.join(child.tail.split())
-        if child.tag == (ns + 'outline'):
+        if child.tag == (XOSID_NS + 'outline'):
             make_str = (make_str + wrap_and_indent(iter_str, 
                         i_indent, s_indent, width)).strip() + '\n'
             iter_str = i_indent + '\n' + make_outline(child, i_indent + '  * ',
@@ -512,10 +513,10 @@ def make_outline(root, i_indent, s_indent = None, width = 72):
     outline = ''
     iter_str = ''
     for child in root:
-        if child.tag == (ns + 'element'):
+        if child.tag == (XOSID_NS + 'element'):
             iter_str = ' '.join(child.text.split())
             for elem in child.iter():
-                if elem.tag == (ns + 'token'):
+                if elem.tag == (XOSID_NS + 'token'):
                     iter_str = iter_str + ' ``' + ' '.join(str(elem.text).split()) + '`` '
                     iter_str = iter_str + '' + ' '.join(str(elem.tail).split()) + ''
             iter_str = wrap_and_indent(iter_str, i_indent, s_indent)
