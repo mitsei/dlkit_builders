@@ -168,6 +168,8 @@ class CompositionLookupSession:
         return self._provider_session.${method_name}()"""
 
 class CompositionQuerySession:
+    
+    # This should be an init_template:
     init = """
     def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
         # Implemented from azosid template for -
