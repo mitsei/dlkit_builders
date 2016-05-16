@@ -217,7 +217,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['svc_mgr_or_catalog'] = 'catalog'
 
         # Uncomment next line to identify on which method a KeyError is occurring
-        print interface['shortname'], method['name']
+        #print interface['shortname'], method['name']
         return context
 
     def _get_method_decorator(self, method):

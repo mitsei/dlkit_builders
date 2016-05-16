@@ -254,6 +254,8 @@ class CompositionQuerySession:
         'UNSEQUESTERED = 1',
     ]
 
+    init_template = CompositionLookupSession.init_template
+
     old_init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
