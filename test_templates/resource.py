@@ -126,6 +126,7 @@ class ResourceLookupSession:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # Implemented from init template for ResourceLookupSession
         cls.${object_name_under}_list = list()
         cls.${object_name_under}_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
@@ -143,6 +144,7 @@ class ResourceLookupSession:
 
     @classmethod
     def tearDownClass(cls):
+        # Implemented from init template for ResourceLookupSession
         #for obj in cls.catalog.get_${object_name_under_plural}():
         #    cls.catalog.delete_${object_name_under}(obj.ident)
         #for catalog in cls.catalogs:

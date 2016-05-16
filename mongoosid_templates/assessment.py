@@ -1126,14 +1126,14 @@ class AssessmentOffered:
             obj_map['startTime']['microsecond'] = start_time.microsecond
         if obj_map['deadline'] is not None:
             deadline = obj_map['deadline']
-            obj_map['startTime'] = dict()
-            obj_map['startTime']['year'] = deadline.year
-            obj_map['startTime']['month'] = deadline.month
-            obj_map['startTime']['day'] = deadline.day
-            obj_map['startTime']['hour'] = deadline.hour
-            obj_map['startTime']['minute'] = deadline.minute
-            obj_map['startTime']['second'] = deadline.second
-            obj_map['startTime']['microsecond'] = deadline.microsecond
+            obj_map['deadline'] = dict()
+            obj_map['deadline']['year'] = deadline.year
+            obj_map['deadline']['month'] = deadline.month
+            obj_map['deadline']['day'] = deadline.day
+            obj_map['deadline']['hour'] = deadline.hour
+            obj_map['deadline']['minute'] = deadline.minute
+            obj_map['deadline']['second'] = deadline.second
+            obj_map['deadline']['microsecond'] = deadline.microsecond
         obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
         if obj_map['displayName']['text'] == '':
             obj_map['displayName']['text'] = self.get_display_name().get_text()

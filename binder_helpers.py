@@ -1,10 +1,9 @@
 import os
 import re
 
-from abcbinder_settings import XOSIDNAMESPACEURI as ns
-from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
-from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
-from mongobuilder_settings import PATTERN_DIR as pattern_maps_dir
+# from abcbinder_settings import INTERFACMAPSDIRECTORY as interface_maps_dir
+# from abcbinder_settings import PKGMAPSDIRECTORY as pkg_maps_dir
+# from mongobuilder_settings import PATTERN_DIR as pattern_maps_dir
 import json
 import keyword
 import textwrap
@@ -202,24 +201,24 @@ def camel_to_caps_under(name):
 # This function returns the category, or 'module' for the interface in question
 # By default it does not raise an exception, but can be called with report-
 # error equals True so that you can track un-categorized interfaces.
-def get_interface_module(pkg_name, interface_shortname, report_error = False):
-    category = 'UNKNOWN_MODULE'
-    try:
-        read_file = open(interface_maps_dir + '/' + pkg_name + '.json' , 'r')
-        index = json.load(read_file)
-        read_file.close()
-    except IOError:
-        if report_error:
-            print ('INTERFACE LOOKUP ERROR - interface map for \'' + pkg_name + 
-                   '.' + interface_shortname + '\' not found.')
-    else:
-        try:
-            category = index[pkg_name + '.' + interface_shortname]
-        except KeyError:
-            if report_error:
-                print ('INTERFACE LOOKUP ERROR - category for \'' + pkg_name + '.'
-                       + interface_shortname + '\' not found.')
-    return category
+# def get_interface_module(pkg_name, interface_shortname, report_error = False):
+#     category = 'UNKNOWN_MODULE'
+#     try:
+#         read_file = open(interface_maps_dir + '/' + pkg_name + '.json' , 'r')
+#         index = json.load(read_file)
+#         read_file.close()
+#     except IOError:
+#         if report_error:
+#             print ('INTERFACE LOOKUP ERROR - interface map for \'' + pkg_name +
+#                    '.' + interface_shortname + '\' not found.')
+#     else:
+#         try:
+#             category = index[pkg_name + '.' + interface_shortname]
+#         except KeyError:
+#             if report_error:
+#                 print ('INTERFACE LOOKUP ERROR - category for \'' + pkg_name + '.'
+#                        + interface_shortname + '\' not found.')
+#     return category
 
 
 ##
@@ -336,18 +335,18 @@ def get_cat_name_for_pkg(pkg):
             return interface['shortname']
     return 'NoCatalog'
 
-def get_cat_name_for_pkg_from_pattern(pkg):
-    try:
-        read_file = open(pattern_maps_dir + '/' + pkg + '.json', 'r')
-        pattern = json.load(read_file)
-        read_file.close()
-    except IOError:
-        #print 'No pattern map found for package \'' + pkg + '\''
-        return 'NoCatalog'
-    if 'package_catalog_caps' in pattern:
-        #print pattern['package_catalog_caps']
-        return pattern['package_catalog_caps']
-    return 'NoCatalog'
+# def get_cat_name_for_pkg_from_pattern(pkg):
+#     try:
+#         read_file = open(pattern_maps_dir + '/' + pkg + '.json', 'r')
+#         pattern = json.load(read_file)
+#         read_file.close()
+#     except IOError:
+#         #print 'No pattern map found for package \'' + pkg + '\''
+#         return 'NoCatalog'
+#     if 'package_catalog_caps' in pattern:
+#         #print pattern['package_catalog_caps']
+#         return pattern['package_catalog_caps']
+#     return 'NoCatalog'
 
 def flagged_for_implementation(interface,
         sessions_to_implement, objects_to_implement, variants_to_implement):

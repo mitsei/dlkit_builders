@@ -1065,6 +1065,18 @@ class BinLookupSession:
 
         return objects.${return_type}(result, runtime=self._runtime)"""
 
+    get_bins_by_genus_type_template = """
+        # Implemented from template for
+        # osid.resource.BinLookupSession.get_bins_by_genus_type_template
+        # NOTE: This implementation currently ignores plenary view
+        collection = MongoClientValidated('${package_name}',
+                                          collection='${cat_name}',
+                                          runtime=self._runtime)
+        result = collection.find({"genusTypeId": str(${arg0_name})}).sort('_id', DESCENDING)
+
+        return objects.${return_type}(result, runtime=self._runtime)"""
+
+
 class BinAdminSession:
 
     import_statements_pattern = [

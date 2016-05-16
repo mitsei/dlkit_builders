@@ -6,7 +6,7 @@ def map_session_patterns(interface, package, index):
         index[interface['shortname'] + '.init_pattern'] = 'repository.CompositionLookupSession'
     elif (interface['shortname'].endswith('QuerySession') and
         interface['shortname'][:-12] in index['package_containable_objects_caps']):
-        index[interface['shortname'] + '.init_pattern'] = 'repository.CompositionLookupSession'
+        index[interface['shortname'] + '.init_pattern'] = 'repository.CompositionQuerySession'
     elif (interface['shortname'].endswith('LookupSession') and
         interface['shortname'][:-13] in index['package_objects_caps']):
         index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceLookupSession'

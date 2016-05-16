@@ -268,6 +268,7 @@ class ResourceLookupSession:
     use_comparative_resource_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._object_views['${object_name_under}'] = COMPARATIVE
+        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].${method_name}()
@@ -277,6 +278,7 @@ class ResourceLookupSession:
     use_plenary_resource_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._object_views[\'${object_name_under}\'] = PLENARY
+        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].${method_name}()
@@ -286,6 +288,7 @@ class ResourceLookupSession:
     use_federated_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._${cat_name_under}_view = FEDERATED
+        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].${method_name}()
@@ -295,6 +298,7 @@ class ResourceLookupSession:
     use_isolated_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._${cat_name_under}_view = ISOLATED
+        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].${method_name}()
@@ -638,6 +642,7 @@ class BinLookupSession:
     use_comparative_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._${cat_name_under}_view = COMPARATIVE
+        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_comparative_${cat_name_under}_view()
@@ -647,6 +652,7 @@ class BinLookupSession:
     use_plenary_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._${cat_name_under}_view = PLENARY
+        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
         for session in self._provider_sessions:
             try:
                 self._provider_sessions[session].use_plenary_${cat_name_under}_view()

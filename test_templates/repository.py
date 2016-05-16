@@ -1,4 +1,4 @@
-from .resource import ResourceLookupSession
+from .resource import ResourceLookupSession, ResourceQuerySession
 
 class RepositoryProfile:
 
@@ -100,6 +100,8 @@ class CompositionLookupSession:
         self.assertEqual(self.catalog.get_compositions().available(), 2)"""
 
 class CompositionQuerySession:
+
+    init_template = ResourceQuerySession.init_template
 
     get_compositions_by_query = """
         cfu = self.catalog.get_composition_form_for_update(self.composition_list[3].ident)

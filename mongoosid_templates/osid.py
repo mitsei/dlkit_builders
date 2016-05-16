@@ -367,7 +367,7 @@ class Sourceable:
         mgr = self._get_provider_manager('RESOURCE')
         lookup_session = mgr.get_resource_lookup_session()
         lookup_session.use_federated_bin_view()
-        resource = lookup_session.get_resource(self.get_provider_id())"""
+        return lookup_session.get_resource(self.get_provider_id())"""
 
     get_branding_ids = """
         from ..id.objects import IdList
