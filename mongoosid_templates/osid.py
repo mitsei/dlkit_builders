@@ -1449,7 +1449,7 @@ class OsidObjectForm:
 
     get_display_name_metadata = """
         metadata = dict(self._mdata['display_name'])
-        metadata.update({'existing_string_values': self._my_map['display_name']['text']})
+        metadata.update({'existing_string_values': self._my_map['displayName']['text']})
         return Metadata(**metadata)"""
 
     set_display_name = """
@@ -1487,7 +1487,7 @@ class OsidObjectForm:
 
     get_genus_type_metadata = """
         metadata = dict(self._mdata['genus_type'])
-        metadata.update({'existing_string_values': self._my_map['genus_type']})
+        metadata.update({'existing_string_values': self._my_map['genusType']})
         return Metadata(**metadata)"""
 
     set_genus_type = """
@@ -1516,7 +1516,7 @@ class OsidRelationshipForm:
         OsidObjectForm._init_metadata(self, **kwargs)
 
     def _init_map(self, **kwargs):
-        OsidTemporalForm._init_map(self, **kwargs)
+        OsidTemporalForm._init_map(self)
         OsidObjectForm._init_map(self, record_types=record_types, **kwargs)"""
 
 
