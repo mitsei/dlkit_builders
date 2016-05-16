@@ -884,10 +884,9 @@ class OsidForm:
         self._mdata.update(dict(default_mdata.OSID_FORM))
         for element_name in self._mdata:
             self._mdata[element_name].update(
-                'element_id': Id(
-                    self._authority,
-                    self._namespace,
-                    element_name))
+                {'element_id': Id(self._authority,
+                                  self._namespace,
+                                  element_name)})
         self._journal_comment_default = self._mdata['journal_comment']['default_string_values'][0]
         self._validation_messages = {}
 
@@ -1419,7 +1418,6 @@ class OsidObjectForm:
         self._genus_type_default = None
         OsidExtensibleForm.__init__(self)
         OsidForm.__init__(self, runtime=runtime, **kwargs)
-        self._init_metadata()
         if osid_object_map is not None:
             self._for_update = True
             self._my_map = osid_object_map
@@ -1442,7 +1440,7 @@ class OsidObjectForm:
 
     def _init_map(self, record_types=None):
         \"\"\"Initialize map for form\"\"\"
-        OsidForm._init_map(self, record_types=None)
+        OsidForm._init_map(self)
         self._my_map['displayName'] = dict(self._display_name_default)
         self._my_map['description'] = dict(self._description_default)
         self._my_map['genusTypeId'] = self._genus_type_default

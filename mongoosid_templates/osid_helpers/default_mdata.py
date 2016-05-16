@@ -132,7 +132,7 @@ OSID_CONTAINABLE = {
         'required': False,
         'read_only': False,
         'linked': False,
-        'default_boolean_values': [None]
+        'default_boolean_values': [None],
         'array': False,
         'syntax': 'BOOLEAN',
     }
