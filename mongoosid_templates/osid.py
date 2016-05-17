@@ -1103,7 +1103,7 @@ class OsidForm:
         raise errors.Unsupported()"""
 
     get_journal_comment_metadata = """
-        return Metadata(**self._journal_comment_metadata)"""
+        return Metadata(**self._mdata['journal_comment'])"""
 
     set_journal_comment = """
         if self.get_journal_comment_metadata().is_read_only():
@@ -1257,14 +1257,14 @@ class OsidContainableForm:
 
     def _init_metadata(self):
         self._mdata.update(dict(default_mdata.OSID_CONTAINABLE))
-        self._sequestered_default = self._mdata['default_boolean_value'][0]
+        self._sequestered_default = self._mdata['sequestered']['default_boolean_values'][0]
         self._sequestered = self._sequestered_default
 
     def _init_map(self):
         self._my_map['sequestered'] = self._sequestered_default"""
 
     get_sequestered_metadata = """
-        return Metadata(**self._sequestered_metadata)"""
+        return Metadata(**self._mdata['sequestered'])"""
 
     set_sequestered = """
         if sequestered is None:
@@ -1319,7 +1319,7 @@ class OsidSourceableForm:
         self._my_map['license'] = dict(self._license_default)"""
 
     get_provider_metadata = """
-        metadata = dict(self._provider_metadata)
+        metadata = dict(self._mdata['provider'])
         metadata.update({'existing_id_values': self._my_map['providerId']})
         return Metadata(**metadata)"""
 
@@ -1337,7 +1337,7 @@ class OsidSourceableForm:
         self._my_map['providerId'] = self._provider_default"""
 
     get_branding_metadata = """
-        metadata = dict(self._branding_metadata)
+        metadata = dict(self._mdata['branding'])
         metadata.update({'existing_id_values': self._my_map['brandingIds']})
         return Metadata(**metadata)"""
 
@@ -1358,7 +1358,7 @@ class OsidSourceableForm:
         self._my_map['brandingIds'] = self._branding_default"""
 
     get_license_metadata = """
-        metadata = dict(self._license_metadata)
+        metadata = dict(self._mdata['license'])
         metadata.update({'existing_string_values': self._my_map['license']})
         return Metadata(**metadata)"""
 
@@ -1487,7 +1487,7 @@ class OsidObjectForm:
 
     get_genus_type_metadata = """
         metadata = dict(self._mdata['genus_type'])
-        metadata.update({'existing_string_values': self._my_map['genusType']})
+        metadata.update({'existing_string_values': self._my_map['genusTypeId']})
         return Metadata(**metadata)"""
 
     set_genus_type = """
@@ -1515,7 +1515,7 @@ class OsidRelationshipForm:
         OsidTemporalForm._init_metadata(self, **kwargs)
         OsidObjectForm._init_metadata(self, **kwargs)
 
-    def _init_map(self, **kwargs):
+    def _init_map(self, record_types=None, **kwargs):
         OsidTemporalForm._init_map(self)
         OsidObjectForm._init_map(self, record_types=record_types, **kwargs)"""
 
@@ -1530,14 +1530,14 @@ class OsidCatalogForm:
             self, osid_object_map=osid_catalog_map, record_types=record_types, runtime=runtime, **kwargs)
 
     def _init_metadata(self, **kwargs):
-        OsidSourceableForm._init_metadata(self, **kwargs)
-        OsidFederateableForm._init_metadata(self, **kwargs)
+        OsidSourceableForm._init_metadata(self)
+        OsidFederateableForm._init_metadata(self)
         OsidObjectForm._init_metadata(self, **kwargs)
 
-    def _init_map(self, **kwargs):
+    def _init_map(self, record_types=None, **kwargs):
         OsidSourceableForm._init_map(self, **kwargs)
-        OsidFederateableForm._init_map(self, **kwargs)
-        OsidObjectForm._init_map(self, **kwargs)
+        OsidFederateableForm._init_map(self)
+        OsidObjectForm._init_map(self, record_types)
 """
 
 class OsidList:

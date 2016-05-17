@@ -1653,7 +1653,7 @@ class ResourceForm:
         #    self._init_map(**kwargs)
 
         if not self.is_for_update():
-            self._init_map(**kwargs)
+            self._init_map(record_types, **kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
@@ -1752,6 +1752,7 @@ class Bin:
 class BinForm:
 
     import_statements_pattern = [
+        'from . import default_mdata',
         '#from ..osid.objects import OsidForm',
         '#from ..osid.objects import OsidObjectForm',
     ]
@@ -1778,18 +1779,18 @@ class BinForm:
         #     self._init_map(**kwargs)
 
         if not self.is_for_update():
-            self._init_map(**kwargs)
-            if record_types is not None:
-                self._init_records(record_types)
-        self._supported_record_type_ids = self._my_map['recordTypeIds']
+            self._init_map(record_types, **kwargs)
+        #     if record_types is not None:
+        #         self._init_records(record_types)
+        # self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
-        osid_objects.OsidCatalogForm._init_metadata(self)
+        osid_objects.OsidCatalogForm._init_metadata(self, **kwargs)
 
-    def _init_map(self, **kwargs):
+    def _init_map(self, record_types=None, **kwargs):
         \"\"\"Initialize form map\"\"\"
-        osid_objects.OsidCatalogForm._init_map(self)
+        osid_objects.OsidCatalogForm._init_map(self, record_types, **kwargs)
 """
 
 

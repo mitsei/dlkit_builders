@@ -467,7 +467,7 @@ def make_metadata_initers(interface_name, persisted_data, initialized_data, retu
             elif (persisted_data[data_name] == 'string' and
                     return_types[data_name] == 'osid.locale.DisplayText'):
                 default += '        self._{0}_default = ' \
-                           'dict(self._{0}_metadata[\'default_string_values\'][0])\n'.format(data_name)
+                           'dict(self._mdata[\'{0}\'][\'default_string_values\'][0])\n'.format(data_name)
             elif persisted_data[data_name] == 'string':
                 default += default_string(data_name, 'string')
             elif (persisted_data[data_name] == 'osid.id.Id' and

@@ -268,7 +268,7 @@ class ActivityForm:
 
     get_assets_metadata_template = """
         # Implemented from template for osid.learning.ActivityForm.get_assets_metadata_template
-        metadata = dict(self._${var_name}_metadata)
+        metadata = dict(self._mdata['${var_name}'])
         metadata.update({'existing_${var_name}_values': self._my_map['${var_name_singular_mixed}Ids']})
         return Metadata(**metadata)"""
 

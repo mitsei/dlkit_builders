@@ -845,7 +845,7 @@ class CompositionForm:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        metadata = dict(self._children_metadata)
+        metadata = dict(self._mdata['children'])
         metadata.update({'existing_children_values': self._my_map['childIds']})
         return Metadata(**metadata)
 
