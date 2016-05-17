@@ -758,6 +758,20 @@ class AssessmentTakenLookupSession:
         collection = MongoClientValidated('assessment',
                                           collection='AssessmentTaken',
                                           runtime=self._runtime)
+
+        am = self._get_provider_manager('ASSESSMENT')
+        aols = am.get_assessment_offered_lookup_session()
+        aols.use_federated_bank_view()
+        offered = aols.get_assessment_offered(assessment_offered_id)
+        try:
+            deadline = offered.get_deadline()
+            nowutc = DateTime.utcnow()
+            if nowutc > deadline:
+                raise errors.PermissionDenied('you are passed the deadline for the offered')
+        except errors.IllegalState:
+            # no deadline set
+            pass
+
         result = collection.find(
             dict({'assessmentOfferedId': str(assessment_offered_id),
                   'takingAgentId': str(resource_id)},
@@ -846,6 +860,10 @@ class AssessmentTakenAdminSession:
         'CREATED = True',
     ]
 
+    import_statements = [
+        'from dlkit.primordium.calendaring.primitives import DateTime'
+    ]
+
     create_assessment_taken_import_templates = [
         'from ...abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm',
         'from ..osid.osid_errors import PermissionDenied'
@@ -891,6 +909,44 @@ class AssessmentTakenAdminSession:
         self._forms[assessment_taken_form.get_id().get_identifier()] = CREATED
         return objects.AssessmentTaken(
             collection.find_one({'_id': insert_result.inserted_id}), runtime=self._runtime)"""
+
+    get_assessment_taken_form_for_create = """
+        if not isinstance(assessment_offered_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        for arg in assessment_taken_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
+
+        am = self._get_provider_manager('ASSESSMENT')
+        aols = am.get_assessment_offered_lookup_session()
+        aols.use_federated_bank_view()
+        offered = aols.get_assessment_offered(assessment_offered_id)
+        try:
+            deadline = offered.get_deadline()
+            nowutc = DateTime.utcnow()
+            if nowutc > deadline:
+                raise errors.PermissionDenied('you are passed the deadline for the offered')
+        except errors.IllegalState:
+            # no deadline set
+            pass
+
+        if assessment_taken_record_types == []:
+            ## WHY are we passing bank_id = self._catalog_id below, seems redundant:
+            obj_form = objects.AssessmentTakenForm(
+                bank_id=self._catalog_id,
+                assessment_offered_id=assessment_offered_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime)
+        else:
+            obj_form = objects.AssessmentTakenForm(
+                bank_id=self._catalog_id,
+                record_types=assessment_taken_record_types,
+                assessment_offered_id=assessment_offered_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime)
+        obj_form._for_update = False
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
+        return obj_form"""
 
 class AssessmentBasicAuthoringSession:
     
