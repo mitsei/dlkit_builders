@@ -159,7 +159,7 @@ class AuthorizationForm:
     _namespace = 'authorization.Authorization'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = self._get_registry('AUTHORIZATION_RECORD_TYPES')
+        self._record_type_data_sets = get_registry('AUTHORIZATION_RECORD_TYPES', self._runtime)
         osid_objects.OsidRelationshipForm.__init__(
             self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
         self._mdata = dict(default_mdata.AUTHORIZATION) # Don't know if we need default mdata for this
@@ -204,7 +204,7 @@ class AuthorizationQuery:
     def __init__(self, runtime):
         self._namespace = 'authorization.Authorization'
         self._runtime = runtime
-        record_type_data_sets = self._get_registry('AUTHORIZATION_RECORD_TYPES')
+        record_type_data_sets = get_registry('AUTHORIZATION_RECORD_TYPES', self._runtime)
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:

@@ -184,7 +184,7 @@ class GradeEntryForm:
     _namespace = 'grading.GradeEntry'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = self._get_registry('GRADE_ENTRY_RECORD_TYPES')
+        self._record_type_data_sets = get_registry('GRADE_ENTRY_RECORD_TYPES', self._runtime)
         osid_objects.OsidRelationshipForm.__init__(
             self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
         self._mdata = dict(default_mdata.GRADE_ENTRY)
@@ -437,8 +437,8 @@ class GradebookColumnSummary:
     _namespace = 'grading.GradebookColumnSummary'
 
     def __init__(self, osid_object_map, runtime=None):
+        self._record_type_data_sets = get_registry('GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES', self._runtime)
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._record_type_data_sets = self._get_registry('GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES')
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         self._catalog_name = 'Gradebook'

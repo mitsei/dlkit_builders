@@ -14,15 +14,15 @@ class OsidProfile:
         self._runtime = None
         self._config = None
 
-    def _get_registry(self, entry):
-        # get from the runtime
-        try:
-            records_location_param_id = Id('parameter:recordsRegistry@mongo')
-            registry = self._runtime.get_configuration().get_value_by_parameter(
-                records_location_param_id).get_string_value()
-            return import_module(registry).__dict__.get(entry, {})
-        except (ImportError, AttributeError, KeyError, errors.NotFound):
-            return {}
+    # def _get_registry(self, entry): # This has been moved to mongo.utilities.py
+    #     # get from the runtime
+    #     try:
+    #         records_location_param_id = Id('parameter:recordsRegistry@mongo')
+    #         registry = self._runtime.get_configuration().get_value_by_parameter(
+    #             records_location_param_id).get_string_value()
+    #         return import_module(registry).__dict__.get(entry, {})
+    #     except (ImportError, AttributeError, KeyError, errors.NotFound):
+    #         return {}
 
     def _initialize_manager(self, runtime):
         \"\"\"Sets the runtime, configuration and mongo client\"\"\"
@@ -205,8 +205,8 @@ class Extensible:
     init = """
     def __init__(self):
         self._records = None
-        self._supported_record_type_ids = None
-        self._record_type_data_sets = None
+        self._supported_record_type_ids = []
+        self._record_type_data_sets = {}
         self._runtime = None
         self._proxy = None
 
@@ -237,15 +237,15 @@ class Extensible:
                     pass
         raise AttributeError()
 
-    def _get_registry(self, entry):
-        # get from the runtime
-        try:
-            records_location_param_id = Id('parameter:recordsRegistry@mongo')
-            registry = self._runtime.get_configuration().get_value_by_parameter(
-                records_location_param_id).get_string_value()
-            return import_module(registry).__dict__.get(entry, {})
-        except (ImportError, AttributeError, KeyError, errors.NotFound):
-            return {}
+    # def _get_registry(self, entry): # This has been moved to mongo.utilities.py
+    #     # get from the runtime
+    #     try:
+    #         records_location_param_id = Id('parameter:recordsRegistry@mongo')
+    #         registry = self._runtime.get_configuration().get_value_by_parameter(
+    #             records_location_param_id).get_string_value()
+    #         return import_module(registry).__dict__.get(entry, {})
+    #     except (ImportError, AttributeError, KeyError, errors.NotFound):
+    #         return {}
 
     def _get_record(self, record_type):
         \"\"\"Get the record string type value given the record_type.\"\"\"

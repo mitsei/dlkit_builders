@@ -612,8 +612,8 @@ class Asset:
     _namespace = 'repository.Asset'
 
     def __init__(self, osid_object_map, runtime=None):
+        self._record_type_data_sets = get_registry('ASSET_RECORD_TYPES', self._runtime)
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._record_type_data_sets = self._get_registry('ASSET_RECORD_TYPES')
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         self._catalog_name = 'Repository'
@@ -697,7 +697,7 @@ class AssetSearch:
     init = """
     def __init__(self, runtime):
         self._namespace = 'repository.Asset'
-        record_type_data_sets = self._get_registry('ASSET_RECORD_TYPES')
+        record_type_data_sets = get_registry('ASSET_RECORD_TYPES', self._runtime)
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
@@ -910,7 +910,7 @@ class CompositionSearch:
     init = """
     def __init__(self, runtime):
         self._namespace = 'repository.Composition'
-        record_type_data_sets = self._get_registry('COMPOSITION_RECORD_TYPES')
+        record_type_data_sets = get_registry('COMPOSITION_RECORD_TYPES', self._runtime)
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []

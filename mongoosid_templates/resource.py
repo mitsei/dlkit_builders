@@ -7,6 +7,7 @@ class ResourceProfile:
         'from . import sessions',
         'from dlkit.abstract_osid.osid import errors',
         'from . import profile',
+		'from ..utilities import get_registry',
     ]
 
     supports_visible_federation_template = """
@@ -22,7 +23,7 @@ class ResourceProfile:
     get_resource_record_types_template = """
         # Implemented from template for
         # osid.resource.ResourceProfile.get_resource_record_types_template
-        record_type_maps = self._get_registry('${object_name_upper}_RECORD_TYPES')
+        record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         record_types = []
         for record_type_map in record_type_maps:
             record_types.append(Type(**record_type_maps[record_type_map]))
@@ -31,7 +32,7 @@ class ResourceProfile:
     supports_resource_record_type_template = """
         # Implemented from template for
         # osid.resource.ResourceProfile.supports_resource_record_type_template
-        record_type_maps = self._get_registry('${object_name_upper}_RECORD_TYPES')
+        record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         supports = False
         for record_type_map in record_type_maps:
             if (${arg0_name}.get_authority() == record_type_maps[record_type_map]['authority'] and
@@ -1486,6 +1487,7 @@ class Resource:
         'from ..primitives import Id',
         '#from ..id.objects import IdList',
         '#import importlib',
+		'from ..utilities import get_registry',
     ]
 
     # Note: self._catalog_name = '${cat_name_under}' below is currently 
@@ -1496,8 +1498,8 @@ class Resource:
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, osid_object_map, runtime=None):
+        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         self._catalog_name = '${cat_name_under}'
@@ -1550,13 +1552,14 @@ class ResourceQuery:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id'
+		'from ..utilities import get_registry',
     ]
 
     init_template = """
     def __init__(self, runtime):
         self._namespace = '${pkg_name_replaced}.${object_name}'
         self._runtime = runtime
-        record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
+        record_type_data_sets = self.get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
@@ -1580,13 +1583,14 @@ class ResourceSearch:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from dlkit.mongo.osid import searches as osid_searches',
+		'from ..utilities import get_registry',
     ]
 
     init = """
     def __init__(self, runtime):
         self._namespace = 'resource.Resource'
         self._runtime = runtime
-        record_type_data_sets = self._get_registry('RESOURCE_RECORD_TYPES')
+        record_type_data_sets = get_registry('RESOURCE_RECORD_TYPES', self._runtime)
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
@@ -1628,6 +1632,7 @@ class ResourceForm:
         'from ..primitives import Id',
         'from ..osid.metadata import Metadata',
         'from . import default_mdata'
+		'from ..utilities import get_registry',
     ]
 
     init_template = """
@@ -1635,7 +1640,7 @@ class ResourceForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
+        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         ${init_object}.__init__(
             self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
         self._mdata = dict(default_mdata.${object_name_caps_under})
@@ -1732,6 +1737,7 @@ class Bin:
 
     import_statements_pattern = [
         'import importlib',
+		'from ..utilities import get_registry',
     ]
 
     init_template = """
@@ -1739,8 +1745,8 @@ class Bin:
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, osid_catalog_map, runtime=None):
+        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         osid_objects.OsidCatalog.__init__(self, osid_catalog_map, runtime)
-        self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
         self._records = dict()
         # This check is here for transition purposes:
         try:
@@ -1755,6 +1761,7 @@ class BinForm:
         'from . import default_mdata',
         '#from ..osid.objects import OsidForm',
         '#from ..osid.objects import OsidObjectForm',
+		'from ..utilities import get_registry',
     ]
 
     init_template = """
@@ -1762,7 +1769,7 @@ class BinForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, osid_catalog_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
+        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         osid_objects.OsidCatalogForm.__init__(
             self, osid_catalog_map=osid_catalog_map, record_types=record_types, runtime=runtime, **kwargs)
         self._mdata = dict(default_mdata.${object_name_caps_under})
@@ -1798,13 +1805,14 @@ class BinQuery:
 
     import_statements_pattern = [
         'from ..primitives import Id',
-        'from ..id.objects import IdList'
+        'from ..id.objects import IdList',
+		'from ..utilities import get_registry',
     ]
 
     init_template = """
     def __init__(self, runtime):
         self._runtime = runtime
-        record_type_data_sets = self._get_registry('${cat_name_upper}_RECORD_TYPES')
+        record_type_data_sets = get_registry('${cat_name_upper}_RECORD_TYPES', self._runtime)
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
