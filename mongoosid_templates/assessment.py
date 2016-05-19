@@ -940,7 +940,8 @@ class AssessmentBasicAuthoringSession:
         # This appears to assume that all the Items exist. Need to consider this further:
         for i in assessment['itemIds']:
             item_list.append(collection.find_one({'_id': ObjectId(Id(i).get_identifier())}))
-        return objects.ItemList(item_list, runtime=self._runtime)"""
+        return objects.ItemList(item_list, runtime=self._runtime)
+"""
     
     add_item = """
         # make sure the item exists, first
