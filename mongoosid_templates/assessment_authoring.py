@@ -26,7 +26,7 @@ class AssessmentPartForm:
     _namespace = 'assessment_authoring.AssessmentPart'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = self._get_registry('ASSESSMENT_PART_RECORD_TYPES')
+        self._record_type_data_sets = get_registry('ASSESSMENT_PART_RECORD_TYPES', runtime)
         osid_objects.OsidContainableForm.__init__(self)
         osid_objects.OsidOperableForm.__init__(self)
         osid_objects.OsidObjectForm.__init__(

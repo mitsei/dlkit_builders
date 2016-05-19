@@ -383,7 +383,7 @@ class ProficiencyQuery:
     def __init__(self, runtime):
         self._namespace = '${pkg_name}.${object_name}'
         self._runtime = runtime
-        record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
+        record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:

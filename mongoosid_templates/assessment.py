@@ -56,6 +56,7 @@ class AssessmentSession:
         'from .rules import Response',
         'from ..osid.sessions import OsidSession',
         'from ..utilities import MongoClientValidated',
+		'from ..utilities import get_registry',
         'SUBMITTED = True',
         'from importlib import import_module',
     ]
@@ -323,7 +324,7 @@ class AssessmentSession:
         ##
         # This is a little hack to get the answer record types from the Item's
         # Question record types. Should really get it from item genus types somehow:
-        record_type_data_sets = self._get_registry('ANSWER_RECORD_TYPES')
+        record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
         collection = MongoClientValidated('assessment',
                                           collection='Item',
                                           runtime=self._runtime)
@@ -346,15 +347,15 @@ class AssessmentSession:
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form
 
-    def _get_registry(self, entry):
-        # get from the runtime
-        try:
-            records_location_param_id = Id('parameter:recordsRegistry@mongo')
-            registry = self._runtime.get_configuration().get_value_by_parameter(
-                records_location_param_id).get_string_value()
-            return import_module(registry).__dict__.get(entry, {})
-        except (ImportError, AttributeError, KeyError, errors.NotFound):
-            return {}"""
+    #def _get_registry(self, entry): # Moved to mongo.utilities
+    #    # get from the runtime
+    #    try:
+    #        records_location_param_id = Id('parameter:recordsRegistry@mongo')
+    #        registry = self._runtime.get_configuration().get_value_by_parameter(
+    #            records_location_param_id).get_string_value()
+    #        return import_module(registry).__dict__.get(entry, {})
+    #    except (ImportError, AttributeError, KeyError, errors.NotFound):
+    #        return {}"""
 
     submit_response_import_templates = [
         'from ...abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
@@ -1513,6 +1514,7 @@ class Response:
     import_statements = [
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
+		'from ..utilities import get_registry',
     ]
     
     init = """
@@ -1524,7 +1526,7 @@ class Response:
         self._records = dict()
         # Consider that responses may want to have their own records separate
         # from the enclosed Answer records:
-        self._record_type_data_sets = self._get_registry('RESPONSE_RECORD_TYPES')
+        self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', answer._runtime)
         response_map = answer.object_map
         self._load_records(response_map['recordTypeIds'])
     
@@ -1592,13 +1594,14 @@ class ItemSearch:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from dlkit.mongo.osid import searches as osid_searches',
+		'from ..utilities import get_registry',
     ]
 
     init = """
     def __init__(self, runtime):
         self._namespace = 'assessment.Item'
         self._runtime = runtime
-        record_type_data_sets = self._get_registry('ITEM_RECORD_TYPES')
+        record_type_data_sets = get_registry('ITEM_RECORD_TYPES', runtime)
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
