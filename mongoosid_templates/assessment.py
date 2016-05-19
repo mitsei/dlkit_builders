@@ -1470,7 +1470,7 @@ class Response:
         self._records = dict()
         # Consider that responses may want to have their own records separate
         # from the enclosed Answer records:
-        self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', self._runtime)
+        self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', answer._runtime)
         response_map = answer.object_map
         self._load_records(response_map['recordTypeIds'])
     
@@ -1545,7 +1545,7 @@ class ItemSearch:
     def __init__(self, runtime):
         self._namespace = 'assessment.Item'
         self._runtime = runtime
-        record_type_data_sets = get_registry('ITEM_RECORD_TYPES', self._runtime)
+        record_type_data_sets = get_registry('ITEM_RECORD_TYPES', runtime)
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []

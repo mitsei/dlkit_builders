@@ -194,7 +194,7 @@ def overlap(start1, end1, start2, end2):
     """
     return not (end1 < start2 or end2 < start1)
 
-def get_registry(self, entry, runtime):
+def get_registry(entry, runtime):
     """Returns a record registry given an entry and runtime"""
     try:
         records_location_param_id = Id('parameter:recordsRegistry@mongo')
