@@ -214,7 +214,7 @@ class GradeEntryForm:
         #     self._init_map(**kwargs)
 
         if not self.is_for_update():
-            self._init_map(**kwargs)
+            self._init_map(record_types, **kwargs)
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
