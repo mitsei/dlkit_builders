@@ -234,7 +234,7 @@ class GradeEntryForm:
         self._score_default = self._mdata['score']['default_decimal_values'][0]
 
 
-    def _init_map(self, **kwargs):
+    def _init_map(self, record_types=None, **kwargs):
         osid_objects.OsidRelationshipForm._init_map(self, record_types=record_types)
         self._my_map['resourceId'] = str(kwargs['resource_id'])
         self._my_map['gradeId'] = self._grade_default
