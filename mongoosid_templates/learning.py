@@ -268,7 +268,7 @@ class ActivityForm:
 
     get_assets_metadata_template = """
         # Implemented from template for osid.learning.ActivityForm.get_assets_metadata_template
-        metadata = dict(self._${var_name}_metadata)
+        metadata = dict(self._mdata['${var_name}'])
         metadata.update({'existing_${var_name}_values': self._my_map['${var_name_singular_mixed}Ids']})
         return Metadata(**metadata)"""
 
@@ -383,7 +383,7 @@ class ProficiencyQuery:
     def __init__(self, runtime):
         self._namespace = '${pkg_name}.${object_name}'
         self._runtime = runtime
-        record_type_data_sets = self._get_registry('${object_name_upper}_RECORD_TYPES')
+        record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:

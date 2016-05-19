@@ -38,63 +38,46 @@ class AssessmentPartForm:
     _namespace = 'assessment_authoring.AssessmentPart'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self, runtime=runtime)
-        self._record_type_data_sets = self._get_registry('ASSESSMENT_PART_RECORD_TYPES')
-        self._kwargs = kwargs
-        if 'catalog_id' in kwargs:
-            self._catalog_id = kwargs['catalog_id']
+        self._record_type_data_sets = get_registry('ASSESSMENT_PART_RECORD_TYPES', runtime)
+        osid_objects.OsidContainableForm.__init__(self)
+        osid_objects.OsidOperableForm.__init__(self)
+        osid_objects.OsidObjectForm.__init__(
+            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+        self._mdata = dict(default_mdata.ASSESSMENT_PART)
         self._init_metadata(**kwargs)
-        self._records = dict()
-        self._supported_record_type_ids = []
-        if osid_object_map is not None:
-            self._for_update = True
-            self._my_map = osid_object_map
-            self._load_records(osid_object_map['recordTypeIds'])
-        else:
-            self._my_map = {}
-            self._for_update = False
+        
+        # self._records = dict()
+        # self._supported_record_type_ids = []
+        # if osid_object_map is not None:
+        #     self._for_update = True
+        #     self._my_map = osid_object_map
+        #     self._load_records(osid_object_map['recordTypeIds'])
+        # else:
+        #     self._my_map = {}
+        #     self._for_update = False
+        #     self._init_map(**kwargs)
+        
+        if not self.is_for_update():
             self._init_map(**kwargs)
-            if record_types is not None:
-                self._init_records(record_types)
-        self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _init_metadata(self, **kwargs):
-        osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
+        \"\"\"Initialize form metadata\"\"\"
         osid_objects.OsidContainableForm._init_metadata(self)
-
-        self._assessment_part_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'assessment_part')}
-        self._assessment_part_metadata.update(mdata_conf.ASSESSMENT_PART_ASSESSMENT_PART)
-        self._assessment_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'assessment')}
-        self._assessment_metadata.update(mdata_conf.ASSESSMENT_PART_ASSESSMENT)
-        self._weight_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'weight')}
-        self._weight_metadata.update(mdata_conf.ASSESSMENT_PART_WEIGHT)
-        self._allocated_time_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'allocated_time')}
-        self._allocated_time_metadata.update(mdata_conf.ASSESSMENT_PART_ALLOCATED_TIME)
-        self._assessment_part_default = self._assessment_part_metadata['default_id_values'][0]
-        self._assessment_default = self._assessment_metadata['default_id_values'][0]
-        self._allocated_time_default = self._allocated_time_metadata['default_duration_values'][0]
+        osid_objects.OsidOperableForm._init_metadata(self)
+        osid_objects.OsidObjectForm._init_metadata(self, record_types=record_types, **kwargs)
+        self._assessment_part_default = self._mdata['assessment_part']['default_id_values'][0]
+        self._assessment_default = self._mdata['assessment']['default_id_values'][0]
+        self._weight_default = self._mdata['weight']['default_integer_values'][0]
+        self._allocated_time_default = self._mdata['allocated_time']['default_duration_values'][0]
         self._items_sequential_default = None
         self._items_shuffled_default = None
 
+
     def _init_map(self, **kwargs):
-        osid_objects.OsidObjectForm._init_map(self)
+        \"\"\"Initialize form map\"\"\"
         osid_objects.OsidContainableForm._init_map(self)
+        osid_objects.OsidOperableForm._init_map(self)
+        osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
 
         if 'assessment_part_id' in kwargs:
             self._my_map['assessmentPartId'] = str(kwargs['assessment_part_id'])

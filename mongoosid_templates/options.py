@@ -23,85 +23,86 @@ STRING_METADATA = """
             'string_match_types': self.my_model.moptions['${data_name}']['match_types']"""
 
 COMMON_MDATA = """
-    'element_label': '${element_label}',
-    'instructions': '${instructions}',
-    'required': False,
-    'read_only': False,
-    'linked': False,
-    'array': ${array},"""
+        'element_label': '${element_label}',
+        'instructions': '${instructions}',
+        'required': False,
+        'read_only': False,
+        'linked': False,
+        'array': ${array},"""
 
 BOOLEAN_MDATA = """
-    'syntax': 'BOOLEAN',"""
+        'default_boolean_values': [None],
+        'syntax': 'BOOLEAN',"""
 
 STRING_MDATA = """
-    'default_string_values': [''],
-    'syntax': 'STRING',
-    'minimum_string_length': 0,
-    'maximum_string_length': ${max_length},
-    'string_set': [],"""
+        'default_string_values': [''],
+        'syntax': 'STRING',
+        'minimum_string_length': 0,
+        'maximum_string_length': ${max_length},
+        'string_set': [],"""
 
 DECIMAL_MDATA = """
-    'default_decimal_values': [None],
-    'syntax': 'DECIMAL',
-    'decimal_scale': None,
-    'minimum_decimal': None,
-    'maximum_decimal': None,
-    'decimal_set': [],"""
+        'default_decimal_values': [None],
+        'syntax': 'DECIMAL',
+        'decimal_scale': None,
+        'minimum_decimal': None,
+        'maximum_decimal': None,
+        'decimal_set': [],"""
 
 DISPLAY_TEXT_MDATA = """
-    'default_string_values': [{
-        'text': '',
-        'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
-        'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
-        'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-        }],
-    'syntax': 'STRING',
-    'minimum_string_length': 0,
-    'maximum_string_length': ${max_length},
-    'string_set': [],"""
+        'default_string_values': [{
+            'text': '',
+            'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+            'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+            'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+            }],
+        'syntax': 'STRING',
+        'minimum_string_length': 0,
+        'maximum_string_length': ${max_length},
+        'string_set': [],"""
 
 ID_MDATA = """
-    'default_${id_type}_values': [''],
-    'syntax': '${syntax}',
-    '${id_type}_set': [],"""
+        'default_${id_type}_values': [''],
+        'syntax': '${syntax}',
+        '${id_type}_set': [],"""
 
 ID_LIST_MDATA = """
-    'default_${id_type}_values': [],
-    'syntax': '${syntax}',
-    '${id_type}_set': [],"""
+        'default_${id_type}_values': [],
+        'syntax': '${syntax}',
+        '${id_type}_set': [],"""
 
 INTEGER_MDATA = """
-    'default_integer_value': [None],
-    'syntax': 'INTEGER',
-    'minimum_integer': None,
-    'maximum_integer': None,
-    'integer_set': []"""
+        'default_integer_value': [None],
+        'syntax': 'INTEGER',
+        'minimum_integer': None,
+        'maximum_integer': None,
+        'integer_set': []"""
 
 TYPE_MDATA = """
-    'default_${id_type}_values': ['NoneType%3ANONE%40dlkit.mit.edu'],
-    'syntax': '${syntax}',
-    '${id_type}_set': [],"""
+        'default_${id_type}_values': ['NoneType%3ANONE%40dlkit.mit.edu'],
+        'syntax': '${syntax}',
+        '${id_type}_set': [],"""
 
 TYPE_LIST_MDATA = """
-    'default_${id_type}_values': [],
-    'syntax': '${syntax}',
-    '${id_type}_set': [],"""
+        'default_${id_type}_values': [],
+        'syntax': '${syntax}',
+        '${id_type}_set': [],"""
 
 DATE_TIME_MDATA = """
-    'default_date_time_values': [None],
-    'syntax': 'DATETIME',
-    'date_time_set': [],"""
+        'default_date_time_values': [None],
+        'syntax': 'DATETIME',
+        'date_time_set': [],"""
 
 DURATION_MDATA = """
-    'default_duration_values': [None],
-    'syntax': 'DURATION',
-    'date_time_set': [],"""
+        'default_duration_values': [None],
+        'syntax': 'DURATION',
+        'date_time_set': [],"""
 
 OBJECT_MDATA = """
-    'default_object_values': [''],
-    'syntax': 'OBJECT',
-    'object_types': [],
-    'object_set': [],"""
+        'default_object_values': [''],
+        'syntax': 'OBJECT',
+        'object_types': [],
+        'object_set': [],"""
 
 #MODEL_FIELD_OPTIONS = """
 #        verbose_name=options['${data_name}']['verbose_name'],

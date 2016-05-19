@@ -227,7 +227,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             if not self._is('authz'):
                 if object_name in self.patterns['package_relationships_caps']:
                     init_object = 'osid_objects.OsidRelationshipForm'
-                else:
+                else: # maybe need to check for other init objects, like Rules?
                     init_object = 'osid_objects.OsidObjectForm'
 
                 for inherit_object in interface['inherit_shortnames']:
@@ -284,6 +284,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 'map_super_initers': map_super_initers,
                 'object_name': object_name,
                 'object_name_under': camel_to_under(object_name),
+                'object_name_caps_under': camel_to_caps_under(object_name),
                 'object_name_upper': camel_to_under(object_name).upper(),
                 'object_name_plural': make_plural(object_name),
                 'object_name_under_plural': camel_to_under(make_plural(object_name)),
@@ -444,13 +445,13 @@ def make_metadata_initers(interface_name, persisted_data, initialized_data, retu
     def default_string(name, default_type, is_list=False):
         dind = 8 * ' '
         if is_list:
-            return '{0}self._{1}_default = self._{1}_metadata[\'default_{2}_values\']\n'.format(dind,
-                                                                                                name,
-                                                                                                default_type)
+            return '{0}self._{1}_default = self._mdata[\'{1}\'][\'default_{2}_values\']\n'.format(dind,
+                                                                                                  name,
+                                                                                                  default_type)
         else:
-            return '{0}self._{1}_default = self._{1}_metadata[\'default_{2}_values\'][0]\n'.format(dind,
-                                                                                                   name,
-                                                                                                   default_type)
+            return '{0}self._{1}_default = self._mdata[\'{1}\'][\'default_{2}_values\'][0]\n'.format(dind,
+                                                                                                     name,
+                                                                                                     default_type)
 
     imports = ''
     initer = ''
@@ -460,13 +461,13 @@ def make_metadata_initers(interface_name, persisted_data, initialized_data, retu
 
         if (persisted_data[data_name] != 'OsidCatalog' and
                 data_name not in initialized_data):
-            template = string.Template(METADATA_INITER)
+            #template = string.Template(METADATA_INITER)
             if persisted_data[data_name] == 'boolean':
-                default += '        self._{}_default = None\n'.format(data_name)
+                default += default_string(data_name, 'boolean')
             elif (persisted_data[data_name] == 'string' and
                     return_types[data_name] == 'osid.locale.DisplayText'):
                 default += '        self._{0}_default = ' \
-                           'dict(self._{0}_metadata[\'default_string_values\'][0])\n'.format(data_name)
+                           'dict(self._mdata[\'{0}\'][\'default_string_values\'][0])\n'.format(data_name)
             elif persisted_data[data_name] == 'string':
                 default += default_string(data_name, 'string')
             elif (persisted_data[data_name] == 'osid.id.Id' and
@@ -490,13 +491,14 @@ def make_metadata_initers(interface_name, persisted_data, initialized_data, retu
             elif persisted_data[data_name] == 'decimal':
                 default += default_string(data_name, 'decimal')
 
-            initer += template.substitute({'data_name': data_name,
-                                           'data_name_upper': data_name_upper})
-    if initer:
-        initer += '\n'
+            #initer += template.substitute({'data_name': data_name,
+            #                               'data_name_upper': data_name_upper})
+    #if initer:
+    #    initer += '\n'
     if default:
         default += '\n'
-    return imports + initer + default
+    #return imports + initer + default
+    return imports + default
 
 # Assemble the initializers for persistance data managed by Osid Object Forms
 # initialized with the form.

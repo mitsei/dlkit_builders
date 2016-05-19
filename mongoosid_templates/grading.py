@@ -184,9 +184,10 @@ class GradeEntryForm:
     _namespace = 'grading.GradeEntry'
 
     def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        osid_objects.OsidForm.__init__(self, runtime=runtime)
-        self._record_type_data_sets = self._get_registry('GRADE_ENTRY_RECORD_TYPES')
-        self._kwargs = kwargs
+        self._record_type_data_sets = get_registry('GRADE_ENTRY_RECORD_TYPES', runtime)
+        osid_objects.OsidRelationshipForm.__init__(
+            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+        self._mdata = dict(default_mdata.GRADE_ENTRY)
         self._effective_agent_id = kwargs['effective_agent_id']
 
         mgr = self._get_provider_manager('GRADING')
@@ -199,62 +200,31 @@ class GradeEntryForm:
         else:
             raise errors.NullArgument('gradebook_column_id required for create forms.')
         self._grade_system = gradebook_column.get_grade_system()
-
-        if 'catalog_id' in kwargs:
-            self._catalog_id = kwargs['catalog_id']
         self._init_metadata(**kwargs)
-        self._records = dict()
-        self._supported_record_type_ids = []
-        if osid_object_map is not None:
-            self._for_update = True
-            self._my_map = osid_object_map
-            self._load_records(osid_object_map['recordTypeIds'])
-        else:
-            self._my_map = {}
-            self._for_update = False
-            self._init_map(**kwargs)
-            if record_types is not None:
-                self._init_records(record_types)
-        self._supported_record_type_ids = self._my_map['recordTypeIds']
+
+        if not self.is_for_update():
+            self._init_map(record_types, **kwargs)
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
-        self._grade_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'grade')}
-        self._grade_metadata.update(mdata_conf.GRADE_ENTRY_GRADE)
-        self._ignored_for_calculations_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'ignored_for_calculations')}
-        self._ignored_for_calculations_metadata.update(mdata_conf.GRADE_ENTRY_IGNORED_FOR_CALCULATIONS)
-        self._score_metadata = {
-            'element_id': Id(
-                self._authority,
-                self._namespace,
-                'score')}
-        self._score_metadata.update(mdata_conf.GRADE_ENTRY_SCORE)
         if self._grade_system.is_based_on_grades():
-            self._score_metadata.update(
+            self._mdata['score'].update(
                 {'minimum_decimal': None,
                  'maximum_decimal': None})
             allowable_grades = self._grade_system.get_grades()
             allowable_grade_ids = [g.ident for g in allowable_grades]
-            self._grade_metadata['id_set'] = allowable_grade_ids
+            self._mdata['grade']['id_set'] = allowable_grade_ids
         else:
-            self._score_metadata.update(
+            self._mdata['score'].update(
                 {'minimum_decimal': self._grade_system.get_lowest_numeric_score(),
                  'maximum_decimal': self._grade_system.get_highest_numeric_score()})
-        self._grade_default = self._grade_metadata['default_id_values'][0]
-        self._ignored_for_calculations_default = None
-        self._score_default = self._score_metadata['default_decimal_values'][0]
+        self._grade_default = self._mdata['grade']['default_id_values'][0]
+        self._ignored_for_calculations_default = self._mdata['ignored_for_calculations']['default_boolean_values'][0]
+        self._score_default = self._mdata['score']['default_decimal_values'][0]
 
 
-    def _init_map(self, **kwargs):
-        osid_objects.OsidRelationshipForm._init_map(self)
+    def _init_map(self, record_types=None, **kwargs):
+        osid_objects.OsidRelationshipForm._init_map(self, record_types=record_types)
         self._my_map['resourceId'] = str(kwargs['resource_id'])
         self._my_map['gradeId'] = self._grade_default
         self._my_map['agentId'] = str(kwargs['effective_agent_id'])
@@ -263,8 +233,8 @@ class GradeEntryForm:
         self._my_map['gradingAgentId'] = ''
         self._my_map['gradebookColumnId'] = str(kwargs['gradebook_column_id'])
         self._my_map['assignedGradebookIds'] = [str(kwargs['gradebook_id'])]
-        self._my_map['derived'] = False
-        self._my_map['timeGraded'] = None
+        self._my_map['derived'] = False # This is probably not persisted data
+        self._my_map['timeGraded'] = None 
         self._my_map['overriddenCalculatedEntryId'] = '' # This will soon do something different
 """
 
@@ -456,8 +426,8 @@ class GradebookColumnSummary:
     _namespace = 'grading.GradebookColumnSummary'
 
     def __init__(self, osid_object_map, runtime=None):
+        self._record_type_data_sets = get_registry('GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES', runtime)
         osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._record_type_data_sets = self._get_registry('GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES')
         self._records = dict()
         self._load_records(osid_object_map['recordTypeIds'])
         self._catalog_name = 'Gradebook'

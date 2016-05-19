@@ -56,6 +56,7 @@ class AssessmentSession:
         'from .rules import Response',
         'from ..osid.sessions import OsidSession',
         'from ..utilities import MongoClientValidated',
+		'from ..utilities import get_registry',
         'SUBMITTED = True',
         'from importlib import import_module',
     ]
@@ -326,7 +327,7 @@ class AssessmentSession:
         ##
         # This is a little hack to get the answer record types from the Item's
         # Question record types. Should really get it from item genus types somehow:
-        record_type_data_sets = self._get_registry('ANSWER_RECORD_TYPES')
+        record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
         collection = MongoClientValidated('assessment',
                                           collection='Item',
                                           runtime=self._runtime)
@@ -349,15 +350,15 @@ class AssessmentSession:
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form
 
-    def _get_registry(self, entry):
-        # get from the runtime
-        try:
-            records_location_param_id = Id('parameter:recordsRegistry@mongo')
-            registry = self._runtime.get_configuration().get_value_by_parameter(
-                records_location_param_id).get_string_value()
-            return import_module(registry).__dict__.get(entry, {})
-        except (ImportError, AttributeError, KeyError, errors.NotFound):
-            return {}"""
+    #def _get_registry(self, entry): # Moved to mongo.utilities
+    #    # get from the runtime
+    #    try:
+    #        records_location_param_id = Id('parameter:recordsRegistry@mongo')
+    #        registry = self._runtime.get_configuration().get_value_by_parameter(
+    #            records_location_param_id).get_string_value()
+    #        return import_module(registry).__dict__.get(entry, {})
+    #    except (ImportError, AttributeError, KeyError, errors.NotFound):
+    #        return {}"""
 
     submit_response_import_templates = [
         'from ...abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
@@ -761,6 +762,20 @@ class AssessmentTakenLookupSession:
         collection = MongoClientValidated('assessment',
                                           collection='AssessmentTaken',
                                           runtime=self._runtime)
+
+        am = self._get_provider_manager('ASSESSMENT')
+        aols = am.get_assessment_offered_lookup_session()
+        aols.use_federated_bank_view()
+        offered = aols.get_assessment_offered(assessment_offered_id)
+        try:
+            deadline = offered.get_deadline()
+            nowutc = DateTime.utcnow()
+            if nowutc > deadline:
+                raise errors.PermissionDenied('you are passed the deadline for the offered')
+        except errors.IllegalState:
+            # no deadline set
+            pass
+
         result = collection.find(
             dict({'assessmentOfferedId': str(assessment_offered_id),
                   'takingAgentId': str(resource_id)},
@@ -849,6 +864,10 @@ class AssessmentTakenAdminSession:
         'CREATED = True',
     ]
 
+    import_statements = [
+        'from dlkit.primordium.calendaring.primitives import DateTime'
+    ]
+
     create_assessment_taken_import_templates = [
         'from ...abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm',
         'from ..osid.osid_errors import PermissionDenied'
@@ -894,6 +913,44 @@ class AssessmentTakenAdminSession:
         self._forms[assessment_taken_form.get_id().get_identifier()] = CREATED
         return objects.AssessmentTaken(
             collection.find_one({'_id': insert_result.inserted_id}), runtime=self._runtime)"""
+
+    get_assessment_taken_form_for_create = """
+        if not isinstance(assessment_offered_id, ABCId):
+            raise errors.InvalidArgument('argument is not a valid OSID Id')
+        for arg in assessment_taken_record_types:
+            if not isinstance(arg, ABCType):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
+
+        am = self._get_provider_manager('ASSESSMENT')
+        aols = am.get_assessment_offered_lookup_session()
+        aols.use_federated_bank_view()
+        offered = aols.get_assessment_offered(assessment_offered_id)
+        try:
+            deadline = offered.get_deadline()
+            nowutc = DateTime.utcnow()
+            if nowutc > deadline:
+                raise errors.PermissionDenied('you are passed the deadline for the offered')
+        except errors.IllegalState:
+            # no deadline set
+            pass
+
+        if assessment_taken_record_types == []:
+            ## WHY are we passing bank_id = self._catalog_id below, seems redundant:
+            obj_form = objects.AssessmentTakenForm(
+                bank_id=self._catalog_id,
+                assessment_offered_id=assessment_offered_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime)
+        else:
+            obj_form = objects.AssessmentTakenForm(
+                bank_id=self._catalog_id,
+                record_types=assessment_taken_record_types,
+                assessment_offered_id=assessment_offered_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime)
+        obj_form._for_update = False
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
+        return obj_form"""
 
 class AssessmentBasicAuthoringSession:
     
@@ -1478,6 +1535,7 @@ class Response:
     import_statements = [
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
+		'from ..utilities import get_registry',
     ]
     
     init = """
@@ -1489,7 +1547,7 @@ class Response:
         self._records = dict()
         # Consider that responses may want to have their own records separate
         # from the enclosed Answer records:
-        self._record_type_data_sets = self._get_registry('RESPONSE_RECORD_TYPES')
+        self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', answer._runtime)
         response_map = answer.object_map
         self._load_records(response_map['recordTypeIds'])
     
@@ -1557,13 +1615,14 @@ class ItemSearch:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from dlkit.mongo.osid import searches as osid_searches',
+		'from ..utilities import get_registry',
     ]
 
     init = """
     def __init__(self, runtime):
         self._namespace = 'assessment.Item'
         self._runtime = runtime
-        record_type_data_sets = self._get_registry('ITEM_RECORD_TYPES')
+        record_type_data_sets = get_registry('ITEM_RECORD_TYPES', runtime)
         self._record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
