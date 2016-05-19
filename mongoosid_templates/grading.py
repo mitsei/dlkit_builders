@@ -200,18 +200,7 @@ class GradeEntryForm:
         else:
             raise errors.NullArgument('gradebook_column_id required for create forms.')
         self._grade_system = gradebook_column.get_grade_system()
-
-        # self._init_metadata(**kwargs)
-        # self._records = dict()
-        # self._supported_record_type_ids = []
-        # if osid_object_map is not None:
-        #     self._for_update = True
-        #     self._my_map = osid_object_map
-        #     self._load_records(osid_object_map['recordTypeIds'])
-        # else:
-        #     self._my_map = {}
-        #     self._for_update = False
-        #     self._init_map(**kwargs)
+        self._init_metadata(**kwargs)
 
         if not self.is_for_update():
             self._init_map(record_types, **kwargs)
@@ -219,14 +208,14 @@ class GradeEntryForm:
     def _init_metadata(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
         if self._grade_system.is_based_on_grades():
-            self._score_metadata.update(
+            self._mdata['score'].update(
                 {'minimum_decimal': None,
                  'maximum_decimal': None})
             allowable_grades = self._grade_system.get_grades()
             allowable_grade_ids = [g.ident for g in allowable_grades]
-            self._grade_metadata['id_set'] = allowable_grade_ids
+            self._mdata['grade']['id_set'] = allowable_grade_ids
         else:
-            self._score_metadata.update(
+            self._mdata['score'].update(
                 {'minimum_decimal': self._grade_system.get_lowest_numeric_score(),
                  'maximum_decimal': self._grade_system.get_highest_numeric_score()})
         self._grade_default = self._mdata['grade']['default_id_values'][0]
