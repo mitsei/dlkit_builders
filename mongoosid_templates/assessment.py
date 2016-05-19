@@ -993,7 +993,7 @@ class AssessmentBasicAuthoringSession:
         if parts.available() != 0:
             return parts.next().get_id()
         assessment = self._assessment_lookup_session.get_assessment(assessment_id)
-        part_form = part_admin_session.get_assessment_part_form_for_assessment(assessment_id, [])
+        part_form = part_admin_session.get_assessment_part_form_for_assessment(assessment_id, []) # send sequestered metadata
         part_form.set_display_name(assessment.get_display_name + ' Default Part')
         part_form.set_weight(100)
         # Should we set allocated time?  Should we sequester it?

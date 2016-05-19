@@ -72,7 +72,6 @@ class AssessmentPartForm:
         self._items_sequential_default = None
         self._items_shuffled_default = None
 
-
     def _init_map(self, **kwargs):
         \"\"\"Initialize form map\"\"\"
         osid_objects.OsidContainableForm._init_map(self)
