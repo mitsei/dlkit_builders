@@ -453,36 +453,8 @@ class AssetCompositionDesignSession:
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
-    old_add_asset = """
-        # This asset found check may want to be run through _get_provider_manager
-        # so as to ensure assess control:
-        from ...abstract_osid.id.primitives import Id as ABCId
-        if not isinstance(asset_id, ABCId):
-            raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        if asset_id.get_identifier_namespace() != 'repository.Asset':
-            if asset_id.get_authority() != self._authority:
-                raise errors.InvalidArgument()
-            else:
-                mgr = self._get_provider_manager('REPOSITORY')
-                admin_session = mgr.get_asset_admin_session_for_repository(self._catalog_id)
-                asset_id = admin_session._get_asset_id_with_enclosure(asset_id)
-        collection = MongoClientValidated('repository',
-                                          collection='Asset',
-                                          runtime=self._runtime)
-        asset = collection.find_one({'_id': ObjectId(asset_id.get_identifier())})
-        collection = MongoClientValidated('repository',
-                                          collection='Composition',
-                                          runtime=self._runtime)
-        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        if 'assetIds' in composition:
-            if str(asset_id) not in composition['assetIds']:
-                composition['assetIds'].append(str(asset_id))
-        else:
-            composition['assetIds'] = [str(asset_id)]
-        collection.save(composition)"""
-
     add_asset_template = """
-        # This ${object_name_under} found check may want to be run through _get_provider_manager
+        # The ${object_name_under} found check may want to be run through _get_provider_manager
         # so as to ensure access control:
         from ...abstract_osid.id.primitives import Id as ABCId
         if not isinstance(${object_name_under}_id, ABCId):
@@ -509,17 +481,7 @@ class AssetCompositionDesignSession:
             ${containable_object_name_under}['${object_name_mixed}Ids'] = [str(${object_name_under}_id)]
         collection.save(${containable_object_name_under})"""
 
-    old_move_asset_ahead = """
-        collection = MongoClientValidated('repository',
-                                          collection='Composition',
-                                          runtime=self._runtime)
-        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        if 'assetIds' not in composition:
-            raise errors.NotFound('no Assets are assigned to this Composition')
-        composition['assetIds'] = move_id_ahead(asset_id, reference_id, composition['assetIds'])
-        collection.save(composition)"""
-
-    move_asset_ahead_template = """
+    older_move_asset_ahead_template = """
         collection = MongoClientValidated('${package_name_replace}',
                                           collection='${containable_object_name}',
                                           runtime=self._runtime)
@@ -529,17 +491,12 @@ class AssetCompositionDesignSession:
         ${containable_object_name_under}['${object_name_mixed}Ids'] = move_id_ahead(${object_name_under}_id, reference_id, ${containable_object_name_under}['${object_name_mixed}Ids'])
         collection.save(${containable_object_name_under})"""
 
-    old_move_asset_behind = """
-        collection = MongoClientValidated('repository',
-                                          collection='Composition',
-                                          runtime=self._runtime)
-        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        if 'assetIds' not in composition:
-            raise errors.NotFound('no Assets are assigned to this Composition')
-        composition['assetIds'] = move_id_behind(asset_id, reference_id, composition['assetIds'])
-        collection.save(composition)"""
+    move_asset_ahead_template = """
+        ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
+        ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_ahead(${object_name_under}_id, reference_id, ${containable_object_name_under}['${object_name_mixed}Ids'])
+        collection.save(${containable_object_name_under}_map)"""
 
-    move_asset_behind_template = """
+    older_move_asset_behind_template = """
         collection = MongoClientValidated('${package_name_replace}',
                                           collection='${containable_object_name}',
                                           runtime=self._runtime)
@@ -549,20 +506,12 @@ class AssetCompositionDesignSession:
         ${containable_object_name_under}['${object_name_mixed}Ids'] = move_id_behind(${object_name_under}_id, reference_id, ${containable_object_name_under}['${object_name_mixed}Ids'])
         collection.save(${containable_object_name_under})"""
 
-    old_order_assets = """
-        collection = MongoClientValidated('repository',
-                                          collection='Composition',
-                                          runtime=self._runtime)
-        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
-        collection = MongoClientValidated('repository',
-                                          collection='Composition',
-                                          runtime=self._runtime)
-        if 'assetIds' not in composition:
-            raise errors.NotFound('no Assets are assigned to this Composition')
-        composition['assetIds'] = order_ids(asset_ids, composition['assetIds'])
-        collection.save(composition)"""
+    move_asset_behind_template = """
+        ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
+        ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_behind(${object_name_under}_id, reference_id, ${containable_object_name_under}['${object_name_mixed}Ids'])
+        collection.save(${containable_object_name_under}_map)"""
 
-    order_assets_template = """
+    older_order_assets_template = """
         collection = MongoClientValidated('${package_name_replace}',
                                           collection='${containable_object_name}',
                                           runtime=self._runtime)
@@ -572,7 +521,12 @@ class AssetCompositionDesignSession:
         ${containable_object_name_under}['${object_name_mixed}Ids'] = order_ids(${object_name_under}_ids, ${containable_object_name_under}['${object_name_mixed}Ids'])
         collection.save(${containable_object_name_under})"""
 
-    remove_asset_template = """
+    order_assets_template = """
+        ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
+        ${containable_object_name_under}_map['${object_name_mixed}Ids'] = order_ids(${object_name_under}_ids, ${containable_object_name_under}['${object_name_mixed}Ids'])
+        collection.save(${containable_object_name_under}_map)"""
+
+    older_remove_asset_template = """
         collection = MongoClientValidated('${package_name_replace}',
                                           collection='${containable_object_name}',
                                           runtime=self._runtime)
@@ -583,17 +537,24 @@ class AssetCompositionDesignSession:
             raise errors.NotFound()
         collection.save(${containable_object_name_under})"""
 
-    old_remove_asset = """
-        collection = MongoClientValidated('repository',
-                                          collection='Composition',
-                                          runtime=self._runtime)
-        composition = collection.find_one({'_id': ObjectId(composition_id.get_identifier())})
+    remove_asset_template = """
+        ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
         try:
-            composition['assetIds'].remove(str(asset_id))
+            ${containable_object_name_under}_map['${object_name_mixed}Ids'].remove(str(${object_name_under}_id))
         except (KeyError, ValueError):
             raise errors.NotFound()
-        collection.save(composition)"""
+        collection.save(${containable_object_name_under}_map)
 
+    def _get_${containable_object_name_under}_collection(self, ${containable_object_name_under}_id):
+        \"\"\"Returns a Mongo Collection and ${containable_object_name} given a ${containable_object_name} Id\"\"\"
+        collection = MongoClientValidated('${package_name_replace}',
+                                          collection='${containable_object_name}',
+                                          runtime=self._runtime)
+        ${containable_object_name_under}_map = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
+        if '${object_name_mixed}Ids' not in ${containable_object_name_under}:
+            raise errors.NotFound('no ${object_name_plural} are assigned to this ${containable_object_name}')
+        return ${containable_object_name_under}_map, collection
+"""
 
 
 class Asset:

@@ -196,7 +196,15 @@ def overlap(start1, end1, start2, end2):
 
 
 class OsidListList(list):
-    """A morker class for initializing OsidLists with a list of other OsidLists"""
+    """
+    A morker class for initializing OsidLists with a list of other OsidLists
+    
+    To use, load up this list with OsidLists of the same object type, and pass
+    it as the argument to an OsidList of that same object type. The OsidList
+    should exhaust all the contained OsidLists in order on iteration to return
+    all the underlying objects as if they are part of one list.
+    
+    """
     pass
 
 

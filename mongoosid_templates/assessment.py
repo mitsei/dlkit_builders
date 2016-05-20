@@ -1,6 +1,4 @@
 
-from .error_lists import session_errors
-
 class AssessmentManager:
     
     import_statements = [
@@ -976,8 +974,8 @@ class AssessmentBasicAuthoringSession:
             db_name='assessment',
             cat_name='Bank',
             cat_class=objects.Bank)
-        mgr = self._get_provider_manager('ASSESSMENT)
-        self._assessment_lookup_session = mgr.get_item_lookup_session()
+        mgr = self._get_provider_manager('ASSESSMENT')
+        self._assessment_lookup_session = mgr.get_assessment_lookup_session()
         self._assessment_lookup_session.use_federated_bank_view()
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         self._part_admin_session = mgr.get_assessment_part_admin_session(self._catalog_id)
@@ -986,18 +984,23 @@ class AssessmentBasicAuthoringSession:
         self._part_item_design_session = mgr.get_assessment_part_item_design_session(self._catalog_id)
         self._part_lookup_session.use_isolated_bank_view()
         self._part_item_session.use_isolated_bank_view()
+        self._first_part_index = {}
 
     def _get_first_part_id(self, assessment_id):
-        \"\"\"\This session implemenation assumes  all items are assigned to the first assessment part"\"\"
+        \"\"\"\This session implemenation assumes all items are assigned to the first assessment part"\"\"
+        if assessment_id in self._first_part_index:
+            return self._first_part_index[assessment_id]
         parts = self._part_lookup_session.get_assessment_parts_for_assessment(assessment_id)
         if parts.available() != 0:
             return parts.next().get_id()
         assessment = self._assessment_lookup_session.get_assessment(assessment_id)
-        part_form = part_admin_session.get_assessment_part_form_for_assessment(assessment_id, []) # send sequestered metadata
+        part_form = part_admin_session.get_assessment_part_form_for_assessment(assessment_id, [], mdata=SECTION_MDATA)
         part_form.set_display_name(assessment.get_display_name + ' Default Part')
         part_form.set_weight(100)
-        # Should we set allocated time?  Should we sequester it?
-        return part_admin_session.create_assessment_part_for_assessment(part_form).get_id()
+        # Should we set allocated time?
+        part_id = part_admin_session.create_assessment_part_for_assessment(part_form).get_id()
+        self._first_part_index[assessment_id] = part_id
+        return part_id
         """
     
     can_author_assessments = """
@@ -1119,7 +1122,6 @@ class Item:
 class Assessment:
 
     additional_methods = """
-
     def are_items_sequential():
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return False
