@@ -98,20 +98,9 @@ class LogEntryForm:
             self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
         self._mdata = dict(default_mdata.LOG_ENTRY)
         self._init_metadata(**kwargs)
-        
-        # self._records = dict()
-        # self._supported_record_type_ids = []
-        # if osid_object_map is not None:
-        #     self._for_update = True
-        #     self._my_map = osid_object_map
-        #     self._load_records(osid_object_map['recordTypeIds'])
-        # else:
-        #     self._my_map = {}
-        #     self._for_update = False
-        #     self._init_map(**kwargs)
 
         if not self.is_for_update():
-            self._init_map(**kwargs)
+            self._init_map(record_types, **kwargs)
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
@@ -119,7 +108,7 @@ class LogEntryForm:
         self._timestamp_default = datetime.datetime.now()
         self._agent_default = self._mdata['agent']['default_id_values'][0]
 
-    def _init_map(self, **kwargs):
+    def _init_map(self, record_types=None, **kwargs):
         osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         self._my_map['priorityId'] = self._priority_default
         self._my_map['timestamp'] = self._timestamp_default
