@@ -493,7 +493,7 @@ class Bank:
                 self._provider_sessions[session_name] = session
             return session
 
-    def _get_sub_package_provider_manager(self, sub_package):
+    def _get_sub_package_provider_manager(self, sub_package_name):
         if sub_package_name in self._sub_package_managers:
             return self._sub_package_managers[sub_package_name]
         config = self._runtime.get_configuration()
