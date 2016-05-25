@@ -493,7 +493,7 @@ class AssetCompositionDesignSession:
 
     move_asset_ahead_template = """
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
-        ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_ahead(${object_name_under}_id, reference_id, ${containable_object_name_under}['${object_name_mixed}Ids'])
+        ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_ahead(${object_name_under}_id, reference_id, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
         collection.save(${containable_object_name_under}_map)"""
 
     older_move_asset_behind_template = """
@@ -508,7 +508,7 @@ class AssetCompositionDesignSession:
 
     move_asset_behind_template = """
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
-        ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_behind(${object_name_under}_id, reference_id, ${containable_object_name_under}['${object_name_mixed}Ids'])
+        ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_behind(${object_name_under}_id, reference_id, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
         collection.save(${containable_object_name_under}_map)"""
 
     older_order_assets_template = """
@@ -523,7 +523,7 @@ class AssetCompositionDesignSession:
 
     order_assets_template = """
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
-        ${containable_object_name_under}_map['${object_name_mixed}Ids'] = order_ids(${object_name_under}_ids, ${containable_object_name_under}['${object_name_mixed}Ids'])
+        ${containable_object_name_under}_map['${object_name_mixed}Ids'] = order_ids(${object_name_under}_ids, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
         collection.save(${containable_object_name_under}_map)"""
 
     older_remove_asset_template = """
@@ -551,7 +551,7 @@ class AssetCompositionDesignSession:
                                           collection='${containable_object_name}',
                                           runtime=self._runtime)
         ${containable_object_name_under}_map = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
-        if '${object_name_mixed}Ids' not in ${containable_object_name_under}:
+        if '${object_name_mixed}Ids' not in ${containable_object_name_under}_map:
             raise errors.NotFound('no ${object_name_plural} are assigned to this ${containable_object_name}')
         return ${containable_object_name_under}_map, collection
 """

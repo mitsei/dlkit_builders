@@ -72,7 +72,7 @@ ID_LIST_MDATA = """
         '${id_type}_set': [],"""
 
 INTEGER_MDATA = """
-        'default_integer_value': [None],
+        'default_integer_values': [None],
         'syntax': 'INTEGER',
         'minimum_integer': None,
         'maximum_integer': None,

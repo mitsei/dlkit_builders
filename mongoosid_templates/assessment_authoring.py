@@ -1,11 +1,6 @@
-class AssessmentPart:
-    import_statements = [
-        'from ..assessment.objects import Bank'
-    ]
-
 
 class AssessmentPartLookupSession:
-
+    
     additional_methods = """
     @utilities.arguments_not_none
     def get_assessment_parts_for_assessment_part(self, assessment_part_id):
@@ -111,6 +106,11 @@ class AssessmentPartAdminSession:
 """
 
 class AssessmentPart:
+    
+    # Is there a way to template this so that all sub-package objects get a catalog import?
+    import_statements = [
+        'from ..assessment.objects import Bank'
+    ]
 
     is_section = """
         return not self.is_sequestered()"""
@@ -139,18 +139,18 @@ class AssessmentPartForm:
         self._mdata = dict(default_mdata.ASSESSMENT_PART)
         self._init_metadata(**kwargs)
         if not self.is_for_update():
-            self._init_map(**kwargs)
+            self._init_map(record_types, **kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
         osid_objects.OsidContainableForm._init_metadata(self)
         osid_objects.OsidOperableForm._init_metadata(self)
-        osid_objects.OsidObjectForm._init_metadata(self, record_types=record_types, **kwargs)
+        osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
         if 'assessmentPartId' not in kwargs:
             # Only "Section" Parts are allowed directly under Assessments
-            self.._mdata['sequestered']['is_read_only'] = True
-            self.._mdata['sequestered']['is_required'] = True
-            self.._mdata['sequestered']['default_boolean_values'] = ['False']
+            self._mdata['sequestered']['is_read_only'] = True
+            self._mdata['sequestered']['is_required'] = True
+            self._mdata['sequestered']['default_boolean_values'] = ['False']
         self._assessment_part_default = self._mdata['assessment_part']['default_id_values'][0]
         self._assessment_default = self._mdata['assessment']['default_id_values'][0]
         self._weight_default = self._mdata['weight']['default_integer_values'][0]
@@ -158,7 +158,7 @@ class AssessmentPartForm:
         self._items_sequential_default = None
         self._items_shuffled_default = None
 
-    def _init_map(self, **kwargs):
+    def _init_map(self, record_types, **kwargs):
         \"\"\"Initialize form map\"\"\"
         osid_objects.OsidContainableForm._init_map(self)
         osid_objects.OsidOperableForm._init_map(self)
