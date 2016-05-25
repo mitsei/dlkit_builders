@@ -169,6 +169,7 @@ class ResourceManager:
         return ${cat_name}(
             self._provider_manager,
             session.get_${cat_name_under}(),
+            self._runtime,
             self._proxy, ${method_session_name}=session)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
@@ -182,6 +183,7 @@ class ResourceManager:
         return ${cat_name}(
             self._provider_manager,
             self.get_${cat_name_under}(*args, **kwargs),
+            self._runtime,
             self._proxy,
             ${return_type_under}=session)"""
 
@@ -217,6 +219,7 @@ class ResourceManager:
         return ${cat_name}(
             self._provider_manager,
             session.get_${cat_name_under}(),
+            self._runtime,
             self._proxy, ${method_session_name}=session)"""
 
     get_resource_notification_session_for_bin_catalogtemplate = """
@@ -230,6 +233,7 @@ class ResourceManager:
         return ${cat_name}(
             self._provider_manager,
             self.get_${cat_name_under}(*args, **kwargs),
+            self._runtime,
             self._proxy,
             ${return_type_under}=session)"""
 
@@ -551,7 +555,7 @@ class ResourceBinSession:
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
-            cat_list.append(${cat_name}(self._provider_manager, cat, self._proxy))
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
         return ${cat_name}List(cat_list)"""
 
 
@@ -669,6 +673,7 @@ class BinLookupSession:
         # osid.resource.BinLookupSession.get_bin
         return ${cat_name}(self._provider_manager,
                            self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}),
+                           self._runtime,
                            self._proxy)"""
 
     get_bins_by_ids_template = """
@@ -678,7 +683,7 @@ class BinLookupSession:
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
-            cat_list.append(${cat_name}(self._provider_manager, cat, self._proxy))
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
         return ${cat_name}List(cat_list)"""
 
     get_bins_by_genus_type_template = """
@@ -688,7 +693,7 @@ class BinLookupSession:
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
-            cat_list.append(${cat_name}(self._provider_manager, cat, self._proxy))
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
         return ${cat_name}List(cat_list)"""
 
     get_bins_by_parent_genus_type_template = """
@@ -698,7 +703,7 @@ class BinLookupSession:
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
-            cat_list.append(${cat_name}(self._provider_manager, cat, self._proxy))
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
         return ${cat_name}List(cat_list)"""
 
     get_bins_by_record_type_template = """
@@ -708,7 +713,7 @@ class BinLookupSession:
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
-            cat_list.append(${cat_name}(self._provider_manager, cat, self._proxy))
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
         return ${cat_name}List(cat_list)"""
 
     get_bins_by_provider_template = """
@@ -718,7 +723,7 @@ class BinLookupSession:
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
-            cat_list.append(${cat_name}(self._provider_manager, cat, self._proxy))
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
         return ${cat_name}List(cat_list)"""
 
     get_bins_template = """
@@ -728,7 +733,7 @@ class BinLookupSession:
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})
         cat_list = []
         for cat in catalogs:
-            cat_list.append(${cat_name}(self._provider_manager, cat, self._proxy))
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
         return ${cat_name}List(cat_list)"""
 
 
@@ -746,6 +751,7 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.create_bin
         return ${cat_name}(self._provider_manager,
                            self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}),
+                           self._runtime,
                            self._proxy)"""
 
     get_bin_form_for_update_template = """
@@ -771,6 +777,7 @@ class BinAdminSession:
         # OSID spec does not require returning updated catalog
         return ${cat_name}(self._provider_manager,
                            self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing}),
+                           self._runtime,
                            self._proxy)
 
     def save_${cat_name_under}(self, ${cat_name_under}_form, *args, **kwargs):
@@ -1012,9 +1019,10 @@ class Bin:
 
     init_template = """
     # WILL THIS EVER BE CALLED DIRECTLY - OUTSIDE OF A MANAGER?
-    def __init__(self, provider_manager, catalog, proxy, **kwargs):
+    def __init__(self, provider_manager, catalog, runtime, proxy, **kwargs):
         self._provider_manager = provider_manager
         self._catalog = catalog
+        self._runtime = runtime
         osid.OsidObject.__init__(self, self._catalog) # This is to initialize self._object
         osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
         self._catalog_id = catalog.get_id()

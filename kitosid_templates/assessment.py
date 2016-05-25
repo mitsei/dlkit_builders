@@ -6,19 +6,19 @@ class AssessmentManager:
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_catalog_template
         session = self._provider_manager.get_assessment_taken_query_session_for_bank(*args, **kwargs)
-        return Bank(self._provider_manager, session.get_bank(), self._proxy, assessment_taken_query_session = session)
+        return Bank(self._provider_manager, session.get_bank(), self._runtime, self._proxy, assessment_taken_query_session = session)
 
     def get_assessment_taken_admin_session(self, *args, **kwargs):
         \"\"\"Pass through to provider method\"\"\"
         session = self._provider_manager.get_assessment_taken_admin_session(*args, **kwargs)
-        return Bank(self._provider_manager, session.get_bank(), self._proxy, assessment_taken_admin_session = session)
+        return Bank(self._provider_manager, session.get_bank(), self._runtime, self._proxy, assessment_taken_admin_session = session)
 
     assessment_taken_admin_session = property(fget=get_assessment_taken_admin_session)
 
     def get_assessment_taken_admin_session_for_bank(self, *args, **kwargs):
         \"\"\"Pass through to provider method\"\"\"
         session = self._provider_manager.get_assessment_taken_admin_session_for_bank(*args, **kwargs)
-        return Bank(self._provider_manager, session.get_bank(), self._proxy, assessment_taken_admin_session = session)"""
+        return Bank(self._provider_manager, session.get_bank(), self._runtime, self._proxy, assessment_taken_admin_session = session)"""
 
 class AssessmentAuthoringProfile:
     get_assessment_part_record_types = """
@@ -437,9 +437,10 @@ class Bank:
     ]
 
     init = """
-    def __init__(self, provider_manager, catalog, proxy, **kwargs):
+    def __init__(self, provider_manager, catalog, runtime, proxy, **kwargs):
         self._provider_manager = provider_manager
         self._catalog = catalog
+        self._runtime = runtime
         osid.OsidObject.__init__(self, self._catalog) # This is to initialize self._object
         osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
         self._catalog_id = catalog.get_id()
@@ -492,7 +493,7 @@ class Bank:
             return session
 
     def _get_sub_package_provider_manager(self, sub_package):
-        config = self._catalog._runtime.get_configuration()
+        config = self._runtime.get_configuration()
         parameter_id = Id('parameter:{0}ProviderImpl@dlkit_service'.format(sub_package))
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         if self._proxy is None:
