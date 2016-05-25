@@ -1234,13 +1234,13 @@ class AssessmentOffered:
         return bool(self._my_map['itemsShuffled'])"""
 
     additional_methods = """
-    def are_sections_sequential()
+    def are_sections_sequential():
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
             return True
         return True
 
-    def are_sections_shuffled()
+    def are_sections_shuffled():
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
             return False
@@ -1477,6 +1477,7 @@ class AssessmentTakenQuery:
     match_taking_agent_id = """
         self._add_match('takingAgentId', str(agent_id), bool(match))"""
 
+
 class AssessmentQuery:
     match_item_id = """
         self._add_match('itemIds', str(item_id), match)"""
@@ -1488,26 +1489,32 @@ class AssessmentSection:
     _record_type_data_sets = {}
     _namespace = 'assessment.AssessmentSection'
 
-    def __init__(self, osid_object_map, runtime=None):
-        osid_objects.OsidObject.__init__(self, assessment_part_id, osid_object_map, runtime)
-        self._record_type_data_sets = self._get_registry('ASSESSMENT_SECTION_RECORD_TYPES')
-        self._records = dict()
-        self._load_records(osid_object_map['recordTypeIds'])
-        self._assessment_part_id = assessment_part # The id of the Part that spawned this Section
-        self._catalog_name = 'bank'
+    def __init__(self, assessment_part):
+        self._assessment_part = assessment_part
+        self._authoring_manager = None
+
+    def __getattribute__(self, name):
+        if not name.startswith('_'):
+            try:
+                return self._assessment_part[name]
+            except AttributeError:
+                return object.__getattribute__(self, name)
 """
 
     has_allocated_time = """
-        return bool(self._get_assessment_part().get_allocated_time())"""
+        return bool(self._assessment_part.get_allocated_time())"""
     
     get_allocated_time = """
-        return self._get_assessment_part().get_allocated_time()"""
+        # Should never be called due to __getattribute__
+        return self._assessment_part.get_allocated_time()"""
     
     are_items_sequential = """
-        return self._get_assessment_part().are_items_sequential()"""
+        # Should never be called due to __getattribute__
+        return self._assessment_part.are_items_sequential()"""
     
     are_items_shuffled = """
-        return self._get_assessment_part().are_items_shuffled()"""
+        # Should never be called due to __getattribute__
+        return self._assessment_part.are_items_shuffled()"""
 
     additional_methods = """
     def _get_authoring_manager(self):
@@ -1522,13 +1529,15 @@ class AssessmentSection:
         lookup_session.use_federated_bank_view()
         return lookup_session.get_assessment_part(self._assessment_part_id)
 
-    def _get_items(self, part_id=self._assessment_part_id):
+    def _get_items(self, part_id=None):
+        if part_id is None:
+            part_id = self._assessment_part_id
         if self.are_items_sequential():
             raise errors.IllegalState('Items can only be accessed one-at-a-time.') # Should this return special ItemList?
         mgr = self._get_authoring_manager
         if not mgr.supports_assessment_part_lookup():
             raise errors.OperationFailed('Assessment.Authoring does not support AssessmentPartLookup')
-        part_item_session = mgr.get_assessment_part_lookup_session()
+        part_item_session = mgr.get_assessment_part_item_session()
         part_item_session.use_federated_bank_view()
         return part_item_session.get_assessment_part_items(part_id)"""
 
