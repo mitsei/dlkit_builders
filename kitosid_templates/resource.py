@@ -41,6 +41,7 @@ class ResourceManager:
         self._${cat_name_under}_view = DEFAULT
         # This is to initialize self._proxy
         osid.OsidSession.__init__(self, proxy)
+        self._sub_package_managers = dict()
 
     # def _get_view(self, view):
     #     \"\"\"Gets the currently set view\"\"\"
@@ -76,16 +77,20 @@ class ResourceManager:
                 self._provider_sessions[session_name] = session
             return session
 
-    def _get_sub_package_provider_manager(self, sub_package):
+    def _get_sub_package_provider_manager(self, sub_package_name):
+        if sub_package_name in self._sub_package_managers:
+            return self._sub_package_managers[sub_package_name]
         config = self._runtime.get_configuration()
-        parameter_id = Id('parameter:{0}ProviderImpl@dlkit_service'.format(sub_package))
+        parameter_id = Id('parameter:{0}ProviderImpl@dlkit_service'.format(sub_package_name))
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         if self._proxy is None:
             # need to add version argument
-            return self._runtime.get_manager(sub_package.upper(), provider_impl)
+            sub_package = self._runtime.get_manager(sub_package_name.upper(), provider_impl)
         else:
             # need to add version argument
-            return self._runtime.get_proxy_manager(sub_package.upper(), provider_impl)
+            sub_package = self._runtime.get_proxy_manager(sub_package_name.upper(), provider_impl)
+        self._sub_package_managers[sub_package_name] = sub_package
+        return sub_package
 
     def _get_sub_package_provider_session(self, sub_package, session_name, proxy=None):
         \"\"\"Gets the session from a sub-package\"\"\"
