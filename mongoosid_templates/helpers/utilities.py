@@ -162,12 +162,19 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
     # Try to return a Manager from this implementation, or raise OperationFailed:
     try:
         module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
-        manager = getattr(module, osid.title() + 'Manager')()
+        manager_name = ''.join((osid.title()).split('_')) + 'Manager'
+        manager = getattr(module, manager_name)()
     except (ImportError, AttributeError):
         raise OperationFailed()
     if runtime is not None:
         manager.initialize(runtime)
     return manager
+
+def get_provider_session(provider_manager, session_method, proxy=None, *args, **kwargs):
+    if proxy is None:
+        return getattr(provider_manager, session_method)(*args, **kwargs)
+    else:
+        return getattr(provider_manager, session_method)(proxy, *args, **kwargs)
 
 def format_catalog(catalog_name):
     return catalog_name.replace('_', '').title()

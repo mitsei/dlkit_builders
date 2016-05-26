@@ -155,6 +155,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     not 'containable_object_name_under' in context and
                     not 'containable_object_name_upper' in context):
                 context['containable_object_name_under'] = camel_to_under(context['containable_object_name'])
+                context['containable_object_name_plural'] = make_plural(context['containable_object_name'])
+                context['containable_object_name_plural_under'] = camel_to_under(context['containable_object_name_plural'])
                 context['containable_object_name_mixed'] = camel_to_mixed(context['containable_object_name'])
                 context['containable_object_name_upper'] = camel_to_under(context['containable_object_name']).upper()
             if 'object_namespace' in context:

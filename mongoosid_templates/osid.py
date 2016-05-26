@@ -552,6 +552,10 @@ class OsidSession:
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
         return get_provider_manager(osid, runtime=self._runtime, local=local)
 
+    def _get_provider_session(self, provider_manager, session_method, *args, **kwargs):
+        \"\"\"Gets the session from the provider manager or proxy manager depending on proxy.\"\"\"
+        return get_provider_session(provider_manager, session_method, self._proxy, *args, **kwargs)
+
     def _get_id(self, id_, pkg_name):
         \"\"\"
         Returns the primary id given an alias.

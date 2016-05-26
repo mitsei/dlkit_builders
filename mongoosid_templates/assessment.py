@@ -975,13 +975,17 @@ class AssessmentBasicAuthoringSession:
             cat_name='Bank',
             cat_class=objects.Bank)
         mgr = self._get_provider_manager('ASSESSMENT')
-        self._assessment_lookup_session = mgr.get_assessment_lookup_session()
+        self._assessment_lookup_session = self._get_provider_session(mgr, 'get_assessment_lookup_session,)
         self._assessment_lookup_session.use_federated_bank_view()
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        self._part_admin_session = mgr.get_assessment_part_admin_session(self._catalog_id)
-        self._part_lookup_session = mgr.get_assessment_part_lookup_session(self._catalog_id)
-        self._part_item_session = mgr.get_assessment_part_item_session(self._catalog_id)
-        self._part_item_design_session = mgr.get_assessment_part_item_design_session(self._catalog_id)
+        self._part_admin_session = self._get_provider_session(
+            mgr, 'get_assessment_part_admin_session_for_bank', self._catalog_id)
+        self._part_lookup_session = self._get_provider_session(
+            mgr, 'get_assessment_part_lookup_session_for_bank', self._catalog_id)
+        self._part_item_session = self._get_provider_session(
+            mgr, 'get_assessment_part_item_session_for_bank', self._catalog_id)
+        self._part_item_design_session = self._get_provider_session(
+            mgr, 'get_assessment_part_item_design_session', self._catalog_id)
         self._part_lookup_session.use_isolated_bank_view()
         self._part_item_session.use_isolated_bank_view()
         self._first_part_index = {}

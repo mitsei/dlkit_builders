@@ -178,12 +178,12 @@ class AssetCompositionSession:
             cls.svc_mgr.delete_repository(catalog.ident)
 """
 
-    get_composition_assets = """
-        self.assertEqual(self.catalog.get_composition_assets(self.composition.ident).available(), 4)"""
+    get_composition_assets_template = """
+        self.assertEqual(self.catalog.get_${containable_object_name_plural_under}_${object_name_plural_under}(self.${containable_object_name_under}.ident).available(), 4)"""
 
     get_compositions_by_asset = """
-        self.assertEqual(self.catalog.get_compositions_by_asset(self.asset_ids[0]).available(), 1)
-        self.assertEqual(self.catalog.get_compositions_by_asset(self.asset_ids[0]).next().ident, self.composition.ident)"""
+        self.assertEqual(self.catalog.get_${containable_object_name_under}_by_${object_name_under}(self.${object_name_under}_ids[0]).available(), 1)
+        self.assertEqual(self.catalog.get_${containable_object_name_under}_by_${object_name_under}(self.${object_name_under}[0]).next().ident, self.${containable_object_name_under}.ident)"""
 
 class AssetCompositionDesignSession:
 
