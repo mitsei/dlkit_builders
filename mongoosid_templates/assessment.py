@@ -975,7 +975,7 @@ class AssessmentBasicAuthoringSession:
             cat_name='Bank',
             cat_class=objects.Bank)
         mgr = self._get_provider_manager('ASSESSMENT')
-        self._assessment_lookup_session = self._get_provider_session(mgr, 'get_assessment_lookup_session,)
+        self._assessment_lookup_session = self._get_provider_session(mgr, 'get_assessment_lookup_session',)
         self._assessment_lookup_session.use_federated_bank_view()
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         self._part_admin_session = self._get_provider_session(
