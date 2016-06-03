@@ -47,6 +47,7 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
 
         for arg in method['args']:
             if arg['var_name'] in arg_default_map:
+                print 'ARG DEFAULT MAP', arg_default_map
                 args.append(arg['var_name'] + '=' + arg_default_map[arg['var_name']])
             else:
                 args.append(arg['var_name'])
