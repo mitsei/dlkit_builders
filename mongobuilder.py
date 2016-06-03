@@ -47,10 +47,13 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
 
         for arg in method['args']:
             if arg['var_name'] in arg_default_map:
-                print 'ARG DEFAULT MAP', arg_default_map
                 args.append(arg['var_name'] + '=' + arg_default_map[arg['var_name']])
             else:
                 args.append(arg['var_name'])
+        if 'args' in arg_default_map and arg_default_map['args']:
+            args.append('*args')
+        if 'kwargs' in arg_default_map and arg_default_map['args']:
+            args.append('**kwargs')
         return args
 
     def _get_method_decorator(self, method):

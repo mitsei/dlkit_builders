@@ -55,12 +55,21 @@ class ResourceManager:
     def __init__(self):
         osid_managers.OsidManager.__init__(self)"""
 
+    get_resource_lookup_session_arg_template = {
+        'args': True,
+        'kwargs': True,
+    }
 
     get_resource_lookup_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         # pylint: disable=no-member
         return ${return_module}.${return_type}(runtime=self._runtime)"""
+
+    get_resource_lookup_session_for_bin_arg_template = {
+        'args': True,
+        'kwargs': True,
+    }
 
     get_resource_lookup_session_for_bin_template = """
         if not self.supports_${support_check}():

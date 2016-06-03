@@ -673,7 +673,8 @@ class Templates(Utilities):
             else:
                 if hasattr(templates, pattern.split('.')[-2]):
                     template_class = getattr(templates, pattern.split('.')[-2])
-                    pattern_template = self.last(pattern) + '_import_templates'
+                    #pattern_template = self.last(pattern) + '_import_templates'
+                    pattern_template = self.last(pattern) + template_extension
                     if hasattr(template_class, pattern_template):
                         templates_obj = getattr(template_class, pattern_template)
 
@@ -740,14 +741,15 @@ class Templates(Utilities):
         if arg_template is not None:
             arg_list = arg_context['arg_list'].split(',')
             for index, val in arg_template.iteritems():
-                if index = 'args':
+                if index == 'args':
                     arg_map['args'] = val
-                if index = 'kwargs':
+                elif index == 'kwargs':
                     arg_map['kwargs'] = val
-                try:
-                    arg_map[arg_list[int(index)].strip()] = str(val)
-                except KeyError:
-                    pass
+                else:
+                    try:
+                        arg_map[arg_list[int(index)].strip()] = str(val)
+                    except KeyError:
+                        pass
 
         return arg_map
 
