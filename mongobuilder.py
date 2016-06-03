@@ -50,6 +50,7 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
                 args.append(arg['var_name'] + '=' + arg_default_map[arg['var_name']])
             else:
                 args.append(arg['var_name'])
+
         if 'args' in arg_default_map and arg_default_map['args']:
             args.append('*args')
         if 'kwargs' in arg_default_map and arg_default_map['args']:

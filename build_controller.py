@@ -673,9 +673,11 @@ class Templates(Utilities):
             else:
                 if hasattr(templates, pattern.split('.')[-2]):
                     template_class = getattr(templates, pattern.split('.')[-2])
-                    #pattern_template = self.last(pattern) + '_import_templates'
-                    pattern_template = self.last(pattern) + template_extension
-                    if hasattr(template_class, pattern_template):
+                    extension_pattern_template = self.last(pattern) + template_extension
+                    pattern_template = self.last(pattern) + '_import_templates'
+                    if hasattr(template_class, extension_pattern_template):
+                        templates_obj = getattr(template_class, extension_pattern_template)
+                    elif hasattr(template_class, pattern_template):
                         templates_obj = getattr(template_class, pattern_template)
 
         return templates_obj
