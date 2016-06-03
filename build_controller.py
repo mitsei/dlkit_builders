@@ -740,6 +740,10 @@ class Templates(Utilities):
         if arg_template is not None:
             arg_list = arg_context['arg_list'].split(',')
             for index, val in arg_template.iteritems():
+                if index = 'args':
+                    arg_map['args'] = val
+                if index = 'kwargs':
+                    arg_map['kwargs'] = val
                 try:
                     arg_map[arg_list[int(index)].strip()] = str(val)
                 except KeyError:
