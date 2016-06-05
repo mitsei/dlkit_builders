@@ -246,20 +246,48 @@ class AssessmentBasicAuthoringSession:
         return self._get_provider_session('assessment_basic_authoring_session').get_items(*args, **kwargs)"""
 
     add_item = """
-        \"\"\"Pass through to provider method\"\"\"
-        self._get_provider_session('assessment_basic_authoring_session').add_item(*args, **kwargs)"""
+        \"\"\"Pass through to provider methods.\"\"\"
+        try:
+            self._get_provider_session('assessment_basic_authoring_session').add_item(*args, **kwargs)
+        except InvalidArgument:
+            try:
+                self._get_sub_package_provider_session(
+                    'assessment_authoring', 'assessment_part_item_design_session').add_item(*args, **kwargs)"""
 
     remove_item = """
-        \"\"\"Pass through to provider method\"\"\"
-        self._get_provider_session('assessment_basic_authoring_session').remove_item(*args, **kwargs)"""
+        \"\"\"Pass through to provider methods.\"\"\"
+        try:
+            self._get_provider_session('assessment_basic_authoring_session').remove_item(*args, **kwargs)
+        except InvalidArgument:
+            try:
+                self._get_sub_package_provider_session(
+                    'assessment_authoring', 'assessment_part_item_design_session').remove_item(*args, **kwargs)"""
 
     move_item = """
         \"\"\"Pass through to provider method\"\"\"
         self._get_provider_session('assessment_basic_authoring_session').move_item(*args, **kwargs)"""
 
     order_items = """
-        \"\"\"Pass through to provider method\"\"\"
-        self._get_provider_session('assessment_basic_authoring_session').order_items(*args, **kwargs)"""
+        \"\"\"Pass through to provider methods.\"\"\"
+        try:
+            self._get_provider_session('assessment_basic_authoring_session').order_items(*args, **kwargs)
+        except InvalidArgument:
+            try:
+                self._get_sub_package_provider_session(
+                    'assessment_authoring', 'assessment_part_item_design_session').order_items(*args, **kwargs)
+
+    # This was an idea, but not a good one. Feel free to remove:
+    # def _get_container_arg_type(*args, **kwargs):
+    #     from dlkit.abstract_osid.id.primitives import Id as abc_id # Should go in module imports
+    #     if 'assessment_part_id' in kwargs:
+    #         return 'AssessmentPart'
+    #     elif 'assessment' in kwargs:
+    #         return 'Assessment'
+    #     else:
+    #         for arg in args:
+    #             if isinstance(args['arg'], abc_id) and args['arg'].get_namespace() != 'assessment.Item':
+    #                 return args['arg'].get_namespace().split('.')[-1]
+    #     return None"""
 
 class AssessmentTakenLookupSession:
 
@@ -376,6 +404,34 @@ class AssessmentPartAdminSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_admin_session').can_update_assessment_parts()"""
 
+class AssessmentPartItemDesignSession:
+
+    can_design_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_item_design_session').can_design_assessment_parts()"""
+
+    get_assessment_part_items = """
+        \"\"\"Pass through to provider method\"\"\"
+        # Note: this method is differenct from the underlying signature
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_item_design_session').get_items(*args, **kwargs)"""
+
+    add_item = None
+    
+    move_item_ahead = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_item_design_session').move_item_ahead(*args, **kwargs)"""
+    
+    move_item_behind = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_item_design_session').move_item_behind(*args, **kwargs)"""
+
+    remove_items = None
+
+    order_items = None
 
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """

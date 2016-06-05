@@ -63,6 +63,8 @@ class ResourceManager:
     get_resource_lookup_session_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
+        if self._proxy_in_args(*args, **kwargs):
+            raise errors.InvalidArgument('A Proxy object was received but not expected.')
         # pylint: disable=no-member
         return ${return_module}.${return_type}(runtime=self._runtime)"""
 
@@ -74,13 +76,19 @@ class ResourceManager:
     get_resource_lookup_session_for_bin_template = """
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
+        if self._proxy_in_args(*args, **kwargs):
+            raise errors.InvalidArgument('A Proxy object was received but not expected.')
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
         # pylint: disable=no-member
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)"""
+        
+    get_resource_admin_session_arg_template = get_resource_lookup_session_arg_template
 
     get_resource_admin_session_template = get_resource_lookup_session_template
+
+    get_resource_admin_session_for_bin_arg_template = get_resource_lookup_session_for_bin_arg_template
 
     get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
 
@@ -98,7 +106,6 @@ class ResourceManager:
         ##
         # pylint: disable=no-member
         return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name})"""
-
 
 class ResourceProxyManager:
 
@@ -547,7 +554,7 @@ class ResourceAdminSession:
         
         \"\"\"
         mgr = self._get_provider_manager('REPOSITORY')
-        query_session = mgr.get_${object_name_under}_query_session_for_${cat_name_under}(self._catalog_id)
+        query_session = mgr.get_${object_name_under}_query_session_for_${cat_name_under}(self._catalog_id, proxy=self._proxy)
         query_form = query_session.get_${object_name_under}_query()
         query_form.match_enclosed_object_id(enclosure_id)
         query_result = query_session.get_${object_name_plural_under}_by_query(query_form)
@@ -565,7 +572,7 @@ class ResourceAdminSession:
                                           collection='${object_name}',
                                           runtime=self._runtime)
         mgr = self._get_provider_manager('${package_name_replace_upper}')
-        lookup_session = mgr.get_${object_name_under}_lookup_session()
+        lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_${cat_name_under}_view()
         try:
             lookup_session.use_unsequestered_${object_name_under}_view()
@@ -781,7 +788,7 @@ class ResourceBinSession:
         # Implemented from template for
         # osid.resource.ResourceBinSession.get_resources_by_bin
         mgr = self._get_provider_manager('${package_name_replace_upper}')
-        lookup_session = mgr.get_${object_name_under}_lookup_session_for_${cat_name_under}(${arg0_name})
+        lookup_session = mgr.get_${object_name_under}_lookup_session_for_${cat_name_under}(${arg0_name}, proxy=self._proxy)
         lookup_session.use_isolated_${cat_name_under}_view()
         return lookup_session.get_${object_name_plural_under}()"""
 
@@ -806,7 +813,7 @@ class ResourceBinSession:
         # Implemented from template for
         # osid.resource.ResourceBinSession.get_bin_ids_by_resource
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${object_name_under}_lookup_session()
+        lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_${cat_name_under}_view()
         ${object_name_under} = lookup_session.get_${object_name_under}(${arg0_name})
         id_list = []
@@ -818,7 +825,7 @@ class ResourceBinSession:
         # Implemented from template for
         # osid.resource.ResourceBinSession.get_bins_by_resource
         mgr = self._get_provider_manager('${package_name_replace_upper}')
-        lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         return lookup_session.get_${cat_name_plural_under}_by_ids(
             self.get_${cat_name_under}_ids_by_${object_name_under}(${arg0_name}))"""
 
@@ -858,7 +865,7 @@ class ResourceBinAssignmentSession:
         # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids
         # This will likely be overridden by an authorization adapter
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         ${object_name_plural_under} = lookup_session.get_${cat_name_plural_under}()
         id_list = []
         for ${object_name_under} in ${object_name_plural_under}:
@@ -875,7 +882,7 @@ class ResourceBinAssignmentSession:
         # Implemented from template for
         # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
         self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
 
@@ -883,7 +890,7 @@ class ResourceBinAssignmentSession:
         # Implemented from template for
         # osid.resource.ResourceBinAssignmentSession.unassign_resource_from_bin
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${cat_name_under}_lookup_session()
+        lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         cat = lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
         self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
 
@@ -1289,7 +1296,8 @@ class BinHierarchySession:
         self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
             Id(authority='${pkg_name_upper}',
                namespace='CATALOG',
-               identifier='${cat_name_upper}')
+               identifier='${cat_name_upper}'),
+             proxy=self._proxy
         )"""
 
     can_access_bin_hierarchy_template = """
@@ -1417,7 +1425,8 @@ class BinHierarchyDesignSession:
         self._hierarchy_session = hierarchy_mgr.get_hierarchy_design_session_for_hierarchy(
             Id(authority='${pkg_name_upper}',
                namespace='CATALOG',
-               identifier='${cat_name_upper}')
+               identifier='${cat_name_upper}'),
+            proxy=self._proxy
         )"""
 
     can_modify_bin_hierarchy_template = """
@@ -1539,7 +1548,7 @@ ${instance_initers}"""
         mgr = self._get_provider_manager('${return_pkg_caps}')
         if not mgr.supports_${return_type_under}_lookup():
             raise errors.OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
-        lookup_session = mgr.get_${return_type_under}_lookup_session()
+        lookup_session = mgr.get_${return_type_under}_lookup_session() # What about the Proxy
         lookup_session.use_federated_${return_cat_name_under}_view()
         osid_object = lookup_session.get_${return_type_under}(self.get_${var_name}_id())
         return osid_object"""
@@ -1834,7 +1843,7 @@ class BinQuery:
             Id(authority='${pkg_name_upper}',
                namespace='CATALOG',
                identifier='${cat_name_upper}')
-        )
+        ) # What about the Proxy?
         descendants = []
         if hts.has_children(catalog_id):
             for child_id in hts.get_children(catalog_id):

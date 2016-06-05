@@ -156,13 +156,20 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
             config = runtime.get_configuration()
             parameter_id = Id('parameter:' + osid.lower() + 'ProviderImpl@mongo')
             impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
-            return runtime.get_manager(osid, impl_name) # What about ProxyManagers?
+            if proxy is None:
+                return runtime.get_manager(osid, impl_name)
+            else:
+                return runtime.get_proxy_manager(osid, impl_name)
         except (AttributeError, KeyError, NotFound):
             pass
     # Try to return a Manager from this implementation, or raise OperationFailed:
     try:
+        if proxy is None:
+            mgr_str = 'Manager'
+        else:
+            mgr_str = 'ProxyManager'
         module = import_module('dlkit.mongo.' + osid.lower() + '.managers')
-        manager_name = ''.join((osid.title()).split('_')) + 'Manager'
+        manager_name = ''.join((osid.title()).split('_')) + mgr_str
         manager = getattr(module, manager_name)()
     except (ImportError, AttributeError):
         raise OperationFailed()

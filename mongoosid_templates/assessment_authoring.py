@@ -51,7 +51,7 @@ class AssessmentPartAdminSession:
         if assessment_part_record_types == []:
             assessment_part_record_types = None
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local)
-        lookup_session = mgr.get_assessment_part_lookup_session_for_bank(self._catalog_id)
+        lookup_session = mgr.get_assessment_part_lookup_session_for_bank(self._catalog_id, proxy=self._proxy)
         child_parts = lookup_session.get_assessment_parts_for_assessment_part(assessment_part_id)
         mdata = {}
         # Check for underlying Parts, whether Sections and set appropriate mdata overrides:
@@ -95,7 +95,7 @@ class AssessmentPartAdminSession:
         else:
             parent_part_id = Id(result['assessmentPartId'])
             mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local)
-            lookup_session = mgr.get_assessment_part_lookup_session_for_bank(self._catalog_id)
+            lookup_session = mgr.get_assessment_part_lookup_session_for_bank(self._catalog_id, proxy=self._proxy)
             if lookup_session.get_assessment_parts_for_assessment_part(parent_part_id).available() > 1:
                 mdata['sequestered']['is_read_only'] = True
                 mdata['sequestered']['is_required'] = True

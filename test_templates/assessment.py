@@ -416,18 +416,32 @@ class AssessmentBasicAuthoringSession:
         cls.assessment_offered_list = list()
         cls.assessment_offered_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        cls.auth_svc_mgr = Runtime().get_service_manager('ASSESSMENT_AUTHORING', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
-        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        create_form.description = 'Test Bank for AssessmentBasicAuthoringSession tests'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
         create_form = cls.catalog.get_assessment_form_for_create([])
         create_form.display_name = 'Test Assessment'
-        create_form.description = 'Test Assessment for AssessmentSession tests'
+        create_form.description = 'Test Assessment for AssessmentBasicAuthoringSession tests'
         cls.assessment = cls.catalog.create_assessment(create_form)
+        cls.test_items = list()
+        cls.test_item_ids = list()
+        for number in ['One', 'Two', 'Three', 'Four']:
+            ifc = cls.catalog.get_item_form_for_create([])
+            ifc.set_display_name('Test Assessment Item ' + number)
+            ifc.set_description('This is a Test Item Called Number ' + number)
+            test_item = cls.catalog.create_item(ifc)
+            cls.test_items.append(test_item)
+            cls.test_item_ids.append(test_item.ident)
+            cls.catalog.add_item(test_item.ident, cls.assessment.ident)
+        
 
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_banks():
+            for obj in catalog.get_items():
+                catalog.delete_item(obj.ident)
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
             cls.svc_mgr.delete_bank(catalog.ident)

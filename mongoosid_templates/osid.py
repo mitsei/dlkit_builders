@@ -126,6 +126,7 @@ class OsidManager:
         'from ..primitives import DisplayText',
         'from pymongo import MongoClient',
         'from .. import MONGO_CLIENT',
+        'from dlkit.abstract_osid.proxy.rules import Proxy as abc_proxy',
     ]  
 
     init = """
@@ -134,6 +135,16 @@ class OsidManager:
     
     initialize = """
         OsidProfile._initialize_manager(self, runtime)"""
+
+    additional_methods = """
+    def _proxy_in_args(self, *args, **kwargs):
+        for arg in args:
+            if isinstance(arg, abc_proxy):
+                return True
+        if 'proxy' in kwargs and kwargs['proxy'] is not None:
+            return True
+        else:
+            return False"""
 
 class OsidProxyManager:
 
@@ -364,7 +375,7 @@ class Sourceable:
         if 'providerId' not in self._my_map or not self._my_map['providerId']:
             raise errors.IllegalState('this sourceable object has no provider set')
         mgr = self._get_provider_manager('RESOURCE')
-        lookup_session = mgr.get_resource_lookup_session()
+        lookup_session = mgr.get_resource_lookup_session() # What about the Proxy?
         lookup_session.use_federated_bin_view()
         return lookup_session.get_resource(self.get_provider_id())"""
 
@@ -550,11 +561,12 @@ class OsidSession:
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
-        return get_provider_manager(osid, runtime=self._runtime, local=local)
+        return get_provider_manager(osid, runtime=self._runtime, proxy=self._proxy, local=local)
 
-    def _get_provider_session(self, provider_manager, session_method, *args, **kwargs):
-        \"\"\"Gets the session from the provider manager or proxy manager depending on proxy.\"\"\"
-        return get_provider_session(provider_manager, session_method, self._proxy, *args, **kwargs)
+    # No longer needed?
+    # def _get_provider_session(self, provider_manager, session_method, *args, **kwargs):
+    #     \"\"\"Gets the session from the provider manager or proxy manager depending on proxy.\"\"\"
+    #     return get_provider_session(provider_manager, session_method, self._proxy, *args, **kwargs)
 
     def _get_id(self, id_, pkg_name):
         \"\"\"
@@ -620,7 +632,8 @@ class OsidSession:
                 hierarchy_session = mgr.get_hierarchy_traversal_session_for_hierarchy(
                     Id(authority=pkg_name.upper(),
                        namespace='CATALOG',
-                       identifier=cat_name.upper()))
+                       identifier=cat_name.upper()),
+                    proxy=self._proxy)
             except (errors.OperationFailed, errors.Unsupported):
                 return idstr_list # there is no hierarchy
         if hierarchy_session.has_children(cat_id):
@@ -1309,7 +1322,7 @@ class OsidSourceableForm:
         if 'effective_agent_id' in kwargs:
             try:
                 mgr = self._get_provider_manager('RESOURCE', local=True)
-                agent_session = mgr.get_resource_agent_session()
+                agent_session = mgr.get_resource_agent_session() # Should this send a Proxy somehow? From where?
                 agent_session.use_federated_bin_view()
                 resource_idstr = str(agent_session.get_resource_id_by_agent(kwargs['effective_agent_id']))
             except (errors.OperationFailed,

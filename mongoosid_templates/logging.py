@@ -19,8 +19,8 @@ class LoggingSession:
         OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='logging', cat_name='Log', cat_class=objects.Log)
         self._forms = dict()
         lm = self._get_provider_manager('LOGGING')
-        self._leas = lm.get_log_entry_admin_session_for_log(self._catalog_id)
-        self._lels = lm.get_log_entry_lookup_session_for_log(self._catalog_id)
+        self._leas = lm.get_log_entry_admin_session_for_log(self._catalog_id, proxy=self._proxy)
+        self._lels = lm.get_log_entry_lookup_session_for_log(self._catalog_id, proxy=self._proxy)
         self._content_types = lm.get_content_types()"""
 
     can_log = """

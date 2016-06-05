@@ -32,7 +32,7 @@ class ObjectiveRequisiteSession:
         # NOTE: This implementation currently ignores plenary view
         requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
         relm = self._get_provider_manager('RELATIONSHIP')
-        rls = relm.get_relationship_lookup_session()
+        rls = relm.get_relationship_lookup_session(proxy=self._proxy)
         rls.use_federated_family_view()
         requisite_relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name},
                                                                                  requisite_type)
@@ -53,7 +53,7 @@ class ObjectiveRequisiteSession:
         # NOTE: This implementation currently ignores plenary view
         requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
         relm = self._get_provider_manager('RELATIONSHIP')
-        rls = relm.get_relationship_lookup_session()
+        rls = relm.get_relationship_lookup_session(proxy=self._proxy)
         rls.use_federated_family_view()
         requisite_relationships = rls.get_relationships_by_genus_type_for_destination(${arg0_name},
                                                                                       requisite_type)
@@ -99,7 +99,7 @@ class ObjectiveRequisiteAssignmentSession:
 
         ras = self._get_provider_manager(
             'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_objective_bank_id())
+            self.get_objective_bank_id(), proxy=self._proxy)
         rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name}, [])
         rfc.set_display_name('Objective Requisite')
         rfc.set_description('An Objective Requisite created by the ObjectiveRequisiteAssignmentSession')
@@ -115,10 +115,10 @@ class ObjectiveRequisiteAssignmentSession:
         requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
         rls = self._get_provider_manager(
             'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_objective_bank_id())
+            self.get_objective_bank_id(), proxy=self._proxy)
         ras = self._get_provider_manager(
             'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_objective_bank_id())"""
+            self.get_objective_bank_id(), proxy=self._proxy)"""
 
 class ObjectiveAdminSession:
 
@@ -236,7 +236,7 @@ class Activity:
         mgr = self._get_provider_manager('${return_pkg_replace_caps}')
         if not mgr.supports_${return_type_under}_lookup():
             raise errors.OperationFailed('${return_pkg_replace_title} does not support ${return_type} lookup')
-        lookup_session = mgr.get_${return_type_under}_lookup_session()
+        lookup_session = mgr.get_${return_type_under}_lookup_session() # What about the Proxy?
         lookup_session.use_federated_${return_cat_name_under}_view()
         return lookup_session.get_${return_type_under}(self.get_${var_name}_id())"""
 
@@ -250,13 +250,10 @@ class Activity:
 
     get_assets_template = """
         # Implemented from template for osid.learning.Activity.get_assets_template
-        try:
-            mgr = self._get_provider_manager('${return_pkg_caps}')
-        except ImportError:
-            raise errors.OperationFailed('failed to instantiate ${return_pkg_title}Manager')
+        mgr = self._get_provider_manager('${return_pkg_caps}')
         if not mgr.supports_${return_type_list_object_under}_lookup():
             raise errors.OperationFailed('${return_pkg_title} does not support ${return_type_list_object} lookup')
-        lookup_session = mgr.get_${return_type_list_object_under}_lookup_session()
+        lookup_session = mgr.get_${return_type_list_object_under}_lookup_session() # What about the Proxy?
         lookup_session.use_federated_${return_cat_name_under}_view()
         return lookup_session.get_${return_type_list_object_plural_under}_by_ids(self.get_${var_name_singular}_ids())"""
 
@@ -313,7 +310,8 @@ class ObjectiveHierarchySession:
         self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
             Id(authority='LEARNING',
                namespace='CATALOG',
-               identifier='OBJECTIVE')
+               identifier='OBJECTIVE'),
+            proxy=self._proxy
         )"""
 
 
@@ -337,7 +335,8 @@ class ObjectiveHierarchyDesignSession:
         self._hierarchy_session = hierarchy_mgr.get_hierarchy_design_session_for_hierarchy(
             Id(authority='LEARNING',
                namespace='CATALOG',
-               identifier='OBJECTIVE')
+               identifier='OBJECTIVE'),
+            proxy=self._proxy
         )"""
 
 

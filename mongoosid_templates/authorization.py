@@ -40,7 +40,8 @@ class AuthorizationSession:
         hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
             Id(authority=authority,
                namespace='CATALOG',
-               identifier=identifier))
+               identifier=identifier),
+             proxy=self._proxy)
         node = hierarchy_session.get_nodes(qualifier_id, 10, 0, False)
         return self._get_ancestor_idstrs(node) + [str(root_qualifier_id)]
 

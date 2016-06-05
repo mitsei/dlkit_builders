@@ -190,7 +190,7 @@ class GradeEntryForm:
         self._mdata = dict(default_mdata.GRADE_ENTRY)
         self._effective_agent_id = kwargs['effective_agent_id']
 
-        mgr = self._get_provider_manager('GRADING')
+        mgr = self._get_provider_manager('GRADING') # What about the Proxy?
         lookup_session = mgr.get_gradebook_column_lookup_session()
         lookup_session.use_federated_gradebook_view()
         if 'gradebook_column_id' in kwargs:
@@ -315,7 +315,7 @@ class GradebookColumnAdminSession:
     additional_methods = """
     def _has_entries(self, gradebook_column_id):
         grading_manager = self._get_provider_manager('GRADING')
-        gels = grading_manager.get_grade_entry_lookup_session()
+        gels = grading_manager.get_grade_entry_lookup_session(proxy=self._proxy)
         gels.use_federated_gradebook_view()
         entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
         return entries.available() > 0
@@ -327,7 +327,7 @@ class GradebookColumnAdminSession:
 
         # check that no entries already exist for this gradebook column
         grading_manager = self._get_provider_manager('GRADING')
-        gels = grading_manager.get_grade_entry_lookup_session()
+        gels = grading_manager.get_grade_entry_lookup_session(proxy=self._proxy)
         gels.use_federated_gradebook_view()
         entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
         if self._has_entries(gradebook_column_id):
@@ -387,7 +387,7 @@ class GradeSystemAdminSession:
     additional_methods = """
     def _has_columns(self, grade_system_id):
         grading_manager = self._get_provider_manager('GRADING')
-        gcqs = grading_manager.get_gradebook_column_query_session()
+        gcqs = grading_manager.get_gradebook_column_query_session(proxy=self._proxy)
         gcqs.use_federated_gradebook_view()
         querier = gcqs.get_gradebook_column_query()
         querier.match_grade_system_id(grade_system_id, match=True)
@@ -438,7 +438,7 @@ class GradebookColumnSummary:
 
     def _get_entries_for_calculation(self):
         \"\"\"Ignores entries flagged with ignoreForCalculation\"\"\"
-        mgr = self._get_provider_manager('Grading')
+        mgr = self._get_provider_manager('Grading') # what about the Proxy?
         if not mgr.supports_gradebook_column_lookup():
             raise errors.OperationFailed('Grading does not support GradebookColumn lookup')
         gradebook_id = Id(self._my_map['assignedGradebookIds'][0])

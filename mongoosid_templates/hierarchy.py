@@ -33,7 +33,7 @@ class HierarchyTraversalSession:
         OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='hierarchy', cat_name='Hierarchy', cat_class=Hierarchy)
         self._kwargs = kwargs
         rm = self._get_provider_manager('RELATIONSHIP')
-        self._rls = rm.get_relationship_lookup_session_for_family(catalog_id)
+        self._rls = rm.get_relationship_lookup_session_for_family(catalog_id, proxy=self._proxy)
 
     def _get_catalog_hierarchy_id(self, catalog_id, proxy, runtime):
         \"\"\"Gets the catalog hierarchy\"\"\"
@@ -185,8 +185,9 @@ class HierarchyDesignSession:
         OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='hierarchy', cat_name='Hierarchy', cat_class=Hierarchy)
         self._kwargs = kwargs
         rm = self._get_provider_manager('RELATIONSHIP')
-        self._rls = rm.get_relationship_lookup_session_for_family(catalog_id)
-        self._ras = rm.get_relationship_admin_session_for_family(catalog_id)
+        self._rls = rm.get_relationship_lookup_session_for_family(catalog_id, proxy=self._proxy)
+        self._ras = rm.get_relationship_admin_session_for_family(catalog_id, proxy=self._proxy)
+        # This next one may or may not want to use self._get_provider_manager('HIERARCHY'), etc.
         self._hts = HierarchyTraversalSession(self.get_hierarchy_id(), self._proxy, self._runtime, relationship_type=self._relationship_type)
 
     def _get_catalog_hierarchy_id(self, catalog_id, proxy, runtime):

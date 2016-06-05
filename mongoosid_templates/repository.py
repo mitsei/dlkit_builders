@@ -360,7 +360,7 @@ class AssetCompositionSession:
         for idstr in composition['assetIds']:
             asset_ids.append(Id(idstr))
         mgr = self._get_provider_manager('REPOSITORY')
-        als = mgr.get_asset_lookup_session()
+        als = mgr.get_asset_lookup_session(proxy=self._proxy)
         als.use_federated_repository_view()
         return als.get_assets_by_ids(asset_ids)"""
 
@@ -379,7 +379,7 @@ class AssetCompositionSession:
         for idstr in ${containable_object_name_under}['${object_name_mixed}Ids']:
             ${object_name_under}_ids.append(Id(idstr))
         mgr = self._get_provider_manager('${package_name_replace_upper}')
-        lookup_session = mgr.get_${object_name_under}_lookup_session()
+        lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_${package_name_replace}_view()
         return lookup_session.get_${object_name_plural_under}_by_ids(${object_name_under}_ids)"""
 
@@ -459,12 +459,15 @@ class AssetCompositionDesignSession:
         from ...abstract_osid.id.primitives import Id as ABCId
         if not isinstance(${object_name_under}_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
         if ${object_name_under}_id.get_identifier_namespace() != '${object_namespace}':
             if ${object_name_under}_id.get_authority() != self._authority:
                 raise errors.InvalidArgument()
             else:
                 mgr = self._get_provider_manager('${object_package_name_replace_upper}')
-                admin_session = mgr.get_${object_name_under}_admin_session_for_${cat_name_under}(self._catalog_id)
+                admin_session = mgr.get_${object_name_under}_admin_session_for_${cat_name_under}(self._catalog_id, proxy=self._proxy)
                 ${object_name_under}_id = admin_session._get_${object_name_under}_id_with_enclosure(${object_name_under}_id)
         collection = MongoClientValidated('${object_package_name_replace}',
                                           collection='${object_name}',
@@ -492,6 +495,9 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under})"""
 
     move_asset_ahead_template = """
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
         ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_ahead(${object_name_under}_id, reference_id, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
         collection.save(${containable_object_name_under}_map)"""
@@ -507,6 +513,9 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under})"""
 
     move_asset_behind_template = """
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
         ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_behind(${object_name_under}_id, reference_id, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
         collection.save(${containable_object_name_under}_map)"""
@@ -522,6 +531,9 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under})"""
 
     order_assets_template = """
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
         ${containable_object_name_under}_map['${object_name_mixed}Ids'] = order_ids(${object_name_under}_ids, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
         collection.save(${containable_object_name_under}_map)"""
@@ -538,6 +550,9 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under})"""
 
     remove_asset_template = """
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
         try:
             ${containable_object_name_under}_map['${object_name_mixed}Ids'].remove(str(${object_name_under}_id))
@@ -908,7 +923,7 @@ class CompositionSearchResults:
 class CompositionRepositorySession:
     get_repository_ids_by_composition = """
         mgr = self._get_provider_manager('REPOSITORY', local=True)
-        lookup_session = mgr.get_composition_lookup_session()
+        lookup_session = mgr.get_composition_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_repository_view()
         lookup_session.use_unsequestered_composition_view()
         composition = lookup_session.get_composition(composition_id)

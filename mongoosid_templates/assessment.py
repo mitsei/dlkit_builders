@@ -118,7 +118,7 @@ class AssessmentSession:
             #                                  runtime=self._runtime)
             mgr = self._get_provider_manager('ASSESSMENT')
             assessment = mgr.get_assessment_lookup_session().get_assessment(
-                assessment_taken.get_assessment_offered().get_assessment_id())
+                assessment_taken.get_assessment_offered(proxy=self._proxy).get_assessment_id())
             if 'itemIds' not in assessment._my_map:
                 item_ids = [] # But will this EVER be the case?
             else:
@@ -197,7 +197,7 @@ class AssessmentSession:
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT')
-        lookup_session = mgr.get_assessment_taken_lookup_session() # Should this be _for_bank?
+        lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy) # Should this be _for_bank?
         lookup_session.use_federated_bank_view()
         return lookup_session.get_assessment_taken(assessment_taken_id)"""
     
@@ -288,7 +288,7 @@ class AssessmentSession:
     def _get_question(self, item_idstr):
         \"\"\"Helper method for getting a Question object given an Id.\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        lookup_session = mgr.get_item_lookup_session()
+        lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
         return lookup_session.get_item(Id(item_idstr)).get_question()
 
@@ -762,7 +762,7 @@ class AssessmentTakenLookupSession:
                                           runtime=self._runtime)
 
         am = self._get_provider_manager('ASSESSMENT')
-        aols = am.get_assessment_offered_lookup_session()
+        aols = am.get_assessment_offered_lookup_session(proxy=self._proxy)
         aols.use_federated_bank_view()
         offered = aols.get_assessment_offered(assessment_offered_id)
         try:
@@ -920,7 +920,7 @@ class AssessmentTakenAdminSession:
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
 
         am = self._get_provider_manager('ASSESSMENT')
-        aols = am.get_assessment_offered_lookup_session()
+        aols = am.get_assessment_offered_lookup_session(proxy=self._proxy)
         aols.use_federated_bank_view()
         offered = aols.get_assessment_offered(assessment_offered_id)
         try:
@@ -975,17 +975,13 @@ class AssessmentBasicAuthoringSession:
             cat_name='Bank',
             cat_class=objects.Bank)
         mgr = self._get_provider_manager('ASSESSMENT')
-        self._assessment_lookup_session = self._get_provider_session(mgr, 'get_assessment_lookup_session',)
+        self._assessment_lookup_session = mgr.get_assessment_lookup_session(proxy=self._proxy)
         self._assessment_lookup_session.use_federated_bank_view()
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        self._part_admin_session = self._get_provider_session(
-            mgr, 'get_assessment_part_admin_session_for_bank', self._catalog_id)
-        self._part_lookup_session = self._get_provider_session(
-            mgr, 'get_assessment_part_lookup_session_for_bank', self._catalog_id)
-        self._part_item_session = self._get_provider_session(
-            mgr, 'get_assessment_part_item_session_for_bank', self._catalog_id)
-        self._part_item_design_session = self._get_provider_session(
-            mgr, 'get_assessment_part_item_design_session', self._catalog_id)
+        self._part_admin_session = mgr.get_assessment_part_admin_session_for_bank(proxy=self._proxy)
+        self._part_lookup_session = mgr.get_assessment_part_lookup_session_for_bank(proxy=self._proxy)
+        self._part_item_session = mgr.get_assessment_part_item_session_for_bank(proxy=self._proxy)
+        self._part_item_design_session = mgr.get_assessment_part_item_design_session(proxy=self._proxy)
         self._part_lookup_session.use_isolated_bank_view()
         self._part_item_session.use_isolated_bank_view()
         self._first_part_index = {}
@@ -1013,18 +1009,28 @@ class AssessmentBasicAuthoringSession:
         return True"""
     
     get_items = """
+        if assessment_id.get_namespace() != 'assessment.Assessment:
+            raise errors.InvalidArgument
         return self._part_item_session.get_items(self._get_first_part_id)"""
     
     add_item = """
+        if assessment_id.get_namespace() != 'assessment.Assessment:
+            raise errors.InvalidArgument
         self._part_item_design_session.add_item(item_id, self._get_first_part_id(assessment_id))"""
     
     remove_item = """
+        if assessment_id.get_namespace() != 'assessment.Assessment:
+            raise errors.InvalidArgument
         self._part_item_design_session.remove_item(item_id, self._get_first_part_id(assessment_id))"""
     
     move_item = """
+        if assessment_id.get_namespace() != 'assessment.Assessment:
+            raise errors.InvalidArgument
         self._part_item_design_session.move_item_behind(item_id, preceeding_item_id, self._get_first_part_id(assessment_id))"""
     
     order_items = """
+        if assessment_id.get_namespace() != 'assessment.Assessment:
+            raise errors.InvalidArgument
         self._part_item_design_session.order_items(item_ids, self._get_first_part_id(assessment_id))"""
 
 
@@ -1524,12 +1530,13 @@ class AssessmentSection:
     def _get_authoring_manager(self):
         if self._authoring_manager is None:
             self._authoring_manager = self._get_provider_manager('ASSESSMENT_AUTHORING', Local)
+        return self._authoring_manager
 
     def _get_assessment_part(self):
         mgr = self._get_authoring_manager
         if not mgr.supports_assessment_part_lookup():
             raise errors.OperationFailed('Assessment.Authoring does not support AssessmentPartItem')
-        lookup_session = mgr.get_assessment_part_lookup_session()
+        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
         return lookup_session.get_assessment_part(self._assessment_part_id)
 
@@ -1541,7 +1548,7 @@ class AssessmentSection:
         mgr = self._get_authoring_manager
         if not mgr.supports_assessment_part_lookup():
             raise errors.OperationFailed('Assessment.Authoring does not support AssessmentPartLookup')
-        part_item_session = mgr.get_assessment_part_item_session()
+        part_item_session = mgr.get_assessment_part_item_session(proxy=self._proxy)
         part_item_session.use_federated_bank_view()
         return part_item_session.get_assessment_part_items(part_id)"""
 
