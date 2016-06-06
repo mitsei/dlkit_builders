@@ -1,4 +1,202 @@
 
+class AssessmentAuthoringManager:
+
+    # The following is here only until Tom fixes spec and adds these methods
+    additional_methods = """
+    @utilities.arguments_not_none
+    def get_assessment_part_item_session(self, *args, **kwargs):
+        \"\"\"Gets the ``OsidSession`` associated with the assessment part item service.
+
+        return: (osid.assessment.authoring.AssessmentPartItemSession)
+                - an ``AssessmentPartItemSession``
+        raise:  OperationFailed - unable to complete request
+        raise:  Unimplemented - ``supports_assessment_part_item()`` is
+                ``false``
+        *compliance: optional -- This method must be implemented if
+        ``supports_assessment_part_lookup()`` is ``true``.*
+
+        \"\"\"
+        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+            raise errors.Unimplemented()
+        if self._proxy_in_args(*args, **kwargs):
+            raise errors.InvalidArgument('A Proxy object was received but not expected.')
+        # pylint: disable=no-member
+        return sessions.AssessmentPartItemSession(runtime=self._runtime)
+
+    assessment_part_item_session = property(fget=get_assessment_part_item_session)
+
+    @utilities.arguments_not_none
+    def get_assessment_part_item_session_for_bank(self, bank_id, *args, **kwargs):
+        \"\"\"Gets the ``OsidSession`` associated with the assessment part item service for the given bank.
+
+        arg:    bank_id (osid.id.Id): the ``Id`` of the ``Bank``
+        return: (osid.assessment.authoring.AssessmentPartItemSession)
+                - an ``AssessmentPartItemSession``
+        raise:  NotFound - no ``Bank`` found by the given ``Id``
+        raise:  NullArgument - ``bank_id`` is ``null``
+        raise:  OperationFailed - unable to complete request
+        raise:  Unimplemented - ``supports_assessment_part_item()`` or
+                ``supports_visible_federation()`` is ``false``
+        *compliance: optional -- This method must be implemented if
+        ``supports_assessment_part_item()`` and
+        ``supports_visible_federation()`` are ``true``.*
+
+        \"\"\"
+        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+            raise errors.Unimplemented()
+        if self._proxy_in_args(*args, **kwargs):
+            raise errors.InvalidArgument('A Proxy object was received but not expected.')
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        # pylint: disable=no-member
+        return sessions.AssessmentPartItemSession(bank_id, runtime=self._runtime)
+
+    @utilities.arguments_not_none
+    def get_assessment_part_item_design_session(self, *args, **kwargs):
+        \"\"\"Gets the ``OsidSession`` associated with the assessment part item design service.
+
+        return: (osid.assessment.authoring.AssessmentPartItemDesignSession)
+                - an ``AssessmentPartItemDesignSession``
+        raise:  OperationFailed - unable to complete request
+        raise:  Unimplemented - ``supports_assessment_part_item_design()`` is
+                ``false``
+        *compliance: optional -- This method must be implemented if
+        ``supports_assessment_part_lookup()`` is ``true``.*
+
+        \"\"\"
+        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+            raise errors.Unimplemented()
+        if self._proxy_in_args(*args, **kwargs):
+            raise errors.InvalidArgument('A Proxy object was received but not expected.')
+        # pylint: disable=no-member
+        return sessions.AssessmentPartItemDesignSession(runtime=self._runtime)
+
+    assessment_part_item_design_session = property(fget=get_assessment_part_item_design_session)
+
+    @utilities.arguments_not_none
+    def get_assessment_part_item_design_session_for_bank(self, bank_id, *args, **kwargs):
+        \"\"\"Gets the ``OsidSession`` associated with the assessment part item design service for the given bank.
+
+        arg:    bank_id (osid.id.Id): the ``Id`` of the ``Bank``
+        return: (osid.assessment.authoring.AssessmentPartItemDesignSession)
+                - an ``AssessmentPartItemDesignSession``
+        raise:  NotFound - no ``Bank`` found by the given ``Id``
+        raise:  NullArgument - ``bank_id`` is ``null``
+        raise:  OperationFailed - unable to complete request
+        raise:  Unimplemented - ``supports_assessment_part_item_design()`` or
+                ``supports_visible_federation()`` is ``false``
+        *compliance: optional -- This method must be implemented if
+        ``supports_assessment_part_item_design()`` and
+        ``supports_visible_federation()`` are ``true``.*
+
+        \"\"\"
+        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+            raise errors.Unimplemented()
+        if self._proxy_in_args(*args, **kwargs):
+            raise errors.InvalidArgument('A Proxy object was received but not expected.')
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        # pylint: disable=no-member
+        return sessions.AssessmentPartItemDesignSession(bank_id, runtime=self._runtime)"""
+
+
+class AssessmentAuthoringProxyManager:
+
+    # The following is here only until Tom fixes spec and adds these methods
+    additional_methods = """
+    @utilities.arguments_not_none
+    def get_assessment_part_item_session(self, proxy):
+        \"\"\"Gets the ``OsidSession`` associated with the assessment part item service.
+
+        return: (osid.assessment.authoring.AssessmentPartItemSession)
+                - an ``AssessmentPartItemSession``
+        raise:  OperationFailed - unable to complete request
+        raise:  Unimplemented - ``supports_assessment_part_item()`` is
+                ``false``
+        *compliance: optional -- This method must be implemented if
+        ``supports_assessment_part_lookup()`` is ``true``.*
+
+        \"\"\"
+        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentPartItemSession(proxy=proxy, runtime=self._runtime)
+
+    assessment_part_item_session = property(fget=get_assessment_part_item_session)
+
+    @utilities.arguments_not_none
+    def get_assessment_part_item_session_for_bank(self, bank_id, proxy):
+        \"\"\"Gets the ``OsidSession`` associated with the assessment part item service for the given bank.
+
+        arg:    bank_id (osid.id.Id): the ``Id`` of the ``Bank``
+        return: (osid.assessment.authoring.AssessmentPartItemSession)
+                - an ``AssessmentPartItemSession``
+        raise:  NotFound - no ``Bank`` found by the given ``Id``
+        raise:  NullArgument - ``bank_id`` is ``null``
+        raise:  OperationFailed - unable to complete request
+        raise:  Unimplemented - ``supports_assessment_part_item()`` or
+                ``supports_visible_federation()`` is ``false``
+        *compliance: optional -- This method must be implemented if
+        ``supports_assessment_part_item()`` and
+        ``supports_visible_federation()`` are ``true``.*
+
+        \"\"\"
+        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        # pylint: disable=no-member
+        return sessions.AssessmentPartItemSession(bank_id, proxy=proxy, runtime=self._runtime)
+
+    @utilities.arguments_not_none
+    def get_assessment_part_item_design_session(self, proxy):
+        \"\"\"Gets the ``OsidSession`` associated with the assessment part item design service.
+
+        return: (osid.assessment.authoring.AssessmentPartItemDesignSession)
+                - an ``AssessmentPartItemDesignSession``
+        raise:  OperationFailed - unable to complete request
+        raise:  Unimplemented - ``supports_assessment_part_item_design()`` is
+                ``false``
+        *compliance: optional -- This method must be implemented if
+        ``supports_assessment_part_lookup()`` is ``true``.*
+
+        \"\"\"
+        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return sessions.AssessmentPartItemDesignSession(proxy=proxy, runtime=self._runtime)
+
+    assessment_part_item_design_session = property(fget=get_assessment_part_item_design_session)
+
+    @utilities.arguments_not_none
+    def get_assessment_part_item_design_session_for_bank(self, bank_id, proxy):
+        \"\"\"Gets the ``OsidSession`` associated with the assessment part item design service for the given bank.
+
+        arg:    bank_id (osid.id.Id): the ``Id`` of the ``Bank``
+        return: (osid.assessment.authoring.AssessmentPartItemDesignSession)
+                - an ``AssessmentPartItemDesignSession``
+        raise:  NotFound - no ``Bank`` found by the given ``Id``
+        raise:  NullArgument - ``bank_id`` is ``null``
+        raise:  OperationFailed - unable to complete request
+        raise:  Unimplemented - ``supports_assessment_part_item_design()`` or
+                ``supports_visible_federation()`` is ``false``
+        *compliance: optional -- This method must be implemented if
+        ``supports_assessment_part_item_design()`` and
+        ``supports_visible_federation()`` are ``true``.*
+
+        \"\"\"
+        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        # pylint: disable=no-member
+        return sessions.AssessmentPartItemDesignSession(bank_id, proxy=proxy, runtime=self._runtime)"""
+
+
 class AssessmentPartLookupSession:
     
     additional_methods = """
@@ -104,6 +302,29 @@ class AssessmentPartAdminSession:
 
         return obj_form
 """
+
+class AssessmentPartItemSession:
+
+    # This should really be implemented in repository.AssetCompositionSession
+    # but need to capture patterns for composition objects (i.e. AssessmentParts - ASSESSMENT_AUTHORING) 
+    # as opposed to regular objects (i.e. Items - ASSESSMENT).
+    get_assessment_part_items = """
+        collection = MongoClientValidated('assessment_authoring',
+                                          collection='AssessmentPart',
+                                          runtime=self._runtime)
+        assessment_part = collection.find_one(
+            dict({'_id': ObjectId(assessment_part_id.get_identifier())},
+                 **self._view_filter()))
+        if 'itemIds' not in assessment_part:
+            raise errors.NotFound('no Items are assigned to this AssessmentPart')
+        item_ids = []
+        for idstr in assessment_part['itemIds']:
+            item_ids.append(Id(idstr))
+        mgr = self._get_provider_manager('ASSESSMENT')
+        lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
+        return lookup_session.get_items_by_ids(item_ids)"""
+
 
 class AssessmentPart:
     
