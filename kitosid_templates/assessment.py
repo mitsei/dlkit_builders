@@ -20,6 +20,7 @@ class AssessmentManager:
         session = self._provider_manager.get_assessment_taken_admin_session_for_bank(*args, **kwargs)
         return Bank(self._provider_manager, session.get_bank(), self._runtime, self._proxy, assessment_taken_admin_session = session)"""
 
+
 class AssessmentAuthoringProfile:
     get_assessment_part_record_types = """
         \"\"\"Pass through to provider method\"\"\"
@@ -250,18 +251,16 @@ class AssessmentBasicAuthoringSession:
         try:
             self._get_provider_session('assessment_basic_authoring_session').add_item(*args, **kwargs)
         except InvalidArgument:
-            try:
-                self._get_sub_package_provider_session(
-                    'assessment_authoring', 'assessment_part_item_design_session').add_item(*args, **kwargs)"""
+            self._get_sub_package_provider_session(
+                'assessment_authoring', 'assessment_part_item_design_session').add_item(*args, **kwargs)"""
 
     remove_item = """
         \"\"\"Pass through to provider methods.\"\"\"
         try:
             self._get_provider_session('assessment_basic_authoring_session').remove_item(*args, **kwargs)
         except InvalidArgument:
-            try:
-                self._get_sub_package_provider_session(
-                    'assessment_authoring', 'assessment_part_item_design_session').remove_item(*args, **kwargs)"""
+            self._get_sub_package_provider_session(
+                'assessment_authoring', 'assessment_part_item_design_session').remove_item(*args, **kwargs)"""
 
     move_item = """
         \"\"\"Pass through to provider method\"\"\"
@@ -272,9 +271,8 @@ class AssessmentBasicAuthoringSession:
         try:
             self._get_provider_session('assessment_basic_authoring_session').order_items(*args, **kwargs)
         except InvalidArgument:
-            try:
-                self._get_sub_package_provider_session(
-                    'assessment_authoring', 'assessment_part_item_design_session').order_items(*args, **kwargs)
+            self._get_sub_package_provider_session(
+                'assessment_authoring', 'assessment_part_item_design_session').order_items(*args, **kwargs)
 
     # This was an idea, but not a good one. Feel free to remove:
     # def _get_container_arg_type(*args, **kwargs):

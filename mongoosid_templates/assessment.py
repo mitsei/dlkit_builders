@@ -20,6 +20,7 @@ class AssessmentManager:
             raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(bank_id, runtime=self._runtime)"""
 
+
 class AssessmentProxyManager:
 
     import_statements = [
@@ -978,10 +979,10 @@ class AssessmentBasicAuthoringSession:
         self._assessment_lookup_session = mgr.get_assessment_lookup_session(proxy=self._proxy)
         self._assessment_lookup_session.use_federated_bank_view()
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        self._part_admin_session = mgr.get_assessment_part_admin_session_for_bank(proxy=self._proxy)
-        self._part_lookup_session = mgr.get_assessment_part_lookup_session_for_bank(proxy=self._proxy)
-        self._part_item_session = mgr.get_assessment_part_item_session_for_bank(proxy=self._proxy)
-        self._part_item_design_session = mgr.get_assessment_part_item_design_session(proxy=self._proxy)
+        self._part_admin_session = mgr.get_assessment_part_admin_session_for_bank(self._catalog_id, proxy=self._proxy)
+        self._part_lookup_session = mgr.get_assessment_part_lookup_session_for_bank(self._catalog_id, proxy=self._proxy)
+        self._part_item_session = mgr.get_assessment_part_item_session_for_bank(self._catalog_id, proxy=self._proxy)
+        self._part_item_design_session = mgr.get_assessment_part_item_design_session_for_bank(self._catalog_id, proxy=self._proxy)
         self._part_lookup_session.use_isolated_bank_view()
         self._part_item_session.use_isolated_bank_view()
         self._first_part_index = {}
@@ -994,11 +995,12 @@ class AssessmentBasicAuthoringSession:
         if parts.available() != 0:
             return parts.next().get_id()
         assessment = self._assessment_lookup_session.get_assessment(assessment_id)
-        part_form = part_admin_session.get_assessment_part_form_for_assessment(assessment_id, [], mdata=SECTION_MDATA)
-        part_form.set_display_name(assessment.get_display_name + ' Default Part')
-        part_form.set_weight(100)
+        part_form = self._part_admin_session.get_assessment_part_form_for_create_for_assessment(assessment_id, [])
+        part_form.set_display_name(assessment.get_display_name().get_text() + ' Default Part')
+        part_form.set_sequestered(False) # Any Part of an Assessment must be a Section (i.e. non sequestered)
+        # part_form.set_weight(100) # Uncomment this line when set_weight is implemented
         # Should we set allocated time?
-        part_id = part_admin_session.create_assessment_part_for_assessment(part_form).get_id()
+        part_id = self._part_admin_session.create_assessment_part_for_assessment(part_form).get_id()
         self._first_part_index[assessment_id] = part_id
         return part_id
         """
@@ -1009,27 +1011,27 @@ class AssessmentBasicAuthoringSession:
         return True"""
     
     get_items = """
-        if assessment_id.get_namespace() != 'assessment.Assessment:
+        if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
-        return self._part_item_session.get_items(self._get_first_part_id)"""
+        return self._part_item_session.get_assessment_part_items(self._get_first_part_id(assessment_id))"""
     
     add_item = """
-        if assessment_id.get_namespace() != 'assessment.Assessment:
+        if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         self._part_item_design_session.add_item(item_id, self._get_first_part_id(assessment_id))"""
     
     remove_item = """
-        if assessment_id.get_namespace() != 'assessment.Assessment:
+        if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         self._part_item_design_session.remove_item(item_id, self._get_first_part_id(assessment_id))"""
     
     move_item = """
-        if assessment_id.get_namespace() != 'assessment.Assessment:
+        if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
-        self._part_item_design_session.move_item_behind(item_id, preceeding_item_id, self._get_first_part_id(assessment_id))"""
+        self._part_item_design_session.move_item_behind(item_id, self._get_first_part_id(assessment_id), preceeding_item_id)"""
     
     order_items = """
-        if assessment_id.get_namespace() != 'assessment.Assessment:
+        if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         self._part_item_design_session.order_items(item_ids, self._get_first_part_id(assessment_id))"""
 

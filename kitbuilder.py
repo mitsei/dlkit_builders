@@ -212,7 +212,7 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
             self.append(imports, 'from . import osid')
 
         # And don't forget the osid_error import:
-        import_str = 'from .osid_errors import Unimplemented, IllegalState'
+        import_str = 'from .osid_errors import Unimplemented, IllegalState, InvalidArgument'
         self.append(imports, import_str)
 
         self._append_templated_imports(imports, interface)

@@ -380,7 +380,7 @@ class AssetCompositionSession:
             ${object_name_under}_ids.append(Id(idstr))
         mgr = self._get_provider_manager('${package_name_replace_upper}')
         lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
-        lookup_session.use_federated_${package_name_replace}_view()
+        lookup_session.use_federated_${cat_name_under}_view()
         return lookup_session.get_${object_name_plural_under}_by_ids(${object_name_under}_ids)"""
 
     old_get_compositions_by_asset = """
@@ -406,7 +406,7 @@ class AssetCompositionSession:
 
 class AssetCompositionDesignSession:
 
-    import_statements = [
+    import_statements_pattern = [
         'from ..list_utilities import move_id_ahead, move_id_behind, order_ids',
     ]
 
@@ -460,7 +460,7 @@ class AssetCompositionDesignSession:
         if not isinstance(${object_name_under}_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         if (not isinstance(${containable_object_name_under}_id, ABCId) and 
-                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+                ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         if ${object_name_under}_id.get_identifier_namespace() != '${object_namespace}':
             if ${object_name_under}_id.get_authority() != self._authority:
@@ -496,7 +496,7 @@ class AssetCompositionDesignSession:
 
     move_asset_ahead_template = """
         if (not isinstance(${containable_object_name_under}_id, ABCId) and 
-                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+                ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
         ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_ahead(${object_name_under}_id, reference_id, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
@@ -514,7 +514,7 @@ class AssetCompositionDesignSession:
 
     move_asset_behind_template = """
         if (not isinstance(${containable_object_name_under}_id, ABCId) and 
-                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+                ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
         ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_behind(${object_name_under}_id, reference_id, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
@@ -532,7 +532,7 @@ class AssetCompositionDesignSession:
 
     order_assets_template = """
         if (not isinstance(${containable_object_name_under}_id, ABCId) and 
-                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+                ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
         ${containable_object_name_under}_map['${object_name_mixed}Ids'] = order_ids(${object_name_under}_ids, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
@@ -551,7 +551,7 @@ class AssetCompositionDesignSession:
 
     remove_asset_template = """
         if (not isinstance(${containable_object_name_under}_id, ABCId) and 
-                ${containable_object_name_under}_id.get_namespace() != '${package_name_replace}.${containable_object_name}'):
+                ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
         try:

@@ -416,7 +416,7 @@ class AssessmentBasicAuthoringSession:
         cls.assessment_offered_list = list()
         cls.assessment_offered_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
-        cls.auth_svc_mgr = Runtime().get_service_manager('ASSESSMENT_AUTHORING', proxy=PROXY, implementation='TEST_SERVICE')
+        # cls.auth_svc_mgr = Runtime().get_service_manager('ASSESSMENT_AUTHORING', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
         create_form.description = 'Test Bank for AssessmentBasicAuthoringSession tests'
@@ -434,7 +434,7 @@ class AssessmentBasicAuthoringSession:
             test_item = cls.catalog.create_item(ifc)
             cls.test_items.append(test_item)
             cls.test_item_ids.append(test_item.ident)
-            cls.catalog.add_item(test_item.ident, cls.assessment.ident)
+            cls.catalog.add_item(cls.assessment.ident, test_item.ident)
         
 
     @classmethod
@@ -451,19 +451,55 @@ class AssessmentBasicAuthoringSession:
         pass"""
     
     get_items = """
-        pass"""
+        self.assertEqual(self.catalog.get_assessment_items(self.assessment.ident).available(), 4)"""
     
     add_item = """
-        pass"""
+        self._reorder_items()
+        ifc = self.catalog.get_item_form_for_create([])
+        ifc.set_display_name('Test Assessment Additional Item')
+        ifc.set_description('This is an addtional Test Item')
+        additional_item = self.catalog.create_item(ifc)
+        self.catalog.add_item(self.assessment.ident, additional_item.ident)
+        self.assertEqual(self.catalog.get_assessment_items(self.assessment.ident).available(), 5)
+        self.catalog.remove_item(self.assessment.ident, additional_item.ident)
+        """
     
     remove_item = """
-        pass"""
+        self._reorder_items()
+        self.catalog.remove_item(self.assessment.ident, self.test_item_ids[1])
+        self.assertEqual(self.catalog.get_assessment_items(self.assessment.ident).available(), 3)
+        self.catalog.add_item(self.assessment.ident, self.test_item_ids[1])
+        items = self.catalog.get_assessment_items(self.assessment.ident)
+        self.assertEqual(items.next().ident, self.test_item_ids[0])
+        self.assertEqual(items.next().ident, self.test_item_ids[2])
+        self.assertEqual(items.next().ident, self.test_item_ids[3])
+        self.assertEqual(items.next().ident, self.test_item_ids[1])"""
     
     move_item = """
-        pass"""
+        self._reorder_items()
+        self.catalog.move_item(self.assessment.ident, self.test_item_ids[0], self.test_item_ids[3])
+        items = self.catalog.get_assessment_items(self.assessment.ident)
+        self.assertEqual(items.next().ident, self.test_item_ids[1])
+        self.assertEqual(items.next().ident, self.test_item_ids[2])
+        self.assertEqual(items.next().ident, self.test_item_ids[3])
+        self.assertEqual(items.next().ident, self.test_item_ids[0])"""
     
     order_items = """
-        pass"""
+        self.catalog.order_items([
+            self.test_item_ids[3],
+            self.test_item_ids[2],
+            self.test_item_ids[1],
+            self.test_item_ids[0]], 
+            self.assessment.ident)
+        self.assertEqual(self.catalog.get_assessment_items(self.assessment.ident).next().ident, self.test_item_ids[3])
+
+    def _reorder_items(self):
+        self.catalog.order_items([
+            self.test_item_ids[0],
+            self.test_item_ids[1],
+            self.test_item_ids[2],
+            self.test_item_ids[3]], 
+            self.assessment.ident)"""
 
 
 class Question:
