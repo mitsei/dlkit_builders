@@ -90,7 +90,30 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
 
     def _get_sub_package_imports(self, interface):
         # get the imports from sub-packages
-        return []
+        sub_package_imports = []
+        current_package = self.package['name']
+
+        for json_file in glob.glob(self._package_directory()):
+            sub_package_prefix = '{}_'.format(current_package)
+            if sub_package_prefix in json_file:
+                with open(json_file, 'r') as read_file:
+                    sub_package = json.load(read_file)
+                    for inf in sub_package['interfaces']:
+                        self.patterns = self._update_patterns_with_manager_catalog_flags(self.patterns,
+                                                                                         inf,
+                                                                                         sub_package)
+
+                    # need to update self.patterns with the new subpackage patterns
+                    # this is OK here because it assumes that the main package has already been constructed
+                    pattern_file = self._package_pattern_file(package=sub_package)
+                    with open(pattern_file, 'r') as sub_package_patterns:
+                        self.patterns.update(json.load(sub_package_patterns))
+
+                    for sub_inf in sub_package['interfaces']:
+                        if self._is_matching_interface(interface, sub_inf):
+                            self._append_pattern_imports(sub_package_imports, sub_inf)
+
+        return sub_package_imports
 
     def _get_sub_package_methods(self, interface):
         # check the packages directory for related sub-packages
@@ -106,6 +129,12 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                         self.patterns = self._update_patterns_with_manager_catalog_flags(self.patterns,
                                                                                          inf,
                                                                                          sub_package)
+
+                    # need to update self.patterns with the new subpackage patterns
+                    # this is OK here because it assumes that the main package has already been constructed
+                    pattern_file = self._package_pattern_file(package=sub_package)
+                    with open(pattern_file, 'r') as sub_package_patterns:
+                        self.patterns.update(json.load(sub_package_patterns))
 
                     for sub_inf in sub_package['interfaces']:
                         sub_interface_name = sub_inf['shortname']

@@ -333,6 +333,9 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
     def make_methods(self, interface, package_name=None):
         body = []
+        if package_name is None:
+            package_name = self.package['name']
+
         for method in interface['methods']:
             if self._in(['mongo', 'tests']):
                 if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
@@ -346,7 +349,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     method['name'] = 'get_assessment_part_items'
 
             if (self._in(['mongo', 'services', 'authz', 'tests']) and
-                    not build_this_method(self.package['name'], interface, method)):
+                    not build_this_method(package_name, interface, method)):
                 continue
             if self._is('doc_dlkit') and not self.build_this_method(interface, method):
                 continue

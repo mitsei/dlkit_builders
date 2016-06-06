@@ -689,6 +689,7 @@ class Templates(Utilities):
         # Try loading hand-built implementations class for this interface
         if package_name is None:
             package_name = self.package['name']
+
         impl_class = None
         try:
             if ABS_PATH not in sys.path:
