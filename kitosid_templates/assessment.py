@@ -235,6 +235,9 @@ class AssessmentSession:
 
 
 class AssessmentBasicAuthoringSession:
+    import_statements = [
+        'from .osid_errors import InvalidArgument'
+    ]
 
     can_author_assessments = """
         \"\"\"Pass through to provider method\"\"\"
@@ -296,115 +299,11 @@ class AssessmentTakenLookupSession:
         return self._get_provider_session('assessment_taken_lookup_session').get_assessments_taken_for_taker_and_assessment_offered(*args, **kwargs)"""
 
 
-class AssessmentPartLookupSession:
-    get_assessment_part = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').get_assessment_part(*args, **kwargs)"""
-
-    get_assessment_parts = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').get_assessment_parts()"""
-
-    get_assessment_parts_by_genus_type = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').get_assessment_parts_by_genus_type(*args, **kwargs)"""
-
-    get_assessment_parts_by_ids = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').get_assessment_parts_by_ids(*args, **kwargs)"""
-
-    get_assessment_parts_by_parent_genus_type = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').get_assessment_parts_by_parent_genus_type(*args, **kwargs)"""
-
-    get_assessment_parts_by_record_type = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').get_assessment_parts_by_record_type(*args, **kwargs)"""
-
-    can_lookup_assessment_parts = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').can_lookup_assessment_parts()"""
-
-    use_comparative_assessment_part_view = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').use_comparative_assessment_part_view()"""
-
-    use_plenary_assessment_part_view = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').use_plenary_assessment_part_view()"""
-
-    use_unsequestered_assessment_part_view = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').use_unsequestered_assessment_part_view()"""
-
-
-class AssessmentPartAdminSession:
-    alias_assessment_part = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').alias_assessment_part(*args, **kwargs)"""
-
-    get_assessment_part_form_for_create_for_assessment = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment(*args, **kwargs)"""
-
-    get_assessment_part_form_for_create_for_assessment_part = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment_part(*args, **kwargs)"""
-
-    get_assessment_part_form_for_update = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').get_assessment_part_form_for_update(*args, **kwargs)"""
-
-    create_assessment_part_for_assessment = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').create_assessment_part_for_assessment(*args, **kwargs)"""
-
-    create_assessment_part_for_assessment_part = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').create_assessment_part_for_assessment_part(*args, **kwargs)"""
-
-    update_assessment_part = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').update_assessment_part(*args, **kwargs)"""
-
-    delete_assessment_part = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').delete_assessment_part(*args, **kwargs)"""
-
-    can_create_assessment_parts = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').can_create_assessment_parts()"""
-
-    can_delete_assessment_parts = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').can_delete_assessment_parts()"""
-
-    can_update_assessment_parts = """
-        \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_admin_session').can_update_assessment_parts()"""
-
 class AssessmentPartItemDesignSession:
+    import_statements = [
+        'from .osid_errors import InvalidArgument'
+    ]
+
 
     can_design_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
