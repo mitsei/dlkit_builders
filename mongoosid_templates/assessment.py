@@ -326,10 +326,14 @@ class AssessmentSession:
             raise errors.IllegalState()
         if self.requires_synchronous_responses(assessment_section_id):
             raise errors.IllegalState() # This may want to be implemented with special "blocking" list
-        item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
+        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING')
+        part_id = self._get_assessment_section(assessment_section_id)._get_assessment_part().get_id()
+        part_item_session = mgr.get_assessment_part_item_session(proxy=self._proxy)
+        items = part_item_session.get_assessment_part_items(part_id)
         questions = []
-        for item_idstr in item_ids:
-            questions.append(self._get_question(item_idstr))
+        for item in items:
+            questions.append(item.get_question)
+            # Add to assessment_taken_map as appropriate here
         return objects.QuestionList(questions, runtime=self._runtime)"""
 
     get_response_form_import_templates = [
