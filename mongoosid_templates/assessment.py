@@ -100,10 +100,11 @@ class AssessmentSession:
         else:
             raise errors.IllegalState()"""
 
-    ## DONE:
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     requires_synchronous_sections = """
         return self._get_assessment_taken(assessment_taken_id).get_assessment_offered().are_sections_sequential()"""
     
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     get_first_assessment_section = """
         # Could this be implemented using get_next_assessment_section?
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
@@ -112,85 +113,99 @@ class AssessmentSession:
         if 'actualStartTime' not in assessment_taken._my_map:
             assessment_taken._my_map['actualStartTime'] = None
         assessment_taken_map = assessment_taken._my_map
-        if  assessment_taken_map['actualStartTime'] is None:
-            # perhaps put everything here in a separate helper method
-            #collection = MongoClientValidated('assessment',
-            #                                  collection='Assessment',
-            #                                  runtime=self._runtime)
-            mgr = self._get_provider_manager('ASSESSMENT')
-            assessment = mgr.get_assessment_lookup_session().get_assessment(
-                assessment_taken.get_assessment_offered(proxy=self._proxy).get_assessment_id())
-            if 'itemIds' not in assessment._my_map:
-                item_ids = [] # But will this EVER be the case?
-            else:
-                item_ids = assessment.my_map['itemIds']
+        if  assessment_taken_map['actualStartTime'] is None: # This is the first run
+            assessment_id = assesment_taken.get_assessment_offered().get_assessment_id()
+            
+            mgr = self._get_provider_manager('ASSESSMENT_OFFERED')
+            part_lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+            # This implementation currently assumes only one part per assessment, this will change soon.
+            first_part = part_lookup_session.get_assessment_parts_for_assessment(assessment_id).next()
+            first_section_identifier = ObjectId()
+
             assessment_taken_map['synchronousResponses'] = bool(
                 assessment_taken.get_assessment_offered().are_items_sequential())
             assessment_taken_map['actualStartTime'] = DateTime.now()
-            #### NOW WE HAVE TO THINK ABOUT GETTING THE FIRST PART
-            assessment_taken_map['itemIds'] = item_ids
-            assessment_taken_map['responses'] = dict()
-            for item_idstr in item_ids:
-                assessment_taken_map['responses'][Id(item_idstr).get_identifier()] = None
+
+            # Model for section map to be constructed through assessment taken process:
+            #
+            # 'sections': [{
+            #     'sectionIdentifier': '<idstr of Section>'
+            #     'assessmentPartId': '<idstr of related AssessmentPart>'
+            #     'questions': [{
+            #         'questionMap': {<dict of Question given to student>},
+            #         'responses: [{
+            #             'response': {<dict of the student's Response> or None},
+            #             'timeStamp: <DateTime of Response>
+            #             }]
+            #         }]
+            #     }, <etc..>]
+
+            assessment_taken_map['sections'] = [{'sectionIdentifier': first_section_identifier,
+                                                 'assessmentPartId': str(first_part.get_id())
+                                                 'questions': []}]
             collection = MongoClientValidated('assessment',
                                               collection='AssessmentTaken',
                                               runtime=self._runtime)
             collection.save(assessment_taken_map)
-        assessment_section_map = {
-            '_id': ObjectId(assessment_taken_id.get_identifier()),
-            'displayName': assessment_taken_map['displayName'],
-            'description': assessment_taken_map['description'],
-            'genusTypeId': assessment_taken_map['genusTypeId'],
-            'recordTypeIds': [],
-            'bankId': str(self.get_bank_id()),
-            'assessmentTakenId': str(assessment_taken_id)
-        }
-        return objects.AssessmentSection(assessment_section_map, runtime=self._runtime)"""
-    
+        return objects.AssessmentSection(assessment_taken_map['sections']['sectionIdentifier'],
+                                         assessment_part_id=Id(assessment_taken_map['sections'][0]['assessmentPartId']),
+                                         assessment_taken=assessment_taken)"""
+   
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     has_next_assessment_section = """
-        # For now we are only working only with 'sectionless' assessments
+        # For now we are only working only with one-section assessments
         if not self.has_assessment_begun(assessment_section_id):
             raise errors.IllegalState()
         return False"""
     
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     get_next_assessment_section = """
-        # For now we are only working only with 'sectionless' assessments
+        # For now we are only working only with one-section assessments
         if not self.has_assessment_begun(assessment_section_id):
             raise errors.IllegalState()
         raise errors.IllegalState()"""
     
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     has_previous_assessment_section = """
-        # For now we are only working only with 'sectionless' assessments
+        # For now we are only working only with one-section assessments
         if not self.has_assessment_begun(assessment_section_id):
             raise errors.IllegalState()
         return False"""
     
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     get_previous_assessment_section = """
-        # For now we are only working only with 'sectionless' assessments
+        # For now we are only working only with one-section assessments
         if not self.has_assessment_begun(assessment_section_id):
             raise errors.IllegalState()
         raise errors.IllegalState()"""
     
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     get_assessment_section = """
         # currently implemented to take advantage of the 1 to 1 relationship
         # between AssessmentSection and AssessmentTaken
         if not self.has_assessment_begun(assessment_section_id):
             raise errors.IllegalState()
-        assessment_taken = self._get_assessment_taken(assessment_section_id)
-        assessment_taken_map = assessment_taken._my_map
-        assessment_section_map = {
-            '_id': assessment_taken_map['_id'],
-            'displayName': assessment_taken_map['displayName'],
-            'description': assessment_taken_map['description'],
-            'genusTypeId': assessment_taken_map['genusTypeId'],
-            'recordTypeIds': [],
-            'bankId': str(self.get_bank_id()),
-            'assessmentTakenId': str(assessment_taken.get_id())
-        }
-        return objects.AssessmentSection(assessment_section_map, runtime=self._runtime)"""
+        collection = MongoClientValidated('assessment',
+                                          collection='AssessmentTaken',
+                                          runtime=self._runtime)
+        section_identifier = assessment_section_id.get_identifier()
+        # There must be a way to get the required section part in one find_one query
+        assessment_taken_map = collection.find_one({sections.sectionIdentifier: {$'in': ObjectId(section_identifier)}})
+        for section in assessment_taken_map['sections']:
+            if section['sectionIdentifier'] == ObjectId(section_identifier):
+                this_section = section
+        assessment_taken_id = Id(authority=self._authority,
+                                 namespace='assessment.AssessmentTaken',
+                                 identifier=str(assessment_taken_map['id_']))
+        return objects.AssessmentSection(section_identifier,
+                                         assessment_part_id = Id(section['assessmentPartId']),
+                                         assessment_taken_id=assessment_taken_id)"""
     
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     get_assessment_sections = """
         # This currently assumes that there is only one section:
+        # A real impl should take into account whether synchronous sections are allowed and
+        # if so perhaps only get the section ids from the AssessmentTaken.
         return objects.AssessmentSectionList(
             [self.get_first_assessment_section(assessment_taken_id)],
             runtime=self._runtime)
@@ -200,26 +215,38 @@ class AssessmentSession:
         mgr = self._get_provider_manager('ASSESSMENT')
         lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy) # Should this be _for_bank?
         lookup_session.use_federated_bank_view()
-        return lookup_session.get_assessment_taken(assessment_taken_id)"""
+        return lookup_session.get_assessment_taken(assessment_taken_id)
+
+    def _get_assessment_part(self, assessment_part_id):
+        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING')
+        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy) # Should this be _for_bank?
+        lookup_session.use_federated_bank_view()
+        return lookup_session.get_assessment_part(assessment_part_id)
+        """
     
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     is_assessment_section_complete = """
+        # This probably does not the definition of "complete":
         return self.get_assessment_section(assessment_section_id).get_assessment_taken().has_ended()"""
     
+    ## DONE RE-IMPLEMENTING FOR PARTS:
     get_incomplete_assessment_sections = """
+        # This assumes only one section. But how do we define complete?
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
-        # Is this right?  How do we define complete?
         if assessment_taken.has_ended():
             return objects.AssessmentSectionList([], runtime=self._runtime)
         else:
             return objects.AssessmentSectionList(
-                [self.get_assessment_section(assessment_taken_id)],
+                [objects.AssessmentSection(self.get_first_assessment_section(assessment_taken_id)]),
                 runtime=self._runtime)"""
     
+    ## This method has been deprecated:
     has_assessment_section_begun = """
-        return self._get_assessment_taken(assessment_section_id).has_started()"""
+        return self._get_assessment_section(assessment_section_id).get_assessment_taken().has_started()"""
     
+    ## This method has been deprecated:
     is_assessment_section_over = """
-        return self._get_assessment_taken(assessment_section_id).has_ended()"""
+        return self._get_assessment_section(assessment_section_id).get_assessment_taken().has_ended()"""
     
     ## This method has been deprecated:
     finished_assessment_section = """
@@ -228,12 +255,12 @@ class AssessmentSession:
             raise errors.IllegalState()
         self.finished_assessment(assessment_section_id)"""
     
+    ## This method has been deprecated:
     requires_synchronous_responses = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
-        return self.get_assessment_section(
-            assessment_section_id).get_assessment_taken()._my_map['synchronousResponses']"""
+        return self.get_assessment_section(assessment_section_id).are_items_sequential()"""
     
     get_first_question = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
@@ -287,26 +314,18 @@ class AssessmentSession:
         return self._get_question(str(item_id))
 
     def _get_question(self, item_idstr):
-        \"\"\"Helper method for getting a Question object given an Id.\"\"\"
+        \"\"\"Helper method for getting a Question object given an item Id.\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
         lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
-        return lookup_session.get_item(Id(item_idstr)).get_question()
-
-        # Old impl:
-        # item_id = Id(item_idstr)
-        # collection = MongoClientValidated('assessment',
-        #                                   collection='Item',
-        #                                   runtime=self._runtime)
-        # item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        # return objects.Question(item_map['question'], runtime=self._runtime)"""
+        return lookup_session.get_item(Id(item_idstr)).get_question()"""
     
     get_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
         if self.requires_synchronous_responses(assessment_section_id):
-            raise errors.IllegalState() # This may need to actually be implemented
+            raise errors.IllegalState() # This may want to be implemented with special "blocking" list
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         questions = []
         for item_idstr in item_ids:
@@ -347,17 +366,7 @@ class AssessmentSession:
             runtime=self._runtime)
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
-        return obj_form
-
-    #def _get_registry(self, entry): # Moved to mongo.utilities
-    #    # get from the runtime
-    #    try:
-    #        records_location_param_id = Id('parameter:recordsRegistry@mongo')
-    #        registry = self._runtime.get_configuration().get_value_by_parameter(
-    #            records_location_param_id).get_string_value()
-    #        return import_module(registry).__dict__.get(entry, {})
-    #    except (ImportError, AttributeError, KeyError, errors.NotFound):
-    #        return {}"""
+        return obj_form"""
 
     submit_response_import_templates = [
         'from ...abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
@@ -1324,6 +1333,24 @@ class AssessmentTaken:
         else:
             return self.get_assessment_offered().get_description()
 
+    def _get_sections(self):
+        section_list = []
+        for section in self._my_map['sections']:
+            section_list.append(AssessmentSection(str(section['sectionIdentifier']),
+                                                  assessment_part_id=Id(section['assessmentPartId']),
+                                                  assessment_taken_id=self.get_id()))
+        return AssessmentSectionList(section_list, runtime=self._runtime)
+
+    def _get_questions_in_section(self, assessment_section_id, answered=None):
+        question_list = []
+        for section in self._my_map['sections']:
+            if section['sectionIdentifier'] == ObjectId(assessment_section_id.get_identifier())
+                for question_map in self._my_map['sections']:
+                    if answered is None or bool(question_map['responses'][0]) == answered:
+                        question_list.append(question_map)
+                return QuestionList(question_list, runtime=self._runtime)
+        return errors.NotFound('AssessmentSection id not found.')
+
     def get_object_map(self):
         obj_map = dict(self._my_map)
         if obj_map['actualStartTime'] is not None:
@@ -1346,10 +1373,8 @@ class AssessmentTaken:
             obj_map['completionTime']['minute'] = completion_time.minute
             obj_map['completionTime']['second'] = completion_time.second
             obj_map['completionTime']['microsecond'] = completion_time.microsecond
-        if 'itemIds' in obj_map:
-            del obj_map['itemIds']
-        if 'responses' in obj_map:
-            del obj_map['responses']
+        if 'sections' in obj_map:
+            del obj_map['sectons']
         obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
         if obj_map['displayName']['text'] == '':
             obj_map['displayName']['text'] = self.get_display_name().get_text()
@@ -1497,13 +1522,34 @@ class AssessmentQuery:
 
 class AssessmentSection:
 
+    import_statements = [
+        'from ..primitives import Id',
+    ]
+
     init = """
-    _record_type_data_sets = {}
     _namespace = 'assessment.AssessmentSection'
 
-    def __init__(self, assessment_part):
-        self._assessment_part = assessment_part
+    def __init__(self,
+                 identifier,
+                 assessment_part_id=None,
+                 assessment_part=None,
+                 assessment_taken_id=None,
+                 assessment_taken=None):
+        self._identifier = identifier
+        if assessment_part:
+            self._assessment_part = assessment_part
+            self._assessment_part_id = assessment_part.get_id()
+        else:
+            self._assessment_part_id = assessment_part_id
+            self._assessment_part = self._get_assessment_part(assessment_part_id)
+        if assessment_taken:
+            self._assessment_taken = assessment_taken
+            self._assessment_taken_id = assessment_taken.get_id()
+        else:
+            self._assessment_taken_id = assessment_taken_id
+            self._assessment_taken = self._get_assessment_taken(assessment_taken_id)
         self._authoring_manager = None
+        self._assessment_manager = None
 
     def __getattribute__(self, name):
         if not name.startswith('_'):
@@ -1512,6 +1558,11 @@ class AssessmentSection:
             except AttributeError:
                 return object.__getattribute__(self, name)
 """
+    get_assessment_taken_id = """
+        return self._assessment_taken_id"""
+
+    get_assessment_taken = """
+        return self._assessment_taken"""
 
     has_allocated_time = """
         return bool(self._assessment_part.get_allocated_time())"""
@@ -1529,27 +1580,41 @@ class AssessmentSection:
         return self._assessment_part.are_items_shuffled()"""
 
     additional_methods = """
+    def get_id(self):
+        \"\"\"Overrides get_id() in osid.Identifiable\"\"\"
+        return Id(
+            identifier=self._identifier,
+            namespace=self._namespace,
+            authority=self._authority)
+
     def _get_authoring_manager(self):
         if self._authoring_manager is None:
             self._authoring_manager = self._get_provider_manager('ASSESSMENT_AUTHORING', Local)
         return self._authoring_manager
 
+    def _get_assessment_manager(self):
+        if self._assessment_manager is None:
+            self._assessment_manager = self._get_provider_manager('ASSESSMENT_AUTHORING', Local)
+        return self._assessment_manager
+
     def _get_assessment_part(self):
-        mgr = self._get_authoring_manager
-        if not mgr.supports_assessment_part_lookup():
-            raise errors.OperationFailed('Assessment.Authoring does not support AssessmentPartItem')
-        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        mgr = self._get_authoring_manager()
+        lookup_session = mgr.get_assessment_part_lookup_session()
         lookup_session.use_federated_bank_view()
         return lookup_session.get_assessment_part(self._assessment_part_id)
+
+    def _get_assessment_taken(self):
+        mgr = self._get_assessment_manager()
+        lookup_session = mgr.get_assessment_taken_lookup_session()
+        lookup_session.use_federated_bank_view()
+        return lookup_session.get_assessment_taken(self._assessment_taken_id)
 
     def _get_items(self, part_id=None):
         if part_id is None:
             part_id = self._assessment_part_id
         if self.are_items_sequential():
-            raise errors.IllegalState('Items can only be accessed one-at-a-time.') # Should this return special ItemList?
+            raise errors.IllegalState('Items can only be accessed one-at-a-time.') # Or should this return special ItemList?
         mgr = self._get_authoring_manager
-        if not mgr.supports_assessment_part_lookup():
-            raise errors.OperationFailed('Assessment.Authoring does not support AssessmentPartLookup')
         part_item_session = mgr.get_assessment_part_item_session(proxy=self._proxy)
         part_item_session.use_federated_bank_view()
         return part_item_session.get_assessment_part_items(part_id)"""
