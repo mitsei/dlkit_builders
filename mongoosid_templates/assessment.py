@@ -343,7 +343,7 @@ class AssessmentSession:
             catalog_id=self._catalog_id,
             assessment_section_id=assessment_section_id,
             runtime=self._runtime,
-            proxy=self_proxy)
+            proxy=self._proxy)
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form
