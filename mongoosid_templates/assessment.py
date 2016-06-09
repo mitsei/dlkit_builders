@@ -342,7 +342,8 @@ class AssessmentSession:
             item_id=item_id,
             catalog_id=self._catalog_id,
             assessment_section_id=assessment_section_id,
-            runtime=self._runtime)
+            runtime=self._runtime,
+            proxy=self_proxy)
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form
@@ -679,7 +680,7 @@ class ItemAdminSession:
         if not isinstance(question_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
-        obj_form = objects.QuestionForm(document['question'], runtime=self._runtime)
+        obj_form = objects.QuestionForm(osid_object_form=document['question'], runtime=self._runtime, proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
 
@@ -839,7 +840,8 @@ class AssessmentOfferedAdminSession:
                 assessment_id=assessment_id,
                 catalog_id=self._catalog_id,
                 default_display_name=assessment_map['displayName']['text'],
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         else:
             obj_form = objects.AssessmentOfferedForm(
                 bank_id=self._catalog_id,
@@ -847,7 +849,8 @@ class AssessmentOfferedAdminSession:
                 assessment_id=assessment_id,
                 catalog_id=self._catalog_id,
                 default_display_name=assessment_map['displayName']['text'],
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""

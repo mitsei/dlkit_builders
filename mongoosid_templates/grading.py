@@ -56,7 +56,8 @@ class GradeEntryAdminSession:
         obj_form = objects.GradeEntryForm(
             result,
             effective_agent_id=str(self.get_effective_agent_id()),
-            runtime=self._runtime)
+            runtime=self._runtime,
+            proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
@@ -186,27 +187,25 @@ class GradeEntryForm:
     _record_type_data_sets = {}
     _namespace = 'grading.GradeEntry'
 
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = get_registry('GRADE_ENTRY_RECORD_TYPES', runtime)
-        osid_objects.OsidRelationshipForm.__init__(
-            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+    def __init__(self, **kwargs):
+        self._record_type_data_sets = get_registry('GRADE_ENTRY_RECORD_TYPES', kwargs['runtime'])
+        osid_objects.OsidRelationshipForm.__init__(self, **kwargs)
         self._mdata = dict(default_mdata.GRADE_ENTRY)
         self._effective_agent_id = kwargs['effective_agent_id']
-
         mgr = self._get_provider_manager('GRADING')
         lookup_session = mgr.get_gradebook_column_lookup_session()
         lookup_session.use_federated_gradebook_view()
         if 'gradebook_column_id' in kwargs:
             gradebook_column = lookup_session.get_gradebook_column(kwargs['gradebook_column_id'])
-        elif osid_object_map is not None:
-            gradebook_column = lookup_session.get_gradebook_column(Id(osid_object_map['gradebookColumnId']))
+        elif 'osid_object_map' in kwargs and kwargs['osid_object_map'] is not None:
+            gradebook_column = lookup_session.get_gradebook_column(Id(kwargs['osid_object_map']['gradebookColumnId']))
         else:
             raise errors.NullArgument('gradebook_column_id required for create forms.')
         self._grade_system = gradebook_column.get_grade_system()
         self._init_metadata(**kwargs)
 
         if not self.is_for_update():
-            self._init_map(record_types, **kwargs)
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
