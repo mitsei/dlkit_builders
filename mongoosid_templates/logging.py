@@ -96,6 +96,8 @@ class LogEntry:
             obj_map['timestamp']['second'] = timestamp.second
             obj_map['timestamp']['microsecond'] = timestamp.microsecond
 
+        obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
+
         return obj_map
 
     object_map = property(fget=get_object_map)"""
