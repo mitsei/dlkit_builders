@@ -849,8 +849,8 @@ class OsidForm:
         self._kwargs = kwargs
         self._locale_map = dict()
         locale = get_locale_with_proxy(proxy)
-        self._locale_map['languageType'] = locale.get_language_type()
-        self._locale_map['scriptType'] = locale.get_script_type()
+        self._locale_map['languageType'] = str(locale.get_language_type())
+        self._locale_map['scriptType'] = str(locale.get_script_type())
         if runtime is not None:
             self._set_authority(runtime=runtime)
         if 'mdata' in kwargs:
@@ -1289,6 +1289,7 @@ class OsidSourceableForm:
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
         self._mdata.update(dict(default_mdata.OSID_SOURCEABLE))
+        update_display_text_defaults(self._mdata['license'], self._locale_map)
         self._provider_default = self._mdata['provider']['default_id_values'][0]
         self._branding_default = self._mdata['branding']['default_id_values']
         self._license_default = self._mdata['license']['default_string_values'][0]
@@ -1426,7 +1427,9 @@ class OsidObjectForm:
         if 'default_description' in kwargs:
             self._mdata['description']['default_string_values'][0]['text'] = kwargs['default_description']
         self._display_name_default = dict(self._mdata['display_name']['default_string_values'][0])
+        update_display_text_defaults(self._mdata['display_name'], self._locale_map)
         self._description_default = dict(self._mdata['description']['default_string_values'][0])
+        update_display_text_defaults(self._mdata['description'], self._locale_map)
         self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
 
     def _init_map(self, record_types=None):
