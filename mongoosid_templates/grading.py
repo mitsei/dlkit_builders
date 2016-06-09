@@ -54,7 +54,7 @@ class GradeEntryAdminSession:
         result = collection.find_one({'_id': ObjectId(grade_entry_id.get_identifier())})
 
         obj_form = objects.GradeEntryForm(
-            result,
+            osid_object_map=result,
             effective_agent_id=str(self.get_effective_agent_id()),
             runtime=self._runtime,
             proxy=self._proxy)
