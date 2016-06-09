@@ -680,7 +680,9 @@ class ItemAdminSession:
         if not isinstance(question_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
-        obj_form = objects.QuestionForm(osid_object_form=document['question'], runtime=self._runtime, proxy=self._proxy)
+        obj_form = objects.QuestionForm(osid_object_map=document['question'],
+                                        runtime=self._runtime,
+                                        proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
 

@@ -113,7 +113,7 @@ class AssetAdminSession:
         for sub_doc in document['${aggregated_objects_name_mixed}']: # There may be a MongoDB shortcut for this
             if sub_doc['_id'] == ObjectId(${arg0_name}.get_identifier()):
                 result = sub_doc
-        obj_form = ${return_type}(osid_object_form=result, runtime=self._runtime, proxy=self._proxy)
+        obj_form = ${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
