@@ -937,14 +937,16 @@ class AssessmentTakenAdminSession:
                 bank_id=self._catalog_id,
                 assessment_offered_id=assessment_offered_id,
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         else:
             obj_form = objects.AssessmentTakenForm(
                 bank_id=self._catalog_id,
                 record_types=assessment_taken_record_types,
                 assessment_offered_id=assessment_offered_id,
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""

@@ -467,13 +467,15 @@ class ResourceAdminSession:
             obj_form = objects.${return_type}(
                 ${cat_name_under}_id=self._catalog_id,
                 runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id())
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
         else:
             obj_form = objects.${return_type}(
                 ${cat_name_under}_id=self._catalog_id,
                 record_types=${arg0_name},
                 runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id())
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
@@ -526,7 +528,7 @@ class ResourceAdminSession:
                 ${arg0_name} = self._get_${object_name_under}_id_with_enclosure(${arg0_name})
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        obj_form = objects.${return_type}(result, runtime=self._runtime)
+        obj_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form
@@ -1131,7 +1133,8 @@ class BinAdminSession:
             result = objects.${return_type}(
                 record_types=${arg0_name},
                 runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id())
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy) ## Probably don't need effective agent id now that we have proxy in form.
         self._forms[result.get_id().get_identifier()] = not CREATED
         return result"""
 
@@ -1179,7 +1182,7 @@ class BinAdminSession:
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        cat_form = objects.${return_type}(result, runtime=self._runtime)
+        cat_form = objects.${return_type}(osid_catalog_map=result, runtime=self._runtime, proxy=self._proxy)
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
 
         return cat_form"""
@@ -1639,26 +1642,13 @@ class ResourceForm:
     _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${object_name}'
 
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
-        ${init_object}.__init__(
-            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+    def __init__(self, **kwargs):
+        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', kwargs['runtime'])
+        ${init_object}.__init__(self, **kwargs)
         self._mdata = dict(default_mdata.${object_name_caps_under})
         self._init_metadata(**kwargs)
-
-        #self._records = dict() # This should be set in OsidExtensibleForm now
-        #self._supported_record_type_ids = [] # This should be set in OsidExtensibleForm now
-        #if osid_object_map is not None:
-        #    self._for_update = True
-        #    self._my_map = osid_object_map
-        #    self._load_records(osid_object_map['recordTypeIds'])
-        #else:
-        #    self._my_map = {}
-        #    self._for_update = False
-        #    self._init_map(**kwargs)
-
         if not self.is_for_update():
-            self._init_map(record_types, **kwargs)
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
@@ -1768,28 +1758,14 @@ class BinForm:
     _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${object_name}'
 
-    def __init__(self, osid_catalog_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
-        osid_objects.OsidCatalogForm.__init__(
-            self, osid_catalog_map=osid_catalog_map, record_types=record_types, runtime=runtime, **kwargs)
+    def __init__(self, **kwargs):
+        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', kwargs['runtime'])
+        osid_objects.OsidCatalogForm.__init__(self, **kwargs)
         self._mdata = dict(default_mdata.${object_name_caps_under})
         self._init_metadata(**kwargs)
-        
-        # self._records = dict()
-        # if osid_catalog_map is not None:
-        #     self._for_update = True
-        #     self._my_map = osid_catalog_map
-        #     self._load_records(osid_catalog_map['recordTypeIds'])
-        # else:
-        #     self._my_map = {}
-        #     self._for_update = False
-        #     self._init_map(**kwargs)
 
         if not self.is_for_update():
-            self._init_map(record_types, **kwargs)
-        #     if record_types is not None:
-        #         self._init_records(record_types)
-        # self._supported_record_type_ids = self._my_map['recordTypeIds']
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"

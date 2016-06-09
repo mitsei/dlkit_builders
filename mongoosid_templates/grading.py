@@ -17,13 +17,15 @@ class GradeEntryAdminSession:
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if grade_entry_record_types == []:
             ## WHY are we passing gradebook_id = self._catalog_id below, seems redundant:
+            ## Probably don't need effective agent id since form can now get that from proxy.
             obj_form = objects.GradeEntryForm(
                 gradebook_id=self._catalog_id,
                 gradebook_column_id=gradebook_column_id,
                 resource_id=resource_id,
                 effective_agent_id=str(self.get_effective_agent_id()),
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         else:
             obj_form = objects.GradeEntryForm(
                 gradebook_id=self._catalog_id,
@@ -32,7 +34,8 @@ class GradeEntryAdminSession:
                 resource_id=resource_id,
                 effective_agent_id=str(self.get_effective_agent_id()),
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""

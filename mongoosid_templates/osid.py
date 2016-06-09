@@ -419,8 +419,15 @@ class OsidSession:
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
         'from importlib import import_module',
+        'from ..locale.objects import Locale',
         'from ..utilities import MongoClientValidated',
         'from ..utilities import get_provider_manager',
+        'from ..utilities import is_authenticated_with_proxy',
+        'from ..utilities import get_authenticated_agent_id_with_proxy',
+        'from ..utilities import get_authenticated_agent_with_proxy',
+        'from ..utilities import get_effective_agent_id_with_proxy',
+        'from ..utilities import get_effective_agent_with_proxy',
+        'from ..utilities import get_locale_with_proxy',
         'from .. import types',
         'COMPARATIVE = 0',
         'PLENARY = 1',
@@ -705,54 +712,22 @@ class OsidSession:
         collection.save(obj_map)"""
 
     get_locale = """
-        #from ..locale.objects import Locale
-        ##
-        # This implementation could assume that instantiating a new Locale
-        # without constructor arguments wlll return the default Locale.
-        #return Locale()
-        raise errors.Unimplemented()"""  
+        return get_locale_with_proxy(self._proxy)"""  
 
     is_authenticated = """
-        if self._proxy is None:
-            return False
-        elif self._proxy.has_authentication():
-            return self._proxy.get_authentication().is_valid()
-        else:
-            return False"""
+        return is_authenticate_with_proxy(self._proxy)"""
 
     get_authenticated_agent_id = """
-        if self.is_authenticated():
-            return self._proxy.get_authentication().get_agent_id()
-        else:
-            raise errors.IllegalState()"""  
+        return get_authenticated_agent_id_with_proxy(self._proxy)"""
 
     get_authenticated_agent = """
-        if self.is_authenticated():
-            return self._proxy.get_authentication().get_agent()
-        else:
-            raise errors.IllegalState()"""
+        return get_authenticated_agent_with_proxy(self._proxy)"""
 
     get_effective_agent_id = """
-        if self.is_authenticated():
-            if self._proxy.has_effective_agent():
-                return self._proxy.get_effective_agent_id()
-            else:
-                return self._proxy.get_authentication().get_agent_id()
-        else:
-            return Id(
-                identifier='MC3GUE$T@MIT.EDU',
-                namespace='authentication.Agent',
-                authority='MIT-ODL')"""
+        return get_effective_agent_id_with_proxy(self._proxy)"""
 
     get_effective_agent = """
-        #effective_agent_id = self.get_effective_agent_id()
-        # This may want to be extended to get the Agent directly from the Authentication
-        # if available and if not effective agent is available in the proxy
-        #return Agent(
-        #    identifier=effective_agent_id.get_identifier(),
-        #    namespace=effective_agent_id.get_namespace(),
-        #    authority=effective_agent_id.get_authority())
-        raise errors.Unimplemented()"""
+        return get_effective_agent_id_with_proxy(self._proxy) # Currently raises Unimplemented"""
 
     supports_transactions = """
         return False"""
@@ -853,6 +828,8 @@ class OsidForm:
         'from dlkit.abstract_osid.osid import errors',
         'from . import default_mdata',
         'from .metadata import Metadata',
+        'from ..utilities import get_locale_with_proxy',
+        'from ..utilities import update_display_text_defaults',
         'import uuid',
         'from decimal import Decimal',
     ]
@@ -863,12 +840,17 @@ class OsidForm:
 
     _namespace = 'mongo.OsidForm'
 
-    def __init__(self, runtime=None, **kwargs):
+    def __init__(self, runtime=None, proxy=None, **kwargs):
         self._identifier = str(uuid.uuid4())
         self._mdata = None
         self._for_update = None
         self._runtime = runtime
+        self._proxy = proxy
         self._kwargs = kwargs
+        self._locale_map = dict()
+        locale = get_locale_with_proxy(proxy)
+        self._locale_map['languageType'] = locale.get_language_type()
+        self._locale_map['scriptType'] = locale.get_script_type()
         if runtime is not None:
             self._set_authority(runtime=runtime)
         if 'mdata' in kwargs:
@@ -882,6 +864,7 @@ class OsidForm:
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
         self._mdata.update(dict(default_mdata.OSID_FORM))
+        update_display_text_defaults(self._mdata['journal_comment'], self._locale_map)
         for element_name in self._mdata:
             self._mdata[element_name].update(
                 {'element_id': Id(self._authority,
@@ -999,6 +982,18 @@ class OsidForm:
         else:
             return True
 
+    def _get_display_text(self, inpt, metadata):
+        if metadata.is_read_only():
+            raise errors.NoAccess()
+        if isinstance(inpt, abc_display_text):
+            display_text = inpt
+        elif self._is_valid_string(inpt, metadata):
+            display_text = dict(metadata.get_default_string_values()[0])
+            display_text.update({'text': inpt})
+        else:
+            raise errors.InvalidArgument()
+        return display_text
+
     def _is_valid_cardinal(self, inpt, metadata):
         \"\"\"Checks if input is a valid cardinal value\"\"\"
         if not isinstance(inpt, int):
@@ -1089,7 +1084,7 @@ class OsidForm:
         from ..locale.objects import Locale
         # If no constructor arguments are given it is expected that the
         # locale service will return the default Locale.
-        return Locale()"""
+        return get_locale_with_proxy(self._proxy)"""
 
     get_locales = """
         # Someday I might have a real implementation
@@ -1100,17 +1095,14 @@ class OsidForm:
     set_locale = """
         # Someday I might have a real implementation
         # For now only default Locale is supported
-        raise errors.Unsupported()"""
+        self._locale_map['languageType'] = language_type
+        self._locale_map['scriptType'] = script_type"""
 
     get_journal_comment_metadata = """
         return Metadata(**self._mdata['journal_comment'])"""
 
     set_journal_comment = """
-        if self.get_journal_comment_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_string(comment, self.get_journal_comment_metadata()):
-            raise errors.InvalidArgument()
-        self._journal_comment = comment"""
+        self._my_map['journal_comment'] = self._get_display_text(comment, self.get_journal_comment_metadata())"""
 
     is_valid = """
         # It is assumed that all setter methods check validity so there
@@ -1364,11 +1356,7 @@ class OsidSourceableForm:
         return Metadata(**metadata)"""
 
     set_license = """
-        if self.get_license_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_string(license, self.get_license_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['license']['text'] = license"""
+        self._my_map['license'] = self._get_display_text(license, self.get_license_metadata())"""
 
     clear_license = """
         if (self.get_license_metadata().is_read_only() or
@@ -1408,17 +1396,19 @@ class OsidObjectForm:
         'from dlkit.abstract_osid.osid import errors',
         'from . import default_mdata',
         'from .metadata import Metadata',
+        'from ...abstract_osid.locale.primitives import DisplayText as abc_display_text',
+        'from ..utilities import update_display_text_defaults',
     ]
 
     init = """
     _namespace = "mongo.OsidObjectForm"
 
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+    def __init__(self, osid_object_map=None, **kwargs): # removed record_types=None, runtime=None, 
         self._display_name_default = None
         self._description_default = None
         self._genus_type_default = None
         OsidExtensibleForm.__init__(self)
-        OsidForm.__init__(self, runtime=runtime, **kwargs)
+        OsidForm.__init__(self, **kwargs)
         if osid_object_map is not None:
             self._for_update = True
             self._my_map = osid_object_map
@@ -1454,12 +1444,7 @@ class OsidObjectForm:
         return Metadata(**metadata)"""
 
     set_display_name = """
-        if self.get_display_name_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_string(display_name,
-                                     self.get_display_name_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['displayName']['text'] = display_name"""
+        self._my_map['displayName'] = self._get_display_text(display_name, self.get_display_name_metadata())"""
 
     clear_display_name = """
         if (self.get_display_name_metadata().is_read_only() or
@@ -1473,12 +1458,7 @@ class OsidObjectForm:
         return Metadata(**metadata)"""
 
     set_description = """
-        if self.get_description_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_string(description,
-                                     self.get_description_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['description']['text'] = description"""
+        self._my_map['description'] = self._get_display_text(description, self.get_description_metadata())"""
 
     clear_description = """
         if (self.get_description_metadata().is_read_only() or

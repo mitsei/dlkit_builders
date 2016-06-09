@@ -113,7 +113,7 @@ class AssetAdminSession:
         for sub_doc in document['${aggregated_objects_name_mixed}']: # There may be a MongoDB shortcut for this
             if sub_doc['_id'] == ObjectId(${arg0_name}.get_identifier()):
                 result = sub_doc
-        obj_form = ${return_type}(result, runtime=self._runtime)
+        obj_form = ${return_type}(osid_object_form=result, runtime=self._runtime, proxy=self._proxy)
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
@@ -672,11 +672,7 @@ class AssetForm:
 
     set_title_template = """
         # Implemented from template for osid.repository.AssetForm.set_title_template
-        if self.get_${var_name}_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_${arg0_type}(${arg0_name}, self.get_${arg0_name}_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['${var_name_mixed}']['text'] = ${arg0_name}"""
+        self._my_map['${var_name_mixed}'] = self._get_display_text(${arg0_name}, self.get_${var_name}_metadata())"""
 
     clear_title_template = """
         # Implemented from template for osid.repository.AssetForm.clear_title_template
