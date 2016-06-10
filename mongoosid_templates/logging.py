@@ -82,6 +82,25 @@ class LogEntry:
         else:
             return Id(self._my_map['${var_name_mixed}'])"""
 
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if obj_map['timestamp'] is not None:
+            timestamp = obj_map['timestamp']
+            obj_map['timestamp'] = dict()
+            obj_map['timestamp']['year'] = timestamp.year
+            obj_map['timestamp']['month'] = timestamp.month
+            obj_map['timestamp']['day'] = timestamp.day
+            obj_map['timestamp']['hour'] = timestamp.hour
+            obj_map['timestamp']['minute'] = timestamp.minute
+            obj_map['timestamp']['second'] = timestamp.second
+            obj_map['timestamp']['microsecond'] = timestamp.microsecond
+
+        obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
+
+        return obj_map
+
+    object_map = property(fget=get_object_map)"""
 
 class LogEntryForm:
 
