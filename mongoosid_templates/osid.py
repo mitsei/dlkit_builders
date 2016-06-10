@@ -289,8 +289,7 @@ class Extensible:
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
-        return get_provider_manager(osid, runtime=self._runtime, local=local)
-"""
+        return get_provider_manager(osid, runtime=self._runtime, proxy=self._proxy, local=local)"""
 
     has_record_type = """
         return str(record_type) in self._supported_record_type_ids"""
@@ -557,7 +556,7 @@ class OsidSession:
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
-        return get_provider_manager(osid, runtime=self._runtime, local=local)
+        return get_provider_manager(osid, runtime=self._runtime, proxy=self._proxy, local=local)
 
     def _get_id(self, id_, pkg_name):
         \"\"\"
@@ -754,6 +753,9 @@ class OsidObject:
         self._runtime = runtime
         if runtime is not None:
             self._set_authority(runtime=runtime)
+        # This needs to be updated to call inherited classes, esp Extensible
+        # Until then:
+        self._proxy = None
 
     def get_object_map(self, obj_map=None):
         if obj_map is None:
