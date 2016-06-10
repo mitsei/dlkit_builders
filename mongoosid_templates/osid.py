@@ -849,8 +849,8 @@ class OsidForm:
         self._kwargs = kwargs
         self._locale_map = dict()
         locale = get_locale_with_proxy(proxy)
-        self._locale_map['languageType'] = str(locale.get_language_type())
-        self._locale_map['scriptType'] = str(locale.get_script_type())
+        self._locale_map['languageTypeId'] = str(locale.get_language_type())
+        self._locale_map['scriptTypeId'] = str(locale.get_script_type())
         if runtime is not None:
             self._set_authority(runtime=runtime)
         if 'mdata' in kwargs:
@@ -1424,12 +1424,12 @@ class OsidObjectForm:
         OsidForm._init_metadata(self)
         if 'default_display_name' in kwargs:
             self._mdata['display_name']['default_string_values'][0]['text'] = kwargs['default_display_name']
+        update_display_text_defaults(self._mdata['display_name'], self._locale_map)
         if 'default_description' in kwargs:
             self._mdata['description']['default_string_values'][0]['text'] = kwargs['default_description']
-        self._display_name_default = dict(self._mdata['display_name']['default_string_values'][0])
-        update_display_text_defaults(self._mdata['display_name'], self._locale_map)
-        self._description_default = dict(self._mdata['description']['default_string_values'][0])
         update_display_text_defaults(self._mdata['description'], self._locale_map)
+        self._display_name_default = dict(self._mdata['display_name']['default_string_values'][0])
+        self._description_default = dict(self._mdata['description']['default_string_values'][0])
         self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
 
     def _init_map(self, record_types=None):

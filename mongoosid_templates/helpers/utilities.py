@@ -261,8 +261,8 @@ def get_locale_with_proxy(proxy):
     from .locale.objects import Locale
     if proxy is not None:
             locale = proxy.get_locale()
-            if locale is None:
-                return Locale()
+            if locale is not None:
+                return locale
     return Locale()
 
 def update_display_text_defaults(mdata, locale_map):

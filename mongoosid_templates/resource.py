@@ -1128,7 +1128,8 @@ class BinAdminSession:
         if ${arg0_name} == []:
             result = objects.${return_type}(
                 runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id())
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy) ## Probably don't need effective agent id now that we have proxy in form.
         else:
             result = objects.${return_type}(
                 record_types=${arg0_name},
@@ -1636,6 +1637,7 @@ class ResourceForm:
         'from ..osid.metadata import Metadata',
         'from . import default_mdata',
 		'from ..utilities import get_registry',
+		'from ..utilities import update_display_text_defaults',
     ]
 
     init_template = """
@@ -1763,7 +1765,6 @@ class BinForm:
         osid_objects.OsidCatalogForm.__init__(self, **kwargs)
         self._mdata = dict(default_mdata.${object_name_caps_under})
         self._init_metadata(**kwargs)
-
         if not self.is_for_update():
             self._init_map(**kwargs)
 
