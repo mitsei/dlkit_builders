@@ -184,12 +184,10 @@ class GradeEntryForm:
     ]
 
     init = """
-    _record_type_data_sets = {}
     _namespace = 'grading.GradeEntry'
 
     def __init__(self, **kwargs):
-        self._record_type_data_sets = get_registry('GRADE_ENTRY_RECORD_TYPES', kwargs['runtime'])
-        osid_objects.OsidRelationshipForm.__init__(self, **kwargs)
+        osid_objects.OsidRelationshipForm.__init__(self, object_name='GRADE_ENTRY', **kwargs)
         self._mdata = dict(default_mdata.GRADE_ENTRY)
         self._effective_agent_id = kwargs['effective_agent_id']
         mgr = self._get_provider_manager('GRADING')

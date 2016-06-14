@@ -24,14 +24,12 @@ class AssessmentPartForm:
 
     # Why is this a special initter?
     init = """
-    _record_type_data_sets = {}
     _namespace = 'assessment_authoring.AssessmentPart'
 
     def __init__(self, **kwargs):
-        self._record_type_data_sets = get_registry('ASSESSMENT_PART_RECORD_TYPES', kwargs['runtime'])
         osid_objects.OsidContainableForm.__init__(self)
         osid_objects.OsidOperableForm.__init__(self)
-        osid_objects.OsidObjectForm.__init__(self, *kwargs)
+        osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT_PART', *kwargs)
         self._mdata = dict(default_mdata.ASSESSMENT_PART)
         self._init_metadata(**kwargs)
         if not self.is_for_update():

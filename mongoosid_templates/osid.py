@@ -14,16 +14,6 @@ class OsidProfile:
         self._runtime = None
         self._config = None
 
-    # def _get_registry(self, entry): # This has been moved to mongo.utilities.py
-    #     # get from the runtime
-    #     try:
-    #         records_location_param_id = Id('parameter:recordsRegistry@mongo')
-    #         registry = self._runtime.get_configuration().get_value_by_parameter(
-    #             records_location_param_id).get_string_value()
-    #         return import_module(registry).__dict__.get(entry, {})
-    #     except (ImportError, AttributeError, KeyError, errors.NotFound):
-    #         return {}
-
     def _initialize_manager(self, runtime):
         \"\"\"Sets the runtime, configuration and mongo client\"\"\"
         if self._runtime is not None:
@@ -168,9 +158,10 @@ class Identifiable:
     ]  
 
     init = """
-    def __init__(self, authority=None):
-        self._namespace = 'osid.Identifiable'
-        self._authority = authority or 'ODL.MIT.EDU'
+    _namespace = 'osid.Identifiable'
+
+    def __init__(self, runtime=None):
+        self._set_authority(runtime)
         self._my_map = {}
 
     def _set_authority(self, runtime):
@@ -178,7 +169,7 @@ class Identifiable:
             authority_param_id = Id('parameter:authority@mongo')
             self._authority = runtime.get_configuration().get_value_by_parameter(
                 authority_param_id).get_string_value()
-        except (KeyError, errors.NotFound):
+        except (AttributeError, KeyError, errors.NotFound):
             self._authority = 'ODL.MIT.EDU'
 """
 
@@ -200,15 +191,16 @@ class Extensible:
         'from ..primitives import Type',
         'from importlib import import_module',
         'from ..utilities import get_provider_manager',
+        'from ..utilities import get_registry',
     ]  
 
     init = """
-    def __init__(self):
-        self._records = None
+    def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
+        self._records = {}
         self._supported_record_type_ids = []
-        self._record_type_data_sets = {}
-        self._runtime = None
-        self._proxy = None
+        self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
+        self._runtime = runtime
+        self._proxy = proxy
 
     def __iter__(self):
         for attr in dir(self):
@@ -236,16 +228,6 @@ class Extensible:
                 except AttributeError:
                     pass
         raise AttributeError()
-
-    # def _get_registry(self, entry): # This has been moved to mongo.utilities.py
-    #     # get from the runtime
-    #     try:
-    #         records_location_param_id = Id('parameter:recordsRegistry@mongo')
-    #         registry = self._runtime.get_configuration().get_value_by_parameter(
-    #             records_location_param_id).get_string_value()
-    #         return import_module(registry).__dict__.get(entry, {})
-    #     except (ImportError, AttributeError, KeyError, errors.NotFound):
-    #         return {}
 
     def _get_record(self, record_type):
         \"\"\"Get the record string type value given the record_type.\"\"\"
@@ -278,7 +260,7 @@ class Extensible:
 
     def _delete(self):
         \"\"\"Override this method in inheriting objects to perform special clearing operations.\"\"\"
-        try: # Need to implement records for catalogs one of these days
+        try:
             for record in self._records:
                 try:
                     self._records[record]._delete()
@@ -500,7 +482,7 @@ class OsidSession:
                 'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
                 'recordTypeIds': [] # Could this somehow inherit source catalog records?
             }
-        self._catalog = cat_class(self._my_catalog_map, runtime=self._runtime)
+        self._catalog = cat_class(osid_object_map=self._my_catalog_map, runtime=self._runtime, proxy=self._proxy)
         self._catalog._authority = self._authority  # there should be a better way...
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
@@ -520,7 +502,7 @@ class OsidSession:
             'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
             'recordTypeIds': [] # Could this somehow inherit source catalog records?
         }
-        return cat_class(catalog_map, self._runtime)
+        return cat_class(osid_object_map=catalog_map, runtime=self._runtime, proxy=self._proxy)
 
     def _create_orchestrated_cat(self, foreign_catalog_id, db_name, cat_name):
         \"\"\"Creates a catalog in the current service orchestrated with a foreign service Id.\"\"\"
@@ -746,16 +728,20 @@ class OsidObject:
     ]
 
     init = """
-    _namespace = 'mongo.OsidObject'
+    _namespace = 'osid.OsidObject'
 
-    def __init__(self, osid_object_map, runtime=None):
+    def __init__(self, osid_object_map, runtime=None, **kwargs):
+        osid_markers.Identifiable.__init__(self, runtime=runtime)
+        osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
         self._my_map = osid_object_map
-        self._runtime = runtime
-        if runtime is not None:
-            self._set_authority(runtime=runtime)
-        # This needs to be updated to call inherited classes, esp Extensible
+        self._load_records(osid_object_map['recordTypeIds'])
+        # self._runtime = runtime # Now set in Extensible
+        # if runtime is not None:
+        #     self._set_authority(runtime=runtime)
+        
+        # This impl needs to be updated to call inherited classes, esp Extensible
         # Until then:
-        self._proxy = None
+        #self._proxy = None
 
     def get_object_map(self, obj_map=None):
         if obj_map is None:
@@ -809,6 +795,17 @@ class OsidObject:
     is_of_genus_type = """
         return genus_type == Type(idstr=self._my_map['genusTypeId'])"""
 
+class OsidCatalog:
+
+    init = """
+    _namespace = 'osid.OsidCatalog'
+    
+    def __init__(self, **kwargs):
+        OsidObject.__init__(self, **kwargs)
+        # Should we initialize Sourceable?
+        # Should we initialize Federatable?
+    """
+
 class OsidRule:
 
     has_rule = """
@@ -840,14 +837,14 @@ class OsidForm:
     # pylint: disable=no-self-use
     # MUCH OF THIS SHOULD BE MOVED TO A UTILITY MODULE
 
-    _namespace = 'mongo.OsidForm'
+    _namespace = 'osid.OsidForm'
 
     def __init__(self, runtime=None, proxy=None, **kwargs):
         self._identifier = str(uuid.uuid4())
         self._mdata = None
         self._for_update = None
-        self._runtime = runtime
-        self._proxy = proxy
+        self._runtime = None # This is now being set in Extensible by higher order objects
+        self._proxy = None # This is now being set in Extensible by higher order objects
         self._kwargs = kwargs
         self._locale_map = dict()
         locale = get_locale_with_proxy(proxy)
@@ -1126,9 +1123,11 @@ class OsidExtensibleForm:
     ]
 
     init = """
-    def __init__(self):
-        self._records = dict()
-        self._supported_record_type_ids = []
+    def __init__(self, **kwargs):
+        # self._records = dict() # Moved to markers.Extensible
+        # self._supported_record_type_ids = [] # Moved to markers.Extensible
+        osid_markers.Extensible.__init__(self, **kwargs)
+        # self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime) # Now in Extensible
 
     def _init_map(self, record_types):
         self._my_map['recordTypeIds'] = []
@@ -1170,7 +1169,7 @@ class OsidTemporalForm:
         ]
 
     init = """
-    _namespace = "mongo.OsidTemporalForm"
+    _namespace = "osid.OsidTemporalForm"
 
     def __init__(self):
         self._mdata = None
@@ -1404,13 +1403,13 @@ class OsidObjectForm:
     ]
 
     init = """
-    _namespace = "mongo.OsidObjectForm"
+    _namespace = "osid.OsidObjectForm"
 
     def __init__(self, osid_object_map=None, **kwargs): # removed record_types=None, runtime=None, 
         self._display_name_default = None
         self._description_default = None
         self._genus_type_default = None
-        OsidExtensibleForm.__init__(self)
+        OsidExtensibleForm.__init__(self, **kwargs)
         OsidForm.__init__(self, **kwargs)
         if osid_object_map is not None:
             self._for_update = True
@@ -1492,10 +1491,9 @@ class OsidObjectForm:
 class OsidRelationshipForm:
 
     init = """
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+    def __init__(self, **kwargs):
         OsidTemporalForm.__init__(self)
-        OsidObjectForm.__init__(
-            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+        OsidObjectForm.__init__(self, **kwargs)
 
     def _init_metadata(self, **kwargs):
         OsidTemporalForm._init_metadata(self, **kwargs)
@@ -1509,11 +1507,10 @@ class OsidRelationshipForm:
 class OsidCatalogForm:
     
     init = """
-    def __init__(self, osid_catalog_map=None, record_types=None, runtime=None, **kwargs):
+    def __init__(self, **kwargs):
         OsidSourceableForm.__init__(self)
         OsidFederateableForm.__init__(self)
-        OsidObjectForm.__init__(
-            self, osid_object_map=osid_catalog_map, record_types=record_types, runtime=runtime, **kwargs)
+        OsidObjectForm.__init__(self, **kwargs)
 
     def _init_metadata(self, **kwargs):
         OsidSourceableForm._init_metadata(self)
@@ -1532,7 +1529,7 @@ class OsidList:
     ]
 
     init = """
-    def __init__(self, iter_object=None, runtime=None):
+    def __init__(self, iter_object=None, runtime=None, proxy=None):
         if iter_object is None:
             iter_object = []
         if isinstance(iter_object, dict) or isinstance(iter_object, list):
@@ -1542,6 +1539,7 @@ class OsidList:
         else:
             self._count = None
         self._runtime = runtime
+        self._proxy = proxy
         self._iter_object = iter(iter_object)
 
     def __iter__(self):
@@ -1587,7 +1585,7 @@ class OsidList:
         except Exception:  # Need to specify exceptions here!
             raise errors.OperationFailed()
         if isinstance(next_object, dict):
-            next_object = object_class(next_object, runtime=self._runtime)
+            next_object = object_class(osid_object_map=next_object, runtime=self._runtime, proxy=self._proxy)
         return next_object
 
     def next(self):

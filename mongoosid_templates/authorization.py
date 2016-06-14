@@ -160,13 +160,10 @@ class AuthorizationForm:
     ]
 
     init = """
-    _record_type_data_sets = dict()
     _namespace = 'authorization.Authorization'
 
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = get_registry('AUTHORIZATION_RECORD_TYPES', runtime)
-        osid_objects.OsidRelationshipForm.__init__(
-            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+    def __init__(self, **kwargs):
+        osid_objects.OsidRelationshipForm.__init__(self, object_name='AUTHORIZATION', **kwargs)
         self._mdata = dict(default_mdata.AUTHORIZATION) # Don't know if we need default mdata for this
         self._init_metadata(**kwargs)
 

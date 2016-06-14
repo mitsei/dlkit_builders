@@ -216,7 +216,7 @@ class ResourceLookupSession:
         result = collection.find_one(
             dict({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name_replace}').get_identifier())},
                  **self._view_filter()))
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)"""
 
     get_resources_by_ids_template = """
         # Implemented from template for
@@ -238,7 +238,7 @@ class ResourceLookupSession:
                 if object_map['_id'] == object_id:
                     sorted_result.append(object_map)
                     break
-        return objects.${return_type}(sorted_result, runtime=self._runtime)"""
+        return objects.${return_type}(sorted_result, runtime=self._runtime, proxy=self._proxy)"""
 
     get_resources_by_genus_type_template = """
         # Implemented from template for
@@ -250,11 +250,12 @@ class ResourceLookupSession:
         result = collection.find(
             dict({'genusTypeId': str(${arg0_name})},
                  **self._view_filter())).sort('_id', DESCENDING)
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
     get_resources_by_parent_genus_type_template = """
         # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_parent_genus_type
+        # STILL NEED TO IMPLEMENT!!!
         return objects.${return_type}([])"""
 
     get_resources_by_record_type_template = """
@@ -271,7 +272,7 @@ class ResourceLookupSession:
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(self._view_filter()).sort('_id', DESCENDING)
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
 class ResourceQuerySession:
 
@@ -339,7 +340,7 @@ class ResourceQuerySession:
                                           collection='${object_name}',
                                           runtime=self._runtime)
         result = collection.find(query_terms).sort('_id', DESCENDING)
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
 
 class ResourceSearchSession:
@@ -504,8 +505,9 @@ class ResourceAdminSession:
 
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
-            collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime)
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
 
         return result"""
 
@@ -572,8 +574,9 @@ class ResourceAdminSession:
             ${object_name_under}_map['assigned${cat_name}Ids'] = [str(self._catalog_id)]
         insert_result = collection.insert_one(${object_name_under}_map)
         result = objects.${object_name}(
-            collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime)
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
         return result"""
 
     update_resource_import_templates = [
@@ -603,8 +606,9 @@ class ResourceAdminSession:
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.${return_type}(
-            ${arg0_name}._my_map,
-            runtime=self._runtime)"""
+            osid_object_map=${arg0_name}._my_map,
+            runtime=self._runtime,
+            proxy=self._proxy)"""
 
     delete_resource_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
@@ -622,7 +626,7 @@ class ResourceAdminSession:
             dict({'_id': ObjectId(${arg0_name}.get_identifier())},
                  **self._view_filter()))
 
-        objects.${object_name}(${object_name_under}_map, runtime=self._runtime)._delete()
+        objects.${object_name}(osid_object_map=${object_name_under}_map, runtime=self._runtime, proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
     can_manage_asset_aliases_template = """
@@ -915,8 +919,9 @@ class ResourceAgentSession:
             dict({'agentIds': {'$in': [str(agent_id)]}},
                  **self._view_filter()))
         return objects.Resource(
-            result,
-            runtime=self._runtime)"""
+            osid_object_map=result,
+            runtime=self._runtime,
+            proxy=self._proxy)"""
 
     get_agent_ids_by_resource = """
         collection = MongoClientValidated('resource',
@@ -1039,7 +1044,7 @@ class BinLookupSession:
             # Try creating an orchestrated ${cat_name}.  Let it raise errors.NotFound()
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
 
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)"""
 
     get_bins_by_ids_template = """
         # Implemented from template for
@@ -1054,7 +1059,7 @@ class BinLookupSession:
                                           runtime=self._runtime)
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
 
     get_bins_template = """
@@ -1066,7 +1071,7 @@ class BinLookupSession:
                                           runtime=self._runtime)
         result = collection.find().sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
     get_bins_by_genus_type_template = """
         # Implemented from template for
@@ -1077,7 +1082,7 @@ class BinLookupSession:
                                           runtime=self._runtime)
         result = collection.find({"genusTypeId": str(${arg0_name})}).sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
 
 class BinAdminSession:
@@ -1164,8 +1169,9 @@ class BinAdminSession:
 
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         result = objects.${return_type}(
-            collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime)
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
 
         return result"""
 
@@ -1183,7 +1189,7 @@ class BinAdminSession:
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        cat_form = objects.${return_type}(osid_catalog_map=result, runtime=self._runtime, proxy=self._proxy)
+        cat_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
 
         return cat_form"""
@@ -1214,7 +1220,7 @@ class BinAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned
-        return objects.${return_type}(${arg0_name}._my_map, runtime=self._runtime)"""
+        return objects.${return_type}(osid_object_map=${arg0_name}._my_map, runtime=self._runtime, proxy=self._proxy)"""
 
     delete_bin_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
@@ -1498,14 +1504,13 @@ class Resource:
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # ${cat_name}Id element and may be removed someday
     init_template = """
-    _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __init__(self, osid_object_map, runtime=None):
-        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
-        osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._records = dict()
-        self._load_records(osid_object_map['recordTypeIds'])
+    def __init__(self, **kwargs): # removed osid_object_map, runtime=None
+        # self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
+        osid_objects.OsidObject.__init__(self, object_name='${object_name_upper}', **kwargs)
+        # self._records = dict() # Now in Extensible
+        # self._load_records(osid_object_map['recordTypeIds']) # Now in OsidObject
         self._catalog_name = '${cat_name_under}'
 ${instance_initers}"""
 
@@ -1641,12 +1646,10 @@ class ResourceForm:
     ]
 
     init_template = """
-    _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, **kwargs):
-        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', kwargs['runtime'])
-        ${init_object}.__init__(self, **kwargs)
+        ${init_object}.__init__(self, object_name='${object_name_upper}', **kwargs)
         self._mdata = dict(default_mdata.${object_name_caps_under})
         self._init_metadata(**kwargs)
         if not self.is_for_update():
@@ -1729,23 +1732,21 @@ class Bin:
 
     import_statements_pattern = [
         'import importlib',
-		'from ..utilities import get_registry',
     ]
 
     init_template = """
-    _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __init__(self, osid_catalog_map, runtime=None):
-        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
-        osid_objects.OsidCatalog.__init__(self, osid_catalog_map, runtime)
-        self._records = dict()
+    def __init__(self, **kwargs):
+        # self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
+        osid_objects.OsidCatalog.__init__(self, object_name='${object_name_upper}', **kwargs)
+        # self._records = dict() # Now set in Extensible, including transition stuff below. Let's hope we've transitioned:
         # This check is here for transition purposes:
-        try:
-            self._load_records(osid_catalog_map['recordTypeIds'])
-        except KeyError:
-            #print 'KeyError: recordTypeIds key not found in ', self._my_map['displayName']['text']
-            self._load_records([]) # In place for transition purposes"""
+        # try:
+        #     self._load_records(osid_object_map['recordTypeIds'])
+        # except KeyError:
+        #     #print 'KeyError: recordTypeIds key not found in ', self._my_map['displayName']['text']
+        #     self._load_records([]) # In place for transition purposes"""
 
 class BinForm:
 
@@ -1753,16 +1754,14 @@ class BinForm:
         'from . import default_mdata',
         '#from ..osid.objects import OsidForm',
         '#from ..osid.objects import OsidObjectForm',
-		'from ..utilities import get_registry',
+		'#from ..utilities import get_registry',
     ]
 
     init_template = """
-    _record_type_data_sets = {}
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, **kwargs):
-        self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', kwargs['runtime'])
-        osid_objects.OsidCatalogForm.__init__(self, **kwargs)
+        osid_objects.OsidCatalogForm.__init__(self, object_name='${object_name_upper}', **kwargs)
         self._mdata = dict(default_mdata.${object_name_caps_under})
         self._init_metadata(**kwargs)
         if not self.is_for_update():

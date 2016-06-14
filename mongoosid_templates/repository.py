@@ -608,14 +608,10 @@ class Asset:
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # repositoryId element and may be removed someday
     init = """
-    _record_type_data_sets = {}
     _namespace = 'repository.Asset'
 
-    def __init__(self, osid_object_map, runtime=None):
-        self._record_type_data_sets = get_registry('ASSET_RECORD_TYPES', runtime)
-        osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._records = dict()
-        self._load_records(osid_object_map['recordTypeIds'])
+    def __init__(self, **kwargs):
+        osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
         self._catalog_name = 'Repository'
         if self.is_composition():
             self._composition = self.get_composition()

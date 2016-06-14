@@ -366,6 +366,7 @@ class ObjectiveSequencingSession:
         self._forms = dict()"""
 
 class ProficiencyForm:
+
     set_level = """
         if self.get_level_metadata().is_read_only():
             raise errors.NoAccess()
