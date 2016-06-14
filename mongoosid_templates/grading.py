@@ -408,7 +408,7 @@ class GradeSystemAdminSession:
             raise errors.InvalidArgument('Grade system being used by gradebook columns. ' +
                                          'Cannot delete it.')
 
-        objects.GradeSystem(grade_system_map, runtime=self._runtime)._delete()
+        objects.GradeSystem(osid_object_map=grade_system_map, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
         """
 
