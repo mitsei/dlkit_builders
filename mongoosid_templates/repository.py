@@ -97,7 +97,7 @@ class AssetAdminSession:
 
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         from .${return_module} import ${aggregated_object_name}
-        return ${return_type}(${arg0_name}._my_map, runtime=self._runtime)"""
+        return ${return_type}(osid_object_map=${arg0_name}._my_map, runtime=self._runtime)"""
 
     get_asset_content_form_for_update_template = """
         # Implemented from template for
@@ -159,7 +159,7 @@ class AssetAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         from .objects import ${aggregated_object_name}
 
-        return ${aggregated_object_name}(${arg0_name}._my_map, runtime=self._runtime)"""
+        return ${aggregated_object_name}(osid_object_map=${arg0_name}._my_map, runtime=self._runtime)"""
 
     delete_asset_content_template = """
         # Implemented from template for
@@ -182,7 +182,7 @@ class AssetAdminSession:
             found = True
         if not found:
             raise errors.OperationFailed()
-        ${aggregated_object_name}(${aggregated_object_name_under}_map, runtime=self._runtime)._delete()
+        ${aggregated_object_name}(osid_object_map=${aggregated_object_name_under}_map, runtime=self._runtime)._delete()
         collection.save(${object_name_under})"""
 
 

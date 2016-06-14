@@ -1409,8 +1409,8 @@ class OsidObjectForm:
         self._display_name_default = None
         self._description_default = None
         self._genus_type_default = None
-        OsidExtensibleForm.__init__(self, **kwargs)
         OsidForm.__init__(self, **kwargs)
+        OsidExtensibleForm.__init__(self, **kwargs)
         if osid_object_map is not None:
             self._for_update = True
             self._my_map = osid_object_map

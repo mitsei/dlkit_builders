@@ -1143,7 +1143,7 @@ class Item:
         self.get_question().get_id()"""
     
     get_question = """
-        return Question(self._my_map['question'], runtime=self._runtime)"""
+        return Question(osid_object_map=self._my_map['question'], runtime=self._runtime)"""
     
     additional_methods = """
     
