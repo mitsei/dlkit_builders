@@ -14,3 +14,7 @@ class VaultLookupSession:
             raise PermissionDenied()
         else:
             return self._provider_session.get_vaults_by_genus_type(vault_genus_type)"""
+
+class AuthorizationSession:
+    is_authorized = """
+        return self._provider_session.is_authorized(agent_id, function_id, qualifier_id)"""
