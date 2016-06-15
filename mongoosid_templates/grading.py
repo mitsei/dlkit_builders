@@ -374,8 +374,9 @@ class GradebookColumnAdminSession:
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.GradebookColumn(
-            gradebook_column_form._my_map,
-            runtime=self._runtime)
+            osid_object_map=gradebook_column_form._my_map,
+            runtime=self._runtime,
+            proxy=self._proxy)
         """
 
 class GradebookColumnQuery:
