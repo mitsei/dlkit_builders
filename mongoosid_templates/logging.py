@@ -111,10 +111,9 @@ class LogEntryForm:
     ]
 
     init = """
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+    def __init__(self, **kwargs):
         self._record_type_data_sets = get_registry('LOG_ENTRY_RECORD_TYPES', runtime)
-        osid_objects.OsidObjectForm.__init__(
-            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+        osid_objects.OsidObjectForm.__init__(self, osid_name='LOG_ENTRY', **kwargs)
         self._mdata = dict(default_mdata.LOG_ENTRY)
         self._init_metadata(**kwargs)
 

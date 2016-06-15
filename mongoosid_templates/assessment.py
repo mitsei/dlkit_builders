@@ -143,7 +143,7 @@ class AssessmentSession:
             'bankId': str(self.get_bank_id()),
             'assessmentTakenId': str(assessment_taken_id)
         }
-        return objects.AssessmentSection(assessment_section_map, runtime=self._runtime)"""
+        return objects.AssessmentSection(osid_object_map=assessment_section_map, runtime=self._runtime, proxy=self._proxy)"""
     
     has_next_assessment_section = """
         # For now we are only working only with 'sectionless' assessments
@@ -185,13 +185,14 @@ class AssessmentSession:
             'bankId': str(self.get_bank_id()),
             'assessmentTakenId': str(assessment_taken.get_id())
         }
-        return objects.AssessmentSection(assessment_section_map, runtime=self._runtime)"""
+        return objects.AssessmentSection(osid_object_map=assessment_section_map, runtime=self._runtime, proxy=self._proxy)"""
     
     get_assessment_sections = """
         # This currently assumes that there is only one section:
         return objects.AssessmentSectionList(
             [self.get_first_assessment_section(assessment_taken_id)],
-            runtime=self._runtime)
+            runtime=self._runtime,
+            proxy=self._proxy)
 
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
@@ -211,7 +212,8 @@ class AssessmentSession:
         else:
             return objects.AssessmentSectionList(
                 [self.get_assessment_section(assessment_taken_id)],
-                runtime=self._runtime)"""
+                runtime=self._runtime,
+                proxy=self._proxy)"""
     
     has_assessment_section_begun = """
         return self._get_assessment_taken(assessment_section_id).has_started()"""
@@ -309,7 +311,7 @@ class AssessmentSession:
         questions = []
         for item_idstr in item_ids:
             questions.append(self._get_question(item_idstr))
-        return objects.QuestionList(questions, runtime=self._runtime)"""
+        return objects.QuestionList(questions, runtime=self._runtime, proxy=self._proxy)"""
 
     get_response_form_import_templates = [
         'from ...abstract_osid.id.primitives import Id as ABCId'
@@ -342,7 +344,8 @@ class AssessmentSession:
             item_id=item_id,
             catalog_id=self._catalog_id,
             assessment_section_id=assessment_section_id,
-            runtime=self._runtime)
+            runtime=self._runtime,
+            proxy=self._proxy)
         obj_form._for_update = False # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form
@@ -422,7 +425,7 @@ class AssessmentSession:
         for item_idstr in item_ids:
             if responses[Id(item_idstr).get_identifier()] is None:
                 question_list.append(self._get_question(item_idstr))
-        return objects.QuestionList(question_list, runtime=self._runtime)"""
+        return objects.QuestionList(question_list, runtime=self._runtime, proxy=self._proxy)"""
     
     has_unanswered_questions = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
@@ -516,8 +519,9 @@ class AssessmentSession:
         responses = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['responses']
         if item_id.get_identifier() in responses and responses[item_id.get_identifier()] is not None:
             return Response(objects.Answer(
-                responses[item_id.get_identifier()],
-                runtime=self._runtime))
+                osid_object_map=responses[item_id.get_identifier()],
+                runtime=self._runtime,
+                proxy=self._proxy))
         else:
             raise errors.NotFound()"""
     
@@ -530,8 +534,9 @@ class AssessmentSession:
         for item_idstr in responses:
             if responses[item_idstr] is not None:
                 answer_list.append(objects.Answer(
-                    responses[Id(item_idstr).get_identifier()],
-                    runtime=self._runtime))
+                    osid_object_map=responses[Id(item_idstr).get_identifier()],
+                    runtime=self._runtime,
+                    proxy=self._proxy))
         return objects.ResponseList(answer_list)"""
     
     clear_response = """
@@ -593,7 +598,7 @@ class AssessmentSession:
                                               collection='Item',
                                               runtime=self._runtime)
             item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-            return objects.AnswerList(item_map['answers'], runtime=self._runtime)
+            return objects.AnswerList(item_map['answers'], runtime=self._runtime, proxy=self._proxy)
         else:
             raise errors.IllegalState()"""
 
@@ -628,7 +633,7 @@ class ItemAdminSession:
                                           collection='Item',
                                           runtime=self._runtime)
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        objects.Item(item_map, runtime=self._runtime)._delete()
+        objects.Item(osid_object_map=item_map, runtime=self._runtime, proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(item_id.get_identifier())})"""
     
     # These methods overwrite the canonical aggregate object admin methods to
@@ -666,7 +671,7 @@ class ItemAdminSession:
             item['question'] = question_form._my_map # Let's just assume we can overwrite it
         collection.save(item)
         self._forms[question_form.get_id().get_identifier()] = CREATED
-        return objects.Question(question_form._my_map, runtime=self._runtime)"""
+        return objects.Question(osid_object_map=question_form._my_map, runtime=self._runtime, proxy=self._proxy)"""
 
     get_question_form_for_update_import_templates = [
         'from ...abstract_osid.id.primitives import Id as ABCId'
@@ -679,7 +684,9 @@ class ItemAdminSession:
         if not isinstance(question_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
-        obj_form = objects.QuestionForm(document['question'], runtime=self._runtime)
+        obj_form = objects.QuestionForm(osid_object_map=document['question'],
+                                        runtime=self._runtime,
+                                        proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
 
@@ -712,7 +719,7 @@ class ItemAdminSession:
             raise errors.OperationFailed()
         self._forms[question_form.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
-        return objects.Question(question_form._my_map, runtime=self._runtime)"""
+        return objects.Question(osid_object_map=question_form._my_map, runtime=self._runtime, proxy=self._proxy)"""
 
 
 class AssessmentAdminSession:
@@ -777,7 +784,7 @@ class AssessmentTakenLookupSession:
             dict({'assessmentOfferedId': str(assessment_offered_id),
                   'takingAgentId': str(resource_id)},
                   **self._view_filter())).sort('_id', DESCENDING)
-        return objects.AssessmentTakenList(result, runtime=self._runtime)"""
+        return objects.AssessmentTakenList(result, runtime=self._runtime, proxy=self._proxy)"""
 
     get_assessments_taken_for_assessment = """
         collection = MongoClientValidated('assessment',
@@ -801,7 +808,8 @@ class AssessmentTakenLookupSession:
             dict({'assessmentOfferedId': {'$in':[ao_ids]}},
                  **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result,
-                                           runtime=self._runtime)"""
+                                           runtime=self._runtime,
+                                           proxy=self._proxy)"""
 
 
 class AssessmentOfferedAdminSession:
@@ -839,7 +847,8 @@ class AssessmentOfferedAdminSession:
                 assessment_id=assessment_id,
                 catalog_id=self._catalog_id,
                 default_display_name=assessment_map['displayName']['text'],
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         else:
             obj_form = objects.AssessmentOfferedForm(
                 bank_id=self._catalog_id,
@@ -847,7 +856,8 @@ class AssessmentOfferedAdminSession:
                 assessment_id=assessment_id,
                 catalog_id=self._catalog_id,
                 default_display_name=assessment_map['displayName']['text'],
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
@@ -909,7 +919,9 @@ class AssessmentTakenAdminSession:
         insert_result = collection.insert_one(assessment_taken_form._my_map)
         self._forms[assessment_taken_form.get_id().get_identifier()] = CREATED
         return objects.AssessmentTaken(
-            collection.find_one({'_id': insert_result.inserted_id}), runtime=self._runtime)"""
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)"""
 
     get_assessment_taken_form_for_create = """
         if not isinstance(assessment_offered_id, ABCId):
@@ -937,14 +949,16 @@ class AssessmentTakenAdminSession:
                 bank_id=self._catalog_id,
                 assessment_offered_id=assessment_offered_id,
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         else:
             obj_form = objects.AssessmentTakenForm(
                 bank_id=self._catalog_id,
                 record_types=assessment_taken_record_types,
                 assessment_offered_id=assessment_offered_id,
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
@@ -987,7 +1001,7 @@ class AssessmentBasicAuthoringSession:
                                           runtime=self._runtime)
         assessment = collection.find_one({'_id': ObjectId(assessment_id.get_identifier())})
         if 'itemIds' not in assessment or assessment['itemIds'] == []:
-            return objects.ItemList([], runtime=self._runtime)
+            return objects.ItemList([], runtime=self._runtime, proxy=self._proxy)
 
         collection = MongoClientValidated('assessment',
                                           collection='Item',
@@ -997,7 +1011,7 @@ class AssessmentBasicAuthoringSession:
         # This appears to assume that all the Items exist. Need to consider this further:
         for i in assessment['itemIds']:
             item_list.append(collection.find_one({'_id': ObjectId(Id(i).get_identifier())}))
-        return objects.ItemList(item_list, runtime=self._runtime)
+        return objects.ItemList(item_list, runtime=self._runtime, proxy=self._proxy)
 """
     
     add_item = """
@@ -1129,7 +1143,7 @@ class Item:
         self.get_question().get_id()"""
     
     get_question = """
-        return Question(self._my_map['question'], runtime=self._runtime)"""
+        return Question(osid_object_map=self._my_map['question'], runtime=self._runtime)"""
     
     additional_methods = """
     

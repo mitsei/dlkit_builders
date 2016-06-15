@@ -7,7 +7,7 @@ from pymongo.errors import OperationFailure as PyMongoOperationFailed
 from bson import ObjectId
 from bson.timestamp import Timestamp
 
-from .osid.osid_errors import NullArgument, NotFound, OperationFailed
+from .osid.osid_errors import NullArgument, NotFound, OperationFailed, Unimplemented
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id
 from importlib import import_module
@@ -204,3 +204,67 @@ def get_registry(entry, runtime):
     except (ImportError, AttributeError, KeyError, NotFound):
         return {}
 
+def is_authenticated_with_proxy(proxy):
+    """Given a Proxy, checks whether a user is authenticated"""
+    if proxy is None:
+        return False
+    elif proxy.has_authentication():
+        return proxy.get_authentication().is_valid()
+    else:
+        return False
+
+def get_authenticated_agent_id_with_proxy(proxy):
+    """Given a Proxy, returns the Id of the authenticated Agent"""
+    if is_authenticated_with_proxy(proxy):
+        return proxy.get_authentication().get_agent_id()
+    else:
+        raise errors.IllegalState()
+
+def get_authenticated_agent_with_proxy(proxy):
+    """Given a Proxy, returns the authenticated Agent"""
+    if is_authenticated_with_proxy(proxy):
+        return proxy.get_authentication().get_agent()
+    else:
+        raise errors.IllegalState()
+
+def get_effective_agent_id_with_proxy(proxy):
+    """Given a Proxy, returns the Id of the effective Agent"""
+    if is_authenticated_with_proxy(proxy):
+        if proxy.has_effective_agent():
+            return proxy.get_effective_agent_id()
+        else:
+            return proxy.get_authentication().get_agent_id()
+    else:
+        return Id(
+            identifier='MC3GUE$T@MIT.EDU',
+            namespace='authentication.Agent',
+            authority='MIT-ODL')
+
+def get_effective_agent_with_proxy(proxy):
+    """Given a Proxy, returns the effective Agent"""
+    #effective_agent_id = self.get_effective_agent_id()
+    # This may want to be extended to get the Agent directly from the Authentication
+    # if available and if not effective agent is available in the proxy
+    #return Agent(
+    #    identifier=effective_agent_id.get_identifier(),
+    #    namespace=effective_agent_id.get_namespace(),
+    #    authority=effective_agent_id.get_authority())
+    raise Unimplemented()
+
+def get_locale_with_proxy(proxy):
+    """Given a Proxy, returns the Locale
+
+    This assumes that instantiating a dlkit.mongo.locale.objects.Locale
+    without constructor arguments wlll return the default Locale.
+    
+    """
+    from .locale.objects import Locale
+    if proxy is not None:
+            locale = proxy.get_locale()
+            if locale is not None:
+                return locale
+    return Locale()
+
+def update_display_text_defaults(mdata, locale_map):
+    for default_display_text in mdata['default_string_values']:
+        default_display_text.update(locale_map)

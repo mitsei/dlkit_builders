@@ -71,7 +71,6 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
         }
         old_supports = []
         osid_package = self.package['name']
-
         try:
             # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
             if self._root_dir not in sys.path:

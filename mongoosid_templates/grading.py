@@ -17,13 +17,15 @@ class GradeEntryAdminSession:
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if grade_entry_record_types == []:
             ## WHY are we passing gradebook_id = self._catalog_id below, seems redundant:
+            ## Probably don't need effective agent id since form can now get that from proxy.
             obj_form = objects.GradeEntryForm(
                 gradebook_id=self._catalog_id,
                 gradebook_column_id=gradebook_column_id,
                 resource_id=resource_id,
                 effective_agent_id=str(self.get_effective_agent_id()),
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         else:
             obj_form = objects.GradeEntryForm(
                 gradebook_id=self._catalog_id,
@@ -32,7 +34,8 @@ class GradeEntryAdminSession:
                 resource_id=resource_id,
                 effective_agent_id=str(self.get_effective_agent_id()),
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
@@ -51,9 +54,10 @@ class GradeEntryAdminSession:
         result = collection.find_one({'_id': ObjectId(grade_entry_id.get_identifier())})
 
         obj_form = objects.GradeEntryForm(
-            result,
+            osid_object_map=result,
             effective_agent_id=str(self.get_effective_agent_id()),
-            runtime=self._runtime)
+            runtime=self._runtime,
+            proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
@@ -180,30 +184,26 @@ class GradeEntryForm:
     ]
 
     init = """
-    _record_type_data_sets = {}
     _namespace = 'grading.GradeEntry'
 
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = get_registry('GRADE_ENTRY_RECORD_TYPES', runtime)
-        osid_objects.OsidRelationshipForm.__init__(
-            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+    def __init__(self, **kwargs):
+        osid_objects.OsidRelationshipForm.__init__(self, object_name='GRADE_ENTRY', **kwargs)
         self._mdata = dict(default_mdata.GRADE_ENTRY)
         self._effective_agent_id = kwargs['effective_agent_id']
-
         mgr = self._get_provider_manager('GRADING')
         lookup_session = mgr.get_gradebook_column_lookup_session()
         lookup_session.use_federated_gradebook_view()
         if 'gradebook_column_id' in kwargs:
             gradebook_column = lookup_session.get_gradebook_column(kwargs['gradebook_column_id'])
-        elif osid_object_map is not None:
-            gradebook_column = lookup_session.get_gradebook_column(Id(osid_object_map['gradebookColumnId']))
+        elif 'osid_object_map' in kwargs and kwargs['osid_object_map'] is not None:
+            gradebook_column = lookup_session.get_gradebook_column(Id(kwargs['osid_object_map']['gradebookColumnId']))
         else:
             raise errors.NullArgument('gradebook_column_id required for create forms.')
         self._grade_system = gradebook_column.get_grade_system()
         self._init_metadata(**kwargs)
 
         if not self.is_for_update():
-            self._init_map(record_types, **kwargs)
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
@@ -408,7 +408,7 @@ class GradeSystemAdminSession:
             raise errors.InvalidArgument('Grade system being used by gradebook columns. ' +
                                          'Cannot delete it.')
 
-        objects.GradeSystem(grade_system_map, runtime=self._runtime)._delete()
+        objects.GradeSystem(osid_object_map=grade_system_map, runtime=self._runtime)._delete()
         collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
         """
 

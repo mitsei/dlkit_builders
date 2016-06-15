@@ -14,16 +14,6 @@ class OsidProfile:
         self._runtime = None
         self._config = None
 
-    # def _get_registry(self, entry): # This has been moved to mongo.utilities.py
-    #     # get from the runtime
-    #     try:
-    #         records_location_param_id = Id('parameter:recordsRegistry@mongo')
-    #         registry = self._runtime.get_configuration().get_value_by_parameter(
-    #             records_location_param_id).get_string_value()
-    #         return import_module(registry).__dict__.get(entry, {})
-    #     except (ImportError, AttributeError, KeyError, errors.NotFound):
-    #         return {}
-
     def _initialize_manager(self, runtime):
         \"\"\"Sets the runtime, configuration and mongo client\"\"\"
         if self._runtime is not None:
@@ -168,9 +158,10 @@ class Identifiable:
     ]  
 
     init = """
-    def __init__(self, authority=None):
-        self._namespace = 'osid.Identifiable'
-        self._authority = authority or 'ODL.MIT.EDU'
+    _namespace = 'osid.Identifiable'
+
+    def __init__(self, runtime=None):
+        self._set_authority(runtime)
         self._my_map = {}
 
     def _set_authority(self, runtime):
@@ -178,7 +169,7 @@ class Identifiable:
             authority_param_id = Id('parameter:authority@mongo')
             self._authority = runtime.get_configuration().get_value_by_parameter(
                 authority_param_id).get_string_value()
-        except (KeyError, errors.NotFound):
+        except (AttributeError, KeyError, errors.NotFound):
             self._authority = 'ODL.MIT.EDU'
 """
 
@@ -200,15 +191,16 @@ class Extensible:
         'from ..primitives import Type',
         'from importlib import import_module',
         'from ..utilities import get_provider_manager',
+        'from ..utilities import get_registry',
     ]  
 
     init = """
-    def __init__(self):
-        self._records = None
+    def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
+        self._records = {}
         self._supported_record_type_ids = []
-        self._record_type_data_sets = {}
-        self._runtime = None
-        self._proxy = None
+        self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
+        self._runtime = runtime
+        self._proxy = proxy
 
     def __iter__(self):
         for attr in dir(self):
@@ -236,16 +228,6 @@ class Extensible:
                 except AttributeError:
                     pass
         raise AttributeError()
-
-    # def _get_registry(self, entry): # This has been moved to mongo.utilities.py
-    #     # get from the runtime
-    #     try:
-    #         records_location_param_id = Id('parameter:recordsRegistry@mongo')
-    #         registry = self._runtime.get_configuration().get_value_by_parameter(
-    #             records_location_param_id).get_string_value()
-    #         return import_module(registry).__dict__.get(entry, {})
-    #     except (ImportError, AttributeError, KeyError, errors.NotFound):
-    #         return {}
 
     def _get_record(self, record_type):
         \"\"\"Get the record string type value given the record_type.\"\"\"
@@ -278,7 +260,7 @@ class Extensible:
 
     def _delete(self):
         \"\"\"Override this method in inheriting objects to perform special clearing operations.\"\"\"
-        try: # Need to implement records for catalogs one of these days
+        try:
             for record in self._records:
                 try:
                     self._records[record]._delete()
@@ -289,8 +271,7 @@ class Extensible:
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
-        return get_provider_manager(osid, runtime=self._runtime, local=local)
-"""
+        return get_provider_manager(osid, runtime=self._runtime, proxy=self._proxy, local=local)"""
 
     has_record_type = """
         return str(record_type) in self._supported_record_type_ids"""
@@ -419,8 +400,15 @@ class OsidSession:
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
         'from importlib import import_module',
+        'from ..locale.objects import Locale',
         'from ..utilities import MongoClientValidated',
         'from ..utilities import get_provider_manager',
+        'from ..utilities import is_authenticated_with_proxy',
+        'from ..utilities import get_authenticated_agent_id_with_proxy',
+        'from ..utilities import get_authenticated_agent_with_proxy',
+        'from ..utilities import get_effective_agent_id_with_proxy',
+        'from ..utilities import get_effective_agent_with_proxy',
+        'from ..utilities import get_locale_with_proxy',
         'from .. import types',
         'COMPARATIVE = 0',
         'PLENARY = 1',
@@ -494,7 +482,7 @@ class OsidSession:
                 'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
                 'recordTypeIds': [] # Could this somehow inherit source catalog records?
             }
-        self._catalog = cat_class(self._my_catalog_map, runtime=self._runtime)
+        self._catalog = cat_class(osid_object_map=self._my_catalog_map, runtime=self._runtime, proxy=self._proxy)
         self._catalog._authority = self._authority  # there should be a better way...
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
@@ -514,7 +502,7 @@ class OsidSession:
             'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
             'recordTypeIds': [] # Could this somehow inherit source catalog records?
         }
-        return cat_class(catalog_map, self._runtime)
+        return cat_class(osid_object_map=catalog_map, runtime=self._runtime, proxy=self._proxy)
 
     def _create_orchestrated_cat(self, foreign_catalog_id, db_name, cat_name):
         \"\"\"Creates a catalog in the current service orchestrated with a foreign service Id.\"\"\"
@@ -550,7 +538,7 @@ class OsidSession:
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
-        return get_provider_manager(osid, runtime=self._runtime, local=local)
+        return get_provider_manager(osid, runtime=self._runtime, proxy=self._proxy, local=local)
 
     def _get_id(self, id_, pkg_name):
         \"\"\"
@@ -705,54 +693,22 @@ class OsidSession:
         collection.save(obj_map)"""
 
     get_locale = """
-        #from ..locale.objects import Locale
-        ##
-        # This implementation could assume that instantiating a new Locale
-        # without constructor arguments wlll return the default Locale.
-        #return Locale()
-        raise errors.Unimplemented()"""  
+        return get_locale_with_proxy(self._proxy)"""  
 
     is_authenticated = """
-        if self._proxy is None:
-            return False
-        elif self._proxy.has_authentication():
-            return self._proxy.get_authentication().is_valid()
-        else:
-            return False"""
+        return is_authenticate_with_proxy(self._proxy)"""
 
     get_authenticated_agent_id = """
-        if self.is_authenticated():
-            return self._proxy.get_authentication().get_agent_id()
-        else:
-            raise errors.IllegalState()"""  
+        return get_authenticated_agent_id_with_proxy(self._proxy)"""
 
     get_authenticated_agent = """
-        if self.is_authenticated():
-            return self._proxy.get_authentication().get_agent()
-        else:
-            raise errors.IllegalState()"""
+        return get_authenticated_agent_with_proxy(self._proxy)"""
 
     get_effective_agent_id = """
-        if self.is_authenticated():
-            if self._proxy.has_effective_agent():
-                return self._proxy.get_effective_agent_id()
-            else:
-                return self._proxy.get_authentication().get_agent_id()
-        else:
-            return Id(
-                identifier='MC3GUE$T@MIT.EDU',
-                namespace='authentication.Agent',
-                authority='MIT-ODL')"""
+        return get_effective_agent_id_with_proxy(self._proxy)"""
 
     get_effective_agent = """
-        #effective_agent_id = self.get_effective_agent_id()
-        # This may want to be extended to get the Agent directly from the Authentication
-        # if available and if not effective agent is available in the proxy
-        #return Agent(
-        #    identifier=effective_agent_id.get_identifier(),
-        #    namespace=effective_agent_id.get_namespace(),
-        #    authority=effective_agent_id.get_authority())
-        raise errors.Unimplemented()"""
+        return get_effective_agent_id_with_proxy(self._proxy) # Currently raises Unimplemented"""
 
     supports_transactions = """
         return False"""
@@ -772,13 +728,20 @@ class OsidObject:
     ]
 
     init = """
-    _namespace = 'mongo.OsidObject'
+    _namespace = 'osid.OsidObject'
 
-    def __init__(self, osid_object_map, runtime=None):
+    def __init__(self, osid_object_map, runtime=None, **kwargs):
+        osid_markers.Identifiable.__init__(self, runtime=runtime)
+        osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
         self._my_map = osid_object_map
-        self._runtime = runtime
-        if runtime is not None:
-            self._set_authority(runtime=runtime)
+        self._load_records(osid_object_map['recordTypeIds'])
+        # self._runtime = runtime # Now set in Extensible
+        # if runtime is not None:
+        #     self._set_authority(runtime=runtime)
+        
+        # This impl needs to be updated to call inherited classes, esp Extensible
+        # Until then:
+        #self._proxy = None
 
     def get_object_map(self, obj_map=None):
         if obj_map is None:
@@ -832,6 +795,17 @@ class OsidObject:
     is_of_genus_type = """
         return genus_type == Type(idstr=self._my_map['genusTypeId'])"""
 
+class OsidCatalog:
+
+    init = """
+    _namespace = 'osid.OsidCatalog'
+    
+    def __init__(self, **kwargs):
+        OsidObject.__init__(self, **kwargs)
+        # Should we initialize Sourceable?
+        # Should we initialize Federatable?
+    """
+
 class OsidRule:
 
     has_rule = """
@@ -853,6 +827,8 @@ class OsidForm:
         'from dlkit.abstract_osid.osid import errors',
         'from . import default_mdata',
         'from .metadata import Metadata',
+        'from ..utilities import get_locale_with_proxy',
+        'from ..utilities import update_display_text_defaults',
         'import uuid',
         'from decimal import Decimal',
     ]
@@ -861,14 +837,19 @@ class OsidForm:
     # pylint: disable=no-self-use
     # MUCH OF THIS SHOULD BE MOVED TO A UTILITY MODULE
 
-    _namespace = 'mongo.OsidForm'
+    _namespace = 'osid.OsidForm'
 
-    def __init__(self, runtime=None, **kwargs):
+    def __init__(self, runtime=None, proxy=None, **kwargs):
         self._identifier = str(uuid.uuid4())
         self._mdata = None
         self._for_update = None
-        self._runtime = runtime
+        self._runtime = None # This is now being set in Extensible by higher order objects
+        self._proxy = None # This is now being set in Extensible by higher order objects
         self._kwargs = kwargs
+        self._locale_map = dict()
+        locale = get_locale_with_proxy(proxy)
+        self._locale_map['languageTypeId'] = str(locale.get_language_type())
+        self._locale_map['scriptTypeId'] = str(locale.get_script_type())
         if runtime is not None:
             self._set_authority(runtime=runtime)
         if 'mdata' in kwargs:
@@ -882,6 +863,7 @@ class OsidForm:
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
         self._mdata.update(dict(default_mdata.OSID_FORM))
+        update_display_text_defaults(self._mdata['journal_comment'], self._locale_map)
         for element_name in self._mdata:
             self._mdata[element_name].update(
                 {'element_id': Id(self._authority,
@@ -999,6 +981,18 @@ class OsidForm:
         else:
             return True
 
+    def _get_display_text(self, inpt, metadata):
+        if metadata.is_read_only():
+            raise errors.NoAccess()
+        if isinstance(inpt, abc_display_text):
+            display_text = inpt
+        elif self._is_valid_string(inpt, metadata):
+            display_text = dict(metadata.get_default_string_values()[0])
+            display_text.update({'text': inpt})
+        else:
+            raise errors.InvalidArgument()
+        return display_text
+
     def _is_valid_cardinal(self, inpt, metadata):
         \"\"\"Checks if input is a valid cardinal value\"\"\"
         if not isinstance(inpt, int):
@@ -1089,7 +1083,7 @@ class OsidForm:
         from ..locale.objects import Locale
         # If no constructor arguments are given it is expected that the
         # locale service will return the default Locale.
-        return Locale()"""
+        return get_locale_with_proxy(self._proxy)"""
 
     get_locales = """
         # Someday I might have a real implementation
@@ -1100,17 +1094,14 @@ class OsidForm:
     set_locale = """
         # Someday I might have a real implementation
         # For now only default Locale is supported
-        raise errors.Unsupported()"""
+        self._locale_map['languageType'] = language_type
+        self._locale_map['scriptType'] = script_type"""
 
     get_journal_comment_metadata = """
         return Metadata(**self._mdata['journal_comment'])"""
 
     set_journal_comment = """
-        if self.get_journal_comment_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_string(comment, self.get_journal_comment_metadata()):
-            raise errors.InvalidArgument()
-        self._journal_comment = comment"""
+        self._my_map['journal_comment'] = self._get_display_text(comment, self.get_journal_comment_metadata())"""
 
     is_valid = """
         # It is assumed that all setter methods check validity so there
@@ -1132,9 +1123,11 @@ class OsidExtensibleForm:
     ]
 
     init = """
-    def __init__(self):
-        self._records = dict()
-        self._supported_record_type_ids = []
+    def __init__(self, **kwargs):
+        # self._records = dict() # Moved to markers.Extensible
+        # self._supported_record_type_ids = [] # Moved to markers.Extensible
+        osid_markers.Extensible.__init__(self, **kwargs)
+        # self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime) # Now in Extensible
 
     def _init_map(self, record_types):
         self._my_map['recordTypeIds'] = []
@@ -1176,7 +1169,7 @@ class OsidTemporalForm:
         ]
 
     init = """
-    _namespace = "mongo.OsidTemporalForm"
+    _namespace = "osid.OsidTemporalForm"
 
     def __init__(self):
         self._mdata = None
@@ -1297,6 +1290,7 @@ class OsidSourceableForm:
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
         self._mdata.update(dict(default_mdata.OSID_SOURCEABLE))
+        update_display_text_defaults(self._mdata['license'], self._locale_map)
         self._provider_default = self._mdata['provider']['default_id_values'][0]
         self._branding_default = self._mdata['branding']['default_id_values']
         self._license_default = self._mdata['license']['default_string_values'][0]
@@ -1364,11 +1358,7 @@ class OsidSourceableForm:
         return Metadata(**metadata)"""
 
     set_license = """
-        if self.get_license_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_string(license, self.get_license_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['license']['text'] = license"""
+        self._my_map['license'] = self._get_display_text(license, self.get_license_metadata())"""
 
     clear_license = """
         if (self.get_license_metadata().is_read_only() or
@@ -1408,17 +1398,19 @@ class OsidObjectForm:
         'from dlkit.abstract_osid.osid import errors',
         'from . import default_mdata',
         'from .metadata import Metadata',
+        'from ...abstract_osid.locale.primitives import DisplayText as abc_display_text',
+        'from ..utilities import update_display_text_defaults',
     ]
 
     init = """
-    _namespace = "mongo.OsidObjectForm"
+    _namespace = "osid.OsidObjectForm"
 
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+    def __init__(self, osid_object_map=None, **kwargs): # removed record_types=None, runtime=None, 
         self._display_name_default = None
         self._description_default = None
         self._genus_type_default = None
-        OsidExtensibleForm.__init__(self)
-        OsidForm.__init__(self, runtime=runtime, **kwargs)
+        OsidForm.__init__(self, **kwargs)
+        OsidExtensibleForm.__init__(self, **kwargs)
         if osid_object_map is not None:
             self._for_update = True
             self._my_map = osid_object_map
@@ -1433,8 +1425,10 @@ class OsidObjectForm:
         OsidForm._init_metadata(self)
         if 'default_display_name' in kwargs:
             self._mdata['display_name']['default_string_values'][0]['text'] = kwargs['default_display_name']
+        update_display_text_defaults(self._mdata['display_name'], self._locale_map)
         if 'default_description' in kwargs:
             self._mdata['description']['default_string_values'][0]['text'] = kwargs['default_description']
+        update_display_text_defaults(self._mdata['description'], self._locale_map)
         self._display_name_default = dict(self._mdata['display_name']['default_string_values'][0])
         self._description_default = dict(self._mdata['description']['default_string_values'][0])
         self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
@@ -1454,12 +1448,7 @@ class OsidObjectForm:
         return Metadata(**metadata)"""
 
     set_display_name = """
-        if self.get_display_name_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_string(display_name,
-                                     self.get_display_name_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['displayName']['text'] = display_name"""
+        self._my_map['displayName'] = self._get_display_text(display_name, self.get_display_name_metadata())"""
 
     clear_display_name = """
         if (self.get_display_name_metadata().is_read_only() or
@@ -1473,12 +1462,7 @@ class OsidObjectForm:
         return Metadata(**metadata)"""
 
     set_description = """
-        if self.get_description_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_string(description,
-                                     self.get_description_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['description']['text'] = description"""
+        self._my_map['description'] = self._get_display_text(description, self.get_description_metadata())"""
 
     clear_description = """
         if (self.get_description_metadata().is_read_only() or
@@ -1507,10 +1491,9 @@ class OsidObjectForm:
 class OsidRelationshipForm:
 
     init = """
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+    def __init__(self, **kwargs):
         OsidTemporalForm.__init__(self)
-        OsidObjectForm.__init__(
-            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+        OsidObjectForm.__init__(self, **kwargs)
 
     def _init_metadata(self, **kwargs):
         OsidTemporalForm._init_metadata(self, **kwargs)
@@ -1524,11 +1507,10 @@ class OsidRelationshipForm:
 class OsidCatalogForm:
     
     init = """
-    def __init__(self, osid_catalog_map=None, record_types=None, runtime=None, **kwargs):
+    def __init__(self, **kwargs):
         OsidSourceableForm.__init__(self)
         OsidFederateableForm.__init__(self)
-        OsidObjectForm.__init__(
-            self, osid_object_map=osid_catalog_map, record_types=record_types, runtime=runtime, **kwargs)
+        OsidObjectForm.__init__(self, **kwargs)
 
     def _init_metadata(self, **kwargs):
         OsidSourceableForm._init_metadata(self)
@@ -1547,7 +1529,7 @@ class OsidList:
     ]
 
     init = """
-    def __init__(self, iter_object=None, runtime=None):
+    def __init__(self, iter_object=None, runtime=None, proxy=None):
         if iter_object is None:
             iter_object = []
         if isinstance(iter_object, dict) or isinstance(iter_object, list):
@@ -1557,6 +1539,7 @@ class OsidList:
         else:
             self._count = None
         self._runtime = runtime
+        self._proxy = proxy
         self._iter_object = iter(iter_object)
 
     def __iter__(self):
@@ -1602,7 +1585,7 @@ class OsidList:
         except Exception:  # Need to specify exceptions here!
             raise errors.OperationFailed()
         if isinstance(next_object, dict):
-            next_object = object_class(next_object, runtime=self._runtime)
+            next_object = object_class(osid_object_map=next_object, runtime=self._runtime, proxy=self._proxy)
         return next_object
 
     def next(self):

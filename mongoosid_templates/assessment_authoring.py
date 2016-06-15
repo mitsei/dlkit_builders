@@ -21,30 +21,17 @@ class AssessmentPartAdminSession:
     ]
 
 class AssessmentPartForm:
+
+    # Why is this a special initter?
     init = """
-    _record_type_data_sets = {}
     _namespace = 'assessment_authoring.AssessmentPart'
 
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = get_registry('ASSESSMENT_PART_RECORD_TYPES', runtime)
+    def __init__(self, **kwargs):
         osid_objects.OsidContainableForm.__init__(self)
         osid_objects.OsidOperableForm.__init__(self)
-        osid_objects.OsidObjectForm.__init__(
-            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+        osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT_PART', *kwargs)
         self._mdata = dict(default_mdata.ASSESSMENT_PART)
         self._init_metadata(**kwargs)
-        
-        # self._records = dict()
-        # self._supported_record_type_ids = []
-        # if osid_object_map is not None:
-        #     self._for_update = True
-        #     self._my_map = osid_object_map
-        #     self._load_records(osid_object_map['recordTypeIds'])
-        # else:
-        #     self._my_map = {}
-        #     self._for_update = False
-        #     self._init_map(**kwargs)
-        
         if not self.is_for_update():
             self._init_map(**kwargs)
 
