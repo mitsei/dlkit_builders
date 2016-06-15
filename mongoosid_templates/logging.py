@@ -63,8 +63,9 @@ class LogEntryAdminSession:
 
         self._forms[log_entry_form.get_id().get_identifier()] = CREATED
         result = objects.LogEntry(
-            collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime)
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
 
         return result"""
 
