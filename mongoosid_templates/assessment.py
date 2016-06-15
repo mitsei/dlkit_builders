@@ -633,7 +633,9 @@ class ItemAdminSession:
                                           collection='Item',
                                           runtime=self._runtime)
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
-        objects.Item(osid_object_map=item_map, runtime=self._runtime, proxy=self._proxy)._delete()
+        objects.Item(osid_object_map=item_map,
+                     runtime=self._runtime,
+                     proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(item_id.get_identifier())})"""
     
     # These methods overwrite the canonical aggregate object admin methods to
@@ -671,7 +673,9 @@ class ItemAdminSession:
             item['question'] = question_form._my_map # Let's just assume we can overwrite it
         collection.save(item)
         self._forms[question_form.get_id().get_identifier()] = CREATED
-        return objects.Question(osid_object_map=question_form._my_map, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.Question(osid_object_map=question_form._my_map,
+                                runtime=self._runtime,
+                                proxy=self._proxy)"""
 
     get_question_form_for_update_import_templates = [
         'from ...abstract_osid.id.primitives import Id as ABCId'
@@ -719,7 +723,9 @@ class ItemAdminSession:
             raise errors.OperationFailed()
         self._forms[question_form.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
-        return objects.Question(osid_object_map=question_form._my_map, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.Question(osid_object_map=question_form._my_map,
+                                runtime=self._runtime,
+                                proxy=self._proxy)"""
 
 
 class AssessmentAdminSession:

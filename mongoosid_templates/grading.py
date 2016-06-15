@@ -339,7 +339,9 @@ class GradebookColumnAdminSession:
 
         gradebook_column_map = collection.find_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
 
-        objects.GradebookColumn(gradebook_column_map, runtime=self._runtime)._delete()
+        objects.GradebookColumn(osid_object_map=gradebook_column_map,
+                                runtime=self._runtime,
+                                proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
         """
 
@@ -408,7 +410,9 @@ class GradeSystemAdminSession:
             raise errors.InvalidArgument('Grade system being used by gradebook columns. ' +
                                          'Cannot delete it.')
 
-        objects.GradeSystem(osid_object_map=grade_system_map, runtime=self._runtime)._delete()
+        objects.GradeSystem(osid_object_map=grade_system_map,
+                            runtime=self._runtime,
+                            proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
         """
 
