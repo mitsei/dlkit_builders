@@ -7,7 +7,7 @@ from pymongo.errors import OperationFailure as PyMongoOperationFailed
 from bson import ObjectId
 from bson.timestamp import Timestamp
 
-from .osid.osid_errors import NullArgument, NotFound, OperationFailed, Unimplemented
+from .osid.osid_errors import NullArgument, NotFound, OperationFailed, Unimplemented, IllegalState
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id
 from importlib import import_module
@@ -218,14 +218,14 @@ def get_authenticated_agent_id_with_proxy(proxy):
     if is_authenticated_with_proxy(proxy):
         return proxy.get_authentication().get_agent_id()
     else:
-        raise errors.IllegalState()
+        raise IllegalState()
 
 def get_authenticated_agent_with_proxy(proxy):
     """Given a Proxy, returns the authenticated Agent"""
     if is_authenticated_with_proxy(proxy):
         return proxy.get_authentication().get_agent()
     else:
-        raise errors.IllegalState()
+        raise IllegalState()
 
 def get_effective_agent_id_with_proxy(proxy):
     """Given a Proxy, returns the Id of the effective Agent"""
