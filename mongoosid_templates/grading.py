@@ -430,12 +430,9 @@ class GradebookColumnSummary:
     _record_type_data_sets = {}
     _namespace = 'grading.GradebookColumnSummary'
 
-    def __init__(self, osid_object_map, runtime=None):
-        self._record_type_data_sets = get_registry('GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES', runtime)
-        osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._records = dict()
-        self._load_records(osid_object_map['recordTypeIds'])
-        self._catalog_name = 'Gradebook'
+    def __init__(self, **kwargs):
+        osid_objects.OsidObject.__init__(self, object_name='GRADEBOOK_COLUMN_SUMMARY', **kwargs)
+        self._catalog_name = 'gradebook'
 
         # Not set the entries to be included in the calculation
         self._entries = self._get_entries_for_calculation()
