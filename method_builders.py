@@ -220,7 +220,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         #print interface['shortname'], method['name']
         return context
 
-    def _get_method_decorator(self, method):
+    def _get_method_decorator(self, method, interface):
         return ''
 
     @staticmethod
@@ -248,7 +248,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
     def _make_method(self, method, interface):
         args = self._get_method_args(method, interface)
-        decorator = self._get_method_decorator(method)
+        decorator = self._get_method_decorator(method, interface)
         method_sig = self._get_method_sig(method, interface)
         method_impl = self._make_method_impl(method, interface)
         method_doc = self._build_method_doc(method)

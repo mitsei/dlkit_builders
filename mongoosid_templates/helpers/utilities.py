@@ -122,6 +122,16 @@ class MongoClientValidated(object):
         self._validate_write(result)
         return result
 
+def remove_proxy_kwarg(func):
+    """decorator, to remove a 'proxy' keyword argument. For wrapping certain Manager methods"""
+    def wrapper(*args, **kwargs):
+        if 'proxy' in kwargs:
+            if kwargs['proxy'] is None:
+                del kwargs['proxy']
+            else:
+                raise InvalidArgument('Manager sessions cannot be called with Proxies. Use ProxyManager instead')
+        return func(*args, **kwargs)
+
 def arguments_not_none(func):
     """decorator, to check if any arguments are None; raise exception if so"""
     def wrapper(*args, **kwargs):

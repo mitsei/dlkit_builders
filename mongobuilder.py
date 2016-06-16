@@ -52,8 +52,11 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
                 args.append(arg['var_name'])
         return args
 
-    def _get_method_decorator(self, method):
-        return '{0}@utilities.arguments_not_none'.format(self._ind)
+    def _get_method_decorator(self, method, interface):
+        decorator = '{0}@utilities.arguments_not_none'.format(self._ind)
+        if 'OsidManager' in interface['inherit_shortnames'] and 'session' in method['name']:
+            decorator = '{0}@utilities.remove_proxy_kwarg\n'.format(self._ind) + decorator
+        return decorator
 
     def _get_method_sig(self, method, interface):
         args = self._get_method_args(method, interface)
