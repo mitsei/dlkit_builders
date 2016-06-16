@@ -308,7 +308,8 @@ class GradebookColumnLookupSession:
         summary_map = gradebook_column._my_map
         summary_map['gradebookColumnId'] = str(gradebook_column.ident)
         return GradebookColumnSummary(osid_object_map=summary_map,
-                                      runtime=self._runtime)"""
+                                      runtime=self._runtime,
+                                      proxy=self._proxy)"""
 
 class GradebookColumnAdminSession:
 
