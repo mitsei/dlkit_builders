@@ -56,7 +56,7 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
         # This should be re-implemented to template patterns somehow
         decorators = []
         if 'OsidManager' in interface['inherit_shortnames'] and 'session' in method['name']:
-            decorators.append('{0}@utilities.remove_proxy_kwarg'.format(self._ind))
+            decorators.append('{0}@utilities.remove_null_proxy_kwarg'.format(self._ind))
         if len(args) > 1:
             decorators.append('{0}@utilities.arguments_not_none'.format(self._ind))
         return decorators

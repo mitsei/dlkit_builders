@@ -122,7 +122,7 @@ class MongoClientValidated(object):
         self._validate_write(result)
         return result
 
-def remove_proxy_kwarg(func):
+def remove_null_proxy_kwarg(func):
     """decorator, to remove a 'proxy' keyword argument. For wrapping certain Manager methods"""
     def wrapper(*args, **kwargs):
         if 'proxy' in kwargs:
