@@ -52,11 +52,14 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
                 args.append(arg['var_name'])
         return args
 
-    def _get_method_decorator(self, method, interface):
-        decorator = '{0}@utilities.arguments_not_none'.format(self._ind)
+    def _get_method_decorators(self, method, interface, args):
+        # This should be re-implemented to template patterns somehow
+        decorators = []
         if 'OsidManager' in interface['inherit_shortnames'] and 'session' in method['name']:
-            decorator = '{0}@utilities.remove_proxy_kwarg\n'.format(self._ind) + decorator
-        return decorator
+            decorators.append('{0}@utilities.remove_proxy_kwarg'.format(self._ind))
+        if len(args) > 1:
+            decorators.append('{0}@utilities.arguments_not_none'.format(self._ind))
+        return decorators
 
     def _get_method_sig(self, method, interface):
         args = self._get_method_args(method, interface)

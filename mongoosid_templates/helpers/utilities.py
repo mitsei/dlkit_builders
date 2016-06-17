@@ -132,6 +132,8 @@ def remove_proxy_kwarg(func):
                 raise InvalidArgument('Manager sessions cannot be called with Proxies. Use ProxyManager instead')
         return func(*args, **kwargs)
 
+    return wrapper
+
 def arguments_not_none(func):
     """decorator, to check if any arguments are None; raise exception if so"""
     def wrapper(*args, **kwargs):
