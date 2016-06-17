@@ -197,6 +197,35 @@ class AuthorizationForm:
             self._my_map['resourceId'] = str(kwargs['resource_id'])"""
 
 
+class Authorization:
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if obj_map['startDate'] is not None:
+            start_date = obj_map['startDate']
+            obj_map['startDate'] = dict()
+            obj_map['startDate']['year'] = start_date.year
+            obj_map['startDate']['month'] = start_date.month
+            obj_map['startDate']['day'] = start_date.day
+            obj_map['startDate']['hour'] = start_date.hour
+            obj_map['startDate']['minute'] = start_date.minute
+            obj_map['startDate']['second'] = start_date.second
+            obj_map['startDate']['microsecond'] = start_date.microsecond
+        if obj_map['endDate'] is not None:
+            end_date = obj_map['endDate']
+            obj_map['endDate'] = dict()
+            obj_map['endDate']['year'] = end_date.year
+            obj_map['endDate']['month'] = end_date.month
+            obj_map['endDate']['day'] = end_date.day
+            obj_map['endDate']['hour'] = end_date.hour
+            obj_map['endDate']['minute'] = end_date.minute
+            obj_map['endDate']['second'] = end_date.second
+            obj_map['endDate']['microsecond'] = end_date.microsecond
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)
+    """
+
 class AuthorizationQuery:
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',

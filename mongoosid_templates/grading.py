@@ -308,7 +308,8 @@ class GradebookColumnLookupSession:
         summary_map = gradebook_column._my_map
         summary_map['gradebookColumnId'] = str(gradebook_column.ident)
         return GradebookColumnSummary(osid_object_map=summary_map,
-                                      runtime=self._runtime)"""
+                                      runtime=self._runtime,
+                                      proxy=self._proxy)"""
 
 class GradebookColumnAdminSession:
 
@@ -339,7 +340,9 @@ class GradebookColumnAdminSession:
 
         gradebook_column_map = collection.find_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
 
-        objects.GradebookColumn(gradebook_column_map, runtime=self._runtime)._delete()
+        objects.GradebookColumn(osid_object_map=gradebook_column_map,
+                                runtime=self._runtime,
+                                proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
         """
 
@@ -372,8 +375,9 @@ class GradebookColumnAdminSession:
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.GradebookColumn(
-            gradebook_column_form._my_map,
-            runtime=self._runtime)
+            osid_object_map=gradebook_column_form._my_map,
+            runtime=self._runtime,
+            proxy=self._proxy)
         """
 
 class GradebookColumnQuery:
@@ -408,7 +412,9 @@ class GradeSystemAdminSession:
             raise errors.InvalidArgument('Grade system being used by gradebook columns. ' +
                                          'Cannot delete it.')
 
-        objects.GradeSystem(osid_object_map=grade_system_map, runtime=self._runtime)._delete()
+        objects.GradeSystem(osid_object_map=grade_system_map,
+                            runtime=self._runtime,
+                            proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
         """
 
@@ -425,12 +431,9 @@ class GradebookColumnSummary:
     _record_type_data_sets = {}
     _namespace = 'grading.GradebookColumnSummary'
 
-    def __init__(self, osid_object_map, runtime=None):
-        self._record_type_data_sets = get_registry('GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES', runtime)
-        osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._records = dict()
-        self._load_records(osid_object_map['recordTypeIds'])
-        self._catalog_name = 'Gradebook'
+    def __init__(self, **kwargs):
+        osid_objects.OsidObject.__init__(self, object_name='GRADEBOOK_COLUMN_SUMMARY', **kwargs)
+        self._catalog_name = 'gradebook'
 
         # Not set the entries to be included in the calculation
         self._entries = self._get_entries_for_calculation()
