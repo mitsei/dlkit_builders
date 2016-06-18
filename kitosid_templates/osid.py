@@ -127,7 +127,15 @@ class OsidSession:
     ISOLATED = 1
 
     def __init__(self, proxy):
-        self._proxy = proxy"""
+        self._proxy = proxy
+
+    def set_proxy(self, proxy):
+        \"\"\"Sets a new Proxy. Probably wants to be followed by a Manager.clear_sessions call\"\"\"
+        self._proxy = proxy
+
+    def clear_proxy(self):
+        \"\"\"Sets proxy to None. Probably wants to be followed by a Manager.clear_sessions call\"\"\"
+        self._proxy = None"""
 
     get_locale = """
         pass"""

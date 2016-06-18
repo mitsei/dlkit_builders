@@ -32,9 +32,10 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
     def _clean_up_impl(self, impl, interface, method):
         return impl
 
-    def _compile_method(self, args, decorator, method_sig, method_doc, method_impl):
-        if len(args) > 1:
-            return self._wrap('{0}\n{1}\n{2}\n{3}'.format(decorator,
+    def _compile_method(self, args, decorators, method_sig, method_doc, method_impl):
+        if decorators:
+            decorators = '\n'.join(decorators)
+            return self._wrap('{0}\n{1}\n{2}\n{3}'.format(decorators,
                                                           method_sig,
                                                           method_doc,
                                                           method_impl))
@@ -222,7 +223,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         #print interface['shortname'], method['name']
         return context
 
-    def _get_method_decorator(self, method):
+    def _get_method_decorators(self, method, interface, args):
         return ''
 
     @staticmethod
@@ -250,12 +251,12 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
     def _make_method(self, method, interface):
         args = self._get_method_args(method, interface)
-        decorator = self._get_method_decorator(method)
+        decorators = self._get_method_decorators(method, interface, args)
         method_sig = self._get_method_sig(method, interface)
         method_impl = self._make_method_impl(method, interface)
         method_doc = self._build_method_doc(method)
 
-        return self._compile_method(args, decorator, method_sig, method_doc, method_impl)
+        return self._compile_method(args, decorators, method_sig, method_doc, method_impl)
 
     def _make_method_impl(self, method, interface):
         impl = ''

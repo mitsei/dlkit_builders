@@ -18,7 +18,7 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
             impl = '{}raise Unimplemented()'.format(self._dind)
         return impl
 
-    def _compile_method(self, args, decorator, method_sig, method_doc, method_impl):
+    def _compile_method(self, args, decorators, method_sig, method_doc, method_impl):
         return method_sig + '\n' + method_impl
 
     def _get_method_args(self, method, interface):

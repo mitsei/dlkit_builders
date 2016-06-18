@@ -97,7 +97,9 @@ class AssetAdminSession:
 
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         from .${return_module} import ${aggregated_object_name}
-        return ${return_type}(${arg0_name}._my_map, runtime=self._runtime)"""
+        return ${return_type}(osid_object_map=${arg0_name}._my_map,
+                              runtime=self._runtime,
+                              proxy=self._proxy)"""
 
     get_asset_content_form_for_update_template = """
         # Implemented from template for
@@ -113,7 +115,9 @@ class AssetAdminSession:
         for sub_doc in document['${aggregated_objects_name_mixed}']: # There may be a MongoDB shortcut for this
             if sub_doc['_id'] == ObjectId(${arg0_name}.get_identifier()):
                 result = sub_doc
-        obj_form = ${return_type}(result, runtime=self._runtime)
+        obj_form = ${return_type}(osid_object_map=result,
+                                  runtime=self._runtime,
+                                  proxy=self._proxy)
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
@@ -159,7 +163,9 @@ class AssetAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         from .objects import ${aggregated_object_name}
 
-        return ${aggregated_object_name}(${arg0_name}._my_map, runtime=self._runtime)"""
+        return ${aggregated_object_name}(osid_object_map=${arg0_name}._my_map,
+                                         runtime=self._runtime,
+                                         proxy=self._proxy)"""
 
     delete_asset_content_template = """
         # Implemented from template for
@@ -182,7 +188,9 @@ class AssetAdminSession:
             found = True
         if not found:
             raise errors.OperationFailed()
-        ${aggregated_object_name}(${aggregated_object_name_under}_map, runtime=self._runtime)._delete()
+        ${aggregated_object_name}(osid_object_map=${aggregated_object_name_under}_map,
+                                  runtime=self._runtime,
+                                  proxy=self._proxy)._delete()
         collection.save(${object_name_under})"""
 
 
@@ -584,14 +592,10 @@ class Asset:
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # repositoryId element and may be removed someday
     init = """
-    _record_type_data_sets = {}
     _namespace = 'repository.Asset'
 
-    def __init__(self, osid_object_map, runtime=None):
-        self._record_type_data_sets = get_registry('ASSET_RECORD_TYPES', runtime)
-        osid_objects.OsidObject.__init__(self, osid_object_map, runtime)
-        self._records = dict()
-        self._load_records(osid_object_map['recordTypeIds'])
+    def __init__(self, **kwargs):
+        osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
         self._catalog_name = 'Repository'
         if self.is_composition():
             self._composition = self.get_composition()
@@ -648,11 +652,7 @@ class AssetForm:
 
     set_title_template = """
         # Implemented from template for osid.repository.AssetForm.set_title_template
-        if self.get_${var_name}_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_${arg0_type}(${arg0_name}, self.get_${arg0_name}_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['${var_name_mixed}']['text'] = ${arg0_name}"""
+        self._my_map['${var_name_mixed}'] = self._get_display_text(${arg0_name}, self.get_${var_name}_metadata())"""
 
     clear_title_template = """
         # Implemented from template for osid.repository.AssetForm.clear_title_template

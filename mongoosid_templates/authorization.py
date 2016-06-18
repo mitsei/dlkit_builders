@@ -94,13 +94,15 @@ class AuthorizationAdminSession:
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if authorization_record_types == []:
             ## WHY are we passing vault_id = self._catalog_id below, seems redundant:
+            ## We probably also don't need to send agent_id. The form can now get that from the proxy
             obj_form = objects.AuthorizationForm(
                 vault_id=self._catalog_id,
                 agent_id=agent_id,
                 function_id=function_id,
                 qualifier_id=qualifier_id,
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         else:
             obj_form = objects.AuthorizationForm(
                 vault_id=self._catalog_id,
@@ -109,7 +111,8 @@ class AuthorizationAdminSession:
                 function_id=function_id,
                 qualifier_id=qualifier_id,
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form
@@ -133,7 +136,8 @@ class AuthorizationAdminSession:
                 function_id=function_id,
                 qualifier_id=qualifier_id,
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                prox=self._proxy)
         else:
             obj_form = objects.AuthorizationForm(
                 vault_id=self._catalog_id,
@@ -142,7 +146,8 @@ class AuthorizationAdminSession:
                 function_id=function_id,
                 qualifier_id=qualifier_id,
                 catalog_id=self._catalog_id,
-                runtime=self._runtime)
+                runtime=self._runtime,
+                proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form
@@ -156,13 +161,10 @@ class AuthorizationForm:
     ]
 
     init = """
-    _record_type_data_sets = dict()
     _namespace = 'authorization.Authorization'
 
-    def __init__(self, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        self._record_type_data_sets = get_registry('AUTHORIZATION_RECORD_TYPES', runtime)
-        osid_objects.OsidRelationshipForm.__init__(
-            self, osid_object_map=osid_object_map, record_types=record_types, runtime=runtime, **kwargs)
+    def __init__(self, **kwargs):
+        osid_objects.OsidRelationshipForm.__init__(self, object_name='AUTHORIZATION', **kwargs)
         self._mdata = dict(default_mdata.AUTHORIZATION) # Don't know if we need default mdata for this
         self._init_metadata(**kwargs)
 
@@ -195,6 +197,35 @@ class AuthorizationForm:
         if 'resource_id' in kwargs:
             self._my_map['resourceId'] = str(kwargs['resource_id'])"""
 
+
+class Authorization:
+    additional_methods = """
+    def get_object_map(self):
+        obj_map = dict(self._my_map)
+        if obj_map['startDate'] is not None:
+            start_date = obj_map['startDate']
+            obj_map['startDate'] = dict()
+            obj_map['startDate']['year'] = start_date.year
+            obj_map['startDate']['month'] = start_date.month
+            obj_map['startDate']['day'] = start_date.day
+            obj_map['startDate']['hour'] = start_date.hour
+            obj_map['startDate']['minute'] = start_date.minute
+            obj_map['startDate']['second'] = start_date.second
+            obj_map['startDate']['microsecond'] = start_date.microsecond
+        if obj_map['endDate'] is not None:
+            end_date = obj_map['endDate']
+            obj_map['endDate'] = dict()
+            obj_map['endDate']['year'] = end_date.year
+            obj_map['endDate']['month'] = end_date.month
+            obj_map['endDate']['day'] = end_date.day
+            obj_map['endDate']['hour'] = end_date.hour
+            obj_map['endDate']['minute'] = end_date.minute
+            obj_map['endDate']['second'] = end_date.second
+            obj_map['endDate']['microsecond'] = end_date.microsecond
+        return osid_objects.OsidObject.get_object_map(self, obj_map)
+
+    object_map = property(fget=get_object_map)
+    """
 
 class AuthorizationQuery:
     import_statements = [
