@@ -1311,7 +1311,7 @@ class OsidSourceableForm:
         if 'effective_agent_id' in kwargs:
             try:
                 mgr = self._get_provider_manager('RESOURCE', local=True)
-                agent_session = mgr.get_resource_agent_session() # Should this send a Proxy somehow? From where?
+                agent_session = mgr.get_resource_agent_session(proxy=self._proxy)
                 agent_session.use_federated_bin_view()
                 resource_idstr = str(agent_session.get_resource_id_by_agent(kwargs['effective_agent_id']))
             except (errors.OperationFailed,
