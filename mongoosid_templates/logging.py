@@ -63,8 +63,9 @@ class LogEntryAdminSession:
 
         self._forms[log_entry_form.get_id().get_identifier()] = CREATED
         result = objects.LogEntry(
-            collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime)
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
 
         return result"""
 
@@ -112,13 +113,12 @@ class LogEntryForm:
 
     init = """
     def __init__(self, **kwargs):
-        self._record_type_data_sets = get_registry('LOG_ENTRY_RECORD_TYPES', runtime)
-        osid_objects.OsidObjectForm.__init__(self, osid_name='LOG_ENTRY', **kwargs)
+        osid_objects.OsidObjectForm.__init__(self, object_name='LOG_ENTRY', **kwargs)
         self._mdata = dict(default_mdata.LOG_ENTRY)
         self._init_metadata(**kwargs)
 
         if not self.is_for_update():
-            self._init_map(record_types, **kwargs)
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
