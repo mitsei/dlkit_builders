@@ -219,6 +219,7 @@ class AssessmentSession:
         return lookup_session.get_assessment_taken(assessment_taken_id)
 
     def _get_assessment_part(self, assessment_part_id):
+        \"\"\"Helper method for getting an AssessmentPart objects given an Id.\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING')
         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy) # Should this be _for_bank?
         lookup_session.use_federated_bank_view()
@@ -1632,15 +1633,38 @@ class AssessmentSection:
         lookup_session.use_federated_bank_view()
         return lookup_session.get_assessment_taken(self._assessment_taken_id)
 
-    def _get_items(self, part_id=None):
+    def _get_items_from_part(self, part_id=None):
         if part_id is None:
             part_id = self._assessment_part_id
-        if self.are_items_sequential():
-            raise errors.IllegalState('Items can only be accessed one-at-a-time.') # Or should this return special ItemList?
         mgr = self._get_authoring_manager
         part_item_session = mgr.get_assessment_part_item_session(proxy=self._proxy)
         part_item_session.use_federated_bank_view()
-        return part_item_session.get_assessment_part_items(part_id)"""
+        return part_item_session.get_assessment_part_items(part_id)
+
+    def _get_questions(self, part_id=None, honor_sequential=True):
+        if self.are_items_sequential() and honor_sequential:
+            raise errors.IllegalState('Items can only be accessed one-at-a-time.') # Or should this return special ItemList?
+        question_list = []
+        for item in self._get_items(part_id):
+            question_list.append(item.get_question())
+        return QuestionList(question_list)
+
+    def _get_first_item_from_part(self, part_id=None):
+        if part_id is None:
+            part_id = self._assessment_part_id
+        mgr = self._get_authoring_manager
+        part_item_session = mgr.get_assessment_part_item_session(proxy=self._proxy)
+        part_item_session.use_federated_bank_view()
+        return part_item_session.get_assessment_part_items(part_id).next()
+
+    def _get_first_question(self):
+        if not self._assessment_taken._has_questions_for_section(self.get_id()):
+            self._assessment_taken._append_question_to_section(self._get_first_item().get_question(), self.get_id())
+        return self._assessment_taken._get_questions_for_section(self.get_id()).next()
+
+    def _get_next_question(self, part_id=None):
+        for item in self._get_items
+"""
 
 class Response:
     
