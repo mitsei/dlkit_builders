@@ -7,7 +7,8 @@ from pymongo.errors import OperationFailure as PyMongoOperationFailed
 from bson import ObjectId
 from bson.timestamp import Timestamp
 
-from .osid.osid_errors import NullArgument, NotFound, OperationFailed, Unimplemented, IllegalState
+from .osid.osid_errors import NullArgument, NotFound,\
+    OperationFailed, Unimplemented, IllegalState, InvalidArgument
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id
 from importlib import import_module
