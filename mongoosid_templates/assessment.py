@@ -272,7 +272,7 @@ class AssessmentSession:
             raise errors.NotFound('item id not in assessment')"""
     
     get_previous_question = """
-        if not self.has_previous_question():
+        if not self.has_previous_question(assessment_section_id, item_id):
             raise errors.IllegalState()
         item_ids = self.get_assessment_section(assessment_section_id).get_assessment_taken()._my_map['itemIds']
         return self._get_question(item_ids[item_ids.index(str(item_id)) - 1])"""
