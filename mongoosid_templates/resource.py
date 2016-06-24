@@ -1663,6 +1663,7 @@ ${metadata_initers}    def _init_map(self, record_types=None, **kwargs):
 ${map_super_initers}        ${init_object}._init_map(self, record_types=record_types)
 ${persisted_initers}"""
 
+    # this needs to be re-designed to know about variable syntax type
     get_group_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
         metadata = dict(self._mdata['${var_name}'])

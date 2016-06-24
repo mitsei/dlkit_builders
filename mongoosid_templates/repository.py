@@ -816,6 +816,14 @@ class AssetContentForm:
         self._my_map['data'] = self._data_default
         del self._my_map['base64']"""
 
+    get_url_metadata = """
+        # special one-off implementation of ResourceForm.get_group_metadata_template
+        metadata = dict(self._mdata['string'])
+        metadata.update({'existing_string_values': self._my_map['url']})
+        return Metadata(**metadata)
+
+    url_metadata = property(fget=get_url_metadata)"""
+
 class Composition:
     
     ## This two methods are defined here because of an inconsistency with
