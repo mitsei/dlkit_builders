@@ -819,7 +819,7 @@ class AssetContentForm:
     get_url_metadata = """
         # special one-off implementation of ResourceForm.get_group_metadata_template
         metadata = dict(self._mdata['url'])
-        metadata.update({'existing_string_values': self._my_map['url']})
+        metadata.update({'existing_string_values': [self._my_map['url']]})
         return Metadata(**metadata)
 
     url_metadata = property(fget=get_url_metadata)"""
