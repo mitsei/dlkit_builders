@@ -325,17 +325,23 @@ class AssessmentSession:
             raise errors.InvalidArgument('argument is not a valid OSID Id')
         ##
         # This is a little hack to get the answer record types from the Item's
-        # Question record types. Should really get it from item genus types somehow:
+        # first Answer record types. Should really get it from item genus types somehow:
         record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
         collection = MongoClientValidated('assessment',
                                           collection='Item',
                                           runtime=self._runtime)
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         answer_record_types = []
-        for record_type_idstr in item_map['question']['recordTypeIds']:
-            identifier = Id(record_type_idstr).get_identifier()
-            if identifier in record_type_data_sets:
-                answer_record_types.append(Type(**record_type_data_sets[identifier]))
+        if len(item_map['answers'] > 0):
+            for record_type_idstr in item_map['answers'][0]['recordTypeIds']:
+                identifier = Id(record_type_idstr).get_identifier()
+                if identifier in record_type_data_sets:
+                    answer_record_types.append(Type(**record_type_data_sets[identifier]))
+        else:
+            for record_type_idstr in item_map['question']['recordTypeIds']:
+                identifier = Id(record_type_idstr).get_identifier()
+                if identifier in record_type_data_sets:
+                    answer_record_types.append(Type(**record_type_data_sets[identifier]))
         # Thus endith the hack.
         ##
         obj_form = objects.AnswerForm(
