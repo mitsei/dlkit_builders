@@ -332,7 +332,7 @@ class AssessmentSession:
                                           runtime=self._runtime)
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         answer_record_types = []
-        if len(item_map['answers'] > 0):
+        if len(item_map['answers']) > 0:
             for record_type_idstr in item_map['answers'][0]['recordTypeIds']:
                 identifier = Id(record_type_idstr).get_identifier()
                 if identifier in record_type_data_sets:
