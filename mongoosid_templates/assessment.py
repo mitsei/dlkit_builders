@@ -1129,12 +1129,11 @@ class Question:
 
     def get_object_map(self):
         obj_map = dict(self._my_map)
-        my_idstr = obj_map['itemId']
         del obj_map['itemId']
         lo_ids = self.get_learning_objective_ids()
         obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
         obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
-        obj_map['id'] = my_idstr
+        obj_map['id'] = str(self.get_id())
         return obj_map
 
     object_map = property(fget=get_object_map)"""
