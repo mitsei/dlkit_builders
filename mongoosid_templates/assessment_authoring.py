@@ -300,15 +300,29 @@ class AssessmentPartAdminSession:
         obj_form = objects.AssessmentPartForm(result, runtime=self._runtime, mdata=mdata)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
-        return obj_form
-"""
+        return obj_form"""
+
 
 class AssessmentPartItemSession:
 
-    # This should really be implemented in repository.AssetCompositionSession
-    # but need to capture patterns for composition objects (i.e. AssessmentParts - ASSESSMENT_AUTHORING) 
-    # as opposed to regular objects (i.e. Items - ASSESSMENT).
+    import_statements = [
+        'ISOLATED = 1',
+    ]
+
     get_assessment_part_items = """
+        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        if self._catalog_view == ISOLATED:
+            lookup_session.use_isolated_bank_view()
+        else:
+            lookup_session.use_federated_bank_view()
+        item_ids = lookup_session.get_assessment_part(assessment_part_id)
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
+        return lookup_session.get_items_by_ids(item_ids)"""
+
+    old_get_assessment_part_items = """
         collection = MongoClientValidated('assessment_authoring',
                                           collection='AssessmentPart',
                                           runtime=self._runtime)
@@ -330,20 +344,90 @@ class AssessmentPart:
     
     # Is there a way to template this so that all sub-package objects get a catalog import?
     import_statements = [
-        'from ..assessment.objects import Bank'
+        'from ..assessment.objects import Bank',
+        'from ..id.objects import IdList',
     ]
 
     is_section = """
         return not self.is_sequestered()"""
     
     additional_methods = """
+    def get_child_ids(self):
+        \"\"\"Gets the child ``Ids`` of this assessment part.
+
+        return: (osid.id.IdList) - the assessment part child ``Ids``
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return IdList(self._my_map['childIds'])
+
+    def supports_item_ordering(self):
+        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
+        return False
+
+    def supports_simple_item_sequencing(self):
+        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
+        return False
+
+    def has_children(self):
+        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
+        return False
+
+    def supports_simple_child_sequencing(self):
+        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
+        return False
+
     def are_items_sequential(self):
         \"\"\"This can be overwridden by a record extension\"\"\"
         return True
 
     def are_items_shuffled(self):
         \"\"\"This can be overwridden by a record extension\"\"\"
-        return False"""
+        return False
+
+    def are_children_sequential(self):
+        \"\"\"This can be overwridden by a record extension\"\"\"
+        return True
+
+    def are_children_shuffled(self):
+        \"\"\"This can be overwridden by a record extension\"\"\"
+        return False
+
+    def has_items(self):
+        \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
+        if 'itemIds' in self._my_map and self._my_map['itemIds']:
+            return True
+        return False
+
+    def get_items(self):
+        \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
+        item_ids = []
+        if self.has_items():
+            for idstr in self._my_map['itemIds']:
+                item_ids.append(idstr)
+        return IdList(item_ids)
+
+    def has_next_assessment_part(self, assessment_part_id):
+        \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
+        if not self.supports_child_ordering or not self.supports_simple_child_sequencing:
+            raise AttributeError() # Only available through a record extension
+        if 'childIds' in self._my_map and str(part_id) in self._my_map['childIds']:
+            if self._my_map['childIds'][-1] != str(assessment_part_id):
+                return True
+            else:
+                return False
+        raise NotFound(the Part with Id ' + str(assessment_part_id) + ' is not a child of this Part)
+
+    def get_next_assessment_part_id(self, assessment_part_id):
+        \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
+        if self.has_next_assessment_part(assessment_part_id):
+            return Id(self._my_map['childIds'][elf._my_map['childIds'].index(str(assessment_part_id)) + 1])
+
+    def get_next_assessment_part(self, assessment_part_id):
+        next_part_id = self.get_next_assessment_part_id(assessment_part_id)
+        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        return lookup_session.get_assessment_part(next_part_id)"""
 
 
 class AssessmentPartForm:
@@ -397,10 +481,79 @@ class AssessmentPartForm:
         self._my_map['itemsSequential'] = self._items_sequential_default
         self._my_map['itemsShuffled'] = self._items_shuffled_default"""
 
-    # Need to add metadata as well
+    # Need to add metadata as well, but perhaps these should be in record extension
     additional_methods = """
-        def set_items_sequential(self, sequential):
-            self._my_map['itemsSequential'] = sequential
+    def set_items_sequential(self, sequential):
+        self._my_map['itemsSequential'] = sequential
 
-        def set_items_sequential(self, shuffled):
-            self._my_map['itemsShuffled'] = shuffled"""
+    def set_items_shuffled(self, shuffled):
+        self._my_map['itemsShuffled'] = shuffled
+
+    def set_children_sequential(self, sequential): # This should be set in a record
+        if not self._is_simple_sequence:
+            raise IllegalState('This Assessment Part does not support simple child sequencing)
+        self._my_map['itemsSequential'] = sequential
+
+    def set_children_shuffled(self, shuffled):
+        if not self._is_simple_sequence:
+            raise IllegalState('This Assessment Part does not support simple child sequencing)
+        self._my_map['itemsShuffled'] = shuffled
+
+    def get_children_metadata(self):
+        \"\"\"Gets the metadata for children.
+
+        return: (osid.Metadata) - metadata for the children
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        if not self._is_simple_sequence:
+            raise IllegalState('This Assessment Part does not support simple child sequencing)
+        metadata = dict(self._mdata['children'])
+        metadata.update({'existing_children_values': self._my_map['childIds']})
+        return Metadata(**metadata)
+
+    children_metadata = property(fget=get_children_metadata)
+
+    @utilities.arguments_not_none
+    def set_children(self, child_ids):
+        \"\"\"Sets the children.
+
+        arg:    child_ids (osid.id.Id[]): the children``Ids``
+        raise:  InvalidArgument - ``child_ids`` is invalid
+        raise:  NoAccess - ``Metadata.isReadOnly()`` is ``true``
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        if not self._is_simple_sequence:
+            raise IllegalState('This Assessment Part does not support simple child sequencing)
+        if not isinstance(child_ids, list):
+            raise errors.InvalidArgument()
+        if self.get_children_metadata().is_read_only():
+            raise errors.NoAccess()
+        idstr_list = []
+        for object_id in child_ids:
+            if not self._is_valid_id(object_id):
+                raise errors.InvalidArgument()
+            if str(object_id) not in idstr_list:
+                idstr_list.append(str(object_id))
+        self._my_map['childIds'] = idstr_list
+
+    def clear_children(self):
+        \"\"\"Clears the children.
+
+        raise:  NoAccess - ``Metadata.isRequired()`` or
+                ``Metadata.isReadOnly()`` is ``true``
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        if not self._is_simple_sequence:
+            raise IllegalState('This Assessment Part does not support simple child sequencing)
+        if (self.get_children_metadata().is_read_only() or
+                self.get_children_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['childIds'] = self._children_default
+
+    children = property(fset=set_children, fdel=clear_children)
+
+    def _is_simple_sequence:
+        return bool(SIMPLE_SEQUENCE_RECORD_TYPE in self._my_map['recordTypeIds'])"""

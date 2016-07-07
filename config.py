@@ -57,6 +57,7 @@ managers_to_implement = [
 sessions_to_implement = [
     ### assessment service:
     'AssessmentSession',
+    'AssessmentResultsSession',
     'ItemLookupSession',
     'ItemQuerySession',
     'ItemSearchSession',

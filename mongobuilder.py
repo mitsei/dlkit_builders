@@ -64,6 +64,10 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
             decorators.append('{0}@utilities.remove_null_proxy_kwarg'.format(self._ind))
         if len(args) > 1:
             decorators.append('{0}@utilities.arguments_not_none'.format(self._ind))
+        if method['name'] in ['create_assessment_part_for_assessment',
+                              'create_assessment_part_for_assessment_part',
+                              'delete_assessment_part']:
+            decorators.append('{0}@utilities.handle_simple_sequencing'.format(self._ind))
         return decorators
 
     def _get_method_sig(self, method, interface):
