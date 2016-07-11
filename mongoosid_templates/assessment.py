@@ -1479,11 +1479,11 @@ class AssessmentSection:
     #       'itemId': <idstr of question's item>
     #       'partId': <idstr of the part this question came from>
     #       'labelElements': <list for constructing label, based on part levels, like [3, 1, 2]
-    #       'responses: [{
-    #           'answer': {<dict of the student's Response or None>},
-    #           'timeStamp: <DateTime of Response>
-    #           }, <etc for additional responses>]
-    #       }, <etc for additional questions>]
+    #       'responses: [<dict of the student's Answer>,
+    #                    <or empty dict() if response has been cleared>,
+    #                    <or None if no attempts have yet been made on question>,
+    #                    <etc for additional attempts>...]
+    #       }, <etc for additional questions>...]
 
     def _is_simple_section(self):
         \"\"\"Tests if this section is simple (ie, items assigned directly to Section Part).\"\"\"
@@ -1638,9 +1638,10 @@ class AssessmentSection:
         
         \"\"\"
         if answer_form is None:
-            response = 0
+            response = {}
         else:
-            response = answer_form._my_map
+            response = dict(answer_form._my_map)
+            response['submissionTime'] = DateTime.now()
         for question_map in part_map['questions']:
             if question_map['questionId'] == str(item_id):
                 if question_map['responses'][0] is None: # No existing attempts
