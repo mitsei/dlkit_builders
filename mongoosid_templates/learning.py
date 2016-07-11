@@ -238,7 +238,7 @@ class Activity:
         mgr = self._get_provider_manager('${return_pkg_replace_caps}')
         if not mgr.supports_${return_type_under}_lookup():
             raise errors.OperationFailed('${return_pkg_replace_title} does not support ${return_type} lookup')
-        lookup_session = mgr.get_${return_type_under}_lookup_session() # What about the Proxy?
+        lookup_session = mgr.get_${return_type_under}_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_${return_cat_name_under}_view()
         return lookup_session.get_${return_type_under}(self.get_${var_name}_id())"""
 

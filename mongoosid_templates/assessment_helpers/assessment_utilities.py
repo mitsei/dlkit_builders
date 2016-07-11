@@ -37,7 +37,7 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0):
     else: # We are at a lowest leaf and need to check parent
         if isinstance(part, abc_assessment): # This is an Assessment masquerading as an AssessmentPart 
             raise IllegalState('No next AssessmentPart is available for part_id')
-        elif part.has_assessment_part(): # This is the child of another AssessmentPart
+        elif part.has_parent_part(): # This is the child of another AssessmentPart
             next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, -1)
         else: # This is the child of an Assessment. Will this ever be the case?
             next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1)
@@ -46,7 +46,7 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0):
 def get_level_delta(part1_id, part2_id, runtime, proxy):
     def count_levels(part, increment):
         level = 0
-        while part.has_assessment_part():
+        while part.has_parent_part():
             level = level + increment
             part = part.get_assessment_part()
         return level
@@ -55,12 +55,12 @@ def get_level_delta(part1_id, part2_id, runtime, proxy):
     lookup_session = mgr.get_assessment_part_lookoup_session(proxy=proxy)
     part1 = lookup_session.get_assessment_part(part1_id)
     part2 = lookup_session.get_assessment_part(part2_id)
-    while part1.has_assessment_part() and part2.has_assessment_part:
+    while part1.has_parent_part() and part2.has_parent_part:
         part1 = part1.get_assessment_part
         part2 = part2.get_assessment_part
-    if part1.has_assessment_part():
+    if part1.has_parent_part():
         return count_levels(part1, -1)
-    elif part2.has_assessment_part():
+    elif part2.has_parent_part():
         return count_levels(part2, 1)
     else:
         return 0
@@ -73,7 +73,7 @@ def get_decision_objects(part_id, runtime, proxy):
     except NotFound: # perhaps this is an assessment masquerading as a part:
         part = assessment_lookup_session.get_assessment(part_id)
     else:
-        if part.has_assessment_part():
+        if part.has_parent_part():
             parent = part.get_assessment_part()
         else:
             parent = part.get_assessment()
@@ -88,7 +88,8 @@ def create_first_assessment_section(assessment_id, runtime, proxy, bank_id):
     assessment_lookup_session = mgr.get_assessment_lookup_session(proxy=proxy)
     assessment_lookup_session.use_federated_bank_view()
     assessment = assessment_lookup_session.get_assessment(assessment_id)
-    part_form = part_admin_session.get_assessment_part_form_for_create_for_assessment(assessment_id, [])
+    part_form = part_admin_session.get_assessment_part_form_for_create_for_assessment(assessment_id,
+                                                                                      [SIMPLE_SEQUENCE_RECORD_TYPE])
     part_form.set_display_name(assessment.get_display_name().get_text() + ' First Part')
     part_form.set_sequestered(False) # Any Part of an Assessment must be a Section (i.e. non sequestered)
     # part_form.set_weight(100) # Uncomment this line when set_weight is implemented
@@ -157,12 +158,12 @@ def get_default_question_map(item_id, question_id, assessment_part_id, display_e
 
 def update_parent_sequence_map(child_part, delete=False):
     """Updates the child map of a simple sequence assessment assessment part"""
-    if child_part.has_assessment_part():
+    if child_part.has_parent_part():
         object_map = child_part.get_assessment_part()._my_map
         database = 'assessment_authoring'
         collection_type = 'AssessmentPart'
     else:
-        object_map = child_part.get_assessment_part()._my_map
+        object_map = child_part.get_assessment()._my_map
         database = 'assessment'
         collection_type = 'Assessment'
     collection = MongoClientValidated(database,
@@ -188,7 +189,7 @@ def simple_sequencing_error_check(assessment_part_id, next_assessment_part_id, *
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=None, proxy=None, local=True)
     for child_part_id in [assessment_part_id, next_assessment_part_id]:
         child_part = mgr.get_assessment_part_lookup_session().get_assessment_part(child_part_id)
-        if child_part.has_assessment_part() and child_part.get_assessment_part().supports_simple_child_sequencing():
+        if child_part.has_parent_part() and child_part.get_assessment_part().supports_simple_child_sequencing():
             raise IllegalState('AssessmentPart only supports simple sequencing')
         elif child_part.get_assessment().supports_simple_child_sequencing():
             raise IllegalState('Assessment only supports simple sequencing')

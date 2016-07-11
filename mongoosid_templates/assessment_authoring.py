@@ -356,6 +356,9 @@ class AssessmentPart:
 
     is_section = """
         return not self.is_sequestered()"""
+
+    has_parent_part = """
+        return 'assessmentPartId' in self._my_map and self._my_map['assessmentPartId']"""
     
     additional_methods = """
     def get_child_ids(self):

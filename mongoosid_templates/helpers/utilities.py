@@ -326,7 +326,7 @@ def simple_sequencing_error_check(assessment_part_id, next_assessment_part_id, *
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=None, proxy=None, local=True)
     for child_part_id in [assessment_part_id, next_assessment_part_id]:
         child_part = mgr.get_assessment_part_lookup_session().get_assessment_part(child_part_id)
-        if child_part.has_assessment_part() and child_part.get_assessment_part().supports_simple_child_sequencing():
+        if child_part.has_parent_part() and child_part.get_assessment_part().supports_simple_child_sequencing():
             raise IllegalState('AssessmentPart only supports simple sequencing')
         elif child_part.get_assessment().supports_simple_child_sequencing():
             raise IllegalState('Assessment only supports simple sequencing')
