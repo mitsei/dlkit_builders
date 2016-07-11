@@ -346,6 +346,7 @@ class AssessmentPart:
     import_statements = [
         'from ..assessment.objects import Bank',
         'from ..id.objects import IdList',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
     is_section = """
@@ -412,17 +413,17 @@ class AssessmentPart:
         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
         if not self.supports_child_ordering or not self.supports_simple_child_sequencing:
             raise AttributeError() # Only available through a record extension
-        if 'childIds' in self._my_map and str(part_id) in self._my_map['childIds']:
+        if 'childIds' in self._my_map and str(assessment_part_id) in self._my_map['childIds']:
             if self._my_map['childIds'][-1] != str(assessment_part_id):
                 return True
             else:
                 return False
-        raise NotFound(the Part with Id ' + str(assessment_part_id) + ' is not a child of this Part)
+        raise errors.NotFound('the Part with Id ' + str(assessment_part_id) + ' is not a child of this Part')
 
     def get_next_assessment_part_id(self, assessment_part_id):
         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
         if self.has_next_assessment_part(assessment_part_id):
-            return Id(self._my_map['childIds'][elf._my_map['childIds'].index(str(assessment_part_id)) + 1])
+            return Id(self._my_map['childIds'][self._my_map['childIds'].index(str(assessment_part_id)) + 1])
 
     def get_next_assessment_part(self, assessment_part_id):
         next_part_id = self.get_next_assessment_part_id(assessment_part_id)
@@ -492,12 +493,12 @@ class AssessmentPartForm:
 
     def set_children_sequential(self, sequential): # This should be set in a record
         if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing)
+            raise IllegalState('This Assessment Part does not support simple child sequencing')
         self._my_map['itemsSequential'] = sequential
 
     def set_children_shuffled(self, shuffled):
         if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing)
+            raise IllegalState('This Assessment Part does not support simple child sequencing')
         self._my_map['itemsShuffled'] = shuffled
 
     def get_children_metadata(self):
@@ -508,7 +509,7 @@ class AssessmentPartForm:
 
         \"\"\"
         if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing)
+            raise IllegalState('This Assessment Part does not support simple child sequencing')
         metadata = dict(self._mdata['children'])
         metadata.update({'existing_children_values': self._my_map['childIds']})
         return Metadata(**metadata)
@@ -526,7 +527,7 @@ class AssessmentPartForm:
 
         \"\"\"
         if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing)
+            raise IllegalState('This Assessment Part does not support simple child sequencing')
         if not isinstance(child_ids, list):
             raise errors.InvalidArgument()
         if self.get_children_metadata().is_read_only():
@@ -548,7 +549,7 @@ class AssessmentPartForm:
 
         \"\"\"
         if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing)
+            raise IllegalState('This Assessment Part does not support simple child sequencing')
         if (self.get_children_metadata().is_read_only() or
                 self.get_children_metadata().is_required()):
             raise errors.NoAccess()
@@ -556,5 +557,5 @@ class AssessmentPartForm:
 
     children = property(fset=set_children, fdel=clear_children)
 
-    def _is_simple_sequence:
+    def _is_simple_sequence(self):
         return bool(SIMPLE_SEQUENCE_RECORD_TYPE in self._my_map['recordTypeIds'])"""

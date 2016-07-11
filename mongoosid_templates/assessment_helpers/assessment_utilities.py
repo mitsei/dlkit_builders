@@ -1,8 +1,9 @@
 """Utilities for use by assessment package implementations"""
 
-from dlkit.abstract_osid.osid.errors import NotFound, NullArgument
+from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
 from dlkit.abstract_osid.assessment.objects import Assessment as abc_assessment
 from ..utilities import get_provider_manager
+from bson import ObjectId
 
 def get_first_part_id_for_assessment(assessment_id, runtime=None, proxy=None, create=False, bank_id=None):
     """Gets the first part id, which represents the first section, of assessment"""
@@ -26,7 +27,7 @@ def get_next_part_id(part_id, runtime=None, proxy=None):
         next_part_id = part.get_child_ids()[0]
         level = -1
     elif siblings and siblings[-1] != part_id:
-        next_part_id = siblings(siblings.index(part_id) + 1)
+        next_part_id = siblings[siblings.index(part_id) + 1]
         level = 0
     else: # We are at a lowest leaf and need to check parent
         if isinstance(part, abc_assessment): # This is an Assessment masquerading as an AssessmentPart 
@@ -76,7 +77,7 @@ def get_decision_objects(part_id, runtime, proxy):
     rule = get_first_successful_sequence_rule_for_part(part_id, rule_lookup_session)
     return part, rule, list(sibling_ids)
 
-def create_first_assessment_section(assessment, runtime, proxy, bank_id):
+def create_first_assessment_section(assessment_id, runtime, proxy, bank_id):
     assessment_admin_session, part_admin_session, rule_admin_session = get_admin_sessions(runtime, proxy, bank_id)
     mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
     assessment_lookup_session = mgr.get_assessment_lookup_session(proxy=proxy)
