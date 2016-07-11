@@ -64,7 +64,7 @@ def get_decision_objects(part_id, runtime, proxy):
     assessment_lookup_session, part_lookup_session, rule_lookup_session = get_lookup_sessions(runtime, proxy)
     sibling_ids = []
     try:
-        part = part_lookoup_session.get_part(part_id)
+        part = part_lookup_session.get_part(part_id)
     except NotFound: # perhaps this is an assessment masquerading as a part:
         part = assessment_lookup_session.get_assessment(part_id)
     else:
