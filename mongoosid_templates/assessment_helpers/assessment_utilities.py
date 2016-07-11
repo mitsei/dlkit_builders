@@ -17,25 +17,23 @@ def get_first_part_id_for_assessment(assessment_id, runtime=None, proxy=None, cr
         else:
             raise
 
-def get_next_part_id(part_id, runtime=None, proxy=None):
+def get_next_part_id(part_id, runtime=None, proxy=None, level=0):
     part, rule, siblings = get_decision_objects(part_id, runtime, proxy)
     if rule is not None: # A SequenceRule trumps everything.
         next_part_id = rule.get_next_assessment_part_id()
-        if level:
-            level = get_level_delta(part_id, next_part_id, runtime, proxy)
+        level = get_level_delta(part_id, next_part_id, runtime, proxy)
     elif part.has_children(): # This is a special AssessmentPart that can manage child Parts
         next_part_id = part.get_child_ids()[0]
-        level = -1
+        level = level + 1
     elif siblings and siblings[-1] != part_id:
         next_part_id = siblings[siblings.index(part_id) + 1]
-        level = 0
     else: # We are at a lowest leaf and need to check parent
         if isinstance(part, abc_assessment): # This is an Assessment masquerading as an AssessmentPart 
             raise IllegalState('No next AssessmentPart is available for part_id')
         elif part.has_assessment_part(): # This is the child of another AssessmentPart
-            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy)
-        else: # This is the child of an Assessment
-            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy)
+            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, -1)
+        else: # This is the child of an Assessment. Will this ever be the case?
+            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1)
     return next_part_id, level
 
 def get_level_delta(part1_id, part2_id, runtime, proxy):
