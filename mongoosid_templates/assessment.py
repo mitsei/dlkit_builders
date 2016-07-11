@@ -974,6 +974,10 @@ class Item:
 
 class Assessment:
 
+    import_statements = [
+        "from .assessment_utilities import SIMPLE_SEQUENCE_RECORD_TYPE"
+    ]
+
     additional_methods = """
     def has_children(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
@@ -1001,11 +1005,11 @@ class Assessment:
         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         return lookup_session.get_assessment_part(next_part_id)
 
-    def are_items_sequential():
+    def are_items_sequential(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return False
 
-    def are_items_shuffled():
+    def are_items_shuffled(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return False
 

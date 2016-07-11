@@ -2,7 +2,7 @@
 
 from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
 from dlkit.abstract_osid.assessment.objects import Assessment as abc_assessment
-from ..utilities import get_provider_manager
+from ..utilities import get_provider_manager, MongoClientValidated
 from dlkit.primordium.type.primitives import Type
 from bson import ObjectId
 
@@ -87,7 +87,7 @@ def create_first_assessment_section(assessment_id, runtime, proxy, bank_id):
     mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
     assessment_lookup_session = mgr.get_assessment_lookup_session(proxy=proxy)
     assessment_lookup_session.use_federated_bank_view()
-    assessment = assessment_lookup_session.get_assessmen(assessment_id)
+    assessment = assessment_lookup_session.get_assessment(assessment_id)
     part_form = part_admin_session.get_assessment_part_form_for_create_for_assessment(assessment_id, [])
     part_form.set_display_name(assessment.get_display_name().get_text() + ' First Part')
     part_form.set_sequestered(False) # Any Part of an Assessment must be a Section (i.e. non sequestered)
@@ -119,10 +119,10 @@ def get_lookup_sessions(runtime, proxy):
 
 def get_admin_sessions(runtime, proxy, bank_id):
     mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
-    assessment_admin_session = mgr.get_assessment_admin_session_for_bank(bank=bank, proxy=proxy)
+    assessment_admin_session = mgr.get_assessment_admin_session_for_bank(bank_id=bank_id, proxy=proxy)
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=runtime, proxy=proxy, local=True)
-    part_admin_session = mgr.get_assessment_part_admin_session_for_bank(bank=bank, proxy=proxy)
-    rule_admin_session = mgr.get_sequence_rule_admin_session_for_bank(bank=bank, proxy=proxy)
+    part_admin_session = mgr.get_assessment_part_admin_session_for_bank(bank_id=bank_id, proxy=proxy)
+    rule_admin_session = mgr.get_sequence_rule_admin_session_for_bank(bank_id=bank_id, proxy=proxy)
     return assessment_admin_session, part_admin_session, rule_admin_session
 
 def get_first_successful_sequence_rule_for_part(part_id, rule_lookup_session):
@@ -131,22 +131,22 @@ def get_first_successful_sequence_rule_for_part(part_id, rule_lookup_session):
             return rule
     return None
 
-def get_assessment_section(self, section_id, runtime=None, proxy=None):
+def get_assessment_section(section_id, runtime=None, proxy=None):
     """Gets a Section given a section_id"""
     from .objects import AssessmentSection
     collection = MongoClientValidated('assessment',
                                       collection='AssessmentSection',
-                                      runtime=self._runtime)
-    result = collection.find_one(dict({'_id': ObjectId(assessment_id.get_identifier())}))
-    return AssessmentSection(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
+                                      runtime=runtime)
+    result = collection.find_one(dict({'_id': ObjectId(section_id.get_identifier())}))
+    return AssessmentSection(osid_object_map=result, runtime=runtime, proxy=proxy)
 
-def get_default_part_map(self, part_id, level):
+def get_default_part_map(part_id, level):
     return {
         'assessmentPartId': str(part_id),
         'level': level
     }
 
-def get_default_question_map(self, item_id, question_id, assessment_part_id, display_elements):
+def get_default_question_map(item_id, question_id, assessment_part_id, display_elements):
     return {
         'itemId': str(item_id),
         'questionId': str(question_id),
@@ -154,3 +154,41 @@ def get_default_question_map(self, item_id, question_id, assessment_part_id, dis
         'displayElements': display_elements,
         'responses': [None]
     }
+
+def update_parent_sequence_map(child_part, delete=False):
+    """Updates the child map of a simple sequence assessment assessment part"""
+    if child_part.has_assessment_part():
+        object_map = child_part.get_assessment_part()._my_map
+        database = 'assessment_authoring'
+        collection_type = 'AssessmentPart'
+    else:
+        object_map = child_part.get_assessment_part()._my_map
+        database = 'assessment'
+        collection_type = 'Assessment'
+    collection = MongoClientValidated(database,
+                                      collection=collection_type,
+                                      runtime=child_part._runtime)
+    if delete:
+        object_map['childIds'].remove(str(child_part.get_id()))
+    else:
+        object_map['childIds'].append(str(child_part.get_id()))
+    collection.save(object_map)
+
+def remove_from_parent_sequence_map(assessment_part_id):
+    """Updates the child map of a simple sequence assessment assessment part to remove child part"""
+    mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=None, proxy=None, local=True)
+    apls = mgr.get_assessment_part_lookup_session()
+    apls.use_federated_bank_view()
+    child_part = apls.get_assessment_part(assessment_part_id)
+    update_parent_sequence_map(child_part, delete=True)
+
+# This may not be needed anymore, Time will tell
+def simple_sequencing_error_check(assessment_part_id, next_assessment_part_id, *args, **kwargs):
+    """This may not be needed anymore. Time will tell"""
+    mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=None, proxy=None, local=True)
+    for child_part_id in [assessment_part_id, next_assessment_part_id]:
+        child_part = mgr.get_assessment_part_lookup_session().get_assessment_part(child_part_id)
+        if child_part.has_assessment_part() and child_part.get_assessment_part().supports_simple_child_sequencing():
+            raise IllegalState('AssessmentPart only supports simple sequencing')
+        elif child_part.get_assessment().supports_simple_child_sequencing():
+            raise IllegalState('Assessment only supports simple sequencing')

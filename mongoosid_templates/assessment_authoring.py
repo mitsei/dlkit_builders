@@ -445,11 +445,11 @@ class AssessmentPartForm:
     def __init__(self, **kwargs):
         osid_objects.OsidContainableForm.__init__(self)
         osid_objects.OsidOperableForm.__init__(self)
-        osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT_PART', *kwargs)
+        osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT_PART', **kwargs)
         self._mdata = dict(default_mdata.ASSESSMENT_PART)
         self._init_metadata(**kwargs)
         if not self.is_for_update():
-            self._init_map(record_types, **kwargs)
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
@@ -468,7 +468,7 @@ class AssessmentPartForm:
         self._items_sequential_default = None
         self._items_shuffled_default = None
 
-    def _init_map(self, record_types, **kwargs):
+    def _init_map(self, record_types=None, **kwargs):
         \"\"\"Initialize form map\"\"\"
         osid_objects.OsidContainableForm._init_map(self)
         osid_objects.OsidOperableForm._init_map(self)

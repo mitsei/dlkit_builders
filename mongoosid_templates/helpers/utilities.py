@@ -154,12 +154,13 @@ def arguments_not_none(func):
 
 def handle_simple_sequencing(func):
     """decorator, deal with simple sequencing cases"""
+    from .assessment import assessment_utilities
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         if 'create_assessment_part' in func.__name__:
-            update_parent_sequence_map(result)
+            assessment_utilities.update_parent_sequence_map(result)
         elif func.__name__ == 'delete_assessment_part':
-            remove_from_parent_sequence_map(*args, **kwargs)
+            assessment_utilities.remove_from_parent_sequence_map(*args, **kwargs)
         return result
     return wrapper
 
@@ -318,31 +319,6 @@ def get_locale_with_proxy(proxy):
 def update_display_text_defaults(mdata, locale_map):
     for default_display_text in mdata['default_string_values']:
         default_display_text.update(locale_map)
-
-def update_parent_sequence_map(self, child_part, delete=False):
-    """Updates the child map of a simple sequence assessment assessment part"""
-    if child_part.has_assessment_part():
-        object_map = child_part.get_assessment_part()._my_map
-        database = 'assessment_authoring'
-        collection_type = 'AssessmentPart'
-    else:
-        object_map = child_part.get_assessment_part()._my_map
-        database = 'assessment'
-        collection_type = 'Assessment'
-    collection = MongoClientValidated(database,
-                                      collection=collection_type,
-                                      runtime=self._runtime)
-    if delete:
-        object_map['childIds'].remove(str(child_part.get_id()))
-    else:
-        object_map['childIds'].append(str(child_part.get_id()))
-    collection.save(object_map)
-
-def remove_from_parent_sequence_map(assessment_part_id):
-    """Updates the child map of a simple sequence assessment assessment part to remove child part"""
-    mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=None, proxy=None, local=True)
-    child_part = mgr.get_assessment_part_lookup_session().get_assessment_part(assessment_part_id)
-    update_parent_sequence_map(child_part, delete=True)
 
 # This may not be needed anymore, Time will tell
 def simple_sequencing_error_check(assessment_part_id, next_assessment_part_id, *args, **kwargs):
