@@ -316,8 +316,8 @@ class AssessmentPartItemSession:
             lookup_session.use_isolated_bank_view()
         else:
             lookup_session.use_federated_bank_view()
-        item_ids = lookup_session.get_assessment_part(assessment_part_id)
-        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        item_ids = lookup_session.get_assessment_part(assessment_part_id).get_item_ids()
+        mgr = self._get_provider_manager('ASSESSMENT')
         lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
         return lookup_session.get_items_by_ids(item_ids)"""
@@ -393,13 +393,14 @@ class AssessmentPart:
         \"\"\"This can be overwridden by a record extension\"\"\"
         return False
 
+    # This method is probably not required
     def has_items(self):
         \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
         if 'itemIds' in self._my_map and self._my_map['itemIds']:
             return True
         return False
 
-    def get_items(self):
+    def get_item_ids(self):
         \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
         item_ids = []
         if self.has_items():

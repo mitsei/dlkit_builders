@@ -146,7 +146,6 @@ def arguments_not_none(func):
         try:
             return func(*args, **kwargs)
         except TypeError as ex:
-            print "EX.ARGS", ex.args[0]
             if 'takes exactly' in ex.args[0]:
                 raise NullArgument('Wrong number of arguments provided: ' + str(ex.args[0]))
             else:

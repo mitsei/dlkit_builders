@@ -68,6 +68,42 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
                               'create_assessment_part_for_assessment_part',
                               'delete_assessment_part']:
             decorators.append('{0}@utilities.handle_simple_sequencing'.format(self._ind))
+        if interface['shortname'] == 'AssessmentSession' and method['name'] in [
+                'get_first_assessment_section',
+                'has_next_assessment_section',
+                'get_next_assessment_section',
+                'has_previous_assessment_section',
+                'get_previous_assessment_section',
+                'get_assessment_section',
+                'get_assessment_sections',
+                'get_incomplete_assessment_sections',
+                'finished_assessment_section',
+                'requires_synchronous_responses',
+                'get_first_question',
+                'has_next_question',
+                'get_next_question',
+                'has_previous_question',
+                'get_previous_question',
+                'get_question',
+                'get_questions',
+                'get_response_form',
+                'submit_response',
+                'skip_item',
+                'is_question_answered',
+                'get_unanswered_questions',
+                'has_unanswered_questions',
+                'get_first_unanswered_question',
+                'has_next_unanswered_question',
+                'get_next_unanswered_question',
+                'has_previous_unanswered_question',
+                'get_previous_unanswered_question',
+                'get_response',
+                'get_responses',
+                'finish_assessment_section',
+                'finish_assessment',
+                'is_answer_available',
+                'get_answers']:
+            decorators.append('{0}@_check_effective'.format(self._ind))
         return decorators
 
     def _get_method_sig(self, method, interface):

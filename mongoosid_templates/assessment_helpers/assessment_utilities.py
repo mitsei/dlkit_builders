@@ -1,17 +1,15 @@
 """Utilities for use by assessment package implementations"""
 
 from dlkit.abstract_osid.osid.errors import NotFound, NullArgument
-from dlkit.absract_osid.assessment.objects import Assessment as abc_assessment
+from dlkit.abstract_osid.assessment.objects import Assessment as abc_assessment
 from ..utilities import get_provider_manager
-from ..assessment.objects import AssessmentSection
-
 
 def get_first_part_id_for_assessment(assessment_id, runtime=None, proxy=None, create=False, bank_id=None):
     """Gets the first part id, which represents the first section, of assessment"""
     if create and bank_id is None:
         raise NullArgument('Bank Id must be provided for create option')
     try:
-        return get_next_part_id(part_id=assessment_id, runtime, proxy)[0]
+        return get_next_part_id(assessment_id, runtime, proxy)[0]
     except IllegalState:
         if create:
             return create_first_assessment_section(assessment_id, runtime, proxy, bank_id)
@@ -60,10 +58,6 @@ def get_level_delta(part1_id, part2_id, runtime, proxy):
             level = level + increment
             part = part.get_assessment_part()
         return level
-        
-    
-        
-        
 
 def get_decision_objects(part_id, runtime, proxy):
     assessment_lookup_session, part_lookup_session, rule_lookup_session = get_lookup_sessions(runtime, proxy)
@@ -133,8 +127,24 @@ def get_first_successful_sequence_rule_for_part(part_id, rule_lookup_session):
 
 def get_assessment_section(self, section_id, runtime=None, proxy=None):
     """Gets a Section given a section_id"""
+    from .objects import AssessmentSection
     collection = MongoClientValidated('assessment',
                                       collection='AssessmentSection',
                                       runtime=self._runtime)
     result = collection.find_one(dict({'_id': ObjectId(assessment_id.get_identifier())}))
     return AssessmentSection(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
+
+def get_default_part_map(self, part_id, level):
+    return {
+        'assessmentPartId': str(part_id),
+        'level': level
+    }
+
+def get_default_question_map(self, item_id, question_id, assessment_part_id, display_elements):
+    return {
+        'itemId': str(item_id),
+        'questionId': str(question_id),
+        'assessmentPartId': str(assessment_part_id),
+        'displayElements': display_elements,
+        'responses': [None]
+    }
