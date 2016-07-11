@@ -37,6 +37,13 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0):
     return next_part_id, level
 
 def get_level_delta(part1_id, part2_id, runtime, proxy):
+    def count_levels(part, increment):
+        level = 0
+        while part.has_assessment_part():
+            level = level + increment
+            part = part.get_assessment_part()
+        return level
+
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime, proxy)
     lookup_session = mgr.get_assessment_part_lookoup_session(proxy=proxy)
     part1 = lookup_session.get_assessment_part(part1_id)
@@ -51,18 +58,11 @@ def get_level_delta(part1_id, part2_id, runtime, proxy):
     else:
         return 0
 
-    def count_levels(part, increment):
-        level = 0
-        while part.has_assessment_part():
-            level = level + increment
-            part = part.get_assessment_part()
-        return level
-
 def get_decision_objects(part_id, runtime, proxy):
     assessment_lookup_session, part_lookup_session, rule_lookup_session = get_lookup_sessions(runtime, proxy)
     sibling_ids = []
     try:
-        part = part_lookup_session.get_part(part_id)
+        part = part_lookup_session.get_assessment_part(part_id)
     except NotFound: # perhaps this is an assessment masquerading as a part:
         part = assessment_lookup_session.get_assessment(part_id)
     else:
