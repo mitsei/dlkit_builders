@@ -346,7 +346,12 @@ class AssessmentPart:
     import_statements = [
         'from ..assessment.objects import Bank',
         'from ..id.objects import IdList',
+        'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
+        """SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
+    'authority': 'ODL.MIT.EDU',
+    'namespace': 'osid-object',
+    'identifier': 'simple-child-sequencing'})""",
     ]
 
     is_section = """
@@ -371,15 +376,11 @@ class AssessmentPart:
         return False
 
     def has_children(self):
-        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
-        return False
-
-    def supports_simple_child_sequencing(self):
-        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
-        return False
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        return self._supports_simple_sequencing() and self._my_map['childIds']
 
     def are_items_sequential(self):
-        \"\"\"This can be overwridden by a record extension\"\"\"
+        \"\"\"This can be overridden by a record extension\"\"\"
         return True
 
     def are_items_shuffled(self):
@@ -408,6 +409,9 @@ class AssessmentPart:
             for idstr in self._my_map['itemIds']:
                 item_ids.append(idstr)
         return IdList(item_ids)
+
+    def _supports_simple_sequencing(self):
+        return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])
 
     def has_next_assessment_part(self, assessment_part_id):
         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
@@ -481,25 +485,31 @@ class AssessmentPartForm:
         self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]
         self._my_map['allocatedTime'] = self._allocated_time_default
         self._my_map['itemsSequential'] = self._items_sequential_default
-        self._my_map['itemsShuffled'] = self._items_shuffled_default"""
+        self._my_map['itemsShuffled'] = self._items_shuffled_default
+        if self._supports_simple_sequencing():
+            self._my_map['childIds'] = []"""
 
     # Need to add metadata as well, but perhaps these should be in record extension
     additional_methods = """
     def set_items_sequential(self, sequential):
+        if not self._supports_simple_sequencing:
+            raise AttributeError('This Assessment Part does not support simple child sequencing')
         self._my_map['itemsSequential'] = sequential
 
     def set_items_shuffled(self, shuffled):
+        if not self._supports_simple_sequencing:
+            raise AttributeError('This Assessment Part does not support simple child sequencing')
         self._my_map['itemsShuffled'] = shuffled
 
     def set_children_sequential(self, sequential): # This should be set in a record
-        if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing')
-        self._my_map['itemsSequential'] = sequential
+        if not self._supports_simple_sequencing:
+            raise AttributeError('This Assessment Part does not support simple child sequencing')
+        self._my_map['childrenSequential'] = sequential
 
     def set_children_shuffled(self, shuffled):
-        if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing')
-        self._my_map['itemsShuffled'] = shuffled
+        if not self._supports_simple_sequencing:
+            raise AttributeError('This Assessment Part does not support simple child sequencing')
+        self._my_map['childrenShuffled'] = shuffled
 
     def get_children_metadata(self):
         \"\"\"Gets the metadata for children.
@@ -508,8 +518,8 @@ class AssessmentPartForm:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing')
+        if not self._supports_simple_sequencing:
+            raise AttributeError('This Assessment Part does not support simple child sequencing')
         metadata = dict(self._mdata['children'])
         metadata.update({'existing_children_values': self._my_map['childIds']})
         return Metadata(**metadata)
@@ -526,8 +536,8 @@ class AssessmentPartForm:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing')
+        if not self._supports_simple_sequencing():
+            raise AttributeError('This Assessment Part does not support simple child sequencing')
         if not isinstance(child_ids, list):
             raise errors.InvalidArgument()
         if self.get_children_metadata().is_read_only():
@@ -548,8 +558,8 @@ class AssessmentPartForm:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        if not self._is_simple_sequence:
-            raise IllegalState('This Assessment Part does not support simple child sequencing')
+        if not self._supports_simple_sequencing():
+            raise AttributeError('This Assessment Part does not support simple child sequencing')
         if (self.get_children_metadata().is_read_only() or
                 self.get_children_metadata().is_required()):
             raise errors.NoAccess()
@@ -557,5 +567,5 @@ class AssessmentPartForm:
 
     children = property(fset=set_children, fdel=clear_children)
 
-    def _is_simple_sequence(self):
-        return bool(SIMPLE_SEQUENCE_RECORD_TYPE in self._my_map['recordTypeIds'])"""
+    def _supports_simple_sequencing(self):
+        return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])"""
