@@ -91,12 +91,8 @@ class AssessmentSession:
                 if not assessment_taken.has_started() or assessment_taken.has_ended():
                     raise errors.IllegalState()
             return func(*args, **kwargs)
-        return wrapper
+        return wrapper"""
 
-    # In case someone inherits this class.
-    # (per http://stackoverflow.com/questions/1263451/python-decorators-in-classes):
-    #_check_effective = staticmethod(_check_effective)"""
-    
     can_take_assessments = """
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
@@ -173,12 +169,12 @@ class AssessmentSession:
     ## Has this method has been deprecated???
     ## IMPLEMENT ME?
     has_assessment_section_begun = """
-        return self._get_assessment_section(assessment_section_id).get_assessment_taken().has_started()"""
+        return self.get_assessment_section(assessment_section_id)._assessment_taken().has_started()"""
     
     ## Has this method has been deprecated???
-    ## IMPLEMENT ME?
+    ## Is this the right way to check if section is over (probably not)
     is_assessment_section_over = """
-        return self._get_assessment_section(assessment_section_id).get_assessment_taken().has_ended()"""
+        return self.get_assessment_section(assessment_section_id)._assessment_taken().has_ended()"""
     
     ## This method has been deprecated:
     finished_assessment_section = """
@@ -1409,7 +1405,7 @@ class AssessmentSection:
 
     def _initialize_part_map(self):
         \"\"\"Sets up assessmentPartMap with as much information as is initially available.\"\"\"
-        #self._my_map['assessmentParts'] = {}
+        self._my_map['assessmentParts'] = []
         self._my_map['questions'] = []
         item_ids = self._assessment_part_id().get_item_ids()
         if item_ids.available():
@@ -1484,7 +1480,7 @@ class AssessmentSection:
     #       'partId': <idstr of the part this question came from>
     #       'labelElements': <list for constructing label, based on part levels, like [3, 1, 2]
     #       'responses: [{
-    #           'response': {<dict of the student's Response or None>},
+    #           'answer': {<dict of the student's Response or None>},
     #           'timeStamp: <DateTime of Response>
     #           }, <etc for additional responses>]
     #       }, <etc for additional questions>]
@@ -1495,51 +1491,6 @@ class AssessmentSection:
         if item_ids.available():
             return True
         return False
-
-    ## Do we really need this?
-    # def get_first_part(self):
-    #     \"\"\"Gets the first part for this Section.\"\"\"
-    #     if not self._my_map['assessmentParts']:
-    #         first_part_id = get_first_part_id_for_assessment(self._assessment_part_id,
-    #                                                          runtime=self._runtime,
-    #                                                          proxy=self._proxy)
-    #         self._my_map['assessmentParts'] = [get_default_part_map(first_part_id, [1])]
-    #         self._save()
-    #         return self._get_assessment_part(first_part_id)
-    #     else:
-    #         return self._get_assessment_part(Id(self._my_map['assessmentParts'][0]['assessmentPartId']))
-    #     return first_section
-
-    ## Do we really need this?
-    # def _get_next_part(self, part_id):
-    #     \"\"\"Gets the next part following part_id.\"\"\"
-    #     if self._is_simple_section():
-    #         raise IllegalState('No more AssessmentParts in this Section')
-    #     next_part_id, level = get_next_part_id(part_id,
-    #                                            runtime=self._runtime,
-    #                                            proxy=self._proxy) # Raises IllegalState
-    #     if str(next_part_id) not in self._my_map['assessmentParts']:
-    #         self._my_map['assessmentParts'][str(next_part_id)] = level
-    #     self._save()
-    #     return next_part_id
-
-    ## Do we really need this?
-    # def _get_index_for_part(self, part_id):
-    #     \"\"\"Gets the index of part in assessmentPart list. Assumes part is in list.\"\"\"
-    #     index = 0
-    #     for part_map in self._my_map['assessmentParts']:
-    #         if part_map['assessmentPartId'] == str(part_id):
-    #             return index
-    #         index += 1
-
-    ## Do we really need this?
-    # def _get_taken_parts(self):
-    #     \"\"\"Gets a PartList of all Parts currently known to this Session\"\"\"
-    #     part_list = []
-    #     for part_map in self._my_map['assessmentParts']:
-    #         part_idstr = part_map['assessmentPartId']
-    #         part_list.append(self._get_assessment_part(Id(part_idstr)))
-    #     return AssessmentPartList(part_list, runtime=self._runtime, proxy=self._proxy)
 
     def _get_assessment_part(self, part_id):
         \"\"\"Gets an AssessmentPart given a part_id\"\"\"
@@ -1622,12 +1573,6 @@ class AssessmentSection:
         session.use_federated_bank_view()
         return session
 
-    def _get_assessment_part_item_session(self):
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        session = mgr.get_assessment_part_item_session(proxy=self._proxy)
-        session.use_federated_bank_view()
-        return session
-
     def _get_questions(self, answered=None):
         prev_question_answered = True
         question_list = []
@@ -1661,23 +1606,29 @@ class AssessmentSection:
         \"\"\"Inspects question map to return the next available question.\"\"\"
         # self._update() # Make sure we are current with database. Do we need this?
         self._update_questions() # Make sure questions list is current
-        for question_map in part_map['questions']:
-            if question_map['question_id'] == str(question_id):
-                question_answered = bool(question_map['responses'][0])
-                if answered is None or question_answered == answered:
-                    return self._get_question(Id(question_map['question_id']))
-        raise IllegalState('No more Questions currently available for this Section')
-
-    #NEED TO IMPLEMENT:
-    def _get_previous_question(self, question_id, answered=None):
-        \"\"\"Inspects question map to return the next available question.\"\"\"
-        # self._update() # Make sure we are current with database. Do we need this?
-        self._update_questions() # Make sure questions list is current
+        if self._my_map['questions'][-1]['question_id'] == str(question_id):
+            raise IllegalState('No more Questions currently available for this Section')
         for question_map in self._my_map['questions']:
             if question_map['question_id'] == str(question_id):
                 question_answered = bool(question_map['responses'][0])
                 if answered is None or question_answered == answered:
                     return self._get_question(Id(question_map['question_id']))
+        ### SHOULD THIS RAISE NotFound?
+        raise IllegalState('No more Questions currently available for this Section')
+
+    ### THIS IS STILL NOT RIGHT.  LOOK AT previous_question_map.  what if unanswered?
+    def _get_previous_question(self, question_id, answered=None):
+        \"\"\"Inspects question map to return previous next question.\"\"\"
+        # self._update() # Make sure we are current with database. Do we need this?
+        self._update_questions() # Make sure questions list is current
+        if self._my_map['questions'][0]['question_id'] == str(question_id):
+            raise IllegalState('No previous Questions available for this Section')
+        for question_map in self._my_map['questions']:
+            if question_map['question_id'] == str(question_id):
+                return self._get_question(Id(question_map['question_id']))
+            else:
+                previous_question_map = question_map
+        ### SHOULD THIS RAISE NotFound?
         raise IllegalState('No more Questions currently available for this Section')
 
     def _submit_response(self, item_id, answer_form=None):
