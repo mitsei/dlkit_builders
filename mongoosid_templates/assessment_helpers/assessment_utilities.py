@@ -3,7 +3,14 @@
 from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
 from dlkit.abstract_osid.assessment.objects import Assessment as abc_assessment
 from ..utilities import get_provider_manager
+from dlkit.primordium.type.primitives import Type
 from bson import ObjectId
+
+SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
+    'authority': 'ODL.MIT.EDU',
+    'namespace': 'osid-object',
+    'identifier': 'simple-child-sequencing'})
+
 
 def get_first_part_id_for_assessment(assessment_id, runtime=None, proxy=None, create=False, bank_id=None):
     """Gets the first part id, which represents the first section, of assessment"""

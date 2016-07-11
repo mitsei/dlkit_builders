@@ -812,7 +812,7 @@ class AssessmentBasicAuthoringSession:
         #'from ..primitives import Id',
         'from . import objects',
         'from ..osid.sessions import OsidSession',
-        'from .assessment_utilities import get_first_part_id_for_assessment'
+        'from .assessment_utilities import get_first_part_id_for_assessment',
     ]
     
     init = """
@@ -975,6 +975,32 @@ class Item:
 class Assessment:
 
     additional_methods = """
+    def has_children(self):
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        return self._supports_simple_sequencing() and self._my_map['childIds']
+
+    def has_next_assessment_part(self, assessment_part_id):
+        \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
+        if not self.supports_child_ordering or not self.supports_simple_child_sequencing:
+            raise AttributeError() # Only available through a record extension
+        if 'childIds' in self._my_map and str(assessment_part_id) in self._my_map['childIds']:
+            if self._my_map['childIds'][-1] != str(assessment_part_id):
+                return True
+            else:
+                return False
+        raise errors.NotFound('the Part with Id ' + str(assessment_part_id) + ' is not a child of this Part')
+
+    def get_next_assessment_part_id(self, assessment_part_id):
+        \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
+        if self.has_next_assessment_part(assessment_part_id):
+            return Id(self._my_map['childIds'][self._my_map['childIds'].index(str(assessment_part_id)) + 1])
+
+    def get_next_assessment_part(self, assessment_part_id):
+        next_part_id = self.get_next_assessment_part_id(assessment_part_id)
+        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        return lookup_session.get_assessment_part(next_part_id)
+
     def are_items_sequential():
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return False
@@ -983,9 +1009,8 @@ class Assessment:
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return False
 
-    def supports_simple_child_sequencing():
-        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
-        return False
+    def _supports_simple_sequencing(self):
+        return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])
 
     def get_object_map(self):
         obj_map = dict(self._my_map)
