@@ -79,6 +79,15 @@ class AssessmentPartLookupSession:
         else:
             return self._provider_session.use_unsequestered_assessment_part_view()"""
 
+    additional_methods = """
+    def get_assessment_parts_for_assessment_part(self, assessment_part_id):
+        # NOT IN SPEC - Implemented from
+        # osid.assessment_authoring.AssessmentPartLookupSession.additional_methods
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessment_parts_for_assessment_part(assessment_part_id)"""
+
 class AssessmentPartAdminSession:
     alias_assessment_part = """
         # Implemented from azosid template for -
@@ -257,6 +266,45 @@ class SequenceRuleLookupSession:
         else:
             return self._provider_session.get_sequence_rules()"""
 
+class AssessmentAuthoringManager:
+    # The following is here only until Tom fixes spec and adds these methods
+    additional_methods = """
+    def get_assessment_part_item_session(self):
+        return self._provider_manager.get_assessment_part_item_session()
+
+    assessment_part_item_session = property(fget=get_assessment_part_item_session)
+
+    def get_assessment_part_item_session_for_bank(self, bank_id):
+        return self._provider_manager.get_assessment_part_item_session_for_bank(bank_id)
+
+    def get_assessment_part_item_design_session(self):
+        return self._provider_manager.get_assessment_part_item_design_session()
+
+    assessment_part_item_design_session = property(fget=get_assessment_part_item_design_session)
+
+    def get_assessment_part_item_design_session_for_bank(self, bank_id):
+        return self._provider_manager.get_assessment_part_item_design_session_for_bank(bank_id)"""
+
+
+class AssessmentAuthoringProxyManager:
+    # The following is here only until Tom fixes spec and adds these methods
+    additional_methods = """
+    def get_assessment_part_item_session(self, proxy):
+        return self._provider_manager.get_assessment_part_item_session(proxy)
+
+    assessment_part_item_session = property(fget=get_assessment_part_item_session)
+
+    def get_assessment_part_item_session_for_bank(self, bank_id, proxy):
+        return self._provider_manager.get_assessment_part_item_session_for_bank(bank_id, proxy)
+
+    def get_assessment_part_item_design_session(self, proxy):
+        return self._provider_manager.get_assessment_part_item_design_session(proxy)
+
+    assessment_part_item_design_session = property(fget=get_assessment_part_item_design_session)
+
+    def get_assessment_part_item_design_session_for_bank(self, bank_id, proxy):
+        return self._provider_manager.get_assessment_part_item_design_session_for_bank(bank_id, proxy)"""
+
 
 class AssessmentAuthoringProfile:
     import_statements_pattern = [
@@ -340,6 +388,16 @@ class AssessmentAuthoringProfile:
         # Implemented from azosid template for -
         # osid.assessment_authoring.AssessmentAuthoringProfile.supports_assessment_part_lookup
         return self._provider_manager.supports_assessment_part_lookup()"""
+
+    supports_assessment_part_item_design = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.supports_assessment_part_item_design
+        return self._provider_manager.supports_assessment_part_item_design()"""
+
+    supports_assessment_part_item = """
+        # Implemented from azosid template for -
+        # osid.assessment_authoring.AssessmentAuthoringProfile.supports_assessment_part_item
+        return self._provider_manager.supports_assessment_part_item()"""
 
     supports_sequence_rule_admin = """
         # Implemented from azosid template for -

@@ -9,12 +9,9 @@ class ResourceProfile:
     def __init__(self, interface_name):
         osid_managers.OsidProfile.__init__(self)
 
-    def _get_hierarchy_session(self):
+    def _get_hierarchy_session(self, proxy=None):
         try:
-            return self._provider_manager.get_${cat_name_under}_hierarchy_session(
-                Id(authority='${pkg_name_replaced_upper}',
-                   namespace='CATALOG',
-                   identifier='${cat_name_upper}'))
+            return self._provider_manager.get_${cat_name_under}_hierarchy_session(proxy)
         except Unsupported:
             return None
 """
@@ -138,7 +135,7 @@ class ResourceProxyManager:
                 self._provider_manager.${method_name}(proxy),
                 self._get_authz_session(),
                 proxy,
-                hierarchy_session=self._get_hierarchy_session(),
+                hierarchy_session=self._get_hierarchy_session(proxy),
                 query_session=query_session)
         except AttributeError:
             raise OperationFailed()"""
@@ -156,7 +153,7 @@ class ResourceProxyManager:
                 self._provider_manager.${method_name}(${arg0_name}, proxy),
                 self._get_authz_session(),
                 proxy,
-                hierarchy_session=self._get_hierarchy_session(),
+                hierarchy_session=self._get_hierarchy_session(proxy),
                 query_session=query_session)
         except AttributeError:
             raise OperationFailed()"""

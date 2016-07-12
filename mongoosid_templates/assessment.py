@@ -83,11 +83,17 @@ class AssessmentSession:
         \"\"\"
         def wrapper(*args, **kwargs):
             if ('assessment_section_id' in kwargs or 
-                    args and 'Section' in args[0].get_identifier_namespace()):
-                if (not self.has_assessment_section_begun(assessment_section_id) or
-                        self.is_assessment_section_over(assessment_section_id)):
+                    args and 'Section' in args[1].get_identifier_namespace()):
+                assessment_section_id = kwargs['assessment_section_id']
+                if (not args[0].has_assessment_section_begun(assessment_section_id) or
+                        args[0].is_assessment_section_over(assessment_section_id)):
                     raise errors.IllegalState()
             else:
+                if 'assessment_taken_id' in kwargs:
+                    assessment_taken_id = kwargs['assessment_taken_id']
+                else:
+                    assessment_taken_id = args[1]
+                assessment_taken = args[0]._get_assessment_taken(assessment_taken_id)
                 if not assessment_taken.has_started() or assessment_taken.has_ended():
                     raise errors.IllegalState()
             return func(*args, **kwargs)
@@ -983,6 +989,13 @@ class Assessment:
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return self._supports_simple_sequencing() and self._my_map['childIds']
 
+    def get_child_ids(self):
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        if self._supports_simple_sequencing():
+            return IdList(self._my_map['childIds'])
+        else:
+            raise errors.IllegalState()
+
     def has_next_assessment_part(self, assessment_part_id):
         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
         if not self.supports_child_ordering or not self.supports_simple_child_sequencing:
@@ -1024,6 +1037,47 @@ class Assessment:
 
     object_map = property(fget=get_object_map)"""
 
+
+class AssessmentForm:
+
+    import_statements = [
+        "from .assessment_utilities import SIMPLE_SEQUENCE_RECORD_TYPE"
+    ]
+
+    init = """
+    _namespace = 'assessment.Assessment'
+
+    def __init__(self, **kwargs):
+        osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT', **kwargs)
+        self._mdata = dict(default_mdata.ASSESSMENT)
+        self._init_metadata(**kwargs)
+        if not self.is_for_update():
+            self._init_map(**kwargs)
+
+    def _init_metadata(self, **kwargs):
+        \"\"\"Initialize form metadata\"\"\"
+        osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
+        self._rubric_default = self._mdata['rubric']['default_id_values'][0]
+        self._level_default = self._mdata['level']['default_id_values'][0]
+
+    def _init_map(self, record_types=None, **kwargs):
+        \"\"\"Initialize form map\"\"\"
+        osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
+        self._my_map['rubricId'] = self._rubric_default
+        self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]
+        self._my_map['levelId'] = self._level_default
+        if self._supports_simple_sequencing():
+            self._my_map['childIds'] = []"""
+
+    additional_methods = """
+    def _supports_simple_sequencing(self):
+        return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])
+
+    def set_children(self, child_ids):
+        \"\"\"Set the children IDs\"\"\"
+        if not self._supports_simple_sequencing():
+            raise errors.IllegalState()
+        self._my_map['childIds'] = [str(i) for i in child_ids]"""
 
 class AssessmentOffered:
     
@@ -1210,7 +1264,7 @@ class AssessmentTaken:
         while not finished:
             try:
                 section_id = self._get_next_assessment_section(section_id)
-            except IllegalState:
+            except errors.IllegalState:
                 finished = True                
             
     def _get_first_assessment_section(self):
@@ -1220,16 +1274,16 @@ class AssessmentTaken:
             # SHOULD THIS USE self._update_available_sections????
             assessment_id = self.get_assessment_offered().get_assessment().get_id()
             first_part_id = get_first_part_id_for_assessment(assessment_id, runtime=self._runtime, proxy=self._proxy)
-            init_map = {'assessmentPartId': first_part_id,
-                        'assessmentTakenId': self.get_id()}
-            first_section = AssessmentSection(object_map=init_map, runtime=self._runtime, proxy=self._proxy)
+            init_map = {'assessmentPartId': str(first_part_id),
+                        'assessmentTakenId': str(self.get_id()),
+                        'recordTypeIds': []}
+            first_section = AssessmentSection(osid_object_map=init_map, runtime=self._runtime, proxy=self._proxy)
             self._my_map['sections'] = [str(first_section.get_id())]
             self._my_map['actualStartTime'] = DateTime.now()
             self._save()
             return first_section
         else:
             return get_assessment_section(self._my_map['sections'][0])
-        return first_section
 
     def _get_next_assessment_section(self, assessment_section_id):
         \"\"\"Gets the next section following section_id. 
@@ -1347,7 +1401,7 @@ class AssessmentTaken:
             return now >= assessment_offered.get_deadline()
         elif assessment_offered.has_duration() and self._my_map['actualStartTime'] is not None:
             return now >= self._my_map['actualStartTime'] + assessment_offered.get_duration()
-        elif self._my_map[completionTime] is not None:
+        elif self._my_map['completionTime'] is not None:
             return True
         else:
             return False"""
@@ -1420,14 +1474,20 @@ class AssessmentSection:
         self._assessment_taken_id = Id(self._my_map['assessmentTakenId'])
 
         assessment_mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        taken_lookup_session = assessment_mgr.get_assessment_taken_lookup_session()
+        if self._proxy:
+            taken_lookup_session = assessment_mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
+        else:
+            taken_lookup_session = assessment_mgr.get_assessment_taken_lookup_session()
         taken_lookup_session.use_federated_bank_view()
-        self._assessment_taken = self._get_my_assessment_taken()
+        self._assessment_taken = taken_lookup_session.get_assessment_taken(self._assessment_taken_id)
 
         authoring_mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        part_lookup_session = authoring_mgr.get_assessment_part_lookup_session()
+        if self._proxy:
+            part_lookup_session = authoring_mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        else:
+            part_lookup_session = authoring_mgr.get_assessment_part_lookup_session()
         part_lookup_session.use_federated_bank_view()
-        self._assessment_part = self._get_my_assessment_part()
+        self._assessment_part = part_lookup_session.get_assessment_part(self._assessment_part_id)
 
         if 'questions' not in self._my_map: # This is the first instantiation
             self._initialize_part_map()
@@ -1436,7 +1496,7 @@ class AssessmentSection:
         \"\"\"Sets up assessmentPartMap with as much information as is initially available.\"\"\"
         self._my_map['assessmentParts'] = []
         self._my_map['questions'] = []
-        item_ids = self._assessment_part_id().get_item_ids()
+        item_ids = self._assessment_part.get_item_ids()
         if item_ids.available():
             # This is a simple section:
             self._load_simple_section_questions(item_ids)
@@ -1454,7 +1514,8 @@ class AssessmentSection:
             self._my_map['questions'].append(get_default_question_map(
                 item.get_id(),
                 question_id,
-                self._assessment_part_id),
+                self._assessment_part_id,
+                {}),
                 label_elements = [display_num])
             display_num += 1
         self._save()
@@ -1525,7 +1586,7 @@ class AssessmentSection:
         \"\"\"Gets an AssessmentPart given a part_id\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
-        lookoup_session.use_federated_bank_view()
+        lookup_session.use_federated_bank_view()
         return lookup_session.get_assessment_part(part_id)
 
     def _update(self):
@@ -1538,7 +1599,7 @@ class AssessmentSection:
         collection = MongoClientValidated('assessment',
                                           collection='AssessmentSection',
                                           runtime=self._runtime)
-        self._my_map = collection.find_one({'_id': sef._my_map['_id']})
+        self._my_map = collection.find_one({'_id': self._my_map['_id']})
 
     def _update_questions(self):
         if self._update_part_map():
@@ -1556,15 +1617,15 @@ class AssessmentSection:
             prev_part_id = part_id
             try:
                 part_id, delta = get_next_part_id(part_id, runtime=self._runtime, proxy=self._proxy)
-            except IllegalState:
+            except errors.IllegalState:
                 finished = True
             else:
                 if self._get_part_lookup_session().get_part(part_id).has_items():
                     if str(part_id) not in self._my_map['assessmentParts']:
-                        insert_part_map()
+                        self.insert_part_map()
         return updated
 
-        def insert_part_map():
+        def insert_part_map(self):
             part_index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
             absolute_level = prev_part_map['absolute_level'] + level
             self._my_map['assessmentParts'].insert(part_index, get_default_part_map(part_id), absolute_level)

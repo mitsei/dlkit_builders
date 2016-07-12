@@ -236,17 +236,17 @@ class AssetCompositionSession:
     can_access_asset_compositions = """
         return self._can('access')"""
 
-    get_composition_assets = """
+    get_composition_assets_template = """
         if not self._can('access'):
             raise PermissionDenied()
         else:
-            return self._provider_session.get_composition_assets(composition_id)"""
+            return self._provider_session.${method_name}(${arg0_name})"""
 
-    get_compositions_by_asset = """
+    get_compositions_by_asset_template = """
         if not self._can('access'):
             raise PermissionDenied()
         else:
-            return self._provider_session.get_compositions_by_asset(asset_id)"""
+            return self._provider_session.${method_name}(${arg0_name})"""
 
 
 class AssetCompositionDesignSession:
@@ -261,33 +261,33 @@ class AssetCompositionDesignSession:
     can_compose_assets = """
         return self._can('compose')"""
 
-    add_asset = """
+    add_asset_template = """
         if not self._can('compose'):
             raise PermissionDenied()
         else:
-            return self._provider_session.add_asset(asset_id, composition_id)"""
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
-    move_asset_ahead = """
+    move_asset_ahead_template = """
         if not self._can('compose'):
             raise PermissionDenied()
         else:
-            return self._provider_session.move_asset_ahead(asset_id, composition_id, reference_id)"""
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name}, ${arg2_name})"""
 
-    move_asset_behind = """
+    move_asset_behind_template = """
         if not self._can('compose'):
             raise PermissionDenied()
         else:
-            return self._provider_session.move_asset_behind(asset_id, composition_id, reference_id)"""
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name}, ${arg2_name})"""
 
-    order_assets = """
+    order_assets_template = """
         if not self._can('compose'):
             raise PermissionDenied()
         else:
-            return self._provider_session.order_assets(asset_ids, composition_id)"""
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
-    remove_asset = """
+    remove_asset_template = """
         if not self._can('compose'):
             raise PermissionDenied()
         else:
-            return self._provider_session.remove_asset(asset_id, composition_id)"""
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 

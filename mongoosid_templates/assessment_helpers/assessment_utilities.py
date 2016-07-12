@@ -3,6 +3,7 @@
 from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
 from dlkit.abstract_osid.assessment.objects import Assessment as abc_assessment
 from ..utilities import get_provider_manager, MongoClientValidated
+from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 from bson import ObjectId
 
@@ -30,7 +31,7 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0):
         next_part_id = rule.get_next_assessment_part_id()
         level = get_level_delta(part_id, next_part_id, runtime, proxy)
     elif part.has_children(): # This is a special AssessmentPart that can manage child Parts
-        next_part_id = part.get_child_ids()[0]
+        next_part_id = part.get_child_ids().next()
         level = level + 1
     elif siblings and siblings[-1] != part_id:
         next_part_id = siblings[siblings.index(part_id) + 1]
@@ -95,12 +96,12 @@ def create_first_assessment_section(assessment_id, runtime, proxy, bank_id):
     # part_form.set_weight(100) # Uncomment this line when set_weight is implemented
     # Should we set allocated time?
     part_id = part_admin_session.create_assessment_part_for_assessment(part_form).get_id()
-    if assessment.supports_simple_child_sequencing():
-        child_ids = assessment.get_child_ids()
+    if assessment._supports_simple_sequencing():
+        child_ids = list(assessment.get_child_ids())
         child_ids.insert(0, str(part_id))
         update_form = assessment_admin_session.get_assessment_form_for_update(assessment.get_id())
-        update_form.set_children(child_ids)
-        assessment_admin_session.update_assessment(assessment.get_id())
+        update_form.set_children([Id(i) for i in child_ids])
+        assessment_admin_session.update_assessment(update_form)
     else:
         rule_form = rule_admin_session.get_rule_form_for_create(assessment.get_id(), part_id, [])
         rule_form.set_display_name('First Part Rule')

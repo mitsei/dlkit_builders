@@ -792,6 +792,12 @@ class AssetContentForm:
         self._my_map['data'] = self._data_default
         del self._my_map['base64']"""
 
+    get_url_metadata = """
+        # Should be templated...but that sets 'existing_url_values' instead of 'existing_string_values'
+        metadata = dict(self._mdata['url'])
+        metadata.update({'existing_string_values': [self._my_map['url']]})
+        return Metadata(**metadata)"""
+
 class Composition:
     
     ## This two methods are defined here because of an inconsistency with
