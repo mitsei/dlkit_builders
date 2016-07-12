@@ -1516,7 +1516,7 @@ class AssessmentSection:
                 item.get_id(),
                 question_id,
                 self._assessment_part_id,
-                {}),
+                []),
                 label_elements = [display_num])
             display_num += 1
         self._save()
@@ -1615,8 +1615,8 @@ class AssessmentSection:
     def _update_part_map(self, part_id=None):
         def insert_part_map():
             part_index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
-            absolute_level = prev_part_map['absolute_level'] + level
-            self._my_map['assessmentParts'].insert(part_index, get_default_part_map(part_id), absolute_level)
+            absolute_level = prev_part_map['level'] + delta
+            self._my_map['assessmentParts'].insert(part_index, get_default_part_map(part_id, absolute_level))
             updated = True
 
         if part_id is None:
@@ -1626,6 +1626,8 @@ class AssessmentSection:
         finished = False
         updated = False
         while not finished:
+            # TODO
+            prev_part = self._get_part_lookup_session().get_part(prev_part_id) # 0 if doesn't exist
             prev_part_id = part_id
             try:
                 part_id, delta = get_next_part_id(part_id, runtime=self._runtime, proxy=self._proxy)
@@ -1643,9 +1645,10 @@ class AssessmentSection:
 
             if (len(self._my_map['questions']) == index or 
                     self._my_map['questions'][index]['assessmentPartId'] != part_map['assessmentPartId']):
+                    part_id = part_map['assessmentPartId']
                 for item in self._get_part_lookup_session().get_part(part_id).get_items():
                     self._my_map['questions'].insert(index, get_default_question_map(
-                        item.get_id(), item.get_question().get_id(), {}))
+                        item.get_id(), item.get_question().get_id(), []))
                     index += 1
                     
             else: # skip through all remaining questions for this part
@@ -1688,6 +1691,8 @@ class AssessmentSection:
 
     def _get_question(self, question_id):
         # This is where we might inject a new display_name
+        # TODO: use magic sessions here, and also modify the question
+        # to
         return self._get_item_lookup_session().get_item(question_id).get_question()
 
     def _get_answers(self, question_id):
@@ -1738,7 +1743,7 @@ class AssessmentSection:
         else:
             response = dict(answer_form._my_map)
             response['submissionTime'] = DateTime.now()
-        for question_map in part_map['questions']:
+        for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(item_id):
                 if question_map['responses'][0] is None: # No existing attempts
                     question_map['responses'] = []
@@ -1771,7 +1776,7 @@ class AssessmentSection:
         return ResponseList()
 
     def _is_question_answered(self, item_id):
-        for question_map in part_map['questions']:
+        for question_map in self._my_map['questions']:
             if question_map['questionId'] == item_id:
                 if question_map['responses'][0]:
                     return True
@@ -1788,7 +1793,7 @@ class AssessmentSection:
         \"\"\"
         #self._update() # Make sure we are current with database
         self._update_questions() # Make sure questions list is current
-        for question_map in part_map['questions']:
+        for question_map in self._my_map['questions']:
             if not question_map['responses'][0]:
                 return False
         return True"""

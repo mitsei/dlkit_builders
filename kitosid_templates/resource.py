@@ -800,6 +800,13 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.delete_bin
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
+    alias_bin_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.BinAdminSession.alias_bin
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+
 class BinHierarchySession:
 
     get_bin_hierarchy_id_template = """
