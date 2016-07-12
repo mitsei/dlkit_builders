@@ -1170,13 +1170,13 @@ class AssessmentOffered:
         return bool(self._my_map['itemsShuffled'])"""
 
     additional_methods = """
-    def are_sections_sequential():
+    def are_sections_sequential(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
             return True
         return True
 
-    def are_sections_shuffled():
+    def are_sections_shuffled(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
             return False
@@ -1232,7 +1232,7 @@ class AssessmentTaken:
         'from .assessment_utilities import get_assessment_section',
         'from dlkit.primordium.id.primitives import Id',
         'from bson.objectid import ObjectId',
-        'from ..primitives import DateTime',
+        'from ..primitives import DateTime, DisplayText',
     ]
     
     additional_methods = """
@@ -1463,6 +1463,7 @@ class AssessmentSection:
         'from .assessment_utilities import get_assessment_section',
         'from .assessment_utilities import get_default_question_map',
         'from .assessment_utilities import get_default_part_map',
+        'from .rules import Response',
     ]
 
     init = """
@@ -1582,11 +1583,16 @@ class AssessmentSection:
             return True
         return False
 
-    def _get_assessment_part(self, part_id):
+    def _get_part_lookup_session(self):
         \"\"\"Gets an AssessmentPart given a part_id\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
+        return lookup_session
+
+    def _get_assessment_part(self, part_id):
+        \"\"\"Gets an AssessmentPart given a part_id\"\"\"
+        lookup_session = self._get_part_lookup_session()
         return lookup_session.get_assessment_part(part_id)
 
     def _update(self):
@@ -1607,6 +1613,12 @@ class AssessmentSection:
             self._save()
 
     def _update_part_map(self, part_id=None):
+        def insert_part_map():
+            part_index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
+            absolute_level = prev_part_map['absolute_level'] + level
+            self._my_map['assessmentParts'].insert(part_index, get_default_part_map(part_id), absolute_level)
+            updated = True
+
         if part_id is None:
             part_id = self._assessment_part_id
         if part_id == self._assessment_part_id and self._is_simple_section():
@@ -1622,14 +1634,8 @@ class AssessmentSection:
             else:
                 if self._get_part_lookup_session().get_part(part_id).has_items():
                     if str(part_id) not in self._my_map['assessmentParts']:
-                        self.insert_part_map()
+                        insert_part_map()
         return updated
-
-        def insert_part_map(self):
-            part_index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
-            absolute_level = prev_part_map['absolute_level'] + level
-            self._my_map['assessmentParts'].insert(part_index, get_default_part_map(part_id), absolute_level)
-            updated = True
 
     def _update_question_map(self):
         index = 0
@@ -1639,7 +1645,7 @@ class AssessmentSection:
                     self._my_map['questions'][index]['assessmentPartId'] != part_map['assessmentPartId']):
                 for item in self._get_part_lookup_session().get_part(part_id).get_items():
                     self._my_map['questions'].insert(index, get_default_question_map(
-                        item.get_id(), item.get_question().get_id))
+                        item.get_id(), item.get_question().get_id(), {}))
                     index += 1
                     
             else: # skip through all remaining questions for this part
@@ -1664,14 +1670,6 @@ class AssessmentSection:
         return session
 
     def _get_questions(self, answered=None):
-        prev_question_answered = True
-        question_list = []
-        self._update()
-        for question_map in self._my_map['questions']:
-            if prev_question_answered == self._are_items_sequential():
-                prev_question_answered = update_question_list(question_map)
-        return QuestionList(question_list, runtime=self._runtime, proxy=self._proxy)
-    
         def update_question_list():
             \"\"\"Supportive function to aid readability of _get_questions.\"\"\"
             question_id = Id(question_map['questionId'])
@@ -1680,12 +1678,20 @@ class AssessmentSection:
                 question_list.append(self._get_question(question_id))
             return question_answered
 
+        prev_question_answered = True
+        question_list = []
+        self._update()
+        for question_map in self._my_map['questions']:
+            if prev_question_answered == self._are_items_sequential():
+                prev_question_answered = update_question_list()
+        return QuestionList(question_list, runtime=self._runtime, proxy=self._proxy)
+
     def _get_question(self, question_id):
         # This is where we might inject a new display_name
-        return self._get_item_lookup_session.get_item(question_id).get_question()
+        return self._get_item_lookup_session().get_item(question_id).get_question()
 
     def _get_answers(self, question_id):
-        return self._get_item_lookup_session.get_item(question_id).get_answers()
+        return self._get_item_lookup_session().get_item(question_id).get_answers()
 
     def _get_first_question(self):
         question_id = Id(self._my_map['questions'][0]['questionId'])
@@ -1697,14 +1703,14 @@ class AssessmentSection:
         # self._update() # Make sure we are current with database. Do we need this?
         self._update_questions() # Make sure questions list is current
         if self._my_map['questions'][-1]['question_id'] == str(question_id):
-            raise IllegalState('No more Questions currently available for this Section')
+            raise errors.IllegalState('No more Questions currently available for this Section')
         for question_map in self._my_map['questions']:
             if question_map['question_id'] == str(question_id):
                 question_answered = bool(question_map['responses'][0])
                 if answered is None or question_answered == answered:
                     return self._get_question(Id(question_map['question_id']))
         ### SHOULD THIS RAISE NotFound?
-        raise IllegalState('No more Questions currently available for this Section')
+        raise errors.IllegalState('No more Questions currently available for this Section')
 
     ### THIS IS STILL NOT RIGHT.  LOOK AT previous_question_map.  what if unanswered?
     def _get_previous_question(self, question_id, answered=None):
@@ -1712,14 +1718,14 @@ class AssessmentSection:
         # self._update() # Make sure we are current with database. Do we need this?
         self._update_questions() # Make sure questions list is current
         if self._my_map['questions'][0]['question_id'] == str(question_id):
-            raise IllegalState('No previous Questions available for this Section')
+            raise errors.IllegalState('No previous Questions available for this Section')
         for question_map in self._my_map['questions']:
             if question_map['question_id'] == str(question_id):
                 return self._get_question(Id(question_map['question_id']))
             else:
                 previous_question_map = question_map
         ### SHOULD THIS RAISE NotFound?
-        raise IllegalState('No more Questions currently available for this Section')
+        raise errors.IllegalState('No more Questions currently available for this Section')
 
     def _submit_response(self, item_id, answer_form=None):
         \"\"\"Updates assessmentParts map to insert an item response.
@@ -1750,8 +1756,8 @@ class AssessmentSection:
                         runtime=self._runtime,
                         proxy=self._proxy))
                 else:
-                    raise IllegalState('No response is currently available for question_id')
-        raise NotFound()
+                    raise errors.IllegalState('No response is currently available for question_id')
+        raise errors.NotFound()
 
     def _get_responses(self):
         answer_list = []
