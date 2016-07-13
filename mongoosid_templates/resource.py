@@ -1037,7 +1037,7 @@ class BinLookupSession:
         if ${arg0_name}.get_identifier() == '000000000000000000000000':
             return self._get_phantom_root_catalog(cat_class=objects.${cat_name}, cat_name='${cat_name}')
         try:
-            result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+            result = collection.find_one({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name_replace}').get_identifier())})
         except errors.NotFound:
             # Try creating an orchestrated ${cat_name}.  Let it raise errors.NotFound()
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
@@ -1243,8 +1243,7 @@ class BinAdminSession:
     alias_bin_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.alias_bin_template
-        # NEED TO FIGURE OUT HOW TO IMPLEMENT THIS SOMEDAY
-        raise errors.Unimplemented()"""
+        self._alias_id(primary_id=${arg0_name}, equivalent_id=alias_id)"""
 
 class BinNotificationSession:
 
@@ -1663,6 +1662,7 @@ ${metadata_initers}    def _init_map(self, record_types=None, **kwargs):
 ${map_super_initers}        ${init_object}._init_map(self, record_types=record_types)
 ${persisted_initers}"""
 
+    # this needs to be re-designed to know about variable syntax type
     get_group_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
         metadata = dict(self._mdata['${var_name}'])

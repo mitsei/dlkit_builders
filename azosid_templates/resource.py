@@ -883,7 +883,7 @@ class BinAdminSession:
         if not self._can('alias'):
             raise PermissionDenied()
         else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+            return self._provider_session.${method_name}(${arg_list})"""
 
 class BinHierarchySession:
 

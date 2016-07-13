@@ -216,7 +216,7 @@ class AssessmentSession:
 
     get_previous_question = """
         return self.get_assessment_section(assessment_section_id)._get_previous_question(question_id=item_id)"""
-    
+
     get_question = """
         return self.get_assessment_section(assessment_section_id)._get_question(question_id)"""
     
@@ -234,15 +234,29 @@ class AssessmentSession:
 
         ##
         # This is a little hack to get the answer record types from the Item's
-        # Question record types. Should really get it from item genus types somehow:
+        # first Answer record types. Should really get it from item genus types somehow:
         record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
         question = self.get_question(assessment_section_id, item_id)
         answer_record_types = []
+<<<<<<< HEAD
         for record_type_idstr in question._my_map['recordTypeIds']:
             identifier = Id(record_type_idstr).get_identifier()
             if identifier in record_type_data_sets:
                 answer_record_types.append(Type(**record_type_data_sets[identifier]))
         # Thus ends the hack.
+=======
+        if len(item_map['answers']) > 0:
+            for record_type_idstr in item_map['answers'][0]['recordTypeIds']:
+                identifier = Id(record_type_idstr).get_identifier()
+                if identifier in record_type_data_sets:
+                    answer_record_types.append(Type(**record_type_data_sets[identifier]))
+        else:
+            for record_type_idstr in item_map['question']['recordTypeIds']:
+                identifier = Id(record_type_idstr).get_identifier()
+                if identifier in record_type_data_sets:
+                    answer_record_types.append(Type(**record_type_data_sets[identifier]))
+        # Thus endith the hack.
+>>>>>>> master
         ##
 
         obj_form = objects.AnswerForm(
@@ -913,12 +927,11 @@ class Question:
 
     def get_object_map(self):
         obj_map = dict(self._my_map)
-        my_idstr = obj_map['itemId']
         del obj_map['itemId']
         lo_ids = self.get_learning_objective_ids()
         obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
         obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
-        obj_map['id'] = my_idstr
+        obj_map['id'] = str(self.get_id())
         return obj_map
 
     object_map = property(fget=get_object_map)"""
