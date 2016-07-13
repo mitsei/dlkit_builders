@@ -1658,7 +1658,7 @@ class AssessmentSection:
 
             if (len(self._my_map['questions']) == index or 
                     self._my_map['questions'][index]['assessmentPartId'] != part_map['assessmentPartId']):
-                    part_id = part_map['assessmentPartId']
+                part_id = part_map['assessmentPartId']
                 for item in self._get_part_lookup_session().get_part(part_id).get_items():
                     self._my_map['questions'].insert(index, get_default_question_map(
                         item.get_id(), item.get_question().get_id(), []))
