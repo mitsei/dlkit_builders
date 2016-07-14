@@ -1727,10 +1727,10 @@ class AssessmentSection:
         if self._my_map['questions'][-1]['questionId'] == str(question_id):
             raise errors.IllegalState('No more Questions currently available for this Section')
         for question_map in self._my_map['questions']:
-            if question_map['question_id'] == str(question_id):
+            if question_map['questionId'] == str(question_id):
                 question_answered = bool(question_map['responses'][0])
                 if answered is None or question_answered == answered:
-                    return self._get_question(Id(question_map['question_id']))
+                    return self._get_question(Id(question_map['questionId']))
         ### SHOULD THIS RAISE NotFound?
         raise errors.IllegalState('No more Questions currently available for this Section')
 
@@ -1739,11 +1739,11 @@ class AssessmentSection:
         \"\"\"Inspects question map to return previous next question.\"\"\"
         # self._update() # Make sure we are current with database. Do we need this?
         self._update_questions() # Make sure questions list is current
-        if self._my_map['questions'][0]['question_id'] == str(question_id):
+        if self._my_map['questions'][0]['questionId'] == str(question_id):
             raise errors.IllegalState('No previous Questions available for this Section')
         for question_map in self._my_map['questions']:
-            if question_map['question_id'] == str(question_id):
-                return self._get_question(Id(question_map['question_id']))
+            if question_map['questionId'] == str(question_id):
+                return self._get_question(Id(question_map['questionId']))
             else:
                 previous_question_map = question_map
         ### SHOULD THIS RAISE NotFound?
