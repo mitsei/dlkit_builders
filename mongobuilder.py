@@ -103,7 +103,7 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
                 'finish_assessment',
                 'is_answer_available',
                 'get_answers']:
-            decorators.append('{0}@_check_effective'.format(self._ind))
+            decorators.append('{0}@check_effective'.format(self._ind))
         return decorators
 
     def _get_method_sig(self, method, interface):

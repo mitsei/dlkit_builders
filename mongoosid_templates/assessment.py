@@ -58,6 +58,7 @@ class AssessmentSession:
         'SUBMITTED = True',
         'from importlib import import_module',
         'from .assessment_utilities import get_assessment_section as get_section_util',
+        'from .assessment_utilities import check_effective',
     ]
     
     init = """
@@ -73,31 +74,7 @@ class AssessmentSession:
             db_name='assessment',
             cat_name='Bank',
             cat_class=objects.Bank)
-        self._forms = dict()
-
-    def _check_effective(func):
-        \"\"\"decorator, tests if an Assessment or Section is effective, raises error if not
-
-        Side benefit: raised NotFound on AssessmentSections and AssessmentTakens
-
-        \"\"\"
-        def wrapper(*args, **kwargs):
-            if ('assessment_section_id' in kwargs or 
-                    args and 'Section' in args[1].get_identifier_namespace()):
-                assessment_section_id = kwargs['assessment_section_id']
-                if (not args[0].has_assessment_section_begun(assessment_section_id) or
-                        args[0].is_assessment_section_over(assessment_section_id)):
-                    raise errors.IllegalState()
-            else:
-                if 'assessment_taken_id' in kwargs:
-                    assessment_taken_id = kwargs['assessment_taken_id']
-                else:
-                    assessment_taken_id = args[1]
-                assessment_taken = args[0]._get_assessment_taken(assessment_taken_id)
-                if not assessment_taken.has_started() or assessment_taken.has_ended():
-                    raise errors.IllegalState()
-            return func(*args, **kwargs)
-        return wrapper"""
+        self._forms = dict()"""
 
     can_take_assessments = """
         # NOTE: It is expected that real authentication hints will be
@@ -134,33 +111,33 @@ class AssessmentSession:
     has_next_assessment_section = """
         try:
             self.get_next_assessment_section(assessment_section_id)
-        except IllegalState:
+        except errors.IllegalState:
             return False
         else:
             return True"""
     
     get_next_assessment_section = """
-        assessment_taken = get_assessment_section(assessment_section_id)._assessment_taken()
+        assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
         return assessment_taken._get_next_assessment_section(assessment_section_id)"""
     
     has_previous_assessment_section = """
         try:
             self.get_previous_assessment_section(assessment_section_id)
-        except IllegalState:
+        except errors.IllegalState:
             return False
         else:
             return True"""
     
     get_previous_assessment_section = """
-        assessment_taken = get_assessment_section(assessment_section_id)._assessment_taken()
+        assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
         return assessment_taken._get_previous_assessment_section(assessment_section_id)"""
     
     get_assessment_section = """
         return get_section_util(assessment_section_id, runtime=self._runtime, proxy=self._proxy)"""
 
     get_assessment_sections = """
-        assessment_taken = get_assessment_section(assessment_section_id)._assessment_taken()
-        return assessment_taken._get_assessment_sections(assessment_section_id)"""
+        assessment_taken = self._get_assessment_taken(assessment_taken_id)
+        return assessment_taken._get_assessment_sections()"""
     
     is_assessment_section_complete = """
         return self.get_assessment_section(assessment_section_id)._is_complete()"""
@@ -170,12 +147,13 @@ class AssessmentSession:
         for section in self.get_assessment_sections(assessment_taken_id):
             if not section._is_complete():
                 section_list.append(section)
-        return AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)"""
     
     ## Has this method has been deprecated???
     ## IMPLEMENT ME PROPERLY!
     has_assessment_section_begun = """
-        return self.get_assessment_section(assessment_section_id)._assessment_taken().has_started()"""
+        return get_section_util(assessment_section_id,
+                                runtime=self._runtime)._assessment_taken.has_started()"""
     
     ## Has this method has been deprecated???
     is_assessment_section_over = """
@@ -196,7 +174,7 @@ class AssessmentSession:
     has_next_question = """
         try:
             self.get_next_question(assessment_section_id, item_id)
-        except IllegalState:
+        except errors.IllegalState:
             return False
         else:
             return True"""
@@ -207,7 +185,7 @@ class AssessmentSession:
     has_previous_question = """
         try:
             self.get_previous_question(assessment_section_id, item_id)
-        except IllegalState:
+        except errors.IllegalState:
             return False
         else:
             return True"""
@@ -234,7 +212,14 @@ class AssessmentSession:
         # This is a little hack to get the answer record types from the Item's
         # first Answer record types. Should really get it from item genus types somehow:
         record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
-        question = self.get_question(assessment_section_id, item_id)
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        if self._proxy:
+            ils = mgr.get_item_lookup_session(proxy=self._proxy)
+        else:
+            ils = mgr.get_item_lookup_session()
+        ils.use_federated_bank_view()
+        item = ils.get_item(item_id)
+        item_map = item.object_map
         answer_record_types = []
         if len(item_map['answers']) > 0:
             for record_type_idstr in item_map['answers'][0]['recordTypeIds']:
@@ -309,7 +294,7 @@ class AssessmentSession:
         # There's probably a more efficient way to implement this:
         try:
             self.get_next_unanswered_question(assessment_section_id, item_id)
-        except IllegalState:
+        except errors.IllegalState:
             return False
         else:
             return True"""
@@ -321,14 +306,14 @@ class AssessmentSession:
                 if questions.available():
                     return questions.next()
                 else:
-                    raise IllegalState('No next unanswered question is available')
-        raise NotFound('item_id is not found in Section')"""
+                    raise errors.IllegalState('No next unanswered question is available')
+        raise errors.NotFound('item_id is not found in Section')"""
     
     has_previous_unanswered_question = """
         # There's probably a more efficient way to implement this:
         try:
             self.get_previous_unanswered_question(assessment_section_id, item_id)
-        except IllegalState:
+        except errors.IllegalState:
             return False
         else:
             return True"""
@@ -338,13 +323,13 @@ class AssessmentSession:
         questions = self.get_unanswered_questions(assessment_section_id)
         previous_question = questions.next()
         if previous_question.get_id() == item_id:
-            raise IllegalState('No previous unanswered question is available')
+            raise errors.IllegalState('No previous unanswered question is available')
         for question in questions:
             if question.get_id() == item_id:
                 return previous_question
             else:
                 previous_question = question
-        raise NotFound('item_id is not found in Section')"""
+        raise errors.NotFound('item_id is not found in Section')"""
     
     get_response = """
         return self.get_assessment_section(assessment_section_id)._get_response(question_id=item_id)"""
@@ -391,7 +376,7 @@ class AssessmentSession:
         # a response has been submitted for an Item.
         try:
             self.get_response(assessment_section_id, item_id)
-        except IllegalState:
+        except errors.IllegalState:
             return False
         else:
             return True"""
@@ -1267,8 +1252,8 @@ class AssessmentTaken:
             try:
                 section_id = self._get_next_assessment_section(section_id)
             except errors.IllegalState:
-                finished = True                
-            
+                finished = True
+
     def _get_first_assessment_section(self):
         \"\"\"Gets the first section for this Taken's Assessment.\"\"\"
         if ('sections' not in self._my_map or not self._my_map['sections']):
@@ -1285,7 +1270,8 @@ class AssessmentTaken:
             self._save()
             return first_section
         else:
-            return get_assessment_section(self._my_map['sections'][0])
+            return get_assessment_section(Id(self._my_map['sections'][0]),
+                                          runtime=self._runtime)
 
     def _get_next_assessment_section(self, assessment_section_id):
         \"\"\"Gets the next section following section_id. 
@@ -1313,7 +1299,7 @@ class AssessmentTaken:
         section_list = []
         for section_idstr in self._my_map['sections']:
             section_list.append(get_assessment_section(Id(section_idstr)))
-        return AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)
+        return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)
 
     def _save(self):
         \"\"\"Saves the current state of this AssessmentTaken.
@@ -1349,7 +1335,7 @@ class AssessmentTaken:
             obj_map['completionTime']['second'] = completion_time.second
             obj_map['completionTime']['microsecond'] = completion_time.microsecond
         if 'sections' in obj_map:
-            del obj_map['sectons']
+            del obj_map['sections']
         obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
         if obj_map['displayName']['text'] == '':
             obj_map['displayName']['text'] = self.get_display_name().get_text()
@@ -1509,7 +1495,9 @@ class AssessmentSection:
 
     def _load_simple_section_questions(self, item_ids):
         \"\"\"For the simple section case (common) just load the questions for the section.\"\"\"
-        lookup_session = self._get_assessment_manager().get_item_lookup_session(proxy=self._proxy)
+        assessment_mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = assessment_mgr.get_item_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
         items = lookup_session.get_items_by_ids(item_ids)
         display_num = 1
         for item in items:
@@ -1518,8 +1506,7 @@ class AssessmentSection:
                 item.get_id(),
                 question_id,
                 self._assessment_part_id,
-                []),
-                label_elements = [display_num])
+                [display_num]))
             display_num += 1
         self._save()
 
@@ -1532,7 +1519,7 @@ class AssessmentSection:
         collection = MongoClientValidated('assessment',
                                           collection='AssessmentSection',
                                           runtime=self._runtime)
-        if 'id_' in self._my_map: # This is the first time:
+        if '_id' in self._my_map: # This is the first time:
             collection.save(self._my_map)
         else:
             insert_result = collection.insert_one(self._my_map)
@@ -1617,9 +1604,9 @@ class AssessmentSection:
     def _update_part_map(self, part_id=None):
         def insert_part_map():
             part_index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
-            absolute_level = prev_part_map['level'] + delta
+            absolute_level = prev_part_level + delta
             self._my_map['assessmentParts'].insert(part_index, get_default_part_map(part_id, absolute_level))
-            updated = True
+            return True
 
         if part_id is None:
             part_id = self._assessment_part_id
@@ -1627,9 +1614,13 @@ class AssessmentSection:
             return
         finished = False
         updated = False
+        prev_part_id = None
         while not finished:
-            # TODO
-            prev_part = self._get_part_lookup_session().get_part(prev_part_id) # 0 if doesn't exist
+            if prev_part_id is None:
+                prev_part_level = 0
+            else:
+                prev_part = self._get_part_lookup_session().get_part(prev_part_id) # 0 if doesn't exist
+                prev_part_level = prev_part.object_map['level']
             prev_part_id = part_id
             try:
                 part_id, delta = get_next_part_id(part_id, runtime=self._runtime, proxy=self._proxy)
@@ -1638,7 +1629,7 @@ class AssessmentSection:
             else:
                 if self._get_part_lookup_session().get_part(part_id).has_items():
                     if str(part_id) not in self._my_map['assessmentParts']:
-                        insert_part_map()
+                        updated = insert_part_map()
         return updated
 
     def _update_question_map(self):
@@ -1647,10 +1638,10 @@ class AssessmentSection:
 
             if (len(self._my_map['questions']) == index or 
                     self._my_map['questions'][index]['assessmentPartId'] != part_map['assessmentPartId']):
-                    part_id = part_map['assessmentPartId']
+                part_id = part_map['assessmentPartId']
                 for item in self._get_part_lookup_session().get_part(part_id).get_items():
                     self._my_map['questions'].insert(index, get_default_question_map(
-                        item.get_id(), item.get_question().get_id(), []))
+                        item.get_id(), item.get_question().get_id(), Id(part_id), []))
                     index += 1
                     
             else: # skip through all remaining questions for this part
@@ -1687,7 +1678,7 @@ class AssessmentSection:
         question_list = []
         # self._update() # Make sure we are current with database. Do we need this?
         for question_map in self._my_map['questions']:
-            if prev_question_answered == self._are_items_sequential():
+            if prev_question_answered == self.are_items_sequential():
                 prev_question_answered = update_question_list()
         return QuestionList(question_list, runtime=self._runtime, proxy=self._proxy)
 
@@ -1709,7 +1700,7 @@ class AssessmentSection:
         \"\"\"Inspects question map to return the next available question.\"\"\"
         # self._update() # Make sure we are current with database. Do we need this?
         self._update_questions() # Make sure questions list is current
-        if self._my_map['questions'][-1]['question_id'] == str(question_id):
+        if self._my_map['questions'][-1]['questionId'] == str(question_id):
             raise errors.IllegalState('No more Questions currently available for this Section')
         for question_map in self._my_map['questions']:
             if question_map['question_id'] == str(question_id):
@@ -1755,9 +1746,10 @@ class AssessmentSection:
         raise errors.NotFound('item_id not found in this AssessmentSection')
 
     def _get_response(self, question_id):
+        \"\"\"Gets the latest response\"\"\"
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(question_id):
-                if question_map['responses'][0]:
+                if len(question_map['responses']) > 0:
                     return Response(Answer(
                         osid_object_map=question_map['responses'][0],
                         runtime=self._runtime,
@@ -1769,12 +1761,11 @@ class AssessmentSection:
     def _get_responses(self):
         answer_list = []
         for question_map in self._my_map['questions']:
-            if question_map['questionId'] == str(question_id):
-                if question_map['responses'][0]:
-                    answer_list.append(Answer(
-                        osid_object_map=question_map['responses'][0],
-                        runtime=self._runtime,
-                        proxy=self._proxy))
+            if len(question_map['responses']) > 0:
+                return Response(Answer(
+                    osid_object_map=question_map['responses'][0],
+                    runtime=self._runtime,
+                    proxy=self._proxy))
         return ResponseList()
 
     def _is_question_answered(self, item_id):
