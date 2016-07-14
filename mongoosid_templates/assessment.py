@@ -157,7 +157,8 @@ class AssessmentSession:
     
     ## Has this method has been deprecated???
     is_assessment_section_over = """
-        return self.get_assessment_section(assessment_section_id)._is_over()"""
+        return get_section_util(assessment_section_id,
+                                runtime=self._runtime)._is_over()"""
     
     ## This method has been deprecated:
     finished_assessment_section = """
@@ -1780,7 +1781,7 @@ class AssessmentSection:
         raise errors.NotFound()
 
     def _finish(self):
-        self._my_map['over'] == True # finished == over?
+        self._my_map['over'] = True # finished == over?
         self._my_map['completionTime'] = DateTime.now()
         self._save()
 
