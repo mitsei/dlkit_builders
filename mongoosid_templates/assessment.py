@@ -173,14 +173,13 @@ class AssessmentSession:
         return AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)"""
     
     ## Has this method has been deprecated???
-    ## IMPLEMENT ME?
+    ## IMPLEMENT ME PROPERLY!
     has_assessment_section_begun = """
         return self.get_assessment_section(assessment_section_id)._assessment_taken().has_started()"""
     
     ## Has this method has been deprecated???
-    ## Is this the right way to check if section is over (probably not)
     is_assessment_section_over = """
-        return self.get_assessment_section(assessment_section_id)._assessment_taken().has_ended()"""
+        return self.get_assessment_section(assessment_section_id)._is_over()"""
     
     ## This method has been deprecated:
     finished_assessment_section = """
@@ -188,7 +187,6 @@ class AssessmentSession:
         self.finished_assessment(assessment_section_id)"""
     
     ## Has this method has been deprecated???
-    ## IMPLEMENT ME:
     requires_synchronous_responses = """
         return self.get_assessment_section(assessment_section_id).are_items_sequential()"""
     
@@ -238,13 +236,6 @@ class AssessmentSession:
         record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
         question = self.get_question(assessment_section_id, item_id)
         answer_record_types = []
-<<<<<<< HEAD
-        for record_type_idstr in question._my_map['recordTypeIds']:
-            identifier = Id(record_type_idstr).get_identifier()
-            if identifier in record_type_data_sets:
-                answer_record_types.append(Type(**record_type_data_sets[identifier]))
-        # Thus ends the hack.
-=======
         if len(item_map['answers']) > 0:
             for record_type_idstr in item_map['answers'][0]['recordTypeIds']:
                 identifier = Id(record_type_idstr).get_identifier()
@@ -256,7 +247,6 @@ class AssessmentSession:
                 if identifier in record_type_data_sets:
                     answer_record_types.append(Type(**record_type_data_sets[identifier]))
         # Thus endith the hack.
->>>>>>> master
         ##
 
         obj_form = objects.AnswerForm(
@@ -295,9 +285,9 @@ class AssessmentSession:
         self.get_assessment_section(assessment_section_id)._submit_response(item_id, answer_form)
         self._forms[answer_form.get_id().get_identifier()] = SUBMITTED"""
     
-    # IMPLEMENT ME:
     skip_item = """
-        raise errors.Unimplemented()"""
+        # if the assessment or part allows us to skip:
+        self.get_assessment_section(assessment_section_id)._submit_response(item_id, None)"""
     
     is_question_answered = """
         return self.get_assessment_section(assessment_section_id)._is_question_answered(item_id)"""
@@ -369,12 +359,11 @@ class AssessmentSession:
         # Should probably check to see if responses can be cleared, but how?
         self.get_assessment_section(assessment_section_id)._submit_response(item_id, None)"""
     
-    # IMPLEMENT ME:
     finish_assessment_section = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
-        self.finish_assessment(assessment_section_id)"""
+        self.get_assessment_section(assessment_section_id)._finish()"""
     
     ## This is no longer needed:
     finish = """
@@ -1696,7 +1685,7 @@ class AssessmentSection:
 
         prev_question_answered = True
         question_list = []
-        self._update()
+        # self._update() # Make sure we are current with database. Do we need this?
         for question_map in self._my_map['questions']:
             if prev_question_answered == self._are_items_sequential():
                 prev_question_answered = update_question_list()
@@ -1797,14 +1786,24 @@ class AssessmentSection:
                     return False
         raise errors.NotFound()
 
+    def _finish(self):
+        self._my_map['over'] == True # finished == over?
+        self._my_map['completionTime'] = DateTime.now()
+        self._save()
+
+    def _is_over(self):
+        if 'over' in self._my_map and self._my_map['over']:
+            return True
+        return False
+        
     def _is_complete(self):
-        \"\"\"Check all Parts and Questions for completeness
+        \"\"\"Check all Questions for completeness
         
         For now, completeness simply means that all questions have been 
-        responded to.
+        responded to and not skipped or cleared.
         
         \"\"\"
-        #self._update() # Make sure we are current with database
+        # self._update() # Make sure we are current with database
         self._update_questions() # Make sure questions list is current
         for question_map in self._my_map['questions']:
             if not question_map['responses'][0]:
