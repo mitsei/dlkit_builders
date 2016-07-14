@@ -197,7 +197,7 @@ class AssessmentSession:
         return self.get_assessment_section(assessment_section_id)._get_previous_question(question_id=item_id)"""
 
     get_question = """
-        return self.get_assessment_section(assessment_section_id)._get_question(question_id)"""
+        return self.get_assessment_section(assessment_section_id)._get_question(item_id)"""
     
     get_questions = """
         # Does this want to return a blocking list of available questions?
@@ -1383,7 +1383,9 @@ class AssessmentTaken:
         assessment_offered = self.get_assessment_offered()
         now = DateTime.now()
         # There's got to be a better way to do this:
-        if assessment_offered.has_deadline() and assessment_offered.has_duration():
+        if self._my_map['completionTime'] is not None:
+            return True
+        elif assessment_offered.has_deadline() and assessment_offered.has_duration():
             if self._my_map['actualStartTime'] is None:
                 return now >= assessment_offered.get_deadline()
             else:
@@ -1393,8 +1395,6 @@ class AssessmentTaken:
             return now >= assessment_offered.get_deadline()
         elif assessment_offered.has_duration() and self._my_map['actualStartTime'] is not None:
             return now >= self._my_map['actualStartTime'] + assessment_offered.get_duration()
-        elif self._my_map['completionTime'] is not None:
-            return True
         else:
             return False"""
     
@@ -1753,7 +1753,8 @@ class AssessmentSection:
         \"\"\"Gets the latest response\"\"\"
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(question_id):
-                if len(question_map['responses']) > 0:
+                if (len(question_map['responses']) > 0 and
+                            question_map['responses'][0] is not None):
                     return Response(Answer(
                         osid_object_map=question_map['responses'][0],
                         runtime=self._runtime,
@@ -1765,7 +1766,8 @@ class AssessmentSection:
     def _get_responses(self):
         answer_list = []
         for question_map in self._my_map['questions']:
-            if len(question_map['responses']) > 0:
+            if (len(question_map['responses']) > 0 and
+                        question_map['responses'][0] is not None):
                 return Response(Answer(
                     osid_object_map=question_map['responses'][0],
                     runtime=self._runtime,
