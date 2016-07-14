@@ -1144,7 +1144,19 @@ class AssessmentOffered:
             obj_map['description']['text'] = self.get_description().get_text()
         return obj_map
 
-    object_map = property(fget=get_object_map)"""
+    object_map = property(fget=get_object_map)
+
+    def are_sections_sequential(self):
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
+            return True
+        return True
+
+    def are_sections_shuffled(self):
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
+            return False
+        return False"""
     
     has_start_time_template = """
         # Implemented from template for osid.assessment.AssessmentOffered.has_start_time_template
@@ -1177,18 +1189,6 @@ class AssessmentOffered:
             return self.get_assessment().are_items_shuffled()
         return bool(self._my_map['itemsShuffled'])"""
 
-    additional_methods = """
-    def are_sections_sequential(self):
-        \"\"\"This method can be overwritten by a record extension.\"\"\"
-        if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
-            return True
-        return True
-
-    def are_sections_shuffled(self):
-        \"\"\"This method can be overwritten by a record extension.\"\"\"
-        if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
-            return False
-        return False"""
 
 class AssessmentOfferedForm:
     
