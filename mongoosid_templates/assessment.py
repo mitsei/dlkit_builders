@@ -570,10 +570,28 @@ class AssessmentAdminSession:
         ]
 
     delete_assessment_import_templates = [
-        'from ...abstract_osid.id.primitives import Id as ABCId'
+        'from ...abstract_osid.id.primitives import Id as ABCId',
+        'from ..assessment_authoring import objects as assessment_authoring_objects'
     ]
 
     delete_assessment = """
+        \"\"\"Delete all the children AssessmentParts recursively, too\"\"\"
+        def remove_children_parts(parent_id):
+            part_collection = MongoClientValidated('assessment_authoring',
+                                                    collection='AssessmentPart',
+                                                    runtime=self._runtime)
+            if 'assessment.Assessment' in parent_id:
+                query = {"assessmentId": parent_id}
+            else:
+                query = {"assessmentPartId": parent_id}
+
+            for part in part_collection.find(query):
+                part = assessment_authoring_objects.AssessmentPart(osid_object_map=part,
+                                              runtime=self._runtime,
+                                              proxy=self._proxy)
+                part_collection.delete_one({'_id': ObjectId(part.ident.get_identifier())})
+                remove_children_parts(str(part.ident))
+
         if not isinstance(assessment_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         collection = MongoClientValidated('assessment',
@@ -584,7 +602,9 @@ class AssessmentAdminSession:
         collection = MongoClientValidated('assessment',
                                           collection='Assessment',
                                           runtime=self._runtime)
-        collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})"""
+        collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
+        remove_children_parts(str(assessment_id))
+        """
 
 class AssessmentTakenLookupSession:
     
