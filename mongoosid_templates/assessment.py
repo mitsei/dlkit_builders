@@ -1726,11 +1726,15 @@ class AssessmentSection:
         self._update_questions() # Make sure questions list is current
         if self._my_map['questions'][-1]['questionId'] == str(question_id):
             raise errors.IllegalState('No more Questions currently available for this Section')
-        for question_map in self._my_map['questions']:
+        current_index = None
+        for index, question_map in enumerate(self._my_map['questions']):
             if question_map['questionId'] == str(question_id):
                 question_answered = bool(question_map['responses'][0])
                 if answered is None or question_answered == answered:
-                    return self._get_question(Id(question_map['questionId']))
+                    current_index = index
+                    break
+        if current_index is not None:
+            return self._get_question(Id(self._my_map['questions'][current_index + 1]['questionId']))
         ### SHOULD THIS RAISE NotFound?
         raise errors.IllegalState('No more Questions currently available for this Section')
 
@@ -1741,11 +1745,13 @@ class AssessmentSection:
         self._update_questions() # Make sure questions list is current
         if self._my_map['questions'][0]['questionId'] == str(question_id):
             raise errors.IllegalState('No previous Questions available for this Section')
-        for question_map in self._my_map['questions']:
+        current_index = None
+        for index, question_map in enumerate(self._my_map['questions']):
             if question_map['questionId'] == str(question_id):
-                return self._get_question(Id(question_map['questionId']))
-            else:
-                previous_question_map = question_map
+                current_index = index
+                break
+        if current_index is not None:
+            return self._get_question(Id(self._my_map['questions'][current_index - 1]['questionId']))
         ### SHOULD THIS RAISE NotFound?
         raise errors.IllegalState('No more Questions currently available for this Section')
 
