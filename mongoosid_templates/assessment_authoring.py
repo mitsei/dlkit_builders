@@ -384,7 +384,7 @@ class AssessmentPart:
 
     def are_items_sequential(self):
         \"\"\"This can be overridden by a record extension\"\"\"
-        return True
+        return False
 
     def are_items_shuffled(self):
         \"\"\"This can be overwridden by a record extension\"\"\"
@@ -392,7 +392,7 @@ class AssessmentPart:
 
     def are_children_sequential(self):
         \"\"\"This can be overwridden by a record extension\"\"\"
-        return True
+        return False
 
     def are_children_shuffled(self):
         \"\"\"This can be overwridden by a record extension\"\"\"
