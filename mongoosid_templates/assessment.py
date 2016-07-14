@@ -453,8 +453,8 @@ class ItemAdminSession:
     delete_item = """
         if not isinstance(item_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        collection = MongoClientValidated('assessment',
-                                          collection='Assessment',
+        collection = MongoClientValidated('assessment_authoring',
+                                          collection='AssessmentPart',
                                           runtime=self._runtime)
         # This needs to be updated to actually check for AssessmentsTaken (and does that find even work?)
         if collection.find({'itemIds': str(item_id)}).count() != 0:
@@ -1679,8 +1679,11 @@ class AssessmentSection:
         question_list = []
         # self._update() # Make sure we are current with database. Do we need this?
         for question_map in self._my_map['questions']:
-            if prev_question_answered == self.are_items_sequential():
-                prev_question_answered = update_question_list()
+            if self.are_items_sequential():
+                if prev_question_answered:
+                    prev_question_answered = update_question_list()
+            else:
+                update_question_list()
         return QuestionList(question_list, runtime=self._runtime, proxy=self._proxy)
 
     def _get_question(self, question_id):
