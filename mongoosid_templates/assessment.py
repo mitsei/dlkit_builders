@@ -1713,7 +1713,19 @@ class AssessmentSection:
         return self._get_item_lookup_session().get_item(question_id).get_question()
 
     def _get_answers(self, question_id):
-        return self._get_item_lookup_session().get_item(question_id).get_answers()
+        # What if we want the wrong answers, too?
+        # collection = MongoClientValidated('assessment',
+        #                                   collection='Item',
+        #                                   runtime=self._runtime)
+        # item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
+        # return objects.AnswerList(item_map['answers'], runtime=self._runtime, proxy=self._proxy)
+        item = self._get_item_lookup_session().get_item(question_id)
+        answers = list(item.get_answers())
+        try:
+            answers += list(item.get_wrong_answers())
+        except AttributeError:
+            pass
+        return answers
 
     def _get_first_question(self):
         question_id = Id(self._my_map['questions'][0]['questionId'])
