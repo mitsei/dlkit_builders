@@ -1320,7 +1320,7 @@ class AssessmentTaken:
         section_list = []
         for section_idstr in self._my_map['sections']:
             section_list.append(get_assessment_section(Id(section_idstr)))
-        return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)
+        return AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)
 
     def _save(self):
         \"\"\"Saves the current state of this AssessmentTaken.

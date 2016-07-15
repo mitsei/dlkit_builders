@@ -1842,7 +1842,7 @@ class BinNode:
     get_bin_template = """
         if self._lookup_session is None:
             mgr = get_provider_manager('${package_name_upper}', runtime=self._runtime, proxy=self._proxy)
-            self._lookup_session = mgr.get_${object_name_under}_lookup_session()
+            self._lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=getattr(self, "_proxy", None))
         return self._lookup_session.get_${object_name_under}(Id(self._my_map['id']))"""
 
     get_parent_bin_nodes_template = """
