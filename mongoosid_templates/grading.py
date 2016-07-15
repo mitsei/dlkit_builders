@@ -192,7 +192,7 @@ class GradeEntryForm:
         self._effective_agent_id = kwargs['effective_agent_id']
 
         mgr = self._get_provider_manager('GRADING') # What about the Proxy?
-        lookup_session = mgr.get_gradebook_column_lookup_session()
+        lookup_session = mgr.get_gradebook_column_lookup_session(proxy=getattr(self, "_proxy", None))
         lookup_session.use_federated_gradebook_view()
         if 'gradebook_column_id' in kwargs:
             gradebook_column = lookup_session.get_gradebook_column(kwargs['gradebook_column_id'])
@@ -317,7 +317,7 @@ class GradebookColumnAdminSession:
     additional_methods = """
     def _has_entries(self, gradebook_column_id):
         grading_manager = self._get_provider_manager('GRADING')
-        gels = grading_manager.get_grade_entry_lookup_session(proxy=self._proxy)
+        gels = grading_manager.get_grade_entry_lookup_session(proxy=getattr(self, "_proxy", None))
         gels.use_federated_gradebook_view()
         entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
         return entries.available() > 0
@@ -329,7 +329,7 @@ class GradebookColumnAdminSession:
 
         # check that no entries already exist for this gradebook column
         grading_manager = self._get_provider_manager('GRADING')
-        gels = grading_manager.get_grade_entry_lookup_session(proxy=self._proxy)
+        gels = grading_manager.get_grade_entry_lookup_session(proxy=getattr(self, "_proxy", None))
         gels.use_federated_gradebook_view()
         entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
         if self._has_entries(gradebook_column_id):
@@ -446,7 +446,8 @@ class GradebookColumnSummary:
         if not mgr.supports_gradebook_column_lookup():
             raise errors.OperationFailed('Grading does not support GradebookColumn lookup')
         gradebook_id = Id(self._my_map['assignedGradebookIds'][0])
-        lookup_session = mgr.get_grade_entry_lookup_session_for_gradebook(gradebook_id)
+        lookup_session = mgr.get_grade_entry_lookup_session_for_gradebook(gradebook_id,
+                                                                          proxy=getattr(self, "_proxy", None))
         entries = lookup_session.get_grade_entries_for_gradebook_column(self.get_gradebook_column_id())
         return [e for e in entries if not e.is_ignored_for_calculations()]
 
