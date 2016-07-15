@@ -65,7 +65,7 @@ class AssetAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
         'from ..utilities import MongoClientValidated',
-        'CREATED = True'
+        'CREATED = True',
         'UPDATED = True',
     ]
 
