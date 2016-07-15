@@ -114,7 +114,7 @@ class LogEntryForm:
     init = """
     def __init__(self, **kwargs):
         osid_objects.OsidObjectForm.__init__(self, object_name='LOG_ENTRY', **kwargs)
-        self._mdata = dict(default_mdata.LOG_ENTRY)
+        self._mdata = dict(default_mdata.LOG_ENTRY).copy()
         self._init_metadata(**kwargs)
 
         if not self.is_for_update():

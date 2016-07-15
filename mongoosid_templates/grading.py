@@ -188,7 +188,7 @@ class GradeEntryForm:
 
     def __init__(self, **kwargs):
         osid_objects.OsidRelationshipForm.__init__(self, object_name='GRADE_ENTRY', **kwargs)
-        self._mdata = dict(default_mdata.GRADE_ENTRY)
+        self._mdata = dict(default_mdata.GRADE_ENTRY).copy()
         self._effective_agent_id = kwargs['effective_agent_id']
 
         mgr = self._get_provider_manager('GRADING') # What about the Proxy?
