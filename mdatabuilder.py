@@ -89,7 +89,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
         from builders.mongoosid_templates import options
         pd = interface['shortname'] + '.persisted_data'
         rt = interface['shortname'] + '.return_types'
-        mdata = camel_to_caps_under(interface['shortname']) + ' = {\n'
+        mdata = 'def get_' + camel_to_under(interface['shortname']) + '_mdata():\n    return {\n'
         if pd in self.patterns and self.patterns[pd] != {}:
             for data_name in self.patterns[pd]:
                 if self.patterns[pd][data_name] == 'OsidCatalog':
@@ -106,7 +106,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                                                   data_name,
                                                   self.patterns[pd][data_name],
                                                   options) #+ '\n'
-        return mdata + '}'
+        return mdata + '    }'
 
     def _make_mdata_map(self, interface_name, data_name, data_type, options):
         def construct_data(opt, context):
@@ -208,7 +208,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                 mdata = getattr(impl_class, mdata_name)
 
         if mdata is not None:
-            return '    \'{0}\': {{{1}\n    }},\n'.format(data_name,
+            return '        \'{0}\': {{{1}\n        }},\n'.format(data_name,
                                                      mdata)
         else:
             return ''
