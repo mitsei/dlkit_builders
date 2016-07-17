@@ -449,7 +449,7 @@ class AssessmentPartForm:
         osid_objects.OsidContainableForm.__init__(self)
         osid_objects.OsidOperableForm.__init__(self)
         osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT_PART', **kwargs)
-        self._mdata = dict(default_mdata.ASSESSMENT_PART)
+        self._mdata = dict(default_mdata.ASSESSMENT_PART).copy()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
             self._init_map(**kwargs)
@@ -461,9 +461,11 @@ class AssessmentPartForm:
         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
         if 'assessmentPartId' not in kwargs:
             # Only "Section" Parts are allowed directly under Assessments
+            # this is super dangerous, since it will change the values of
+            # default_mdata.OSID_CONTAINABLE in memory
             self._mdata['sequestered']['is_read_only'] = True
             self._mdata['sequestered']['is_required'] = True
-            self._mdata['sequestered']['default_boolean_values'] = ['False']
+            self._mdata['sequestered']['default_boolean_values'] = [False]
         self._assessment_part_default = self._mdata['assessment_part']['default_id_values'][0]
         self._assessment_default = self._mdata['assessment']['default_id_values'][0]
         self._weight_default = self._mdata['weight']['default_integer_values'][0]

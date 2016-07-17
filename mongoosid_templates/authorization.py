@@ -165,7 +165,7 @@ class AuthorizationForm:
 
     def __init__(self, **kwargs):
         osid_objects.OsidRelationshipForm.__init__(self, object_name='AUTHORIZATION', **kwargs)
-        self._mdata = dict(default_mdata.AUTHORIZATION) # Don't know if we need default mdata for this
+        self._mdata = dict(default_mdata.AUTHORIZATION).copy() # Don't know if we need default mdata for this
         self._init_metadata(**kwargs)
 
         # self._records = dict()
