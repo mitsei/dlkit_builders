@@ -874,7 +874,7 @@ class OsidForm:
 
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
-        self._mdata.update(dict(default_mdata.OSID_FORM).copy())
+        self._mdata.update(default_mdata.get_osid_form_mdata())
         update_display_text_defaults(self._mdata['journal_comment'], self._locale_map)
         for element_name in self._mdata:
             self._mdata[element_name].update(
@@ -1189,7 +1189,7 @@ class OsidTemporalForm:
     def _init_metadata(self, **kwargs):
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
-        self._mdata.update(dict(default_mdata.OSID_TEMPORAL).copy())
+        self._mdata.update(default_mdata.get_osid_temporal_mdata())
         self._mdata['start_date'].update({'default_date_time_values': [datetime.datetime.now()]})
         self._mdata['end_date'].update({
             'default_date_time_values': [datetime.datetime.now() + datetime.timedelta(weeks=9999)]
@@ -1262,7 +1262,7 @@ class OsidContainableForm:
         self._sequestered = None
 
     def _init_metadata(self):
-        self._mdata.update(dict(default_mdata.OSID_CONTAINABLE).copy())
+        self._mdata.update(default_mdata.get_osid_containable_mdata())
         self._sequestered_default = self._mdata['sequestered']['default_boolean_values'][0]
         self._sequestered = self._sequestered_default
 
@@ -1301,7 +1301,7 @@ class OsidSourceableForm:
     def _init_metadata(self):
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
-        self._mdata.update(dict(default_mdata.OSID_SOURCEABLE).copy())
+        self._mdata.update(default_mdata.get_osid_sourceable_mdata())
         update_display_text_defaults(self._mdata['license'], self._locale_map)
         self._provider_default = self._mdata['provider']['default_id_values'][0]
         self._branding_default = self._mdata['branding']['default_id_values']
@@ -1433,7 +1433,7 @@ class OsidObjectForm:
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize metadata for form\"\"\"
-        self._mdata.update(dict(default_mdata.OSID_OBJECT).copy())
+        self._mdata.update(default_mdata.get_osid_object_mdata())
         OsidForm._init_metadata(self)
         if 'default_display_name' in kwargs:
             self._mdata['display_name']['default_string_values'][0]['text'] = kwargs['default_display_name']

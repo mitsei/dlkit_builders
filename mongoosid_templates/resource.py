@@ -1649,7 +1649,7 @@ class ResourceForm:
 
     def __init__(self, **kwargs):
         ${init_object}.__init__(self, object_name='${object_name_upper}', **kwargs)
-        self._mdata = dict(default_mdata.${object_name_caps_under}).copy()
+        self._mdata = default_mdata.get_${object_name_under}_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
             self._init_map(**kwargs)
@@ -1762,7 +1762,7 @@ class BinForm:
 
     def __init__(self, **kwargs):
         osid_objects.OsidCatalogForm.__init__(self, object_name='${object_name_upper}', **kwargs)
-        self._mdata = dict(default_mdata.${object_name_caps_under}).copy()
+        self._mdata = default_mdata.get_${object_name_under}_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
             self._init_map(**kwargs)

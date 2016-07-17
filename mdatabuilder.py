@@ -89,7 +89,9 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
         from builders.mongoosid_templates import options
         pd = interface['shortname'] + '.persisted_data'
         rt = interface['shortname'] + '.return_types'
-        mdata = 'def get_' + camel_to_under(interface['shortname']) + '_mdata():\n    return {\n'
+        mdata = ('def get_' + camel_to_under(interface['shortname']) + 
+                    '_mdata():\n    \"\"\"Return default mdata map for ' + 
+                    (interface['shortname']) +'\"\"\"\n    return {\n')
         if pd in self.patterns and self.patterns[pd] != {}:
             for data_name in self.patterns[pd]:
                 if self.patterns[pd][data_name] == 'OsidCatalog':

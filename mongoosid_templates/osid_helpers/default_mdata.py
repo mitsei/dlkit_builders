@@ -28,7 +28,8 @@ DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data('DEFAULT'))
 #     'microsecond': datetime.datetime.max.microsecond,
 # }
 
-def osid_form_mdata():
+def get_osid_form_mdata():
+    """Return default mdata map for OsidForm"""
     return {
         'journal_comment': {
             'element_label': 'Journal Comment',
@@ -72,6 +73,7 @@ def osid_form_mdata():
 # }
 
 def get_osid_object_mdata():
+    """Return default mdata map for OsidObject"""
     return {
         'display_name': {
             'element_label': 'Display Name',
@@ -175,6 +177,7 @@ def get_osid_object_mdata():
 # }
 
 def get_osid_temporal_mdata():
+    """Return default mdata map for OsidTemporal"""
     return {
         'start_date': {
             'element_label': 'Start Date',
@@ -226,6 +229,7 @@ def get_osid_temporal_mdata():
 # }
 
 def get_osid_containable_mdata():
+    """Return default mdata map for OsidContainable"""
     return {
         'sequestered': {
             'element_label': 'sequestered',
@@ -253,6 +257,7 @@ def get_osid_containable_mdata():
 # }
 
 def get_osid_sourceable_mdata():
+    """Return default mdata map for OsidSourceable"""
     return {
         'provider': {
             'element_label': 'provider',

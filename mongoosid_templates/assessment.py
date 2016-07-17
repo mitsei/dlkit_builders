@@ -1057,7 +1057,7 @@ class AssessmentForm:
 
     def __init__(self, **kwargs):
         osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT', **kwargs)
-        self._mdata = dict(default_mdata.ASSESSMENT).copy()
+        self._mdata = default_mdata.get_assessment_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
             self._init_map(**kwargs)
