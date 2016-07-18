@@ -1605,6 +1605,8 @@ class OsidList:
             raise errors.OperationFailed()
         if isinstance(next_object, dict):
             next_object = object_class(osid_object_map=next_object, runtime=self._runtime, proxy=self._proxy)
+        elif isinstance(next_object, basestring) and object_class == Id:
+            next_object = Id(next_object)
         return next_object
 
     def next(self):
