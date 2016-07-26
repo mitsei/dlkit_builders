@@ -214,11 +214,7 @@ class AssessmentSession:
         # first Answer record types. Should really get it from item genus types somehow:
         record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        if self._proxy:
-            ils = mgr.get_item_lookup_session(proxy=self._proxy)
-        else:
-            ils = mgr.get_item_lookup_session()
-        ils.use_federated_bank_view()
+        ils = self.get_assessment_section(assessment_section_id)._get_item_lookup_session()
         item = ils.get_item(item_id)
         item_map = item.object_map
         answer_record_types = []
