@@ -1677,8 +1677,19 @@ class AssessmentSection:
     def _get_item_lookup_session(self):
         # First do something special to get a magic session, if available.
         # TO BE IMPLEMENTED!
-        mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        session = mgr.get_item_lookup_session(proxy=self._proxy)
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:magicItemLookupSessions@mongo')
+            import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+            module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+            magic_class = import_path_with_class.split('.')[-1]
+            module = importlib.import_module(module_path)
+            session = getattr(module, magic_class)(runtime=self._runtime,
+                                                   proxy=self._proxy)
+        except (AttributeError, KeyError, errors.NotFound):
+            mgr = self._get_provider_manager('ASSESSMENT', local=True)
+            session = mgr.get_item_lookup_session(proxy=self._proxy)
+
         session.use_federated_bank_view()
         return session
 
