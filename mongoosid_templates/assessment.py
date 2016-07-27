@@ -95,7 +95,7 @@ class AssessmentSession:
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         assessment_taken_map = assessment_taken._my_map
         if assessment_taken.has_started() and not assessment_taken.has_ended():
-            assessment_taken_map['completionTime'] = DateTime.now()
+            assessment_taken_map['completionTime'] = DateTime.utcnow()
             assessment_taken_map['ended'] = True
             collection.save(assessment_taken_map)
         else:
@@ -358,7 +358,7 @@ class AssessmentSession:
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         assessment_taken_map = assessment_taken._my_map
         if assessment_taken.has_started() and not assessment_taken.has_ended():
-            assessment_taken_map['completionTime'] = DateTime.now()
+            assessment_taken_map['completionTime'] = DateTime.utcnow()
             assessment_taken_map['ended'] = True
             collection = MongoClientValidated('assessment',
                                               collection='AssessmentTaken',
@@ -1283,7 +1283,7 @@ class AssessmentTaken:
                         'recordTypeIds': []}
             first_section = AssessmentSection(osid_object_map=init_map, runtime=self._runtime, proxy=self._proxy)
             self._my_map['sections'] = [str(first_section.get_id())]
-            self._my_map['actualStartTime'] = DateTime.now()
+            self._my_map['actualStartTime'] = DateTime.utcnow()
             self._save()
             return first_section
         else:
@@ -1380,7 +1380,7 @@ class AssessmentTaken:
     has_started = """
         assessment_offered = self.get_assessment_offered()
         if assessment_offered.has_start_time():
-            return DateTime.now() >= assessment_offered.get_start_time()
+            return DateTime.utcnow() >= assessment_offered.get_start_time()
         else:
             return True"""
     
@@ -1394,7 +1394,7 @@ class AssessmentTaken:
     
     has_ended = """
         assessment_offered = self.get_assessment_offered()
-        now = DateTime.now()
+        now = DateTime.utcnow()
         # There's got to be a better way to do this:
         if self._my_map['completionTime'] is not None:
             return True
@@ -1792,7 +1792,7 @@ class AssessmentSection:
             response = {}
         else:
             response = dict(answer_form._my_map)
-            response['submissionTime'] = DateTime.now()
+            response['submissionTime'] = DateTime.utcnow()
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(item_id):
                 if question_map['responses'][0] is None: # No existing attempts
@@ -1840,7 +1840,7 @@ class AssessmentSection:
 
     def _finish(self):
         self._my_map['over'] = True # finished == over?
-        self._my_map['completionTime'] = DateTime.now()
+        self._my_map['completionTime'] = DateTime.utcnow()
         self._save()
 
     def _is_over(self):

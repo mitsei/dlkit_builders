@@ -309,7 +309,7 @@ class Temporal:
 """
 
     is_effective = """
-        now = DateTime.now()
+        now = DateTime.utcnow()
         return self.get_start_date() <= now and self.get_end_date() >= now"""
 
     get_start_date = """
@@ -652,7 +652,7 @@ class OsidSession:
     def _effective_view_filter(self):
         \"\"\"Returns the mongodb relationship filter for effective views\"\"\"
         if self._effective_view == EFFECTIVE:
-            now = datetime.datetime.now()
+            now = datetime.datetime.utcnow()
             return {'startDate': {'$$lte': now}, 'endDate': {'$$gte': now}}
         return {}
 
@@ -1193,9 +1193,9 @@ class OsidTemporalForm:
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
         self._mdata.update(default_mdata.get_osid_temporal_mdata())
-        self._mdata['start_date'].update({'default_date_time_values': [datetime.datetime.now()]})
+        self._mdata['start_date'].update({'default_date_time_values': [datetime.datetime.utcnow()]})
         self._mdata['end_date'].update({
-            'default_date_time_values': [datetime.datetime.now() + datetime.timedelta(weeks=9999)]
+            'default_date_time_values': [datetime.datetime.utcnow() + datetime.timedelta(weeks=9999)]
         })
 
     def _init_map(self):

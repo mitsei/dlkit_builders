@@ -32,7 +32,7 @@ class LoggingSession:
         if not content_type in self._content_types:
             raise errors.Unsupported()
         lefc = self._leas.get_content_form_for_create([])
-        lefc.set_timestamp(DateTime.now())"""
+        lefc.set_timestamp(DateTime.utcnow())"""
 
 class LogEntryAdminSession:
     import_statements_pattern = [
@@ -56,7 +56,7 @@ class LogEntryAdminSession:
             raise errors.InvalidArgument('one or more of the form elements is invalid')
 
         if 'timestamp' not in log_entry_form._my_map or log_entry_form._my_map['timestamp'] is None:
-            log_entry_form._my_map['timestamp'] = DateTime.now()
+            log_entry_form._my_map['timestamp'] = DateTime.utcnow()
         log_entry_form._my_map['agentId'] = str(self.get_effective_agent_id())
 
         insert_result = collection.insert_one(log_entry_form._my_map)
@@ -123,7 +123,7 @@ class LogEntryForm:
     def _init_metadata(self, **kwargs):
         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
         self._priority_default = self._mdata['priority']['default_type_values'][0]
-        self._timestamp_default = datetime.datetime.now()
+        self._timestamp_default = datetime.datetime.utcnow()
         self._agent_default = self._mdata['agent']['default_id_values'][0]
 
     def _init_map(self, record_types=None, **kwargs):
