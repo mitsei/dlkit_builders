@@ -1715,9 +1715,17 @@ class AssessmentSection:
 
     def _get_question(self, question_id):
         # This is where we might inject a new display_name
-        # TODO: use magic sessions here, and also modify the question
-        # to
-        return self._get_item_lookup_session().get_item(question_id).get_question()
+        item = self._get_item_lookup_session().get_item(question_id)
+        question = item.get_question()
+        try:
+            new_display_name = [q['displayElements']
+                                for q in self._my_map['questions']
+                                if q['questionId'] == str(question_id)][0]
+            new_display_name = [str(e) for e in new_display_name]
+            question.set_display_label('.'.join(new_display_name))
+        except AttributeError:
+            pass
+        return question
 
     def _get_answers(self, question_id):
         # What if we want the wrong answers, too?
@@ -1799,7 +1807,7 @@ class AssessmentSection:
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(question_id):
                 if (len(question_map['responses']) > 0 and
-                            question_map['responses'][0] is not None):
+                        question_map['responses'][0] is not None):
                     return Response(Answer(
                         osid_object_map=question_map['responses'][0],
                         runtime=self._runtime,
@@ -1812,12 +1820,14 @@ class AssessmentSection:
         answer_list = []
         for question_map in self._my_map['questions']:
             if (len(question_map['responses']) > 0 and
-                        question_map['responses'][0] is not None):
-                return Response(Answer(
-                    osid_object_map=question_map['responses'][0],
-                    runtime=self._runtime,
-                    proxy=self._proxy))
-        return ResponseList()
+                    question_map['responses'][0] is not None):
+                answer_list.append(Answer(
+                        osid_object_map=question_map['responses'][0],
+                        runtime=self._runtime,
+                        proxy=self._proxy))
+        return ResponseList(answer_list,
+                            runtime=self._runtime,
+                            proxy=self._proxy)
 
     def _is_question_answered(self, item_id):
         for question_map in self._my_map['questions']:
@@ -1858,7 +1868,7 @@ class Response:
     import_statements = [
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
-		'from ..utilities import get_registry',
+        'from ..utilities import get_registry',
     ]
     
     init = """
@@ -1873,7 +1883,7 @@ class Response:
         self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', answer._runtime)
         response_map = answer.object_map
         self._load_records(response_map['recordTypeIds'])
-    
+
     def _load_records(self, record_type_idstrs):
         for record_type_idstr in record_type_idstrs:
             self._init_record(record_type_idstr)

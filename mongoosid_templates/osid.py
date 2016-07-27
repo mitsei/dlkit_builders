@@ -282,7 +282,10 @@ class Extensible:
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
-        return get_provider_manager(osid, runtime=self._runtime, proxy=self._proxy, local=local)"""
+        return get_provider_manager(osid,
+                                    runtime=self._runtime,
+                                    proxy=getattr(self, '_proxy', None),
+                                    local=local)"""
 
     has_record_type = """
         return str(record_type) in self._supported_record_type_ids"""
