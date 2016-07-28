@@ -317,6 +317,14 @@ class AssessmentPartAdminSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_admin_session').duplicate_assessment_part(assessment_part_id)"""
 
+class AssessmentPartItemSession:
+    get_assessment_part_items = """
+        \"\"\"Pass through to provider method\"\"\"
+        # Note: this method is different from the underlying signature
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_item_session').get_assessment_part_items(*args, **kwargs)"""
+
+
 class AssessmentPartItemDesignSession:
     import_statements = [
         'from .osid_errors import InvalidArgument'
