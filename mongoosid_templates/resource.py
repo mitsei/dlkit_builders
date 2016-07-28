@@ -1776,6 +1776,9 @@ class BinForm:
         osid_objects.OsidCatalogForm._init_map(self, record_types, **kwargs)
 """
 
+    get_bin_form_record_template = """
+        return self._get_record(${cat_name_lower}_record_type)"""
+
 
 class BinQuery:
 

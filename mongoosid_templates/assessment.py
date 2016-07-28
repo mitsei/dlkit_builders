@@ -1993,6 +1993,12 @@ class ItemSearchSession:
         'from . import searches',
     ]
 
+class BankForm:
+    get_bank_form_record = """
+        # this should be templated from Resource, but
+        # would have to update pattern mappers
+        return self._get_record(bank_record_type)"""
+
 class BankQuery:
     import_statements = [
         'from bson import ObjectId'
