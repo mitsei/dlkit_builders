@@ -1515,7 +1515,7 @@ class AssessmentSection:
             self._load_simple_section_questions(item_ids)
         else:
             # This goes down the winding path...
-            self._update_available_questions()
+            self._update_questions()
 
     def _load_simple_section_questions(self, item_ids):
         \"\"\"For the simple section case (common) just load the questions for the section.\"\"\"
@@ -1643,7 +1643,7 @@ class AssessmentSection:
             if prev_part_id is None:
                 prev_part_level = 0
             else:
-                prev_part = self._get_part_lookup_session().get_part(prev_part_id) # 0 if doesn't exist
+                prev_part = self._get_assessment_part(prev_part_id) # 0 if doesn't exist
                 prev_part_level = prev_part.object_map['level']
             prev_part_id = part_id
             try:
@@ -1651,7 +1651,7 @@ class AssessmentSection:
             except errors.IllegalState:
                 finished = True
             else:
-                if self._get_part_lookup_session().get_part(part_id).has_items():
+                if self._get_assessment_part(part_id).has_items():
                     if str(part_id) not in self._my_map['assessmentParts']:
                         updated = insert_part_map()
         return updated
