@@ -1559,17 +1559,6 @@ class AssessmentSection:
             obj_map = dict(self._my_map)
         del obj_map['_id']
 
-        if obj_map['actualStartTime'] is not None:
-            actual_start_time = obj_map['actualStartTime']
-            obj_map['actualStartTime'] = dict()
-            obj_map['actualStartTime']['year'] = actual_start_time.year
-            obj_map['actualStartTime']['month'] = actual_start_time.month
-            obj_map['actualStartTime']['day'] = actual_start_time.day
-            obj_map['actualStartTime']['hour'] = actual_start_time.hour
-            obj_map['actualStartTime']['minute'] = actual_start_time.minute
-            obj_map['actualStartTime']['second'] = actual_start_time.second
-            obj_map['actualStartTime']['microsecond'] = actual_start_time.microsecond
-            
         obj_map.update(
             {'type': self._namespace.split('.')[-1],
              'id': str(self.get_id())})
