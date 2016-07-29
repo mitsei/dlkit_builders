@@ -1505,6 +1505,11 @@ class AssessmentSection:
         if 'questions' not in self._my_map: # This is the first instantiation
             self._initialize_part_map()
 
+        if '_id' not in self._my_map:
+            # could happen if not created with items -- then self._initialize_part_map()
+            # will not call self._save(). But we need to assign it an ID
+            self._save()
+
     def _initialize_part_map(self):
         \"\"\"Sets up assessmentPartMap with as much information as is initially available.\"\"\"
         self._my_map['assessmentParts'] = []
@@ -1548,6 +1553,29 @@ class AssessmentSection:
         else:
             insert_result = collection.insert_one(self._my_map)
             self._my_map = collection.find_one({'_id': insert_result.inserted_id}) # To get the _id
+
+    def get_object_map(self, obj_map=None):
+        if obj_map is None:
+            obj_map = dict(self._my_map)
+        del obj_map['_id']
+
+        if obj_map['actualStartTime'] is not None:
+            actual_start_time = obj_map['actualStartTime']
+            obj_map['actualStartTime'] = dict()
+            obj_map['actualStartTime']['year'] = actual_start_time.year
+            obj_map['actualStartTime']['month'] = actual_start_time.month
+            obj_map['actualStartTime']['day'] = actual_start_time.day
+            obj_map['actualStartTime']['hour'] = actual_start_time.hour
+            obj_map['actualStartTime']['minute'] = actual_start_time.minute
+            obj_map['actualStartTime']['second'] = actual_start_time.second
+            obj_map['actualStartTime']['microsecond'] = actual_start_time.microsecond
+            
+        obj_map.update(
+            {'type': self._namespace.split('.')[-1],
+             'id': str(self.get_id())})
+        return obj_map
+
+    object_map = property(get_object_map)
 
     # Not sure we need this:
     # def __getattribute__(self, name):
@@ -1626,6 +1654,12 @@ class AssessmentSection:
             self._save()
 
     def _update_part_map(self, part_id=None):
+        def get_part_level(target_part_id):
+            for p in self._my_map['assessmentParts']:
+                if p['assessmentPartId'] == str(target_part_id):
+                    return p['level']
+            return 0
+
         def insert_part_map():
             part_index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
             absolute_level = prev_part_level + delta
@@ -1640,11 +1674,7 @@ class AssessmentSection:
         updated = False
         prev_part_id = None
         while not finished:
-            if prev_part_id is None:
-                prev_part_level = 0
-            else:
-                prev_part = self._get_assessment_part(prev_part_id) # 0 if doesn't exist
-                prev_part_level = prev_part.object_map['level']
+            prev_part_level = get_part_level(prev_part_id)
             prev_part_id = part_id
             try:
                 part_id, delta = get_next_part_id(part_id, runtime=self._runtime, proxy=self._proxy)
