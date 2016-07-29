@@ -867,8 +867,6 @@ class OsidForm:
         self._locale_map['scriptTypeId'] = str(locale.get_script_type())
         if runtime is not None:
             self._set_authority(runtime=runtime)
-        if 'mdata' in kwargs:
-            self._mdata.update(kwargs['mdata'])
         if 'catalog_id' in kwargs:
             self._catalog_id = kwargs['catalog_id']
 
@@ -1447,6 +1445,9 @@ class OsidObjectForm:
         self._display_name_default = dict(self._mdata['display_name']['default_string_values'][0])
         self._description_default = dict(self._mdata['description']['default_string_values'][0])
         self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
+        
+        if 'mdata' in kwargs:
+            self._mdata.update(kwargs['mdata'])
 
     def _init_map(self, record_types=None):
         \"\"\"Initialize map for form\"\"\"
