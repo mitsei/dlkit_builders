@@ -146,7 +146,8 @@ class AssessmentPartAdminSession:
         if not self._can('update'):
             raise PermissionDenied()
         else:
-            return self._provider_session.update_assessment_part(assessment_part_form)"""
+            # because there is a bug in the spec
+            return self._provider_session.update_assessment_part(assessment_part_id, assessment_part_form)"""
 
     delete_assessment_part = """
         # Implemented from azosid template for -

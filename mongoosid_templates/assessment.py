@@ -1571,13 +1571,14 @@ class AssessmentSection:
 
     object_map = property(get_object_map)
 
-    # Not sure we need this:
-    # def __getattribute__(self, name):
-    #     if not name.startswith('_'):
-    #         try:
-    #             return self._assessment_part[name]
-    #         except AttributeError:
-    #             return object.__getattribute__(self, name)"""
+    # Let's give the Part attributes to the Section
+    def __getattribute__(self, name):
+        if not name.startswith('_') and name not in ['ident', 'get_id', 'id_']:
+            try:
+                return self._assessment_part[name]
+            except AttributeError:
+                return object.__getattribute__(self, name)
+        return object.__getattribute__(self, name)"""
 
     get_assessment_taken_id = """
         return self._assessment_taken_id"""
