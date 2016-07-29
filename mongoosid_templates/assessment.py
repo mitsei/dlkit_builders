@@ -1278,6 +1278,12 @@ class AssessmentTaken:
             except errors.IllegalState:
                 finished = True
 
+    def _create_section(self, part_id):
+            init_map = {'assessmentPartId': str(part_id),
+                        'assessmentTakenId': str(self.get_id()),
+                        'recordTypeIds': []}
+            return AssessmentSection(osid_object_map=init_map, runtime=self._runtime, proxy=self._proxy)
+
     def _get_first_assessment_section(self):
         \"\"\"Gets the first section for this Taken's Assessment.\"\"\"
         if ('sections' not in self._my_map or not self._my_map['sections']):
@@ -1285,10 +1291,7 @@ class AssessmentTaken:
             # SHOULD THIS USE self._update_available_sections????
             assessment_id = self.get_assessment_offered().get_assessment().get_id()
             first_part_id = get_first_part_id_for_assessment(assessment_id, runtime=self._runtime, proxy=self._proxy)
-            init_map = {'assessmentPartId': str(first_part_id),
-                        'assessmentTakenId': str(self.get_id()),
-                        'recordTypeIds': []}
-            first_section = AssessmentSection(osid_object_map=init_map, runtime=self._runtime, proxy=self._proxy)
+            first_section = self._create_section(first_part_id)
             self._my_map['sections'] = [str(first_section.get_id())]
             self._my_map['actualStartTime'] = DateTime.utcnow()
             self._save()
@@ -1306,8 +1309,10 @@ class AssessmentTaken:
         \"\"\"
         if self._my_map['sections'][-1] == str(assessment_section_id):
             # section_id represents the last seen section
-            section = get_assessment_section(assessment_section_id)
-            next_part_id, level = get_next_part_id(section._assessment_part_id(),
+            section = get_assessment_section(assessment_section_id,
+                                             runtime=self._runtime,
+                                             proxy=self._proxy)
+            next_part_id, level = get_next_part_id(section._assessment_part_id,
                                                    runtime=self._runtime,
                                                    proxy=self._proxy) # Raises IllegalState
             next_section = self._create_section(next_part_id)
