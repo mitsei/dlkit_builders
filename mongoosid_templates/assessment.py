@@ -95,7 +95,7 @@ class AssessmentSession:
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         assessment_taken_map = assessment_taken._my_map
         if assessment_taken.has_started() and not assessment_taken.has_ended():
-            assessment_taken_map['completionTime'] = DateTime.now()
+            assessment_taken_map['completionTime'] = DateTime.utcnow()
             assessment_taken_map['ended'] = True
             collection.save(assessment_taken_map)
         else:
@@ -214,11 +214,7 @@ class AssessmentSession:
         # first Answer record types. Should really get it from item genus types somehow:
         record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        if self._proxy:
-            ils = mgr.get_item_lookup_session(proxy=self._proxy)
-        else:
-            ils = mgr.get_item_lookup_session()
-        ils.use_federated_bank_view()
+        ils = self.get_assessment_section(assessment_section_id)._get_item_lookup_session()
         item = ils.get_item(item_id)
         item_map = item.object_map
         answer_record_types = []
@@ -362,7 +358,7 @@ class AssessmentSession:
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         assessment_taken_map = assessment_taken._my_map
         if assessment_taken.has_started() and not assessment_taken.has_ended():
-            assessment_taken_map['completionTime'] = DateTime.now()
+            assessment_taken_map['completionTime'] = DateTime.utcnow()
             assessment_taken_map['ended'] = True
             collection = MongoClientValidated('assessment',
                                               collection='AssessmentTaken',
@@ -388,6 +384,35 @@ class AssessmentSession:
         raise errors.IllegalState()"""
 
     additional_methods = """
+
+    def is_feedback_available(assessment_section_id, item_id):
+        \"\"\"Is feedback available for this item in this section\"\"\"
+        return self.get_assessment_section(assessment_section_id)._is_feedback_available(item_id)
+
+    def get_feedback(assessment_section_id, item_id):
+        \"\"\"Get feedback for this item in this section\"\"\"
+        return self.get_assessment_section(assessment_section_id)._get_feedback(item_id)
+
+    def is_solution_available(assessment_section_id, item_id):
+        \"\"\"Is a solution available for this item in this section\"\"\"
+        return self.get_assessment_section(assessment_section_id)._is_solution_available(item_id)
+
+    def get_solution(assessment_section_id, item_id):
+        \"\"\"Get solution for this item in this section\"\"\"
+        return self.get_assessment_section(assessment_section_id)._get_solution(item_id)
+
+    def is_correctness_available(assessment_section_id, item_id):
+        \"\"\"Is a determination of correctness available for this item in this section\"\"\"
+        return self.get_assessment_section(assessment_section_id)._is_correctness_available(item_id)
+
+    def is_correct(assessment_section_id, item_id):
+        \"\"\"is the response for this item in this section correct\"\"\"
+        return self.get_assessment_section(assessment_section_id)._is_correct(item_id)
+
+    def get_correctness(assessment_section_id, item_id):
+        \"\"\"Get correctness for this item in this section\"\"\"
+        return self.get_assessment_section(assessment_section_id)._get_correctness(item_id)
+
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT')
@@ -1015,10 +1040,17 @@ class Assessment:
                 return False
         raise errors.NotFound('the Part with Id ' + str(assessment_part_id) + ' is not a child of this Part')
 
-    def get_next_assessment_part_id(self, assessment_part_id):
+    def get_next_assessment_part_id(self, assessment_part_id=None):
         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
-        if self.has_next_assessment_part(assessment_part_id):
-            return Id(self._my_map['childIds'][self._my_map['childIds'].index(str(assessment_part_id)) + 1])
+        if assessment_part_id is None:
+            part_id = self.get_id()
+        else:
+            part_id = assessment_part_id
+        return get_next_part_id(part_id,
+                                runtime=self._runtime,
+                                proxy=self._proxy)[0]
+        # if self.has_next_assessment_part(assessment_part_id):
+        #     return Id(self._my_map['childIds'][self._my_map['childIds'].index(str(assessment_part_id)) + 1])
 
     def get_next_assessment_part(self, assessment_part_id):
         next_part_id = self.get_next_assessment_part_id(assessment_part_id)
@@ -1275,6 +1307,12 @@ class AssessmentTaken:
             except errors.IllegalState:
                 finished = True
 
+    def _create_section(self, part_id):
+            init_map = {'assessmentPartId': str(part_id),
+                        'assessmentTakenId': str(self.get_id()),
+                        'recordTypeIds': []}
+            return AssessmentSection(osid_object_map=init_map, runtime=self._runtime, proxy=self._proxy)
+
     def _get_first_assessment_section(self):
         \"\"\"Gets the first section for this Taken's Assessment.\"\"\"
         if ('sections' not in self._my_map or not self._my_map['sections']):
@@ -1282,12 +1320,9 @@ class AssessmentTaken:
             # SHOULD THIS USE self._update_available_sections????
             assessment_id = self.get_assessment_offered().get_assessment().get_id()
             first_part_id = get_first_part_id_for_assessment(assessment_id, runtime=self._runtime, proxy=self._proxy)
-            init_map = {'assessmentPartId': str(first_part_id),
-                        'assessmentTakenId': str(self.get_id()),
-                        'recordTypeIds': []}
-            first_section = AssessmentSection(osid_object_map=init_map, runtime=self._runtime, proxy=self._proxy)
+            first_section = self._create_section(first_part_id)
             self._my_map['sections'] = [str(first_section.get_id())]
-            self._my_map['actualStartTime'] = DateTime.now()
+            self._my_map['actualStartTime'] = DateTime.utcnow()
             self._save()
             return first_section
         else:
@@ -1303,8 +1338,10 @@ class AssessmentTaken:
         \"\"\"
         if self._my_map['sections'][-1] == str(assessment_section_id):
             # section_id represents the last seen section
-            section = get_assessment_section(assessment_section_id)
-            next_part_id, level = get_next_part_id(section._assessment_part_id(),
+            section = get_assessment_section(assessment_section_id,
+                                             runtime=self._runtime,
+                                             proxy=self._proxy)
+            next_part_id, level = get_next_part_id(section._assessment_part_id,
                                                    runtime=self._runtime,
                                                    proxy=self._proxy) # Raises IllegalState
             next_section = self._create_section(next_part_id)
@@ -1384,7 +1421,7 @@ class AssessmentTaken:
     has_started = """
         assessment_offered = self.get_assessment_offered()
         if assessment_offered.has_start_time():
-            return DateTime.now() >= assessment_offered.get_start_time()
+            return DateTime.utcnow() >= assessment_offered.get_start_time()
         else:
             return True"""
     
@@ -1398,7 +1435,7 @@ class AssessmentTaken:
     
     has_ended = """
         assessment_offered = self.get_assessment_offered()
-        now = DateTime.now()
+        now = DateTime.utcnow()
         # There's got to be a better way to do this:
         if self._my_map['completionTime'] is not None:
             return True
@@ -1502,6 +1539,11 @@ class AssessmentSection:
         if 'questions' not in self._my_map: # This is the first instantiation
             self._initialize_part_map()
 
+        if '_id' not in self._my_map:
+            # could happen if not created with items -- then self._initialize_part_map()
+            # will not call self._save(). But we need to assign it an ID
+            self._save()
+
     def _initialize_part_map(self):
         \"\"\"Sets up assessmentPartMap with as much information as is initially available.\"\"\"
         self._my_map['assessmentParts'] = []
@@ -1512,7 +1554,7 @@ class AssessmentSection:
             self._load_simple_section_questions(item_ids)
         else:
             # This goes down the winding path...
-            self._update_available_questions()
+            self._update_questions()
 
     def _load_simple_section_questions(self, item_ids):
         \"\"\"For the simple section case (common) just load the questions for the section.\"\"\"
@@ -1546,13 +1588,26 @@ class AssessmentSection:
             insert_result = collection.insert_one(self._my_map)
             self._my_map = collection.find_one({'_id': insert_result.inserted_id}) # To get the _id
 
-    # Not sure we need this:
-    # def __getattribute__(self, name):
-    #     if not name.startswith('_'):
-    #         try:
-    #             return self._assessment_part[name]
-    #         except AttributeError:
-    #             return object.__getattribute__(self, name)"""
+    def get_object_map(self, obj_map=None):
+        if obj_map is None:
+            obj_map = dict(self._my_map)
+        del obj_map['_id']
+
+        obj_map.update(
+            {'type': self._namespace.split('.')[-1],
+             'id': str(self.get_id())})
+        return obj_map
+
+    object_map = property(get_object_map)
+
+    # Let's give the Part attributes to the Section
+    def __getattribute__(self, name):
+        if not name.startswith('_') and name not in ['ident', 'get_id', 'id_']:
+            try:
+                return self._assessment_part[name]
+            except AttributeError:
+                return object.__getattribute__(self, name)
+        return object.__getattribute__(self, name)"""
 
     get_assessment_taken_id = """
         return self._assessment_taken_id"""
@@ -1623,6 +1678,12 @@ class AssessmentSection:
             self._save()
 
     def _update_part_map(self, part_id=None):
+        def get_part_level(target_part_id):
+            for p in self._my_map['assessmentParts']:
+                if p['assessmentPartId'] == str(target_part_id):
+                    return p['level']
+            return 0
+
         def insert_part_map():
             part_index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
             absolute_level = prev_part_level + delta
@@ -1637,18 +1698,14 @@ class AssessmentSection:
         updated = False
         prev_part_id = None
         while not finished:
-            if prev_part_id is None:
-                prev_part_level = 0
-            else:
-                prev_part = self._get_part_lookup_session().get_part(prev_part_id) # 0 if doesn't exist
-                prev_part_level = prev_part.object_map['level']
+            prev_part_level = get_part_level(prev_part_id)
             prev_part_id = part_id
             try:
                 part_id, delta = get_next_part_id(part_id, runtime=self._runtime, proxy=self._proxy)
             except errors.IllegalState:
                 finished = True
             else:
-                if self._get_part_lookup_session().get_part(part_id).has_items():
+                if self._get_assessment_part(part_id).has_items():
                     if str(part_id) not in self._my_map['assessmentParts']:
                         updated = insert_part_map()
         return updated
@@ -1681,8 +1738,19 @@ class AssessmentSection:
     def _get_item_lookup_session(self):
         # First do something special to get a magic session, if available.
         # TO BE IMPLEMENTED!
-        mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        session = mgr.get_item_lookup_session(proxy=self._proxy)
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:magicItemLookupSessions@mongo')
+            import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+            module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+            magic_class = import_path_with_class.split('.')[-1]
+            module = importlib.import_module(module_path)
+            session = getattr(module, magic_class)(runtime=self._runtime,
+                                                   proxy=self._proxy)
+        except (AttributeError, KeyError, errors.NotFound):
+            mgr = self._get_provider_manager('ASSESSMENT', local=True)
+            session = mgr.get_item_lookup_session(proxy=self._proxy)
+
         session.use_federated_bank_view()
         return session
 
@@ -1708,9 +1776,17 @@ class AssessmentSection:
 
     def _get_question(self, question_id):
         # This is where we might inject a new display_name
-        # TODO: use magic sessions here, and also modify the question
-        # to
-        return self._get_item_lookup_session().get_item(question_id).get_question()
+        item = self._get_item_lookup_session().get_item(question_id)
+        question = item.get_question()
+        try:
+            new_display_name = [q['displayElements']
+                                for q in self._my_map['questions']
+                                if q['questionId'] == str(question_id)][0]
+            new_display_name = [str(e) for e in new_display_name]
+            question.set_display_label('.'.join(new_display_name))
+        except AttributeError:
+            pass
+        return question
 
     def _get_answers(self, question_id):
         # What if we want the wrong answers, too?
@@ -1777,7 +1853,7 @@ class AssessmentSection:
             response = {}
         else:
             response = dict(answer_form._my_map)
-            response['submissionTime'] = DateTime.now()
+            response['submissionTime'] = DateTime.utcnow()
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(item_id):
                 if question_map['responses'][0] is None: # No existing attempts
@@ -1792,7 +1868,7 @@ class AssessmentSection:
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(question_id):
                 if (len(question_map['responses']) > 0 and
-                            question_map['responses'][0] is not None):
+                        question_map['responses'][0] is not None):
                     return Response(Answer(
                         osid_object_map=question_map['responses'][0],
                         runtime=self._runtime,
@@ -1805,12 +1881,14 @@ class AssessmentSection:
         answer_list = []
         for question_map in self._my_map['questions']:
             if (len(question_map['responses']) > 0 and
-                        question_map['responses'][0] is not None):
-                return Response(Answer(
-                    osid_object_map=question_map['responses'][0],
-                    runtime=self._runtime,
-                    proxy=self._proxy))
-        return ResponseList()
+                    question_map['responses'][0] is not None):
+                answer_list.append(Answer(
+                        osid_object_map=question_map['responses'][0],
+                        runtime=self._runtime,
+                        proxy=self._proxy))
+        return ResponseList(answer_list,
+                            runtime=self._runtime,
+                            proxy=self._proxy)
 
     def _is_question_answered(self, item_id):
         for question_map in self._my_map['questions']:
@@ -1823,7 +1901,7 @@ class AssessmentSection:
 
     def _finish(self):
         self._my_map['over'] = True # finished == over?
-        self._my_map['completionTime'] = DateTime.now()
+        self._my_map['completionTime'] = DateTime.utcnow()
         self._save()
 
     def _is_over(self):
@@ -1851,7 +1929,7 @@ class Response:
     import_statements = [
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
-		'from ..utilities import get_registry',
+        'from ..utilities import get_registry',
     ]
     
     init = """
@@ -1866,7 +1944,7 @@ class Response:
         self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', answer._runtime)
         response_map = answer.object_map
         self._load_records(response_map['recordTypeIds'])
-    
+
     def _load_records(self, record_type_idstrs):
         for record_type_idstr in record_type_idstrs:
             self._init_record(record_type_idstr)
@@ -1900,6 +1978,106 @@ class Response:
             raise errors.Unimplemented()
         return self._records[str(item_record_type)]"""
 
+class Item:
+
+    additional_methods = """
+    def is_feedback_available(self):
+        \"\"\"is general feedback available for this Item
+
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+
+    def get_feedback(self):
+        \"\"\"get general feedback for this Item
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        if self.is_feedback_available():
+            pass # what is feedback anyway? Just a DisplayText or something more?
+        raise IllegalState()
+
+    def is_solution_available(self):
+        \"\"\"is a solution available for this Item (is this different than feedback?)
+
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+
+    def get_solution(self):
+        \"\"\"get general feedback for this Item (is this different than feedback?)
+
+        to be overriden in a record extension
+
+        \"\"\"
+        if self.is_solution_available():
+            pass
+        raise IllegalState()
+
+    def is_feedback_available_for_response(self, response):
+        \"\"\"is feedback available for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+
+    def get_feedback_for_response(self, response):
+        \"\"\"get feedback for a particular response
+        
+        to be overriden in a record extension
+        
+        \"\"\"
+        if self.is_feedback_available_for_response(response):
+            pass # what is feedback anyway? Just a DisplayText or something more?
+        raise IllegalState()
+
+    def is_response_correct(self, response):
+        \"\"\"returns True if response evaluates to an Item Answer that is 100 percent correct
+
+        to be overriden in a record extension
+
+        \"\"\"
+        raise IllegalState()
+
+    def is_correctness_available_for_response(self, response):
+        \"\"\"is a measure of correctness available for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+    
+    def get_correctness_for_response(self, response):
+        \"\"\"get measure of correctness available for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        if self.is_correctness_available_for_response(response):
+            pass # return a correctness score 0 thru 100
+        raise IllegalState()
+
+    def is_learning_objective_available_for_response(self, response):
+        \"\"\"is a learning objective available for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+    
+    def get_learning_objective_for_response(self, response):
+        \"\"\"get learning objective for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        if self.is_learning_objective_available_for_response(response):
+            pass # return Objective Id
+        raise IllegalState()"""
 
 class ItemQuery:
 
@@ -1975,6 +2153,12 @@ class ItemSearchSession:
     import_statements = [
         'from . import searches',
     ]
+
+class BankForm:
+    get_bank_form_record = """
+        # this should be templated from Resource, but
+        # would have to update pattern mappers
+        return self._get_record(bank_record_type)"""
 
 class BankQuery:
     import_statements = [
