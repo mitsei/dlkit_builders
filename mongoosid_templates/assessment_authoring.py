@@ -292,12 +292,15 @@ class AssessmentPartAdminSession:
             pass
         else:
             parent_part_id = Id(result['assessmentPartId'])
-            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local)
+            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
             lookup_session = mgr.get_assessment_part_lookup_session_for_bank(self._catalog_id, proxy=self._proxy)
             if lookup_session.get_assessment_parts_for_assessment_part(parent_part_id).available() > 1:
                 mdata['sequestered']['is_read_only'] = True
                 mdata['sequestered']['is_required'] = True
-        obj_form = objects.AssessmentPartForm(result, runtime=self._runtime, mdata=mdata)
+        obj_form = objects.AssessmentPartForm(osid_object_map=result,
+                                              runtime=self._runtime,
+                                              proxy=self._proxy,
+                                              mdata=mdata)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
@@ -358,7 +361,7 @@ class AssessmentPart:
         return not self.is_sequestered()"""
 
     has_parent_part = """
-        return 'assessmentPartId' in self._my_map and self._my_map['assessmentPartId']"""
+        return bool('assessmentPartId' in self._my_map and self._my_map['assessmentPartId'])"""
     
     additional_methods = """
     def get_child_ids(self):

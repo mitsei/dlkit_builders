@@ -282,7 +282,10 @@ class Extensible:
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
-        return get_provider_manager(osid, runtime=self._runtime, proxy=self._proxy, local=local)"""
+        return get_provider_manager(osid,
+                                    runtime=self._runtime,
+                                    proxy=getattr(self, '_proxy', None),
+                                    local=local)"""
 
     has_record_type = """
         return str(record_type) in self._supported_record_type_ids"""
@@ -306,7 +309,7 @@ class Temporal:
 """
 
     is_effective = """
-        now = DateTime.now()
+        now = DateTime.utcnow()
         return self.get_start_date() <= now and self.get_end_date() >= now"""
 
     get_start_date = """
@@ -649,7 +652,7 @@ class OsidSession:
     def _effective_view_filter(self):
         \"\"\"Returns the mongodb relationship filter for effective views\"\"\"
         if self._effective_view == EFFECTIVE:
-            now = datetime.datetime.now()
+            now = datetime.datetime.utcnow()
             return {'startDate': {'$$lte': now}, 'endDate': {'$$gte': now}}
         return {}
 
@@ -864,8 +867,6 @@ class OsidForm:
         self._locale_map['scriptTypeId'] = str(locale.get_script_type())
         if runtime is not None:
             self._set_authority(runtime=runtime)
-        if 'mdata' in kwargs:
-            self._mdata.update(kwargs['mdata'])
         if 'catalog_id' in kwargs:
             self._catalog_id = kwargs['catalog_id']
 
@@ -1190,9 +1191,9 @@ class OsidTemporalForm:
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
         self._mdata.update(default_mdata.get_osid_temporal_mdata())
-        self._mdata['start_date'].update({'default_date_time_values': [datetime.datetime.now()]})
+        self._mdata['start_date'].update({'default_date_time_values': [datetime.datetime.utcnow()]})
         self._mdata['end_date'].update({
-            'default_date_time_values': [datetime.datetime.now() + datetime.timedelta(weeks=9999)]
+            'default_date_time_values': [datetime.datetime.utcnow() + datetime.timedelta(weeks=9999)]
         })
 
     def _init_map(self):
@@ -1445,6 +1446,9 @@ class OsidObjectForm:
         self._description_default = dict(self._mdata['description']['default_string_values'][0])
         self._genus_type_default = self._mdata['genus_type']['default_type_values'][0]
 
+        if 'mdata' in kwargs:
+            self._mdata.update(kwargs['mdata'])
+
     def _init_map(self, record_types=None):
         \"\"\"Initialize map for form\"\"\"
         OsidForm._init_map(self)
@@ -1605,6 +1609,8 @@ class OsidList:
             raise errors.OperationFailed()
         if isinstance(next_object, dict):
             next_object = object_class(osid_object_map=next_object, runtime=self._runtime, proxy=self._proxy)
+        elif isinstance(next_object, basestring) and object_class == Id:
+            next_object = Id(next_object)
         return next_object
 
     def next(self):
