@@ -1949,6 +1949,106 @@ class Response:
             raise errors.Unimplemented()
         return self._records[str(item_record_type)]"""
 
+class Item:
+
+    additional_methods = """
+    def is_feedback_available(self):
+        \"\"\"is general feedback available for this Item
+
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+
+    def get_feedback(self):
+        \"\"\"get general feedback for this Item
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        if self.is_feedback_available():
+            pass # what is feedback anyway? Just a DisplayText or something more?
+        raise IllegalState()
+
+    def is_solution_available(self):
+        \"\"\"is a solution available for this Item (is this different than feedback?)
+
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+
+    def get_solution(self):
+        \"\"\"get general feedback for this Item (is this different than feedback?)
+
+        to be overriden in a record extension
+
+        \"\"\"
+        if self.is_solution_available():
+            pass
+        raise IllegalState()
+
+    def is_feedback_available_for_response(self, response):
+        \"\"\"is feedback available for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+
+    def get_feedback_for_response(self, response):
+        \"\"\"get feedback for a particular response
+        
+        to be overriden in a record extension
+        
+        \"\"\"
+        if self.is_feedback_available_for_response(response):
+            pass # what is feedback anyway? Just a DisplayText or something more?
+        raise IllegalState()
+
+    def is_response_correct(self, response):
+        \"\"\"returns True if response evaluates to an Item Answer that is 100 percent correct
+
+        to be overriden in a record extension
+
+        \"\"\"
+        raise IllegalState()
+
+    def is_correctness_available_for_response(self, response):
+        \"\"\"is a measure of correctness available for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+    
+    def get_correctness_for_response(self, response):
+        \"\"\"get measure of correctness available for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        if self.is_correctness_available_for_response(response):
+            pass # return a correctness score 0 thru 100
+        raise IllegalState()
+
+    def is_learning_objective_available_for_response(self, response):
+        \"\"\"is a learning objective available for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+    
+    def get_learning_objective_for_response(self, response):
+        \"\"\"get learning objective for a particular response
+        
+        to be overriden in a record extension
+
+        \"\"\"
+        if self.is_learning_objective_available_for_response(response):
+            pass # return Objective Id
+        raise IllegalState()"""
 
 class ItemQuery:
 
