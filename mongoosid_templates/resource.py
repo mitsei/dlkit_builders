@@ -539,7 +539,9 @@ class ResourceAdminSession:
         return: (osid.id.Id) - the id of the new ${object_name}
         
         \"\"\"
-        mgr = self._get_provider_manager('REPOSITORY')
+        mgr = self._get_provider_manager('${package_name_replace_upper}',
+                                         runtime=self._runtime,
+                                         proxy=getattr(self, '_proxy', None))
         query_session = mgr.get_${object_name_under}_query_session_for_${cat_name_under}(self._catalog_id, proxy=self._proxy)
         query_form = query_session.get_${object_name_under}_query()
         query_form.match_enclosed_object_id(enclosure_id)
@@ -557,7 +559,9 @@ class ResourceAdminSession:
         collection = MongoClientValidated('${package_name_replace}',
                                           collection='${object_name}',
                                           runtime=self._runtime)
-        mgr = self._get_provider_manager('${package_name_replace_upper}')
+        mgr = self._get_provider_manager('${package_name_replace_upper}',
+                                         runtime=self._runtime,
+                                         proxy=getattr(self, '_proxy', None))
         lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_${cat_name_under}_view()
         try:

@@ -358,6 +358,13 @@ class AssessmentPartItemDesignSession:
 
     order_items = None
 
+class AssessmentPartLookupSession:
+    get_assessment_part = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_part(*args, **kwargs)"""
+
+
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """
         \"\"\"Pass through to provider method\"\"\"
