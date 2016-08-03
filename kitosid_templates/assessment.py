@@ -317,6 +317,11 @@ class AssessmentPartAdminSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_admin_session').duplicate_assessment_part(assessment_part_id)"""
 
+    delete_assessment_part = """
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').delete_assessment_part(*args, **kwargs)"""
+
+
 class AssessmentPartItemSession:
     get_assessment_part_items = """
         \"\"\"Pass through to provider method\"\"\"
