@@ -1064,14 +1064,6 @@ class Item:
             pass # what is feedback anyway? Just a DisplayText or something more?
         raise IllegalState()
 
-    def is_response_correct(self, response):
-        \"\"\"returns True if response evaluates to an Item Answer that is 100 percent correct
-
-        to be overriden in a record extension
-
-        \"\"\"
-        raise IllegalState()
-
     def is_correctness_available_for_response(self, response):
         \"\"\"is a measure of correctness available for a particular response
         
@@ -1080,6 +1072,16 @@ class Item:
         \"\"\"
         return False
     
+    def is_response_correct(self, response):
+        \"\"\"returns True if response evaluates to an Item Answer that is 100 percent correct
+
+        to be overriden in a record extension
+
+        \"\"\"
+        if self.is_correctness_available_for_response(response):
+            pass # return True or False
+        raise IllegalState()
+
     def get_correctness_for_response(self, response):
         \"\"\"get measure of correctness available for a particular response
         
@@ -2034,6 +2036,30 @@ class AssessmentSection:
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.get_learning_outcome_for_response(
+                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+        raise IllegalState()
+
+    def _is_correctness_available(self, item_id)
+        item = self._item_lookup_session.get_item(item_id)
+        response = self._get_question_map(item_id)['responses'][0]
+        if response:
+            return item.is_correctness_available_for_response(
+                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+        return False
+
+    def _is_correct(self, item_id)
+        item = self._item_lookup_session.get_item(item_id)
+        response = self._get_question_map(item_id)['responses'][0]
+        if response:
+            return item.is_response_correct(
+                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+        raise IllegalState()
+
+    def _get_correctness(self, item_id)
+        item = self._item_lookup_session.get_item(item_id)
+        response = self._get_question_map(item_id)['responses'][0]
+        if response:
+            return item.get_correctness_for_response(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
         raise IllegalState()
 
