@@ -1997,6 +1997,46 @@ class AssessmentSection:
                     return False
         raise errors.NotFound()
 
+    def _get_question_map(self, item_id):
+        return map for map in self._my_map['questions'] if map['questionId'] == str(item_id)
+
+    def _is_feedback_available(self, item_id):
+        item = self._item_lookup_session.get_item(item_id)
+        response = self._get_question_map(item_id)['responses'][0]
+        if response:
+            if item.is_feedback_available_for_response(response)
+            return True
+        else:
+            return item.is_feedback_available()
+
+    def _get_feedback(self, item_id):
+        item = self._item_lookup_session.get_item(item_id)
+        response = self._get_question_map(item_id)['responses'][0]
+        if response:
+            try:
+                return item.get_feedback_for_response(
+                    Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+            except IllegalState:
+                pass
+        else:
+            return item.get_feedback() # raises IllegalState
+
+    def _is_learning_outcome_available(self, item_id):
+        item = self._item_lookup_session.get_item(item_id)
+        response = self._get_question_map(item_id)['responses'][0]
+        if response:
+            return item.is_learning_outcome_available_for_response(
+                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+        return False
+
+    def _get_learning_outcome(self, item_id):
+        item = self._item_lookup_session.get_item(item_id)
+        response = self._get_question_map(item_id)['responses'][0]
+        if response:
+            return item.get_learning_outcome_for_response(
+                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+        raise IllegalState()
+
     def _finish(self):
         self._my_map['over'] = True # finished == over?
         self._my_map['completionTime'] = DateTime.utcnow()
