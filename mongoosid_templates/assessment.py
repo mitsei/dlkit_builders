@@ -1814,13 +1814,13 @@ class AssessmentSection:
             module_path = '.'.join(import_path_with_class.split('.')[0:-1])
             magic_class = import_path_with_class.split('.')[-1]
             module = importlib.import_module(module_path)
-            session = getattr(module, magic_class)(runtime=self._runtime,
+            session = getattr(module, magic_class)(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
+                                                   runtime=self._runtime,
                                                    proxy=self._proxy)
         except (AttributeError, KeyError, errors.NotFound):
             mgr = self._get_provider_manager('ASSESSMENT', local=True)
-            session = mgr.get_item_lookup_session(proxy=self._proxy)
-
-        session.use_federated_bank_view()
+            session = mgr.get_item_lookup_session(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
+                                                  proxy=self._proxy)
         return session
 
     def _get_questions(self, answered=None):
