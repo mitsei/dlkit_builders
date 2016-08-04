@@ -1720,6 +1720,7 @@ class AssessmentSection:
 
     def _get_part_lookup_session(self):
         \"\"\"Gets an AssessmentPart given a part_id\"\"\"
+
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
@@ -1799,15 +1800,25 @@ class AssessmentSection:
             
     def _get_assessment_part_lookup_session(self):
         # First do something special to get a magic session, if available.
-        # TO BE IMPLEMENTED!
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
+            import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+            module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+            magic_class = import_path_with_class.split('.')[-1]
+            module = importlib.import_module(module_path)
+            session = getattr(module, magic_class)(self.get_id(),
+                                                   catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
+                                                   runtime=self._runtime,
+                                                   proxy=self._proxy)
+        except (AttributeError, KeyError, errors.NotFound):
+            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+            session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         session.use_federated_bank_view()
         return session
 
     def _get_item_lookup_session(self):
         # First do something special to get a magic session, if available.
-        # TO BE IMPLEMENTED!
         try:
             config = self._runtime.get_configuration()
             parameter_id = Id('parameter:magicItemLookupSessions@mongo')
@@ -1822,6 +1833,7 @@ class AssessmentSection:
             mgr = self._get_provider_manager('ASSESSMENT', local=True)
             session = mgr.get_item_lookup_session(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
                                                   proxy=self._proxy)
+        session.use_federated_bank_view()
         return session
 
     def _get_questions(self, answered=None):
