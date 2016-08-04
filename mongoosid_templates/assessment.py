@@ -1848,11 +1848,14 @@ class AssessmentSection:
         item = self._get_item_lookup_session().get_item(question_id)
         question = item.get_question()
         try:
-            new_display_name = [q['displayElements']
-                                for q in self._my_map['questions']
-                                if q['questionId'] == str(question_id)][0]
-            new_display_name = [str(e) for e in new_display_name]
-            question.set_display_label('.'.join(new_display_name))
+            matching_questions = [q['displayElements']
+                                 for q in self._my_map['questions']
+                                 if q['questionId'] == str(question_id)]
+            if len(matching_questions) > 0:
+                new_display_name = matching_questions[0]
+                new_display_name = [str(e) for e in new_display_name]
+                question.set_display_label('.'.join(new_display_name))
+                
         except AttributeError:
             pass
         return question
