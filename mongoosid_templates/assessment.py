@@ -1419,7 +1419,8 @@ class AssessmentTaken:
             return next_section
         else:
             return get_assessment_section(
-                self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1])
+                Id(self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1]),
+                runtime=self._runtime)
 
     def _get_assessment_sections(self):
         \"\"\"Gets a SectionList of all Sections currently known to this AssessmentTaken\"\"\"
@@ -1858,7 +1859,13 @@ class AssessmentSection:
 
         except AttributeError:
             pass
-        return question
+
+        # only return the question if the item is part of this section ... not just "in this bank"
+        section_question_ids = [q['questionId'] for q in self._my_map['questions']]
+        if str(question_id) in section_question_ids:
+            return question
+        else:
+            raise errors.NotFound
 
     def _get_answers(self, question_id):
         # What if we want the wrong answers, too?
