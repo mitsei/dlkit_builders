@@ -413,6 +413,10 @@ class AssessmentSession:
         \"\"\"Get correctness for this item in this section\"\"\"
         return self.get_assessment_section(assessment_section_id)._get_correctness(item_id)
 
+    def get_confused_learning_objective_ids(assessment_section_id, item_id):
+        \"\"\"Get confused objective ids for this item in this section\"\"\"
+        return self.get_assessment_section(assessment_section_id)._get_confused_learning_objective_ids(item_id)
+
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
         mgr = self._get_provider_manager('ASSESSMENT')
@@ -1092,22 +1096,14 @@ class Item:
             pass # return a correctness score 0 thru 100
         raise IllegalState()
 
-    def is_confused_learning_objective_available_for_response(self, response):
-        \"\"\"is a learning objective available for a particular response
-        
-        to be overriden in a record extension
-
-        \"\"\"
-        return False
-    
-    def get_confused_learning_objective_for_response(self, response):
-        \"\"\"get learning objective for a particular response
+    def get_confused_learning_objective_ids_for_response(self, response):
+        \"\"\"get learning objectives for a particular response
         
         to be overriden in a record extension
 
         \"\"\"
         if self.is_learning_objective_available_for_response(response):
-            pass # return Objective Id
+            pass # return Objective IdList
         raise IllegalState()"""
 
 
@@ -2030,19 +2026,11 @@ class AssessmentSection:
         else:
             return item.get_feedback() # raises IllegalState
 
-    def _is_confused_learning_objective_available(self, item_id):
+    def _get_confused_learning_objective_ids(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
-            return item.is_confused_learning_objective_available_for_response(
-                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
-        return False
-
-    def _get_confused_learning_objective(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
-        response = self._get_question_map(item_id)['responses'][0]
-        if response:
-            return item.get_confused_learning_objective_for_response(
+            return item.get_confused_learning_objective_ids_for_response(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
         raise IllegalState()
 
