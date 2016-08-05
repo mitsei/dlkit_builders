@@ -1828,16 +1828,25 @@ class AssessmentSection:
                     index += 1
             
     def _get_assessment_part_lookup_session(self):
-        # First do something special to get a magic session, if available.
-        # TO BE IMPLEMENTED!
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        # This appears to share code with _get_item_lookup_session
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
+            import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+            module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+            magic_class = import_path_with_class.split('.')[-1]
+            module = importlib.import_module(module_path)
+            session = getattr(module, magic_class)(runtime=self._runtime,
+                                                   proxy=self._proxy)
+        except (AttributeError, KeyError, errors.NotFound):
+            mgr = self._get_provider_manager('ASSESSMENT', local=True)
+            session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+
         session.use_federated_bank_view()
         return session
 
     def _get_item_lookup_session(self):
-        # First do something special to get a magic session, if available.
-        # TO BE IMPLEMENTED!
+        # This appears to share code with _get_assessment_part_lookup_session
         try:
             config = self._runtime.get_configuration()
             parameter_id = Id('parameter:magicItemLookupSessions@mongo')
@@ -2000,16 +2009,14 @@ class AssessmentSection:
         raise errors.NotFound()
 
     def _get_question_map(self, item_id):
-        return map for map in self._my_map['questions'] if map['questionId'] == str(item_id)
+        return (map for map in self._my_map['questions'] if map['questionId'] == str(item_id))
 
     def _is_feedback_available(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
-            if item.is_feedback_available_for_response(response)
-            return True
-        else:
-            return item.is_feedback_available()
+            return item.is_feedback_available_for_response(response)
+        return item.is_feedback_available()
 
     def _get_feedback(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
@@ -2023,7 +2030,7 @@ class AssessmentSection:
         else:
             return item.get_feedback() # raises IllegalState
 
-    def _is_learning_outcome_available(self, item_id):
+    def _is_learning_objective_available(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
@@ -2031,7 +2038,7 @@ class AssessmentSection:
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
         return False
 
-    def _get_learning_outcome(self, item_id):
+    def _get_learning_objective(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
@@ -2039,7 +2046,7 @@ class AssessmentSection:
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
         raise IllegalState()
 
-    def _is_correctness_available(self, item_id)
+    def _is_correctness_available(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
@@ -2047,7 +2054,7 @@ class AssessmentSection:
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
         return False
 
-    def _is_correct(self, item_id)
+    def _is_correct(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
@@ -2055,7 +2062,7 @@ class AssessmentSection:
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
         raise IllegalState()
 
-    def _get_correctness(self, item_id)
+    def _get_correctness(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
