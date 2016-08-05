@@ -1092,7 +1092,7 @@ class Item:
             pass # return a correctness score 0 thru 100
         raise IllegalState()
 
-    def is_learning_objective_available_for_response(self, response):
+    def is_confused_learning_objective_available_for_response(self, response):
         \"\"\"is a learning objective available for a particular response
         
         to be overriden in a record extension
@@ -1100,7 +1100,7 @@ class Item:
         \"\"\"
         return False
     
-    def get_learning_objective_for_response(self, response):
+    def get_confused_learning_objective_for_response(self, response):
         \"\"\"get learning objective for a particular response
         
         to be overriden in a record extension
@@ -2030,19 +2030,19 @@ class AssessmentSection:
         else:
             return item.get_feedback() # raises IllegalState
 
-    def _is_learning_objective_available(self, item_id):
+    def _is_confused_learning_objective_available(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
-            return item.is_learning_outcome_available_for_response(
+            return item.is_confused_learning_objective_available_for_response(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
         return False
 
-    def _get_learning_objective(self, item_id):
+    def _get_confused_learning_objective(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
-            return item.get_learning_outcome_for_response(
+            return item.get_confused_learning_objective_for_response(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
         raise IllegalState()
 
