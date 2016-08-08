@@ -1748,17 +1748,9 @@ class AssessmentSection:
             return True
         return False
 
-    def _get_part_lookup_session(self):
-        \"\"\"Gets an AssessmentPart given a part_id\"\"\"
-
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
-        lookup_session.use_federated_bank_view()
-        return lookup_session
-
     def _get_assessment_part(self, part_id):
         \"\"\"Gets an AssessmentPart given a part_id\"\"\"
-        lookup_session = self._get_part_lookup_session()
+        lookup_session = self._get_assessment_part_lookup_session()
         return lookup_session.get_assessment_part(part_id)
 
     def _update(self):
@@ -1818,7 +1810,7 @@ class AssessmentSection:
             if (len(self._my_map['questions']) == index or 
                     self._my_map['questions'][index]['assessmentPartId'] != part_map['assessmentPartId']):
                 part_id = part_map['assessmentPartId']
-                for item in self._get_part_lookup_session().get_part(part_id).get_items():
+                for item in self._get_assessment_part_lookup_session().get_part(part_id).get_items():
                     self._my_map['questions'].insert(index, get_default_question_map(
                         item.get_id(), item.get_question().get_id(), Id(part_id), []))
                     index += 1
