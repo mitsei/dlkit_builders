@@ -316,13 +316,11 @@ class AssessmentAuthoringProfile:
     def __init__(self, interface_name):
         osid_managers.OsidProfile.__init__(self)
 
-    def _get_hierarchy_session(self):
+    def _get_hierarchy_session(self, proxy=None):
+        # currently proxy not used, even if it's passed in...
         try:
             base_package_mgr = self._get_base_package_provider_manager('assessment')
-            return base_package_mgr.get_bank_hierarchy_session(
-                Id(authority='ASSESSMENT',
-                   namespace='CATALOG',
-                   identifier='BANK'))
+            return base_package_mgr.get_bank_hierarchy_session(proxy)
         except Unsupported:
             return None
 

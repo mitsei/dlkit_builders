@@ -248,7 +248,7 @@ class AssessmentPartAdminSession:
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if assessment_part_record_types == []:
             assessment_part_record_types = None
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local)
+        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         lookup_session = mgr.get_assessment_part_lookup_session_for_bank(self._catalog_id, proxy=self._proxy)
         child_parts = lookup_session.get_assessment_parts_for_assessment_part(assessment_part_id)
         mdata = {}
@@ -256,12 +256,13 @@ class AssessmentPartAdminSession:
         if child_parts.available == 0:
             pass
         else:
+            mdata['sequestered'] = {}
             mdata['sequestered']['is_read_only'] = True
             mdata['sequestered']['is_required'] = True
-            if child_parts.next().is_section():
-                mdata['sequestered']['default_boolean_values'] = ['False']
+            if child_parts.available() > 0 and child_parts.next().is_section():
+                mdata['sequestered']['default_boolean_values'] = [False]
             else:
-                mdata['sequestered']['default_boolean_values'] = ['True']
+                mdata['sequestered']['default_boolean_values'] = [True]
         ## WHY are we passing bank_id = self._catalog_id below, seems redundant:
         obj_form = objects.AssessmentPartForm(
             bank_id=self._catalog_id,

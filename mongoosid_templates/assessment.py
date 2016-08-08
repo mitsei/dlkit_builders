@@ -1048,7 +1048,6 @@ class Item:
 
     def get_feedback(self):
         \"\"\"get general feedback for this Item
-        
         to be overriden in a record extension
 
         \"\"\"
@@ -1076,7 +1075,6 @@ class Item:
 
     def is_feedback_available_for_response(self, response):
         \"\"\"is feedback available for a particular response
-        
         to be overriden in a record extension
 
         \"\"\"
@@ -1084,9 +1082,7 @@ class Item:
 
     def get_feedback_for_response(self, response):
         \"\"\"get feedback for a particular response
-        
         to be overriden in a record extension
-        
         \"\"\"
         if self.is_feedback_available_for_response(response):
             pass # what is feedback anyway? Just a DisplayText or something more?
@@ -1112,7 +1108,7 @@ class Item:
 
     def get_correctness_for_response(self, response):
         \"\"\"get measure of correctness available for a particular response
-        
+
         to be overriden in a record extension
 
         \"\"\"
@@ -1120,13 +1116,20 @@ class Item:
             pass # return a correctness score 0 thru 100
         raise IllegalState()
 
+    def are_confused_learning_objective_ids_available_for_response(self, response):
+        \"\"\"is a learning objective available for a particular response
+        to be overriden in a record extension
+
+        \"\"\"
+        return False
+
     def get_confused_learning_objective_ids_for_response(self, response):
         \"\"\"get learning objectives for a particular response
         
         to be overriden in a record extension
 
         \"\"\"
-        if self.is_learning_objective_available_for_response(response):
+        if self.are_confused_learning_objective_ids_available_for_response(response):
             pass # return Objective IdList
         raise IllegalState()"""
 
@@ -1470,7 +1473,8 @@ class AssessmentTaken:
             return next_section
         else:
             return get_assessment_section(
-                self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1])
+                Id(self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1]),
+                runtime=self._runtime)
 
     def _get_assessment_sections(self):
         \"\"\"Gets a SectionList of all Sections currently known to this AssessmentTaken\"\"\"
@@ -1768,16 +1772,9 @@ class AssessmentSection:
             return True
         return False
 
-    def _get_part_lookup_session(self):
-        \"\"\"Gets an AssessmentPart given a part_id\"\"\"
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
-        lookup_session.use_federated_bank_view()
-        return lookup_session
-
     def _get_assessment_part(self, part_id):
         \"\"\"Gets an AssessmentPart given a part_id\"\"\"
-        lookup_session = self._get_part_lookup_session()
+        lookup_session = self._get_assessment_part_lookup_session()
         return lookup_session.get_assessment_part(part_id)
 
     def _update(self):
@@ -1837,7 +1834,7 @@ class AssessmentSection:
             if (len(self._my_map['questions']) == index or 
                     self._my_map['questions'][index]['assessmentPartId'] != part_map['assessmentPartId']):
                 part_id = part_map['assessmentPartId']
-                for item in self._get_part_lookup_session().get_part(part_id).get_items():
+                for item in self._get_assessment_part_lookup_session().get_part(part_id).get_items():
                     self._my_map['questions'].insert(index, get_default_question_map(
                         item.get_id(), item.get_question().get_id(), Id(part_id), []))
                     index += 1
@@ -1849,6 +1846,7 @@ class AssessmentSection:
             
     def _get_assessment_part_lookup_session(self):
         # This appears to share code with _get_item_lookup_session
+        # First do something special to get a magic session, if available.
         try:
             config = self._runtime.get_configuration()
             parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
@@ -1856,17 +1854,19 @@ class AssessmentSection:
             module_path = '.'.join(import_path_with_class.split('.')[0:-1])
             magic_class = import_path_with_class.split('.')[-1]
             module = importlib.import_module(module_path)
-            session = getattr(module, magic_class)(runtime=self._runtime,
+            session = getattr(module, magic_class)(self.get_id(),
+                                                   catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
+                                                   runtime=self._runtime,
                                                    proxy=self._proxy)
         except (AttributeError, KeyError, errors.NotFound):
-            mgr = self._get_provider_manager('ASSESSMENT', local=True)
+            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
             session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
-
         session.use_federated_bank_view()
         return session
 
     def _get_item_lookup_session(self):
         # This appears to share code with _get_assessment_part_lookup_session
+        # First do something special to get a magic session, if available.
         try:
             config = self._runtime.get_configuration()
             parameter_id = Id('parameter:magicItemLookupSessions@mongo')
@@ -1874,12 +1874,13 @@ class AssessmentSection:
             module_path = '.'.join(import_path_with_class.split('.')[0:-1])
             magic_class = import_path_with_class.split('.')[-1]
             module = importlib.import_module(module_path)
-            session = getattr(module, magic_class)(runtime=self._runtime,
+            session = getattr(module, magic_class)(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
+                                                   runtime=self._runtime,
                                                    proxy=self._proxy)
         except (AttributeError, KeyError, errors.NotFound):
             mgr = self._get_provider_manager('ASSESSMENT', local=True)
-            session = mgr.get_item_lookup_session(proxy=self._proxy)
-
+            session = mgr.get_item_lookup_session(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
+                                                  proxy=self._proxy)
         session.use_federated_bank_view()
         return session
 
@@ -1908,14 +1909,23 @@ class AssessmentSection:
         item = self._get_item_lookup_session().get_item(question_id)
         question = item.get_question()
         try:
-            new_display_name = [q['displayElements']
-                                for q in self._my_map['questions']
-                                if q['questionId'] == str(question_id)][0]
-            new_display_name = [str(e) for e in new_display_name]
-            question.set_display_label('.'.join(new_display_name))
+            matching_questions = [q['displayElements']
+                                  for q in self._my_map['questions']
+                                  if q['questionId'] == str(question_id)]
+            if len(matching_questions) > 0:
+                new_display_name = matching_questions[0]
+                new_display_name = [str(e) for e in new_display_name]
+                question.set_display_label('.'.join(new_display_name))
+
         except AttributeError:
             pass
-        return question
+
+        # only return the question if the item is part of this section ... not just "in this bank"
+        section_question_ids = [q['questionId'] for q in self._my_map['questions']]
+        if str(question_id) in section_question_ids:
+            return question
+        else:
+            raise errors.NotFound
 
     def _get_answers(self, question_id):
         # What if we want the wrong answers, too?
@@ -2045,7 +2055,7 @@ class AssessmentSection:
             try:
                 return item.get_feedback_for_response(
                     Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
-            except IllegalState:
+            except errors.IllegalState:
                 pass
         else:
             return item.get_feedback() # raises IllegalState
@@ -2056,7 +2066,7 @@ class AssessmentSection:
         if response:
             return item.get_confused_learning_objective_ids_for_response(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def _is_correctness_available(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
@@ -2072,7 +2082,7 @@ class AssessmentSection:
         if response:
             return item.is_response_correct(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def _get_correctness(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
@@ -2080,7 +2090,7 @@ class AssessmentSection:
         if response:
             return item.get_correctness_for_response(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def _finish(self):
         self._my_map['over'] = True # finished == over?
@@ -2160,107 +2170,6 @@ class Response:
         if str(item_record_type) not in self._records:
             raise errors.Unimplemented()
         return self._records[str(item_record_type)]"""
-
-class Item:
-
-    additional_methods = """
-    def is_feedback_available(self):
-        \"\"\"is general feedback available for this Item
-
-        to be overriden in a record extension
-
-        \"\"\"
-        return False
-
-    def get_feedback(self):
-        \"\"\"get general feedback for this Item
-        
-        to be overriden in a record extension
-
-        \"\"\"
-        if self.is_feedback_available():
-            pass # what is feedback anyway? Just a DisplayText or something more?
-        raise IllegalState()
-
-    def is_solution_available(self):
-        \"\"\"is a solution available for this Item (is this different than feedback?)
-
-        to be overriden in a record extension
-
-        \"\"\"
-        return False
-
-    def get_solution(self):
-        \"\"\"get general feedback for this Item (is this different than feedback?)
-
-        to be overriden in a record extension
-
-        \"\"\"
-        if self.is_solution_available():
-            pass
-        raise IllegalState()
-
-    def is_feedback_available_for_response(self, response):
-        \"\"\"is feedback available for a particular response
-        
-        to be overriden in a record extension
-
-        \"\"\"
-        return False
-
-    def get_feedback_for_response(self, response):
-        \"\"\"get feedback for a particular response
-        
-        to be overriden in a record extension
-        
-        \"\"\"
-        if self.is_feedback_available_for_response(response):
-            pass # what is feedback anyway? Just a DisplayText or something more?
-        raise IllegalState()
-
-    def is_response_correct(self, response):
-        \"\"\"returns True if response evaluates to an Item Answer that is 100 percent correct
-
-        to be overriden in a record extension
-
-        \"\"\"
-        raise IllegalState()
-
-    def is_correctness_available_for_response(self, response):
-        \"\"\"is a measure of correctness available for a particular response
-        
-        to be overriden in a record extension
-
-        \"\"\"
-        return False
-    
-    def get_correctness_for_response(self, response):
-        \"\"\"get measure of correctness available for a particular response
-        
-        to be overriden in a record extension
-
-        \"\"\"
-        if self.is_correctness_available_for_response(response):
-            pass # return a correctness score 0 thru 100
-        raise IllegalState()
-
-    def is_learning_objective_available_for_response(self, response):
-        \"\"\"is a learning objective available for a particular response
-        
-        to be overriden in a record extension
-
-        \"\"\"
-        return False
-    
-    def get_learning_objective_for_response(self, response):
-        \"\"\"get learning objective for a particular response
-        
-        to be overriden in a record extension
-
-        \"\"\"
-        if self.is_learning_objective_available_for_response(response):
-            pass # return Objective Id
-        raise IllegalState()"""
 
 class ItemQuery:
 

@@ -264,10 +264,13 @@ def update_parent_sequence_map(child_part, delete=False):
         object_map['childIds'].append(str(child_part.get_id()))
     collection.save(object_map)
 
-def remove_from_parent_sequence_map(assessment_part_id):
+def remove_from_parent_sequence_map(assessment_part_admin_session, assessment_part_id):
     """Updates the child map of a simple sequence assessment assessment part to remove child part"""
-    mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=None, proxy=None, local=True)
-    apls = mgr.get_assessment_part_lookup_session()
+    mgr = get_provider_manager('ASSESSMENT_AUTHORING',
+                               runtime=assessment_part_admin_session._runtime,
+                               proxy=assessment_part_admin_session._proxy,
+                               local=True)
+    apls = mgr.get_assessment_part_lookup_session(proxy=assessment_part_admin_session._proxy)
     apls.use_federated_bank_view()
     child_part = apls.get_assessment_part(assessment_part_id)
     update_parent_sequence_map(child_part, delete=True)

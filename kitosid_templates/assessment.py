@@ -317,6 +317,11 @@ class AssessmentPartAdminSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_admin_session').duplicate_assessment_part(assessment_part_id)"""
 
+    delete_assessment_part = """
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').delete_assessment_part(*args, **kwargs)"""
+
+
 class AssessmentPartItemSession:
     get_assessment_part_items = """
         \"\"\"Pass through to provider method\"\"\"
@@ -357,6 +362,18 @@ class AssessmentPartItemDesignSession:
     remove_items = None
 
     order_items = None
+
+class AssessmentPartLookupSession:
+    get_assessment_part = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_part(*args, **kwargs)"""
+
+    get_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts()"""
+
 
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """
@@ -497,7 +514,7 @@ class Bank:
             return self._provider_sessions[session_name]
         else:
             manager = self._get_sub_package_provider_manager(sub_package)
-            session = self._instantiate_session('get_' + session_name,
+            session = self._instantiate_session('get_' + session_name + '_for_bank',
                                                 proxy=self._proxy,
                                                 manager=manager)
             self._set_bank_view(session)
@@ -512,9 +529,15 @@ class Bank:
 
         session_class = getattr(manager, method_name)
         if proxy is None:
-            return session_class(*args, **kwargs)
+            try:
+                return session_class(bank_id=self._catalog_id, *args, **kwargs)
+            except AttributeError:
+                return session_class(*args, **kwargs)
         else:
-            return session_class(proxy=proxy, *args, **kwargs)
+            try:
+                return session_class(bank_id=self._catalog_id, proxy=proxy, *args, **kwargs)
+            except AttributeError:
+                return session_class(proxy=proxy, *args, **kwargs)
 
     def get_bank_id(self):
         \"\"\"Gets the Id of this bank."\"\"

@@ -100,7 +100,7 @@ class ResourceManager:
             return self._provider_sessions[session_name]
         else:
             manager = self._get_sub_package_provider_manager(sub_package)
-            session = self._instantiate_session('get_' + session_name,
+            session = self._instantiate_session('get_' + session_name + '_for_bank',
                                                 proxy=self._proxy,
                                                 manager=manager)
             self._set_bank_view(session)
@@ -112,9 +112,15 @@ class ResourceManager:
         \"\"\"Instantiates a provider session\"\"\"
         session_class = getattr(self._provider_manager, method_name)
         if proxy is None:
-            return session_class(*args, **kwargs)
+            try:
+                return session_class(bank_id=self._catalog_id, *args, **kwargs)
+            except AttributeError:
+                return session_class(*args, **kwargs)
         else:
-            return session_class(proxy=proxy, *args, **kwargs)
+            try:
+                return session_class(bank_id=self._catalog_id, proxy=proxy, *args, **kwargs)
+            except AttributeError:
+                return session_class(proxy=proxy, *args, **kwargs)
 
     def initialize(self, runtime):
         \"\"\"OSID Manager initialize\"\"\"
