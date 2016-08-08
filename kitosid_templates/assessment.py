@@ -369,6 +369,11 @@ class AssessmentPartLookupSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_lookup_session').get_assessment_part(*args, **kwargs)"""
 
+    get_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts()"""
+
 
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """

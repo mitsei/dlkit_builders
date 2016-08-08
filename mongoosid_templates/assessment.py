@@ -2039,7 +2039,7 @@ class AssessmentSection:
             try:
                 return item.get_feedback_for_response(
                     Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
-            except IllegalState:
+            except errors.IllegalState:
                 pass
         else:
             return item.get_feedback() # raises IllegalState
@@ -2050,7 +2050,7 @@ class AssessmentSection:
         if response:
             return item.get_confused_learning_objective_ids_for_response(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def _is_correctness_available(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
@@ -2066,7 +2066,7 @@ class AssessmentSection:
         if response:
             return item.is_response_correct(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def _get_correctness(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
@@ -2074,7 +2074,7 @@ class AssessmentSection:
         if response:
             return item.get_correctness_for_response(
                 Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def _finish(self):
         self._my_map['over'] = True # finished == over?
