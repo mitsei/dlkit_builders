@@ -426,6 +426,15 @@ class AssessmentSession:
 
 class AssessmentResultsSession:
 
+    import_statements = [
+        'from .assessment_utilities import get_assessment_section',
+        'from .assessment_utilities import get_item_lookup_session',
+        'from ..utilities import OsidListList',
+        'from ..primitives import Id',
+        'from .objects import ItemList',
+        'from .objects import ResponseList',
+    ]
+
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
@@ -449,18 +458,33 @@ class AssessmentResultsSession:
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
         taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
         taken = taken_lookup_session.get_assessment_taken(assessment_taken_id)
-        item_id_list = []
+        ils = get_item_lookup_session(runtime=self._runtime, proxy=self._proxy)
+        item_list = []
         if 'sections' in taken._my_map:
-            for section in taken._my_map['sections']:
-                if 'questions' in section:
-                    for question in section['questions']:
-                        item_list.append(Id(question['questionId']))
-                elif 'parts' in sections:
-                    for part in section['parts']:
-                        for question in part['questions']:
-                            item_list.append(Id(question['questionId']))
-        item_lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
-        return item_lookup_session.get_items_by_ids(item_list)"""
+            for section_id in taken._my_map['sections']:
+                section = get_assessment_section(Id(section_id))
+                for question in section._my_map['questions']:
+                    item_list.append(ils.get_item(question['questionId']))
+        return ItemList(item_list)"""
+
+    get_responses = """
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
+        taken = taken_lookup_session.get_assessment_taken(assessment_taken_id)
+        response_list = OsidListList
+        if 'sections' in taken._my_map:
+            for section_id in taken._my_map['sections']:
+                section = get_assessment_section(Id(section_id))
+                response_list.append(section._get_responses())
+        return ResponseList(response_list)"""
+
+    are_results_available = """
+        # not implemented yet
+        return False"""
+
+    get_grade_entries = """
+        # not implemented yet and are_results_available is False
+        raise IllegalState()"""
 
 class ItemAdminSession:
     

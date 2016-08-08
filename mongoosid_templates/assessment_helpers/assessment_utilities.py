@@ -192,6 +192,44 @@ def get_assessment_section(section_id, runtime=None, proxy=None):
     result = collection.find_one(dict({'_id': ObjectId(section_id.get_identifier())}))
     return AssessmentSection(osid_object_map=result, runtime=runtime, proxy=proxy)
 
+def get_assessment_part_lookup_session(self, runtime=None, proxy=None):
+    """returns an assessment part lookup session, perhaps even a magic one"""
+    # This appears to share code with get_item_lookup_session
+    try:
+        config = runtime.get_configuration()
+        parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
+        import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+        module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+        magic_class = import_path_with_class.split('.')[-1]
+        module = importlib.import_module(module_path)
+        session = getattr(module, magic_class)(runtime=runtime,
+                                               proxy=proxy)
+    except (AttributeError, KeyError, errors.NotFound):
+        mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
+        session = mgr.get_assessment_part_lookup_session(proxy=proxy)
+
+    session.use_federated_bank_view()
+    return session
+
+def get_item_lookup_session(self, runtime=None, proxy=None):
+    """returns an item lookup session, perhaps even a magic one"""
+    # This appears to share code with get_assessment_part_lookup_session
+    try:
+        config = runtime.get_configuration()
+        parameter_id = Id('parameter:magicItemLookupSessions@mongo')
+        import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+        module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+        magic_class = import_path_with_class.split('.')[-1]
+        module = importlib.import_module(module_path)
+        session = getattr(module, magic_class)(runtime=runtime,
+                                               proxy=proxy)
+    except (AttributeError, KeyError, errors.NotFound):
+        mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
+        session = mgr.get_item_lookup_session(proxy=proxy)
+
+    session.use_federated_bank_view()
+    return session
+
 def get_default_part_map(part_id, level):
     return {
         'assessmentPartId': str(part_id),
