@@ -991,7 +991,7 @@ class Item:
 
     def get_feedback(self):
         \"\"\"get general feedback for this Item
-        
+
         to be overriden in a record extension
 
         \"\"\"
@@ -1019,7 +1019,7 @@ class Item:
 
     def is_feedback_available_for_response(self, response):
         \"\"\"is feedback available for a particular response
-        
+
         to be overriden in a record extension
 
         \"\"\"
@@ -1029,7 +1029,7 @@ class Item:
         \"\"\"get feedback for a particular response
         
         to be overriden in a record extension
-        
+
         \"\"\"
         if self.is_feedback_available_for_response(response):
             pass # what is feedback anyway? Just a DisplayText or something more?
@@ -1045,7 +1045,7 @@ class Item:
 
     def is_correctness_available_for_response(self, response):
         \"\"\"is a measure of correctness available for a particular response
-        
+
         to be overriden in a record extension
 
         \"\"\"
@@ -1063,7 +1063,7 @@ class Item:
 
     def is_learning_objective_available_for_response(self, response):
         \"\"\"is a learning objective available for a particular response
-        
+
         to be overriden in a record extension
 
         \"\"\"
@@ -1419,7 +1419,8 @@ class AssessmentTaken:
             return next_section
         else:
             return get_assessment_section(
-                self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1])
+                Id(self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1]),
+                runtime=self._runtime)
 
     def _get_assessment_sections(self):
         \"\"\"Gets a SectionList of all Sections currently known to this AssessmentTaken\"\"\"
@@ -1719,6 +1720,7 @@ class AssessmentSection:
 
     def _get_part_lookup_session(self):
         \"\"\"Gets an AssessmentPart given a part_id\"\"\"
+
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
@@ -1798,15 +1800,25 @@ class AssessmentSection:
             
     def _get_assessment_part_lookup_session(self):
         # First do something special to get a magic session, if available.
-        # TO BE IMPLEMENTED!
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
+            import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+            module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+            magic_class = import_path_with_class.split('.')[-1]
+            module = importlib.import_module(module_path)
+            session = getattr(module, magic_class)(self.get_id(),
+                                                   catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
+                                                   runtime=self._runtime,
+                                                   proxy=self._proxy)
+        except (AttributeError, KeyError, errors.NotFound):
+            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+            session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         session.use_federated_bank_view()
         return session
 
     def _get_item_lookup_session(self):
         # First do something special to get a magic session, if available.
-        # TO BE IMPLEMENTED!
         try:
             config = self._runtime.get_configuration()
             parameter_id = Id('parameter:magicItemLookupSessions@mongo')
@@ -1814,12 +1826,13 @@ class AssessmentSection:
             module_path = '.'.join(import_path_with_class.split('.')[0:-1])
             magic_class = import_path_with_class.split('.')[-1]
             module = importlib.import_module(module_path)
-            session = getattr(module, magic_class)(runtime=self._runtime,
+            session = getattr(module, magic_class)(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
+                                                   runtime=self._runtime,
                                                    proxy=self._proxy)
         except (AttributeError, KeyError, errors.NotFound):
             mgr = self._get_provider_manager('ASSESSMENT', local=True)
-            session = mgr.get_item_lookup_session(proxy=self._proxy)
-
+            session = mgr.get_item_lookup_session(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
+                                                  proxy=self._proxy)
         session.use_federated_bank_view()
         return session
 
@@ -1848,14 +1861,23 @@ class AssessmentSection:
         item = self._get_item_lookup_session().get_item(question_id)
         question = item.get_question()
         try:
-            new_display_name = [q['displayElements']
-                                for q in self._my_map['questions']
-                                if q['questionId'] == str(question_id)][0]
-            new_display_name = [str(e) for e in new_display_name]
-            question.set_display_label('.'.join(new_display_name))
+            matching_questions = [q['displayElements']
+                                  for q in self._my_map['questions']
+                                  if q['questionId'] == str(question_id)]
+            if len(matching_questions) > 0:
+                new_display_name = matching_questions[0]
+                new_display_name = [str(e) for e in new_display_name]
+                question.set_display_label('.'.join(new_display_name))
+
         except AttributeError:
             pass
-        return question
+
+        # only return the question if the item is part of this section ... not just "in this bank"
+        section_question_ids = [q['questionId'] for q in self._my_map['questions']]
+        if str(question_id) in section_question_ids:
+            return question
+        else:
+            raise errors.NotFound
 
     def _get_answers(self, question_id):
         # What if we want the wrong answers, too?

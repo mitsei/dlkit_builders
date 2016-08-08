@@ -539,7 +539,7 @@ class ResourceAdminSession:
         return: (osid.id.Id) - the id of the new ${object_name}
         
         \"\"\"
-        mgr = self._get_provider_manager('REPOSITORY')
+        mgr = self._get_provider_manager('${package_name_replace_upper}')
         query_session = mgr.get_${object_name_under}_query_session_for_${cat_name_under}(self._catalog_id, proxy=self._proxy)
         query_form = query_session.get_${object_name_under}_query()
         query_form.match_enclosed_object_id(enclosure_id)
