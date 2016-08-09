@@ -463,13 +463,14 @@ class AssessmentPartForm:
         osid_objects.OsidContainableForm._init_metadata(self)
         osid_objects.OsidOperableForm._init_metadata(self)
         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
-        if 'assessmentPartId' not in kwargs:
+        if 'assessment_part_id' not in kwargs:
             # Only "Section" Parts are allowed directly under Assessments
-            # this is super dangerous, since it will change the values of
-            # default_mdata.OSID_CONTAINABLE in memory
             self._mdata['sequestered']['is_read_only'] = True
             self._mdata['sequestered']['is_required'] = True
             self._mdata['sequestered']['default_boolean_values'] = [False]
+        else:
+            if 'mdata' in kwargs:
+                self._mdata['sequestered'] = kwargs['mdata']['sequestered']
         self._assessment_part_default = self._mdata['assessment_part']['default_id_values'][0]
         self._assessment_default = self._mdata['assessment']['default_id_values'][0]
         self._weight_default = self._mdata['weight']['default_integer_values'][0]
@@ -484,6 +485,8 @@ class AssessmentPartForm:
         osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         if 'assessment_part_id' in kwargs:
             self._my_map['assessmentPartId'] = str(kwargs['assessment_part_id'])
+            if 'mdata' in kwargs:
+                self._my_map['sequestered'] = kwargs['mdata']['sequestered']['default_boolean_values'][0]
         else:
             self._my_map['assessmentPartId'] = self._assessment_part_default
             self._my_map['sequestered'] = False # Parts under Assessments must be "Sections"

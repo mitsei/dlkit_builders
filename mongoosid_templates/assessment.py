@@ -1633,6 +1633,7 @@ class AssessmentSection:
             part_lookup_session = authoring_mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         else:
             part_lookup_session = authoring_mgr.get_assessment_part_lookup_session()
+        part_lookup_session.use_unsequestered_assessment_part_view()
         part_lookup_session.use_federated_bank_view()
         self._assessment_part = part_lookup_session.get_assessment_part(self._assessment_part_id)
 
@@ -1778,7 +1779,14 @@ class AssessmentSection:
             return 0
 
         def insert_part_map():
-            part_index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
+            if str(prev_part_id) in self._my_map['assessmentParts']:
+                index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
+            elif str(prev_part_id) == str(self._assessment_part_id):
+                index = 0  # previous part
+            else:
+                return False
+
+            part_index = index
             absolute_level = prev_part_level + delta
             self._my_map['assessmentParts'].insert(part_index, get_default_part_map(part_id, absolute_level))
             return True
@@ -1831,7 +1839,6 @@ class AssessmentSection:
             magic_class = import_path_with_class.split('.')[-1]
             module = importlib.import_module(module_path)
             session = getattr(module, magic_class)(self.get_id(),
-                                                   catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
                                                    runtime=self._runtime,
                                                    proxy=self._proxy)
         except (AttributeError, KeyError, errors.NotFound):
@@ -1850,13 +1857,13 @@ class AssessmentSection:
             module_path = '.'.join(import_path_with_class.split('.')[0:-1])
             magic_class = import_path_with_class.split('.')[-1]
             module = importlib.import_module(module_path)
-            session = getattr(module, magic_class)(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
-                                                   runtime=self._runtime,
+            session = getattr(module, magic_class)(runtime=self._runtime,
                                                    proxy=self._proxy)
         except (AttributeError, KeyError, errors.NotFound):
             mgr = self._get_provider_manager('ASSESSMENT', local=True)
-            session = mgr.get_item_lookup_session(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
-                                                  proxy=self._proxy)
+            session = mgr.get_item_lookup_session(proxy=self._proxy)
+
+        session.use_unsequestered_assessment_part_view()
         session.use_federated_bank_view()
         return session
 

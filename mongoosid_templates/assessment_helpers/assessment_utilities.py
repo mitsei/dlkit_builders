@@ -72,17 +72,21 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
             # the given child as a param (prev_part_id) and make sure we
             # get the next child.
             child_ids = list(part.get_child_ids())
-            if prev_part_id not in child_ids:
+            child_id_strs = [str(c) for c in child_ids]
+            if str(prev_part_id) not in child_id_strs:
                 raise IllegalState('previous part is not a child of its own parent')
-            if prev_part_id == child_ids[-1]:
+            if str(prev_part_id) == child_id_strs[-1]:
                 pass
             else:
-                for index, child_id in enumerate(child_ids):
-                    if child_id == prev_part_id:
+                for index, child_id_str in enumerate(child_id_strs):
+                    if child_id_str == str(prev_part_id):
                         next_part_id = child_ids[index + 1]
                         level += 1
-    elif siblings and siblings[-1] != part_id:
-        next_part_id = siblings[siblings.index(part_id) + 1]
+                        check_parent = False
+                        break
+    elif siblings and str(siblings[-1]) != str(part_id):
+        siblings_str = [str(s) for s in siblings]
+        next_part_id = siblings[siblings_str.index(str(part_id)) + 1]
         check_parent = False
 
     if check_parent: # We are at a lowest leaf and need to check parent
@@ -164,6 +168,7 @@ def get_lookup_sessions(runtime, proxy):
     assessment_lookup_session.use_federated_bank_view()
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=runtime, proxy=proxy, local=True)
     part_lookup_session = mgr.get_assessment_part_lookup_session(proxy=proxy)
+    part_lookup_session.use_unsequestered_assessment_part_view()
     part_lookup_session.use_federated_bank_view()
     rule_lookup_session = mgr.get_sequence_rule_lookup_session(proxy=proxy)
     rule_lookup_session.use_federated_bank_view()

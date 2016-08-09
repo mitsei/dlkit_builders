@@ -374,6 +374,27 @@ class AssessmentPartLookupSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_lookup_session').get_assessment_parts()"""
 
+    use_sequestered_assessment_part_view = """
+        \"\"\"Pass through to provider AssessmentPartLookupSession.use_sequestered_assessment_part_view\"\"\"
+        self._containable_views['assessment_part'] = SEQUESTERED
+        self._get_sub_package_provider_session('assessment_authoring',
+                                               'assessment_part_lookup_session')
+        for session in self._provider_sessions:
+            try:
+                self._provider_sessions[session].use_sequestered_assessment_part_view()
+            except AttributeError:
+                pass"""
+
+    use_unsequestered_assessment_part_view = """
+        \"\"\"Pass through to provider AssessmentPartLookupSession.use_unsequestered_assessment_part_view\"\"\"
+        self._containable_views['assessment_part'] = UNSEQUESTERED
+        self._get_sub_package_provider_session('assessment_authoring',
+                                               'assessment_part_lookup_session')
+        for session in self._provider_sessions:
+            try:
+                self._provider_sessions[session].use_unsequestered_assessment_part_view()
+            except AttributeError:
+                pass"""
 
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """
@@ -446,6 +467,7 @@ class Bank:
         self._session_management = AUTOMATIC
         self._bank_view = DEFAULT
         self._object_views = dict()
+        self._containable_views = dict()
         self._sub_package_provider_managers = dict()
 
     def _set_bank_view(self, session):
@@ -472,6 +494,20 @@ class Bank:
             else:
                 try:
                     getattr(session, 'use_comparative_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+
+    def _set_containable_view(self, session):
+        \"\"\"Sets the underlying containable views to match current view\"\"\"
+        for obj_name in self._containable_views:
+            if self._containable_views[obj_name] == SEQUESTERED:
+                try:
+                    getattr(session, 'use_sequestered_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+            else:
+                try:
+                    getattr(session, 'use_unsequestered_' + obj_name + '_view')()
                 except AttributeError:
                     pass
 
