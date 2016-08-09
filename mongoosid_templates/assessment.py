@@ -1779,8 +1779,9 @@ class AssessmentSection:
             return 0
 
         def insert_part_map():
-            if str(prev_part_id) in self._my_map['assessmentParts']:
-                index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
+            prev_part_ids = [p['assessmentPartId'] for p in self._my_map['assessmentParts']]
+            if str(prev_part_id) in prev_part_ids:
+                index = prev_part_ids.index(str(prev_part_id)) + 1
             elif str(prev_part_id) == str(self._assessment_part_id):
                 index = 0  # previous part
             else:
@@ -1796,20 +1797,24 @@ class AssessmentSection:
         if part_id == self._assessment_part_id and self._is_simple_section():
             return
         finished = False
-        updated = False
+        number_updates = 0
         prev_part_id = None
         while not finished:
-            prev_part_level = get_part_level(prev_part_id)
             prev_part_id = part_id
+            prev_part_level = get_part_level(prev_part_id)
             try:
-                part_id, delta = get_next_part_id(part_id, runtime=self._runtime, proxy=self._proxy)
+                part_id, delta = get_next_part_id(part_id,
+                                                  runtime=self._runtime,
+                                                  proxy=self._proxy,
+                                                  unsequestered=True)
             except errors.IllegalState:
                 finished = True
             else:
                 if self._get_assessment_part(part_id).has_items():
                     if str(part_id) not in self._my_map['assessmentParts']:
-                        updated = insert_part_map()
-        return updated
+                        if insert_part_map():
+                            number_updates += 1
+        return number_updates > 0
 
     def _update_question_map(self):
         index = 0
@@ -1818,7 +1823,7 @@ class AssessmentSection:
             if (len(self._my_map['questions']) == index or 
                     self._my_map['questions'][index]['assessmentPartId'] != part_map['assessmentPartId']):
                 part_id = part_map['assessmentPartId']
-                for item in self._get_assessment_part_lookup_session().get_part(part_id).get_items():
+                for item in self._get_assessment_part_lookup_session().get_assessment_part(Id(part_id)).get_items():
                     self._my_map['questions'].insert(index, get_default_question_map(
                         item.get_id(), item.get_question().get_id(), Id(part_id), []))
                     index += 1
@@ -1844,6 +1849,7 @@ class AssessmentSection:
         except (AttributeError, KeyError, errors.NotFound):
             mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
             session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        session.use_unsequestered_assessment_part_view()
         session.use_federated_bank_view()
         return session
 
@@ -1863,7 +1869,6 @@ class AssessmentSection:
             mgr = self._get_provider_manager('ASSESSMENT', local=True)
             session = mgr.get_item_lookup_session(proxy=self._proxy)
 
-        session.use_unsequestered_assessment_part_view()
         session.use_federated_bank_view()
         return session
 

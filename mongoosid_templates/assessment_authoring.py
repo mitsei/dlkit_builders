@@ -348,7 +348,7 @@ class AssessmentPart:
     
     # Is there a way to template this so that all sub-package objects get a catalog import?
     import_statements = [
-        'from ..assessment.objects import Bank',
+        'from ..assessment.objects import Bank, ItemList',
         'from ..id.objects import IdList',
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
@@ -384,7 +384,7 @@ class AssessmentPart:
 
     def has_children(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
-        return self._supports_simple_sequencing() and self._my_map['childIds']
+        return bool(self._supports_simple_sequencing() and self._my_map['childIds'])
 
     def are_items_sequential(self):
         \"\"\"This can be overridden by a record extension\"\"\"
@@ -408,6 +408,17 @@ class AssessmentPart:
         if 'itemIds' in self._my_map and self._my_map['itemIds']:
             return True
         return False
+
+    def get_items(self):
+        \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        ils = mgr.get_item_lookup_session(proxy=self._proxy)
+        ils.use_federated_bank_view()
+        items = []
+        if self.has_items():
+            for idstr in self._my_map['itemIds']:
+                items.append(ils.get_item(Id(idstr)))
+        return ItemList(items, runtime=self._runtime, proxy=self._proxy)
 
     def get_item_ids(self):
         \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
@@ -441,6 +452,18 @@ class AssessmentPart:
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         return lookup_session.get_assessment_part(next_part_id)"""
+
+    get_child_assessment_part_ids = """
+        return IdList(self._my_map['childIds'])"""
+
+    get_child_assessment_parts = """
+        \"\"\"only returned unsequestered children? \"\"\"
+        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+        if not mgr.supports_assessment_part_lookup():
+            raise errors.OperationFailed('Bank does not support Assessment Part lookup')
+        lookup_session = mgr.get_assessment_part_lookup_session(proxy=getattr(self, "_proxy", None))
+        lookup_session.use_federated_bank_view()
+        return lookup_session.get_assessment_parts_by_ids(self.get_child_ids())"""
 
 
 class AssessmentPartForm:
