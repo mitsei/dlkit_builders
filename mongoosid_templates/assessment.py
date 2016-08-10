@@ -51,7 +51,7 @@ class AssessmentSession:
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
         'from . import objects',
-        'from .rules import Response',
+        #'from .rules import Response',
         'from ..osid.sessions import OsidSession',
         'from ..utilities import MongoClientValidated',
 		'from ..utilities import get_registry',
@@ -1888,7 +1888,8 @@ class AssessmentSection:
         def update_question_list():
             \"\"\"Supportive function to aid readability of _get_questions.\"\"\"
             question_id = Id(question_map['questionId'])
-            question_answered = bool(question_map['responses'][0])
+            question_answered = bool(question_map['responses'][0] and 
+                                     'responseCleared' not in question_map['responses'][0])
             if answered is None or answered == question_answered:
                 question_list.append(self._get_question(question_id))
             return question_answered
@@ -1989,7 +1990,7 @@ class AssessmentSection:
         
         \"\"\"
         if answer_form is None:
-            response = {}
+            response = {'responseCleared': DateTime.utcnow()}
         else:
             response = dict(answer_form._my_map)
             response['submissionTime'] = DateTime.utcnow()
@@ -2006,25 +2007,15 @@ class AssessmentSection:
         \"\"\"Gets the latest response\"\"\"
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(question_id):
-                if (len(question_map['responses']) > 0 and
-                        question_map['responses'][0] is not None):
-                    return Response(Answer(
-                        osid_object_map=question_map['responses'][0],
-                        runtime=self._runtime,
-                        proxy=self._proxy))
-                else:
-                    raise errors.IllegalState('No response is currently available for question_id')
+                return Response(osid_object_map=question_map['responses'][0],
+                                runtime=self._runtime,
+                                proxy=self._proxy)
         raise errors.NotFound()
 
     def _get_responses(self):
         answer_list = []
         for question_map in self._my_map['questions']:
-            if (len(question_map['responses']) > 0 and
-                    question_map['responses'][0] is not None):
-                answer_list.append(Answer(
-                        osid_object_map=question_map['responses'][0],
-                        runtime=self._runtime,
-                        proxy=self._proxy))
+            answer_list.append(question_map['responses'][0])
         return ResponseList(answer_list,
                             runtime=self._runtime,
                             proxy=self._proxy)
@@ -2032,7 +2023,7 @@ class AssessmentSection:
     def _is_question_answered(self, item_id):
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == item_id:
-                if question_map['responses'][0]:
+                if question_map['responses'][0] and 'responseCleared' not in question_map['responses'][0]:
                     return True
                 else:
                     return False
@@ -2123,20 +2114,30 @@ class Response:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from ..utilities import get_registry',
+        'UNANSWERED = 0',
+        'SKIPPED = 1',
     ]
     
     init = """
-    _record_type_data_sets = {}
     _namespace = 'assessment.Response'
     
-    def __init__(self, answer, **kwargs):
-        self._my_answer = answer
+    def __init__(self, osid_object_map, runtime=None, proxy=None, **kwargs):
+        if osid_object_map is None:
+            self._my_answer == UNANSWERED
+        elif len(osid_object_map) == 1:
+            self._my_answer == SKIPPED
+        else:
+            # Expects osid_object_map to really be an answer's map
+            self._my_answer = Answer(osid_object_map, runtime=runtime, proxy=proxy)
         self._records = dict()
         # Consider that responses may want to have their own records separate
         # from the enclosed Answer records:
-        self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', answer._runtime)
-        response_map = answer.object_map
-        self._load_records(response_map['recordTypeIds'])
+        self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', runtime)
+        if osid_object_map:
+            record_type_ids = osid_object_map['recordTypeIds']
+        else:
+            record_type_ids = []
+        self._load_records(record_type_ids)
 
     def _load_records(self, record_type_idstrs):
         for record_type_idstr in record_type_idstrs:
@@ -2151,6 +2152,10 @@ class Response:
         return getattr(self, item)
     
     def __getattr__(self, name):
+        if self._my_answer == UNANSWERED:
+            raise IllegalState('this Item has not been answered)
+        if self._my_answer == SKIPPED:
+            raise IllegalState('this Item has been skipped)
         if not name.startswith('__'):
             try:
                 return getattr(self._my_answer, name)
@@ -2170,6 +2175,17 @@ class Response:
         if str(item_record_type) not in self._records:
             raise errors.Unimplemented()
         return self._records[str(item_record_type)]"""
+
+    additional_methods = """
+    def is_answered(self):
+        if self._my_answer in [UNANSWERED, SKIPPED]:
+            return False
+        return True
+
+    def is_skipped(self):
+        if self._my_answer == SKIPPED:
+            return True
+        return False"""
 
 class ItemQuery:
 
