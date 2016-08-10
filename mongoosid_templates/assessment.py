@@ -1610,6 +1610,7 @@ class AssessmentSection:
         'from .assessment_utilities import get_assessment_section',
         'from .assessment_utilities import get_default_question_map',
         'from .assessment_utilities import get_default_part_map',
+        'from .assessment_utilities import get_assessment_part_lookup_session',
         'from .rules import Response',
     ]
 
@@ -1839,19 +1840,9 @@ class AssessmentSection:
     def _get_assessment_part_lookup_session(self):
         # This appears to share code with _get_item_lookup_session
         # First do something special to get a magic session, if available.
-        try:
-            config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
-            import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
-            module_path = '.'.join(import_path_with_class.split('.')[0:-1])
-            magic_class = import_path_with_class.split('.')[-1]
-            module = importlib.import_module(module_path)
-            session = getattr(module, magic_class)(self,
-                                                   runtime=self._runtime,
-                                                   proxy=self._proxy)
-        except (AttributeError, KeyError, errors.NotFound):
-            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-            session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        session = get_assessment_part_lookup_session(self._runtime,
+                                                     self._proxy,
+                                                     self)
         session.use_unsequestered_assessment_part_view()
         session.use_federated_bank_view()
         return session
