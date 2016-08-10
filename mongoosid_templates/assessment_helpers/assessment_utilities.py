@@ -1,4 +1,5 @@
 """Utilities for use by assessment package implementations"""
+import importlib
 
 from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
 from dlkit.abstract_osid.assessment.objects import Assessment as abc_assessment
@@ -172,11 +173,24 @@ def create_first_assessment_section(assessment_id, runtime, proxy, bank_id):
     return part_id
 
 def get_lookup_sessions(runtime, proxy, unsequestered):
+    # this has to use the magic part lookup session, too, if available ...
     mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
     assessment_lookup_session = mgr.get_assessment_lookup_session(proxy=proxy)
     assessment_lookup_session.use_federated_bank_view()
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=runtime, proxy=proxy, local=True)
-    part_lookup_session = mgr.get_assessment_part_lookup_session(proxy=proxy)
+    try:
+        config = runtime.get_configuration()
+        parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
+        import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+        module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+        magic_class = import_path_with_class.split('.')[-1]
+        module = importlib.import_module(module_path)
+        part_lookup_session = getattr(module, magic_class)(None,
+                                                           runtime=runtime,
+                                                           proxy=proxy)
+    except (AttributeError, KeyError, NotFound):
+        mgr = get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+        part_lookup_session = mgr.get_assessment_part_lookup_session(proxy=proxy)
     if unsequestered:
         part_lookup_session.use_unsequestered_assessment_part_view()
     part_lookup_session.use_federated_bank_view()

@@ -449,20 +449,42 @@ class AssessmentPart:
 
     def get_next_assessment_part(self, assessment_part_id):
         next_part_id = self.get_next_assessment_part_id(assessment_part_id)
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
-        return lookup_session.get_assessment_part(next_part_id)"""
+        lookup_session = self._get_assessment_part_lookup_session()
+        return lookup_session.get_assessment_part(next_part_id)
+
+    def _get_assessment_part_lookup_session(self):
+        \"\"\"need to account for magic parts\"\"\"
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
+            import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+            module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+            magic_class = import_path_with_class.split('.')[-1]
+            module = importlib.import_module(module_path)
+            section = getattr(self, '_assessment_section', None)
+            session = getattr(module, magic_class)(section,  # will only have this attribute if self is itself a magic part!
+                                                   runtime=self._runtime,
+                                                   proxy=self._proxy)
+        except (AttributeError, KeyError, errors.NotFound):
+            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+            session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        session.use_unsequestered_assessment_part_view()
+        session.use_federated_bank_view()
+        return session"""
+
+    get_assessment_part = """
+        lookup_session = self._get_assessment_part_lookup_session()
+        return lookup_session.get_assessment_part(self.get_assessment_part_id())
+
+    assessment_part = property(fget=get_assessment_part)"""
 
     get_child_assessment_part_ids = """
         return IdList(self._my_map['childIds'])"""
 
     get_child_assessment_parts = """
         \"\"\"only returned unsequestered children? \"\"\"
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        if not mgr.supports_assessment_part_lookup():
-            raise errors.OperationFailed('Bank does not support Assessment Part lookup')
-        lookup_session = mgr.get_assessment_part_lookup_session(proxy=getattr(self, "_proxy", None))
-        lookup_session.use_federated_bank_view()
+        lookup_session = self._get_assessment_part_lookup_session()
+        lookup_session.use_sequestered_assessment_part_view()
         return lookup_session.get_assessment_parts_by_ids(self.get_child_ids())"""
 
 
