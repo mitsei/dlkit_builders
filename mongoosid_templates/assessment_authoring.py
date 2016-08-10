@@ -348,10 +348,11 @@ class AssessmentPart:
     
     # Is there a way to template this so that all sub-package objects get a catalog import?
     import_statements = [
-        'from ..assessment.objects import Bank',
+        'from ..assessment.objects import Bank, ItemList',
         'from ..id.objects import IdList',
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.mongo.assessment.assessment_utilities import get_assessment_part_lookup_session',
         """SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
     'authority': 'ODL.MIT.EDU',
     'namespace': 'osid-object',
@@ -384,7 +385,7 @@ class AssessmentPart:
 
     def has_children(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
-        return self._supports_simple_sequencing() and self._my_map['childIds']
+        return bool(self._supports_simple_sequencing() and self._my_map['childIds'])
 
     def are_items_sequential(self):
         \"\"\"This can be overridden by a record extension\"\"\"
@@ -408,6 +409,17 @@ class AssessmentPart:
         if 'itemIds' in self._my_map and self._my_map['itemIds']:
             return True
         return False
+
+    def get_items(self):
+        \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        ils = mgr.get_item_lookup_session(proxy=self._proxy)
+        ils.use_federated_bank_view()
+        items = []
+        if self.has_items():
+            for idstr in self._my_map['itemIds']:
+                items.append(ils.get_item(Id(idstr)))
+        return ItemList(items, runtime=self._runtime, proxy=self._proxy)
 
     def get_item_ids(self):
         \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
@@ -438,9 +450,33 @@ class AssessmentPart:
 
     def get_next_assessment_part(self, assessment_part_id):
         next_part_id = self.get_next_assessment_part_id(assessment_part_id)
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
-        return lookup_session.get_assessment_part(next_part_id)"""
+        lookup_session = self._get_assessment_part_lookup_session()
+        return lookup_session.get_assessment_part(next_part_id)
+
+    def _get_assessment_part_lookup_session(self):
+        \"\"\"need to account for magic parts\"\"\"
+        section = getattr(self, '_assessment_section', None)
+        session = get_assessment_part_lookup_session(self._runtime,
+                                                     self._proxy,
+                                                     section)
+        session.use_unsequestered_assessment_part_view()
+        session.use_federated_bank_view()
+        return session"""
+
+    get_assessment_part = """
+        lookup_session = self._get_assessment_part_lookup_session()
+        return lookup_session.get_assessment_part(self.get_assessment_part_id())
+
+    assessment_part = property(fget=get_assessment_part)"""
+
+    get_child_assessment_part_ids = """
+        return IdList(self._my_map['childIds'])"""
+
+    get_child_assessment_parts = """
+        \"\"\"only returned unsequestered children? \"\"\"
+        lookup_session = self._get_assessment_part_lookup_session()
+        lookup_session.use_sequestered_assessment_part_view()
+        return lookup_session.get_assessment_parts_by_ids(self.get_child_ids())"""
 
 
 class AssessmentPartForm:
@@ -463,13 +499,14 @@ class AssessmentPartForm:
         osid_objects.OsidContainableForm._init_metadata(self)
         osid_objects.OsidOperableForm._init_metadata(self)
         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
-        if 'assessmentPartId' not in kwargs:
+        if 'assessment_part_id' not in kwargs:
             # Only "Section" Parts are allowed directly under Assessments
-            # this is super dangerous, since it will change the values of
-            # default_mdata.OSID_CONTAINABLE in memory
             self._mdata['sequestered']['is_read_only'] = True
             self._mdata['sequestered']['is_required'] = True
             self._mdata['sequestered']['default_boolean_values'] = [False]
+        else:
+            if 'mdata' in kwargs:
+                self._mdata['sequestered'] = kwargs['mdata']['sequestered']
         self._assessment_part_default = self._mdata['assessment_part']['default_id_values'][0]
         self._assessment_default = self._mdata['assessment']['default_id_values'][0]
         self._weight_default = self._mdata['weight']['default_integer_values'][0]
@@ -484,6 +521,8 @@ class AssessmentPartForm:
         osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         if 'assessment_part_id' in kwargs:
             self._my_map['assessmentPartId'] = str(kwargs['assessment_part_id'])
+            if 'mdata' in kwargs:
+                self._my_map['sequestered'] = kwargs['mdata']['sequestered']['default_boolean_values'][0]
         else:
             self._my_map['assessmentPartId'] = self._assessment_part_default
             self._my_map['sequestered'] = False # Parts under Assessments must be "Sections"

@@ -1179,6 +1179,7 @@ class Assessment:
         next_part_id = self.get_next_assessment_part_id(assessment_part_id)
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
         return lookup_session.get_assessment_part(next_part_id)
 
     def are_items_sequential(self):
@@ -1633,6 +1634,7 @@ class AssessmentSection:
         'from .assessment_utilities import get_assessment_section',
         'from .assessment_utilities import get_default_question_map',
         'from .assessment_utilities import get_default_part_map',
+        'from .assessment_utilities import get_assessment_part_lookup_session',
         'from .rules import Response',
     ]
 
@@ -1657,16 +1659,19 @@ class AssessmentSection:
             part_lookup_session = authoring_mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         else:
             part_lookup_session = authoring_mgr.get_assessment_part_lookup_session()
+        part_lookup_session.use_unsequestered_assessment_part_view()
         part_lookup_session.use_federated_bank_view()
         self._assessment_part = part_lookup_session.get_assessment_part(self._assessment_part_id)
-
-        if 'questions' not in self._my_map: # This is the first instantiation
-            self._initialize_part_map()
 
         if '_id' not in self._my_map:
             # could happen if not created with items -- then self._initialize_part_map()
             # will not call self._save(). But we need to assign it an ID
+            # this has to happen before _initialize_part_map(),
+            # otherwise Parts won't be able to work...
             self._save()
+
+        if 'questions' not in self._my_map: # This is the first instantiation
+            self._initialize_part_map()
 
     def _initialize_part_map(self):
         \"\"\"Sets up assessmentPartMap with as much information as is initially available.\"\"\"
@@ -1802,7 +1807,15 @@ class AssessmentSection:
             return 0
 
         def insert_part_map():
-            part_index = self._my_map['assessmentParts'].index(str(prev_part_id)) + 1
+            prev_part_ids = [p['assessmentPartId'] for p in self._my_map['assessmentParts']]
+            if str(prev_part_id) in prev_part_ids:
+                index = prev_part_ids.index(str(prev_part_id)) + 1
+            elif str(prev_part_id) == str(self._assessment_part_id):
+                index = 0  # previous part
+            else:
+                return False
+
+            part_index = index
             absolute_level = prev_part_level + delta
             self._my_map['assessmentParts'].insert(part_index, get_default_part_map(part_id, absolute_level))
             return True
@@ -1812,20 +1825,24 @@ class AssessmentSection:
         if part_id == self._assessment_part_id and self._is_simple_section():
             return
         finished = False
-        updated = False
+        number_updates = 0
         prev_part_id = None
         while not finished:
-            prev_part_level = get_part_level(prev_part_id)
             prev_part_id = part_id
+            prev_part_level = get_part_level(prev_part_id)
             try:
-                part_id, delta = get_next_part_id(part_id, runtime=self._runtime, proxy=self._proxy)
+                part_id, delta = get_next_part_id(part_id,
+                                                  runtime=self._runtime,
+                                                  proxy=self._proxy,
+                                                  unsequestered=True)
             except errors.IllegalState:
                 finished = True
             else:
                 if self._get_assessment_part(part_id).has_items():
                     if str(part_id) not in self._my_map['assessmentParts']:
-                        updated = insert_part_map()
-        return updated
+                        if insert_part_map():
+                            number_updates += 1
+        return number_updates > 0
 
     def _update_question_map(self):
         index = 0
@@ -1834,7 +1851,7 @@ class AssessmentSection:
             if (len(self._my_map['questions']) == index or 
                     self._my_map['questions'][index]['assessmentPartId'] != part_map['assessmentPartId']):
                 part_id = part_map['assessmentPartId']
-                for item in self._get_assessment_part_lookup_session().get_part(part_id).get_items():
+                for item in self._get_assessment_part_lookup_session().get_assessment_part(Id(part_id)).get_items():
                     self._my_map['questions'].insert(index, get_default_question_map(
                         item.get_id(), item.get_question().get_id(), Id(part_id), []))
                     index += 1
@@ -1847,20 +1864,10 @@ class AssessmentSection:
     def _get_assessment_part_lookup_session(self):
         # This appears to share code with _get_item_lookup_session
         # First do something special to get a magic session, if available.
-        try:
-            config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
-            import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
-            module_path = '.'.join(import_path_with_class.split('.')[0:-1])
-            magic_class = import_path_with_class.split('.')[-1]
-            module = importlib.import_module(module_path)
-            session = getattr(module, magic_class)(self.get_id(),
-                                                   catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
-                                                   runtime=self._runtime,
-                                                   proxy=self._proxy)
-        except (AttributeError, KeyError, errors.NotFound):
-            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-            session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+        session = get_assessment_part_lookup_session(self._runtime,
+                                                     self._proxy,
+                                                     self)
+        session.use_unsequestered_assessment_part_view()
         session.use_federated_bank_view()
         return session
 
@@ -1874,13 +1881,12 @@ class AssessmentSection:
             module_path = '.'.join(import_path_with_class.split('.')[0:-1])
             magic_class = import_path_with_class.split('.')[-1]
             module = importlib.import_module(module_path)
-            session = getattr(module, magic_class)(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
-                                                   runtime=self._runtime,
+            session = getattr(module, magic_class)(runtime=self._runtime,
                                                    proxy=self._proxy)
         except (AttributeError, KeyError, errors.NotFound):
             mgr = self._get_provider_manager('ASSESSMENT', local=True)
-            session = mgr.get_item_lookup_session(catalog_id=Id(self._assessment_taken._my_map['assignedBankIds'][0]),
-                                                  proxy=self._proxy)
+            session = mgr.get_item_lookup_session(proxy=self._proxy)
+
         session.use_federated_bank_view()
         return session
 
@@ -1896,7 +1902,8 @@ class AssessmentSection:
 
         prev_question_answered = True
         question_list = []
-        # self._update() # Make sure we are current with database. Do we need this?
+        #self._update() # Make sure we are current with database. Do we need this?
+        #self._update_questions()  # Make sure questions list is current
         for question_map in self._my_map['questions']:
             if self.are_items_sequential():
                 if prev_question_answered:
