@@ -53,8 +53,8 @@ def get_first_part_id_for_assessment(assessment_id, runtime=None, proxy=None, cr
         else:
             raise
 
-def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=None, unsequestered=False):
-    part, rule, siblings = get_decision_objects(part_id, runtime, proxy, unsequestered)
+def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=None, unsequestered=False, section=None):
+    part, rule, siblings = get_decision_objects(part_id, runtime, proxy, unsequestered, section)
     check_parent = True
     if rule is not None: # A SequenceRule trumps everything.
         next_part_id = rule.get_next_assessment_part_id()
@@ -128,10 +128,11 @@ def get_level_delta(part1_id, part2_id, runtime, proxy):
     else:
         return 0
 
-def get_decision_objects(part_id, runtime, proxy, unsequestered):
+def get_decision_objects(part_id, runtime, proxy, unsequestered, section):
     assessment_lookup_session, part_lookup_session, rule_lookup_session = get_lookup_sessions(runtime,
                                                                                               proxy,
-                                                                                              unsequestered)
+                                                                                              unsequestered,
+                                                                                              section)
     sibling_ids = []
     try:
         part = part_lookup_session.get_assessment_part(part_id)
@@ -172,13 +173,13 @@ def create_first_assessment_section(assessment_id, runtime, proxy, bank_id):
         rule_admin_session.create_rule(rule_form)
     return part_id
 
-def get_lookup_sessions(runtime, proxy, unsequestered):
+def get_lookup_sessions(runtime, proxy, unsequestered, section):
     # this has to use the magic part lookup session, too, if available ...
     mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
     assessment_lookup_session = mgr.get_assessment_lookup_session(proxy=proxy)
     assessment_lookup_session.use_federated_bank_view()
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=runtime, proxy=proxy, local=True)
-    part_lookup_session = get_assessment_part_lookup_session(runtime, proxy)
+    part_lookup_session = get_assessment_part_lookup_session(runtime, proxy, section)
     if unsequestered:
         part_lookup_session.use_unsequestered_assessment_part_view()
     part_lookup_session.use_federated_bank_view()

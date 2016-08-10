@@ -1810,12 +1810,14 @@ class AssessmentSection:
                 part_id, delta = get_next_part_id(part_id,
                                                   runtime=self._runtime,
                                                   proxy=self._proxy,
-                                                  unsequestered=True)
+                                                  unsequestered=True,
+                                                  section=self)
             except errors.IllegalState:
                 finished = True
             else:
                 if self._get_assessment_part(part_id).has_items():
-                    if str(part_id) not in self._my_map['assessmentParts']:
+                    current_part_ids = [p['assessmentPartId'] for p in self._my_map['assessmentParts']]
+                    if str(part_id) not in current_part_ids:
                         if insert_part_map():
                             number_updates += 1
         return number_updates > 0
@@ -1878,7 +1880,7 @@ class AssessmentSection:
         prev_question_answered = True
         question_list = []
         #self._update() # Make sure we are current with database. Do we need this?
-        #self._update_questions()  # Make sure questions list is current
+        self._update_questions()  # Make sure questions list is current
         for question_map in self._my_map['questions']:
             if self.are_items_sequential():
                 if prev_question_answered:
@@ -2022,7 +2024,7 @@ class AssessmentSection:
         raise errors.NotFound()
 
     def _get_question_map(self, item_id):
-        return (map for map in self._my_map['questions'] if map['questionId'] == str(item_id))
+        return [map for map in self._my_map['questions'] if map['questionId'] == str(item_id)][0]
 
     def _is_feedback_available(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
@@ -2060,7 +2062,7 @@ class AssessmentSection:
         return False
 
     def _is_correct(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
+        item = self._get_item_lookup_session().get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.is_response_correct(
