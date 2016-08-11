@@ -473,7 +473,7 @@ class AssessmentPart:
         return IdList(self._my_map['childIds'])"""
 
     get_child_assessment_parts = """
-        \"\"\"only returned unsequestered children? \"\"\"
+        # only returned unsequestered children?
         lookup_session = self._get_assessment_part_lookup_session()
         lookup_session.use_sequestered_assessment_part_view()
         return lookup_session.get_assessment_parts_by_ids(self.get_child_ids())"""

@@ -94,8 +94,12 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
                         break
     elif siblings and str(siblings[-1]) != str(part_id):
         siblings_str = [str(s) for s in siblings]
-        next_part_id = siblings[siblings_str.index(str(part_id)) + 1]
-        check_parent = False
+        try:
+            next_part_id = siblings[siblings_str.index(str(part_id)) + 1]
+            check_parent = False
+        except ValueError:
+            # the given partId is not in the siblings
+            check_parent = True
 
     if check_parent: # We are at a lowest leaf and need to check parent
         if isinstance(part, abc_assessment): # This is an Assessment masquerading as an AssessmentPart

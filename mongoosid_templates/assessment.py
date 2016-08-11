@@ -2039,26 +2039,32 @@ class AssessmentSection:
         if response:
             try:
                 return item.get_feedback_for_response(
-                    Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                    Response(Answer(osid_object_map=response,
+                                    runtime=self._runtime,
+                                    proxy=self._proxy)))
             except errors.IllegalState:
                 pass
         else:
             return item.get_feedback() # raises IllegalState
 
     def _get_confused_learning_objective_ids(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
+        item = self._get_item_lookup_session().get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.get_confused_learning_objective_ids_for_response(
-                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                Response(Answer(osid_object_map=response,
+                                runtime=self._runtime,
+                                proxy=self._proxy)))
         raise errors.IllegalState()
 
     def _is_correctness_available(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
+        item = self._get_item_lookup_session().get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.is_correctness_available_for_response(
-                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                Response(Answer(osid_object_map=response,
+                                runtime=self._runtime,
+                                proxy=self._proxy)))
         return False
 
     def _is_correct(self, item_id):
@@ -2066,15 +2072,19 @@ class AssessmentSection:
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.is_response_correct(
-                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                Response(Answer(osid_object_map=response,
+                                runtime=self._runtime,
+                                proxy=self._proxy)))
         raise errors.IllegalState()
 
     def _get_correctness(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
+        item = self._get_item_lookup_session().get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.get_correctness_for_response(
-                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                Response(Answer(osid_object_map=response,
+                                runtime=self._runtime,
+                                proxy=self._proxy)))
         raise errors.IllegalState()
 
     def _finish(self):
