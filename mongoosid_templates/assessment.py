@@ -1834,26 +1834,75 @@ class AssessmentSection:
                 part_id, delta = get_next_part_id(part_id,
                                                   runtime=self._runtime,
                                                   proxy=self._proxy,
-                                                  unsequestered=True)
+                                                  unsequestered=True,
+                                                  section=self)
             except errors.IllegalState:
                 finished = True
             else:
                 if self._get_assessment_part(part_id).has_items():
-                    if str(part_id) not in self._my_map['assessmentParts']:
+                    current_part_ids = [p['assessmentPartId'] for p in self._my_map['assessmentParts']]
+                    if str(part_id) not in current_part_ids:
                         if insert_part_map():
                             number_updates += 1
         return number_updates > 0
 
     def _update_question_map(self):
+        def __get_question_display_elements(question_part_map):
+            # only get the parts in this route
+            # go backwards until you find a part with level 1?
+            # stop there, so that you don't get shifted to the previous part
+            # i.e. [level 1, level 2, level 1, level 2]
+            #      when running this on the last question, you want to get
+            #      the indices relative to the second level 1, not including
+            #      the first two parts
+            display_elements = []
+            parts_in_same_route = {}
+
+            if question_part_map['level'] > 1:
+                question_map = question_part_map
+                search_index = self._my_map['assessmentParts'].index(question_part_map)
+                level_1_part = {}
+                found_target_question = False
+                while not found_target_question:
+                    if question_map['level'] not in parts_in_same_route:
+                        parts_in_same_route[question_map['level']] = []
+                    parts_in_same_route[question_map['level']].insert(0, question_map)
+                    search_index -= 1
+                    question_map = self._my_map['assessmentParts'][search_index]
+                    level = question_map['level']
+                    if level == 1:
+                        level_1_part = question_map  # let's preserve this for later
+                        found_target_question = True
+            else:
+                level_1_part = question_part_map
+
+            # get all level 1 parts to get the first index
+            all_level_1_parts = [p
+                                 for p in self._my_map['assessmentParts']
+                                 if p['level'] == 1]
+            display_elements.append(all_level_1_parts.index(level_1_part) + 1)
+
+            for level, waypoints in parts_in_same_route.iteritems():
+                display_elements.append(len(waypoints))
+
+            return display_elements
+
         index = 0
         for part_map in self._my_map['assessmentParts']:
-
-            if (len(self._my_map['questions']) == index or 
+            if (len(self._my_map['questions']) == index or
                     self._my_map['questions'][index]['assessmentPartId'] != part_map['assessmentPartId']):
                 part_id = part_map['assessmentPartId']
                 for item in self._get_assessment_part_lookup_session().get_assessment_part(Id(part_id)).get_items():
+                    # need to update the display elements for the question
+                    # kind of convoluted, but the first part of the display elements
+                    # is the "part_index" of the previous level 1 question (if parts were organized
+                    # by level) ... let's re-organize the parts.
+                    display_elements = __get_question_display_elements(part_map)
                     self._my_map['questions'].insert(index, get_default_question_map(
-                        item.get_id(), item.get_question().get_id(), Id(part_id), []))
+                        item.get_id(),
+                        item.get_question().get_id(),
+                        Id(part_id),
+                        display_elements))
                     index += 1
                     
             else: # skip through all remaining questions for this part
@@ -1903,7 +1952,7 @@ class AssessmentSection:
         prev_question_answered = True
         question_list = []
         #self._update() # Make sure we are current with database. Do we need this?
-        #self._update_questions()  # Make sure questions list is current
+        self._update_questions()  # Make sure questions list is current
         for question_map in self._my_map['questions']:
             if self.are_items_sequential():
                 if prev_question_answered:
@@ -2037,7 +2086,7 @@ class AssessmentSection:
         raise errors.NotFound()
 
     def _get_question_map(self, item_id):
-        return (map for map in self._my_map['questions'] if map['questionId'] == str(item_id))
+        return [map for map in self._my_map['questions'] if map['questionId'] == str(item_id)][0]
 
     def _is_feedback_available(self, item_id):
         item = self._item_lookup_session.get_item(item_id)
@@ -2052,42 +2101,52 @@ class AssessmentSection:
         if response:
             try:
                 return item.get_feedback_for_response(
-                    Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                    Response(Answer(osid_object_map=response,
+                                    runtime=self._runtime,
+                                    proxy=self._proxy)))
             except errors.IllegalState:
                 pass
         else:
             return item.get_feedback() # raises IllegalState
 
     def _get_confused_learning_objective_ids(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
+        item = self._get_item_lookup_session().get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.get_confused_learning_objective_ids_for_response(
-                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                Response(Answer(osid_object_map=response,
+                                runtime=self._runtime,
+                                proxy=self._proxy)))
         raise errors.IllegalState()
 
     def _is_correctness_available(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
+        item = self._get_item_lookup_session().get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.is_correctness_available_for_response(
-                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                Response(Answer(osid_object_map=response,
+                                runtime=self._runtime,
+                                proxy=self._proxy)))
         return False
 
     def _is_correct(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
+        item = self._get_item_lookup_session().get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.is_response_correct(
-                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                Response(Answer(osid_object_map=response,
+                                runtime=self._runtime,
+                                proxy=self._proxy)))
         raise errors.IllegalState()
 
     def _get_correctness(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
+        item = self._get_item_lookup_session().get_item(item_id)
         response = self._get_question_map(item_id)['responses'][0]
         if response:
             return item.get_correctness_for_response(
-                Response(Answer(response, runtime=self._runtime, proxy=self._proxy)))
+                Response(Answer(osid_object_map=response,
+                                runtime=self._runtime,
+                                proxy=self._proxy)))
         raise errors.IllegalState()
 
     def _finish(self):
