@@ -1997,7 +1997,7 @@ class AssessmentSection:
         
         \"\"\"
         if answer_form is None:
-            response = {'responseCleared': DateTime.utcnow()}
+            response = {'nullSubmission': DateTime.utcnow()}
         else:
             response = dict(answer_form._my_map)
             response['submissionTime'] = DateTime.utcnow()
@@ -2121,8 +2121,8 @@ class Response:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from ..utilities import get_registry',
-        'UNANSWERED = 0',
-        'SKIPPED = 1',
+        'NO_SUBMISSION = 0',
+        'NULL_SUBMISSION = 1',
     ]
     
     init = """
@@ -2130,12 +2130,14 @@ class Response:
     
     def __init__(self, osid_object_map, runtime=None, proxy=None, **kwargs):
         if osid_object_map is None:
-            self._my_answer == UNANSWERED
-        elif len(osid_object_map) == 1:
-            self._my_answer == SKIPPED
+            self._my_answer == NO_SUBMISSION
+        elif 'nullSubmission' in osid_object_map:
+            self._my_answer == NULL_SUBMISSION
+            self._submission_time = osid_object_map['nullSubmission']
         else:
             # Expects osid_object_map to really be an answer's map
             self._my_answer = Answer(osid_object_map, runtime=runtime, proxy=proxy)
+            self._submission_time = osid_object_map['submissionTime']
         self._records = dict()
         # Consider that responses may want to have their own records separate
         # from the enclosed Answer records:
@@ -2159,10 +2161,10 @@ class Response:
         return getattr(self, item)
     
     def __getattr__(self, name):
-        if self._my_answer == UNANSWERED:
-            raise IllegalState('this Item has not been answered)
-        if self._my_answer == SKIPPED:
-            raise IllegalState('this Item has been skipped)
+        if self._my_answer == NO_SUBMISSION:
+            raise IllegalState('this Item has not been attempted)
+        if self._my_answer == NULL_SUBMISSION:
+            raise IllegalState('this Item has been skipped or cleared)
         if not name.startswith('__'):
             try:
                 return getattr(self._my_answer, name)
@@ -2185,14 +2187,19 @@ class Response:
 
     additional_methods = """
     def is_answered(self):
-        if self._my_answer in [UNANSWERED, SKIPPED]:
+        if self._my_answer in [NO_SUBMISSION, NULL_SUBMISSION]:
             return False
         return True
 
-    def is_skipped(self):
-        if self._my_answer == SKIPPED:
+    def is_null_submission(self):
+        if self._my_answer == NULL_SUBMISSION:
             return True
-        return False"""
+        return False
+
+    def get_submission_time(self):
+        if self._submission_time:
+            return self._submission_time
+        raise IllegalState('Item was not attempted')"""
 
 class ItemQuery:
 
