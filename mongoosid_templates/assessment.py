@@ -2245,9 +2245,9 @@ class Response:
     
     def __getattr__(self, name):
         if self._my_answer == UNANSWERED:
-            raise IllegalState('this Item has not been attempted)
+            raise IllegalState('this Item has not been attempted')
         if self._my_answer == NULL_SUBMISSION:
-            raise IllegalState('this Item has been skipped or cleared)
+            raise IllegalState('this Item has been skipped or cleared')
         if not name.startswith('__'):
             try:
                 return getattr(self._my_answer, name)
