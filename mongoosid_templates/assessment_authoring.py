@@ -230,6 +230,7 @@ class AssessmentPartAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ...abstract_osid.assessment_authoring.objects import AssessmentPartForm as ABCAssessmentPartForm',
         'from ...abstract_osid.id.primitives import Id as ABCId',
+        'from dlkit.mongo.assessment.assessment_utilities import get_assessment_part_lookup_session',
         'DESCENDING = -1',
         'ASCENDING = 1',
         'CREATED = True',
@@ -306,6 +307,31 @@ class AssessmentPartAdminSession:
 
         return obj_form"""
 
+    delete_assessment_part = """
+        # Should be implemented from template for
+        # osid.learning.ObjectiveAdminSession.delete_objective_template
+        # but need to handle magic part delete ...
+
+        if not isinstance(assessment_part_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+        collection = MongoClientValidated('assessment_authoring',
+                                          collection='AssessmentPart',
+                                          runtime=self._runtime)
+        if collection.find({'assessmentPartId': str(assessment_part_id)}).count() != 0:
+            raise errors.IllegalState('there are still AssessmentParts associated with this AssessmentPart')
+
+        collection = MongoClientValidated('assessment_authoring',
+                                          collection='AssessmentPart',
+                                          runtime=self._runtime)
+        try:
+            apls = get_assessment_part_lookup_session(runtime=self._runtime,
+                                                      proxy=self._proxy)
+            apls.use_unsequestered_assessment_part_view()
+            apls.use_federated_bank_view()
+            part = apls.get_assessment_part(assessment_part_id)
+            part.delete()
+        except AttributeError:
+            collection.delete_one({'_id': ObjectId(assessment_part_id.get_identifier())})"""
 
 class AssessmentPartItemSession:
 
@@ -513,6 +539,17 @@ class AssessmentPartForm:
         self._allocated_time_default = self._mdata['allocated_time']['default_duration_values'][0]
         self._items_sequential_default = None
         self._items_shuffled_default = None
+        self._mdata['children'] = {
+            'element_label': 'Children',
+            'instructions': 'accepts an IdList',
+            'required': False,
+            'read_only': False,
+            'linked': False,
+            'array': False,
+            'default_id_values': [''],
+            'syntax': 'ID',
+            'id_set': []
+        }
 
     def _init_map(self, record_types=None, **kwargs):
         \"\"\"Initialize form map\"\"\"
