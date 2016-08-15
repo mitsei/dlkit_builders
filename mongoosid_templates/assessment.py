@@ -1171,7 +1171,8 @@ class Assessment:
             part_id = assessment_part_id
         return get_next_part_id(part_id,
                                 runtime=self._runtime,
-                                proxy=self._proxy)[0]
+                                proxy=self._proxy,
+                                sequestered=True)[0]
         # if self.has_next_assessment_part(assessment_part_id):
         #     return Id(self._my_map['childIds'][self._my_map['childIds'].index(str(assessment_part_id)) + 1])
 
@@ -1467,7 +1468,8 @@ class AssessmentTaken:
                                              proxy=self._proxy)
             next_part_id, level = get_next_part_id(section._assessment_part_id,
                                                    runtime=self._runtime,
-                                                   proxy=self._proxy) # Raises IllegalState
+                                                   proxy=self._proxy,
+                                                   sequestered=True) # Raises IllegalState
             next_section = self._create_section(next_part_id)
             self._my_map['sections'].append(str(next_section.get_id()))
             self._save()
@@ -1837,8 +1839,8 @@ class AssessmentSection:
                 part_id, delta = get_next_part_id(part_id,
                                                   runtime=self._runtime,
                                                   proxy=self._proxy,
-                                                  unsequestered=True,
-                                                  section=self)
+                                                  section=self,
+                                                  sequestered=False)
             except errors.IllegalState:
                 finished = True
             else:
@@ -1850,7 +1852,7 @@ class AssessmentSection:
         return number_updates > 0
 
     def _update_question_map(self):
-        def __get_question_display_elements(question_part_map):
+        def get_question_display_elements(question_part_map):
             # only get the parts in this route
             # go backwards until you find a part with level 1?
             # stop there, so that you don't get shifted to the previous part
@@ -1858,7 +1860,18 @@ class AssessmentSection:
             #      when running this on the last question, you want to get
             #      the indices relative to the second level 1, not including
             #      the first two parts
-            display_elements = []
+            #
+            # self._my_map['assessmentParts'] = [
+            #   {'assessmentPartId': 'assessment_authoring.AssessmentPart%3A57b212a6cdfc5ce546ec9f74%25253F%25257B%252522max_levels%252522%25253A%252520null%25252C%252520%252522item_index%252522%25253A%2525200%25252C%252520%252522objective_ids%252522%25253A%252520%25255B%252522%252522%25255D%25257D%40magic-part-authority',
+            #               'level': 1},
+            #   {'assessmentPartId': 'assessment_authoring.AssessmentPart%3A57b212a6cdfc5ce546ec9f74%25253F%25257B%252522max_levels%252522%25253A%252520null%25252C%252520%252522item_index%252522%25253A%2525200%25252C%252520%252522objective_ids%252522%25253A%252520%25255B%252522foo%2525253A1%25252540MIT%252522%25255D%25257D%40magic-part-authority',
+            #               'level': 2},
+            #   {'assessmentPartId': 'assessment_authoring.AssessmentPart%3A57b212a6cdfc5ce546ec9f75%25253F%25257B%252522max_levels%252522%25253A%252520null%25252C%252520%252522item_index%252522%25253A%2525200%25252C%252520%252522objective_ids%252522%25253A%252520%25255B%252522%252522%25255D%25257D%40magic-part-authority',
+            #               'level': 1}
+            # ]
+            #
+            #
+            my_display_elements = []
             parts_in_same_route = {}
 
             if question_part_map['level'] > 1:
@@ -1883,12 +1896,26 @@ class AssessmentSection:
             all_level_1_parts = [p
                                  for p in self._my_map['assessmentParts']
                                  if p['level'] == 1]
-            display_elements.append(all_level_1_parts.index(level_1_part) + 1)
+            my_display_elements.append(all_level_1_parts.index(level_1_part) + 1)
 
             for level, waypoints in parts_in_same_route.iteritems():
-                display_elements.append(len(waypoints))
+                # for each part in the route at a given level, sum up the number of questions
+                # that have appeared in that part
+                # start the last level at 1, because the "current" question being injected
+                # doesn't exist in self._my_map yet
+                if level == question_part_map['level']:
+                    count = 1
+                else:
+                    count = 0
 
-            return display_elements
+                for waypoint in waypoints:
+                    waypoint_questions = [q
+                                          for q in self._my_map['questions']
+                                          if q['assessmentPartId'] == waypoint['assessmentPartId']]
+                    count += len(waypoint_questions)
+                my_display_elements.append(count)
+
+            return my_display_elements
 
         index = 0
         for part_map in self._my_map['assessmentParts']:
@@ -1900,7 +1927,7 @@ class AssessmentSection:
                     # kind of convoluted, but the first part of the display elements
                     # is the "part_index" of the previous level 1 question (if parts were organized
                     # by level) ... let's re-organize the parts.
-                    display_elements = __get_question_display_elements(part_map)
+                    display_elements = get_question_display_elements(part_map)
                     self._my_map['questions'].insert(index, get_default_question_map(
                         item.get_id(),
                         item.get_question().get_id(),

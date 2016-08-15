@@ -46,15 +46,15 @@ def get_first_part_id_for_assessment(assessment_id, runtime=None, proxy=None, cr
     if create and bank_id is None:
         raise NullArgument('Bank Id must be provided for create option')
     try:
-        return get_next_part_id(assessment_id, runtime, proxy)[0]
+        return get_next_part_id(assessment_id, runtime, proxy, sequestered=False)[0]
     except IllegalState:
         if create:
             return create_first_assessment_section(assessment_id, runtime, proxy, bank_id)
         else:
             raise
 
-def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=None, unsequestered=False, section=None):
-    part, rule, siblings = get_decision_objects(part_id, runtime, proxy, unsequestered, section)
+def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=None, sequestered=True, section=None):
+    part, rule, siblings = get_decision_objects(part_id, runtime, proxy, sequestered, section)
     check_parent = True
     if rule is not None: # A SequenceRule trumps everything.
         next_part_id = rule.get_next_assessment_part_id()
@@ -63,7 +63,7 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
     elif part.has_children(): # This is a special AssessmentPart that can manage child Parts
         if prev_part_id is None:
             try:
-                if unsequestered or isinstance(part, abc_assessment):
+                if not sequestered or isinstance(part, abc_assessment):
                     next_part_id = part.get_child_ids().next()
                 else:
                     next_part = part.get_child_assessment_parts().next()
@@ -105,9 +105,9 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
         if isinstance(part, abc_assessment): # This is an Assessment masquerading as an AssessmentPart
             raise IllegalState('No next AssessmentPart is available for part_id')
         elif part.has_parent_part(): # This is the child of another AssessmentPart
-            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, level - 1, part_id)
+            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, level - 1, prev_part_id=part_id, sequestered=True)
         else: # This is the child of an Assessment. Will this ever be the case?
-            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1, part_id)
+            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1, prev_part_id=part_id, sequestered=True)
     return next_part_id, level
 
 def get_level_delta(part1_id, part2_id, runtime, proxy):
@@ -132,10 +132,10 @@ def get_level_delta(part1_id, part2_id, runtime, proxy):
     else:
         return 0
 
-def get_decision_objects(part_id, runtime, proxy, unsequestered, section):
+def get_decision_objects(part_id, runtime, proxy, sequestered, section):
     assessment_lookup_session, part_lookup_session, rule_lookup_session = get_lookup_sessions(runtime,
                                                                                               proxy,
-                                                                                              unsequestered,
+                                                                                              sequestered,
                                                                                               section)
     sibling_ids = []
     try:
@@ -177,14 +177,16 @@ def create_first_assessment_section(assessment_id, runtime, proxy, bank_id):
         rule_admin_session.create_rule(rule_form)
     return part_id
 
-def get_lookup_sessions(runtime, proxy, unsequestered, section):
+def get_lookup_sessions(runtime, proxy, sequestered, section):
     # this has to use the magic part lookup session, too, if available ...
     mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
     assessment_lookup_session = mgr.get_assessment_lookup_session(proxy=proxy)
     assessment_lookup_session.use_federated_bank_view()
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=runtime, proxy=proxy, local=True)
     part_lookup_session = get_assessment_part_lookup_session(runtime, proxy, section)
-    if unsequestered:
+    if sequestered:
+        part_lookup_session.use_sequestered_assessment_part_view()
+    else:
         part_lookup_session.use_unsequestered_assessment_part_view()
     part_lookup_session.use_federated_bank_view()
     rule_lookup_session = mgr.get_sequence_rule_lookup_session(proxy=proxy)
@@ -285,12 +287,10 @@ def update_parent_sequence_map(child_part, delete=False):
 
 def remove_from_parent_sequence_map(assessment_part_admin_session, assessment_part_id):
     """Updates the child map of a simple sequence assessment assessment part to remove child part"""
-    mgr = get_provider_manager('ASSESSMENT_AUTHORING',
-                               runtime=assessment_part_admin_session._runtime,
-                               proxy=assessment_part_admin_session._proxy,
-                               local=True)
-    apls = mgr.get_assessment_part_lookup_session(proxy=assessment_part_admin_session._proxy)
+    apls = get_assessment_part_lookup_session(runtime=assessment_part_admin_session._runtime,
+                                              proxy=assessment_part_admin_session._proxy)
     apls.use_federated_bank_view()
+    apls.use_unsequestered_assessment_part_view()
     child_part = apls.get_assessment_part(assessment_part_id)
     update_parent_sequence_map(child_part, delete=True)
 
