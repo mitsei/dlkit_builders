@@ -1635,7 +1635,10 @@ class AssessmentSection:
         'from .assessment_utilities import get_default_question_map',
         'from .assessment_utilities import get_default_part_map',
         'from .assessment_utilities import get_assessment_part_lookup_session',
+        'from .assessment_utilities import get_item_lookup_session',
         'from .rules import Response',
+        'UNANSWERED = 0',
+        'NULL_SUBMISSION = 1',
     ]
 
     init = """
@@ -1911,8 +1914,6 @@ class AssessmentSection:
                     index += 1
             
     def _get_assessment_part_lookup_session(self):
-        # This appears to share code with _get_item_lookup_session
-        # First do something special to get a magic session, if available.
         session = get_assessment_part_lookup_session(self._runtime,
                                                      self._proxy,
                                                      self)
@@ -1921,21 +1922,8 @@ class AssessmentSection:
         return session
 
     def _get_item_lookup_session(self):
-        # This appears to share code with _get_assessment_part_lookup_session
-        # First do something special to get a magic session, if available.
-        try:
-            config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:magicItemLookupSessions@mongo')
-            import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
-            module_path = '.'.join(import_path_with_class.split('.')[0:-1])
-            magic_class = import_path_with_class.split('.')[-1]
-            module = importlib.import_module(module_path)
-            session = getattr(module, magic_class)(runtime=self._runtime,
-                                                   proxy=self._proxy)
-        except (AttributeError, KeyError, errors.NotFound):
-            mgr = self._get_provider_manager('ASSESSMENT', local=True)
-            session = mgr.get_item_lookup_session(proxy=self._proxy)
-
+        session = get_item_lookup_session(self._runtime,
+                                          self._proxy)
         session.use_federated_bank_view()
         return session
 
@@ -2046,7 +2034,9 @@ class AssessmentSection:
         
         \"\"\"
         if answer_form is None:
-            response = {'nullSubmission': DateTime.utcnow()}
+            response = {'missingResponse': NULL_RESPONSE,
+                        'submissionTime': DateTime.utcnow(),
+                        'itemId': str(item_id)}
         else:
             response = dict(answer_form._my_map)
             response['submissionTime'] = DateTime.utcnow()
@@ -2063,18 +2053,26 @@ class AssessmentSection:
         \"\"\"Gets the latest response\"\"\"
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(question_id):
-                return Response(osid_object_map=question_map['responses'][0],
-                                runtime=self._runtime,
-                                proxy=self._proxy)
+                return self._get_response_from_question_map(question_map)
         raise errors.NotFound()
 
     def _get_responses(self):
+        \"\"\"Gets list of the latest responses\"\"\"
         answer_list = []
         for question_map in self._my_map['questions']:
-            answer_list.append(question_map['responses'][0])
-        return ResponseList(answer_list,
-                            runtime=self._runtime,
-                            proxy=self._proxy)
+            response_list.append(self._get_response_from_question_map(question_map))
+        return ResponseList(response_list)
+
+    def _get_response_from_question_map(self, question_map):
+        \"\"\"Gets the a Response from the provided question_map\"\"\"
+        response_map = question_map['responses'][0]
+        if response_map is None:
+            response_map = {'missingResponse': UNANSWERED,
+                            'submissionTime': None,
+                            'item_id': question_map['questionId']}
+        return Response(osid_object_map=response_map,
+                        runtime=self._runtime,
+                        proxy=self._proxy)
 
     def _is_question_answered(self, item_id):
         for question_map in self._my_map['questions']:
@@ -2180,28 +2178,27 @@ class Response:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from ..utilities import get_registry',
-        'NO_SUBMISSION = 0',
+        'UNANSWERED = 0',
         'NULL_SUBMISSION = 1',
     ]
     
     init = """
     _namespace = 'assessment.Response'
     
-    def __init__(self, osid_object_map, runtime=None, proxy=None, **kwargs):
-        if osid_object_map is None:
-            self._my_answer == NO_SUBMISSION
-        elif 'nullSubmission' in osid_object_map:
-            self._my_answer == NULL_SUBMISSION
-            self._submission_time = osid_object_map['nullSubmission']
+    def __init__(self, osid_object_map, item_id, runtime=None, proxy=None, **kwargs):
+        self._submission_time = osid_object_map['submissionTime']
+        self._item_id = Id(osid_object_map['itemId'])
+        if 'missingResponse' in osid_object_map:
+            self._my_answer == osid_object_map['missingResponse']
         else:
-            # Expects osid_object_map to really be an answer's map
+            # Expects an answer's osid_object_map:
             self._my_answer = Answer(osid_object_map, runtime=runtime, proxy=proxy)
-            self._submission_time = osid_object_map['submissionTime']
         self._records = dict()
+
         # Consider that responses may want to have their own records separate
         # from the enclosed Answer records:
         self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', runtime)
-        if osid_object_map:
+        if 'recordTypeIds' in osid_object_map:
             record_type_ids = osid_object_map['recordTypeIds']
         else:
             record_type_ids = []
@@ -2220,7 +2217,7 @@ class Response:
         return getattr(self, item)
     
     def __getattr__(self, name):
-        if self._my_answer == NO_SUBMISSION:
+        if self._my_answer == UNANSWERED:
             raise IllegalState('this Item has not been attempted)
         if self._my_answer == NULL_SUBMISSION:
             raise IllegalState('this Item has been skipped or cleared)
@@ -2231,10 +2228,11 @@ class Response:
                 raise"""
     
     get_item_id = """
-        return Id(self._my_answer._my_map['itemId'])"""
+        return self._item_id"""
     
     get_item = """
-        # So, why would we ever let an AssessmentSession user get the Item???
+        # So, we really don't want AssessmentSession users to get the Item.
+        # What to do?
         raise errors.PermissionDenied()"""
     
     get_response_record = """
@@ -2246,9 +2244,14 @@ class Response:
 
     additional_methods = """
     def is_answered(self):
-        if self._my_answer in [NO_SUBMISSION, NULL_SUBMISSION]:
+        if self._my_answer in [UNANSWERED, NULL_SUBMISSION]:
             return False
         return True
+
+    def is_unanswered(self):
+        if self._my_answer == UNANSWERED:
+            return True
+        return False
 
     def is_null_submission(self):
         if self._my_answer == NULL_SUBMISSION:
@@ -2256,7 +2259,7 @@ class Response:
         return False
 
     def get_submission_time(self):
-        if self._submission_time:
+        if self._submission_time is not None:
             return self._submission_time
         raise IllegalState('Item was not attempted')"""
 
