@@ -1148,7 +1148,7 @@ class Assessment:
         return get_next_part_id(part_id,
                                 runtime=self._runtime,
                                 proxy=self._proxy,
-                                sequestered=False)[0]
+                                sequestered=True)[0]
         # if self.has_next_assessment_part(assessment_part_id):
         #     return Id(self._my_map['childIds'][self._my_map['childIds'].index(str(assessment_part_id)) + 1])
 
@@ -1445,7 +1445,7 @@ class AssessmentTaken:
             next_part_id, level = get_next_part_id(section._assessment_part_id,
                                                    runtime=self._runtime,
                                                    proxy=self._proxy,
-                                                   sequestered=False) # Raises IllegalState
+                                                   sequestered=True) # Raises IllegalState
             next_section = self._create_section(next_part_id)
             self._my_map['sections'].append(str(next_section.get_id()))
             self._save()

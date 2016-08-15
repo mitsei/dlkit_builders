@@ -105,9 +105,9 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
         if isinstance(part, abc_assessment): # This is an Assessment masquerading as an AssessmentPart
             raise IllegalState('No next AssessmentPart is available for part_id')
         elif part.has_parent_part(): # This is the child of another AssessmentPart
-            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, level - 1, prev_part_id=part_id, sequestered=False)
+            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, level - 1, prev_part_id=part_id, sequestered=True)
         else: # This is the child of an Assessment. Will this ever be the case?
-            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1, prev_part_id=part_id, sequestered=False)
+            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1, prev_part_id=part_id, sequestered=True)
     return next_part_id, level
 
 def get_level_delta(part1_id, part2_id, runtime, proxy):
@@ -184,7 +184,9 @@ def get_lookup_sessions(runtime, proxy, sequestered, section):
     assessment_lookup_session.use_federated_bank_view()
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=runtime, proxy=proxy, local=True)
     part_lookup_session = get_assessment_part_lookup_session(runtime, proxy, section)
-    if not sequestered:
+    if sequestered:
+        part_lookup_session.use_sequestered_assessment_part_view()
+    else:
         part_lookup_session.use_unsequestered_assessment_part_view()
     part_lookup_session.use_federated_bank_view()
     rule_lookup_session = mgr.get_sequence_rule_lookup_session(proxy=proxy)
