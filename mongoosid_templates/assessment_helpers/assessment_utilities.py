@@ -8,6 +8,7 @@ from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 from bson import ObjectId
 
+UNANSWERED = 0
 SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
     'authority': 'ODL.MIT.EDU',
     'namespace': 'osid-object',
@@ -257,13 +258,20 @@ def get_default_part_map(part_id, level):
         'level': level
     }
 
+def get_default_response_map(question_id):
+    return {
+        'missingResponse': UNANSWERED,
+        'submissionTime': None,
+        'itemId': question_id,
+    }
+
 def get_default_question_map(item_id, question_id, assessment_part_id, display_elements):
     return {
         'itemId': str(item_id),
         'questionId': str(question_id),
         'assessmentPartId': str(assessment_part_id),
         'displayElements': display_elements,
-        'responses': [None]
+        'responses': [get_default_response_map(question_id)]
     }
 
 def update_parent_sequence_map(child_part, delete=False):

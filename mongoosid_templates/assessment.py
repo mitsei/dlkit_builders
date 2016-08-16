@@ -1075,6 +1075,7 @@ class Item:
 
     def is_feedback_available_for_response(self, response):
         \"\"\"is feedback available for a particular response
+
         to be overriden in a record extension
 
         \"\"\"
@@ -1082,7 +1083,9 @@ class Item:
 
     def get_feedback_for_response(self, response):
         \"\"\"get feedback for a particular response
+
         to be overriden in a record extension
+
         \"\"\"
         if self.is_feedback_available_for_response(response):
             pass # what is feedback anyway? Just a DisplayText or something more?
@@ -2062,15 +2065,15 @@ class AssessmentSection:
         \"\"\"
         if answer_form is None:
             response = {'missingResponse': NULL_RESPONSE,
-                        'submissionTime': DateTime.utcnow(),
                         'itemId': str(item_id)}
         else:
             response = dict(answer_form._my_map)
-            response['submissionTime'] = DateTime.utcnow()
+        response['submissionTime'] = DateTime.utcnow()
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == str(item_id):
-                if question_map['responses'][0] is None: # No existing attempts
-                    question_map['responses'] = []
+                if ('missingResponse' in question_map['responses'][0] and
+                     question_map['responses'][0]['missingResponse'] == UNANSWERED):
+                    question_map['responses'] = [] # clear unanswered response
                 question_map['responses'].insert(0, response)
                 self._save()
                 return
@@ -2092,94 +2095,85 @@ class AssessmentSection:
 
     def _get_response_from_question_map(self, question_map):
         \"\"\"Gets the a Response from the provided question_map\"\"\"
-        response_map = question_map['responses'][0]
-        if response_map is None:
-            response_map = {'missingResponse': UNANSWERED,
-                            'submissionTime': None,
-                            'item_id': question_map['questionId']}
-        return Response(osid_object_map=response_map,
+        return Response(osid_object_map=question_map['responses'][0],
                         runtime=self._runtime,
                         proxy=self._proxy)
 
     def _is_question_answered(self, item_id):
+        \"\"\"has the question matching item_id been answered and not skipped\"\"\"
         for question_map in self._my_map['questions']:
             if question_map['questionId'] == item_id:
-                if question_map['responses'][0] and 'responseCleared' not in question_map['responses'][0]:
-                    return True
-                else:
+                if 'missingResponse' in question_map['responses'][0]:
                     return False
+                else:
+                    return True
         raise errors.NotFound()
 
     def _get_question_map(self, item_id):
+        \"\"\"get question map from questions matching item_id\"\"\"
         return [map for map in self._my_map['questions'] if map['questionId'] == str(item_id)][0]
 
     def _is_feedback_available(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
-        response = self._get_question_map(item_id)['responses'][0]
-        if response:
+        \"\"\"is feedback available for item\"\"\"
+        response = self._get_response(question_id=item_id)
+        if response.is_answered():
+            item = self._item_lookup_session.get_item(item_id)
             return item.is_feedback_available_for_response(response)
         return item.is_feedback_available()
 
     def _get_feedback(self, item_id):
-        item = self._item_lookup_session.get_item(item_id)
-        response = self._get_question_map(item_id)['responses'][0]
-        if response:
+        \"\"\"get feedback for item\"\"\"
+        response = self._get_response(question_id=item_id)
+        if response.is_answered():
+            item = self._item_lookup_session.get_item(item_id)
             try:
-                return item.get_feedback_for_response(
-                    Response(Answer(osid_object_map=response,
-                                    runtime=self._runtime,
-                                    proxy=self._proxy)))
+                return item.get_feedback_for_response(response)
             except errors.IllegalState:
                 pass
         else:
             return item.get_feedback() # raises IllegalState
 
     def _get_confused_learning_objective_ids(self, item_id):
-        item = self._get_item_lookup_session().get_item(item_id)
-        response = self._get_question_map(item_id)['responses'][0]
-        if response:
-            return item.get_confused_learning_objective_ids_for_response(
-                Response(Answer(osid_object_map=response,
-                                runtime=self._runtime,
-                                proxy=self._proxy)))
+        \"\"\"get confused objective ids available for item\"\"\"
+        response = self._get_response(question_id=item_id)
+        if response.is_answered():
+            item = self._get_item_lookup_session().get_item(item_id)
+            return item.get_confused_learning_objective_ids_for_response(response)
         raise errors.IllegalState()
 
     def _is_correctness_available(self, item_id):
+        \"\"\"is a measure of correctness available for item\"\"\"
         item = self._get_item_lookup_session().get_item(item_id)
-        response = self._get_question_map(item_id)['responses'][0]
-        if response:
-            return item.is_correctness_available_for_response(
-                Response(Answer(osid_object_map=response,
-                                runtime=self._runtime,
-                                proxy=self._proxy)))
+        response = self._get_response(question_id=item_id)
+        if response.is_answered():
+            item = self._get_item_lookup_session().get_item(item_id)
+            return item.is_correctness_available_for_response(response)
         return False
 
     def _is_correct(self, item_id):
-        item = self._get_item_lookup_session().get_item(item_id)
-        response = self._get_question_map(item_id)['responses'][0]
-        if response:
-            return item.is_response_correct(
-                Response(Answer(osid_object_map=response,
-                                runtime=self._runtime,
-                                proxy=self._proxy)))
+        \"\"\"is item correct\"\"\"
+        response = self._get_response(question_id=item_id)
+        if response.is_answered():
+            item = self._get_item_lookup_session().get_item(item_id)
+            return item.is_response_correct(response)
         raise errors.IllegalState()
 
     def _get_correctness(self, item_id):
-        item = self._get_item_lookup_session().get_item(item_id)
-        response = self._get_question_map(item_id)['responses'][0]
-        if response:
-            return item.get_correctness_for_response(
-                Response(Answer(osid_object_map=response,
-                                runtime=self._runtime,
-                                proxy=self._proxy)))
+        \"\"\"get measure of correctness for item\"\"\"
+        response = self._get_response(question_id=item_id)
+        if response.is_answered():
+            item = self._get_item_lookup_session().get_item(item_id)
+            return item.get_correctness_for_response(response)
         raise errors.IllegalState()
 
     def _finish(self):
+        \"\"\"Declare this section finished\"\"\"
         self._my_map['over'] = True # finished == over?
         self._my_map['completionTime'] = DateTime.utcnow()
         self._save()
 
     def _is_over(self):
+        \"\"\"Check if this section is over\"\"\"
         if 'over' in self._my_map and self._my_map['over']:
             return True
         return False
@@ -2191,10 +2185,9 @@ class AssessmentSection:
         responded to and not skipped or cleared.
         
         \"\"\"
-        # self._update() # Make sure we are current with database
         self._update_questions() # Make sure questions list is current
         for question_map in self._my_map['questions']:
-            if not question_map['responses'][0]:
+            if 'missingResponse' in question_map['responses'][0]:
                 return False
         return True"""
 
