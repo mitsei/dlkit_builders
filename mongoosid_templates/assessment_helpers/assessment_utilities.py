@@ -252,10 +252,11 @@ def get_assessment_section(section_id, runtime=None, proxy=None):
     result = collection.find_one(dict({'_id': ObjectId(section_id.get_identifier())}))
     return AssessmentSection(osid_object_map=result, runtime=runtime, proxy=proxy)
 
-def get_default_part_map(part_id, level):
+def get_default_part_map(part_id, level, sequential):
     return {
         'assessmentPartId': str(part_id),
-        'level': level
+        'level': level,
+        'requiresSequentialItems': sequential
     }
 
 def get_default_response_map(question_id):
@@ -267,6 +268,7 @@ def get_default_response_map(question_id):
 
 def get_default_question_map(item_id, question_id, assessment_part_id, display_elements):
     return {
+        '_id': ObjectId(),
         'itemId': str(item_id),
         'questionId': str(question_id),
         'assessmentPartId': str(assessment_part_id),

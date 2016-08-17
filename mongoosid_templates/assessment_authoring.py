@@ -393,20 +393,15 @@ class AssessmentPart:
     
     additional_methods = """
     def get_child_ids(self):
-        \"\"\"Gets the child ``Ids`` of this assessment part.
-
-        return: (osid.id.IdList) - the assessment part child ``Ids``
-        *compliance: mandatory -- This method must be implemented.*
-
-        \"\"\"
+        \"\"\"Gets the child ``Ids`` of this assessment part.\"\"\"
         return IdList(self._my_map['childIds'])
 
     def supports_item_ordering(self):
-        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
+        \"\"\"This method can be overridden by a record extension. Must be immutable\"\"\"
         return False
 
     def supports_simple_item_sequencing(self):
-        \"\"\"This method can be overwritten by a record extension. Must be immutable\"\"\"
+        \"\"\"This method can be overridden by a record extension. Must be immutable\"\"\"
         return False
 
     def has_children(self):
@@ -418,15 +413,15 @@ class AssessmentPart:
         return False
 
     def are_items_shuffled(self):
-        \"\"\"This can be overwridden by a record extension\"\"\"
+        \"\"\"This can be overridden by a record extension\"\"\"
         return False
 
     def are_children_sequential(self):
-        \"\"\"This can be overwridden by a record extension\"\"\"
+        \"\"\"This can be overridden by a record extension\"\"\"
         return False
 
     def are_children_shuffled(self):
-        \"\"\"This can be overwridden by a record extension\"\"\"
+        \"\"\"This can be overridden by a record extension\"\"\"
         return False
 
     # This method is probably not required
