@@ -63,6 +63,33 @@ class AssessmentAuthoringProfile:
         return self._get_sub_package_provider_manager('assessment_authoring').supports_sequence_rule_lookup()"""
 
 
+class MyAssessmentTakenSession:
+
+    can_get_my_taken_assessments = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').can_get_my_taken_assessments()"""
+
+    get_assessments_started_during = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_started_during(*args, **kwargs)"""
+
+    get_assessments_started = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_started()"""
+
+    get_assessments_in_progress_during = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress_during(*args, **kwargs)"""
+
+    get_assessments_in_progress = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress()"""
+
+    get_assessments_completed = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_completed()"""
+
+
 class AssessmentSession:
 
     can_take_assessments = """
@@ -233,6 +260,29 @@ class AssessmentSession:
         \"\"\"Pass through to provider method\"\"\"
         self._get_provider_session('assessment_session').finish_assessment(*args, **kwargs)"""
  
+
+class AssessmentResultsSession:
+
+    can_access_assessment_results = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_results_session').can_access_assessment_results()"""
+
+    get_assessment_taken_items = """
+        \"\"\"Pass through to provider method\"\"\"
+        # Note: this method is differenct from the underlying signature
+        return self._get_provider_session('assessment_results_session').get_items(*args, **kwargs)"""
+
+    get_responses = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_results_session').get_responses(*args, **kwargs)"""
+
+    are_results_available = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_results_session').are_results_available(*args, **kwargs)"""
+
+    get_grade_entries = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_results_session').get_grade_entries(*args, **kwargs)"""
 
 
 class AssessmentBasicAuthoringSession:
