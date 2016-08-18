@@ -1996,6 +1996,16 @@ class AssessmentSection:
                 return question_map
         raise errors.NotFound()
 
+    def _is_question_sequential(self, question_map):
+        \"\"\"determine if sequential rules apply to question
+
+        Currently only checks the assessment part's items sequential
+
+        \"\"\"
+        return (pm['requiresSequentialItems'] for 
+                pm in self._my_map['assessmentParts'] if
+                pm['assessmentPartId'] == question_map['assessmentPartId'])
+
     def _get_questions(self, answered=None, honor_sequential=True):
         \"\"\"gets all available questions for this section
 
@@ -2019,7 +2029,7 @@ class AssessmentSection:
         question_list = []
         self._update_questions()  # Make sure questions list is current
         for question_map in self._my_map['questions']:
-            if self.are_items_sequential() and honor_sequential:
+            if self._is_question_sequential() and honor_sequential:
                 if prev_question_answered:
                     prev_question_answered = update_question_list()
             else:
@@ -2082,8 +2092,9 @@ class AssessmentSection:
             questions = questions[::-1]
             error_text = ' previous '
         else:
-            if 'missingResponse' in question_map and honor_sequential:
-                raise errors.IllegalState('Next question is not yet available')
+            if 'missingResponse' in question_map:
+                if self._is_question_sequential(question_map) and honor_sequential:
+                    raise errors.IllegalState('Next question is not yet available')
             error_text = ' next '
         if questions[-1] == question_map:
             raise errors.IllegalState('No ' + text + ' questions available')
