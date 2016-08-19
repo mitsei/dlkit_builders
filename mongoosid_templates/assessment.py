@@ -1646,7 +1646,7 @@ class AssessmentSection:
         'from .rules import Response',
         'from dlkit.abstract_osid.id.primitives import Id as abc_id',
         'UNANSWERED = 0',
-        'NULL_SUBMISSION = 1',
+        'NULL_RESPONSE = 1',
     ]
 
     init = """
@@ -1985,7 +1985,7 @@ class AssessmentSection:
         This can make sense of both Section assigned Ids or normal Question/Item Ids
 
         \"\"\"
-        if id_.get_authority() == ASSESSMENT_AUTHORITY:
+        if question_id.get_authority() == ASSESSMENT_AUTHORITY:
             key = '_id'
             match_value = ObjectId(question_id.get_identifier())
         else:
@@ -2029,7 +2029,7 @@ class AssessmentSection:
         question_list = []
         self._update_questions()  # Make sure questions list is current
         for question_map in self._my_map['questions']:
-            if self._is_question_sequential() and honor_sequential:
+            if self._is_question_sequential(question_map) and honor_sequential:
                 if prev_question_answered:
                     prev_question_answered = update_question_list()
             else:
@@ -2058,8 +2058,9 @@ class AssessmentSection:
         # Override Item Id of this question (this is the Id that Questions report)
         question._my_map['itemId'] = str(
             Id(namespace='assessment.Item',
-               identifier=question_map['_id'],
+               identifier=str(question_map['_id']),
                authority=ASSESSMENT_AUTHORITY))
+        return question
 
     def _get_answers(self, question_id):
         question_map = self._get_question_map(question_id) # will raise NotFound()
@@ -2097,7 +2098,7 @@ class AssessmentSection:
                     raise errors.IllegalState('Next question is not yet available')
             error_text = ' next '
         if questions[-1] == question_map:
-            raise errors.IllegalState('No ' + text + ' questions available')
+            raise errors.IllegalState('No ' + error_text + ' questions available')
         index = self._my_map['questions'].index(question_map)
         for question_map in self._my_map['questions'][index:]:
             question_answered = bool('missingResponse' not in question_map)
