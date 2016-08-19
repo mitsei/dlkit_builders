@@ -212,7 +212,7 @@ def get_assessment_part_lookup_session(runtime, proxy, section=None):
         part_lookup_session = mgr.get_assessment_part_lookup_session(proxy=proxy)
     return part_lookup_session
 
-def get_item_lookup_session(self, runtime=None, proxy=None):
+def get_item_lookup_session(runtime=None, proxy=None):
     """returns an item lookup session, perhaps even a magic one"""
     # This appears to share code with get_assessment_part_lookup_session
     try:
@@ -224,7 +224,7 @@ def get_item_lookup_session(self, runtime=None, proxy=None):
         module = importlib.import_module(module_path)
         item_lookup_session = getattr(module, magic_class)(runtime=runtime,
                                                proxy=proxy)
-    except (AttributeError, KeyError, errors.NotFound):
+    except (AttributeError, KeyError, NotFound):
         mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
         item_lookup_session = mgr.get_item_lookup_session(proxy=proxy)
     return item_lookup_session
@@ -263,7 +263,7 @@ def get_default_response_map(question_id):
     return {
         'missingResponse': UNANSWERED,
         'submissionTime': None,
-        'itemId': question_id,
+        'itemId': str(question_id),
     }
 
 def get_default_question_map(item_id, question_id, assessment_part_id, display_elements):
