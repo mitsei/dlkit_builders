@@ -1940,10 +1940,6 @@ class AssessmentSection:
 
     def _update_question_list(self, part_list):
 
-        def get_part_elements(part, elements=None):
-            if elements is None:
-                for 
-
         def get_question_display_elements(question_part_map):
             \"\"\"Get the parts only in this route.
 
