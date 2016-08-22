@@ -179,11 +179,14 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
     service implementations known to this mongodb implementation.
     
     """
-    if runtime is not None and not local:
+    if runtime is not None:
+        if local:
+            parameter_id = Id('parameter:localImpl@mongo')
+        else:
+            parameter_id = Id('parameter:' + osid.lower() + 'ProviderImpl@mongo')
         try:
             # Try to get the manager from the runtime, if available:
             config = runtime.get_configuration()
-            parameter_id = Id('parameter:' + osid.lower() + 'ProviderImpl@mongo')
             impl_name = config.get_value_by_parameter(parameter_id).get_string_value()
             if proxy is None:
                 return runtime.get_manager(osid, impl_name)
@@ -191,7 +194,7 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
                 return runtime.get_proxy_manager(osid, impl_name)
         except (AttributeError, KeyError, NotFound):
             pass
-    # Try to return a Manager from this implementation, or raise OperationFailed:
+    # Try to return a Manager directly from this implementation, or raise OperationFailed:
     try:
         if proxy is None:
             mgr_str = 'Manager'
