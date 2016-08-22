@@ -955,12 +955,22 @@ class Question:
         'from ..utilities import MongoClientValidated',
         'from bson.objectid import ObjectId',
     ]
+
+    init = """
+    def __init__(self, **kwargs):
+        osid_objects.OsidObject.__init__(self, object_name='QUESTION', **kwargs)
+        self._catalog_name = 'bank'
+        if 'item_id' in kwargs:
+            self._item_id = kwargs['item_id']
+        else:
+            self._item_id = Id(kwargs['osid_object_map']['itemId'])
+        """
     
     additional_methods = """
     ##
     # Overide osid.Identifiable.get_id() method to cast this question id as its item id:
     def get_id(self):
-        return Id(self._my_map['itemId'])
+        return self._item_id
     
     id_ = property(fget=get_id)
     ident = property(fget=get_id)
@@ -1707,9 +1717,7 @@ class AssessmentSection:
             get_default_part_map(self._assessment_part_id,
                                  0,
                                  self._assessment_part.are_items_sequential()))
-        assessment_mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        lookup_session = assessment_mgr.get_item_lookup_session(proxy=self._proxy)
-        lookup_session.use_federated_bank_view()
+        lookup_session = self._get_item_lookup_session()
         items = lookup_session.get_items_by_ids(item_ids)
         display_num = 1
         for item in items:
@@ -2056,10 +2064,9 @@ class AssessmentSection:
         question._authority = ASSESSMENT_AUTHORITY
 
         # Override Item Id of this question (this is the Id that Questions report)
-        question._my_map['itemId'] = str(
-            Id(namespace='assessment.Item',
-               identifier=str(question_map['_id']),
-               authority=ASSESSMENT_AUTHORITY))
+        question._item_id = Id(namespace='assessment.Item',
+                               identifier=str(question_map['_id']),
+                               authority=ASSESSMENT_AUTHORITY)
         return question
 
     def _get_answers(self, question_id):
