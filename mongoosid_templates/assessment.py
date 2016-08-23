@@ -185,14 +185,14 @@ class AssessmentSession:
     
     has_previous_question = """
         try:
-            self.get_previous_question(assessment_section_id, question_id=item_id)
+            self.get_previous_question(assessment_section_id, item_id)
         except errors.IllegalState:
             return False
         else:
             return True"""
 
     get_previous_question = """
-        return self.get_assessment_section(assessment_section_id)._get_previous_question(question_id=item_id)"""
+        return self.get_assessment_section(assessment_section_id)._get_next_question(question_id=item_id, reverse=True)"""
 
     get_question = """
         return self.get_assessment_section(assessment_section_id)._get_question(question_id=item_id)"""
@@ -2120,9 +2120,13 @@ class AssessmentSection:
             error_text = ' next '
         if questions[-1] == question_map:
             raise errors.IllegalState('No ' + error_text + ' questions available')
-        index = self._my_map['questions'].index(question_map)
-        for question_map in self._my_map['questions'][index:]:
-            question_answered = bool('missingResponse' not in question_map)
+        index = questions.index(question_map) + 1
+        for question_map in questions[index:]:
+            latest_question_response = question_map['responses'][0]
+            question_answered = False
+            # take missingResponse == UNANSWERED or NULL_RESPONSE as an unanswered question
+            if 'missingResponse' not in latest_question_response:
+                question_answered = True
             if answered is None or question_answered == answered:
                 return self._get_question(question_map=question_map)
         raise errors.IllegalState('No ' + error_text + ' question matching parameters was found')
