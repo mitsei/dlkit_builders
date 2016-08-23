@@ -1067,7 +1067,7 @@ class Item:
         \"\"\"
         if self.is_feedback_available():
             pass # what is feedback anyway? Just a DisplayText or something more?
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def is_solution_available(self):
         \"\"\"is a solution available for this Item (is this different than feedback?)
@@ -1085,7 +1085,7 @@ class Item:
         \"\"\"
         if self.is_solution_available():
             pass
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def is_feedback_available_for_response(self, response):
         \"\"\"is feedback available for a particular response
@@ -1103,7 +1103,7 @@ class Item:
         \"\"\"
         if self.is_feedback_available_for_response(response):
             pass # what is feedback anyway? Just a DisplayText or something more?
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def is_correctness_available_for_response(self, response):
         \"\"\"is a measure of correctness available for a particular response
@@ -1121,7 +1121,7 @@ class Item:
         \"\"\"
         if self.is_correctness_available_for_response(response):
             pass # return True or False
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def get_correctness_for_response(self, response):
         \"\"\"get measure of correctness available for a particular response
@@ -1131,7 +1131,7 @@ class Item:
         \"\"\"
         if self.is_correctness_available_for_response(response):
             pass # return a correctness score 0 thru 100
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def are_confused_learning_objective_ids_available_for_response(self, response):
         \"\"\"is a learning objective available for a particular response
@@ -1148,7 +1148,7 @@ class Item:
         \"\"\"
         if self.are_confused_learning_objective_ids_available_for_response(response):
             pass # return Objective IdList
-        raise IllegalState()"""
+        raise errors.IllegalState()"""
 
 
 class Assessment:
@@ -2181,16 +2181,16 @@ class AssessmentSection:
     def _is_feedback_available(self, question_id):
         \"\"\"is feedback available for item\"\"\"
         response = self._get_response(question_id)
+        item = self._get_item(question_id)
         if response.is_answered():
-            item = self._get_item(question_id)
             return item.is_feedback_available_for_response(response)
         return item.is_feedback_available()
 
     def _get_feedback(self, question_id):
         \"\"\"get feedback for item\"\"\"
         response = self._get_response(question_id)
+        item = self._get_item(response.get_item_id())
         if response.is_answered():
-            item = self._get_item(response.get_item_id())
             try:
                 return item.get_feedback_for_response(response)
             except errors.IllegalState:
