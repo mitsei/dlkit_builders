@@ -2089,8 +2089,12 @@ class AssessmentSection:
         return question
 
     def _get_answers(self, question_id):
+        # don't use the self._get_item() convenience method here
+        # because we need to preserve the magic params (if any) present
+        # in the questionId
         question_map = self._get_question_map(question_id) # will raise NotFound()
-        item = self._get_item(Id(question_map['questionId']))
+        ils = self._get_item_lookup_session()
+        item = ils.get_item(Id(question_map['questionId']))
         answers = list(item.get_answers())
         try:
             answers += list(item.get_wrong_answers())
