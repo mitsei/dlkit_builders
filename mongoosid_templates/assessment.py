@@ -213,9 +213,12 @@ class AssessmentSession:
         # This is a little hack to get the answer record types from the Item's
         # first Answer record types. Should really get it from item genus types somehow:
         record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
-        mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        ils = self.get_assessment_section(assessment_section_id)._get_item_lookup_session()
-        item = ils.get_item(item_id)
+        section = self.get_assessment_section(assessment_section_id)
+        # because we're now giving session-unique question IDs
+        question = section._get_question(item_id)
+        ils = section._get_item_lookup_session()
+        real_item_id = Id(question._my_map['itemId'])
+        item = ils.get_item(real_item_id)
         item_map = item.object_map
         answer_record_types = []
         if len(item_map['answers']) > 0:
@@ -2010,9 +2013,9 @@ class AssessmentSection:
         Currently only checks the assessment part's items sequential
 
         \"\"\"
-        return (pm['requiresSequentialItems'] for 
+        return [pm['requiresSequentialItems'] for
                 pm in self._my_map['assessmentParts'] if
-                pm['assessmentPartId'] == question_map['assessmentPartId'])
+                pm['assessmentPartId'] == question_map['assessmentPartId']][0]
 
     def _get_questions(self, answered=None, honor_sequential=True):
         \"\"\"gets all available questions for this section
@@ -2027,8 +2030,12 @@ class AssessmentSection:
 
         def update_question_list():
             \"\"\"Supportive function to aid readability of _get_questions.\"\"\"
-            question_id = Id(question_map['questionId'])
-            question_answered = bool('missingResponse' not in question_map)
+            latest_question_response = question_map['responses'][0]
+            question_answered = False
+            # take missingResponse == UNANSWERED or NULL_RESPONSE as an unanswered question
+            if 'missingResponse' not in latest_question_response:
+                question_answered = True
+
             if answered is None or answered == question_answered:
                 question_list.append(self._get_question(question_map=question_map))
             return question_answered
@@ -2140,7 +2147,7 @@ class AssessmentSection:
 
     def _get_responses(self):
         \"\"\"Gets list of the latest responses\"\"\"
-        answer_list = []
+        response_list = []
         for question_map in self._my_map['questions']:
             response_list.append(self._get_response_from_question_map(question_map))
         return ResponseList(response_list)
@@ -2252,6 +2259,7 @@ class Response:
     _namespace = 'assessment.Response'
     
     def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, **kwargs):
+        from .objects import Answer
         self._submission_time = osid_object_map['submissionTime']
         self._item_id = Id(osid_object_map['itemId'])
         if additional_attempts is not None:
@@ -2259,9 +2267,11 @@ class Response:
         else:
             self._additional_attempts = []
         if 'missingResponse' in osid_object_map:
-            self._my_answer == osid_object_map['missingResponse']
+            self._my_answer = osid_object_map['missingResponse']
         else:
-            self._my_answer = Answer(osid_object_map, runtime=runtime, proxy=proxy)
+            self._my_answer = Answer(osid_object_map=osid_object_map,
+                                     runtime=runtime,
+                                     proxy=proxy)
         self._records = dict()
 
         # Consider that responses may want to have their own records separate
@@ -2287,9 +2297,9 @@ class Response:
     
     def __getattr__(self, name):
         if self._my_answer == UNANSWERED:
-            raise IllegalState('this Item has not been attempted')
+            raise errors.IllegalState('this Item has not been attempted')
         if self._my_answer == NULL_SUBMISSION:
-            raise IllegalState('this Item has been skipped or cleared')
+            raise errors.IllegalState('this Item has been skipped or cleared')
         if not name.startswith('__'):
             try:
                 return getattr(self._my_answer, name)
