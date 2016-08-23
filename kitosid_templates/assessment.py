@@ -63,6 +63,33 @@ class AssessmentAuthoringProfile:
         return self._get_sub_package_provider_manager('assessment_authoring').supports_sequence_rule_lookup()"""
 
 
+class MyAssessmentTakenSession:
+
+    can_get_my_taken_assessments = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').can_get_my_taken_assessments()"""
+
+    get_assessments_started_during = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_started_during(*args, **kwargs)"""
+
+    get_assessments_started = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_started()"""
+
+    get_assessments_in_progress_during = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress_during(*args, **kwargs)"""
+
+    get_assessments_in_progress = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress()"""
+
+    get_assessments_completed = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_completed()"""
+
+
 class AssessmentSession:
 
     can_take_assessments = """
@@ -234,6 +261,29 @@ class AssessmentSession:
         self._get_provider_session('assessment_session').finish_assessment(*args, **kwargs)"""
  
 
+class AssessmentResultsSession:
+
+    can_access_assessment_results = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_results_session').can_access_assessment_results()"""
+
+    get_assessment_taken_items = """
+        \"\"\"Pass through to provider method\"\"\"
+        # Note: this method is differenct from the underlying signature
+        return self._get_provider_session('assessment_results_session').get_items(*args, **kwargs)"""
+
+    get_responses = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_results_session').get_responses(*args, **kwargs)"""
+
+    are_results_available = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_results_session').are_results_available(*args, **kwargs)"""
+
+    get_grade_entries = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('assessment_results_session').get_grade_entries(*args, **kwargs)"""
+
 
 class AssessmentBasicAuthoringSession:
     import_statements = [
@@ -369,6 +419,32 @@ class AssessmentPartLookupSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_lookup_session').get_assessment_part(*args, **kwargs)"""
 
+    get_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts()"""
+
+    use_sequestered_assessment_part_view = """
+        \"\"\"Pass through to provider AssessmentPartLookupSession.use_sequestered_assessment_part_view\"\"\"
+        self._containable_views['assessment_part'] = SEQUESTERED
+        self._get_sub_package_provider_session('assessment_authoring',
+                                               'assessment_part_lookup_session')
+        for session in self._provider_sessions:
+            try:
+                self._provider_sessions[session].use_sequestered_assessment_part_view()
+            except AttributeError:
+                pass"""
+
+    use_unsequestered_assessment_part_view = """
+        \"\"\"Pass through to provider AssessmentPartLookupSession.use_unsequestered_assessment_part_view\"\"\"
+        self._containable_views['assessment_part'] = UNSEQUESTERED
+        self._get_sub_package_provider_session('assessment_authoring',
+                                               'assessment_part_lookup_session')
+        for session in self._provider_sessions:
+            try:
+                self._provider_sessions[session].use_unsequestered_assessment_part_view()
+            except AttributeError:
+                pass"""
 
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """
@@ -441,6 +517,7 @@ class Bank:
         self._session_management = AUTOMATIC
         self._bank_view = DEFAULT
         self._object_views = dict()
+        self._containable_views = dict()
         self._sub_package_provider_managers = dict()
 
     def _set_bank_view(self, session):
@@ -467,6 +544,20 @@ class Bank:
             else:
                 try:
                     getattr(session, 'use_comparative_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+
+    def _set_containable_view(self, session):
+        \"\"\"Sets the underlying containable views to match current view\"\"\"
+        for obj_name in self._containable_views:
+            if self._containable_views[obj_name] == SEQUESTERED:
+                try:
+                    getattr(session, 'use_sequestered_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+            else:
+                try:
+                    getattr(session, 'use_unsequestered_' + obj_name + '_view')()
                 except AttributeError:
                     pass
 
@@ -509,7 +600,7 @@ class Bank:
             return self._provider_sessions[session_name]
         else:
             manager = self._get_sub_package_provider_manager(sub_package)
-            session = self._instantiate_session('get_' + session_name,
+            session = self._instantiate_session('get_' + session_name + '_for_bank',
                                                 proxy=self._proxy,
                                                 manager=manager)
             self._set_bank_view(session)
@@ -524,9 +615,15 @@ class Bank:
 
         session_class = getattr(manager, method_name)
         if proxy is None:
-            return session_class(*args, **kwargs)
+            try:
+                return session_class(bank_id=self._catalog_id, *args, **kwargs)
+            except AttributeError:
+                return session_class(*args, **kwargs)
         else:
-            return session_class(proxy=proxy, *args, **kwargs)
+            try:
+                return session_class(bank_id=self._catalog_id, proxy=proxy, *args, **kwargs)
+            except AttributeError:
+                return session_class(proxy=proxy, *args, **kwargs)
 
     def get_bank_id(self):
         \"\"\"Gets the Id of this bank."\"\"

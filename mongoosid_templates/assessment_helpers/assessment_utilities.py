@@ -1,4 +1,5 @@
 """Utilities for use by assessment package implementations"""
+import importlib
 
 from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
 from dlkit.abstract_osid.assessment.objects import Assessment as abc_assessment
@@ -7,6 +8,7 @@ from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 from bson import ObjectId
 
+UNANSWERED = 0
 SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
     'authority': 'ODL.MIT.EDU',
     'namespace': 'osid-object',
@@ -45,15 +47,15 @@ def get_first_part_id_for_assessment(assessment_id, runtime=None, proxy=None, cr
     if create and bank_id is None:
         raise NullArgument('Bank Id must be provided for create option')
     try:
-        return get_next_part_id(assessment_id, runtime, proxy)[0]
+        return get_next_part_id(assessment_id, runtime, proxy, sequestered=False)[0]
     except IllegalState:
         if create:
             return create_first_assessment_section(assessment_id, runtime, proxy, bank_id)
         else:
             raise
 
-def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=None):
-    part, rule, siblings = get_decision_objects(part_id, runtime, proxy)
+def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=None, sequestered=True, section=None):
+    part, rule, siblings = get_decision_objects(part_id, runtime, proxy, sequestered, section)
     check_parent = True
     if rule is not None: # A SequenceRule trumps everything.
         next_part_id = rule.get_next_assessment_part_id()
@@ -61,9 +63,16 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
         check_parent = False
     elif part.has_children(): # This is a special AssessmentPart that can manage child Parts
         if prev_part_id is None:
-            next_part_id = part.get_child_ids().next()
-            level += 1
-            check_parent = False
+            try:
+                if not sequestered or isinstance(part, abc_assessment):
+                    next_part_id = part.get_child_ids().next()
+                else:
+                    next_part = part.get_child_assessment_parts().next()
+                    next_part_id = next_part.ident
+                level += 1
+                check_parent = False
+            except StopIteration:
+                check_parent = True
         else:
             # this is to make sure that we don't get into an infinite loop, when
             # a parent object (see below, check_parent) has children, it will
@@ -72,26 +81,34 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
             # the given child as a param (prev_part_id) and make sure we
             # get the next child.
             child_ids = list(part.get_child_ids())
-            if prev_part_id not in child_ids:
+            child_id_strs = [str(c) for c in child_ids]
+            if str(prev_part_id) not in child_id_strs:
                 raise IllegalState('previous part is not a child of its own parent')
-            if prev_part_id == child_ids[-1]:
+            if str(prev_part_id) == child_id_strs[-1]:
                 pass
             else:
-                for index, child_id in enumerate(child_ids):
-                    if child_id == prev_part_id:
+                for index, child_id_str in enumerate(child_id_strs):
+                    if child_id_str == str(prev_part_id):
                         next_part_id = child_ids[index + 1]
                         level += 1
-    elif siblings and siblings[-1] != part_id:
-        next_part_id = siblings[siblings.index(part_id) + 1]
-        check_parent = False
+                        check_parent = False
+                        break
+    elif siblings and str(siblings[-1]) != str(part_id):
+        siblings_str = [str(s) for s in siblings]
+        try:
+            next_part_id = siblings[siblings_str.index(str(part_id)) + 1]
+            check_parent = False
+        except ValueError:
+            # the given partId is not in the siblings
+            check_parent = True
 
     if check_parent: # We are at a lowest leaf and need to check parent
         if isinstance(part, abc_assessment): # This is an Assessment masquerading as an AssessmentPart
             raise IllegalState('No next AssessmentPart is available for part_id')
         elif part.has_parent_part(): # This is the child of another AssessmentPart
-            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, level - 1, part_id)
+            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, level - 1, prev_part_id=part_id, sequestered=True)
         else: # This is the child of an Assessment. Will this ever be the case?
-            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1, part_id)
+            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1, prev_part_id=part_id, sequestered=True)
     return next_part_id, level
 
 def get_level_delta(part1_id, part2_id, runtime, proxy):
@@ -116,8 +133,11 @@ def get_level_delta(part1_id, part2_id, runtime, proxy):
     else:
         return 0
 
-def get_decision_objects(part_id, runtime, proxy):
-    assessment_lookup_session, part_lookup_session, rule_lookup_session = get_lookup_sessions(runtime, proxy)
+def get_decision_objects(part_id, runtime, proxy, sequestered, section):
+    assessment_lookup_session, part_lookup_session, rule_lookup_session = get_lookup_sessions(runtime,
+                                                                                              proxy,
+                                                                                              sequestered,
+                                                                                              section)
     sibling_ids = []
     try:
         part = part_lookup_session.get_assessment_part(part_id)
@@ -158,16 +178,59 @@ def create_first_assessment_section(assessment_id, runtime, proxy, bank_id):
         rule_admin_session.create_rule(rule_form)
     return part_id
 
-def get_lookup_sessions(runtime, proxy):
+def get_lookup_sessions(runtime, proxy, sequestered, section):
+    # this has to use the magic part lookup session, too, if available ...
     mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
     assessment_lookup_session = mgr.get_assessment_lookup_session(proxy=proxy)
     assessment_lookup_session.use_federated_bank_view()
     mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=runtime, proxy=proxy, local=True)
-    part_lookup_session = mgr.get_assessment_part_lookup_session(proxy=proxy)
+    part_lookup_session = get_assessment_part_lookup_session(runtime, proxy, section)
+    if sequestered:
+        part_lookup_session.use_sequestered_assessment_part_view()
+    else:
+        part_lookup_session.use_unsequestered_assessment_part_view()
     part_lookup_session.use_federated_bank_view()
     rule_lookup_session = mgr.get_sequence_rule_lookup_session(proxy=proxy)
     rule_lookup_session.use_federated_bank_view()
     return assessment_lookup_session, part_lookup_session, rule_lookup_session
+
+def get_assessment_part_lookup_session(runtime, proxy, section=None):
+    """returns an assessment part lookup session, perhaps even a magic one"""
+    # This appears to share code with get_item_lookup_session
+    try:
+        config = runtime.get_configuration()
+        parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
+        import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+        module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+        magic_class = import_path_with_class.split('.')[-1]
+        module = importlib.import_module(module_path)
+        part_lookup_session = getattr(module, magic_class)(section,
+                                                           runtime=runtime,
+                                                           proxy=proxy)
+    except (AttributeError, KeyError, NotFound):
+        mgr = get_provider_manager('ASSESSMENT_AUTHORING',
+                                   runtime=runtime,
+                                   proxy=proxy,
+                                   local=True)
+        part_lookup_session = mgr.get_assessment_part_lookup_session(proxy=proxy)
+    return part_lookup_session
+
+def get_item_lookup_session(runtime=None, proxy=None):
+    """returns an item lookup session, perhaps even a magic one"""
+    # This appears to share code with get_assessment_part_lookup_session
+    try:
+        config = runtime.get_configuration()
+        parameter_id = Id('parameter:magicItemLookupSessions@mongo')
+        import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
+        module_path = '.'.join(import_path_with_class.split('.')[0:-1])
+        magic_class = import_path_with_class.split('.')[-1]
+        module = importlib.import_module(module_path)
+        item_lookup_session = getattr(module, magic_class)(runtime=runtime,
+                                                           proxy=proxy)
+    except (AttributeError, KeyError, NotFound):
+        mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
+        item_lookup_session = mgr.get_item_lookup_session(proxy=proxy)
+    return item_lookup_session
 
 def get_admin_sessions(runtime, proxy, bank_id):
     mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
@@ -192,19 +255,28 @@ def get_assessment_section(section_id, runtime=None, proxy=None):
     result = collection.find_one(dict({'_id': ObjectId(section_id.get_identifier())}))
     return AssessmentSection(osid_object_map=result, runtime=runtime, proxy=proxy)
 
-def get_default_part_map(part_id, level):
+def get_default_part_map(part_id, level, sequential):
     return {
         'assessmentPartId': str(part_id),
-        'level': level
+        'level': level,
+        'requiresSequentialItems': sequential
+    }
+
+def get_default_response_map(question_id):
+    return {
+        'missingResponse': UNANSWERED,
+        'submissionTime': None,
+        'itemId': str(question_id),
     }
 
 def get_default_question_map(item_id, question_id, assessment_part_id, display_elements):
     return {
+        '_id': ObjectId(),
         'itemId': str(item_id),
         'questionId': str(question_id),
         'assessmentPartId': str(assessment_part_id),
         'displayElements': display_elements,
-        'responses': [None]
+        'responses': [get_default_response_map(question_id)]
     }
 
 def update_parent_sequence_map(child_part, delete=False):
@@ -228,12 +300,10 @@ def update_parent_sequence_map(child_part, delete=False):
 
 def remove_from_parent_sequence_map(assessment_part_admin_session, assessment_part_id):
     """Updates the child map of a simple sequence assessment assessment part to remove child part"""
-    mgr = get_provider_manager('ASSESSMENT_AUTHORING',
-                               runtime=assessment_part_admin_session._runtime,
-                               proxy=assessment_part_admin_session._proxy,
-                               local=True)
-    apls = mgr.get_assessment_part_lookup_session(proxy=assessment_part_admin_session._proxy)
+    apls = get_assessment_part_lookup_session(runtime=assessment_part_admin_session._runtime,
+                                              proxy=assessment_part_admin_session._proxy)
     apls.use_federated_bank_view()
+    apls.use_unsequestered_assessment_part_view()
     child_part = apls.get_assessment_part(assessment_part_id)
     update_parent_sequence_map(child_part, delete=True)
 

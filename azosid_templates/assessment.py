@@ -42,6 +42,52 @@ class AssessmentProxyManager:
             proxy)
 """
 
+class MyAssessmentTakenSession:
+    
+    import_statements = [
+        'from ..osid.osid_errors import PermissionDenied'
+        ]
+
+    init = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = provider_session.get_bank_id()
+        self._id_namespace = 'assessment.AssessmentTaken'
+"""
+
+    can_get_my_taken_assessments = """
+        return self._can('get_my')"""
+
+    get_assessments_started_during = """
+        if not self._can('get_my'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessments_started_during(start, end)"""
+
+    get_assessments_started = """
+        if not self._can('get_my'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessments_started_during()"""
+            
+    get_assessments_in_progress_during = """
+        if not self._can('get_my'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessments_in_progress_during(start, end)"""
+
+    get_assessments_in_progress = """
+        if not self._can('get_my'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessments_in_progress()"""
+            
+    get_assessments_completed = """
+        if not self._can('get_my'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_assessments_completed()"""
+
 
 class AssessmentSession:
 
@@ -304,6 +350,46 @@ class AssessmentSession:
             raise PermissionDenied()
         else:
             self._provider_session.finish_assessment(assessment_taken_id)"""
+
+class AssessmentResultsSession:
+
+    import_statements = [
+        'from ..osid.osid_errors import PermissionDenied'
+        ]
+
+    init = """
+    def __init__(self, provider_session, authz_session, proxy=None):
+        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+        self._qualifier_id = provider_session.get_bank_id()
+        self._id_namespace = 'assessment.AssessmentResults'
+"""
+
+    can_access_assessment_results = """
+        return self._can('access')"""
+
+    get_items = """
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_items(assessment_taken_id)"""
+
+    get_responses = """
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_responses(assessment_taken_id)"""
+
+    are_results_available = """
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.are_results_available(assessment_taken_id)"""
+
+    get_grade_entries = """
+        if not self._can('access'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_grade_entries(assessment_taken_id)"""
 
 
 class AssessmentBasicAuthoringSession:

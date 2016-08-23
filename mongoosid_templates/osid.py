@@ -750,13 +750,6 @@ class OsidObject:
         osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
         self._my_map = osid_object_map
         self._load_records(osid_object_map['recordTypeIds'])
-        # self._runtime = runtime # Now set in Extensible
-        # if runtime is not None:
-        #     self._set_authority(runtime=runtime)
-        
-        # This impl needs to be updated to call inherited classes, esp Extensible
-        # Until then:
-        #self._proxy = None
 
     def get_object_map(self, obj_map=None):
         if obj_map is None:
@@ -1606,7 +1599,7 @@ class OsidList:
         except StopIteration:
             raise
         except Exception:  # Need to specify exceptions here!
-            raise errors.OperationFailed()
+            raise
         if isinstance(next_object, dict):
             next_object = object_class(osid_object_map=next_object, runtime=self._runtime, proxy=self._proxy)
         elif isinstance(next_object, basestring) and object_class == Id:

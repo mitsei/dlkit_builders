@@ -348,6 +348,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     method['name'] = 'get_assessment_items'
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentPartItemSession':
                     method['name'] = 'get_assessment_part_items'
+                if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentResultsSession':
+                    method['name'] = 'get_assessment_taken_items'
 
             if (self._in(['mongo', 'services', 'authz', 'tests']) and
                     not build_this_method(package_name, interface, method)):
