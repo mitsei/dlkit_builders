@@ -2017,6 +2017,13 @@ class AssessmentSection:
                 pm in self._my_map['assessmentParts'] if
                 pm['assessmentPartId'] == question_map['assessmentPartId']][0]
 
+    def _get_item(self, question_id):
+        \"\"\"we need a middle-man method to convert the unique "assessment-session"
+            authority question_ids into "real" itemIds\"\"\"
+        question = self._get_question(question_id)
+        ils = self._get_item_lookup_session()
+        return ils.get_item(Id(question._my_map['itemId']))
+
     def _get_questions(self, answered=None, honor_sequential=True):
         \"\"\"gets all available questions for this section
 
@@ -2171,7 +2178,7 @@ class AssessmentSection:
         \"\"\"is feedback available for item\"\"\"
         response = self._get_response(question_id)
         if response.is_answered():
-            item = self._item_lookup_session.get_item(question_id)
+            item = self._get_item(question_id)
             return item.is_feedback_available_for_response(response)
         return item.is_feedback_available()
 
@@ -2179,7 +2186,7 @@ class AssessmentSection:
         \"\"\"get feedback for item\"\"\"
         response = self._get_response(question_id)
         if response.is_answered():
-            item = self._item_lookup_session.get_item(response.get_item_id())
+            item = self._get_item(response.get_item_id())
             try:
                 return item.get_feedback_for_response(response)
             except errors.IllegalState:
@@ -2191,7 +2198,7 @@ class AssessmentSection:
         \"\"\"get confused objective ids available for the question\"\"\"
         response = self._get_response(question_id)
         if response.is_answered():
-            item = self._get_item_lookup_session().get_item(response.get_item_id())
+            item = self._get_item(response.get_item_id())
             return item.get_confused_learning_objective_ids_for_response(response)
         raise errors.IllegalState()
 
@@ -2199,7 +2206,7 @@ class AssessmentSection:
         \"\"\"is a measure of correctness available for the question\"\"\"
         response = self._get_response(question_id)
         if response.is_answered():
-            item = self._get_item_lookup_session().get_item(response.get_item_id())
+            item = self._get_item(response.get_item_id())
             return item.is_correctness_available_for_response(response)
         return False
 
@@ -2207,7 +2214,7 @@ class AssessmentSection:
         \"\"\"is the question answered correctly\"\"\"
         response = self._get_response(question_id=question_id)
         if response.is_answered():
-            item = self._get_item_lookup_session().get_item(response.get_item_id())
+            item = self._get_item(response.get_item_id())
             return item.is_response_correct(response)
         raise errors.IllegalState()
 
@@ -2215,7 +2222,7 @@ class AssessmentSection:
         \"\"\"get measure of correctness for the question\"\"\"
         response = self._get_response(question_id)
         if response.is_answered():
-            item = self._get_item_lookup_session().get_item(response.get_item_id())
+            item = self._get_item(response.get_item_id())
             return item.get_correctness_for_response(response)
         raise errors.IllegalState()
 
