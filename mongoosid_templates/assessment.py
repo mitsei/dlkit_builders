@@ -174,7 +174,7 @@ class AssessmentSession:
 
     has_next_question = """
         try:
-            self.get_next_question(assessment_section_id, question_id=item_id)
+            self.get_next_question(assessment_section_id, item_id)
         except errors.IllegalState:
             return False
         else:
@@ -2085,7 +2085,7 @@ class AssessmentSection:
 
     def _get_answers(self, question_id):
         question_map = self._get_question_map(question_id) # will raise NotFound()
-        item = self._get_item_lookup_session().get_item(question_map['questionId'])
+        item = self._get_item(Id(question_map['questionId']))
         answers = list(item.get_answers())
         try:
             answers += list(item.get_wrong_answers())
