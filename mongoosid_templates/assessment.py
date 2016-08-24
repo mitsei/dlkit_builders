@@ -955,12 +955,22 @@ class Question:
         'from ..utilities import MongoClientValidated',
         'from bson.objectid import ObjectId',
     ]
+
+    init = """
+    def __init__(self, **kwargs):
+        osid_objects.OsidObject.__init__(self, object_name='QUESTION', **kwargs)
+        self._catalog_name = 'bank'
+        if 'item_id' in kwargs:
+            self._item_id = kwargs['item_id']
+        else:
+            self._item_id = Id(kwargs['osid_object_map']['itemId'])
+        """
     
     additional_methods = """
     ##
     # Overide osid.Identifiable.get_id() method to cast this question id as its item id:
     def get_id(self):
-        return Id(self._my_map['itemId'])
+        return self._item_id
     
     id_ = property(fget=get_id)
     ident = property(fget=get_id)
@@ -1711,11 +1721,8 @@ class AssessmentSection:
         
         self._my_map['assessmentParts'][str(self._assessment_part_id)] = get_default_part_map(
             0, self._assessment_part.are_items_sequential())
-        
-        
-        assessment_mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        lookup_session = assessment_mgr.get_item_lookup_session(proxy=self._proxy)
-        lookup_session.use_federated_bank_view()
+
+        lookup_session = self._get_item_lookup_session()
         items = lookup_session.get_items_by_ids(item_ids)
         display_num = 1
         for item in items:
@@ -1940,7 +1947,7 @@ class AssessmentSection:
 
     def _update_question_list(self, part_list):
 
-        def get_question_display_elements(question_part_map):
+        def get_question_display_elements():
             \"\"\"Get the parts only in this route.
 
             Go backwards until you find a part with level 1?
@@ -1967,8 +1974,9 @@ class AssessmentSection:
             parts_in_same_route = {}
 
             if question_part_map['level'] > 1:
+                this_part = part
                 question_map = question_part_map
-                search_index = self._my_map['assessmentParts'].index(question_part_map)
+                search_index = part_list.index(part)
                 level_1_part = {}
                 found_target_question = False
                 while not found_target_question:
@@ -1976,7 +1984,7 @@ class AssessmentSection:
                         parts_in_same_route[question_map['level']] = []
                     parts_in_same_route[question_map['level']].insert(0, question_map)
                     search_index -= 1
-                    question_map = self._my_map['assessmentParts'][search_index]
+                    question_map = self._my_map['assessmentParts'][str(part_list[search_index].get_id())]
                     level = question_map['level']
                     if level == 1:
                         level_1_part = question_map  # let's preserve this for later
@@ -1987,7 +1995,7 @@ class AssessmentSection:
             # get all level 1 parts to get the first index
             all_level_1_parts = [p
                                  for p in self._my_map['assessmentParts']
-                                 if p['level'] == 1]
+                                 if self._my_map['assessmentParts'][p]['level'] == 1]
             my_display_elements.append(all_level_1_parts.index(level_1_part) + 1)
 
             for level, waypoints in parts_in_same_route.iteritems():
@@ -2216,10 +2224,9 @@ class AssessmentSection:
         question._authority = ASSESSMENT_AUTHORITY
 
         # Override Item Id of this question (this is the Id that Questions report)
-        question._my_map['itemId'] = str(
-            Id(namespace='assessment.Item',
-               identifier=str(question_map['_id']),
-               authority=ASSESSMENT_AUTHORITY))
+        question._item_id = Id(namespace='assessment.Item',
+                               identifier=str(question_map['_id']),
+                               authority=ASSESSMENT_AUTHORITY)
         return question
 
     def _get_answers(self, question_id):

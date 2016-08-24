@@ -223,7 +223,7 @@ def get_item_lookup_session(runtime=None, proxy=None):
         magic_class = import_path_with_class.split('.')[-1]
         module = importlib.import_module(module_path)
         item_lookup_session = getattr(module, magic_class)(runtime=runtime,
-                                               proxy=proxy)
+                                                           proxy=proxy)
     except (AttributeError, KeyError, NotFound):
         mgr = get_provider_manager('ASSESSMENT', runtime=runtime, proxy=proxy, local=True)
         item_lookup_session = mgr.get_item_lookup_session(proxy=proxy)
