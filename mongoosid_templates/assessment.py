@@ -174,7 +174,7 @@ class AssessmentSession:
 
     has_next_question = """
         try:
-            self.get_next_question(assessment_section_id, question_id=item_id)
+            self.get_next_question(assessment_section_id, item_id)
         except errors.IllegalState:
             return False
         else:
@@ -185,14 +185,14 @@ class AssessmentSession:
     
     has_previous_question = """
         try:
-            self.get_previous_question(assessment_section_id, question_id=item_id)
+            self.get_previous_question(assessment_section_id, item_id)
         except errors.IllegalState:
             return False
         else:
             return True"""
 
     get_previous_question = """
-        return self.get_assessment_section(assessment_section_id)._get_previous_question(question_id=item_id)"""
+        return self.get_assessment_section(assessment_section_id)._get_next_question(question_id=item_id, reverse=True)"""
 
     get_question = """
         return self.get_assessment_section(assessment_section_id)._get_question(question_id=item_id)"""
@@ -213,9 +213,12 @@ class AssessmentSession:
         # This is a little hack to get the answer record types from the Item's
         # first Answer record types. Should really get it from item genus types somehow:
         record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
-        mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        ils = self.get_assessment_section(assessment_section_id)._get_item_lookup_session()
-        item = ils.get_item(item_id)
+        section = self.get_assessment_section(assessment_section_id)
+        # because we're now giving session-unique question IDs
+        question = section._get_question(item_id)
+        ils = section._get_item_lookup_session()
+        real_item_id = Id(question._my_map['itemId'])
+        item = ils.get_item(real_item_id)
         item_map = item.object_map
         answer_record_types = []
         if len(item_map['answers']) > 0:
@@ -1064,7 +1067,7 @@ class Item:
         \"\"\"
         if self.is_feedback_available():
             pass # what is feedback anyway? Just a DisplayText or something more?
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def is_solution_available(self):
         \"\"\"is a solution available for this Item (is this different than feedback?)
@@ -1082,7 +1085,7 @@ class Item:
         \"\"\"
         if self.is_solution_available():
             pass
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def is_feedback_available_for_response(self, response):
         \"\"\"is feedback available for a particular response
@@ -1100,7 +1103,7 @@ class Item:
         \"\"\"
         if self.is_feedback_available_for_response(response):
             pass # what is feedback anyway? Just a DisplayText or something more?
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def is_correctness_available_for_response(self, response):
         \"\"\"is a measure of correctness available for a particular response
@@ -1118,7 +1121,7 @@ class Item:
         \"\"\"
         if self.is_correctness_available_for_response(response):
             pass # return True or False
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def get_correctness_for_response(self, response):
         \"\"\"get measure of correctness available for a particular response
@@ -1128,7 +1131,7 @@ class Item:
         \"\"\"
         if self.is_correctness_available_for_response(response):
             pass # return a correctness score 0 thru 100
-        raise IllegalState()
+        raise errors.IllegalState()
 
     def are_confused_learning_objective_ids_available_for_response(self, response):
         \"\"\"is a learning objective available for a particular response
@@ -1145,7 +1148,7 @@ class Item:
         \"\"\"
         if self.are_confused_learning_objective_ids_available_for_response(response):
             pass # return Objective IdList
-        raise IllegalState()"""
+        raise errors.IllegalState()"""
 
 
 class Assessment:
@@ -2170,9 +2173,16 @@ class AssessmentSection:
         Currently only checks the assessment part's items sequential
 
         \"\"\"
-        return (pm['requiresSequentialItems'] for 
+        return [pm['requiresSequentialItems'] for
                 pm in self._my_map['assessmentParts'] if
-                pm['assessmentPartId'] == question_map['assessmentPartId'])
+                pm['assessmentPartId'] == question_map['assessmentPartId']][0]
+
+    def _get_item(self, question_id):
+        \"\"\"we need a middle-man method to convert the unique "assessment-session"
+            authority question_ids into "real" itemIds\"\"\"
+        question = self._get_question(question_id)
+        ils = self._get_item_lookup_session()
+        return ils.get_item(Id(question._my_map['itemId']))
 
     def _get_questions(self, answered=None, honor_sequential=True):
         \"\"\"gets all available questions for this section
@@ -2187,8 +2197,12 @@ class AssessmentSection:
 
         def update_question_list():
             \"\"\"Supportive function to aid readability of _get_questions.\"\"\"
-            question_id = Id(question_map['questionId'])
-            question_answered = bool('missingResponse' not in question_map)
+            latest_question_response = question_map['responses'][0]
+            question_answered = False
+            # take missingResponse == UNANSWERED or NULL_RESPONSE as an unanswered question
+            if 'missingResponse' not in latest_question_response:
+                question_answered = True
+
             if answered is None or answered == question_answered:
                 question_list.append(self._get_question(question_map=question_map))
             return question_answered
@@ -2231,7 +2245,7 @@ class AssessmentSection:
 
     def _get_answers(self, question_id):
         question_map = self._get_question_map(question_id) # will raise NotFound()
-        item = self._get_item_lookup_session().get_item(question_map['questionId'])
+        item = self._get_item(Id(question_map['questionId']))
         answers = list(item.get_answers())
         try:
             answers += list(item.get_wrong_answers())
@@ -2266,9 +2280,13 @@ class AssessmentSection:
             error_text = ' next '
         if questions[-1] == question_map:
             raise errors.IllegalState('No ' + error_text + ' questions available')
-        index = self._my_map['questions'].index(question_map)
-        for question_map in self._my_map['questions'][index:]:
-            question_answered = bool('missingResponse' not in question_map)
+        index = questions.index(question_map) + 1
+        for question_map in questions[index:]:
+            latest_question_response = question_map['responses'][0]
+            question_answered = False
+            # take missingResponse == UNANSWERED or NULL_RESPONSE as an unanswered question
+            if 'missingResponse' not in latest_question_response:
+                question_answered = True
             if answered is None or question_answered == answered:
                 return self._get_question(question_map=question_map)
         raise errors.IllegalState('No ' + error_text + ' question matching parameters was found')
@@ -2300,7 +2318,7 @@ class AssessmentSection:
 
     def _get_responses(self):
         \"\"\"Gets list of the latest responses\"\"\"
-        answer_list = []
+        response_list = []
         for question_map in self._my_map['questions']:
             response_list.append(self._get_response_from_question_map(question_map))
         return ResponseList(response_list)
@@ -2323,16 +2341,16 @@ class AssessmentSection:
     def _is_feedback_available(self, question_id):
         \"\"\"is feedback available for item\"\"\"
         response = self._get_response(question_id)
+        item = self._get_item(question_id)
         if response.is_answered():
-            item = self._item_lookup_session.get_item(question_id)
             return item.is_feedback_available_for_response(response)
         return item.is_feedback_available()
 
     def _get_feedback(self, question_id):
         \"\"\"get feedback for item\"\"\"
         response = self._get_response(question_id)
+        item = self._get_item(response.get_item_id())
         if response.is_answered():
-            item = self._item_lookup_session.get_item(response.get_item_id())
             try:
                 return item.get_feedback_for_response(response)
             except errors.IllegalState:
@@ -2344,7 +2362,7 @@ class AssessmentSection:
         \"\"\"get confused objective ids available for the question\"\"\"
         response = self._get_response(question_id)
         if response.is_answered():
-            item = self._get_item_lookup_session().get_item(response.get_item_id())
+            item = self._get_item(response.get_item_id())
             return item.get_confused_learning_objective_ids_for_response(response)
         raise errors.IllegalState()
 
@@ -2352,7 +2370,7 @@ class AssessmentSection:
         \"\"\"is a measure of correctness available for the question\"\"\"
         response = self._get_response(question_id)
         if response.is_answered():
-            item = self._get_item_lookup_session().get_item(response.get_item_id())
+            item = self._get_item(response.get_item_id())
             return item.is_correctness_available_for_response(response)
         return False
 
@@ -2360,7 +2378,7 @@ class AssessmentSection:
         \"\"\"is the question answered correctly\"\"\"
         response = self._get_response(question_id=question_id)
         if response.is_answered():
-            item = self._get_item_lookup_session().get_item(response.get_item_id())
+            item = self._get_item(response.get_item_id())
             return item.is_response_correct(response)
         raise errors.IllegalState()
 
@@ -2368,7 +2386,7 @@ class AssessmentSection:
         \"\"\"get measure of correctness for the question\"\"\"
         response = self._get_response(question_id)
         if response.is_answered():
-            item = self._get_item_lookup_session().get_item(response.get_item_id())
+            item = self._get_item(response.get_item_id())
             return item.get_correctness_for_response(response)
         raise errors.IllegalState()
 
@@ -2412,6 +2430,7 @@ class Response:
     _namespace = 'assessment.Response'
     
     def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, **kwargs):
+        from .objects import Answer
         self._submission_time = osid_object_map['submissionTime']
         self._item_id = Id(osid_object_map['itemId'])
         if additional_attempts is not None:
@@ -2419,9 +2438,11 @@ class Response:
         else:
             self._additional_attempts = []
         if 'missingResponse' in osid_object_map:
-            self._my_answer == osid_object_map['missingResponse']
+            self._my_answer = osid_object_map['missingResponse']
         else:
-            self._my_answer = Answer(osid_object_map, runtime=runtime, proxy=proxy)
+            self._my_answer = Answer(osid_object_map=osid_object_map,
+                                     runtime=runtime,
+                                     proxy=proxy)
         self._records = dict()
 
         # Consider that responses may want to have their own records separate
@@ -2447,9 +2468,9 @@ class Response:
     
     def __getattr__(self, name):
         if self._my_answer == UNANSWERED:
-            raise IllegalState('this Item has not been attempted')
+            raise errors.IllegalState('this Item has not been attempted')
         if self._my_answer == NULL_SUBMISSION:
-            raise IllegalState('this Item has been skipped or cleared')
+            raise errors.IllegalState('this Item has been skipped or cleared')
         if not name.startswith('__'):
             try:
                 return getattr(self._my_answer, name)

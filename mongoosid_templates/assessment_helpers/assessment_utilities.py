@@ -208,7 +208,10 @@ def get_assessment_part_lookup_session(runtime, proxy, section=None):
                                                            runtime=runtime,
                                                            proxy=proxy)
     except (AttributeError, KeyError, NotFound):
-        mgr = get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+        mgr = get_provider_manager('ASSESSMENT_AUTHORING',
+                                   runtime=runtime,
+                                   proxy=proxy,
+                                   local=True)
         part_lookup_session = mgr.get_assessment_part_lookup_session(proxy=proxy)
     return part_lookup_session
 
