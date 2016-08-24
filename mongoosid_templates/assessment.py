@@ -1860,11 +1860,11 @@ class AssessmentSection:
             except errors.IllegalState:
                 finished = True
             else:
-                if part.has_items()
-                part_list.append(
-                    self._get_assessment_part_lookup_session().get_assessment_part(
-                        Id(part_id)))
-                delta_list.append(delta)
+                if part.has_items():
+                    part_list.append(
+                        self._get_assessment_part_lookup_session().get_assessment_part(
+                            Id(part_id)))
+                    delta_list.append(delta)
 
     def _update_assessment_parts_map(self, part_list, delta_list):
         \"\"\"Updates the part map.
@@ -2020,7 +2020,7 @@ class AssessmentSection:
         index = 0
         for part in part_list:
             if (len(self._my_map['questions']) == index or
-                    self._my_map['questions'][index]['assessmentPartId'] != str(part.get_id()):
+                    self._my_map['questions'][index]['assessmentPartId'] != str(part.get_id())):
                 part_idstr = str(part.get_id())
                 part_map = self._my_map['assessmentParts'][part_idstr]
                 for item in self._get_assessment_part_lookup_session().get_assessment_part(Id(part_id)).get_items():
