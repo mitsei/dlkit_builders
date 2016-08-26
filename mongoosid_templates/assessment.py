@@ -2167,8 +2167,24 @@ class AssessmentSection:
                 return question_map
         raise errors.NotFound()
 
+    def _get_question_ids_for_assessment_part(self, assessment_part_id):
+        \"\"\"convenience method returns question ids associated with an assessment_part_id\"\"\"
+        question_ids =[]
+        for question_map in self._my_map['questions']:
+            if question_map['assessmentPartId'] == str(assessment_part_id):
+                question_ids.append(Id(question_map['questionId']))
+        return question_ids
+                
+    def _get_item_ids_for_assessment_part(self, assessment_part_id):
+        \"\"\"convenience method returns item ids associated with an assessment_part_id\"\"\"
+        item_ids =[]
+        for question_map in self._my_map['questions']:
+            if question_map['assessmentPartId'] == str(assessment_part_id):
+                question_ids.append(Id(question_map['itemId']))
+        return item_ids
+
     def _is_question_sequential(self, question_map):
-        \"\"\"determine if sequential rules apply to question
+        \"\"\"determine if sequential rules apply to question for getting next question
 
         Currently only checks the assessment part's items sequential
 
