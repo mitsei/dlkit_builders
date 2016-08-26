@@ -106,9 +106,9 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
         if isinstance(part, abc_assessment): # This is an Assessment masquerading as an AssessmentPart
             raise IllegalState('No next AssessmentPart is available for part_id')
         elif part.has_parent_part(): # This is the child of another AssessmentPart
-            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, level - 1, prev_part_id=part_id, sequestered=True)
+            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, level - 1, prev_part_id=part.ident, sequestered=True)
         else: # This is the child of an Assessment. Will this ever be the case?
-            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1, prev_part_id=part_id, sequestered=True)
+            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1, prev_part_id=part.ident, sequestered=True)
     return next_part_id, level
 
 def get_level_delta(part1_id, part2_id, runtime, proxy):
