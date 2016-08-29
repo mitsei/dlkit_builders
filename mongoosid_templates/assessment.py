@@ -990,8 +990,13 @@ class Question:
     def get_object_map(self):
         obj_map = dict(self._my_map)
         del obj_map['itemId']
-        lo_ids = self.get_learning_objective_ids()
-        obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
+        try:
+            lo_ids = self.get_learning_objective_ids()
+            obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
+        except UnicodeEncodeError:
+            lo_ids = self.get_learning_objective_ids()
+            obj_map['learningObjectiveIds'] = [unicode(lo_id) for lo_id in lo_ids]
+
         obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
         obj_map['id'] = str(self.get_id())
         return obj_map
@@ -1097,7 +1102,6 @@ class Item:
 
     def get_feedback_for_response(self, response):
         \"\"\"get feedback for a particular response
-
         to be overriden in a record extension
 
         \"\"\"
@@ -1107,12 +1111,11 @@ class Item:
 
     def is_correctness_available_for_response(self, response):
         \"\"\"is a measure of correctness available for a particular response
-        
         to be overriden in a record extension
 
         \"\"\"
         return False
-    
+
     def is_response_correct(self, response):
         \"\"\"returns True if response evaluates to an Item Answer that is 100 percent correct
 
@@ -1125,7 +1128,6 @@ class Item:
 
     def get_correctness_for_response(self, response):
         \"\"\"get measure of correctness available for a particular response
-
         to be overriden in a record extension
 
         \"\"\"
@@ -1142,7 +1144,7 @@ class Item:
 
     def get_confused_learning_objective_ids_for_response(self, response):
         \"\"\"get learning objectives for a particular response
-        
+
         to be overriden in a record extension
 
         \"\"\"
@@ -2260,8 +2262,12 @@ class AssessmentSection:
         return question
 
     def _get_answers(self, question_id):
+        # don't use the self._get_item() convenience method here
+        # because we need to preserve the magic params (if any) present
+        # in the questionId
         question_map = self._get_question_map(question_id) # will raise NotFound()
-        item = self._get_item(Id(question_map['questionId']))
+        ils = self._get_item_lookup_session()
+        item = ils.get_item(Id(question_map['questionId']))
         answers = list(item.get_answers())
         try:
             answers += list(item.get_wrong_answers())
@@ -2531,6 +2537,7 @@ class Response:
 
     def get_additional_attempts(self):
         return ResponseList(self._additional_attempts, self._runtime, self._proxy)"""
+
 
 class ItemQuery:
 

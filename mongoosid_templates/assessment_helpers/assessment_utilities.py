@@ -82,17 +82,34 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
             # get the next child.
             child_ids = list(part.get_child_ids())
             child_id_strs = [str(c) for c in child_ids]
-            if str(prev_part_id) not in child_id_strs:
-                raise IllegalState('previous part is not a child of its own parent')
+            # if str(prev_part_id) not in child_id_strs:
+                # must be a magic part -- pass here and keep checking up the tree
+                # magic parts are not stored on disk, so they will never be in
+                # their parent's childIds list...
+                # pass
             if str(prev_part_id) == child_id_strs[-1]:
                 pass
             else:
+                found_next_part = False
                 for index, child_id_str in enumerate(child_id_strs):
                     if child_id_str == str(prev_part_id):
                         next_part_id = child_ids[index + 1]
                         level += 1
                         check_parent = False
+                        found_next_part = True
                         break
+                if not found_next_part and section is not None:
+                    # check the section, if you can't find prev_part_id in the children
+                    # because it might be a magic part ID
+                    # and magic part IDs only exist in the assessment sections
+                    section_part_ids = [p['assessmentPartId'] for p in section._my_map['assessmentParts']]
+                    if str(prev_part_id) != section_part_ids[-1]:
+                        for index, section_part_id_str in enumerate(section_part_ids):
+                            if section_part_id_str == str(prev_part_id):
+                                next_part_id = Id(section_part_ids[index + 1])
+                                level += 1
+                                check_parent = False
+                                break
     elif siblings and str(siblings[-1]) != str(part_id):
         siblings_str = [str(s) for s in siblings]
         try:
@@ -106,9 +123,23 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
         if isinstance(part, abc_assessment): # This is an Assessment masquerading as an AssessmentPart
             raise IllegalState('No next AssessmentPart is available for part_id')
         elif part.has_parent_part(): # This is the child of another AssessmentPart
-            next_part_id, level = get_next_part_id(part.get_assessment_part_id(), runtime, proxy, level - 1, prev_part_id=part_id, sequestered=True)
+            # use sequestered = False because we may be nested deeply in magic parts?
+            next_part_id, level = get_next_part_id(part.get_assessment_part_id(),
+                                                   runtime,
+                                                   proxy,
+                                                   level - 1,
+                                                   prev_part_id=part.ident,
+                                                   sequestered=False,
+                                                   section=section)
         else: # This is the child of an Assessment. Will this ever be the case?
-            next_part_id, level = get_next_part_id(part.get_assessment_id(), runtime, proxy, -1, prev_part_id=part_id, sequestered=True)
+            # use sequestered = False because we may be nested deeply in magic parts?
+            next_part_id, level = get_next_part_id(part.get_assessment_id(),
+                                                   runtime,
+                                                   proxy,
+                                                   -1,
+                                                   prev_part_id=part.ident,
+                                                   sequestered=False,
+                                                   section=section)
     return next_part_id, level
 
 def get_level_delta(part1_id, part2_id, runtime, proxy):
