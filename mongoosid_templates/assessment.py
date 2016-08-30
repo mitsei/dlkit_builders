@@ -1711,6 +1711,23 @@ class AssessmentSection:
             # This goes down the winding path...
             self._update_questions()
 
+    def _get_part_map(self, part_id):
+        \"\"\" from self._my_map['assessmentParts'], return the one part map
+        with ID that matches the one passed in\"\"\"
+        return [p for p in self._my_map['assessmentParts']
+                if p['assessmentPartId'] == str(part_id)][0]
+
+    def _insert_part_map(self, part_map, index=-1):
+        \"\"\" add a part map to self._my_map['assessmentParts']\"\"\"
+        if index == -1:
+            self._my_map['assessmentParts'].append(part_map)
+        else:
+            self._my_map['assessmentParts'].insert(index, part_map)
+
+    def _part_ids(self):
+        \"\"\"convenience method to return a list of the part Ids in this section\"\"\"
+        return [p['assessmentPartId'] for p in self._my_map['assessmentParts']]
+
     def _load_simple_section_questions(self, item_ids):
         \"\"\"For the simple section case (common)
         
@@ -1719,13 +1736,13 @@ class AssessmentSection:
         
         \"\"\"
         # old style:
-        # self._my_map['assessmentParts'].append(
-        #     get_default_part_map(self._assessment_part_id,
-        #                          0,
-        #                          self._assessment_part.are_items_sequential()))
+        self._insert_part_map(
+            get_default_part_map(self._assessment_part_id,
+                                 0,
+                                 self._assessment_part.are_items_sequential()))
         
-        self._my_map['assessmentParts'][str(self._assessment_part_id)] = get_default_part_map(
-            0, self._assessment_part.are_items_sequential())
+        # self._my_map['assessmentParts'][str(self._assessment_part_id)] = get_default_part_map(
+        #    self._assessment_part_id, 0, self._assessment_part.are_items_sequential())
 
         lookup_session = self._get_item_lookup_session()
         items = lookup_session.get_items_by_ids(item_ids)
@@ -1850,8 +1867,17 @@ class AssessmentSection:
             self._save()
 
     def _get_parts_and_deltas(self):
-        part_list = delta_list = []
+        def get_part_level(target_part_id):
+            \"\"\"Gets the level of the target part\"\"\"
+            for p in self._my_map['assessmentParts']:
+                if p['assessmentPartId'] == str(target_part_id):
+                    return p['level']
+            return 0
+
+        part_list = []
+        delta_list = []
         finished = False
+        part_id = self._assessment_part_id
         prev_part_id = None
         while not finished:
             prev_part_id = part_id
@@ -1860,16 +1886,19 @@ class AssessmentSection:
                 part_id, delta = get_next_part_id(part_id,
                                                   runtime=self._runtime,
                                                   proxy=self._proxy,
+                                                  level=prev_part_level,
                                                   section=self,
                                                   sequestered=False)
             except errors.IllegalState:
                 finished = True
             else:
+                part = self._get_assessment_part(part_id)
                 if part.has_items():
                     part_list.append(
                         self._get_assessment_part_lookup_session().get_assessment_part(
-                            Id(part_id)))
+                            part_id))
                     delta_list.append(delta)
+        return part_list, delta_list
 
     def _update_assessment_parts_map(self, part_list, delta_list):
         \"\"\"Updates the part map.
@@ -1881,19 +1910,20 @@ class AssessmentSection:
 
         def get_part_level(target_part_id):
             \"\"\"Gets the level of the target part\"\"\"
-            return self._my_map['assessmentParts'][str(target_part_id)]['level']
+            return self._get_part_map(target_part_id)['level']
 
-        def add_part():
+        def add_part(new_part_index):
             part_level = prev_part_level + delta
-            self._my_map['assessmentParts'][str(part_id)] = get_default_part_map(
-                part_level, part.are_items_sequential())
+            self._insert_part_map(get_default_part_map(
+                part_id, part_level, part.are_items_sequential()),
+                index=new_part_index)
 
         prev_part_level = 0
         for part in part_list:
             part_id = part.get_id()
             delta = delta_list[part_list.index(part)]
-            if str(part.get_id()) not in self._my_map['assessmentParts']:
-                add_part() 
+            if str(part.get_id()) not in self._part_ids():
+                add_part(part_list.index(part))
             prev_part_level = get_part_level(part_id)
              
     # Original method of updating assessment part map:
@@ -1952,7 +1982,7 @@ class AssessmentSection:
 
     def _update_question_list(self, part_list):
 
-        def get_question_display_elements():
+        def get_question_display_elements(question_part_map):
             \"\"\"Get the parts only in this route.
 
             Go backwards until you find a part with level 1?
@@ -1962,18 +1992,18 @@ class AssessmentSection:
                  the indices relative to the second level 1, not including
                  the first two parts
             
-            self._my_map['assessmentParts'] = {
-                <idstr of a part. Might be a 'magic' id>: {
-                      'level': 1,
-                      'requiresSequentialItems': False},
-                <idstr of a part. Might be a 'magic' id>: {
-                      'level': 2,
-                      'requiresSequentialItems': True},
-                <idstr of a part. Might be a 'magic' id>: {
-                      'level': 1
-                      'requiresSequentialItems': False},
+            self._my_map['assessmentParts'] = [
+                {'assessmentPartId': <idstr of a part. Might be a 'magic' id>,
+                 'level': 1,
+                 'requiresSequentialItems': False},
+                {'assessmentPartId': <idstr of a part. Might be a 'magic' id>,
+                 'level': 2,
+                 'requiresSequentialItems': True},
+                {'assessmentPartId': <idstr of a part. Might be a 'magic' id>,
+                 'level': 1
+                 'requiresSequentialItems': False},
                 <etc, for additional assessment parts>,
-            }
+            ]
             \"\"\"
             my_display_elements = []
             parts_in_same_route = {}
@@ -1989,7 +2019,7 @@ class AssessmentSection:
                         parts_in_same_route[question_map['level']] = []
                     parts_in_same_route[question_map['level']].insert(0, question_map)
                     search_index -= 1
-                    question_map = self._my_map['assessmentParts'][str(part_list[search_index].get_id())]
+                    question_map = self._get_part_map(part_list[search_index].get_id())
                     level = question_map['level']
                     if level == 1:
                         level_1_part = question_map  # let's preserve this for later
@@ -2000,7 +2030,7 @@ class AssessmentSection:
             # get all level 1 parts to get the first index
             all_level_1_parts = [p
                                  for p in self._my_map['assessmentParts']
-                                 if self._my_map['assessmentParts'][p]['level'] == 1]
+                                 if p['level'] == 1]
             my_display_elements.append(all_level_1_parts.index(level_1_part) + 1)
 
             for level, waypoints in parts_in_same_route.iteritems():
@@ -2026,9 +2056,9 @@ class AssessmentSection:
         for part in part_list:
             if (len(self._my_map['questions']) == index or
                     self._my_map['questions'][index]['assessmentPartId'] != str(part.get_id())):
-                part_idstr = str(part.get_id())
-                part_map = self._my_map['assessmentParts'][part_idstr]
-                for item in self._get_assessment_part_lookup_session().get_assessment_part(Id(part_id)).get_items():
+                part_id = part.get_id()
+                part_map = self._get_part_map(part_id)
+                for item in self._get_assessment_part_lookup_session().get_assessment_part(part_id).get_items():
                     # need to update the display elements for the question
                     # kind of convoluted, but the first part of the display elements
                     # is the "part_index" of the previous level 1 question (if parts were organized
@@ -2037,11 +2067,13 @@ class AssessmentSection:
                     self._my_map['questions'].insert(index, get_default_question_map(
                         item.get_id(),
                         item.get_question().get_id(),
-                        Id(part_idstr),
+                        part_id,
                         display_elements))
                     index += 1
                     
             else: # skip through all remaining questions for this part
+                part_id = part.get_id()
+                part_map = self._get_part_map(part_id)
                 while (len(self._my_map['questions']) > index and
                        self._my_map['questions'][index]['assessmentPartId'] == part_map['assessmentPartId']):
                     index += 1
@@ -2176,13 +2208,13 @@ class AssessmentSection:
             if question_map['assessmentPartId'] == str(assessment_part_id):
                 question_ids.append(Id(question_map['questionId']))
         return question_ids
-                
+
     def _get_item_ids_for_assessment_part(self, assessment_part_id):
         \"\"\"convenience method returns item ids associated with an assessment_part_id\"\"\"
         item_ids =[]
         for question_map in self._my_map['questions']:
             if question_map['assessmentPartId'] == str(assessment_part_id):
-                question_ids.append(Id(question_map['itemId']))
+                item_ids.append(Id(question_map['itemId']))
         return item_ids
 
     def _is_question_sequential(self, question_map):
@@ -2207,7 +2239,7 @@ class AssessmentSection:
 
         if answered == False: only return next unanswered question
         if answered == True: only return next answered question
-        if answered in None: return next question wheter answered or not
+        if answered in None: return next question whether answered or not
         if honor_sequential == True: only return questions if section or part
                                      is set to sequential items
 
