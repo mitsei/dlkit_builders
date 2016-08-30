@@ -1888,7 +1888,8 @@ class AssessmentSection:
                                                   proxy=self._proxy,
                                                   level=prev_part_level,
                                                   section=self,
-                                                  sequestered=False)
+                                                  sequestered=False,
+                                                  follow_across_assessment=False)
             except errors.IllegalState:
                 finished = True
             else:
@@ -1980,7 +1981,7 @@ class AssessmentSection:
     #                         number_updates += 1
     #     return number_updates > 0
 
-    def _update_question_list(self, part_list):
+    def _update_questions_list(self, part_list):
 
         def get_question_display_elements(question_part_map):
             \"\"\"Get the parts only in this route.

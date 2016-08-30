@@ -54,7 +54,14 @@ def get_first_part_id_for_assessment(assessment_id, runtime=None, proxy=None, cr
         else:
             raise
 
-def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=None, sequestered=True, section=None):
+def get_next_part_id(part_id,
+                     runtime=None,
+                     proxy=None,
+                     level=0,
+                     prev_part_id=None,
+                     sequestered=True,
+                     section=None,
+                     follow_across_assessment=True):
     part, rule, siblings = get_decision_objects(part_id, runtime, proxy, sequestered, section)
     check_parent = True
     if rule is not None: # A SequenceRule trumps everything.
@@ -98,18 +105,6 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
                         check_parent = False
                         found_next_part = True
                         break
-                if not found_next_part and section is not None:
-                    # check the section, if you can't find prev_part_id in the children
-                    # because it might be a magic part ID
-                    # and magic part IDs only exist in the assessment sections
-                    section_part_ids = [p['assessmentPartId'] for p in section._my_map['assessmentParts']]
-                    if str(prev_part_id) != section_part_ids[-1]:
-                        for index, section_part_id_str in enumerate(section_part_ids):
-                            if section_part_id_str == str(prev_part_id):
-                                next_part_id = Id(section_part_ids[index + 1])
-                                level += 1
-                                check_parent = False
-                                break
     elif siblings and str(siblings[-1]) != str(part_id):
         siblings_str = [str(s) for s in siblings]
         try:
@@ -130,16 +125,20 @@ def get_next_part_id(part_id, runtime=None, proxy=None, level=0, prev_part_id=No
                                                    level - 1,
                                                    prev_part_id=part.ident,
                                                    sequestered=False,
-                                                   section=section)
+                                                   section=section,
+                                                   follow_across_assessment=follow_across_assessment)
         else: # This is the child of an Assessment. Will this ever be the case?
-            # use sequestered = False because we may be nested deeply in magic parts?
-            next_part_id, level = get_next_part_id(part.get_assessment_id(),
-                                                   runtime,
-                                                   proxy,
-                                                   -1,
-                                                   prev_part_id=part.ident,
-                                                   sequestered=False,
-                                                   section=section)
+            if follow_across_assessment:
+                next_part_id, level = get_next_part_id(part.get_assessment_id(),
+                                                       runtime,
+                                                       proxy,
+                                                       -1,
+                                                       prev_part_id=part.ident,
+                                                       sequestered=True,
+                                                       section=section,
+                                                       follow_across_assessment=follow_across_assessment)
+            else:
+                raise IllegalState('Not configured to follow this across an assessment')
     return next_part_id, level
 
 def get_level_delta(part1_id, part2_id, runtime, proxy):
