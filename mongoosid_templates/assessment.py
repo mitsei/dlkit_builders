@@ -1918,7 +1918,6 @@ class AssessmentSection:
             level = level_list[part_list.index(part)]
             if str(part.get_id()) not in self._part_ids():
                 add_part(part_list.index(part))
-            prev_part_level = get_part_level(part_id)
              
     # Original method of updating assessment part map:
     # def _update_part_map(self, part_id=None):
