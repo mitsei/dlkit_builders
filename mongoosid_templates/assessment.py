@@ -1860,22 +1860,22 @@ class AssessmentSection:
 
         if self._is_simple_section():
             return # we don't need to go through any this for simple sections
-        part_list, delta_list = self._get_parts_and_deltas()
+        part_list, level_list = self._get_parts_and_levels()
         if len(part_list) > len(self._my_map['assessmentParts']):
-            self._update_assessment_parts_map(part_list, delta_list)
+            self._update_assessment_parts_map(part_list, level_list)
             self._update_questions_list(part_list)
             self._save()
 
-    def _get_parts_and_deltas(self):
+    def _get_parts_and_levels(self):
         def get_part_level(target_part_id):
             \"\"\"Gets the level of the target part\"\"\"
-            for p in self._my_map['assessmentParts']:
-                if p['assessmentPartId'] == str(target_part_id):
-                    return p['level']
+            for index, p in enumerate(part_list):
+                if str(p.ident) == str(target_part_id):
+                    return level_list[index]
             return 0
 
         part_list = []
-        delta_list = []
+        level_list = []
         finished = False
         part_id = self._assessment_part_id
         prev_part_id = None
@@ -1883,7 +1883,7 @@ class AssessmentSection:
             prev_part_id = part_id
             prev_part_level = get_part_level(prev_part_id)
             try:
-                part_id, delta = get_next_part_id(part_id,
+                part_id, level = get_next_part_id(part_id,
                                                   runtime=self._runtime,
                                                   proxy=self._proxy,
                                                   level=prev_part_level,
@@ -1898,31 +1898,24 @@ class AssessmentSection:
                     part_list.append(
                         self._get_assessment_part_lookup_session().get_assessment_part(
                             part_id))
-                    delta_list.append(delta)
-        return part_list, delta_list
+                    level_list.append(level)
+        return part_list, level_list
 
-    def _update_assessment_parts_map(self, part_list, delta_list):
+    def _update_assessment_parts_map(self, part_list, level_list):
         \"\"\"Updates the part map.
 
         Called before question list gets updated if it is determined that the
         sections assessmentPart map is out of date with the current part list.
 
         \"\"\"
-
-        def get_part_level(target_part_id):
-            \"\"\"Gets the level of the target part\"\"\"
-            return self._get_part_map(target_part_id)['level']
-
         def add_part(new_part_index):
-            part_level = prev_part_level + delta
             self._insert_part_map(get_default_part_map(
-                part_id, part_level, part.are_items_sequential()),
+                part_id, level, part.are_items_sequential()),
                 index=new_part_index)
 
-        prev_part_level = 0
         for part in part_list:
             part_id = part.get_id()
-            delta = delta_list[part_list.index(part)]
+            level = level_list[part_list.index(part)]
             if str(part.get_id()) not in self._part_ids():
                 add_part(part_list.index(part))
             prev_part_level = get_part_level(part_id)
@@ -2009,16 +2002,17 @@ class AssessmentSection:
             my_display_elements = []
             parts_in_same_route = {}
 
+            original_question_level = question_part_map['level']
             if question_part_map['level'] > 1:
-                this_part = part
                 question_map = question_part_map
                 search_index = part_list.index(part)
                 level_1_part = {}
                 found_target_question = False
                 while not found_target_question:
-                    if question_map['level'] not in parts_in_same_route:
-                        parts_in_same_route[question_map['level']] = []
-                    parts_in_same_route[question_map['level']].insert(0, question_map)
+                    if question_map['level'] <= original_question_level:
+                        if question_map['level'] not in parts_in_same_route:
+                            parts_in_same_route[question_map['level']] = []
+                        parts_in_same_route[question_map['level']].insert(0, question_map)
                     search_index -= 1
                     question_map = self._get_part_map(part_list[search_index].get_id())
                     level = question_map['level']

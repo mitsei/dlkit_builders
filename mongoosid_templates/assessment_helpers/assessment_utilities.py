@@ -97,13 +97,11 @@ def get_next_part_id(part_id,
             if str(prev_part_id) == child_id_strs[-1]:
                 pass
             else:
-                found_next_part = False
                 for index, child_id_str in enumerate(child_id_strs):
                     if child_id_str == str(prev_part_id):
                         next_part_id = child_ids[index + 1]
                         level += 1
                         check_parent = False
-                        found_next_part = True
                         break
     elif siblings and str(siblings[-1]) != str(part_id):
         siblings_str = [str(s) for s in siblings]
@@ -132,7 +130,7 @@ def get_next_part_id(part_id,
                 next_part_id, level = get_next_part_id(part.get_assessment_id(),
                                                        runtime,
                                                        proxy,
-                                                       -1,
+                                                       0,
                                                        prev_part_id=part.ident,
                                                        sequestered=True,
                                                        section=section,
