@@ -622,6 +622,7 @@ class AssessmentAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
         'from ..utilities import MongoClientValidated',
+        'from .assessment_utilities import get_assessment_part_lookup_session',
         'UPDATED = True',
         'CREATED = True'
         ]
@@ -642,11 +643,20 @@ class AssessmentAdminSession:
             else:
                 query = {"assessmentPartId": parent_id}
 
+            # need to account for magic parts ...
             for part in part_collection.find(query):
-                part = assessment_authoring_objects.AssessmentPart(osid_object_map=part,
-                                              runtime=self._runtime,
-                                              proxy=self._proxy)
-                part_collection.delete_one({'_id': ObjectId(part.ident.get_identifier())})
+                apls = get_assessment_part_lookup_session(runtime=self._runtime,
+                                                          proxy=self._proxy)
+                apls.use_unsequestered_assessment_part_view()
+                apls.use_federated_bank_view()
+                part = apls.get_assessment_part(part.ident)
+                try:
+                    part.delete()
+                except AttributeError:
+                    part = assessment_authoring_objects.AssessmentPart(osid_object_map=part,
+                                                  runtime=self._runtime,
+                                                  proxy=self._proxy)
+                    part_collection.delete_one({'_id': ObjectId(part.ident.get_identifier())})
                 remove_children_parts(str(part.ident))
 
         if not isinstance(assessment_id, ABCId):
