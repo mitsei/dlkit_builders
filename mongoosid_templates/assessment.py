@@ -1458,7 +1458,7 @@ class AssessmentTaken:
         finished = False
         while not finished:
             try:
-                section_id = self._get_next_assessment_section(section_id)
+                section_id = self._get_next_assessment_section(section_id).get_id()
             except errors.IllegalState:
                 finished = True
 
