@@ -645,6 +645,9 @@ class AssessmentAdminSession:
 
             # need to account for magic parts ...
             for part in part_collection.find(query):
+                part = assessment_authoring_objects.AssessmentPart(osid_object_map=part,
+                                                                   runtime=self._runtime,
+                                                                   proxy=self._proxy)
                 apls = get_assessment_part_lookup_session(runtime=self._runtime,
                                                           proxy=self._proxy)
                 apls.use_unsequestered_assessment_part_view()
@@ -653,9 +656,6 @@ class AssessmentAdminSession:
                 try:
                     part.delete()
                 except AttributeError:
-                    part = assessment_authoring_objects.AssessmentPart(osid_object_map=part,
-                                                  runtime=self._runtime,
-                                                  proxy=self._proxy)
                     part_collection.delete_one({'_id': ObjectId(part.ident.get_identifier())})
                 remove_children_parts(str(part.ident))
 
