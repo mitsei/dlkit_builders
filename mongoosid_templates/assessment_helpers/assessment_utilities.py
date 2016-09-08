@@ -87,8 +87,7 @@ def get_next_part_id(part_id,
             # child, because that will get into an infinite loop ... so pass
             # the given child as a param (prev_part_id) and make sure we
             # get the next child.
-            child_ids = list(part.get_child_ids())
-            child_id_strs = [str(c) for c in child_ids]
+            child_id_strs = [str(c) for c in part.get_child_ids()]
             # if str(prev_part_id) not in child_id_strs:
                 # must be a magic part -- pass here and keep checking up the tree
                 # magic parts are not stored on disk, so they will never be in
@@ -97,12 +96,12 @@ def get_next_part_id(part_id,
             if str(prev_part_id) == child_id_strs[-1]:
                 pass
             else:
-                for index, child_id_str in enumerate(child_id_strs):
-                    if child_id_str == str(prev_part_id):
-                        next_part_id = child_ids[index + 1]
-                        level += 1
-                        check_parent = False
-                        break
+                try:
+                    next_part_id = Id(child_id_strs[child_id_strs.index(str(prev_part_id)) + 1])
+                    level += 1
+                    check_parent = False
+                except ValueError:
+                    check_parent = True
     elif siblings and str(siblings[-1]) != str(part_id):
         siblings_str = [str(s) for s in siblings]
         try:

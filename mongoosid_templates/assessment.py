@@ -2240,7 +2240,7 @@ class AssessmentSection:
         ils = self._get_item_lookup_session()
         return ils.get_item(Id(question._my_map['itemId']))
 
-    def _get_questions(self, answered=None, honor_sequential=True):
+    def _get_questions(self, answered=None, honor_sequential=True, update=True):
         \"\"\"gets all available questions for this section
 
         if answered == False: only return next unanswered question
@@ -2265,7 +2265,8 @@ class AssessmentSection:
 
         prev_question_answered = True
         question_list = []
-        self._update_questions()  # Make sure questions list is current
+        if update:
+            self._update_questions()  # Make sure questions list is current
         for question_map in self._my_map['questions']:
             if self._is_question_sequential(question_map) and honor_sequential:
                 if prev_question_answered:
