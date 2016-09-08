@@ -1029,7 +1029,9 @@ class Item:
         self.get_question().get_id()"""
     
     get_question = """
-        return Question(osid_object_map=self._my_map['question'], runtime=self._runtime)"""
+        return Question(osid_object_map=self._my_map['question'],
+                        runtime=self._runtime,
+                        proxy=self._proxy)"""
     
     additional_methods = """
     
