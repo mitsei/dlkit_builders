@@ -757,7 +757,11 @@ class OsidObject:
         del obj_map['_id']
 
         obj_map['displayName']['text'] = self.display_name.text
+        obj_map['displayName']['languageTypeId'] = str(self.display_name.language_type)
+        obj_map['displayName']['scriptTypeId'] = str(self.display_name.script_type)
         obj_map['description']['text'] = self.description.text
+        obj_map['description']['languageTypeId'] = str(self.description.language_type)
+        obj_map['description']['scriptTypeId'] = str(self.description.script_type)
         obj_map['genusTypeId'] = str(self.genus_type)
         # Note: The following should be deprecated:
         try:
