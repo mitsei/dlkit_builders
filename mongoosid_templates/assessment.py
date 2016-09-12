@@ -473,9 +473,10 @@ class AssessmentResultsSession:
 
     get_responses = """
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
+        taken_lookup_session = mgr.get_assessment_taken_lookup_session(runtime=self._runtime,
+                                                                       proxy=self._proxy)
         taken = taken_lookup_session.get_assessment_taken(assessment_taken_id)
-        response_list = OsidListList
+        response_list = []
         if 'sections' in taken._my_map:
             for section_id in taken._my_map['sections']:
                 section = get_assessment_section(Id(section_id))
