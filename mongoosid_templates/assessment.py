@@ -473,13 +473,15 @@ class AssessmentResultsSession:
 
     get_responses = """
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        taken_lookup_session = mgr.get_assessment_taken_lookup_session(runtime=self._runtime,
-                                                                       proxy=self._proxy)
+        taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
+        taken_lookup_session.use_federated_bank_view()
         taken = taken_lookup_session.get_assessment_taken(assessment_taken_id)
-        response_list = []
+        response_list = OsidListList()
         if 'sections' in taken._my_map:
             for section_id in taken._my_map['sections']:
-                section = get_assessment_section(Id(section_id))
+                section = get_assessment_section(Id(section_id),
+                                                 runtime=self._runtime,
+                                                 proxy=self._proxy)
                 response_list.append(section._get_responses())
         return ResponseList(response_list)"""
 
