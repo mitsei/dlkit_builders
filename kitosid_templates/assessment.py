@@ -272,7 +272,7 @@ class AssessmentResultsSession:
         # Note: this method is differenct from the underlying signature
         return self._get_provider_session('assessment_results_session').get_items(*args, **kwargs)"""
 
-    get_responses = """
+    get_assessment_taken_responses = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_provider_session('assessment_results_session').get_responses(*args, **kwargs)"""
 
