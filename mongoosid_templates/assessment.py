@@ -2366,6 +2366,11 @@ class AssessmentSection:
                         'itemId': str(question_id)}
         else:
             response = dict(answer_form._my_map)
+            try:
+                response['isCorrect'] = self._get_item(question_id).is_response_correct(
+                    Response(osid_object_map=response, runtime=self._runtime, proxy=self._proxy))
+            except (errors.IllegalState, errors.NotFound):
+                pass
         response['submissionTime'] = DateTime.utcnow()
 
         question_map = self._get_question_map(question_id) # will raise NotFound()
@@ -2389,8 +2394,12 @@ class AssessmentSection:
 
     def _get_response_from_question_map(self, question_map):
         \"\"\"Gets the a Response from the provided question_map\"\"\"
-        return Response(osid_object_map=question_map['responses'][0],
-                        additional_attempts=question_map['responses'][1:],
+        return _get_response_from_response_map(question_map['responses'][0],
+                                               question_map['responses'][1:])
+
+    def _get_response_from_response_map(self, response_map, additional_attempts=None)
+        return Response(osid_object_map=response_map,
+                        additional_attempts=additional_attempts,
                         runtime=self._runtime,
                         proxy=self._proxy)
 
@@ -2507,6 +2516,9 @@ class Response:
             self._my_answer = Answer(osid_object_map=osid_object_map,
                                      runtime=runtime,
                                      proxy=proxy)
+        self._is_correct = None
+        if 'isCorrect' in osid_object_map:
+            self._is_correct = osid_object_map['isCorrect']
         self._records = dict()
 
         # Consider that responses may want to have their own records separate
@@ -2578,7 +2590,12 @@ class Response:
         raise IllegalState('Item was not attempted')
 
     def get_additional_attempts(self):
-        return ResponseList(self._additional_attempts, self._runtime, self._proxy)"""
+        return ResponseList(self._additional_attempts, self._runtime, self._proxy)
+
+    def is_correct(self):
+        if self._is_correct is not None:
+            return self._is_correct
+        raise IllegalState('do not know if this response is correct')"""
 
 
 class ItemQuery:
