@@ -2215,7 +2215,7 @@ class AssessmentSection:
         question_ids =[]
         for question_map in self._my_map['questions']:
             if question_map['assessmentPartId'] == str(assessment_part_id):
-                question_ids.append(Id(question_map['questionId']))
+                question_ids.append(self._get_question(question_map=question_map).get_id())
         return question_ids
 
     def _get_item_ids_for_assessment_part(self, assessment_part_id):
