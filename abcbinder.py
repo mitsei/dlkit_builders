@@ -111,7 +111,12 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
 def eq_methods(interface_name):
     return (
-"""    def __eq__(self, other):
+"""    def __hash__(self):
+        return hash((self.get_authority(),
+                     self.get_identifier_namespace(),
+                     self.get_identifier()))
+
+    def __eq__(self, other):
         if isinstance(other, """ + interface_name + """):
             return (
                 self.get_authority() == other.get_authority() and
