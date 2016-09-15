@@ -1505,11 +1505,8 @@ class Resource:
     init_template = """
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __init__(self, **kwargs): # removed osid_object_map, runtime=None
-        # self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
+    def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='${object_name_upper}', **kwargs)
-        # self._records = dict() # Now in Extensible
-        # self._load_records(osid_object_map['recordTypeIds']) # Now in OsidObject
         self._catalog_name = '${cat_name_under}'
 ${instance_initers}"""
 
