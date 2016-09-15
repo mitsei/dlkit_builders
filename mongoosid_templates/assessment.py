@@ -74,7 +74,8 @@ class AssessmentSession:
             db_name='assessment',
             cat_name='Bank',
             cat_class=objects.Bank)
-        self._forms = dict()"""
+        self._forms = dict()
+        self._assessments_taken = dict()"""
 
     can_take_assessments = """
         # NOTE: It is expected that real authentication hints will be
@@ -423,10 +424,13 @@ class AssessmentSession:
 
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
-        mgr = self._get_provider_manager('ASSESSMENT')
-        lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy) # Should this be _for_bank?
-        lookup_session.use_federated_bank_view()
-        return lookup_session.get_assessment_taken(assessment_taken_id)"""
+        if assessment_taken_id not in self._assessments_taken:
+            mgr = self._get_provider_manager('ASSESSMENT')
+            lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy) # Should this be _for_bank?
+            lookup_session.use_federated_bank_view()
+            self._assessments_taken[assessment_taken_id] = (
+                lookup_session.get_assessment_taken(assessment_taken_id))
+        return self._assessments_taken[assessment_taken_id]"""
 
 class AssessmentResultsSession:
 
@@ -1434,6 +1438,14 @@ class AssessmentTaken:
         'from ..primitives import DateTime, DisplayText',
         'ASSESSMENT_AUTHORITY = \'assessment-session\''
     ]
+
+    init = """
+    _namespace = 'assessment.AssessmentTaken'
+
+    def __init__(self, **kwargs):
+        osid_objects.OsidObject.__init__(self, object_name='ASSESSMENT_TAKEN', **kwargs)
+        self._catalog_name = 'bank'
+        self._assessment_sections = dict()"""
     
     additional_methods = """
     def get_display_name(self):
@@ -1486,8 +1498,7 @@ class AssessmentTaken:
             self._save()
             return first_section
         else:
-            return get_assessment_section(Id(self._my_map['sections'][0]),
-                                          runtime=self._runtime)
+            return self._get_assessment_section(Id(self._my_map['sections'][0]))
 
     def _get_next_assessment_section(self, assessment_section_id):
         \"\"\"Gets the next section following section_id. 
@@ -1498,9 +1509,7 @@ class AssessmentTaken:
         \"\"\"
         if self._my_map['sections'][-1] == str(assessment_section_id):
             # section_id represents the last seen section
-            section = get_assessment_section(assessment_section_id,
-                                             runtime=self._runtime,
-                                             proxy=self._proxy)
+            section = self._get_assessment_section(assessment_section_id)
             next_part_id, level = get_next_part_id(section._assessment_part_id,
                                                    runtime=self._runtime,
                                                    proxy=self._proxy,
@@ -1510,15 +1519,22 @@ class AssessmentTaken:
             self._save()
             return next_section
         else:
-            return get_assessment_section(
-                Id(self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1]),
-                runtime=self._runtime)
+            return self._get_assessment_section(
+                Id(self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1]))
+
+    def _get_assessment_section(self, assessment_section_id):
+        if assessment_section_id not in self._assessment_sections:
+            self._assessment_sections[assessment_section_id] = (
+                get_assessment_section(assessment_section_id,
+                                       runtime=self._runtime,
+                                       proxy=self._proxy))
+        return self._assessment_sections[assessment_section_id]
 
     def _get_assessment_sections(self):
         \"\"\"Gets a SectionList of all Sections currently known to this AssessmentTaken\"\"\"
         section_list = []
         for section_idstr in self._my_map['sections']:
-            section_list.append(get_assessment_section(Id(section_idstr), runtime=self._runtime, proxy=self._proxy))
+            section_list.append(self._get_assessment_section(Id(section_idstr)))
         return AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)
 
     def _save(self):
@@ -1668,7 +1684,6 @@ class AssessmentSection:
 
     import_statements = [
         'from ..primitives import Id',
-        'from .assessment_utilities import get_assessment_section',
         'from .assessment_utilities import get_default_question_map',
         'from .assessment_utilities import get_default_part_map',
         'from .assessment_utilities import get_assessment_part_lookup_session',
@@ -1703,6 +1718,7 @@ class AssessmentSection:
         part_lookup_session.use_unsequestered_assessment_part_view()
         part_lookup_session.use_federated_bank_view()
         self._assessment_part = part_lookup_session.get_assessment_part(self._assessment_part_id)
+        self._assessment_parts = dict()
 
         if '_id' not in self._my_map:
             # could happen if not created with items -- then self._initialize_part_map()
@@ -1850,8 +1866,10 @@ class AssessmentSection:
 
     def _get_assessment_part(self, part_id):
         \"\"\"Gets an AssessmentPart given a part_id\"\"\"
-        lookup_session = self._get_assessment_part_lookup_session()
-        return lookup_session.get_assessment_part(part_id)
+        if part_id not in self._assessment_parts:
+            lookup_session = self._get_assessment_part_lookup_session()
+            self._assessment_parts[part_id] = lookup_session.get_assessment_part(part_id)
+        return self._assessment_parts[part_id]
 
     def _update(self):
         \"\"\"Updates AssessmentSection to latest state in database.
@@ -2397,7 +2415,7 @@ class AssessmentSection:
         return _get_response_from_response_map(question_map['responses'][0],
                                                question_map['responses'][1:])
 
-    def _get_response_from_response_map(self, response_map, additional_attempts=None)
+    def _get_response_from_response_map(self, response_map, additional_attempts=None):
         return Response(osid_object_map=response_map,
                         additional_attempts=additional_attempts,
                         runtime=self._runtime,
