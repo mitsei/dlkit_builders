@@ -66,15 +66,14 @@ class ResourceManager:
 
     def _get_provider_session(self, session_name, proxy=None):
         \"\"\"Gets the session for the provider\"\"\"
-        if self._proxy is None:
-            self._proxy = proxy
-        if session_name in self._provider_sessions:
-            return self._provider_sessions[session_name]
+        agent_key = self._get_agent_key(proxy)
+        if session_name in self._provider_sessions[agent_key]:
+            return self._provider_sessions[agent_key][session_name]
         else:
             session = self._instantiate_session('get_' + session_name, self._proxy)
             self._set_${cat_name_under}_view(session)
             if self._session_management != DISABLED:
-                self._provider_sessions[session_name] = session
+                self._provider_sessions[agent_key][session_name] = session
             return session
 
     def _get_sub_package_provider_manager(self, sub_package_name):
@@ -94,10 +93,9 @@ class ResourceManager:
 
     def _get_sub_package_provider_session(self, sub_package, session_name, proxy=None):
         \"\"\"Gets the session from a sub-package\"\"\"
-        if self._proxy is None:
-            self._proxy = proxy
-        if session_name in self._provider_sessions:
-            return self._provider_sessions[session_name]
+        agent_key = self._get_agent_key(proxy)
+        if session_name in self._provider_sessions[agent_key]:
+            return self._provider_sessions[agent_key][session_name]
         else:
             manager = self._get_sub_package_provider_manager(sub_package)
             session = self._instantiate_session('get_' + session_name + '_for_bank',
@@ -105,7 +103,7 @@ class ResourceManager:
                                                 manager=manager)
             self._set_bank_view(session)
             if self._session_management != DISABLED:
-                self._provider_sessions[session_name] = session
+                self._provider_sessions[agent_key][session_name] = session
             return session
 
     def _instantiate_session(self, method_name, proxy=None, *args, **kwargs):
@@ -1108,8 +1106,9 @@ class Bin:
 
     def _get_provider_session(self, session_name):
         \"\"\"Returns the requested provider session."\"\"
-        if session_name in self._provider_sessions:
-            return self._provider_sessions[session_name]
+        agent_key = self._get_agent_key()
+        if session_name in self._provider_sessions[agent_key]:
+            return self._provider_sessions[agent_key][session_name]
         else:
             session_class = getattr(self._provider_manager, 'get_' + session_name + '_for_${cat_name_under}')
             if self._proxy is None:
@@ -1119,7 +1118,7 @@ class Bin:
             self._set_${cat_name_under}_view(session)
             self._set_object_view(session)
             if self._session_management != DISABLED:
-                self._provider_sessions[session_name] = session
+                self._provider_sessions[agent_key][session_name] = session
             return session
 
     def get_${cat_name_under}_id(self):
