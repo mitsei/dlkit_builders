@@ -2384,6 +2384,7 @@ class AssessmentSection:
                         'itemId': str(question_id)}
         else:
             response = dict(answer_form._my_map)
+            response['submissionTime'] = DateTime.utcnow()
             try:
                 response['isCorrect'] = self._get_item(question_id).is_response_correct(
                     Response(osid_object_map=response, runtime=self._runtime, proxy=self._proxy))
