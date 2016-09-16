@@ -2514,7 +2514,6 @@ class Response:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from ..utilities import get_registry',
-        'from .objects import ResponseList',
         'UNANSWERED = 0',
         'NULL_SUBMISSION = 1',
     ]
@@ -2610,6 +2609,7 @@ class Response:
         raise errors.IllegalState('Item was not attempted')
 
     def get_additional_attempts(self):
+        from .objects import ResponseList
         return ResponseList(self._additional_attempts, self._runtime, self._proxy)
 
     def is_correct(self):
