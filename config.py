@@ -44,6 +44,7 @@ managers_to_implement = [
     'commenting',
     'grading',
     'hierarchy',
+    'id',
     'learning',
     'logging',
     'osid',

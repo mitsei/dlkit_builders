@@ -2412,8 +2412,8 @@ class AssessmentSection:
 
     def _get_response_from_question_map(self, question_map):
         \"\"\"Gets the a Response from the provided question_map\"\"\"
-        return _get_response_from_response_map(question_map['responses'][0],
-                                               question_map['responses'][1:])
+        return self._get_response_from_response_map(question_map['responses'][0],
+                                                    question_map['responses'][1:])
 
     def _get_response_from_response_map(self, response_map, additional_attempts=None):
         return Response(osid_object_map=response_map,
