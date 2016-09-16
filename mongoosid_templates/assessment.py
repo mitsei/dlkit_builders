@@ -2514,6 +2514,7 @@ class Response:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from ..utilities import get_registry',
+        'from .objects import ResponseList',
         'UNANSWERED = 0',
         'NULL_SUBMISSION = 1',
     ]
@@ -2606,7 +2607,7 @@ class Response:
     def get_submission_time(self):
         if self._submission_time is not None:
             return self._submission_time
-        raise IllegalState('Item was not attempted')
+        raise errors.IllegalState('Item was not attempted')
 
     def get_additional_attempts(self):
         return ResponseList(self._additional_attempts, self._runtime, self._proxy)
@@ -2614,7 +2615,7 @@ class Response:
     def is_correct(self):
         if self._is_correct is not None:
             return self._is_correct
-        raise IllegalState('do not know if this response is correct')"""
+        raise errors.IllegalState('do not know if this response is correct')"""
 
 
 class ItemQuery:
