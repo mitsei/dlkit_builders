@@ -653,7 +653,8 @@ class Bank:
         \"\"\"Close all sessions currently being managed by this Manager to save memory."\"\"
         if self._session_management != MANDATORY:
             self._provider_sessions = dict()
-        raise IllegalState()
+        else:
+            raise IllegalState()
 
     def use_automatic_session_management(self):
         \"\"\"Session state will be saved until closed by consumers."\"\"
