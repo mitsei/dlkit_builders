@@ -14,7 +14,6 @@ SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
     'namespace': 'osid-object',
     'identifier': 'simple-child-sequencing'})
 
-
 def check_effective(func):
     """decorator, tests if an Assessment or Section is effective, raises error if not
 
@@ -160,6 +159,24 @@ def get_level_delta(part1_id, part2_id, runtime, proxy):
     else:
         return 0
 
+def get_level_delta_for_parts(part1, part2):
+    def count_levels(part, increment):
+        level = 0
+        while part.has_parent_part():
+            level = level + increment
+            part = part.get_assessment_part()
+        return level
+
+    while part1.has_parent_part() and part2.has_parent_part:
+        part1 = part1.get_assessment_part
+        part2 = part2.get_assessment_part
+    if part1.has_parent_part():
+        return count_levels(part1, -1)
+    elif part2.has_parent_part():
+        return count_levels(part2, 1)
+    else:
+        return 0
+
 def get_decision_objects(part_id, runtime, proxy, sequestered, section):
     assessment_lookup_session, part_lookup_session, rule_lookup_session = get_lookup_sessions(runtime,
                                                                                               proxy,
@@ -275,12 +292,12 @@ def get_first_successful_sequence_rule_for_part(part_id, rule_lookup_session):
 
 def get_assessment_section(section_id, runtime=None, proxy=None):
     """Gets a Section given a section_id"""
-    from .objects import AssessmentSection
+    from .mixins import LoadedSection
     collection = MongoClientValidated('assessment',
                                       collection='AssessmentSection',
                                       runtime=runtime)
     result = collection.find_one(dict({'_id': ObjectId(section_id.get_identifier())}))
-    return AssessmentSection(osid_object_map=result, runtime=runtime, proxy=proxy)
+    return LoadedSection(osid_object_map=result, runtime=runtime, proxy=proxy)
 
 def get_default_part_map(part_id, level, sequential):
     return {

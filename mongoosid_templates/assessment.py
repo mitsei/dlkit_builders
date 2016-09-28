@@ -141,12 +141,12 @@ class AssessmentSession:
         return assessment_taken._get_assessment_sections()"""
     
     is_assessment_section_complete = """
-        return self.get_assessment_section(assessment_section_id)._is_complete()"""
+        return self.get_assessment_section(assessment_section_id).is_complete()"""
     
     get_incomplete_assessment_sections = """
         section_list = []
         for section in self.get_assessment_sections(assessment_taken_id):
-            if not section._is_complete():
+            if not section.is_complete():
                 section_list.append(section)
         return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)"""
     
@@ -159,7 +159,7 @@ class AssessmentSession:
     ## Has this method has been deprecated???
     is_assessment_section_over = """
         return get_section_util(assessment_section_id,
-                                runtime=self._runtime)._is_over()"""
+                                runtime=self._runtime).is_over()"""
     
     ## This method has been deprecated:
     finished_assessment_section = """
@@ -171,7 +171,7 @@ class AssessmentSession:
         return self.get_assessment_section(assessment_section_id).are_items_sequential()"""
     
     get_first_question = """
-        return self.get_assessment_section(assessment_section_id)._get_first_question()"""
+        return self.get_assessment_section(assessment_section_id).get_first_question()"""
 
     has_next_question = """
         try:
@@ -182,7 +182,7 @@ class AssessmentSession:
             return True"""
    
     get_next_question = """
-        return self.get_assessment_section(assessment_section_id)._get_next_question(question_id=item_id)"""
+        return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id)"""
     
     has_previous_question = """
         try:
@@ -193,14 +193,14 @@ class AssessmentSession:
             return True"""
 
     get_previous_question = """
-        return self.get_assessment_section(assessment_section_id)._get_next_question(question_id=item_id, reverse=True)"""
+        return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id, reverse=True)"""
 
     get_question = """
-        return self.get_assessment_section(assessment_section_id)._get_question(question_id=item_id)"""
+        return self.get_assessment_section(assessment_section_id).get_question(question_id=item_id)"""
     
     get_questions = """
         # Does this want to return a blocking list of available questions?
-        return self.get_assessment_section(assessment_section_id)._get_questions()"""
+        return self.get_assessment_section(assessment_section_id).get_questions()"""
 
     get_response_form_import_templates = [
         'from ...abstract_osid.id.primitives import Id as ABCId'
@@ -216,7 +216,7 @@ class AssessmentSession:
         record_type_data_sets = get_registry('ANSWER_RECORD_TYPES', self._runtime)
         section = self.get_assessment_section(assessment_section_id)
         # because we're now giving session-unique question IDs
-        question = section._get_question(item_id)
+        question = section.get_question(item_id)
         ils = section._get_item_lookup_session()
         real_item_id = Id(question._my_map['itemId'])
         item = ils.get_item(real_item_id)
@@ -268,18 +268,18 @@ class AssessmentSession:
         if not answer_form.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         answer_form._my_map['_id'] = ObjectId()
-        self.get_assessment_section(assessment_section_id)._submit_response(item_id, answer_form)
+        self.get_assessment_section(assessment_section_id).submit_response(item_id, answer_form)
         self._forms[answer_form.get_id().get_identifier()] = SUBMITTED"""
     
     skip_item = """
         # add conditional: if the assessment or part allows us to skip:
-        self.get_assessment_section(assessment_section_id)._submit_response(item_id, None)"""
+        self.get_assessment_section(assessment_section_id).submit_response(item_id, None)"""
     
     is_question_answered = """
-        return self.get_assessment_section(assessment_section_id)._is_question_answered(item_id)"""
+        return self.get_assessment_section(assessment_section_id).is_question_answered(item_id)"""
     
     get_unanswered_questions = """
-        return self.get_assessment_section(assessment_section_id)._get_questions(answered=False)"""
+        return self.get_assessment_section(assessment_section_id).get_questions(answered=False)"""
     
     has_unanswered_questions = """
         # There's probably a more efficient way to implement this:
@@ -301,7 +301,7 @@ class AssessmentSession:
             return True"""
     
     get_next_unanswered_question = """
-        # Or this could call through to _get_next_question in the section
+        # Or this could call through to get_next_question in the section
         questions = self.get_unanswered_questions(assessment_section_id)
         for question in questions:
             if question.get_id() == item_id:
@@ -321,7 +321,7 @@ class AssessmentSession:
             return True"""
     
     get_previous_unanswered_question = """
-        # Or this could call through to _get_next_question in the section with reverse=True
+        # Or this could call through to get_next_question in the section with reverse=True
         questions = self.get_unanswered_questions(assessment_section_id)
         previous_question = questions.next()
         if previous_question.get_id() == item_id:
@@ -334,23 +334,23 @@ class AssessmentSession:
         raise errors.NotFound('item_id is not found in Section')"""
     
     get_response = """
-        return self.get_assessment_section(assessment_section_id)._get_response(question_id=item_id)"""
+        return self.get_assessment_section(assessment_section_id).get_response(question_id=item_id)"""
 
     get_responses = """
-        return self.get_assessment_section(assessment_section_id)._get_responses()"""
+        return self.get_assessment_section(assessment_section_id).get_responses()"""
    
     clear_response = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
         # Should probably check to see if responses can be cleared, but how?
-        self.get_assessment_section(assessment_section_id)._submit_response(item_id, None)"""
+        self.get_assessment_section(assessment_section_id).submit_response(item_id, None)"""
     
     finish_assessment_section = """
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
-        self.get_assessment_section(assessment_section_id)._finish()"""
+        self.get_assessment_section(assessment_section_id).finish()"""
     
     ## This is no longer needed:
     finish = """
@@ -385,42 +385,42 @@ class AssessmentSession:
     
     get_answers = """
         if self.is_answer_available(assessment_section_id, item_id):
-            return self.get_assessment_section(assessment_section_id)._get_answers(question_id=item_id)
+            return self.get_assessment_section(assessment_section_id).get_answers(question_id=item_id)
         raise errors.IllegalState()"""
 
     additional_methods = """
 
     def is_feedback_available(assessment_section_id, item_id):
         \"\"\"Is feedback available for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id)._is_feedback_available(question_id=item_id)
+        return self.get_assessment_section(assessment_section_id).is_feedback_available(question_id=item_id)
 
     def get_feedback(assessment_section_id, item_id):
         \"\"\"Get feedback for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id)._get_feedback(question_id=item_id)
+        return self.get_assessment_section(assessment_section_id).get_feedback(question_id=item_id)
 
     def is_solution_available(assessment_section_id, item_id):
         \"\"\"Is a solution available for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id)._is_solution_available(question_id=item_id)
+        return self.get_assessment_section(assessment_section_id).is_solution_available(question_id=item_id)
 
     def get_solution(assessment_section_id, item_id):
         \"\"\"Get solution for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id)._get_solution(question_id=item_id)
+        return self.get_assessment_section(assessment_section_id).get_solution(question_id=item_id)
 
     def is_correctness_available(assessment_section_id, item_id):
         \"\"\"Is a determination of correctness available for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id)._is_correctness_available(question_id=item_id)
+        return self.get_assessment_section(assessment_section_id).is_correctness_available(question_id=item_id)
 
     def is_correct(assessment_section_id, item_id):
         \"\"\"is the response for this item in this section correct\"\"\"
-        return self.get_assessment_section(assessment_section_id)._is_correct(question_id=item_id)
+        return self.get_assessment_section(assessment_section_id).is_correct(question_id=item_id)
 
     def get_correctness(assessment_section_id, item_id):
         \"\"\"Get correctness for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id)._get_correctness(question_id=item_id)
+        return self.get_assessment_section(assessment_section_id).get_correctness(question_id=item_id)
 
     def get_confused_learning_objective_ids(assessment_section_id, item_id):
         \"\"\"Get confused objective ids for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id)._get_confused_learning_objective_ids(question_id=item_id)
+        return self.get_assessment_section(assessment_section_id).get_confused_learning_objective_ids(question_id=item_id)
 
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
@@ -1845,7 +1845,7 @@ class AssessmentSection:
     are_items_shuffled = """
         return self._assessment_part.are_items_shuffled()"""
 
-    additional_methods = """
+    #additional_methods = """
     # # Model for question map to be constructed through taking an assessment section:
     # #
     # #   'questions': [{

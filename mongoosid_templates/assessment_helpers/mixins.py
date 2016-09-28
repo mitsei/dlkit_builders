@@ -6,16 +6,73 @@ from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 from .objects import AssessmentSection
+from .assessment_utilities import get_level_delta_for_parts
 #from bson import ObjectId
+from .objects import AssessmentSection
 
-class ExtendedAssessmentSection(AssessmentSection):
-    """Adds extended functionality to the core AssessmentSection.
 
-    To be used by AssessmentSessions.
+class LoadedSection(AssessmentSessionSection, PartSequenceSection, AssessmentSection):
+    pass
 
-    """
+class PartSequenceSection(object):
+    """Adds records to support AssessmentPart Sequencing."""
 
     def __init__(self, *args, **kwargs):
+        super(PartSequenceSection, self).__init__(*args, **kwargs)
+
+    def get_next_part_and_level(self,
+                                part,
+                                level=0,
+                                sequestered=True): # do we still need sequestered?
+        check_parent = True
+        rule = self._get_first_successful_sequence_rule_for_part(part)
+        part_id = part.get_id()
+        if rule is not None: # A SequenceRule trumps everything.
+            next_part = rule.get_next_assessment_part()
+            level = get_level_delta_for_parts(part, next_part)
+            check_parent = False
+        elif part.has_children(): # This is a special AssessmentPart that can manage child Parts
+            try:
+                next_part = part.get_child_assessment_parts().next()
+                level = level += 1
+                check_parent = False
+            except StopIteration:
+                check_parent = True
+        else: # check to see if this part has a sibling that could be next
+            siblings = []
+            parent = part.get_assessment_part()
+            if parent.has_children():
+                siblings = parent.get_children()
+            if siblings and (siblings[-1]).get_id() != part_id:
+                siblings_ids = [s.get_id() for s in siblings]
+                try:
+                    next_part = siblings[siblings_ids.index(part_id)) + 1]
+                except ValueError:
+                    pass
+                else:
+                    check_parent = False
+
+        if check_parent: # We are at a lowest leaf and need to check parent
+            next_part, level = self.get_next_part_and_level(
+                part.get_assessment_part(),
+                level - 1,
+                sequestered=False)# do we still need sequestered?
+        return next_part, level
+
+    def _get_first_successful_sequence_rule_for_part(self, part):
+        mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=self._runtime, proxy=self._proxy)
+        rule_lookup_session = mgr.get_sequence_rule_lookup_session(proxy=proxy)
+        rule_lookup_session.use_federated_bank_view()
+        for rule in rule_lookup_session.get_sequence_rules_for_assessment_part(part.get_id()):
+            if rule._evaluates_true(): # Or wherever this wants to be evaluated
+                return rule
+        return None
+
+class AssessmentSessionSection(object):
+    """Adds records to support AssessmentSession functionality."""
+
+    def __init__(self, *args, **kwargs):
+        super(AssessmentSessionSection, self).__init__(*args, **kwargs)
         self._assessment_parts = dict()
         if '_id' not in self._my_map:
             # could happen if not created with items -- then self._initialize_part_map()
@@ -52,11 +109,11 @@ class ExtendedAssessmentSection(AssessmentSection):
             self._my_map['assessmentParts'].insert(index, part_map)
 
     def _part_ids(self):
-        """convenience method to return a list of the part Ids in this section"""
+        """private convenience method to return a list of the part Ids in this section"""
         return [p['assessmentPartId'] for p in self._my_map['assessmentParts']]
 
     def _load_simple_section_questions(self, item_ids):
-        """For the simple section case (common)
+        """For loading the simple section case (common)
         
         just load the questions for the section, and insert the one part 
         into assessment part map.
@@ -129,7 +186,7 @@ class ExtendedAssessmentSection(AssessmentSection):
         return self._assessment_parts[part_id]
 
     def _update_from_database(self):
-        """Updates AssessmentSection to latest state in database.
+        """Updates map to latest state in database.
 
         Should be called prior to major object events to assure that an
         assessment being taken on multiple devices are reasonably synchronized.
@@ -157,38 +214,46 @@ class ExtendedAssessmentSection(AssessmentSection):
             self._save()
 
     def _get_parts_and_levels(self):
-        def get_part_level(target_part_id):
+        def get_part_level(target_part):
             """Gets the level of the target part"""
             for index, p in enumerate(part_list):
-                if str(p.ident) == str(target_part_id):
+                if p.get_id() == target_part.get_id():
                     return level_list[index]
             return 0
 
         part_list = []
         level_list = []
         finished = False
-        part_id = self._assessment_part_id
-        prev_part_id = None
+        part = self._assessment_part
+        prev_part = None
         while not finished:
-            prev_part_id = part_id
-            prev_part_level = get_part_level(prev_part_id)
+            prev_part = part
+            prev_part_level = get_part_level(prev_part)
+
+            # If this part is "magic" it may know about a part sequence to add to the mix:
             try:
-                part_id, level = get_next_part_id(part_id,
-                                                  runtime=self._runtime,
-                                                  proxy=self._proxy,
-                                                  level=prev_part_level,
-                                                  section=self,
-                                                  sequestered=False,
-                                                  follow_across_assessment=False)
+                magic_parts, magic_levels = part.get_parts_and_levels(level=prev_part_level)
+            except AttributeError:
+                parts = list()
+                levels = list()
+            else:
+                parts += magic_parts
+                levels += magic_levels
+            
+            try:
+                next_part, next_level = self._get_next_part_and_level_for_part(
+                    part,
+                    level=prev_part_level,
+                    sequestered=False) # do we need to worry about sequestration any more???
             except errors.IllegalState:
                 finished = True
             else:
-                part = self.get_assessment_part(part_id)
+                parts.append(next_part)
+                levels.append(next_level)
+            for part in parts
                 if part.has_items():
-                    part_list.append(
-                        self._get_assessment_part_lookup_session().get_assessment_part(
-                            part_id))
-                    level_list.append(level)
+                    part_list.append(part)
+                    level_list.append(levels[parts.index(part)])
         return part_list, level_list
 
     def _update_assessment_parts_map(self, part_list, level_list):
