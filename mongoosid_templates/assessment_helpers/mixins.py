@@ -11,7 +11,7 @@ from .assessment_utilities import get_level_delta_for_parts
 from .objects import AssessmentSection
 
 
-class LoadedSection(AssessmentSessionSection, PartSequenceSection, AssessmentSection):
+class LoadedSection(PartSequenceSection, AssessmentSessionSection, AssessmentSection):
     pass
 
 class PartSequenceSection(object):
@@ -20,21 +20,18 @@ class PartSequenceSection(object):
     def __init__(self, *args, **kwargs):
         super(PartSequenceSection, self).__init__(*args, **kwargs)
 
-    def get_next_part_and_level(self,
-                                part,
-                                level=0,
-                                sequestered=True): # do we still need sequestered?
+    def get_next_part_for_part(self, part, level=0):
         check_parent = True
         rule = self._get_first_successful_sequence_rule_for_part(part)
         part_id = part.get_id()
         if rule is not None: # A SequenceRule trumps everything.
             next_part = rule.get_next_assessment_part()
-            level = get_level_delta_for_parts(part, next_part)
+            level = level + get_level_delta_for_parts(part, next_part)
             check_parent = False
         elif part.has_children(): # This is a special AssessmentPart that can manage child Parts
             try:
                 next_part = part.get_child_assessment_parts().next()
-                level = level += 1
+                level += 1
                 check_parent = False
             except StopIteration:
                 check_parent = True
@@ -46,18 +43,18 @@ class PartSequenceSection(object):
             if siblings and (siblings[-1]).get_id() != part_id:
                 siblings_ids = [s.get_id() for s in siblings]
                 try:
-                    next_part = siblings[siblings_ids.index(part_id)) + 1]
+                    next_part = siblings[siblings_ids.index(part_id) + 1]
                 except ValueError:
                     pass
                 else:
                     check_parent = False
 
         if check_parent: # We are at a lowest leaf and need to check parent
-            next_part, level = self.get_next_part_and_level(
+            next_part, level = self.get_next_part_for_part(
                 part.get_assessment_part(),
-                level - 1,
-                sequestered=False)# do we still need sequestered?
-        return next_part, level
+                level - 1)
+        next_part._level_in_section = level
+        return next_part
 
     def _get_first_successful_sequence_rule_for_part(self, part):
         mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=self._runtime, proxy=self._proxy)
@@ -199,62 +196,38 @@ class AssessmentSessionSection(object):
 
     def _update_questions(self):
         """Updates questions known to this Section"""
-
-        # Original method for updating questions:
-        # if self._update_part_map():
-        #     self._update_question_map()
-        #     self._save()
-
         if self.is_simple_section():
             return # we don't need to go through any this for simple sections
-        part_list, level_list = self._get_parts_and_levels()
+        part_list = self._get_parts()
         if len(part_list) > len(self._my_map['assessmentParts']):
-            self._update_assessment_parts_map(part_list, level_list)
+            self._update_assessment_parts_map(part_list)
             self._update_questions_list(part_list)
             self._save()
 
-    def _get_parts_and_levels(self):
-        def get_part_level(target_part):
-            """Gets the level of the target part"""
-            for index, p in enumerate(part_list):
-                if p.get_id() == target_part.get_id():
-                    return level_list[index]
-            return 0
-
-        part_list = []
-        level_list = []
-        finished = False
+    def _get_parts(self):
+        parts = list()
         part = self._assessment_part
-        prev_part = None
+        part._level_in_section = 0
+        finished = False
         while not finished:
-            prev_part = part
-            prev_part_level = get_part_level(prev_part)
 
-            # If this part is "magic" it may know about a part sequence to add to the mix:
+            # If this part is "magic" it may manage its own part sequence:
             try:
-                magic_parts, magic_levels = part.get_parts_and_levels(level=prev_part_level)
+                magic_parts = part.get_parts(level=part._level_in_section)
             except AttributeError:
-                parts = list()
-                levels = list()
+                magic_parts = list()
             else:
                 parts += magic_parts
-                levels += magic_levels
-            
+
+            # Now get the next part through normal means:
             try:
-                next_part, next_level = self._get_next_part_and_level_for_part(
-                    part,
-                    level=prev_part_level,
-                    sequestered=False) # do we need to worry about sequestration any more???
+                part = self._get_next_part_for_part(part, level=part._level_in_section)
             except errors.IllegalState:
                 finished = True
             else:
-                parts.append(next_part)
-                levels.append(next_level)
-            for part in parts
                 if part.has_items():
-                    part_list.append(part)
-                    level_list.append(levels[parts.index(part)])
-        return part_list, level_list
+                    parts.append(next_part)
+        return parts
 
     def _update_assessment_parts_map(self, part_list, level_list):
         """Updates the part map.
@@ -263,16 +236,13 @@ class AssessmentSessionSection(object):
         sections assessmentPart map is out of date with the current part list.
 
         """
-        def add_part(new_part_index):
-            self._insert_part_map(get_default_part_map(
-                part_id, level, part.are_items_sequential()),
-                index=new_part_index)
-
         for part in part_list:
-            part_id = part.get_id()
-            level = level_list[part_list.index(part)]
+            # perhaps look for a "level offset"?
+            level = part._level_in_section # plus or minus "level offset"?
             if str(part.get_id()) not in self._part_ids():
-                add_part(part_list.index(part))
+                self._insert_part_map(get_default_part_map(
+                    part.get_id(), level, part.are_items_sequential()),
+                    index=part_list.index(part))
 
     def _update_questions_list(self, part_list):
 
@@ -597,7 +567,7 @@ class AssessmentSessionSection(object):
                         runtime=self._runtime,
                         proxy=self._proxy)
 
-    def is_question_answered((self, question_id):
+    def is_question_answered(self, question_id):
         """has the question matching item_id been answered and not skipped"""
         question_map = self._get_question_map(question_id) # will raise NotFound()
         if 'missingResponse' in question_map['responses'][0]:
@@ -680,4 +650,4 @@ class AssessmentSessionSection(object):
         for question_map in self._my_map['questions']:
             if 'missingResponse' in question_map['responses'][0]:
                 return False
-        return True"""
+        return True
