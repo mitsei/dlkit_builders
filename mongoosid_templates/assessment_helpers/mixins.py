@@ -19,7 +19,7 @@ class PartSequenceSection(object):
     def __init__(self, *args, **kwargs):
         super(PartSequenceSection, self).__init__(*args, **kwargs)
 
-    def get_next_part_for_part(self, part, level=0):
+    def get_next_part_for_part(self, part, level=0, children_checked=False):
         check_parent = True
         rule = self._get_first_successful_sequence_rule_for_part(part)
         part_id = part.get_id()
@@ -27,13 +27,13 @@ class PartSequenceSection(object):
             next_part = rule.get_next_assessment_part()
             level = level + get_level_delta_for_parts(part, next_part)
             check_parent = False
-        elif part.has_children(): # This is a special AssessmentPart that can manage child Parts
+        elif part.has_children() and not children_checked:
             try:
                 next_part = part.get_child_assessment_parts().next()
                 level += 1
                 check_parent = False
             except StopIteration:
-                check_parent = True
+                children_checked = True
         else: # check to see if this part has a sibling that could be next
             siblings = []
             if part.has_parent_part():
@@ -54,7 +54,8 @@ class PartSequenceSection(object):
         if check_parent: # We are at a lowest leaf and need to check parent
             next_part, level = self.get_next_part_for_part(
                 part.get_assessment_part(),
-                level - 1)
+                level - 1,
+                children_checked)
         next_part._level_in_section = level
         return next_part
 
