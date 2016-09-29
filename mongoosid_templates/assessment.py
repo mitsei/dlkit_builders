@@ -1719,7 +1719,30 @@ class AssessmentSection:
         part_lookup_session.use_federated_bank_view()
         self._assessment_part = part_lookup_session.get_assessment_part(self._assessment_part_id)
 
+    def get_object_map(self, obj_map=None):
+        if obj_map is None:
+            obj_map = dict(self._my_map)
+        del obj_map['_id']
+
+        obj_map.update(
+            {'type': self._namespace.split('.')[-1],
+             'id': str(self.get_id())})
+        return obj_map
+
+    object_map = property(get_object_map)
+
+    # Let's give the Part attributes to the Section
+    def __getattribute__(self, name):
+        if not name.startswith('_') and name not in ['ident', 'get_id', 'id_']:
+            try:
+                return self._assessment_part[name]
+            except AttributeError:
+                return object.__getattribute__(self, name)
+        return object.__getattribute__(self, name)"""
+
+
     ## Moved all of this to mixins.py:
+    #     from original init:
     #
     #     self._assessment_parts = dict()
     # 
@@ -1806,26 +1829,6 @@ class AssessmentSection:
     #         insert_result = collection.insert_one(self._my_map)
     #         self._my_map = collection.find_one({'_id': insert_result.inserted_id}) # To get the _id
 
-    def get_object_map(self, obj_map=None):
-        if obj_map is None:
-            obj_map = dict(self._my_map)
-        del obj_map['_id']
-
-        obj_map.update(
-            {'type': self._namespace.split('.')[-1],
-             'id': str(self.get_id())})
-        return obj_map
-
-    object_map = property(get_object_map)
-
-    # Let's give the Part attributes to the Section
-    def __getattribute__(self, name):
-        if not name.startswith('_') and name not in ['ident', 'get_id', 'id_']:
-            try:
-                return self._assessment_part[name]
-            except AttributeError:
-                return object.__getattribute__(self, name)
-        return object.__getattribute__(self, name)"""
 
     get_assessment_taken_id = """
         return self._assessment_taken_id"""
