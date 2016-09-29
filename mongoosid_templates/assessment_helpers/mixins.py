@@ -1,18 +1,16 @@
 """Mixins for use by assessment package implementations"""
 
 from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
-#from dlkit.abstract_osid.assessment.objects import Assessment as abc_assessment
-#from ..utilities import get_provider_manager, MongoClientValidated
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 from .objects import AssessmentSection
 from .assessment_utilities import get_level_delta_for_parts
-#from bson import ObjectId
 from .objects import AssessmentSection
 
 
 class LoadedSection(PartSequenceSection, AssessmentSessionSection, AssessmentSection):
     pass
+
 
 class PartSequenceSection(object):
     """Adds records to support AssessmentPart Sequencing."""
