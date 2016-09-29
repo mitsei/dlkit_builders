@@ -486,9 +486,7 @@ class AssessmentPart:
 
     get_assessment_part = """
         lookup_session = self._get_assessment_part_lookup_session()
-        return lookup_session.get_assessment_part(self.get_assessment_part_id())
-
-    assessment_part = property(fget=get_assessment_part)"""
+        return lookup_session.get_assessment_part(self.get_assessment_part_id())"""
 
     get_child_assessment_part_ids = """
         return IdList(self._my_map['childIds'])"""

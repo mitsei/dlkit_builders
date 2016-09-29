@@ -1480,10 +1480,11 @@ class AssessmentTaken:
                 finished = True
 
     def _create_section(self, part_id):
-            init_map = {'assessmentPartId': str(part_id),
-                        'assessmentTakenId': str(self.get_id()),
-                        'recordTypeIds': []}
-            return AssessmentSection(osid_object_map=init_map, runtime=self._runtime, proxy=self._proxy)
+        from .mixins import LoadedSection
+        init_map = {'assessmentPartId': str(part_id),
+                    'assessmentTakenId': str(self.get_id()),
+                    'recordTypeIds': []}
+        return LoadedSection(osid_object_map=init_map, runtime=self._runtime, proxy=self._proxy)
 
     def _get_first_assessment_section(self):
         \"\"\"Gets the first section for this Taken's Assessment.\"\"\"

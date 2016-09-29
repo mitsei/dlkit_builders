@@ -1,15 +1,16 @@
 """Mixins for use by assessment package implementations"""
+from bson import ObjectId
 
-from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
+import dlkit.abstract_osid.osid.errors as errors
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
+from dlkit.primordium.calendaring.primitives import DateTime
+from .objects import AssessmentSection, NULL_RESPONSE, UNANSWERED, QuestionList, Response, ResponseList,\
+    ASSESSMENT_AUTHORITY
+from .assessment_utilities import get_level_delta_for_parts, get_provider_manager, get_default_part_map,\
+    get_default_question_map, get_assessment_part_lookup_session, get_item_lookup_session
 from .objects import AssessmentSection
-from .assessment_utilities import get_level_delta_for_parts
-from .objects import AssessmentSection
-
-
-class LoadedSection(PartSequenceSection, AssessmentSessionSection, AssessmentSection):
-    pass
+from dlkit.mongo.utilities import MongoClientValidated
 
 
 class PartSequenceSection(object):
@@ -35,17 +36,20 @@ class PartSequenceSection(object):
                 check_parent = True
         else: # check to see if this part has a sibling that could be next
             siblings = []
-            parent = part.get_assessment_part()
-            if parent.has_children():
-                siblings = parent.get_children()
-            if siblings and (siblings[-1]).get_id() != part_id:
-                siblings_ids = [s.get_id() for s in siblings]
-                try:
-                    next_part = siblings[siblings_ids.index(part_id) + 1]
-                except ValueError:
-                    pass
-                else:
-                    check_parent = False
+            if part.has_parent_part():
+                parent = part.get_assessment_part()
+                if parent.has_children():
+                    siblings = parent.get_children()
+                if siblings and (siblings[-1]).get_id() != part_id:
+                    siblings_ids = [s.get_id() for s in siblings]
+                    try:
+                        next_part = siblings[siblings_ids.index(part_id) + 1]
+                    except ValueError:
+                        pass
+                    else:
+                        check_parent = False
+            else:
+                raise errors.IllegalState()
 
         if check_parent: # We are at a lowest leaf and need to check parent
             next_part, level = self.get_next_part_for_part(
@@ -56,7 +60,7 @@ class PartSequenceSection(object):
 
     def _get_first_successful_sequence_rule_for_part(self, part):
         mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=self._runtime, proxy=self._proxy)
-        rule_lookup_session = mgr.get_sequence_rule_lookup_session(proxy=proxy)
+        rule_lookup_session = mgr.get_sequence_rule_lookup_session(proxy=self._proxy)
         rule_lookup_session.use_federated_bank_view()
         for rule in rule_lookup_session.get_sequence_rules_for_assessment_part(part.get_id()):
             if rule._evaluates_true(): # Or wherever this wants to be evaluated
@@ -162,15 +166,18 @@ class AssessmentSessionSection(object):
 
     def is_simple_section(self):
         """Tests if this section is simple (ie, items assigned directly to Section Part)."""
-        item_ids = self.get_assessment_part(self._assessment_part_id).get_item_ids()
+        item_ids = self._get_assessment_part(self._assessment_part_id).get_item_ids()
         if item_ids.available():
             return True
         return False
 
-    def get_assessment_part(self, part_id=None):
+    def _get_assessment_part(self, part_id=None):
         """Gets an AssessmentPart given a part_id.
 
         Returns this Section's own part if part_id is None.
+
+        Make this a private part, so that it doesn't collide with the AssessmentPart.get_assessment_part
+        method, which does not expect any arguments...
 
         """
         if part_id is None:
@@ -219,12 +226,12 @@ class AssessmentSessionSection(object):
 
             # Now get the next part through normal means:
             try:
-                part = self._get_next_part_for_part(part, level=part._level_in_section)
+                part = self.get_next_part_for_part(part, level=part._level_in_section)
             except errors.IllegalState:
                 finished = True
             else:
                 if part.has_items():
-                    parts.append(next_part)
+                    parts.append(part)
         return parts
 
     def _update_assessment_parts_map(self, part_list, level_list):
@@ -649,3 +656,8 @@ class AssessmentSessionSection(object):
             if 'missingResponse' in question_map['responses'][0]:
                 return False
         return True
+
+
+
+class LoadedSection(PartSequenceSection, AssessmentSessionSection, AssessmentSection):
+    pass
