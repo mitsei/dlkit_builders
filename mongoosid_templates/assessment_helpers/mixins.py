@@ -29,32 +29,40 @@ class PartSequenceSection(object):
             check_parent = False
         elif part.has_children(): # This is a special AssessmentPart that can manage child Parts
             try:
-                next_part = part.get_child_assessment_parts().next()
+                child_id = part.get_child_ids().next()
+                apls = get_assessment_part_lookup_session(part._runtime, part._proxy, self)
+                apls.use_unsequestered_assessment_part_view()
+                apls.use_federated_bank_view()
+                next_part = apls.get_assessment_part(child_id)
                 level += 1
                 check_parent = False
             except StopIteration:
                 check_parent = True
         else: # check to see if this part has a sibling that could be next
-            siblings = []
             if part.has_parent_part():
                 parent = part.get_assessment_part()
                 if parent.has_children():
-                    siblings = parent.get_children()
-                if siblings and (siblings[-1]).get_id() != part_id:
-                    siblings_ids = [s.get_id() for s in siblings]
-                    try:
-                        next_part = siblings[siblings_ids.index(part_id) + 1]
-                    except ValueError:
-                        pass
-                    else:
-                        check_parent = False
+                    sibling_ids = list(parent.get_child_ids())
+                    if sibling_ids[-1] != part_id:
+                        try:
+                            apls = get_assessment_part_lookup_session(part._runtime, part._proxy, self)
+                            apls.use_unsequestered_assessment_part_view()
+                            apls.use_federated_bank_view()
+                            next_part_id = sibling_ids[sibling_ids.index(part_id) + 1]
+                            next_part = apls.get_assessment_part(next_part_id)
+                        except ValueError:
+                            pass
+                        else:
+                            check_parent = False
             else:
                 raise errors.IllegalState()
 
-        if check_parent: # We are at a lowest leaf and need to check parent
-            next_part, level = self.get_next_part_for_part(
+        if check_parent and part.has_parent_part(): # We are at a lowest leaf and need to check parent
+            next_part = self.get_next_part_for_part(
                 part.get_assessment_part(),
                 level - 1)
+        elif check_parent:
+            raise errors.IllegalState()
         next_part._level_in_section = level
         return next_part
 
@@ -218,9 +226,9 @@ class AssessmentSessionSection(object):
 
             # If this part is "magic" it may manage its own part sequence:
             try:
-                magic_parts = part.get_parts(level=part._level_in_section)
+                magic_parts = part.get_parts(reference_level=part._level_in_section)
             except AttributeError:
-                magic_parts = list()
+                pass
             else:
                 parts += magic_parts
 

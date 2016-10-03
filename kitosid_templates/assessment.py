@@ -430,10 +430,11 @@ class AssessmentPartLookupSession:
         self._get_sub_package_provider_session('assessment_authoring',
                                                'assessment_part_lookup_session')
         for session in self._provider_sessions:
-            try:
-                self._provider_sessions[session].use_sequestered_assessment_part_view()
-            except AttributeError:
-                pass"""
+            for provider_session_name, provider_session in self._provider_sessions[session].iteritems():
+                try:
+                    provider_session.use_sequestered_assessment_part_view()
+                except AttributeError:
+                    pass"""
 
     use_unsequestered_assessment_part_view = """
         \"\"\"Pass through to provider AssessmentPartLookupSession.use_unsequestered_assessment_part_view\"\"\"
@@ -441,10 +442,11 @@ class AssessmentPartLookupSession:
         self._get_sub_package_provider_session('assessment_authoring',
                                                'assessment_part_lookup_session')
         for session in self._provider_sessions:
-            try:
-                self._provider_sessions[session].use_unsequestered_assessment_part_view()
-            except AttributeError:
-                pass"""
+            for provider_session_name, provider_session in self._provider_sessions[session].iteritems():
+                try:
+                    provider_session.use_unsequestered_assessment_part_view()
+                except AttributeError:
+                    pass"""
 
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """
