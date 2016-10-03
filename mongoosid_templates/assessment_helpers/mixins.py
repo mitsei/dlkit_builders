@@ -37,25 +37,24 @@ class PartSequenceSection(object):
                 level += 1
                 check_parent = False
             except StopIteration:
-                children_checked = True
+                pass
         else: # check to see if this part has a sibling that could be next
+            sibling_ids = []
             if part.has_parent_part():
                 parent = part.get_assessment_part()
                 if parent.has_children():
                     sibling_ids = list(parent.get_child_ids())
-                    if sibling_ids[-1] != part_id:
-                        try:
-                            apls = get_assessment_part_lookup_session(part._runtime, part._proxy, self)
-                            apls.use_unsequestered_assessment_part_view()
-                            apls.use_federated_bank_view()
-                            next_part_id = sibling_ids[sibling_ids.index(part_id) + 1]
-                            next_part = apls.get_assessment_part(next_part_id)
-                        except ValueError:
-                            pass
-                        else:
-                            check_parent = False
-            else:
-                raise errors.IllegalState()
+                if sibling_ids:
+                    try:
+                        apls = get_assessment_part_lookup_session(part._runtime, part._proxy, self)
+                        apls.use_unsequestered_assessment_part_view()
+                        apls.use_federated_bank_view()
+                        next_part_id = sibling_ids[sibling_ids.index(part_id) + 1]
+                        next_part = apls.get_assessment_part(next_part_id)
+                    except (ValueError, IndexError):
+                        children_checked = True
+                    else:
+                        check_parent = False
 
         if check_parent and part.has_parent_part(): # We are at a lowest leaf and need to check parent
             next_part = self.get_next_part_for_part(
