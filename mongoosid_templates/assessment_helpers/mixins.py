@@ -242,7 +242,7 @@ class AssessmentSessionSection(object):
                     parts.append(part)
         return parts
 
-    def _update_assessment_parts_map(self, part_list, level_list):
+    def _update_assessment_parts_map(self, part_list):
         """Updates the part map.
 
         Called before question list gets updated if it is determined that the

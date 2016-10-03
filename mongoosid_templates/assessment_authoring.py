@@ -378,7 +378,7 @@ class AssessmentPart:
         'from ..id.objects import IdList',
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.mongo.assessment.assessment_utilities import get_assessment_part_lookup_session',
+        'from dlkit.mongo.assessment.assessment_utilities import get_assessment_part_lookup_session, get_item_lookup_session',
         """SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
     'authority': 'ODL.MIT.EDU',
     'namespace': 'osid-object',
@@ -433,8 +433,7 @@ class AssessmentPart:
 
     def get_items(self):
         \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
-        mgr = self._get_provider_manager('ASSESSMENT', local=True)
-        ils = mgr.get_item_lookup_session(proxy=self._proxy)
+        ils = get_item_lookup_session(runtime=self._runtime, proxy=self._proxy)
         ils.use_federated_bank_view()
         items = []
         if self.has_items():
