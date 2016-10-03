@@ -225,13 +225,19 @@ class AssessmentSessionSection(object):
         while not finished:
 
             # If this part is "magic" it may manage its own part sequence:
+            skip_magic_parts = False
             try:
                 magic_parts = part.get_parts(reference_level=part._level_in_section)
             except AttributeError:
                 pass
             else:
                 parts += magic_parts
+                skip_magic_parts = True
 
+            if skip_magic_parts:
+                part = parts[-1]
+                # don't call this on magic parts, otherwise
+                # the children magic parts will get added multiple times
             # Now get the next part through normal means:
             try:
                 part = self.get_next_part_for_part(part, level=part._level_in_section)
