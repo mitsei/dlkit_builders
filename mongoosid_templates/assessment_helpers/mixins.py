@@ -43,13 +43,13 @@ class PartSequenceSection(object):
             if part.has_parent_part():
                 parent = part.get_assessment_part()
                 if parent.has_children():
-                    sibling_ids = list(parent.get_child_ids())
+                    sibling_ids = [str(ci) for ci in parent.get_child_ids()]
                 if sibling_ids:
                     try:
                         apls = get_assessment_part_lookup_session(part._runtime, part._proxy, self)
                         apls.use_unsequestered_assessment_part_view()
                         apls.use_federated_bank_view()
-                        next_part_id = sibling_ids[sibling_ids.index(part_id) + 1]
+                        next_part_id = Id(sibling_ids[sibling_ids.index(str(part_id)) + 1])
                         next_part = apls.get_assessment_part(next_part_id)
                     except (ValueError, IndexError):
                         children_checked = True
