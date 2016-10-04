@@ -390,38 +390,6 @@ class AssessmentSession:
 
     additional_methods = """
 
-    def is_feedback_available(assessment_section_id, item_id):
-        \"\"\"Is feedback available for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id).is_feedback_available(question_id=item_id)
-
-    def get_feedback(assessment_section_id, item_id):
-        \"\"\"Get feedback for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id).get_feedback(question_id=item_id)
-
-    def is_solution_available(assessment_section_id, item_id):
-        \"\"\"Is a solution available for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id).is_solution_available(question_id=item_id)
-
-    def get_solution(assessment_section_id, item_id):
-        \"\"\"Get solution for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id).get_solution(question_id=item_id)
-
-    def is_correctness_available(assessment_section_id, item_id):
-        \"\"\"Is a determination of correctness available for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id).is_correctness_available(question_id=item_id)
-
-    def is_correct(assessment_section_id, item_id):
-        \"\"\"is the response for this item in this section correct\"\"\"
-        return self.get_assessment_section(assessment_section_id).is_correct(question_id=item_id)
-
-    def get_correctness(assessment_section_id, item_id):
-        \"\"\"Get correctness for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id).get_correctness(question_id=item_id)
-
-    def get_confused_learning_objective_ids(assessment_section_id, item_id):
-        \"\"\"Get confused objective ids for this item in this section\"\"\"
-        return self.get_assessment_section(assessment_section_id).get_confused_learning_objective_ids(question_id=item_id)
-
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
         if assessment_taken_id not in self._assessments_taken:
