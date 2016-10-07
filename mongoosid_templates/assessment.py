@@ -454,7 +454,7 @@ class AssessmentResultsSession:
                 section = get_assessment_section(Id(section_id),
                                                  runtime=self._runtime,
                                                  proxy=self._proxy)
-                response_list.append(section._get_responses())
+                response_list.append(section.get_responses())
         return ResponseList(response_list)"""
 
     are_results_available = """
