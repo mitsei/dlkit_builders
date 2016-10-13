@@ -1548,7 +1548,12 @@ class AssessmentTaken:
             obj_map['description']['text'] = self.get_description().get_text()
         return obj_map
 
-    object_map = property(fget=get_object_map)"""
+    object_map = property(fget=get_object_map)
+
+    def _delete(self):
+        for section_id in self._my_map['sections']:
+            section = get_assessment_section(section_id, runtime=self._runtime, proxy=self._proxy)
+            section._delete()"""
 
     get_taker_id = """
         if self._my_map['takerId']:

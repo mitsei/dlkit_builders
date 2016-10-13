@@ -144,7 +144,7 @@ class AssessmentSessionSection(object):
         self._save()
 
     def _save(self):
-        """Saves the current state of this AssessmentSection.
+        """Saves the current state of this AssessmentSection to database.
 
         Should be called every time the question map changes.
 
@@ -157,6 +157,18 @@ class AssessmentSessionSection(object):
         else:
             insert_result = collection.insert_one(self._my_map)
             self._my_map = collection.find_one({'_id': insert_result.inserted_id}) # To get the _id
+
+    def _delete(self):
+        """Deletes this AssessmentSection from database.
+
+        Will be called by AssessmentTaken._delete() for clean-up purposes.
+
+        """
+        collection = MongoClientValidated('assessment',
+                                          collection='AssessmentSection',
+                                          runtime=self._runtime)
+        collection.delete_one({'_id': ObjectId(self.get_id().get_identifier())})
+
 
     # Model for question map to be constructed through taking an assessment section:
     #
