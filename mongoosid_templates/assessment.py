@@ -1552,7 +1552,7 @@ class AssessmentTaken:
 
     def _delete(self):
         for section_id in self._my_map['sections']:
-            section = get_assessment_section(section_id, runtime=self._runtime, proxy=self._proxy)
+            section = get_assessment_section(Id(section_id), runtime=self._runtime, proxy=self._proxy)
             section._delete()"""
 
     get_taker_id = """
