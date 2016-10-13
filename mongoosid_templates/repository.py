@@ -944,3 +944,14 @@ class CompositionRepositorySession:
                 id_list.append(Id(idstr))
         return IdList(id_list)"""
 
+class AssetLookupSession:
+
+    additional_methods = """
+    def get_asset_content_by_id(self, asset_content_id):
+        collection = MongoClientValidated('repository',
+                                          collection='AssetContent',
+                                          runtime=self._runtime)
+        result = collection.find_one(
+            dict({'_id': ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())},
+                 **self._view_filter()))
+        return objects.AssetContent(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)"""
