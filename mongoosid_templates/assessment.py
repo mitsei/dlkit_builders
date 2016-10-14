@@ -703,7 +703,7 @@ class AssessmentTakenLookupSession:
             ao_ids.append(str(assessment_offered.get_id()))
 
         result = collection.find(
-            dict({'assessmentOfferedId': {'$in':[ao_ids]}},
+            dict({'assessmentOfferedId': {'$in': ao_ids}},
                  **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result,
                                            runtime=self._runtime,
