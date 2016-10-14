@@ -132,3 +132,12 @@ class AssetCompositionDesignSession:
     remove_asset_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+
+class Repository:
+    additional_methods = """
+    def get_asset_content_by_id(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetLookupSession.get_asset_content_by_id
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_lookup_session').get_asset_content_by_id(*args, **kwargs)"""
