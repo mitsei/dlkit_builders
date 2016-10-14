@@ -703,7 +703,7 @@ class AssessmentTakenLookupSession:
             ao_ids.append(str(assessment_offered.get_id()))
 
         result = collection.find(
-            dict({'assessmentOfferedId': {'$in':[ao_ids]}},
+            dict({'assessmentOfferedId': {'$in': ao_ids}},
                  **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result,
                                            runtime=self._runtime,
@@ -1551,9 +1551,10 @@ class AssessmentTaken:
     object_map = property(fget=get_object_map)
 
     def _delete(self):
-        for section_id in self._my_map['sections']:
-            section = get_assessment_section(Id(section_id), runtime=self._runtime, proxy=self._proxy)
-            section._delete()"""
+        if 'sections' in self._my_map:
+            for section_id in self._my_map['sections']:
+                section = get_assessment_section(Id(section_id), runtime=self._runtime, proxy=self._proxy)
+                section._delete()"""
 
     get_taker_id = """
         if self._my_map['takerId']:
