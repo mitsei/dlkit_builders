@@ -949,9 +949,13 @@ class AssetLookupSession:
     additional_methods = """
     def get_asset_content(self, asset_content_id):
         collection = MongoClientValidated('repository',
-                                          collection='AssetContent',
+                                          collection='Asset',
                                           runtime=self._runtime)
+        asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
         result = collection.find_one(
-            dict({'_id': ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())},
+            dict({'assetContents._id': {'$in': [asset_content_identifier]}},
                  **self._view_filter()))
-        return objects.AssetContent(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)"""
+        # if a match is not found, NotFound exception will be thrown by find_one, so
+        # the below should always work
+        asset_content_map = [ac for ac in result['assetContents'] if ac['_id'] == asset_content_identifier][0]
+        return objects.AssetContent(osid_object_map=asset_content_map, runtime=self._runtime, proxy=self._proxy)"""
