@@ -293,8 +293,8 @@ class AssetCompositionDesignSession:
 
 class AssetLookupSession:
     additional_methods = """
-    def get_asset_content_by_id(self, asset_content_id):
+    def get_asset_content(self, asset_content_id):
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._provider_session.get_asset_content_by_id(asset_content_id)"""
+            return self._provider_session.get_asset_content(asset_content_id)"""

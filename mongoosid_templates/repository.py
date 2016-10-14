@@ -947,7 +947,7 @@ class CompositionRepositorySession:
 class AssetLookupSession:
 
     additional_methods = """
-    def get_asset_content_by_id(self, asset_content_id):
+    def get_asset_content(self, asset_content_id):
         collection = MongoClientValidated('repository',
                                           collection='AssetContent',
                                           runtime=self._runtime)

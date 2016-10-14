@@ -136,8 +136,8 @@ class AssetCompositionDesignSession:
 
 class Repository:
     additional_methods = """
-    def get_asset_content_by_id(self, *args, **kwargs):
-        \"\"\"Pass through to provider AssetLookupSession.get_asset_content_by_id
+    def get_asset_content(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetLookupSession.get_asset_content
             Out-of-band, non-OSID convenience method
         \"\"\"
-        return self._get_provider_session('asset_lookup_session').get_asset_content_by_id(*args, **kwargs)"""
+        return self._get_provider_session('asset_lookup_session').get_asset_content(*args, **kwargs)"""
