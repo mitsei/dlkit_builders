@@ -963,24 +963,43 @@ class Question:
     id_ = property(fget=get_id)
     ident = property(fget=get_id)
     
-    ##
-    # This method mirrors that in the Item so that questions can also be inspected for learning objectives:
+
     def get_learning_objective_ids(self):
-        collection = MongoClientValidated('assessment',
-                                          collection='Item',
-                                          runtime=self._runtime)
-        item_map = collection.find_one({'_id': ObjectId(Id(self._my_map['itemId']).get_identifier())})
-        return IdList(item_map['learningObjectiveIds'])
+        \"\"\" This method mirrors that in the Item.
+        
+        So that questions can also be inspected for learning objectives
+        
+        \"\"\"
+        if 'learningObjectiveIds' not in self._my_map: # Will this ever be the case?
+            collection = MongoClientValidated('assessment',
+                                              collection='Item',
+                                              runtime=self._runtime)
+            item_map = collection.find_one({'_id': ObjectId(Id(self._my_map['itemId']).get_identifier())})
+            self._my_map['learningObjectiveIds'] = list(item_map['learningObjectiveIds'])
+        return IdList(self._my_map['learningObjectiveIds'])
+
+    learning_objective_ids = property(fget=get_learning_objective_ids)
+
+    def get_learning_objectives(self):
+        \"\"\" This method also mirrors that in the Item.\"\"\"
+        # This is pretty much identicial to the method in assessment.Item!
+        mgr = self._get_provider_manager('LEARNING')
+        lookup_session = mgr.get_objective_lookup_session(proxy=getattr(self, "_proxy", None))
+        lookup_session.use_federated_objective_bank_view()
+        return lookup_session.get_objectives_by_ids(self.get_learning_objective_ids())
+
+    learning_objectives = property(fget=get_learning_objectives)
 
     def get_object_map(self):
         obj_map = dict(self._my_map)
         del obj_map['itemId']
-        try:
-            lo_ids = self.get_learning_objective_ids()
-            obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
-        except UnicodeEncodeError:
-            lo_ids = self.get_learning_objective_ids()
-            obj_map['learningObjectiveIds'] = [unicode(lo_id) for lo_id in lo_ids]
+        if 'learningObjectiveIds' not in obj_map:
+            try:
+                lo_ids = self.get_learning_objective_ids()
+                obj_map['learningObjectiveIds'] = [str(lo_id) for lo_id in lo_ids]
+            except UnicodeEncodeError:
+                lo_ids = self.get_learning_objective_ids()
+                obj_map['learningObjectiveIds'] = [unicode(lo_id) for lo_id in lo_ids]
 
         obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
         obj_map['id'] = str(self.get_id())
@@ -1004,7 +1023,9 @@ class Item:
         self.get_question().get_id()"""
     
     get_question = """
-        return Question(osid_object_map=self._my_map['question'],
+        question_map = dict(self._my_map['question'])
+        question_map['learningObjectiveIds'] = self._my_map['learningObjectiveIds']
+        return Question(osid_object_map=question_map,
                         runtime=self._runtime,
                         proxy=self._proxy)"""
     
@@ -2495,6 +2516,7 @@ class Response:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from ..utilities import get_registry',
+        'from .assessment_utilities import get_item_lookup_session',
         'UNANSWERED = 0',
         'NULL_SUBMISSION = 1',
     ]
@@ -2505,7 +2527,7 @@ class Response:
     def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, **kwargs):
         from .objects import Answer
         self._submission_time = osid_object_map['submissionTime']
-        self._item_id = Id(osid_object_map['itemId'])
+        self._item_id = Id(osid_object_map['questionId'])
         if additional_attempts is not None:
             self._additional_attempts = additional_attempts
         else:
@@ -2557,9 +2579,11 @@ class Response:
         return self._item_id"""
     
     get_item = """
-        # So, we really don't want AssessmentSession users to get the Item.
-        # What to do?
-        raise errors.PermissionDenied()"""
+        # So, for now we're assuming that what should be returned here is the question.
+        # We could change this class impl to "know" if it came from a ResponseLookupSession call
+        # and return the whole Item if so.
+        item = get_item_lookup_session(runtime=self._runtime, proxy=self._proxy)
+        return item.get_question()"""
     
     get_response_record = """
         if not self.has_record_type(item_record_type):
