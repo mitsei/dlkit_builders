@@ -2527,7 +2527,7 @@ class Response:
     def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, **kwargs):
         from .objects import Answer
         self._submission_time = osid_object_map['submissionTime']
-        self._item_id = Id(osid_object_map['questionId'])
+        self._item_id = Id(osid_object_map['itemId'])
         if additional_attempts is not None:
             self._additional_attempts = additional_attempts
         else:
