@@ -2524,9 +2524,11 @@ class Response:
     init = """
     _namespace = 'assessment.Response'
     
-    def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, **kwargs):
+    def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, section=None, **kwargs):
         from .objects import Answer
         self._submission_time = osid_object_map['submissionTime']
+        if section is not None:
+            self._section = section
         self._item_id = Id(osid_object_map['itemId'])
         if additional_attempts is not None:
             self._additional_attempts = additional_attempts
@@ -2582,7 +2584,20 @@ class Response:
         # So, for now we're assuming that what should be returned here is the question.
         # We could change this class impl to "know" if it came from a ResponseLookupSession call
         # and return the whole Item if so.
-        item = get_item_lookup_session(runtime=self._runtime, proxy=self._proxy)
+        try:
+            # an un-answered response will have a magic itemId here
+            item_lookup_session = get_item_lookup_session(runtime=self._runtime, proxy=self._proxy)
+            item_lookup_session.use_federated_bank_view()
+            item = item_lookup_session.get_item(self._item_id)
+        except errors.NotFound:
+            # otherwise an answered response will have an assessment-session itemId
+            if self._section is not None:
+                question = self._section.get_question(self._item_id)
+                ils = self._section._get_item_lookup_session()
+                real_item_id = Id(question._my_map['itemId'])
+                item = ils.get_item(real_item_id)
+            else:
+                raise errors.NotFound()
         return item.get_question()"""
     
     get_response_record = """
