@@ -589,7 +589,8 @@ class AssessmentSessionSection(object):
         return Response(osid_object_map=response_map,
                         additional_attempts=additional_attempts,
                         runtime=self._runtime,
-                        proxy=self._proxy)
+                        proxy=self._proxy,
+                        section=self)
 
     def is_question_answered(self, question_id):
         """has the question matching item_id been answered and not skipped"""
