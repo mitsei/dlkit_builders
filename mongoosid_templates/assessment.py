@@ -2527,6 +2527,8 @@ class Response:
     def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, section=None, **kwargs):
         from .objects import Answer
         self._submission_time = osid_object_map['submissionTime']
+        self._runtime = runtime
+        self._proxy = proxy
         if section is not None:
             self._section = section
         self._item_id = Id(osid_object_map['itemId'])
