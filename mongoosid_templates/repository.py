@@ -739,14 +739,14 @@ class AssetContent:
     get_data = """
         dbase = MongoClientValidated('repository',
                                      runtime=self._runtime).raw()
-        filesys = gridfs.GridFS(dbase)
+        filesys = gridfs.GridFS(dbase._mc)
         return DataInputStream(filesys.get(self._my_map['data']))""" 
 
     additional_methods = """
     def _delete(self):
         dbase = MongoClientValidated('repository',
                                      runtime=self._runtime).raw()
-        filesys = gridfs.GridFS(dbase)
+        filesys = gridfs.GridFS(dbase._mc)
         if self._my_map['data'] and filesys.exists(self._my_map['data']):
             filesys.delete(self._my_map['data'])
         osid_objects.OsidObject._delete(self)"""
@@ -776,7 +776,7 @@ class AssetContentForm:
             raise errors.NullArgument()
         dbase = MongoClientValidated('repository',
                                      runtime=self._runtime)
-        filesys = gridfs.GridFS(dbase)
+        filesys = gridfs.GridFS(dbase._mc)
         self._my_map['data'] = filesys.put(data._my_data)
         data._my_data.seek(0)
         self._my_map['base64'] = base64.b64encode(data._my_data.read())"""
@@ -789,7 +789,7 @@ class AssetContentForm:
             pass
         dbase = MongoClientValidated('repository',
                                      runtime=self._runtime)
-        filesys = gridfs.GridFS(dbase)
+        filesys = gridfs.GridFS(dbase._mc)
         filesys.delete(self._my_map['data'])
         self._my_map['data'] = self._data_default
         del self._my_map['base64']"""
