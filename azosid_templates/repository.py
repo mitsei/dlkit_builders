@@ -305,7 +305,7 @@ class AssetQuerySession:
         if not self._can('search'):
             raise PermissionDenied()
         else:
-            return self._provider_session.get_asset_content_query()
+            return self.AssetQueryWrapper(self._provider_session.get_asset_content_query())
 
     def get_asset_contents_by_query(self, asset_content_query):
         if not hasattr(asset_content_query, 'cat_id_args_list'):
