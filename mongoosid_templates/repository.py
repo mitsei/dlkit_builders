@@ -969,12 +969,12 @@ class AssetQuerySession:
     def get_asset_contents_by_query(self, asset_content_query):
         and_list = list()
         or_list = list()
-        for term in asset_query._query_terms:
+        for term in asset_content_query._query_terms:
             content_term = 'assetContents.{0}'.format(term)
-            and_list.append({content_term: asset_query._query_terms[term]})
-        for term in asset_query._keyword_terms:
+            and_list.append({content_term: asset_content_query._query_terms[term]})
+        for term in asset_content_query._keyword_terms:
             content_term = 'assetContents.{0}'.format(term)
-            or_list.append({content_term: asset_query._keyword_terms[term]})
+            or_list.append({content_term: asset_content_query._keyword_terms[term]})
         if or_list:
             and_list.append({'$or': or_list})
         view_filter = self._view_filter()
@@ -990,18 +990,42 @@ class AssetQuerySession:
         # these are Asset results ... need to pull out the matching contents
         matching_asset_contents = []
         for asset in result:
-            for asset_content in result['assetContents']:
+            for asset_content in asset['assetContents']:
                 is_match = True
 
                 # all the ANDs must be true for this to still be a match
-                for term in asset_query._query_terms:
-                    if asset_content[term] != asset_query._query_terms[term]:
-                        is_match = False
+                for term in asset_content_query._query_terms:
+                    if '.' in term:
+                        # is nested
+                        split_terms = term.split('.')  # assume 2 max
+                        for key, value in asset_content[split_terms[0]].iteritems():
+                            if key == split_terms[1]:
+                                search_value = asset_content_query._query_terms[term]
+                                if isinstance(search_value, dict):
+                                    search_value = search_value['$in'][0]
+                                if isinstance(search_value, re._pattern_type):
+                                    # then we need to do a regex comparison on the content value
+                                    if search_value.match(value) is None:
+                                        is_match = False
+                                elif value != asset_content_query._query_terms[term]:
+                                    is_match = False
+                    else:
+                        if asset_content[term] != asset_content_query._query_terms[term]:
+                            is_match = False
 
                 # check the ORs
-                for term in asset_query._keyword_terms:
-                    if asset_query._query_terms[term] in asset_content[term]:
-                        is_match = True
+                for term in asset_content_query._keyword_terms:
+                    if '.' in term:
+                        # is nested
+                        split_terms = term.split('.')
+                        for key, value in asset_content[split_terms[0]].iteritems():
+                            if key == split_terms[1] and asset_content_query._keyword_terms[term] in value:
+                                is_match = True
+                                break
+                    else:
+                        if asset_content_query._keyword_terms[term] in asset_content[term]:
+                            is_match = True
+                            break
 
                 if is_match:
                     matching_asset_contents.append(asset_content)
