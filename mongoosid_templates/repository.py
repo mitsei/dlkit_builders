@@ -959,3 +959,53 @@ class AssetLookupSession:
         # the below should always work
         asset_content_map = [ac for ac in result['assetContents'] if ac['_id'] == asset_content_identifier][0]
         return objects.AssetContent(osid_object_map=asset_content_map, runtime=self._runtime, proxy=self._proxy)"""
+
+class AssetQuerySession:
+
+    additional_methods = """
+    def get_asset_content_query(self):
+        return queries.AssetContentQuery(runtime=self._runtime)
+
+    def get_asset_contents_by_query(self, asset_content_query):
+        and_list = list()
+        or_list = list()
+        for term in asset_query._query_terms:
+            content_term = 'assetContents.{0}'.format(term)
+            and_list.append({content_term: asset_query._query_terms[term]})
+        for term in asset_query._keyword_terms:
+            content_term = 'assetContents.{0}'.format(term)
+            or_list.append({content_term: asset_query._keyword_terms[term]})
+        if or_list:
+            and_list.append({'$or': or_list})
+        view_filter = self._view_filter()
+        if view_filter:
+            and_list.append(view_filter)
+        if and_list:
+            query_terms = {'$and': and_list}
+        collection = MongoClientValidated('repository',
+                                          collection='Asset',
+                                          runtime=self._runtime)
+        result = collection.find(query_terms).sort('_id', DESCENDING)
+
+        # these are Asset results ... need to pull out the matching contents
+        matching_asset_contents = []
+        for asset in result:
+            for asset_content in result['assetContents']:
+                is_match = True
+
+                # all the ANDs must be true for this to still be a match
+                for term in asset_query._query_terms:
+                    if asset_content[term] != asset_query._query_terms[term]:
+                        is_match = False
+
+                # check the ORs
+                for term in asset_query._keyword_terms:
+                    if asset_query._query_terms[term] in asset_content[term]:
+                        is_match = True
+
+                if is_match:
+                    matching_asset_contents.append(asset_content)
+
+        return objects.AssetContentList(matching_asset_contents,
+                                        runtime=self._runtime,
+                                        proxy=self._proxy)"""

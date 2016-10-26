@@ -298,3 +298,26 @@ class AssetLookupSession:
             raise PermissionDenied()
         else:
             return self._provider_session.get_asset_content(asset_content_id)"""
+
+class AssetQuerySession:
+    additional_methods = """
+    def get_asset_content_query(self):
+        if not self._can('search'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_asset_content_query()
+
+    def get_asset_contents_by_query(self, asset_content_query):
+        if not hasattr(asset_content_query, 'cat_id_args_list'):
+            raise Unsupported('asset_content_query not from this session')
+        for kwargs in asset_content_query.cat_id_args_list:
+            if self._can('search', kwargs['repository_id']):
+                asset_content_query._provider_query.match_repository_id(**kwargs)
+        if self._can('search'):
+            return self._provider_session.get_asset_contents_by_query(asset_content_query)
+        elif self._is_isolated_catalog_view():
+            raise PermissionDenied()
+        else:
+            result = self._try_harder(asset_content_query)
+            asset_content_query._provider_query.clear_repository_terms()
+            return result"""
