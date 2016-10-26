@@ -142,6 +142,12 @@ class Repository:
         \"\"\"
         return self._get_provider_session('asset_lookup_session').get_asset_content(*args, **kwargs)
 
+    def get_asset_content_query(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetQuerySession.get_asset_content_query
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_query_session').get_asset_content_query(*args, **kwargs)
+
     def get_asset_contents_by_query(self, *args, **kwargs):
         \"\"\"Pass through to provider AssetQuerySession.get_asset_contents_by_query
             Out-of-band, non-OSID convenience method
