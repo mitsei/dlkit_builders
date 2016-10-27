@@ -103,6 +103,7 @@ class AssessmentSessionSection(object):
             # let's not call this...seems redundant, and per Jeff, this might
             # save us time.
             # self._update_questions()
+            pass
 
     def _get_part_map(self, part_id):
         """ from self._my_map['assessmentParts'], return the one part map

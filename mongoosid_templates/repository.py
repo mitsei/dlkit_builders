@@ -961,12 +961,12 @@ class AssetLookupSession:
         return objects.AssetContent(osid_object_map=asset_content_map, runtime=self._runtime, proxy=self._proxy)"""
 
 class AssetQuerySession:
-
     additional_methods = """
     def get_asset_content_query(self):
         return queries.AssetContentQuery(runtime=self._runtime)
 
     def get_asset_contents_by_query(self, asset_content_query):
+        import re
         and_list = list()
         or_list = list()
         for term in asset_content_query._query_terms:
