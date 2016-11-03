@@ -82,6 +82,48 @@ class AuthorizationAdminSession:
         'from dlkit.abstract_osid.type.primitives import Type as ABCType',
 ]
 
+    create_authorization = """
+        # TODO: not using the create_resource template
+        # because want to prevent duplicate authorizations
+        collection = MongoClientValidated('authorization',
+                                          collection='Authorization',
+                                          runtime=self._runtime)
+        if not isinstance(authorization_form, ABCAuthorizationForm):
+            raise errors.InvalidArgument('argument type is not an AuthorizationForm')
+        if authorization_form.is_for_update():
+            raise errors.InvalidArgument('the AuthorizationForm is for update only, not create')
+        try:
+            if self._forms[authorization_form.get_id().get_identifier()] == CREATED:
+                raise errors.IllegalState('authorization_form already used in a create transaction')
+        except KeyError:
+            raise errors.Unsupported('authorization_form did not originate from this session')
+        if not authorization_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+
+        # try to check first here
+        try:
+            osid_map = collection.find_one({"agentId": authorization_form._my_map['agentId'],
+                                            "functionId": authorization_form._my_map['functionId'],
+                                            "qualifierId": authorization_form._my_map['qualifierId'],
+                                            "assignedVaultIds": authorization_form._my_map['assignedVaultIds']})
+        except errors.NotFound:
+            insert_result = collection.insert_one(authorization_form._my_map)
+
+            self._forms[authorization_form.get_id().get_identifier()] = CREATED
+            osid_map = collection.find_one({'_id': insert_result.inserted_id})
+        result = objects.Authorization(
+            osid_object_map=osid_map,
+            runtime=self._runtime,
+            proxy=self._proxy)
+
+        self._forms[authorization_form.get_id().get_identifier()] = CREATED
+        result = objects.Authorization(
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
+
+        return result"""
+
     get_authorization_form_for_create_for_agent = """
         if not isinstance(agent_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
