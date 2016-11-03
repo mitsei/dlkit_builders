@@ -116,12 +116,6 @@ class AuthorizationAdminSession:
             runtime=self._runtime,
             proxy=self._proxy)
 
-        self._forms[authorization_form.get_id().get_identifier()] = CREATED
-        result = objects.Authorization(
-            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime,
-            proxy=self._proxy)
-
         return result"""
 
     get_authorization_form_for_create_for_agent = """
