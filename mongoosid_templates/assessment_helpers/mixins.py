@@ -561,7 +561,7 @@ class AssessmentSessionSection(object):
                 response['isCorrect'] = self._get_item(question_id).is_response_correct(
                     Response(osid_object_map=response, runtime=self._runtime, proxy=self._proxy))
             except (errors.IllegalState, errors.NotFound):
-                pass
+                response['isCorrect'] = None
         response['submissionTime'] = DateTime.utcnow()
 
         question_map = self._get_question_map(question_id) # will raise NotFound()
