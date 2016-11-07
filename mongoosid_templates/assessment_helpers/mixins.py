@@ -30,10 +30,11 @@ class PartSequenceSection(object):
         elif part.has_children() and not children_checked:
             try:
                 child_id = part.get_child_ids().next()
-                apls = get_assessment_part_lookup_session(part._runtime, part._proxy, self)
-                apls.use_unsequestered_assessment_part_view()
-                apls.use_federated_bank_view()
-                next_part = apls.get_assessment_part(child_id)
+                # apls = get_assessment_part_lookup_session(part._runtime, part._proxy, self)
+                # apls.use_unsequestered_assessment_part_view()
+                # apls.use_federated_bank_view()
+                # next_part = apls.get_assessment_part(child_id)
+                next_part = self._get_assessment_part(child_id)
                 level += 1
                 check_parent = False
             except StopIteration:
@@ -46,11 +47,12 @@ class PartSequenceSection(object):
                     sibling_ids = [str(ci) for ci in parent.get_child_ids()]
                 if sibling_ids:
                     try:
-                        apls = get_assessment_part_lookup_session(part._runtime, part._proxy, self)
-                        apls.use_unsequestered_assessment_part_view()
-                        apls.use_federated_bank_view()
                         next_part_id = Id(sibling_ids[sibling_ids.index(str(part_id)) + 1])
-                        next_part = apls.get_assessment_part(next_part_id)
+                        # apls = get_assessment_part_lookup_session(part._runtime, part._proxy, self)
+                        # apls.use_unsequestered_assessment_part_view()
+                        # apls.use_federated_bank_view()
+                        # next_part = apls.get_assessment_part(next_part_id)
+                        next_part = self._get_assessment_part(next_part_id)
                     except (ValueError, IndexError):
                         children_checked = True
                     else:
@@ -244,6 +246,11 @@ class AssessmentSessionSection(object):
             except AttributeError:
                 pass
             else:
+                # First make sure all these magic parts ore cached
+                for part in list(magic_parts):
+                    part_id = part.get_id()
+                    if part_id not in self._assessment_parts:
+                        self._assessment_parts[part_id] = part
                 parts += magic_parts
 
             # Now get the next part through normal means:
