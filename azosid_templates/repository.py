@@ -208,7 +208,7 @@ class CompositionQuerySession:
         if self._unauth_repository_ids is None:
             self._unauth_repository_ids = self._get_unauth_repository_ids(self._qualifier_id)
         for repository_id in self._unauth_repository_ids:
-            query.match_repository_id(repository, match=False)
+            query.match_repository_id(repository_id, match=False)
         return self._query_session.get_repositories_by_query(query)
 
     class CompositionQueryWrapper(QueryWrapper):
@@ -318,6 +318,12 @@ class AssetQuerySession:
         self._id_namespace = 'repository.Asset'
         self.use_federated_repository_view()
         self._unauth_repository_ids = None
+
+    class AssetQueryWrapper(QueryWrapper):
+        \"\"\"Wrapper for AssetQueries to override match_repository_id method\"\"\"
+
+        def match_repository_id(self, repository_id, match=True):
+            self.cat_id_args_list.append({'repository_id': repository_id, 'match': match})
     """
     additional_methods = """
     def get_asset_content_query(self):
