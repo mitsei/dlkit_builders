@@ -180,6 +180,7 @@ class OsidSession:
         self._proxy = proxy
         self._id_namespace = None
         self._qualifier_id = None
+        self._authz_cache = dict() # Does this want to be a real cache???
         self._object_view = COMPARATIVE
         self._catalog_view = FEDERATED
 
@@ -191,10 +192,15 @@ class OsidSession:
             authority='ODL.MIT.EDU')
         if qualifier_id is None:
             qualifier_id = self._qualifier_id
-        return self._authz_session.is_authorized(
-            agent_id=self.get_effective_agent_id(),
-            function_id=function_id,
-            qualifier_id=qualifier_id)
+        agent_id = self.get_effective_agent_id()
+        try:
+            return self._authz_cache[str(agent_id) + str(function_id) + str(qualifier_id)]
+        except KeyError:
+            authz = self._authz_session.is_authorized(agent_id=agent_id,
+                                                      function_id=function_id,
+                                                      qualifier_id=qualifier_id)
+            self._authz_cache[str(agent_id) + str(function_id) + str(qualifier_id)] = authz
+            return authz
 
     def _use_comparative_object_view(self):
         self._object_view = COMPARATIVE
