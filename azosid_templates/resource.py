@@ -356,6 +356,10 @@ class ResourceQuerySession:
             self._hierarchy_session = kwargs['hierarchy_session']
         else:
             self._hierarchy_session = None
+        if 'query_session' in kwargs:
+            self._query_session = kwargs['query_session']
+        else:
+            self._query_session = None
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
