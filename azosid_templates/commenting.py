@@ -68,7 +68,6 @@ class CommentQuerySession:
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name}.${object_name}'
         self.use_federated_${cat_name_under}_view()
-        self.use_comparative_${object_name_under}_view()
         self._unauth_${cat_name_under}_ids = None
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):

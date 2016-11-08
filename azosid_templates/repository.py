@@ -188,7 +188,6 @@ class CompositionQuerySession:
         self._qualifier_id = provider_session.get_repository_id()
         self._id_namespace = 'repository.Composition'
         self.use_federated_repository_view()
-        self.use_comparative_composition_view()
         self._unauth_repository_ids = None
 
     def _get_unauth_repository_ids(self, repository_id):
