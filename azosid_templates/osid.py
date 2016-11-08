@@ -185,7 +185,14 @@ class OsidSession:
         self._catalog_view = FEDERATED
 
     def _can(self, func_name, qualifier_id=None):
-        \"\"\"Tests if the named function is authorized with agent and qualifier.\"\"\"
+        \"\"\"Tests if the named function is authorized with agent and qualifier.
+
+        Also, caches authz's in a dict.  It is expected that this will not grow to big, as
+        there are typically only a small number of qualifier + function combinations to 
+        store for the agent.  However, if this becomes an issue, we can switch to something
+        like cachetools.
+
+        \"\"\"
         function_id = Id(
             identifier=func_name,
             namespace=self._id_namespace,
