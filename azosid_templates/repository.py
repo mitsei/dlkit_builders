@@ -126,6 +126,7 @@ class CompositionLookupSession:
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
         self.use_comparative_${object_name_under}_view()
+        self._unauth_${cat_name_under}_ids = None
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
         if self._can('lookup', ${cat_name_under}_id):
@@ -142,10 +143,11 @@ class CompositionLookupSession:
             # Should probably try to return empty result instead
             # perhaps through a query.match_any(match = None)?
             raise PermissionDenied()
-        for ${cat_name_under}_id in self._get_unauth_${cat_name_under}_ids(self._qualifier_id):
+        if self._unauth_${cat_name_under}_ids is None:
+            self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
+        for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
             query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
-        return self._query_session.get_${object_name_under_plural}_by_query(query)
-"""
+        return self._query_session.get_${object_name_under_plural}_by_query(query)"""
 
     use_active_composition_view_template = """
         # Implemented from azosid template for -
@@ -186,6 +188,8 @@ class CompositionQuerySession:
         self._qualifier_id = provider_session.get_repository_id()
         self._id_namespace = 'repository.Composition'
         self.use_federated_repository_view()
+        self.use_comparative_composition_view()
+        self._unauth_repository_ids = None
 
     def _get_unauth_repository_ids(self, repository_id):
         if self._can('lookup', repository_id):
@@ -202,17 +206,17 @@ class CompositionQuerySession:
             # Should probably try to return empty result instead
             # perhaps through a query.match_any(match = None)?
             raise PermissionDenied()
-        for repository_id in self._get_unauth_repository_ids(self._qualifier_id):
-            query.match_repository_id(repository_id, match=False)
-        return self._query_session.get_compositions_by_query(query)
+        if self._unauth_repository_ids is None:
+            self._unauth_repository_ids = self._get_unauth_repository_ids(self._qualifier_id)
+        for repository_id in self._unauth_repository_ids:
+            query.match_repository_id(repository, match=False)
+        return self._query_session.get_repositories_by_query(query)
 
     class CompositionQueryWrapper(QueryWrapper):
         \"\"\"Wrapper for CompositionQueries to override match_repository_id method\"\"\"
 
         def match_repository_id(self, repository_id, match=True):
-            self.cat_id_args_list.append({'repository_id': repository_id, 'match': match})
-
-"""
+            self.cat_id_args_list.append({'repository_id': repository_id, 'match': match})"""
 
 
 class CompositionSearchSession:

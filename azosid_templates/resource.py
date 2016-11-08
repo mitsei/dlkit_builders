@@ -201,6 +201,7 @@ class ResourceLookupSession:
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
         self.use_comparative_${object_name_under}_view()
+        self._unauth_${cat_name_under}_ids = None
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
         if self._can('lookup', ${cat_name_under}_id):
@@ -217,10 +218,11 @@ class ResourceLookupSession:
             # Should probably try to return empty result instead
             # perhaps through a query.match_any(match = None)?
             raise PermissionDenied()
-        for ${cat_name_under}_id in self._get_unauth_${cat_name_under}_ids(self._qualifier_id):
+        if self._unauth_${cat_name_under}_ids is None:
+            self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
+        for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
             query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
-        return self._query_session.get_${object_name_under_plural}_by_query(query)
-"""
+        return self._query_session.get_${object_name_under_plural}_by_query(query)"""
 
     get_bin_id_template = """
         # Implemented from azosid template for -
@@ -357,6 +359,8 @@ class ResourceQuerySession:
         self._qualifier_id = provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
+        self.use_comparative_${object_name_under}_view()
+        self._unauth_${cat_name_under}_ids = None
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
         if self._can('search', ${cat_name_under}_id):
@@ -373,16 +377,17 @@ class ResourceQuerySession:
             # Should probably try to return empty result instead
             # perhaps through a query.match_any(match = None)?
             raise PermissionDenied()
-        for ${cat_name_under}_id in self._get_unauth_${cat_name_under}_ids(self._qualifier_id):
-            query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
-        return self._provider_session.get_${object_name_under_plural}_by_query(query)
+        if self._unauth_${cat_name_under}_ids is None:
+            self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
+        for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
+            query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        return self._query_session.get_${object_name_under_plural}_by_query(query)
 
     class ${object_name}QueryWrapper(QueryWrapper):
         \"\"\"Wrapper for ${object_name}Queries to override match_${cat_name_under}_id method\"\"\"
 
         def match_${cat_name_under}_id(self, ${cat_name_under}_id, match=True):
-            self.cat_id_args_list.append({'${cat_name_under}_id': ${cat_name_under}_id, 'match': match})
-"""
+            self.cat_id_args_list.append({'${cat_name_under}_id': ${cat_name_under}_id, 'match': match})"""
 
     can_search_resources_template = """
         # Implemented from azosid template for -
