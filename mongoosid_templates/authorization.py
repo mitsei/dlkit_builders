@@ -7,6 +7,8 @@ class AuthorizationSession:
         'from ..osid.sessions import OsidSession',
         'from ..utilities import MongoClientValidated',
         'from . import objects',
+        'import memcache',
+        "mc = memcache.Client(['127.0.0.1:11211'], debug=0)"
     ]
 
     init = """
@@ -25,25 +27,31 @@ class AuthorizationSession:
         self._kwargs = kwargs
 
     def _get_qualifier_idstrs(self, qualifier_id):
-        try:
-            authority = qualifier_id.get_identifier_namespace().split('.')[0].upper()
-            identifier = qualifier_id.get_identifier_namespace().split('.')[1].upper()
-        except:
-            return [str(qualifier_id)]
-        root_qualifier_id = Id(
-            authority=qualifier_id.get_authority(),
-            namespace=qualifier_id.get_identifier_namespace(),
-            identifier='ROOT')
-        if qualifier_id.get_identifier() == 'ROOT':
-            return [str(root_qualifier_id)]
-        hierarchy_mgr = self._get_provider_manager('HIERARCHY') # local=True ???
-        hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
-            Id(authority=authority,
-               namespace='CATALOG',
-               identifier=identifier),
-             proxy=self._proxy)
-        node = hierarchy_session.get_nodes(qualifier_id, 10, 0, False)
-        return self._get_ancestor_idstrs(node) + [str(root_qualifier_id)]
+        key = 'hierarchy-qualifier-ids-{0}'.format(str(qualifier_id))
+        if mc.get(key) is None:
+            try:
+                authority = qualifier_id.get_identifier_namespace().split('.')[0].upper()
+                identifier = qualifier_id.get_identifier_namespace().split('.')[1].upper()
+            except:
+                return [str(qualifier_id)]
+            root_qualifier_id = Id(
+                authority=qualifier_id.get_authority(),
+                namespace=qualifier_id.get_identifier_namespace(),
+                identifier='ROOT')
+            if qualifier_id.get_identifier() == 'ROOT':
+                return [str(root_qualifier_id)]
+            hierarchy_mgr = self._get_provider_manager('HIERARCHY') # local=True ???
+            hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+                Id(authority=authority,
+                   namespace='CATALOG',
+                   identifier=identifier),
+                 proxy=self._proxy)
+            node = hierarchy_session.get_nodes(qualifier_id, 10, 0, False)
+            qualifier_ids = self._get_ancestor_idstrs(node) + [str(root_qualifier_id)]
+            mc.set(key, qualifier_ids, time=600)
+        else:
+            qualifier_ids = mc.get(key)
+        return qualifier_ids
 
     def _get_ancestor_idstrs(self, node):
         node_list = [str(node.get_id())]
