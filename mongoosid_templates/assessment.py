@@ -1674,7 +1674,7 @@ class AssessmentTakenQuery:
         self._add_match('takingAgentId', str(agent_id), bool(match))"""
 
     match_assessment_offered_id = """
-        self._add_match('assessmentOfferedId', str(assessment_id), match)"""
+        self._add_match('assessmentOfferedId', str(assessment_offered_id), match)"""
 
 
 class AssessmentQuery:
