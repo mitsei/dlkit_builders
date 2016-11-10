@@ -6,9 +6,7 @@ class AuthorizationSession:
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
         'from ..utilities import MongoClientValidated',
-        'from . import objects',
-        'import memcache',
-        "mc = memcache.Client(['127.0.0.1:11211'], debug=0)"
+        'from . import objects'
     ]
 
     init = """
@@ -27,8 +25,7 @@ class AuthorizationSession:
         self._kwargs = kwargs
 
     def _get_qualifier_idstrs(self, qualifier_id):
-        key = 'hierarchy-qualifier-ids-{0}'.format(str(qualifier_id))
-        if mc.get(key) is None:
+        def generate_qualifier_ids():
             try:
                 authority = qualifier_id.get_identifier_namespace().split('.')[0].upper()
                 identifier = qualifier_id.get_identifier_namespace().split('.')[1].upper()
@@ -45,12 +42,32 @@ class AuthorizationSession:
                 Id(authority=authority,
                    namespace='CATALOG',
                    identifier=identifier),
-                 proxy=self._proxy)
+                   proxy=self._proxy)
             node = hierarchy_session.get_nodes(qualifier_id, 10, 0, False)
-            qualifier_ids = self._get_ancestor_idstrs(node) + [str(root_qualifier_id)]
-            mc.set(key, qualifier_ids, time=600)
+            return self._get_ancestor_idstrs(node) + [str(root_qualifier_id)]
+        use_caching = False
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
+            if config.get_value_by_parameter(parameter_id).get_boolean_value():
+                use_caching = True
+            else:
+                pass
+        except (AttributeError, KeyError, errors.NotFound):
+            pass
+        if use_caching:
+            import memcache
+            mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+
+            key = 'hierarchy-qualifier-ids-{0}'.format(str(qualifier_id))
+
+            if mc.get(key) is None:
+                qualifier_ids = generate_qualifier_ids()
+                mc.set(key, qualifier_ids, time=600)
+            else:
+                qualifier_ids = mc.get(key)
         else:
-            qualifier_ids = mc.get(key)
+            qualifier_ids = generate_qualifier_ids()
         return qualifier_ids
 
     def _get_ancestor_idstrs(self, node):
