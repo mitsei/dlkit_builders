@@ -1412,6 +1412,9 @@ class AssessmentOfferedQuery:
         self._match_minimum_date_time('${var_name_mixed}', ${arg0_name}, match)
         self._match_maximum_date_time('${var_name_mixed}', ${arg1_name}, match)"""
 
+    match_assessment_id = """
+        self._add_match('assessmentId', str(assessment_id), match)"""
+
 class AssessmentTaken:
     
     import_statements = [
@@ -1669,6 +1672,9 @@ class AssessmentTakenForm:
 class AssessmentTakenQuery:
     match_taking_agent_id = """
         self._add_match('takingAgentId', str(agent_id), bool(match))"""
+
+    match_assessment_offered_id = """
+        self._add_match('assessmentOfferedId', str(assessment_id), match)"""
 
 
 class AssessmentQuery:
