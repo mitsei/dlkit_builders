@@ -809,6 +809,10 @@ class Builder(Utilities):
         from mongobuilder import MongoBuilder
         MongoBuilder(build_dir=self.build_dir).make()
 
+    def stub(self):
+        from stubbuilder import StubBuilder
+        StubBuilder(build_dir=self.build_dir).make()
+
     def mdata(self):
         from mdatabuilder import MDataBuilder
         MDataBuilder(build_dir=self.build_dir).make()
@@ -842,6 +846,7 @@ if __name__ == '__main__':
         print "  #mdata: build the metadata files"
         print "  authz: build the authz_adapter impl"
         print "  mongo: build the mongo OSID impl"
+        print "  stub: build developer stub impl"
         print "  services: build the dlkit convenience service impls"
         print "  tests: build the tests"
         print "  --all: build all of the above"
@@ -870,6 +875,7 @@ if __name__ == '__main__':
                     'abc',
                     'mdata',
                     'mongo',
+                    'stub',
                     'authz',
                     'services',
                     'tests']
@@ -928,6 +934,9 @@ if __name__ == '__main__':
                 non_test_build = True
             if 'authz' in sys.argv:
                 builder.authz()
+                non_test_build = True
+            if 'stub' in sys.argv:
+                builder.stub()
                 non_test_build = True
             if 'tests' in sys.argv:
                 builder.tests(non_test_build)

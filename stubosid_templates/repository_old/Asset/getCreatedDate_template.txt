@@ -1,0 +1,3 @@
+        # Implemented from template for repository.Asset.getCreateDate
+        from calendaring_kit.dj_calendaring import DateTime
+        return DateTime(self.myModel.${varName})

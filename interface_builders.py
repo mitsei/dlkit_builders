@@ -91,7 +91,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                                            inherit_category + '.' + i['name'] +
                                            unknown_module_protection)
 
-        if self._in(['mongo', 'services', 'authz', 'tests']):
+        if self._in(['mongo', 'stub', 'services', 'authz', 'tests']):
             # Check to see if there are any additional inheritances required
             # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
             # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
@@ -328,7 +328,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             # Check if a directory already exists for the abc osid.  If not,
             # create one and initialize as a python package.
             self._make_dir(self._app_name(), python=True)
-            if self._in(['abc', 'mongo', 'authz', 'tests', 'doc_source', 'doc_dlkit']):
+            if self._in(['abc', 'mongo', 'stub', 'authz', 'tests', 'doc_source', 'doc_dlkit']):
                 self._make_dir(self._abc_pkg_path(), python=True)
 
     def _make_init_methods(self, interface):

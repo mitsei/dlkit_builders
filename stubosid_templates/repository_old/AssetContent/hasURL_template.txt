@@ -1,0 +1,2 @@
+        # Implemented from template for osid.repository.AssetContent.hasURL
+        return bool(self.myModel.${modelVariable})
