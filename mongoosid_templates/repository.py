@@ -59,6 +59,313 @@ class RepositoryProxyManager:
         ##
         return sessions.AssetCompositionDesignSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member"""
 
+
+class AssetLookupSession:
+
+    additional_methods = """
+    def get_asset_content(self, asset_content_id):
+        collection = MongoClientValidated('repository',
+                                          collection='Asset',
+                                          runtime=self._runtime)
+        asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
+        result = collection.find_one(
+            dict({'assetContents._id': {'$in': [asset_content_identifier]}},
+                 **self._view_filter()))
+        # if a match is not found, NotFound exception will be thrown by find_one, so
+        # the below should always work
+        asset_content_map = [ac for ac in result['assetContents'] if ac['_id'] == asset_content_identifier][0]
+        return objects.AssetContent(osid_object_map=asset_content_map, runtime=self._runtime, proxy=self._proxy)
+
+
+class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
+    \"\"\"This session defines methods for retrieving asset contents.
+
+    An ``AssetContent`` represents an element of content stored associated
+    with an ``Asset``.
+
+    This lookup session defines several views:
+
+      * comparative view: elements may be silently omitted or re-ordered
+      * plenary view: provides a complete result set or is an error
+        condition
+      * isolated repository view: All asset content methods in this session
+        operate, retrieve and pertain to asset contents defined explicitly in
+        the current repository. Using an isolated view is useful for
+        managing ``AssetContents`` with the ``AssetAdminSession.``
+      * federated repository view: All asset content methods in this session
+        operate, retrieve and pertain to all asset contents defined in this
+        repository and any other asset contents implicitly available in this
+        repository through repository inheritence.
+
+
+    The methods ``use_federated_repository_view()`` and
+    ``use_isolated_repository_view()`` behave as a radio group and one
+    should be selected before invoking any lookup methods.
+
+    AssetContents may have an additional records indicated by their respective
+    record types. The record may not be accessed through a cast of the
+    ``AssetContent``.
+
+    \"\"\"
+
+    def get_repository_id(self):
+        \"\"\"Gets the ``Repository``  ``Id`` associated with this session.
+
+        :return: the ``Repository Id`` associated with this session
+        :rtype: ``osid.id.Id``
+
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    repository_id = property(fget=get_repository_id)
+
+    def get_repository(self):
+        \"\"\"Gets the ``Repository`` associated with this session.
+
+        :return: the ``Repository`` associated with this session
+        :rtype: ``osid.repository.Repository``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    repository = property(fget=get_repository)
+
+    def can_lookup_asset_contents(self):
+        \"\"\"Tests if this user can perform ``Asset`` lookups.
+
+        A return of true does not guarantee successful authorization. A
+        return of false indicates that it is known all methods in this
+        session will result in a ``PermissionDenied``. This is intended
+        as a hint to an application that may opt not to offer lookup
+        operations.
+
+        :return: ``false`` if lookup methods are not authorized, ``true`` otherwise
+        :rtype: ``boolean``
+
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True
+
+    def use_comparative_asset_content_view(self):
+        \"\"\"The returns from the lookup methods may omit or translate elements based on this session, such as authorization, and not result in an error.
+
+        This view is used when greater interoperability is desired at
+        the expense of precision.
+
+
+
+        *compliance: mandatory -- This method is must be implemented.*
+
+        \"\"\"
+        pass
+
+    def use_plenary_asset_content_view(self):
+        \"\"\"A complete view of the ``Asset`` returns is desired.
+
+        Methods will return what is requested or result in an error.
+        This view is used when greater precision is desired at the
+        expense of interoperability.
+
+
+
+        *compliance: mandatory -- This method is must be implemented.*
+
+        \"\"\"
+        pass
+
+    def use_federated_repository_view(self):
+        \"\"\"Federates the view for methods in this session.
+
+        A federated view will include assets in repositories which are
+        children of this repository in the repository hierarchy.
+
+
+
+        *compliance: mandatory -- This method is must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    def use_isolated_repository_view(self):
+        \"\"\"Isolates the view for methods in this session.
+
+        An isolated view restricts lookups to this repository only.
+
+
+
+        *compliance: mandatory -- This method is must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    @utilities.arguments_not_none
+    def get_asset_content(self, asset_content_id):
+        \"\"\"Gets the ``AssetContent`` specified by its ``Id``.
+
+        In plenary mode, the exact ``Id`` is found or a ``NotFound``
+        results. Otherwise, the returned ``AssetContent`` may have a different
+        ``Id`` than requested, such as the case where a duplicate ``Id``
+        was assigned to an ``AssetContent`` and retained for compatibility.
+
+        :param asset_content_id: the ``Id`` of the ``AssetContent`` to retrieve
+        :type asset_content_id: ``osid.id.Id``
+        :return: the returned ``AssetContent``
+        :rtype: ``osid.repository.Asset``
+        :raise: ``NotFound`` -- no ``AssetContent`` found with the given ``Id``
+        :raise: ``NullArgument`` -- ``asset_content_id`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    @utilities.arguments_not_none
+    def get_asset_contents_by_ids(self, asset_content_ids):
+        \"\"\"Gets an ``AssetList`` corresponding to the given ``IdList``.
+
+        In plenary mode, the returned list contains all of the asset contents
+        specified in the ``Id`` list, in the order of the list,
+        including duplicates, or an error results if an ``Id`` in the
+        supplied list is not found or inaccessible. Otherwise,
+        inaccessible ``AssetContnts`` may be omitted from the list and may
+        present the elements in any order including returning a unique
+        set.
+
+        :param asset_content_ids: the list of ``Ids`` to retrieve
+        :type asset_content_ids: ``osid.id.IdList``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NotFound`` -- an ``Id`` was not found
+        :raise: ``NullArgument`` -- ``asset_ids`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    @utilities.arguments_not_none
+    def get_asset_contents_by_genus_type(self, asset_content_genus_type):
+        \"\"\"Gets an ``AssetContentList`` corresponding to the given asset content genus ``Type`` which does not include asset contents of types derived from the specified ``Type``.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_content_genus_type: an asset content genus type
+        :type asset_content_genus_type: ``osid.type.Type``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_content_genus_type`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    @utilities.arguments_not_none
+    def get_asset_contents_by_parent_genus_type(self, asset_content_genus_type):
+        \"\"\"Gets an ``AssetContentList`` corresponding to the given asset content genus ``Type`` and include any additional asset contents with genus types derived from the specified ``Type``.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_content_genus_type: an asset content genus type
+        :type asset_content_genus_type: ``osid.type.Type``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_content_genus_type`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    @utilities.arguments_not_none
+    def get_asset_contents_by_record_type(self, asset_content_record_type):
+        \"\"\"Gets an ``AssetContentList`` containing the given asset record ``Type``.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_content_record_type: an asset content record type
+        :type asset_content_record_type: ``osid.type.Type``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_content_record_type`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    @utilities.arguments_not_none
+    def get_asset_contents_for_asset(self, asset_id):
+        \"\"\"Gets an ``AssetList`` from the given Asset.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_id: an asset ``Id``
+        :type asset_id: ``osid.id.Id``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_id`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()
+
+    @utilities.arguments_not_none
+    def get_asset_contents_by_genus_type_for_asset(self, asset_content_genus_type, asset_id):
+        \"\"\"Gets an ``AssetContentList`` from the given GenusType and Asset Id.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_content_genus_type: an an asset content genus type
+        :type asset_id: ``osid.type.Type``
+        :param asset_id: an asset ``Id``
+        :type asset_id: ``osid.id.Id``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_content_genus_type`` or ``asset_id`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        raise errors.Unimplemented()"""
+
+
 class AssetAdminSession:
 
     import_statements_pattern = [
@@ -944,21 +1251,6 @@ class CompositionRepositorySession:
                 id_list.append(Id(idstr))
         return IdList(id_list)"""
 
-class AssetLookupSession:
-
-    additional_methods = """
-    def get_asset_content(self, asset_content_id):
-        collection = MongoClientValidated('repository',
-                                          collection='Asset',
-                                          runtime=self._runtime)
-        asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
-        result = collection.find_one(
-            dict({'assetContents._id': {'$in': [asset_content_identifier]}},
-                 **self._view_filter()))
-        # if a match is not found, NotFound exception will be thrown by find_one, so
-        # the below should always work
-        asset_content_map = [ac for ac in result['assetContents'] if ac['_id'] == asset_content_identifier][0]
-        return objects.AssetContent(osid_object_map=asset_content_map, runtime=self._runtime, proxy=self._proxy)"""
 
 class AssetQuerySession:
     additional_methods = """

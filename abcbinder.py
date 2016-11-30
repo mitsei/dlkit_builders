@@ -26,8 +26,13 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
         if interface['shortname'] in ['Id', 'Type']:
             additional_methods += eq_methods(interface['shortname'])
             additional_methods += str_methods()
-
         return additional_methods
+
+    def additional_classes(self, interface):
+        additional_classes = ''
+        if interface['shortname'] == 'AssetLookupSession':
+            additional_classes += asset_content_lookup_session()
+        return additional_classes
 
     def _get_method_args(self, method, interface):
         args = ['self']
@@ -73,11 +78,12 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
-        return '{0}\n{1}\n{2}__metaclass__ = abc.ABCMeta\n\n{3}\n{4}\n\n\n'.format(self.class_sig(interface, inheritance),
+        return '{0}\n{1}\n{2}__metaclass__ = abc.ABCMeta\n\n{3}\n{4}{5}\n\n\n'.format(self.class_sig(interface, inheritance),
                                                                                    self.class_doc(interface),
                                                                                    self._ind,
                                                                                    self._additional_methods(interface),
-                                                                                   self.make_methods(interface))
+                                                                                   self.make_methods(interface),
+                                                                                   self.additional_classes(interface))
 
     def module_header(self, module):
         return ('\"\"\"Implementations of ' + self.package['name'] +
@@ -151,3 +157,305 @@ def str_methods():
         return string.replace("%40", "@").replace("%3A", ":").replace("%25", "%")
 
 """)
+
+
+def asset_content_lookup_session():
+    return (
+"""
+
+
+class AssetContentLookupSession:
+    \"\"\"This session defines methods for retrieving asset contents.
+
+    An ``AssetContent`` represents an element of content stored associated
+    with an ``Asset``.
+
+    This lookup session defines several views:
+
+      * comparative view: elements may be silently omitted or re-ordered
+      * plenary view: provides a complete result set or is an error
+        condition
+      * isolated repository view: All asset content methods in this session
+        operate, retrieve and pertain to asset contents defined explicitly in
+        the current repository. Using an isolated view is useful for
+        managing ``AssetContents`` with the ``AssetAdminSession.``
+      * federated repository view: All asset content methods in this session
+        operate, retrieve and pertain to all asset contents defined in this
+        repository and any other asset contents implicitly available in this
+        repository through repository inheritence.
+
+
+    The methods ``use_federated_repository_view()`` and
+    ``use_isolated_repository_view()`` behave as a radio group and one
+    should be selected before invoking any lookup methods.
+
+    AssetContents may have an additional records indicated by their respective
+    record types. The record may not be accessed through a cast of the
+    ``AssetContent``.
+
+    \"\"\"
+    __metaclass__ = abc.ABCMeta
+
+
+    @abc.abstractmethod
+    def get_repository_id(self):
+        \"\"\"Gets the ``Repository``  ``Id`` associated with this session.
+
+        :return: the ``Repository Id`` associated with this session
+        :rtype: ``osid.id.Id``
+
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # osid.id.Id
+
+    repository_id = property(fget=get_repository_id)
+
+    @abc.abstractmethod
+    def get_repository(self):
+        \"\"\"Gets the ``Repository`` associated with this session.
+
+        :return: the ``Repository`` associated with this session
+        :rtype: ``osid.repository.Repository``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # osid.repository.Repository
+
+    repository = property(fget=get_repository)
+
+    @abc.abstractmethod
+    def can_lookup_asset_contents(self):
+        \"\"\"Tests if this user can perform ``Asset`` lookups.
+
+        A return of true does not guarantee successful authorization. A
+        return of false indicates that it is known all methods in this
+        session will result in a ``PermissionDenied``. This is intended
+        as a hint to an application that may opt not to offer lookup
+        operations.
+
+        :return: ``false`` if lookup methods are not authorized, ``true`` otherwise
+        :rtype: ``boolean``
+
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # boolean
+
+    @abc.abstractmethod
+    def use_comparative_asset_content_view(self):
+        \"\"\"The returns from the lookup methods may omit or translate elements based on this session, such as authorization, and not result in an error.
+
+        This view is used when greater interoperability is desired at
+        the expense of precision.
+
+
+
+        *compliance: mandatory -- This method is must be implemented.*
+
+        \"\"\"
+        pass
+
+    @abc.abstractmethod
+    def use_plenary_asset_content_view(self):
+        \"\"\"A complete view of the ``Asset`` returns is desired.
+
+        Methods will return what is requested or result in an error.
+        This view is used when greater precision is desired at the
+        expense of interoperability.
+
+
+
+        *compliance: mandatory -- This method is must be implemented.*
+
+        \"\"\"
+        pass
+
+    @abc.abstractmethod
+    def use_federated_repository_view(self):
+        \"\"\"Federates the view for methods in this session.
+
+        A federated view will include assets in repositories which are
+        children of this repository in the repository hierarchy.
+
+
+
+        *compliance: mandatory -- This method is must be implemented.*
+
+        \"\"\"
+        pass
+
+    @abc.abstractmethod
+    def use_isolated_repository_view(self):
+        \"\"\"Isolates the view for methods in this session.
+
+        An isolated view restricts lookups to this repository only.
+
+
+
+        *compliance: mandatory -- This method is must be implemented.*
+
+        \"\"\"
+        pass
+
+    @abc.abstractmethod
+    def get_asset_content(self, asset_content_id):
+        \"\"\"Gets the ``AssetContent`` specified by its ``Id``.
+
+        In plenary mode, the exact ``Id`` is found or a ``NotFound``
+        results. Otherwise, the returned ``AssetContent`` may have a different
+        ``Id`` than requested, such as the case where a duplicate ``Id``
+        was assigned to an ``AssetContent`` and retained for compatibility.
+
+        :param asset_content_id: the ``Id`` of the ``AssetContent`` to retrieve
+        :type asset_content_id: ``osid.id.Id``
+        :return: the returned ``AssetContent``
+        :rtype: ``osid.repository.Asset``
+        :raise: ``NotFound`` -- no ``AssetContent`` found with the given ``Id``
+        :raise: ``NullArgument`` -- ``asset_content_id`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # osid.repository.AssetContent
+
+    @abc.abstractmethod
+    def get_asset_contents_by_ids(self, asset_content_ids):
+        \"\"\"Gets an ``AssetList`` corresponding to the given ``IdList``.
+
+        In plenary mode, the returned list contains all of the asset contents
+        specified in the ``Id`` list, in the order of the list,
+        including duplicates, or an error results if an ``Id`` in the
+        supplied list is not found or inaccessible. Otherwise,
+        inaccessible ``AssetContnts`` may be omitted from the list and may
+        present the elements in any order including returning a unique
+        set.
+
+        :param asset_content_ids: the list of ``Ids`` to retrieve
+        :type asset_content_ids: ``osid.id.IdList``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NotFound`` -- an ``Id`` was not found
+        :raise: ``NullArgument`` -- ``asset_ids`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # osid.repository.AssetContentList
+
+    @abc.abstractmethod
+    def get_asset_contents_by_genus_type(self, asset_content_genus_type):
+        \"\"\"Gets an ``AssetContentList`` corresponding to the given asset content genus ``Type`` which does not include asset contents of types derived from the specified ``Type``.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_content_genus_type: an asset content genus type
+        :type asset_content_genus_type: ``osid.type.Type``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_content_genus_type`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # osid.repository.AssetContentList
+
+    @abc.abstractmethod
+    def get_asset_contents_by_parent_genus_type(self, asset_content_genus_type):
+        \"\"\"Gets an ``AssetContentList`` corresponding to the given asset content genus ``Type`` and include any additional asset contents with genus types derived from the specified ``Type``.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_content_genus_type: an asset content genus type
+        :type asset_content_genus_type: ``osid.type.Type``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_content_genus_type`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # osid.repository.AssetContentList
+
+    @abc.abstractmethod
+    def get_asset_contents_by_record_type(self, asset_content_record_type):
+        \"\"\"Gets an ``AssetContentList`` containing the given asset record ``Type``.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_content_record_type: an asset content record type
+        :type asset_content_record_type: ``osid.type.Type``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_content_record_type`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # osid.repository.AssetContentList
+
+    @abc.abstractmethod
+    def get_asset_contents_for_asset(self, asset_id):
+        \"\"\"Gets an ``AssetList`` from the given Asset.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_id: an asset ``Id``
+        :type asset_id: ``osid.id.Id``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_id`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # osid.repository.AssetContentList
+
+    @abc.abstractmethod
+    def get_asset_contents_by_genus_type_for_asset(self, asset_content_genus_type, asset_id):
+        \"\"\"Gets an ``AssetContentList`` from the given GenusType and Asset Id.
+
+        In plenary mode, the returned list contains all known asset contents or
+        an error results. Otherwise, the returned list may contain only
+        those asset contents that are accessible through this session.
+
+        :param asset_content_genus_type: an an asset content genus type
+        :type asset_id: ``osid.type.Type``
+        :param asset_id: an asset ``Id``
+        :type asset_id: ``osid.id.Id``
+        :return: the returned ``AssetContent list``
+        :rtype: ``osid.repository.AssetContentList``
+        :raise: ``NullArgument`` -- ``asset_content_genus_type`` or ``asset_id`` is ``null``
+        :raise: ``OperationFailed`` -- unable to complete request
+        :raise: ``PermissionDenied`` -- authorization failure
+
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return # osid.repository.AssetContentList"""
+)
