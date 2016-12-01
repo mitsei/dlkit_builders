@@ -378,7 +378,6 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         self._use_isolated_catalog_view()
         self._provider_session.use_isolated_repository_view()
 
-    @utilities.arguments_not_none
     def get_asset_content(self, asset_content_id):
         if self._can('lookup'):
             return self._provider_session.get_asset_content(asset_content_id)
@@ -393,7 +392,6 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
             else:
                 raise NotFound()
 
-    @utilities.arguments_not_none
     def get_asset_contents_by_ids(self, asset_content_ids):
         if self._can('lookup'):
             return self._provider_session.get_asset_contents_by_ids(asset_content_ids)
@@ -405,7 +403,6 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
                 query.match_id(asset_content_id, match=True)
             return self._try_harder(query)
 
-    @utilities.arguments_not_none
     def get_asset_contents_by_genus_type(self, asset_content_genus_type):
         if self._can('lookup'):
             return self._provider_session.get_asset_contents_by_genus_type(asset_content_genus_type)
@@ -416,8 +413,6 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
             query.match_genus_type(asset_content_genus_type, match=True)
             return self._try_harder(query)
 
-
-    @utilities.arguments_not_none
     def get_asset_contents_by_parent_genus_type(self, asset_content_genus_type):
         if self._can('lookup'):
             return self._provider_session.get_asset_contents_by_parent_genus_type(asset_content_genus_type)
@@ -428,7 +423,6 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
             query.match_parent_genus_type(asset_content_genus_type, match=True)
             return self._try_harder(query)
 
-    @utilities.arguments_not_none
     def get_asset_contents_by_record_type(self, asset_content_record_type):
         if self._can('lookup'):
             return self._provider_session.get_asset_contents_by_record_type(asset_content_record_type)
@@ -439,15 +433,12 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
             query.match_record_type(asset_content_record_type, match=True)
             return self._try_harder(query)
 
-
-    @utilities.arguments_not_none
     def get_asset_contents_for_asset(self, asset_id):
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
             return self._provider_session.get_asset_contents_for_asset(asset_id)
 
-    @utilities.arguments_not_none
     def get_asset_contents_by_genus_type_for_asset(self, asset_content_genus_type, asset_id):
         if not self._can('lookup'):
             raise PermissionDenied()
