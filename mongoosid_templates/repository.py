@@ -33,7 +33,23 @@ class RepositoryManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return sessions.AssetCompositionDesignSession(repository_id, runtime=self._runtime) # pylint: disable=no-member"""
+        return sessions.AssetCompositionDesignSession(repository_id, runtime=self._runtime) # pylint: disable=no-member
+
+    def get_asset_content_lookup_session(self):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        if not self.supports_asset_lookup():  # should be asset_content_lookup
+            raise errors.Unimplemented()
+        return sessions.AssetContentLookupSession(runtime=self._runtime) # pylint: disable=no-member
+
+    @utilities.arguments_not_none
+    def get_asset_content_lookup_session_for_repository(self, repository_id):
+        # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
+        if not self.supports_asset_lookup():  # should be asset_content_lookup
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        return sessions.AssetContentLookupSession(repository_id, runtime=self._runtime) # pylint: disable=no-member"""
 
 class RepositoryProxyManager:
     # This is here temporarily until Tom adds missing methods to RepositoryProxyManager
@@ -63,18 +79,18 @@ class RepositoryProxyManager:
 class AssetLookupSession:
 
     additional_methods = """
-    def get_asset_content(self, asset_content_id):
-        collection = MongoClientValidated('repository',
-                                          collection='Asset',
-                                          runtime=self._runtime)
-        asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
-        result = collection.find_one(
-            dict({'assetContents._id': {'$in': [asset_content_identifier]}},
-                 **self._view_filter()))
-        # if a match is not found, NotFound exception will be thrown by find_one, so
-        # the below should always work
-        asset_content_map = [ac for ac in result['assetContents'] if ac['_id'] == asset_content_identifier][0]
-        return objects.AssetContent(osid_object_map=asset_content_map, runtime=self._runtime, proxy=self._proxy)
+    # def get_asset_content(self, asset_content_id):
+    #     collection = MongoClientValidated('repository',
+    #                                       collection='Asset',
+    #                                       runtime=self._runtime)
+    #     asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
+    #     result = collection.find_one(
+    #         dict({'assetContents._id': {'$in': [asset_content_identifier]}},
+    #              **self._view_filter()))
+    #     # if a match is not found, NotFound exception will be thrown by find_one, so
+    #     # the below should always work
+    #     asset_content_map = [ac for ac in result['assetContents'] if ac['_id'] == asset_content_identifier][0]
+    #     return objects.AssetContent(osid_object_map=asset_content_map, runtime=self._runtime, proxy=self._proxy)
 
 
 class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
@@ -118,7 +134,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        raise errors.Unimplemented()
+        return self._catalog_id
 
     repository_id = property(fget=get_repository_id)
 
@@ -133,7 +149,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        raise errors.Unimplemented()
+        return self._catalog
 
     repository = property(fget=get_repository)
 
@@ -168,7 +184,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method is must be implemented.*
 
         \"\"\"
-        pass
+        self._use_comparative_object_view()
 
     def use_plenary_asset_content_view(self):
         \"\"\"A complete view of the ``Asset`` returns is desired.
@@ -182,7 +198,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method is must be implemented.*
 
         \"\"\"
-        pass
+        self._use_plenary_object_view()
 
     def use_federated_repository_view(self):
         \"\"\"Federates the view for methods in this session.
@@ -195,7 +211,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method is must be implemented.*
 
         \"\"\"
-        raise errors.Unimplemented()
+        self._use_federated_catalog_view()
 
     def use_isolated_repository_view(self):
         \"\"\"Isolates the view for methods in this session.
@@ -207,7 +223,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method is must be implemented.*
 
         \"\"\"
-        raise errors.Unimplemented()
+        self._use_isolated_catalog_view()
 
     @utilities.arguments_not_none
     def get_asset_content(self, asset_content_id):
@@ -230,7 +246,17 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        raise errors.Unimplemented()
+        collection = MongoClientValidated('repository',
+                                          collection='Asset',
+                                          runtime=self._runtime)
+        asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
+        result = collection.find_one(
+            dict({'assetContents._id': {'$in': [asset_content_identifier]}},
+                 **self._view_filter()))
+        # if a match is not found, NotFound exception will be thrown by find_one, so
+        # the below should always work
+        asset_content_map = [ac for ac in result['assetContents'] if ac['_id'] == asset_content_identifier][0]
+        return objects.AssetContent(osid_object_map=asset_content_map, runtime=self._runtime, proxy=self._proxy)
 
     @utilities.arguments_not_none
     def get_asset_contents_by_ids(self, asset_content_ids):
@@ -256,7 +282,21 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        raise errors.Unimplemented()
+        collection = MongoClientValidated('repository',
+                                          collection='Asset',
+                                          runtime=self._runtime)
+        object_id_list = [ObjectId(self._get_id(i, 'repository').get_identifier()) for i in asset_content_ids]
+
+        result = collection.find_one(
+            dict({'assetContents._id': {'$in': object_id_list}},
+                 **self._view_filter()))
+        # if a match is not found, NotFound exception will be thrown by find_one, so
+        # the below should always work
+        asset_content_maps = [ac
+                              for ac in result['assetContents']
+                              for object_id in object_id_list
+                              if ac['_id'] == object_id]
+        return objects.AssetContentList(asset_content_maps, runtime=self._runtime, proxy=self._proxy)
 
     @utilities.arguments_not_none
     def get_asset_contents_by_genus_type(self, asset_content_genus_type):
@@ -277,7 +317,17 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        raise errors.Unimplemented()
+        collection = MongoClientValidated('repository',
+                                          collection='Asset',
+                                          runtime=self._runtime)
+        result = collection.find_one(
+            dict({'assetContents.genusTypeId': {'$in': [str(asset_content_genus_type)]}},
+                 **self._view_filter()))
+        # if a match is not found, NotFound exception will be thrown by find_one, so
+        # the below should always work
+        asset_content_maps = [ac for ac in result['assetContents'] if ac['genusTypeId'] == str(asset_content_genus_type)]
+        return objects.AssetContentList(asset_content_maps, runtime=self._runtime, proxy=self._proxy)
+
 
     @utilities.arguments_not_none
     def get_asset_contents_by_parent_genus_type(self, asset_content_genus_type):
@@ -340,7 +390,14 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        raise errors.Unimplemented()
+        collection = MongoClientValidated('repository',
+                                          collection='Asset',
+                                          runtime=self._runtime)
+        result = collection.find_one(
+            dict({'_id': ObjectId(self._get_id(asset_id, 'repository').get_identifier())},
+                 **self._view_filter()))
+        asset_content_maps = [ac for ac in result['assetContents']]
+        return objects.AssetContentList(asset_content_maps, runtime=self._runtime, proxy=self._proxy)
 
     @utilities.arguments_not_none
     def get_asset_contents_by_genus_type_for_asset(self, asset_content_genus_type, asset_id):
@@ -363,7 +420,14 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        raise errors.Unimplemented()"""
+        collection = MongoClientValidated('repository',
+                                          collection='Asset',
+                                          runtime=self._runtime)
+        result = collection.find_one(
+            dict({'_id': ObjectId(self._get_id(asset_id, 'repository').get_identifier())},
+                 **self._view_filter()))
+        asset_content_maps = [ac for ac in result['assetContents'] if ac['genusTypeId'] == str(asset_content_genus_type)]
+        return objects.AssetContentList(asset_content_maps, runtime=self._runtime, proxy=self._proxy)"""
 
 
 class AssetAdminSession:
