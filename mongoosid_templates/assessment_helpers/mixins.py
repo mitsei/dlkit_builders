@@ -10,7 +10,7 @@ from .objects import AssessmentSection, NULL_RESPONSE, UNANSWERED, QuestionList,
 from .assessment_utilities import get_level_delta_for_parts, get_provider_manager, get_default_part_map,\
     get_default_question_map, get_assessment_part_lookup_session, get_item_lookup_session
 from .objects import AssessmentSection
-from dlkit.mongo.utilities import MongoClientValidated
+from ..utilities import MongoClientValidated
 
 
 class PartSequenceSection(object):

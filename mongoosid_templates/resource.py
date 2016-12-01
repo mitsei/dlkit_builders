@@ -1587,7 +1587,7 @@ class ResourceSearch:
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-        'from dlkit.mongo.osid import searches as osid_searches',
+        'from ..osid import searches as osid_searches',
 		'from ..utilities import get_registry',
     ]
 

@@ -6,7 +6,7 @@ class ObjectiveRequisiteSession:
         'from . import objects',
         'from ..utilities import MongoClientValidated',
         'from bson.objectid import ObjectId',
-        'from dlkit.mongo.types import Relationship',
+        'from ..types import Relationship',
         'UPDATED = True',
         'CREATED = True'
     ]
@@ -71,7 +71,7 @@ class ObjectiveRequisiteAssignmentSession:
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-        'from dlkit.mongo.types import Relationship'
+        'from ..types import Relationship'
     ]
 
     init = """
@@ -346,7 +346,7 @@ class ObjectiveSequencingSession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-        'from dlkit.mongo.types import Relationship'
+        'from ..types import Relationship'
     ]
 
     init = """

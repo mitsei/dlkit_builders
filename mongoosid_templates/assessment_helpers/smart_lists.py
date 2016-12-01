@@ -2,7 +2,7 @@
 
 from .. import utilities
 from dlkit.abstract_osid.assessment import objects as abc_assessment_objects
-from dlkit.mongo.osid import objects as osid_objects
+from ..osid import objects as osid_objects
 from dlkit.primordium.osid.errors import BlockIteration
 
 class AssessmentTakenSectionList(abc_assessment_objects.AssessmentSectionList, osid_objects.OsidList):
