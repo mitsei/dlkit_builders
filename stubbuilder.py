@@ -203,7 +203,7 @@ class StubBuilder(InterfaceBuilder, BaseBuilder):
         self.make_osids()
 
     def module_header(self, module):
-        return ('\"\"\"Stub implementations of ' + self.package['name'] + ' ' + module + '.\"\"\"\n\n' +
+        return ('\"\"\"GStudio implementations of ' + self.package['name'] + ' ' + module + '.\"\"\"\n\n' +
                 '# pylint: disable=too-many-public-methods,too-few-public-methods\n' +
                 '#     Number of methods are defined in specification\n' +
                 '# pylint: disable=too-many-ancestors\n' +
