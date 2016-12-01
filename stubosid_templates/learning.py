@@ -216,8 +216,8 @@
 # 
 # 
 # 
-# class Activity:
-# 
+class Activity:
+
 #     import_statements_pattern = [
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from ..primitives import Id',

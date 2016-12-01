@@ -245,7 +245,14 @@ class BaseBuilder(Utilities):
                     import_str = 'from . import {0}'.format(i['pkg_name'])
 
                 if not self._is('services'):
-                    import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(
+                    # original absolute import generator:
+                    # import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(
+                    #                                                          self._app_name(package_name=i['pkg_name'])),
+                    #                                                          self._abc_pkg_name(package_name=i['pkg_name'],
+                    #                                                                             abc=False),
+                    #                                                          inherit_category)
+                    # new relative import generator:
+                    import_str = 'from ..{1} import {2} as {1}_{2}'.format(self._import_path(
                                                                              self._app_name(package_name=i['pkg_name'])),
                                                                              self._abc_pkg_name(package_name=i['pkg_name'],
                                                                                                 abc=False),
