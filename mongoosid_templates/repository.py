@@ -317,13 +317,14 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
                                           runtime=self._runtime)
         object_id_list = [ObjectId(self._get_id(i, 'repository').get_identifier()) for i in asset_content_ids]
 
-        result = collection.find_one(
+        results = collection.find(
             dict({'assetContents._id': {'$in': object_id_list}},
                  **self._view_filter()))
         # if a match is not found, NotFound exception will be thrown by find_one, so
         # the below should always work
         asset_content_maps = [ac
-                              for ac in result['assetContents']
+                              for asset in results
+                              for ac in asset['assetContents']
                               for object_id in object_id_list
                               if ac['_id'] == object_id]
         return objects.AssetContentList(asset_content_maps, runtime=self._runtime, proxy=self._proxy)
@@ -350,12 +351,15 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
         collection = MongoClientValidated('repository',
                                           collection='Asset',
                                           runtime=self._runtime)
-        result = collection.find_one(
+        results = collection.find(
             dict({'assetContents.genusTypeId': {'$in': [str(asset_content_genus_type)]}},
                  **self._view_filter()))
         # if a match is not found, NotFound exception will be thrown by find_one, so
         # the below should always work
-        asset_content_maps = [ac for ac in result['assetContents'] if ac['genusTypeId'] == str(asset_content_genus_type)]
+        asset_content_maps = [ac
+                              for asset in results
+                              for ac in asset['assetContents']
+                              if ac['genusTypeId'] == str(asset_content_genus_type)]
         return objects.AssetContentList(asset_content_maps, runtime=self._runtime, proxy=self._proxy)
 
 
