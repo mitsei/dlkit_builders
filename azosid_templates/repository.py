@@ -33,7 +33,24 @@ class RepositoryManager:
                 self._authz_session)
         except AttributeError:
             raise OperationFailed('AssetCompositionDesignSession not implemented in authz_adapter')
-"""
+
+    def get_asset_content_lookup_session(self, proxy):
+        \"\"\"Pass through to provider get_asset_content_lookup_session\"\"\"
+        try:
+            return getattr(sessions, 'AssetContentLookupSession')(
+                self._provider_manager.get_asset_content_lookup_session(),
+                self._authz_session)
+        except AttributeError:
+            raise OperationFailed('AssetContentLookupSession not implemented in authz_adapter')
+
+    def get_asset_content_lookup_session_for_repository(self, repository_id, proxy):
+        \"\"\"Pass through to provider get_asset_content_lookup_session_for_repository\"\"\"
+        try:
+            return getattr(sessions, 'AssetContentLookupSession')(
+                self._provider_manager.get_asset_content_lookup_session_for_repository(repository_id),
+                self._authz_session)
+        except AttributeError:
+            raise OperationFailed('AssetContentLookupSession not implemented in authz_adapter')"""
 
 
 class RepositoryProxyManager:
@@ -70,7 +87,26 @@ class RepositoryProxyManager:
                 proxy)
         except AttributeError:
             raise OperationFailed('AssetCompositionDesignSession not implemented in authz_adapter')
-"""
+
+    def get_asset_content_lookup_session(self, proxy):
+        \"\"\"Pass through to provider get_asset_content_lookup_session\"\"\"
+        try:
+            return getattr(sessions, 'AssetContentLookupSession')(
+                self._provider_manager.get_asset_content_lookup_session(proxy),
+                self._get_authz_session(),
+                proxy)
+        except AttributeError:
+            raise OperationFailed('AssetContentLookupSession not implemented in authz_adapter')
+
+    def get_asset_content_lookup_session_for_repository(self, repository_id, proxy):
+        \"\"\"Pass through to provider get_asset_content_lookup_session_for_repository\"\"\"
+        try:
+            return getattr(sessions, 'AssetContentLookupSession')(
+                self._provider_manager.get_asset_content_lookup_session_for_repository(repository_id, proxy),
+                self._get_authz_session(),
+                proxy)
+        except AttributeError:
+            raise OperationFailed('AssetContentLookupSession not implemented in authz_adapter')"""
 
 
 class AssetAdminSession:
