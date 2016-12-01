@@ -339,7 +339,7 @@ class AssetLookupSession:
     #         return self._provider_session.get_asset_content(asset_content_id)
 
 
-class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
+class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSession, osid_sessions.OsidSession):
     \"\"\"Adapts underlying AssetContentLookupSession methods with authorization checks
     For now uses the "Asset" namespace authz -- assumes if you can lookup an asset, you can
      lookup the contents. That could change in the future.
@@ -358,7 +358,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
         self._qualifier_id = provider_session.get_repository_id()
         self._id_namespace = 'repository.Asset'
         self.use_federated_repository_view()
-        self.use_comparative_asset_view()
+        self.use_comparative_asset_content_view()
         self._unauth_repository_ids = None
 
     def _get_unauth_repository_ids(self, repository_id):
@@ -400,11 +400,11 @@ class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid
 
     def use_comparative_asset_content_view(self):
         self._use_comparative_object_view()
-        self._provider_session.use_comparative_asset_view()
+        self._provider_session.use_comparative_asset_content_view()
 
     def use_plenary_asset_content_view(self):
         self._use_plenary_object_view()
-        self._provider_session.use_plenary_asset_view()
+        self._provider_session.use_plenary_asset_content_view()
 
     def use_federated_repository_view(self):
         self._use_federated_catalog_view()

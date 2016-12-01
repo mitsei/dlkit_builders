@@ -109,7 +109,7 @@ class AssetLookupSession:
     #     return objects.AssetContent(osid_object_map=asset_content_map, runtime=self._runtime, proxy=self._proxy)
 
 
-class AssetContentLookupSession(abc_repository_sessions.AssetLookupSession, osid_sessions.OsidSession):
+class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSession, osid_sessions.OsidSession):
     \"\"\"This session defines methods for retrieving asset contents.
 
     An ``AssetContent`` represents an element of content stored associated
