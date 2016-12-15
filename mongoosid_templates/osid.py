@@ -616,23 +616,49 @@ class OsidSession:
 
     def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
         \"\"\"Recursively returns a list of all descendent catalog ids, inclusive\"\"\"
-        idstr_list = [str(cat_id)]
-        if hierarchy_session is None:
-            pkg_name = cat_id.get_identifier_namespace().split('.')[0]
-            cat_name = cat_id.get_identifier_namespace().split('.')[1]
-            try:
-                mgr = self._get_provider_manager('HIERARCHY')
-                hierarchy_session = mgr.get_hierarchy_traversal_session_for_hierarchy(
-                    Id(authority=pkg_name.upper(),
-                       namespace='CATALOG',
-                       identifier=cat_name.upper()),
-                    proxy=self._proxy)
-            except (errors.OperationFailed, errors.Unsupported):
-                return idstr_list # there is no hierarchy
-        if hierarchy_session.has_children(cat_id):
-            for child_id in hierarchy_session.get_children(cat_id):
-                idstr_list = idstr_list + self._get_descendent_cat_idstrs(child_id, hierarchy_session)
-        return idstr_list
+        def get_descendent_ids():
+            idstr_list = [str(cat_id)]
+            if hierarchy_session is None:
+                pkg_name = cat_id.get_identifier_namespace().split('.')[0]
+                cat_name = cat_id.get_identifier_namespace().split('.')[1]
+                try:
+                    mgr = self._get_provider_manager('HIERARCHY')
+                    hierarchy_session = mgr.get_hierarchy_traversal_session_for_hierarchy(
+                        Id(authority=pkg_name.upper(),
+                           namespace='CATALOG',
+                           identifier=cat_name.upper()),
+                        proxy=self._proxy)
+                except (errors.OperationFailed, errors.Unsupported):
+                    return idstr_list # there is no hierarchy
+            if hierarchy_session.has_children(cat_id):
+                for child_id in hierarchy_session.get_children(cat_id):
+                    idstr_list += self._get_descendent_cat_idstrs(child_id, hierarchy_session)
+            return idstr_list
+
+        use_caching = False
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
+            if config.get_value_by_parameter(parameter_id).get_boolean_value():
+                use_caching = True
+            else:
+                pass
+        except (AttributeError, KeyError, errors.NotFound):
+            pass
+        if use_caching:
+            import memcache
+            mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+
+            key = 'descendent-catalog-ids-{0}'.format(str(cat_id))
+
+            if mc.get(key) is None:
+                catalog_ids = get_descendent_ids()
+                mc.set(key, catalog_ids, time=600)
+            else:
+                catalog_ids = mc.get(key)
+        else:
+            catalog_ids = get_descendent_ids()
+        return catalog_ids
 
     def _is_phantom_root_federated(self):
         return (self._catalog_view == FEDERATED and 
