@@ -616,23 +616,23 @@ class OsidSession:
 
     def _get_descendent_cat_idstrs(self, cat_id, hierarchy_session=None):
         \"\"\"Recursively returns a list of all descendent catalog ids, inclusive\"\"\"
-        def get_descendent_ids():
+        def get_descendent_ids(h_session):
             idstr_list = [str(cat_id)]
-            if hierarchy_session is None:
+            if h_session is None:
                 pkg_name = cat_id.get_identifier_namespace().split('.')[0]
                 cat_name = cat_id.get_identifier_namespace().split('.')[1]
                 try:
                     mgr = self._get_provider_manager('HIERARCHY')
-                    hierarchy_session = mgr.get_hierarchy_traversal_session_for_hierarchy(
+                    h_session = mgr.get_hierarchy_traversal_session_for_hierarchy(
                         Id(authority=pkg_name.upper(),
                            namespace='CATALOG',
                            identifier=cat_name.upper()),
                         proxy=self._proxy)
                 except (errors.OperationFailed, errors.Unsupported):
                     return idstr_list # there is no hierarchy
-            if hierarchy_session.has_children(cat_id):
-                for child_id in hierarchy_session.get_children(cat_id):
-                    idstr_list += self._get_descendent_cat_idstrs(child_id, hierarchy_session)
+            if h_session.has_children(cat_id):
+                for child_id in h_session.get_children(cat_id):
+                    idstr_list += self._get_descendent_cat_idstrs(child_id, h_session)
             return idstr_list
 
         use_caching = False
@@ -652,12 +652,12 @@ class OsidSession:
             key = 'descendent-catalog-ids-{0}'.format(str(cat_id))
 
             if mc.get(key) is None:
-                catalog_ids = get_descendent_ids()
-                mc.set(key, catalog_ids, time=600)
+                catalog_ids = get_descendent_ids(hierarchy_session)
+                mc.set(key, catalog_ids, time=30 * 60)
             else:
                 catalog_ids = mc.get(key)
         else:
-            catalog_ids = get_descendent_ids()
+            catalog_ids = get_descendent_ids(hierarchy_session)
         return catalog_ids
 
     def _is_phantom_root_federated(self):

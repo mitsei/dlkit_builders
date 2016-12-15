@@ -63,7 +63,7 @@ class AuthorizationSession:
 
             if mc.get(key) is None:
                 qualifier_ids = generate_qualifier_ids()
-                mc.set(key, qualifier_ids, time=600)
+                mc.set(key, qualifier_ids, time=30 * 60)
             else:
                 qualifier_ids = mc.get(key)
         else:
