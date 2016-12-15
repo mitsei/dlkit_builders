@@ -48,15 +48,19 @@ class ResourceManager:
         osid_managers.OsidManager.__init__(self)"""
 
     get_resource_lookup_session_template = """
-        super(${package_name}_managers.${interface_name}, self).${method_name}() # Remove when implemented
-        # return ${return_module}.${return_type}(runtime=self._runtime) # Enable when implemented"""
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(runtime=self._runtime)"""
 
     get_resource_lookup_session_for_bin_template = """
-        super(${package_name}_managers.${interface_name}, self).${method_name}(${arg0_name}) # Remove when implemented
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        # return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime) # Enable when implemented"""
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(${arg0_name}, self._runtime)"""
         
     get_resource_admin_session_template = get_resource_lookup_session_template
 
