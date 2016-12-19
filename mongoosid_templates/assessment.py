@@ -800,8 +800,10 @@ class AssessmentTakenAdminSession:
         ##
         # ...here:
         assessment_offered_id = Id(assessment_taken_form._my_map['assessmentOfferedId'])
-        assessment_offered = AssessmentOfferedLookupSession(
-            catalog_id=self._catalog_id, runtime=self._runtime).get_assessment_offered(assessment_offered_id)
+        aols = AssessmentOfferedLookupSession(
+            catalog_id=self._catalog_id, runtime=self._runtime)
+        aols.use_federated_bank_view()
+        assessment_offered = aols.get_assessment_offered(assessment_offered_id)
         try:
             if assessment_offered.has_max_attempts():
                 max_attempts = assessment_offered.get_max_attempts()
