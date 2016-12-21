@@ -341,7 +341,7 @@ class ResourceAdminSession:
         return True"""
 
     get_resource_form_for_create_template = """
-        from ...${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
+        from dlkit.${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .${return_module} import ${return_type}
         from ..osid.osid_errors import NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
         CREATED = True
@@ -359,7 +359,7 @@ class ResourceAdminSession:
         return result"""
 
     create_resource_template = """
-        from ...${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
+        from dlkit.${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .models import ${object_name}_${cat_name}
         from ..osid.osid_errors import IllegalState, InvalidArgument, NullArgument, OperationFailed, PermissionDenied, Unsupported
         CREATED = True
@@ -394,7 +394,7 @@ class ResourceAdminSession:
         return result"""
 
     get_resource_form_for_update_template = """
-        from ...${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
+        from dlkit.${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .${return_module} import ${return_type}
         from .models import ${object_name} as ${object_name}Model
         from ..osid.osid_errors import NotFound, NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
@@ -414,7 +414,7 @@ class ResourceAdminSession:
         return obj_form"""
 
     update_resource_template = """
-        from ...${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
+        from dlkit.${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from ..osid.osid_errors import IllegalState, InvalidArgument, NullArgument, OperationFailed, PermissionDenied, Unsupported
         UPDATED = True
         if ${arg0_name} is None:
@@ -437,7 +437,7 @@ class ResourceAdminSession:
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED"""
 
     delete_resource_template = """
-        from ...${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
+        from dlkit.${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .models import ${object_name} as ${object_name}Model
         from ..osid.osid_errors import NotFound, NullArgument, InvalidArgument, OperationFailed, PermissionDenied, Unsupported
         UPDATED = True

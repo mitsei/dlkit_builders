@@ -203,7 +203,7 @@ class AssessmentSession:
         return self.get_assessment_section(assessment_section_id).get_questions()"""
 
     get_response_form_import_templates = [
-        'from ...abstract_osid.id.primitives import Id as ABCId'
+        'from dlkit.abstract_osid.id.primitives import Id as ABCId'
     ]
 
     get_response_form = """
@@ -248,7 +248,7 @@ class AssessmentSession:
         return obj_form"""
 
     submit_response_import_templates = [
-        'from ...abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
+        'from dlkit.abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
     ]
 
     submit_response = """
@@ -479,7 +479,7 @@ class ItemAdminSession:
     # This method is hand implemented to raise errors.and error if the item
     # is found to be associated with an assessment
     delete_item_import_templates = [
-        'from ...abstract_osid.id.primitives import Id as ABCId'
+        'from dlkit.abstract_osid.id.primitives import Id as ABCId'
     ]
 
     delete_item = """
@@ -504,7 +504,7 @@ class ItemAdminSession:
     # deal with authoring Questions with are special: ie. there is only one per
     # Item.  Perhaps we will see this pattern again and can make templates.
     create_question_import_templates = [
-        'from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
+        'from dlkit.abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
     ]
 
     create_question = """
@@ -540,7 +540,7 @@ class ItemAdminSession:
                                 proxy=self._proxy)"""
 
     get_question_form_for_update_import_templates = [
-        'from ...abstract_osid.id.primitives import Id as ABCId'
+        'from dlkit.abstract_osid.id.primitives import Id as ABCId'
     ]
 
     get_question_form_for_update = """
@@ -557,7 +557,7 @@ class ItemAdminSession:
         return obj_form"""
 
     update_question_import_templates = [
-        'from ...abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
+        'from dlkit.abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
     ]
 
     update_question = """
@@ -603,7 +603,7 @@ class AssessmentAdminSession:
         ]
 
     delete_assessment_import_templates = [
-        'from ...abstract_osid.id.primitives import Id as ABCId',
+        'from dlkit.abstract_osid.id.primitives import Id as ABCId',
         'from ..assessment_authoring import objects as assessment_authoring_objects'
     ]
 
@@ -723,8 +723,8 @@ class AssessmentOfferedAdminSession:
         ##
         # This impl differs from the usual get_osid_object_form_for_create method in that it
         # sets a default display name based on the underlying Assessment...
-        from ...abstract_osid.id.primitives import Id as ABCId
-        from ...abstract_osid.type.primitives import Type as ABCType
+        from dlkit.abstract_osid.id.primitives import Id as ABCId
+        from dlkit.abstract_osid.type.primitives import Type as ABCType
         if not isinstance(assessment_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
         for arg in assessment_offered_record_types:
@@ -774,7 +774,7 @@ class AssessmentTakenAdminSession:
     ]
 
     create_assessment_taken_import_templates = [
-        'from ...abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm',
+        'from dlkit.abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm',
         'from ..osid.osid_errors import PermissionDenied'
     ]
     

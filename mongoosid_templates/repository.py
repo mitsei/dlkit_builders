@@ -869,7 +869,7 @@ class AssetCompositionDesignSession:
     add_asset_template = """
         # The ${object_name_under} found check may want to be run through _get_provider_manager
         # so as to ensure access control:
-        from ...abstract_osid.id.primitives import Id as ABCId
+        from dlkit.abstract_osid.id.primitives import Id as ABCId
         if not isinstance(${object_name_under}_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         if (not isinstance(${containable_object_name_under}_id, ABCId) and 

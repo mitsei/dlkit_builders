@@ -221,18 +221,18 @@
 #         # else:
 #         #     self._my_map = {}
 #         #     self._for_update = False
-#         #     self._init_map(**kwargs)
+#         #     self._init_form(**kwargs)
 # 
 #         if not self.is_for_update():
-#             self._init_map(**kwargs)
+#             self._init_form(**kwargs)
 # 
 #     def _init_metadata(self, **kwargs):
 #         \"\"\"Initialize form metadata\"\"\"
 #         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
 # 
-#     def _init_map(self, record_types=None, **kwargs):
+#     def _init_form(self, record_types=None, **kwargs):
 #         \"\"\"Initialize form map\"\"\"
-#         osid_objects.OsidRelationshipForm._init_map(self, record_types=record_types)
+#         osid_objects.OsidRelationshipForm._init_form(self, record_types=record_types)
 #         self._my_map['assignedVaultIds'] = [str(kwargs['vault_id'])]
 #         self._my_map['functionId'] = str(kwargs['function_id'])
 #         self._my_map['qualifierId'] = str(kwargs['qualifier_id'])

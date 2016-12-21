@@ -3,8 +3,8 @@
 class ResourceProfile:
 
     import_statements_pattern = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -111,8 +111,8 @@ class ResourceProxyManager:
 class ResourceLookupSession:
 
     import_statements_pattern = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -227,8 +227,8 @@ class ResourceLookupSession:
 class ResourceQuerySession:
 
     import_statements_pattern = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -287,8 +287,8 @@ class ResourceQuerySession:
 class ResourceAdminSession:
 
     import_statements_pattern = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -350,8 +350,8 @@ class ResourceNotificationSession:
 class ResourceBinSession:
 
     import_statements_pattern = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -422,8 +422,8 @@ class ResourceBinSession:
 class ResourceAgentSession:
 
     import_statements = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -531,8 +531,8 @@ class ResourceAgentAssignmentSession:
 class BinLookupSession:
 
     import_statements_pattern = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -595,8 +595,8 @@ class BinLookupSession:
 class BinAdminSession:
 
     import_statements_pattern = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',

@@ -228,8 +228,8 @@ class AssessmentAuthoringProxyManager:
 #     import_statements = [
 #         'from . import objects',
 #         'from dlkit.abstract_osid.osid import errors',
-#         'from ...abstract_osid.assessment_authoring.objects import AssessmentPartForm as ABCAssessmentPartForm',
-#         'from ...abstract_osid.id.primitives import Id as ABCId',
+#         'from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartForm as ABCAssessmentPartForm',
+#         'from dlkit.abstract_osid.id.primitives import Id as ABCId',
 #         'from dlkit.mongo.assessment.assessment_utilities import get_assessment_part_lookup_session',
 #         'DESCENDING = -1',
 #         'ASCENDING = 1',
@@ -510,7 +510,7 @@ class AssessmentAuthoringProxyManager:
 #         self._mdata = default_mdata.get_assessment_part_mdata()
 #         self._init_metadata(**kwargs)
 #         if not self.is_for_update():
-#             self._init_map(**kwargs)
+#             self._init_form(**kwargs)
 # 
 #     def _init_metadata(self, **kwargs):
 #         \"\"\"Initialize form metadata\"\"\"
@@ -543,11 +543,11 @@ class AssessmentAuthoringProxyManager:
 #             'id_set': []
 #         }
 # 
-#     def _init_map(self, record_types=None, **kwargs):
+#     def _init_form(self, record_types=None, **kwargs):
 #         \"\"\"Initialize form map\"\"\"
-#         osid_objects.OsidContainableForm._init_map(self)
-#         osid_objects.OsidOperableForm._init_map(self)
-#         osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
+#         osid_objects.OsidContainableForm._init_form(self)
+#         osid_objects.OsidOperableForm._init_form(self)
+#         osid_objects.OsidObjectForm._init_form(self, record_types=record_types)
 #         if 'assessment_part_id' in kwargs:
 #             self._my_map['assessmentPartId'] = str(kwargs['assessment_part_id'])
 #             if 'mdata' in kwargs:

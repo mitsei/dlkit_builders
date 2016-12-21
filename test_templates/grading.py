@@ -21,8 +21,8 @@ class GradeSystemAdminSession:
 class GradebookColumnLookupSession:
     # Until we figure out how to do Relationship init patterns properly:
     import_statements = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -92,8 +92,8 @@ class GradebookColumnLookupSession:
 class GradeEntryLookupSession:
     # Until we figure out how to do Relationship init patterns properly:
     import_statements = [
-        'from dlkit_django import PROXY_SESSION, proxy_example',
-        'from dlkit_django.managers import Runtime',
+        'from dlkit_runtime import PROXY_SESSION, proxy_example',
+        'from dlkit_runtime.managers import Runtime',
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',

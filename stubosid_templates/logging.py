@@ -118,7 +118,7 @@
 #         self._init_metadata(**kwargs)
 # 
 #         if not self.is_for_update():
-#             self._init_map(**kwargs)
+#             self._init_form(**kwargs)
 # 
 #     def _init_metadata(self, **kwargs):
 #         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
@@ -126,8 +126,8 @@
 #         self._timestamp_default = datetime.datetime.utcnow()
 #         self._agent_default = self._mdata['agent']['default_id_values'][0]
 # 
-#     def _init_map(self, record_types=None, **kwargs):
-#         osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
+#     def _init_form(self, record_types=None, **kwargs):
+#         osid_objects.OsidObjectForm._init_form(self, record_types=record_types)
 #         self._my_map['priorityId'] = self._priority_default
 #         self._my_map['timestamp'] = self._timestamp_default
 #         self._my_map['assignedLogIds'] = [str(kwargs['log_id'])]

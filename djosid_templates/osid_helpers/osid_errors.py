@@ -23,7 +23,7 @@ from method to method in accordance with the OSID specification.
 
 """
 
-from ...abstract_osid.osid import errors as abc_errors
+from dlkit.abstract_osid.osid import errors as abc_errors
 
 """ User Errors:
 

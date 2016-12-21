@@ -204,7 +204,7 @@ class GradeEntryForm:
         self._init_metadata(**kwargs)
 
         if not self.is_for_update():
-            self._init_map(**kwargs)
+            self._init_form(**kwargs)
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
@@ -224,8 +224,8 @@ class GradeEntryForm:
         self._score_default = self._mdata['score']['default_decimal_values'][0]
 
 
-    def _init_map(self, record_types=None, **kwargs):
-        osid_objects.OsidRelationshipForm._init_map(self, record_types=record_types)
+    def _init_form(self, record_types=None, **kwargs):
+        osid_objects.OsidRelationshipForm._init_form(self, record_types=record_types)
         self._my_map['resourceId'] = str(kwargs['resource_id'])
         self._my_map['gradeId'] = self._grade_default
         self._my_map['agentId'] = str(kwargs['effective_agent_id'])

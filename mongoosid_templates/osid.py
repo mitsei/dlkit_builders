@@ -990,7 +990,7 @@ class OsidForm:
 
     def _is_valid_id(self, inpt):
         \"\"\"Checks if input is a valid Id\"\"\"
-        from ...abstract_osid.id.primitives import Id as abc_id
+        from dlkit.abstract_osid.id.primitives import Id as abc_id
         if isinstance(inpt, abc_id):
             return True
         else:
@@ -998,7 +998,7 @@ class OsidForm:
 
     def _is_valid_type(self, inpt):
         \"\"\"Checks if input is a valid Type\"\"\"
-        from ...abstract_osid.type.primitives import Type as abc_type
+        from dlkit.abstract_osid.type.primitives import Type as abc_type
         if isinstance(inpt, abc_type):
             return True
         else:
@@ -1082,7 +1082,7 @@ class OsidForm:
     def _is_valid_date_time(self, inpt, metadata):
         \"\"\"Checks if input is a valid DateTime object\"\"\"
         # NEED TO ADD CHECKS FOR OTHER METADATA, LIKE MINIMUM, MAXIMUM, ETC.
-        from ...abstract_osid.calendaring.primitives import DateTime as abc_datetime
+        from dlkit.abstract_osid.calendaring.primitives import DateTime as abc_datetime
         if isinstance(inpt, abc_datetime):
             return True
         else:
@@ -1098,7 +1098,7 @@ class OsidForm:
     def _is_valid_duration(self, inpt, metadata):
         \"\"\"Checks if input is a valid Duration\"\"\"
         # NEED TO ADD CHECKS FOR OTHER METADATA, LIKE MINIMUM, MAXIMUM, ETC.
-        from ...abstract_osid.calendaring.primitives import Duration as abc_duration
+        from dlkit.abstract_osid.calendaring.primitives import Duration as abc_duration
         if isinstance(inpt, abc_duration):
             return True
         else:
@@ -1445,7 +1445,7 @@ class OsidObjectForm:
         'from dlkit.abstract_osid.osid import errors',
         'from . import default_mdata',
         'from .metadata import Metadata',
-        'from ...abstract_osid.locale.primitives import DisplayText as abc_display_text',
+        'from dlkit.abstract_osid.locale.primitives import DisplayText as abc_display_text',
         'from ..utilities import update_display_text_defaults',
     ]
 

@@ -495,7 +495,7 @@ class OsidForm:
         return valid 
 
     def _is_valid_id(self, input):
-        from ...abstract_osid.id.primitives import Id
+        from dlkit.abstract_osid.id.primitives import Id
         if isinstance(input, Id):
             return True
         else:

@@ -95,7 +95,7 @@ class TypeAdminSession:
         return True"""
 
     get_type_form_for_create = """
-        from ...abstract_osid.type.primitives import Type as ABCType
+        from dlkit.abstract_osid.type.primitives import Type as ABCType
         from .objects import TypeForm
 #        from bson.objectid import ObjectId
         collection = self._db['Type']
@@ -113,7 +113,7 @@ class TypeAdminSession:
         return form"""
 
     create_type = """
-        from ...abstract_osid.type.objects import TypeForm as ABCTypeForm
+        from dlkit.abstract_osid.type.objects import TypeForm as ABCTypeForm
         collection = self._db['Type']
         CREATED = True
         if not isinstance(type_form, ABCTypeForm):
@@ -142,7 +142,7 @@ class TypeAdminSession:
         return True"""
 
     get_type_form_for_update = """
-        from ...abstract_osid.type.primitives import Type as ABCType
+        from dlkit.abstract_osid.type.primitives import Type as ABCType
         from .objects import TypeForm
         from .primitives import Type
 #        from bson.objectid import ObjectId
@@ -160,7 +160,7 @@ class TypeAdminSession:
         return type_form"""
 
     update_type = """
-        from ...abstract_osid.type.objects import TypeForm as ABCTypeForm
+        from dlkit.abstract_osid.type.objects import TypeForm as ABCTypeForm
         collection = self._db['Type']
         UPDATED = True
         if not isinstance(type_form, ABCTypeForm):
@@ -187,7 +187,7 @@ class TypeAdminSession:
         return True"""
 
     delete_type = """
-        from ...abstract_osid.type.primitives import Type as ABCType
+        from dlkit.abstract_osid.type.primitives import Type as ABCType
         from bson.objectid import ObjectId
         collection = self._db['Type']
         UPDATED = True
@@ -213,7 +213,7 @@ class TypeForm:
         OsidForm.__init__(self)
         self._init_metadata()
         self._my_map = {}
-        self._init_map()
+        self._init_form()
         self._my_map['authority'] = type_.get_authority()
         self._my_map['namespace'] = type_.get_identifier_namespace()
         self._my_map['identifier'] = type_.get_identifier()
@@ -249,7 +249,7 @@ class TypeForm:
                              identifier = 'description')}
         self._domain_metadata.update(mdata_conf.domain)
 
-    def _init_map(self):
+    def _init_form(self):
         from . import profile
         self._my_map['displayName'] = self._display_name_metadata['default_string_values'][0]
         self._my_map['displayLabel'] = self._display_label_metadata['default_string_values'][0]

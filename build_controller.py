@@ -174,9 +174,9 @@ class BaseBuilder(Utilities):
             package_name = self.package['name']
         if abstract:
             if self._is('services'):
-                return '..abstract_osid'
+                return 'dlkit.abstract_osid'
             else:
-                return '...abstract_osid'
+                return 'dlkit.abstract_osid'
         elif self._root_dir is not None:
             return self._root_dir
         else:

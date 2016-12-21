@@ -291,7 +291,7 @@ class HierarchyAdminSession:
     ]
 
     delete_hierarchy_import_templates = [
-        'from ...abstract_osid.id.primitives import Id as ABCId'
+        'from dlkit.abstract_osid.id.primitives import Id as ABCId'
     ]
 
     delete_hierarchy = """
