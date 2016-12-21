@@ -633,7 +633,7 @@ class OsidSession:
             if h_session.has_children(cat_id):
                 for child_id in h_session.get_children(cat_id):
                     idstr_list += self._get_descendent_cat_idstrs(child_id, h_session)
-            return idstr_list
+            return list(set(idstr_list))
 
         use_caching = False
         try:

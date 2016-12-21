@@ -83,6 +83,8 @@ class AssessmentSessionSection(object):
     def __init__(self, *args, **kwargs):
         super(AssessmentSessionSection, self).__init__(*args, **kwargs)
         self._assessment_parts = dict()
+        self._item_lookup_session = None
+        self._assessment_part_lookup_session = None
         if '_id' not in self._my_map:
             # could happen if not created with items -- then self._initialize_part_map()
             # will not call self._save(). But we need to assign it an ID
@@ -378,17 +380,21 @@ class AssessmentSessionSection(object):
                     index += 1
             
     def _get_assessment_part_lookup_session(self): # get_assessment_part_lookup_session should be mixed in
-        session = get_assessment_part_lookup_session(self._runtime,
-                                                     self._proxy,
-                                                     self)
-        session.use_unsequestered_assessment_part_view()
-        session.use_federated_bank_view()
-        return session
+        if self._assessment_part_lookup_session is None:
+            session = get_assessment_part_lookup_session(self._runtime,
+                                                         self._proxy,
+                                                         self)
+            session.use_unsequestered_assessment_part_view()
+            session.use_federated_bank_view()
+            self._assessment_part_lookup_session = session
+        return self._assessment_part_lookup_session
 
     def _get_item_lookup_session(self): # get_item_lookup_session should be mixed in
-        session = get_item_lookup_session(self._runtime, self._proxy)
-        session.use_federated_bank_view()
-        return session
+        if self._item_lookup_session is None:
+            session = get_item_lookup_session(self._runtime, self._proxy)
+            session.use_federated_bank_view()
+            self._item_lookup_session = session
+        return self._item_lookup_session
 
     def _get_question_map(self, question_id):
         """get question map from questions matching question_id
