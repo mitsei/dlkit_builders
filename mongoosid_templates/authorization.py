@@ -71,11 +71,37 @@ class AuthorizationSession:
         return qualifier_ids
 
     def _get_ancestor_idstrs(self, node):
-        node_list = [str(node.get_id())]
-        if node.has_parents():
-            for parent_node in node.get_parents():
-                node_list = node_list + self._get_ancestor_idstrs(parent_node)
-        return node_list
+        def get_ancestors(internal_node):
+            node_list = [str(internal_node.get_id())]
+            if internal_node.has_parents():
+                for parent_node in internal_node.get_parents():
+                    node_list += self._get_ancestor_idstrs(parent_node)
+            return list(set(node_list))
+
+        use_caching = False
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
+            if config.get_value_by_parameter(parameter_id).get_boolean_value():
+                use_caching = True
+            else:
+                pass
+        except (AttributeError, KeyError, errors.NotFound):
+            pass
+        if use_caching:
+            import memcache
+            mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+
+            key = 'ancestor-ids-{0}'.format(str(node.ident))
+
+            if mc.get(key) is None:
+                ancestor_ids = get_ancestors(node)
+                mc.set(key, ancestor_ids, time=30 * 60)
+            else:
+                ancestor_ids = mc.get(key)
+        else:
+            ancestor_ids = get_ancestors(node)
+        return ancestor_ids
 """
 
     can_access_authorizations = """
