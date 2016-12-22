@@ -387,6 +387,10 @@ class AssessmentSessionSection(object):
             session.use_unsequestered_assessment_part_view()
             session.use_federated_bank_view()
             self._assessment_part_lookup_session = session
+        try:
+            self._assessment_part_lookup_session.update_section(self)
+        except AttributeError:
+            pass
         return self._assessment_part_lookup_session
 
     def _get_item_lookup_session(self): # get_item_lookup_session should be mixed in
