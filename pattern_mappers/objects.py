@@ -1,5 +1,6 @@
 from binder_helpers import make_plural, remove_plural, get_cat_name_for_pkg
 from osid_meta import OSID_Language_Primitives
+from syntax_helpers import get_syntax_for_arg_type
 OSID_Calendaring_Primitives = ['osid.calendaring.Time', 'osid.calendaring.DateTime', 'osid.calendaring.Duration']
 
 def map_object_form_patterns(interface, package, index):
@@ -117,10 +118,11 @@ def map_object_form_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               var_name = var_name[:-9],
-                              return_type_full = method['return_type']))
+                              return_type_full = method['return_type'],
+                              syntax = 'ID'))
 
         ##
-        # ObjectForm methods that return a metadata object for an Id element
+        # ObjectForm methods that return a metadata object for an Id element list
         elif (method['name'].startswith('get_') and
               method['name'].endswith('_metadata') and
               var_name[:-9] in index[object_name + '.persisted_data'] and
@@ -132,12 +134,20 @@ def map_object_form_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               var_name = var_name[:-9],
-                              return_type_full = method['return_type']))
+                              return_type_full = method['return_type'],
+                              syntax = 'ID'))
 
         ##
         # ObjectForm methods that return a metadata object for a primitive element
         elif (method['name'].startswith('get_') and
               method['name'].endswith('_metadata')):
+            try:
+                arg_type = index[object_name + '.arg_detail'][var_name[:-9]][0]['arg_type'].strip('[]')
+            except KeyError:
+                try:
+                    arg_type = index[object_name + '.arg_detail'][make_plural(var_name[:-9])][0]['arg_type'].strip('[]')
+                except KeyError:
+                    arg_type = 'none'
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceForm.get_group_metadata',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -145,7 +155,8 @@ def map_object_form_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               var_name = var_name[:-9],
-                              return_type_full = method['return_type']))
+                              return_type_full = method['return_type'],
+                              syntax = get_syntax_for_arg_type(arg_type)))
 
         ##
         # ObjectForm methods that set a persisted DisplayText string.

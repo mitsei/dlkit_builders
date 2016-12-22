@@ -1663,13 +1663,13 @@ ${persisted_initers}"""
     get_group_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
         metadata = dict(self._mdata['${var_name}'])
-        metadata.update({'existing_${var_name}_values': self._my_map['${var_name_mixed}']})
+        metadata.update({'existing_${syntax_under}_values': self._my_map['${var_name_mixed}']})
         return Metadata(**metadata)"""
 
     get_avatar_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
         metadata = dict(self._mdata['${var_name}'])
-        metadata.update({'existing_${var_name}_values': self._my_map['${var_name_mixed}Id']})
+        metadata.update({'existing_${syntax_under}_values': self._my_map['${var_name_mixed}Id']})
         return Metadata(**metadata)"""
 
     set_group_template = """

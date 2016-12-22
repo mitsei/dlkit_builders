@@ -5,6 +5,7 @@ from binder_helpers import fix_reserved_word, under_to_caps, get_pkg_name, camel
     camel_to_mixed, under_to_mixed, make_plural, remove_plural, SkipMethod
 from build_controller import Utilities, BaseBuilder, Templates
 from config import sessions_to_implement
+from syntax_helpers import syntax_to_under
 
 
 class MethodBuilder(BaseBuilder, Templates, Utilities):
@@ -212,6 +213,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['func_name'] = context['method_name'].split('_')[1]
             if 'method_name' in context:
                 context['method_session_name'] = context['method_name'].replace('get_', '')
+            if 'syntax' in context:
+                context['syntax_under'] = syntax_to_under(context['syntax'])
 
             # Special one for services test builder:
             if self._is_manager_session(interface, self.package['name']):
