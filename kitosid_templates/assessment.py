@@ -508,6 +508,7 @@ class Bank:
         self._session_management = AUTOMATIC
         self._bank_view = DEFAULT
         self._object_views = dict()
+        self._operable_views = dict()
         self._containable_views = dict()
         self._sub_package_provider_managers = dict()
 
@@ -551,6 +552,21 @@ class Bank:
                     getattr(session, 'use_unsequestered_' + obj_name + '_view')()
                 except AttributeError:
                     pass
+
+    def _set_operable_view(self, session):
+        \"\"\"Sets the underlying operable views to match current view\"\"\"
+        # for obj_name in self._operable_views:
+        #     if self._operable_views[obj_name] == ???:
+        #         try:
+        #             getattr(session, 'use_???_' + obj_name + '_view')()
+        #         except AttributeError:
+        #             pass
+        #     else:
+        #         try:
+        #             getattr(session, 'use_???_' + obj_name + '_view')()
+        #         except AttributeError:
+        #             pass
+        pass
 
     def _get_provider_session(self, session_name):
         \"\"\"Returns the requested provider session.\"\"\"
