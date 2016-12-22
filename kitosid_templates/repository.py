@@ -54,40 +54,40 @@ class CompositionLookupSession:
     use_active_composition_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._operable_views['${object_name_under}'] = ACTIVE
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].${method_name}()
+                session.${method_name}()
             except AttributeError:
                 pass"""
 
     use_any_status_composition_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._operable_views['${object_name_under}'] = ANY_STATUS
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].${method_name}()
+                session.${method_name}()
             except AttributeError:
                 pass"""
 
     use_sequestered_composition_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._containable_views['${object_name_under}'] = SEQUESTERED
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].${method_name}()
+                session.${method_name}()
             except AttributeError:
                 pass"""
 
     use_unsequestered_composition_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._containable_views['${object_name_under}'] = UNSEQUESTERED
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].${method_name}()
+                session.${method_name}()
             except AttributeError:
                 pass"""
 

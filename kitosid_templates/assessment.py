@@ -325,20 +325,7 @@ class AssessmentBasicAuthoringSession:
             self._get_provider_session('assessment_basic_authoring_session').order_items(*args, **kwargs)
         except InvalidArgument:
             self._get_sub_package_provider_session(
-                'assessment_authoring', 'assessment_part_item_design_session').order_items(*args, **kwargs)
-
-    # This was an idea, but not a good one. Feel free to remove:
-    # def _get_container_arg_type(*args, **kwargs):
-    #     from dlkit.abstract_osid.id.primitives import Id as abc_id # Should go in module imports
-    #     if 'assessment_part_id' in kwargs:
-    #         return 'AssessmentPart'
-    #     elif 'assessment' in kwargs:
-    #         return 'Assessment'
-    #     else:
-    #         for arg in args:
-    #             if isinstance(args['arg'], abc_id) and args['arg'].get_namespace() != 'assessment.Item':
-    #                 return args['arg'].get_namespace().split('.')[-1]
-    #     return None"""
+                'assessment_authoring', 'assessment_part_item_design_session').order_items(*args, **kwargs)"""
 
 class AssessmentTakenLookupSession:
 
@@ -426,6 +413,7 @@ class AssessmentPartLookupSession:
 
     use_sequestered_assessment_part_view = """
         \"\"\"Pass through to provider AssessmentPartLookupSession.use_sequestered_assessment_part_view\"\"\"
+        # Does this need to be re-implemented to match the other non-sub-package view setters?
         self._containable_views['assessment_part'] = SEQUESTERED
         self._get_sub_package_provider_session('assessment_authoring',
                                                'assessment_part_lookup_session')
@@ -438,6 +426,7 @@ class AssessmentPartLookupSession:
 
     use_unsequestered_assessment_part_view = """
         \"\"\"Pass through to provider AssessmentPartLookupSession.use_unsequestered_assessment_part_view\"\"\"
+        # Does this need to be re-implemented to match the other non-sub-package view setters?
         self._containable_views['assessment_part'] = UNSEQUESTERED
         self._get_sub_package_provider_session('assessment_authoring',
                                                'assessment_part_lookup_session')
@@ -576,6 +565,8 @@ class Bank:
                 session = session_class(self._catalog.get_id(), self._proxy)
             self._set_bank_view(session)
             self._set_object_view(session)
+            self._set_operable_view(session)
+            self._set_containable_view(session)
             if self._session_management != DISABLED:
                 self._provider_sessions[agent_key][session_name] = session
             return session
@@ -606,6 +597,9 @@ class Bank:
                                                 proxy=self._proxy,
                                                 manager=manager)
             self._set_bank_view(session)
+            self._set_object_view(session)
+            self._set_operable_view(session)
+            self._set_containable_view(session)
             if self._session_management != DISABLED:
                 self._provider_sessions[agent_key][session_name] = session
             return session

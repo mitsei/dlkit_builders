@@ -281,40 +281,40 @@ class ResourceLookupSession:
     use_comparative_resource_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._object_views['${object_name_under}'] = COMPARATIVE
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].${method_name}()
+                session.${method_name}()
             except AttributeError:
                 pass"""
 
     use_plenary_resource_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._object_views[\'${object_name_under}\'] = PLENARY
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].${method_name}()
+                session.${method_name}()
             except AttributeError:
                 pass"""
 
     use_federated_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._${cat_name_under}_view = FEDERATED
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].${method_name}()
+                session.${method_name}()
             except AttributeError:
                 pass"""
 
     use_isolated_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._${cat_name_under}_view = ISOLATED
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].${method_name}()
+                session.${method_name}()
             except AttributeError:
                 pass"""
 
@@ -655,20 +655,20 @@ class BinLookupSession:
     use_comparative_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._${cat_name_under}_view = COMPARATIVE
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].use_comparative_${cat_name_under}_view()
+                session.use_comparative_${cat_name_under}_view()
             except AttributeError:
                 pass"""
 
     use_plenary_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         self._${cat_name_under}_view = PLENARY
-        self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._provider_sessions:
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
             try:
-                self._provider_sessions[session].use_plenary_${cat_name_under}_view()
+                session.use_plenary_${cat_name_under}_view()
             except AttributeError:
                 pass"""
 
@@ -1105,7 +1105,11 @@ class Bin:
                     pass
 
     def _get_provider_session(self, session_name):
-        \"\"\"Returns the requested provider session."\"\"
+        \"\"\"Returns the requested provider session.
+
+        Instantiates a new one if the named session is not already known.
+
+        "\"\"
         agent_key = self._get_agent_key()
         if session_name in self._provider_sessions[agent_key]:
             return self._provider_sessions[agent_key][session_name]
@@ -1117,6 +1121,8 @@ class Bin:
                 session = session_class(self._catalog.get_id(), self._proxy)
             self._set_${cat_name_under}_view(session)
             self._set_object_view(session)
+            self._set_operable_view(session)
+            self._set_containable_view(session)
             if self._session_management != DISABLED:
                 self._provider_sessions[agent_key][session_name] = session
             return session
