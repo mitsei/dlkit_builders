@@ -31,7 +31,7 @@ class GradebookColumnLookupSession:
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.primordium.id.primitives import Id',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
-        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'authentication.Agent\', \'authority\': \'odl.mit.edu\',})\n',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\',})\n',
     ]
 
     # Until we figure out how to do Relationship init patterns properly:
@@ -101,7 +101,7 @@ class GradeEntryLookupSession:
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.primordium.id.primitives import Id',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
-        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'authentication.Agent\', \'authority\': \'odl.mit.edu\',})\n',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\',})\n',
     ]
 
     # Until we figure out how to do Relationship init patterns properly:

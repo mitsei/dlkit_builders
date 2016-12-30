@@ -431,8 +431,8 @@ class ResourceAgentSession:
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.primordium.id.primitives import Id',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
-        'AGENT_ID_0 = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'authentication.Agent\', \'authority\': \'odl.mit.edu\',})\n',
-        'AGENT_ID_1 = Id(**{\'identifier\': \'john_doe\', \'namespace\': \'authentication.Agent\', \'authority\': \'odl.mit.edu\',})\n',
+        'AGENT_ID_0 = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\',})\n',
+        'AGENT_ID_1 = Id(**{\'identifier\': \'john_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\',})\n',
     ]
 
     init = """

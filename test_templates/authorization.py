@@ -146,6 +146,8 @@ class AuthorizationSession:
         create_form.display_name = 'Jane Lookup Authorization'
         create_form.description = 'Test Authorization for AuthorizationLookupSession tests'
         jane_lookup_authz = cls.authz_admin_session.create_authorization(create_form)
+        cls.authz_list.append(jane_lookup_authz)
+        cls.authz_id_list.append(jane_lookup_authz.ident)
         
         # Set up Resource lookup authorizations for Jane
         for num in [1, 5]:
