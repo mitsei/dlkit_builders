@@ -112,6 +112,7 @@ class AuthorizationSession:
                                           runtime=self._runtime)
 
         def is_parent_authorized(catalog_id):
+            # THE FOLLOWING COULD ALSO CHECK A CACHE:
             parent_id_list = hierarchy_session.get_parents(catalog_id)
             if parent_id_list:
                 parent_idstr_list = []
