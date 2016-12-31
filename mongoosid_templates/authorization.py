@@ -24,85 +24,84 @@ class AuthorizationSession:
             cat_class=objects.Vault)
         self._kwargs = kwargs
 
-    def _get_qualifier_idstrs(self, qualifier_id):
-        def generate_qualifier_ids():
-            try:
-                authority = qualifier_id.get_identifier_namespace().split('.')[0].upper()
-                identifier = qualifier_id.get_identifier_namespace().split('.')[1].upper()
-            except:
-                return [str(qualifier_id)]
-            root_qualifier_id = Id(
-                authority=qualifier_id.get_authority(),
-                namespace=qualifier_id.get_identifier_namespace(),
-                identifier='ROOT')
-            if qualifier_id.get_identifier() == 'ROOT':
-                return [str(root_qualifier_id)]
-            hierarchy_mgr = self._get_provider_manager('HIERARCHY') # local=True ???
-            hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
-                Id(authority=authority,
-                   namespace='CATALOG',
-                   identifier=identifier),
-                   proxy=self._proxy)
-            node = hierarchy_session.get_nodes(qualifier_id, 10, 0, False)
-            return self._get_ancestor_idstrs(node) + [str(root_qualifier_id)]
-        use_caching = False
-        try:
-            config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
-            if config.get_value_by_parameter(parameter_id).get_boolean_value():
-                use_caching = True
-            else:
-                pass
-        except (AttributeError, KeyError, errors.NotFound):
-            pass
-        if use_caching:
-            import memcache
-            mc = memcache.Client(['127.0.0.1:11211'], debug=0)
-
-            key = 'hierarchy-qualifier-ids-{0}'.format(str(qualifier_id))
-
-            if mc.get(key) is None:
-                qualifier_ids = generate_qualifier_ids()
-                mc.set(key, qualifier_ids, time=30 * 60)
-            else:
-                qualifier_ids = mc.get(key)
-        else:
-            qualifier_ids = generate_qualifier_ids()
-        return qualifier_ids
-
-    def _get_ancestor_idstrs(self, node):
-        def get_ancestors(internal_node):
-            node_list = [str(internal_node.get_id())]
-            if internal_node.has_parents():
-                for parent_node in internal_node.get_parents():
-                    node_list += self._get_ancestor_idstrs(parent_node)
-            return list(set(node_list))
-
-        use_caching = False
-        try:
-            config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
-            if config.get_value_by_parameter(parameter_id).get_boolean_value():
-                use_caching = True
-            else:
-                pass
-        except (AttributeError, KeyError, errors.NotFound):
-            pass
-        if use_caching:
-            import memcache
-            mc = memcache.Client(['127.0.0.1:11211'], debug=0)
-
-            key = 'ancestor-ids-{0}'.format(str(node.ident))
-
-            if mc.get(key) is None:
-                ancestor_ids = get_ancestors(node)
-                mc.set(key, ancestor_ids, time=30 * 60)
-            else:
-                ancestor_ids = mc.get(key)
-        else:
-            ancestor_ids = get_ancestors(node)
-        return ancestor_ids
-"""
+    # def _get_qualifier_idstrs(self, qualifier_id):
+    #     def generate_qualifier_ids():
+    #         try:
+    #             authority = qualifier_id.get_identifier_namespace().split('.')[0].upper()
+    #             identifier = qualifier_id.get_identifier_namespace().split('.')[1].upper()
+    #         except:
+    #             return [str(qualifier_id)]
+    #         root_qualifier_id = Id(
+    #             authority=qualifier_id.get_authority(),
+    #             namespace=qualifier_id.get_identifier_namespace(),
+    #             identifier='ROOT')
+    #         if qualifier_id.get_identifier() == 'ROOT':
+    #             return [str(root_qualifier_id)]
+    #         hierarchy_mgr = self._get_provider_manager('HIERARCHY') # local=True ???
+    #         hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+    #             Id(authority=authority,
+    #                namespace='CATALOG',
+    #                identifier=identifier),
+    #                proxy=self._proxy)
+    #         node = hierarchy_session.get_nodes(qualifier_id, 10, 0, False)
+    #         return self._get_ancestor_idstrs(node) + [str(root_qualifier_id)]
+    #     use_caching = False
+    #     try:
+    #         config = self._runtime.get_configuration()
+    #         parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
+    #         if config.get_value_by_parameter(parameter_id).get_boolean_value():
+    #             use_caching = True
+    #         else:
+    #             pass
+    #     except (AttributeError, KeyError, errors.NotFound):
+    #         pass
+    #     if use_caching:
+    #         import memcache
+    #         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+    # 
+    #         key = 'hierarchy-qualifier-ids-{0}'.format(str(qualifier_id))
+    # 
+    #         if mc.get(key) is None:
+    #             qualifier_ids = generate_qualifier_ids()
+    #             mc.set(key, qualifier_ids, time=30 * 60)
+    #         else:
+    #             qualifier_ids = mc.get(key)
+    #     else:
+    #         qualifier_ids = generate_qualifier_ids()
+    #     return qualifier_ids
+    # 
+    # def _get_ancestor_idstrs(self, node):
+    #     def get_ancestors(internal_node):
+    #         node_list = [str(internal_node.get_id())]
+    #         if internal_node.has_parents():
+    #             for parent_node in internal_node.get_parents():
+    #                 node_list += self._get_ancestor_idstrs(parent_node)
+    #         return list(set(node_list))
+    # 
+    #     use_caching = False
+    #     try:
+    #         config = self._runtime.get_configuration()
+    #         parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
+    #         if config.get_value_by_parameter(parameter_id).get_boolean_value():
+    #             use_caching = True
+    #         else:
+    #             pass
+    #     except (AttributeError, KeyError, errors.NotFound):
+    #         pass
+    #     if use_caching:
+    #         import memcache
+    #         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+    # 
+    #         key = 'ancestor-ids-{0}'.format(str(node.ident))
+    # 
+    #         if mc.get(key) is None:
+    #             ancestor_ids = get_ancestors(node)
+    #             mc.set(key, ancestor_ids, time=30 * 60)
+    #         else:
+    #             ancestor_ids = mc.get(key)
+    #     else:
+    #         ancestor_ids = get_ancestors(node)
+    #     return ancestor_ids"""
 
     can_access_authorizations = """
         return True"""
@@ -111,18 +110,55 @@ class AuthorizationSession:
         collection = MongoClientValidated('authorization',
                                           collection='Authorization',
                                           runtime=self._runtime)
-        # NOTE: For now this only checks basic authorizations. It should
-        # to be extended to deal with Resources and QualifierHierarchies
-        #print 'AGENT ID=', str(agent_id)
-        #print '    FUNCTION ID=', str(function_id)
-        #print '    QUAL ID STRINGS=', self._get_qualifier_idstrs(qualifier_id)
+
+        def is_parent_authorized(catalog_id):
+            parent_id_list = hierarchy_session.get_parents(catalog_id)
+            if parent_id_list:
+                parent_idstr_list = []
+                for parent_id in parent_id_list:
+                    parent_idstr_list.append(str(parent_id))
+                try:
+                    collection.find_one(
+                        {'agentId': str(agent_id),
+                         'functionId': str(function_id),
+                         'qualifierId': {'$in': parent_idstr_list}})
+                except errors.NotFound:
+                    for parent_id in parent_id_list:
+                        if is_parent_authorized(parent_id):
+                            return True
+                    return False
+                else:
+                    return True
+            else:
+                return False
+
+        # Check first for an explicit or 'ROOT' level implicit authorization:
+        try:
+            authority = qualifier_id.get_identifier_namespace().split('.')[0].upper()
+            identifier = qualifier_id.get_identifier_namespace().split('.')[1].upper()
+        except KeyError:
+            idstr_list = [str(qualifier_id)]
+        else:
+            root_qualifier_id = Id(
+                authority=qualifier_id.get_authority(),
+                namespace=qualifier_id.get_identifier_namespace(),
+                identifier='ROOT')
+            idstr_list = [str(root_qualifier_id), str(qualifier_id)]
         try:
             collection.find_one(
                 {'agentId': str(agent_id),
                  'functionId': str(function_id),
-                 'qualifierId': {'$in': self._get_qualifier_idstrs(qualifier_id)}})
+                 'qualifierId': {'$in': idstr_list}})
+                 
+        # Otherwise check for implicit authorization through inheritance:
         except errors.NotFound:
-            return False
+            hierarchy_mgr = self._get_provider_manager('HIERARCHY') # local=True ???
+            hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+                Id(authority=authority,
+                   namespace='CATALOG',
+                   identifier=identifier),
+                   proxy=self._proxy)
+            return is_parent_authorized(qualifier_id)
         else:
             return True"""
 
