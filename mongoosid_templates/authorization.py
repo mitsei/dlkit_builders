@@ -23,6 +23,7 @@ class AuthorizationSession:
             cat_name='Vault',
             cat_class=objects.Vault)
         self._kwargs = kwargs
+        self._hierarchy_sessions = dict()
 
     # def _get_qualifier_idstrs(self, qualifier_id):
     #     def generate_qualifier_ids():
@@ -101,7 +102,40 @@ class AuthorizationSession:
     #             ancestor_ids = mc.get(key)
     #     else:
     #         ancestor_ids = get_ancestors(node)
-    #     return ancestor_ids"""
+    #     return ancestor_ids
+
+    def _get_hierarchy_session(self, hierarchy_id):
+            hierarchy_mgr = self._get_provider_manager('HIERARCHY', local=True)
+            return hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+                hierarchy_id,
+                proxy=self._proxy)
+
+    def _use_caching(self):
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
+            if config.get_value_by_parameter(parameter_id).get_boolean_value():
+                return True
+            else:
+                return False
+        except (AttributeError, KeyError, errors.NotFound):
+            return False
+
+    def _get_parent_id_list(self, qualifier_id, hierarchy_id):
+        if self._use_caching():
+            import memcache
+            mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+            key = 'parent_id_list_{0}'.format(str(qualifier_id.ident))
+            if mc.get(key) is None:
+                parent_ids = self._get_hierarchy_session(hierarchy_id).get_parents(qualifier_id)
+                parent_id_list = [str(parent_id) for parent_id in parent_ids]
+                mc.set(key, parent_id_list, time=30 * 60)
+            else:
+                parent_id_list = mc.get(key)
+        else:
+            parent_ids = self._get_hierarchy_session(hierarchy_id).get_parents(qualifier_id)
+            parent_id_list = [str(parent_id) for parent_id in parent_ids]
+        return parent_id_list"""
 
     can_access_authorizations = """
         return True"""
@@ -112,20 +146,16 @@ class AuthorizationSession:
                                           runtime=self._runtime)
 
         def is_parent_authorized(catalog_id):
-            # THE FOLLOWING COULD ALSO CHECK A CACHE:
-            parent_id_list = hierarchy_session.get_parents(catalog_id)
+            parent_id_list = self._get_parent_id_list(catalog_id, hierarchy_id)
             if parent_id_list:
-                parent_idstr_list = []
-                for parent_id in parent_id_list:
-                    parent_idstr_list.append(str(parent_id))
                 try:
                     collection.find_one(
                         {'agentId': str(agent_id),
                          'functionId': str(function_id),
-                         'qualifierId': {'$in': parent_idstr_list}})
+                         'qualifierId': {'$in': parent_id_list}})
                 except errors.NotFound:
                     for parent_id in parent_id_list:
-                        if is_parent_authorized(parent_id):
+                        if is_parent_authorized(Id(parent_id)):
                             return True
                     return False
                 else:
@@ -139,6 +169,7 @@ class AuthorizationSession:
             identifier = qualifier_id.get_identifier_namespace().split('.')[1].upper()
         except KeyError:
             idstr_list = [str(qualifier_id)]
+            authority = identifier = None
         else:
             root_qualifier_id = Id(
                 authority=qualifier_id.get_authority(),
@@ -153,13 +184,13 @@ class AuthorizationSession:
                  
         # Otherwise check for implicit authorization through inheritance:
         except errors.NotFound:
-            hierarchy_mgr = self._get_provider_manager('HIERARCHY') # local=True ???
-            hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
-                Id(authority=authority,
-                   namespace='CATALOG',
-                   identifier=identifier),
-                   proxy=self._proxy)
-            return is_parent_authorized(qualifier_id)
+            if authority and identifier:
+                hierarchy_id = Id(authority=authority,
+                                  namespace='CATALOG',
+                                  identifier=identifier)
+                return is_parent_authorized(qualifier_id)
+            else:
+                return False
         else:
             return True"""
 
