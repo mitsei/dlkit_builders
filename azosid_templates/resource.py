@@ -383,14 +383,14 @@ class ResourceQuerySession:
         if self._unauth_${cat_name_under}_ids is None:
             self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
         for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
-            query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+            query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
         return self._query_session.get_${object_name_under_plural}_by_query(query)
 
     class ${object_name}QueryWrapper(QueryWrapper):
         \"\"\"Wrapper for ${object_name}Queries to override match_${cat_name_under}_id method\"\"\"
 
         def match_${cat_name_under}_id(self, ${cat_name_under}_id, match=True):
-            self.cat_id_args_list.append({'${cat_name_under}_id': ${cat_name_under}_id, 'match': match})"""
+            self._cat_id_args_list.append({'${cat_name_under}_id': ${cat_name_under}_id, 'match': match})"""
 
     can_search_resources_template = """
         # Implemented from azosid template for -
@@ -409,9 +409,9 @@ class ResourceQuerySession:
     get_resources_by_query_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceQuerySession.get_resources_by_query_template
-        if not hasattr(${arg0_name}, 'cat_id_args_list'):
+        if not hasattr(${arg0_name}, '_cat_id_args_list'):
             raise Unsupported('${arg0_name} not from this session')
-        for kwargs in ${arg0_name}.cat_id_args_list:
+        for kwargs in ${arg0_name}._cat_id_args_list:
             if self._can('search', kwargs['${cat_name_under}_id']):
                 ${arg0_name}._provider_query.match_${cat_name_under}_id(**kwargs)
         if self._can('search'):
