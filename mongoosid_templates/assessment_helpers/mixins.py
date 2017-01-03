@@ -271,7 +271,7 @@ class AssessmentSessionSection(object):
                     ## THIS is a hack -- to get around repeated items within the same
                     ## section....
                     for item_id in part.get_item_ids():
-                        if str(item_id) not in self._my_map['itemIdsList']:
+                        if str(item_id) not in self._item_id_list:
                             self._item_id_list.append(str(item_id))
                     parts.append(part)
         return parts
