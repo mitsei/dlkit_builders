@@ -23,7 +23,6 @@ class AuthorizationSession:
             cat_name='Vault',
             cat_class=objects.Vault)
         self._kwargs = kwargs
-        self._hierarchy_sessions = dict()
 
     # def _get_qualifier_idstrs(self, qualifier_id):
     #     def generate_qualifier_ids():
@@ -105,12 +104,14 @@ class AuthorizationSession:
     #     return ancestor_ids
 
     def _get_hierarchy_session(self, hierarchy_id):
-            hierarchy_mgr = self._get_provider_manager('HIERARCHY', local=True)
-            return hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
-                hierarchy_id,
-                proxy=self._proxy)
+        \"\"\"Returns a hierarchy traversal session for the hierarchy\"\"\"
+        hierarchy_mgr = self._get_provider_manager('HIERARCHY', local=True)
+        return hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+            hierarchy_id,
+            proxy=self._proxy)
 
-    def _use_caching(self):
+    def _caching_enabled(self):
+        \"\"\"Returns True if caching is enabled per configuration, false otherwise.\"\"\"
         try:
             config = self._runtime.get_configuration()
             parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
@@ -122,7 +123,12 @@ class AuthorizationSession:
             return False
 
     def _get_parent_id_list(self, qualifier_id, hierarchy_id):
-        if self._use_caching():
+        \"\"\"Returns list of parent id strings for qualifier_id in hierarchy.
+        
+        Uses memcache if caching is enabled.
+        
+        \"\"\"
+        if self._caching_enabled():
             import memcache
             mc = memcache.Client(['127.0.0.1:11211'], debug=0)
             key = 'parent_id_list_{0}'.format(str(qualifier_id.ident))
@@ -146,6 +152,7 @@ class AuthorizationSession:
                                           runtime=self._runtime)
 
         def is_parent_authorized(catalog_id):
+            \"\"\"Recursively checks parents for implicit authorizations\"\"\"
             parent_id_list = self._get_parent_id_list(catalog_id, hierarchy_id)
             if parent_id_list:
                 try:
