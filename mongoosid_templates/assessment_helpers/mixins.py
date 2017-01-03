@@ -85,6 +85,7 @@ class AssessmentSessionSection(object):
         self._assessment_parts = dict()
         self._item_lookup_session = None
         self._assessment_part_lookup_session = None
+        self._item_id_list = []
         if '_id' not in self._my_map:
             # could happen if not created with items -- then self._initialize_part_map()
             # will not call self._save(). But we need to assign it an ID
@@ -230,6 +231,11 @@ class AssessmentSessionSection(object):
         """Updates questions known to this Section"""
         if self.is_simple_section():
             return # we don't need to go through any this for simple sections
+        ## ideally, we would update the parts map and questions list
+        ## at the same time as _get_parts(), to not run into the
+        ## issue where magic parts are initialized (with items)
+        ## ignorant of their "sibling" magic part items...
+        ## because the section hasn't been updated or saved to database
         part_list = self._get_parts()
         if len(part_list) > len(self._my_map['assessmentParts']):
             self._update_assessment_parts_map(part_list)
@@ -262,6 +268,11 @@ class AssessmentSessionSection(object):
                 finished = True
             else:
                 if part.has_items():
+                    ## THIS is a hack -- to get around repeated items within the same
+                    ## section....
+                    for item_id in part.get_item_ids():
+                        if str(item_id) not in self._my_map['itemIdsList']:
+                            self._item_id_list.append(str(item_id))
                     parts.append(part)
         return parts
 
