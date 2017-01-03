@@ -131,7 +131,7 @@ class AuthorizationSession:
         if self._caching_enabled():
             import memcache
             mc = memcache.Client(['127.0.0.1:11211'], debug=0)
-            key = 'parent_id_list_{0}'.format(str(qualifier_id.ident))
+            key = 'parent_id_list_{0}'.format(str(qualifier_id))
             if mc.get(key) is None:
                 parent_ids = self._get_hierarchy_session(hierarchy_id).get_parents(qualifier_id)
                 parent_id_list = [str(parent_id) for parent_id in parent_ids]
