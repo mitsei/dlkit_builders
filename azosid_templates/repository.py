@@ -491,7 +491,7 @@ class AssetQuerySession:
             return self.AssetQueryWrapper(self._provider_session.get_asset_content_query())
 
     def get_asset_contents_by_query(self, asset_content_query):
-        if not hasattr(asset_content_query, 'cat_id_args_list'):
+        if not hasattr(asset_content_query, '_cat_id_args_list'):
             raise Unsupported('asset_content_query not from this session')
         for kwargs in asset_content_query.cat_id_args_list:
             if self._can('search', kwargs['repository_id']):
