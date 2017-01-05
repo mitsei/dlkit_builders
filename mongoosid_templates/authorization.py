@@ -178,6 +178,10 @@ class AuthorizationSession:
             idstr_list = [str(qualifier_id)]
             authority = identifier = None
         else:
+            # handle aliased IDs
+            package_name = qualifier_id.get_identifier_namespace().split('.')[0]
+            qualifier_id = self._get_id(qualifier_id, package_name)
+
             root_qualifier_id = Id(
                 authority=qualifier_id.get_authority(),
                 namespace=qualifier_id.get_identifier_namespace(),
