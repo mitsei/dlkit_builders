@@ -1598,11 +1598,9 @@ class AssessmentTaken:
         raise errors.Unimplemented()"""
     
     has_started = """
-        assessment_offered = self.get_assessment_offered()
-        if assessment_offered.has_start_time():
-            return DateTime.utcnow() >= assessment_offered.get_start_time()
-        else:
-            return True"""
+        if self._my_map['actualStartTime'] is None:
+            return False
+        return True"""
     
     get_actual_start_time = """
         if not self.has_started():
