@@ -1177,6 +1177,8 @@ class AssetContentForm:
         self._my_map['${var_name_mixed}'] = ${arg0_name}"""
 
     set_data = """
+        # This should probably just store the DataInputStream and let the 
+        # create and update session methods save it to gridfs
         if data is None:
             raise errors.NullArgument()
         dbase = MongoClientValidated('repository',
