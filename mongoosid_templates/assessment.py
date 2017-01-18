@@ -1683,6 +1683,67 @@ class AssessmentQuery:
     match_item_id = """
         self._add_match('itemIds', str(item_id), match)"""
 
+    match_assessment_offered_id = """
+        self._add_match('assessmentOfferedId', str(assessment_offered_id), match)"""
+
+
+class AssessmentQuerySession:
+    get_assessments_by_query = """
+        \"\"\"Gets a list of ``Assessments`` matching the given assessment query.
+
+        arg:    assessment_query (osid.assessment.AssessmentQuery): the
+                assessment query
+        return: (osid.assessment.AssessmentList) - the returned
+                ``AssessmentList``
+        raise:  NullArgument - ``assessment_query`` is ``null``
+        raise:  OperationFailed - unable to complete request
+        raise:  PermissionDenied - authorization failure occurred
+        raise:  Unsupported - ``assessment_query`` is not of this
+                service
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        if 'assessmentOfferedId' in assessment_query._query_terms:
+            collection = MongoClientValidated('assessment',
+                                              collection='AssessmentOffered',
+                                              runtime=self._runtime)
+            match = '$in' in assessment_query._query_terms['assessmentOfferedId'].keys()
+            if match:
+                result = collection.find_one({
+                    "_id": ObjectId(Id(assessment_query._query_terms['assessmentOfferedId']).identifier)
+                })
+            else:
+                result = collection.find_one({
+                    "_id": {"$nin": [ObjectId(Id(assessment_query._query_terms['assessmentOfferedId']).identifier)]}
+                })
+
+            collection = MongoClientValidated('assessment',
+                                              collection='Assessment',
+                                              runtime=self._runtime)
+            result = collection.find({
+                "_id": ObjectId(Id(result['assessmentId']).identifier)
+            })
+            return objects.AssessmentList(result, runtime=self._runtime, proxy=self._proxy)
+        else:
+            and_list = list()
+            or_list = list()
+            for term in assessment_query._query_terms:
+                and_list.append({term: assessment_query._query_terms[term]})
+            for term in assessment_query._keyword_terms:
+                or_list.append({term: assessment_query._keyword_terms[term]})
+            if or_list:
+                and_list.append({'$or': or_list})
+            view_filter = self._view_filter()
+            if view_filter:
+                and_list.append(view_filter)
+            if and_list:
+                query_terms = {'$and': and_list}
+
+            collection = MongoClientValidated('assessment',
+                                              collection='Assessment',
+                                              runtime=self._runtime)
+            result = collection.find(query_terms).sort('_id', DESCENDING)
+            return objects.AssessmentList(result, runtime=self._runtime, proxy=self._proxy)"""
 
 class AssessmentSection:
 
