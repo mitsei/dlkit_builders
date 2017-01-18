@@ -1717,7 +1717,7 @@ class AssessmentQuerySession:
                 "_id": query
             })
 
-            assessment_ids = [r['assessmentId'] for r in result]
+            assessment_ids = [ObjectId(Id(r['assessmentId']).identifier) for r in result]
 
             collection = MongoClientValidated('assessment',
                                               collection='Assessment',
