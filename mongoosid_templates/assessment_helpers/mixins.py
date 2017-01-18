@@ -86,8 +86,6 @@ class AssessmentSessionSection(object):
         self._item_lookup_session = None
         self._assessment_part_lookup_session = None
         self._item_id_list = []
-        if 'actualStartTime' not in self._my_map:
-            self._my_map['actualStartTime'] = None
         if '_id' not in self._my_map:
             # could happen if not created with items -- then self._initialize_part_map()
             # will not call self._save(). But we need to assign it an ID
@@ -463,23 +461,6 @@ class AssessmentSessionSection(object):
         ils = self._get_item_lookup_session()
         return ils.get_item(Id(question._my_map['itemId']))
 
-    def has_started(self):
-        """Checks if the taker has started taking this Section
-        
-        Meaning that the taker has retrieved the first question or all questions
-        for the first time
-        
-        """
-        if self._my_map['actualStartTime'] is None:
-            return False
-        return True
-
-    def get_actual_start_time(self):
-        """The DateTime the taker first retrieved question or questions from this Section"""
-        if self._my_map['actualStartTime'] is None:
-            raise errors.IllegalState()
-        return self._my_map['actualStartTime']
-            
     def get_questions(self, answered=None, honor_sequential=True, update=True):
         """gets all available questions for this section
 
@@ -513,8 +494,6 @@ class AssessmentSessionSection(object):
                     prev_question_answered = update_question_list()
             else:
                 update_question_list()
-        if self._my_map['actualStartTime'] is None:
-            self._my_map['actualStartTime'] = DateTime.utcnow()
         return QuestionList(question_list, runtime=self._runtime, proxy=self._proxy)
 
     def get_question(self, question_id=None, question_map=None):
@@ -557,8 +536,6 @@ class AssessmentSessionSection(object):
         return answers # Should this return and AnswerList?
 
     def get_first_question(self):
-        if self._my_map['actualStartTime'] is None:
-            self._my_map['actualStartTime'] = DateTime.utcnow()
         return self.get_question(question_map=self._my_map['questions'][0])
 
     def get_next_question(self, question_id, answered=None, reverse=False, honor_sequential=True):
@@ -731,20 +708,7 @@ class AssessmentSessionSection(object):
                 return False
         return True
 
-    def get_object_map(self):
-        obj_map = dict(self._my_map)
-        if obj_map['actualStartTime'] is not None:
-            actual_start_time = obj_map['actualStartTime']
-            obj_map['actualStartTime'] = dict()
-            obj_map['actualStartTime']['year'] = actual_start_time.year
-            obj_map['actualStartTime']['month'] = actual_start_time.month
-            obj_map['actualStartTime']['day'] = actual_start_time.day
-            obj_map['actualStartTime']['hour'] = actual_start_time.hour
-            obj_map['actualStartTime']['minute'] = actual_start_time.minute
-            obj_map['actualStartTime']['second'] = actual_start_time.second
-            obj_map['actualStartTime']['microsecond'] = actual_start_time.microsecond
-        obj_map = AssessmentSection.get_object_map(self, obj_map)
-        return obj_map
+
 
 class LoadedSection(PartSequenceSection, AssessmentSessionSection, AssessmentSection):
     pass
