@@ -1709,19 +1709,23 @@ class AssessmentQuerySession:
                                               runtime=self._runtime)
             match = '$in' in assessment_query._query_terms['assessmentOfferedId'].keys()
             if match:
-                result = collection.find_one({
-                    "_id": ObjectId(Id(assessment_query._query_terms['assessmentOfferedId']).identifier)
-                })
+                match_identifiers = [ObjectId(Id(i).identifier) for i in assessment_query._query_terms['assessmentOfferedId']['$in']]
+                query = {'$in': match_identifiers}
             else:
-                result = collection.find_one({
-                    "_id": {"$nin": [ObjectId(Id(assessment_query._query_terms['assessmentOfferedId']).identifier)]}
-                })
+                match_identifiers = [ObjectId(Id(i).identifier) for i in assessment_query._query_terms['assessmentOfferedId']['$in']]
+                query = {'$nin': match_identifiers}
+
+            result = collection.find({
+                "_id": query
+            })
+
+            assessment_ids = [r['assessmentId'] for r in result]
 
             collection = MongoClientValidated('assessment',
                                               collection='Assessment',
                                               runtime=self._runtime)
             result = collection.find({
-                "_id": ObjectId(Id(result['assessmentId']).identifier)
+                "_id": {"$in": assessment_ids}
             })
             return objects.AssessmentList(result, runtime=self._runtime, proxy=self._proxy)
         else:
