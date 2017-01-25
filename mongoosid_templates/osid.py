@@ -651,11 +651,10 @@ class OsidSession:
 
             key = 'descendent-catalog-ids-{0}'.format(str(cat_id))
 
-            if mc.get(key) is None:
+            catalog_ids = mc.get(key)
+            if catalog_ids is None:
                 catalog_ids = get_descendent_ids(hierarchy_session)
-                mc.set(key, catalog_ids, time=30 * 60)
-            else:
-                catalog_ids = mc.get(key)
+                mc.set(key, catalog_ids)
         else:
             catalog_ids = get_descendent_ids(hierarchy_session)
         return catalog_ids

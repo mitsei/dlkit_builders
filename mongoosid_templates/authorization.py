@@ -132,12 +132,11 @@ class AuthorizationSession:
             import memcache
             mc = memcache.Client(['127.0.0.1:11211'], debug=0)
             key = 'parent_id_list_{0}'.format(str(qualifier_id))
-            if mc.get(key) is None:
+            parent_id_list = mc.get(key)
+            if parent_id_list is None:
                 parent_ids = self._get_hierarchy_session(hierarchy_id).get_parents(qualifier_id)
                 parent_id_list = [str(parent_id) for parent_id in parent_ids]
-                mc.set(key, parent_id_list, time=30 * 60)
-            else:
-                parent_id_list = mc.get(key)
+                mc.set(key, parent_id_list)
         else:
             parent_ids = self._get_hierarchy_session(hierarchy_id).get_parents(qualifier_id)
             parent_id_list = [str(parent_id) for parent_id in parent_ids]
