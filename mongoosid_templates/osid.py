@@ -1404,7 +1404,7 @@ class OsidSourceableForm:
         return Metadata(**metadata)"""
 
     set_license = """
-        self._my_map['license'] = self._get_display_text(license, self.get_license_metadata())"""
+        self._my_map['license'] = self._get_display_text(license_, self.get_license_metadata())"""
 
     clear_license = """
         if (self.get_license_metadata().is_read_only() or
