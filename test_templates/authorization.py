@@ -13,6 +13,7 @@ class AuthorizationSession:
         'SEARCH_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'search\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
         'CREATE_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'create\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
         'DELETE_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'delete\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
+        'ASSIGN_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'assign\', \'namespace\': \'resource.ResourceBin\', \'authority\': \'ODL.MIT.EDU\',})',
         'CREATE_BIN_FUNCTION_ID = Id(**{\'identifier\': \'create\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
         'DELETE_BIN_FUNCTION_ID = Id(**{\'identifier\': \'delete\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
         'LOOKUP_BIN_FUNCTION_ID = Id(**{\'identifier\': \'lookup\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
@@ -104,6 +105,16 @@ class AuthorizationSession:
         create_form.description = 'Resource Delete Authorization for AuthorizationLookupSession tests'
         resource_delete_authz = cls.authz_admin_session.create_authorization(create_form)
 
+        # Set up Resource - Bin assignment authorization for current user
+        create_form = cls.authz_admin_session.get_authorization_form_for_create_for_agent(
+            PROXY.get_authentication().get_agent_id(),
+            ASSIGN_RESOURCE_FUNCTION_ID,
+            ROOT_QUALIFIER_ID,
+            [])
+        create_form.display_name = 'Resource Delete for Test Authorizations'
+        create_form.description = 'Resource Delete Authorization for AuthorizationLookupSession tests'
+        resource_delete_authz = cls.authz_admin_session.create_authorization(create_form)
+
         # Set up Resource lookup authorization for current user
         create_form = cls.authz_admin_session.get_authorization_form_for_create_for_agent(
             PROXY.get_authentication().get_agent_id(),
@@ -119,10 +130,10 @@ class AuthorizationSession:
         cls.authz_list = list()
         cls.authz_id_list = list()
         cls.resource_mgr = Runtime().get_service_manager('RESOURCE', proxy=PROXY, implementation='TEST_SERVICE')
-        for num in [0, 1, 2, 3, 4, 5]:
+        for num in [0, 1, 2, 3, 4, 5, 6, 7]:
             create_form = cls.resource_mgr.get_bin_form_for_create([])
-            create_form.display_name = 'Test Resource'
-            create_form.description = 'Test Resource for Testing Authorization Number: ' + str(num)
+            create_form.display_name = 'Test Bin ' + str(num)
+            create_form.description = 'Test Bin for Testing Authorization Number: ' + str(num)
             bin = cls.resource_mgr.create_bin(create_form)
             cls.bin_list.append(bin)
             cls.bin_id_list.append(bin.ident)
@@ -150,7 +161,7 @@ class AuthorizationSession:
         cls.authz_id_list.append(jane_lookup_authz.ident)
         
         # Set up Resource lookup authorizations for Jane
-        for num in [1, 5]:
+        for num in [1, 5, 7]:
             create_form = cls.authz_admin_session.get_authorization_form_for_create_for_agent(
                 AGENT_ID,
                 LOOKUP_RESOURCE_FUNCTION_ID,
@@ -193,9 +204,9 @@ class AuthorizationSession:
         #
         #            _____ 0 _____
         #           |             |
-        #        _ 1(t) _         2 
+        #        _ 1(t) _         2     not in hierarchy
         #       |        |        |
-        #       3        4       5(t)
+        #       3        4       5(t)      6     7(t)   (the 'blue' resource in bin 2 is also assigned to bin 7)
 """
 
     is_authorized = """
@@ -220,6 +231,14 @@ class AuthorizationSession:
     def test_is_authorized_5(self):
         \"\"\"Tests is_authorized 5\"\"\"
         self.assertTrue(self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[5]))
+
+    def test_is_authorized_6(self):
+        \"\"\"Tests is_authorized 5\"\"\"
+        self.assertFalse(self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[6]))
+
+    def test_is_authorized_7(self):
+        \"\"\"Tests is_authorized 5\"\"\"
+        self.assertTrue(self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[7]))
 """
 
 class AuthorizationLookupSession:
