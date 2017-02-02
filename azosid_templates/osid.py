@@ -20,19 +20,62 @@ class OsidProfile:
         if self._my_runtime is not None:
             raise IllegalState('this manager has already been initialized.')
         self._my_runtime = runtime
-        #config = runtime.get_configuration()
-        #parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
-        #provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        #authz_manager = runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
-        #self._authz_session = authz_manager.get_authorization_session()
 
-    def _get_authz_session(self):
+    def _get_authz_manager(self):
         config = self._my_runtime.get_configuration()
         parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        authz_manager = self._my_runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
-        return authz_manager.get_authorization_session() # what about vaults?
-"""
+        return self._my_runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
+
+    def _get_vault_lookup_session(self):
+        return self._get_authz_manager().get_vault_lookup_session()
+
+    def _get_authz_session(self):
+        \"\"\"Gets the AuthorizationSession for the default (bootstrap) typed Vault
+        
+        Assumes only one vault of this Type, but it can have children depending on underlying impl.
+        
+        \"\"\"
+        from ..utilities import BOOTSTRAP_VAULT_TYPE
+        vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(BOOTSTRAP_VAULT_TYPE)
+        if vaults.available():
+            vault = vaults.next()
+        else:
+            raise errors.OperationFailed()
+        session = self._get_authz_manager().get_authorization_session_for_vault(vault.get_id())
+        return session
+
+    def _get_authz_lookup_session(self): ## DO WE REALLY NEED THIS STILL???
+        \"\"\"Gets the AuthorizationLookupSession for the default (bootstrap) typed Vault
+        
+        Assumes only one Vault of this Type, but it can have children
+        
+        \"\"\"
+        from ..utilities import BOOTSTRAP_VAULT_TYPE
+        vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(BOOTSTRAP_VAULT_TYPE)
+        if vaults.available():
+            vault = vaults.next()
+        else:
+            raise errors.OperationFailed()
+        session = self._get_authz_manager().get_authorization_lookup_session_for_vault(vault.get_id())
+        session.use_federated_vault_view()
+        return session
+
+    def _get_override_lookup_session(self):
+        \"\"\"Gets the AuthorizationLookupSession for the override typed Vault
+        
+        Assumes only one
+        
+        \"\"\"
+        from ..utilities import OVERRIDE_VAULT_TYPE
+        override_vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(OVERRIDE_VAULT_TYPE)
+        if override_vaults.available():
+            vault = override_vaults.next()
+        else:
+            return None
+        session = self._get_authz_manager().get_authorization_lookup_session_for_vault(vault.get_id(), proxy=self._proxy)
+        session.use_isolated_vault_view()
+        return session"""
 
     get_id = """
         pass"""
@@ -82,24 +125,6 @@ class OsidManager:
     initialize = """
         OsidProfile.initialize(self, runtime)"""
 
-    old_initialize_delete_me_soon = """
-        if runtime is None:
-            raise NullArgument()
-        if self._my_runtime is not None:
-            raise IllegalState('this manager has already been initialized.')
-        self._my_runtime = runtime
-        config = runtime.get_configuration()
-        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
-        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        authz_manager = runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
-        self._authz_session = authz_manager.get_authorization_session()
-
-    def _get_authz_session(self):
-        config = self._my_runtime.get_configuration()
-        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
-        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        authz_manager = self._my_runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
-        return authz_manager.get_authorization_session() # what about vaults?"""
 
 class OsidProxyManager:
     
@@ -109,25 +134,6 @@ class OsidProxyManager:
 
     initialize = """
         OsidProfile.initialize(self, runtime)"""
-
-    old_initialize_delete_me_soon = """
-        if runtime is None:
-            raise NullArgument()
-        if self._my_runtime is not None:
-            raise IllegalState('this manager has already been initialized.')
-        self._my_runtime = runtime
-        config = runtime.get_configuration()
-        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
-        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        authz_manager = runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
-        self._authz_session = authz_manager.get_authorization_session()
-
-    def _get_authz_session(self):
-        config = self._my_runtime.get_configuration()
-        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
-        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        authz_manager = self._my_runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
-        return authz_manager.get_authorization_session() # what about vaults?"""
 
 
 class Identifiable:
@@ -174,15 +180,31 @@ class OsidSession:
     ]
 
     init = """
-    def __init__(self, provider_session, authz_session, proxy=None):
+    def __init__(self, provider_session, authz_session, override_lookup_session=None, authz_lookup_session=None, proxy=None, **kwargs):
         self._provider_session = provider_session
         self._authz_session = authz_session
+        self._override_lookup_session = override_lookup_session
+        self._authz_lookup_session = authz_lookup_session  # DO WE STILL NEED THIS?
         self._proxy = proxy
+        if 'hierarchy_session' in kwargs:
+            self._hierarchy_session = kwargs['hierarchy_session']
+        else:
+            self._hierarchy_session = None
+        if 'query_session' in kwargs:
+            self._query_session = kwargs['query_session']
+        else:
+            self._query_session = None
         self._id_namespace = None
         self._qualifier_id = None
         self._authz_cache = dict() # Does this want to be a real cache???
         self._object_view = COMPARATIVE
         self._catalog_view = FEDERATED
+
+    def _get_function_id(self, func_name):
+        return Id(
+            identifier=func_name,
+            namespace=self._id_namespace,
+            authority='ODL.MIT.EDU')
 
     def _can(self, func_name, qualifier_id=None):
         \"\"\"Tests if the named function is authorized with agent and qualifier.
@@ -193,10 +215,7 @@ class OsidSession:
         like cachetools.
 
         \"\"\"
-        function_id = Id(
-            identifier=func_name,
-            namespace=self._id_namespace,
-            authority='ODL.MIT.EDU')
+        function_id = self._get_function_id(func_name)
         if qualifier_id is None:
             qualifier_id = self._qualifier_id
         agent_id = self.get_effective_agent_id()
@@ -208,6 +227,19 @@ class OsidSession:
                                                       qualifier_id=qualifier_id)
             self._authz_cache[str(agent_id) + str(function_id) + str(qualifier_id)] = authz
             return authz
+
+    def _get_auth_catalog_ids(self, func_name):
+        function_id = Id(
+            identifier=func_name,
+            namespace=self._id_namespace,
+            authority='ODL.MIT.EDU')
+        auths = self._authz_lookup_session.get_authorizations_for_agent_and_function(
+            self.get_effective_agent_id(),
+            function_id)
+        auth_id_list = []
+        for auth in auths:
+            auth_id_list.append(auth.get_qualifier_id())
+        return auth_id_list
 
     def _use_comparative_object_view(self):
         self._object_view = COMPARATIVE

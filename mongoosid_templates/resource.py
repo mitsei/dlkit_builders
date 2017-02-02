@@ -324,7 +324,12 @@ class ResourceQuerySession:
         and_list = list()
         or_list = list()
         for term in ${arg0_name}._query_terms:
-            and_list.append({term: ${arg0_name}._query_terms[term]})
+            if '$$in' in ${arg0_name}._query_terms[term] and '$$nin' in ${arg0_name}._query_terms[term]:
+                and_list.append(
+                    {'$$or': [{term: {'$$in': ${arg0_name}._query_terms[term]['$$in']}},
+                             {term: {'$$nin': ${arg0_name}._query_terms[term]['$$nin']}}]})
+            else:
+                and_list.append({term: resource_query._query_terms[term]})
         for term in ${arg0_name}._keyword_terms:
             or_list.append({term: ${arg0_name}._keyword_terms[term]})
         if or_list:

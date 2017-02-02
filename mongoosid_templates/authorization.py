@@ -204,6 +204,19 @@ class AuthorizationSession:
         else:
             return True"""
 
+class AuthorizationLookupSession:
+
+    get_authorizations_for_agent_and_function = """
+        collection = MongoClientValidated('authorization',
+                                          collection='Authorization',
+                                          runtime=self._runtime)
+        result = collection.find(
+            dict({'agentId': str(agent_id),
+                  'functionId': str(function_id)},
+                 **self._view_filter())).sort('_sort_id', ASCENDING)
+        return objects.AuthorizationList(result, runtime=self._runtime)
+"""
+
 class AuthorizationAdminSession:
 
     import_statements = [

@@ -59,8 +59,9 @@ class ResourceManager:
             query_session = None
         try:
             return getattr(sessions, '${return_type}')(
-                self._provider_manager.${method_name}(),
-                self._get_authz_session(),
+                provider_session=self._provider_manager.${method_name}(),
+                authz_session=self._get_authz_session(),
+                authz_lookup_session=self._get_authz_lookup_session(),
                 hierarchy_session=self._get_hierarchy_session(),
                 query_session=query_session)
         except AttributeError:
@@ -76,8 +77,9 @@ class ResourceManager:
             query_session = None
         try:
             return getattr(sessions, '${return_type}')(
-                self._provider_manager.${method_name}(${arg0_name}),
-                self._get_authz_session(),
+                provider_session=self._provider_manager.${method_name}(${arg0_name}),
+                authz_session=self._get_authz_session(),
+                authz_lookup_session=self._get_authz_lookup_session(),
                 hierarchy_session=self._get_hierarchy_session(),
                 query_session=query_session)
         except AttributeError:
@@ -88,8 +90,11 @@ class ResourceManager:
         # osid.resource.ResourceManager.get_resource_lookup_session_template
         try:
             return getattr(sessions, '${return_type}')(
-                self._provider_manager.${method_name}(),
-                self._get_authz_session())
+                provider_session=self._provider_manager.${method_name}(),
+                authz_session=self._get_authz_session(),
+                authz_lookup_session=self._get_authz_lookup_session(),
+                override_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
         except AttributeError:
             raise OperationFailed()"""
 
@@ -98,8 +103,11 @@ class ResourceManager:
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
         try:
             return getattr(sessions, '${return_type}')(
-                self._provider_manager.${method_name}(${arg0_name}),
-                self._get_authz_session())
+                provider_session=self._provider_manager.${method_name}(${arg0_name}),
+                authz_session=self._get_authz_session(),
+                authz_lookup_session=self._get_authz_lookup_session(),
+                override_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
         except AttributeError:
             raise OperationFailed()"""
 
@@ -134,6 +142,7 @@ class ResourceProxyManager:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(proxy),
                 self._get_authz_session(),
+                self._get_authz_lookup_session(),
                 proxy,
                 hierarchy_session=self._get_hierarchy_session(proxy),
                 query_session=query_session)
@@ -152,6 +161,7 @@ class ResourceProxyManager:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(${arg0_name}, proxy),
                 self._get_authz_session(),
+                self._get_authz_lookup_session(),
                 proxy,
                 hierarchy_session=self._get_hierarchy_session(proxy),
                 query_session=query_session)
@@ -165,6 +175,7 @@ class ResourceProxyManager:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(proxy),
                 self._get_authz_session(),
+                self._get_authz_lookup_session(),
                 proxy)
         except AttributeError:
             raise OperationFailed()"""
@@ -176,6 +187,7 @@ class ResourceProxyManager:
             return getattr(sessions, '${return_type}')(
                 self._provider_manager.${method_name}(${arg0_name}, proxy),
                 self._get_authz_session(),
+                self._get_authz_lookup_session(),
                 proxy)
         except AttributeError:
             raise OperationFailed()"""
@@ -187,20 +199,13 @@ class ResourceLookupSession:
     ]
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        if 'hierarchy_session' in kwargs:
-            self._hierarchy_session = kwargs['hierarchy_session']
-        else:
-            self._hierarchy_session = None
-        if 'query_session' in kwargs:
-            self._query_session = kwargs['query_session']
-        else:
-            self._query_session = None
-        self._qualifier_id = provider_session.get_${cat_name_under}_id()
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
         self.use_comparative_${object_name_under}_view()
+        self._auth_${cat_name_under}_ids = None
         self._unauth_${cat_name_under}_ids = None
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
@@ -213,6 +218,9 @@ class ResourceLookupSession:
                 unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
         return unauth_list
 
+    def _get_auth_${cat_name_under}_ids(self):
+        return self._get_auth_catalog_ids('lookup')
+
     def _try_harder(self, query):
         if self._hierarchy_session is None or self._query_session is None:
             # Should probably try to return empty result instead
@@ -220,8 +228,12 @@ class ResourceLookupSession:
             raise PermissionDenied()
         if self._unauth_${cat_name_under}_ids is None:
             self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
+        if self._auth_${cat_name_under}_ids is None:
+            self._auth_${cat_name_under}_ids = self._get_auth_${cat_name_under}_ids()
         for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
             query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        for ${cat_name_under}_id in self._auth_${cat_name_under}_ids:
+            query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
         return self._query_session.get_${object_name_under_plural}_by_query(query)"""
 
     get_bin_id_template = """
@@ -350,17 +362,9 @@ class ResourceQuerySession:
     ]
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        if 'hierarchy_session' in kwargs:
-            self._hierarchy_session = kwargs['hierarchy_session']
-        else:
-            self._hierarchy_session = None
-        if 'query_session' in kwargs:
-            self._query_session = kwargs['query_session']
-        else:
-            self._query_session = None
-        self._qualifier_id = provider_session.get_${cat_name_under}_id()
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
         self._unauth_${cat_name_under}_ids = None
@@ -448,11 +452,34 @@ class ResourceSearchSession:
 class ResourceAdminSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = provider_session.get_${cat_name_under}_id()
+    def __init__(self, provider_manager, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self,  *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
-"""
+        try:
+            self._${object_name_under}_${cat_name_under}_session = provider_manager.get_${object_name_under}_${cat_name_under}_session()
+        except errors.Unimplemented():
+            self._${object_name_under}_${cat_name_under}_session = None
+
+    def _can_for_${object_name_under}(self, func_name, ${object_name_under}_id):
+        \"\"\"Checks if agent can perform function for object\"\"\"
+        can_for_session = OsidSession._can(self, func_name)
+        if (can_for_session or 
+                self._${object_name_under}_${cat_name_under}_session is None or
+                self._override_lookup_session is None):
+            return can_for_session
+
+        override_auths = override_lookup_session.get_authorizations_for_agent_and_function(
+            self.get_effective_agent_id(),
+            self._get_function_id(func_name))
+        if not override_auths.available():
+            return False
+
+        ${cat_name_under}_ids = list(self._${object_name_under}_${cat_name_under}_session.get_${cat_name_under}_ids_for_${object_name_under}(${object_name_under}_id))
+        for auth in override_auths:
+            if auth.get_qualifier_id() in ${cat_name_under}_ids:
+                return True
+        return False"""
 
     can_create_resources_template = """
         # Implemented from azosid template for -
@@ -487,7 +514,7 @@ class ResourceAdminSession:
     get_resource_form_for_update_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.get_resource_form_for_update
-        if not self._can('update'):
+        if not self._can_for_${object_name_under}('update', ${object_name_under}_id):
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name})
@@ -509,7 +536,7 @@ class ResourceAdminSession:
     delete_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.delete_resource
-        if not self._can('delete'):
+        if not self._can_for_${object_name_under}('delete', ${object_name_under}_id):
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name})"""
@@ -517,7 +544,7 @@ class ResourceAdminSession:
     alias_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.alias_resources
-        if not self._can('alias'):
+        if not self._can_for_${object_name_under}('alias', ${object_name_under}_id):
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
@@ -525,9 +552,9 @@ class ResourceAdminSession:
 class ResourceNotificationSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = provider_session.get_${cat_name_under}_id()
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
 """
 
@@ -590,8 +617,8 @@ class ResourceNotificationSession:
 class ResourceBinSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This could be better
         self._id_namespace = '${pkg_name_replaced}.${object_name}${cat_name}'
 """
@@ -652,8 +679,8 @@ class ResourceBinSession:
 class ResourceBinAssignmentSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This could be better
         self._id_namespace = '${pkg_name_replaced}.${object_name}${cat_name}'
 """
@@ -704,9 +731,9 @@ class ResourceBinAssignmentSession:
 class ResourceAgentSession:
 
     init = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = provider_session.get_bin_id()
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_bin_id()
         self._id_namespace = 'resource.ResourceAgent'
 """
 
@@ -741,9 +768,9 @@ class ResourceAgentSession:
 class ResourceAgentAssignmentSession:
 
     init = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = provider_session.get_bin_id()
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_bin_id()
         self._id_namespace = 'resource.ResourceAgent'
 """
 
@@ -769,8 +796,8 @@ class ResourceAgentAssignmentSession:
 class BinLookupSession:
     
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         # This needs to be done right
         # Build from authority in config
         self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
@@ -823,8 +850,8 @@ class BinLookupSession:
 class BinAdminSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         # This needs to be done right
         # Build from authority in config
         self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
@@ -896,8 +923,8 @@ class BinAdminSession:
 class BinHierarchySession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         # This needs to be done right
         # Build from authority in config
         self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
@@ -1046,8 +1073,8 @@ class BinHierarchySession:
 class BinHierarchyDesignSession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         # This needs to be done right
         # Build from authority in config
         self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
@@ -1095,8 +1122,8 @@ class BinHierarchyDesignSession:
 class BinQuerySession:
 
     init_template = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         # This needs to be done right
         # Build from authority in config
         self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
