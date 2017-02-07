@@ -1814,7 +1814,8 @@ class AssessmentSection:
             return choices
 
         if obj_map is None:
-            obj_map = dict(self._my_map)
+            # obj_map = dict(self._my_map)
+            obj_map = dict(self._assessment_part._my_map)
         del obj_map['_id']
 
         obj_map.update(
@@ -1870,20 +1871,7 @@ class AssessmentSection:
             obj_map.update({
                 'questions': questions
             })
-        # Also need to inject the LO ID from the child part, if available
-        try:
-            obj_map.update({
-                'learningObjectiveId': self._assessment_part.learning_objective_id
-            })
-        except AttributeError:
-            pass
-        # also add in minimum proficiency if available
-        try:
-            obj_map.update({
-                'minimumProficiency': self._assessment_part.minimum_proficiency
-            })
-        except AttributeError:
-            pass
+            
         ####
 
         return obj_map
