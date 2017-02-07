@@ -1848,7 +1848,7 @@ class AssessmentSection:
                 is_correct = None
                 if 'missingResponse' in response:
                     response = None
-                    responded = false
+                    responded = False
                 else:
                     response['confusedLearningObjectiveIds'] = []
                     if ('missingResponse' not in response and
