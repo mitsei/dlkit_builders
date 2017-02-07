@@ -1877,6 +1877,13 @@ class AssessmentSection:
             })
         except AttributeError:
             pass
+        # also add in minimum proficiency if available
+        try:
+            obj_map.update({
+                'minimumProficiency': self._assessment_part.minimum_proficiency
+            })
+        except AttributeError:
+            pass
         ####
 
         return obj_map
