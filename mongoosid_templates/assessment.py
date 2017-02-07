@@ -1836,13 +1836,19 @@ class AssessmentSection:
                 question_map['_id'] = str(question_map['_id'])
                 question_map['learningObjectiveIds'] = item['learningObjectiveIds']
 
+                if 'displayElements' in question:
+                    question_map['displayName']['text'] = '.'.join([str(key) for key in question['displayElements']])
+
                 # if this is a magic MC question, try reordering the choices:
                 if 'choices' in question_map:
                     question_map['choices'] = reorder_choices(question_map['choices'], question['questionId'])
 
                 response = question['responses'][0]
+                responded = True
+                is_correct = None
                 if 'missingResponse' in response:
                     response = None
+                    responded = false
                 else:
                     response['confusedLearningObjectiveIds'] = []
                     if ('missingResponse' not in response and
@@ -1867,8 +1873,15 @@ class AssessmentSection:
                             'minute': submit.minute,
                             'second': submit.second
                         }
+                    is_correct = response['isCorrect']
                 question_map.update({
-                    'response': response
+                    'response': response,
+                    'responded': responded
+                })
+
+                if is_correct is not None:
+                    question_map.update({
+                    'isCorrect': is_correct
                 })
 
                 questions.append(question_map)
