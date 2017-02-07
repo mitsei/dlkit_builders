@@ -1870,6 +1870,13 @@ class AssessmentSection:
             obj_map.update({
                 'questions': questions
             })
+        # Also need to inject the LO ID from the child part, if available
+        try:
+            obj_map.update({
+                'learningObjectiveId': self._assessment_part.learning_objective_id
+            })
+        except AttributeError:
+            pass
         ####
 
         return obj_map
