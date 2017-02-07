@@ -1839,29 +1839,32 @@ class AssessmentSection:
                     question_map['choices'] = reorder_choices(question_map['choices'], question['questionId'])
 
                 response = question['responses'][0]
-                response['confusedLearningObjectiveIds'] = []
-                if ('missingResponse' not in response and
-                        'choiceIds' in response and
-                        len(response['choiceIds']) > 0):
-                    matching_answers = [a for a in item['answers']
-                                       if a['choiceIds'][0] == response['choiceIds'][0]]
-                    if len(matching_answers) > 0 and 'confusedLearningObjectiveIds' in matching_answers[0]:
-                        response['confusedLearningObjectiveIds'] = matching_answers[0]['confusedLearningObjectiveIds']
+                if 'missingResponse' in response:
+                    response = None
+                else:
+                    response['confusedLearningObjectiveIds'] = []
+                    if ('missingResponse' not in response and
+                            'choiceIds' in response and
+                            len(response['choiceIds']) > 0):
+                        matching_answers = [a for a in item['answers']
+                                           if a['choiceIds'][0] == response['choiceIds'][0]]
+                        if len(matching_answers) > 0 and 'confusedLearningObjectiveIds' in matching_answers[0]:
+                            response['confusedLearningObjectiveIds'] = matching_answers[0]['confusedLearningObjectiveIds']
 
-                if 'solution' in item:
-                    response['feedback'] = item['solution']['text']
-                if '_id' in response:
-                    response['_id'] = str(response['_id'])
-                submit = response['submissionTime']
-                if submit is not None:
-                    response['submissionTime'] = {
-                        'year': submit.year,
-                        'month': submit.month,
-                        'day': submit.day,
-                        'hour': submit.hour,
-                        'minute': submit.minute,
-                        'second': submit.second
-                    }
+                    if 'solution' in item:
+                        response['feedback'] = item['solution']['text']
+                    if '_id' in response:
+                        response['_id'] = str(response['_id'])
+                    submit = response['submissionTime']
+                    if submit is not None:
+                        response['submissionTime'] = {
+                            'year': submit.year,
+                            'month': submit.month,
+                            'day': submit.day,
+                            'hour': submit.hour,
+                            'minute': submit.minute,
+                            'second': submit.second
+                        }
                 question_map.update({
                     'response': response
                 })
