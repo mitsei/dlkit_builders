@@ -1822,13 +1822,13 @@ class AssessmentSection:
             {'type': self._namespace.split('.')[-1],
              'id': str(self.get_id())})
 
-        ## testing for performance
-        if 'questions' in obj_map:
+        ## should this be here, or elsewhere?
+        if 'questions' in self._my_map:
             collection = MongoClientValidated('assessment',
                                               collection='Item',
                                               runtime=self._runtime)
             questions = []
-            for question in obj_map['questions']:
+            for question in self._my_map['questions']:
                 item = collection.find_one({"_id": ObjectId(Id(question['itemId']).identifier)})
                 question_map = item['question']
                 question_map['_id'] = str(question_map['_id'])
@@ -1871,7 +1871,7 @@ class AssessmentSection:
             obj_map.update({
                 'questions': questions
             })
-            
+
         ####
 
         return obj_map
