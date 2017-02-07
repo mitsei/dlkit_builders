@@ -1799,6 +1799,7 @@ class AssessmentSection:
             return None
 
         def reorder_choices(choices, magic_id):
+            ## We may want to do this with the magic lookup session instead
             # reorder the choices list according to the order in the magic_id
             identifier = unquote(Id(magic_id).identifier)
             if '?' in identifier:
@@ -1823,6 +1824,7 @@ class AssessmentSection:
              'id': str(self.get_id())})
 
         ## should this be here, or elsewhere?
+        ## Trying to make getting the section maps faster
         if 'questions' in self._my_map:
             collection = MongoClientValidated('assessment',
                                               collection='Item',
