@@ -1759,6 +1759,8 @@ class AssessmentSection:
         'from .assessment_utilities import get_item_lookup_session',
         'from .rules import Response',
         'from dlkit.abstract_osid.id.primitives import Id as abc_id',
+        'from urllib import unquote',
+        'import json',
         'UNANSWERED = 0',
         'NULL_RESPONSE = 1',
     ]
@@ -1789,6 +1791,28 @@ class AssessmentSection:
         self._assessment_part = part_lookup_session.get_assessment_part(self._assessment_part_id)
 
     def get_object_map(self, obj_map=None):
+        def grab_choice(choices, choice_id):
+            choice_ids = [c['id'] for c in choices]
+
+            if choice_id in choice_ids:
+                return [c for c in choices if c['id'] == choice_id][0]
+            return None
+
+        def reorder_choices(choices, magic_id):
+            # reorder the choices list according to the order in the magic_id
+            identifier = unquote(Id(magic_id).identifier)
+            if '?' in identifier:
+                #it is a magic ID, by our convention
+                magic_params = json.loads(identifier.split('?')[1])
+                choice_ids = [c['id'] for c in choices]
+                if (isinstance(magic_params, list) and
+                        list(set(choice_ids)) == list(set(magic_params))):
+                    ordered_choices = []
+                    for ordered_id in magic_params:
+                        ordered_choices.append(grab_choice(choices, ordered_id))
+                    return ordered_choices
+            return choices
+
         if obj_map is None:
             obj_map = dict(self._my_map)
         del obj_map['_id']
@@ -1796,13 +1820,65 @@ class AssessmentSection:
         obj_map.update(
             {'type': self._namespace.split('.')[-1],
              'id': str(self.get_id())})
+
+        ## testing for performance
+        if 'questions' in obj_map:
+            collection = MongoClientValidated('assessment',
+                                              collection='Item',
+                                              runtime=self._runtime)
+            questions = []
+            for question in obj_map['questions']:
+                item = collection.find_one({"_id": ObjectId(Id(question['itemId']).identifier)})
+                question_map = item['question']
+                question_map['_id'] = str(question_map['_id'])
+                question_map['learningObjectiveIds'] = item['learningObjectiveIds']
+
+                # if this is a magic MC question, try reordering the choices:
+                if 'choices' in question_map:
+                    question_map['choices'] = reorder_choices(question_map['choices'], question['questionId'])
+
+                response = question['responses'][0]
+                response['confusedLearningObjectiveIds'] = []
+                if ('missingResponse' not in response and
+                        'choiceIds' in response and
+                        len(response['choiceIds']) > 0):
+                    matching_answers = [a for a in item['answers']
+                                       if a['choiceIds'][0] == response['choiceIds'][0]]
+                    if len(matching_answers) > 0 and 'confusedLearningObjectiveIds' in matching_answers[0]:
+                        response['confusedLearningObjectiveIds'] = matching_answers[0]['confusedLearningObjectiveIds']
+
+                if 'solution' in item:
+                    response['feedback'] = item['solution']['text']
+                if '_id' in response:
+                    response['_id'] = str(response['_id'])
+                submit = response['submissionTime']
+                if submit is not None:
+                    response['submissionTime'] = {
+                        'year': submit.year,
+                        'month': submit.month,
+                        'day': submit.day,
+                        'hour': submit.hour,
+                        'minute': submit.minute,
+                        'second': submit.second
+                    }
+                question_map.update({
+                    'response': response
+                })
+
+                questions.append(question_map)
+
+            obj_map.update({
+                'questions': questions
+            })
+        ####
+
         return obj_map
 
     object_map = property(get_object_map)
 
     # Let's give the Part attributes to the Section
     def __getattribute__(self, name):
-        if not name.startswith('_') and name not in ['ident', 'get_id', 'id_']:
+        if not name.startswith('_') and name not in ['ident', 'get_id', 'id_', 'get_object_map', 'object_map']:
             try:
                 return self._assessment_part[name]
             except AttributeError:
