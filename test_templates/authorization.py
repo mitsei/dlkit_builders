@@ -174,7 +174,7 @@ class AuthorizationSession:
         cls.authz_id_list.append(jane_lookup_authz.ident)
         
         # Set up Resource lookup authorizations for Jane
-        for num in [1, 5, 7]:
+        for num in [1, 5]:
             create_form = cls.authz_admin_session.get_authorization_form_for_create_for_agent(
                 AGENT_ID,
                 LOOKUP_RESOURCE_FUNCTION_ID,
@@ -195,7 +195,20 @@ class AuthorizationSession:
                 [])
             create_form.display_name = 'Test Authorization ' + str(num) + ' (override)'
             create_form.description = 'Test Authorization for AuthorizationLookupSession tests'
-            authz = cls.authz_admin_session.create_authorization(create_form)
+            authz = cls.override_authz_admin_session.create_authorization(create_form)
+            cls.authz_list.append(authz)
+            cls.authz_id_list.append(authz.ident)
+
+        # Set up Resource search override authorizations for Jane
+        for num in [7]:
+            create_form = cls.override_authz_admin_session.get_authorization_form_for_create_for_agent(
+                AGENT_ID,
+                SEARCH_RESOURCE_FUNCTION_ID,
+                cls.bin_id_list[num],
+                [])
+            create_form.display_name = 'Test Authorization ' + str(num) + ' (override)'
+            create_form.description = 'Test Authorization for AuthorizationLookupSession tests'
+            authz = cls.override_authz_admin_session.create_authorization(create_form)
             cls.authz_list.append(authz)
             cls.authz_id_list.append(authz.ident)
 
