@@ -5,7 +5,7 @@ class ObjectiveAdminSession:
     delete_objective_template = """
         # Implemented from azosid template for -
         # osid.learning.ObjectiveAdminSession.delete_objective_template
-        if not self._can('delete'):
+        if not self._can_for_${object_name_under}('delete', ${object_name_under}_id):
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name})"""
@@ -18,15 +18,28 @@ class ActivityLookupSession:
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+            return self._provider_session.${method_name}(${arg0_name})
+
+        if self._can('lookup'):
+            return self._provider_session.${method_name}(${arg0_name})
+        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
+            raise PermissionDenied()
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_${arg0_object_under}_id(${arg0_name}, match=True)
+        return self._try_harder(query)"""
+
 
     get_activities_for_objectives_template = """
         # Implemented from azosid template for -
         # osid.learning.ActivityLookupSession.get_activities_for_objectives_template
-        if not self._can('lookup'):
+        if self._can('lookup'):
+            return self._provider_session.${method_name}(${arg0_name})
+        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        query = self._query_session.get_${object_name_under}_query()
+        for ${object_name_under}_id in (${arg0_name}):
+            query.match_${arg0_object_under}_id(${object_name_under}_id, match=True)
+        return self._try_harder(query)"""
 
 
 class ActivityAdminSession:

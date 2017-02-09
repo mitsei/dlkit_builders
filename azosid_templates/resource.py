@@ -61,7 +61,7 @@ class ResourceManager:
             return getattr(sessions, '${return_type}')(
                 provider_session=self._provider_manager.${method_name}(),
                 authz_session=self._get_authz_session(),
-                authz_lookup_session=self._get_authz_lookup_session(),
+                override_lookup_session=self._get_override_lookup_session(),
                 hierarchy_session=self._get_hierarchy_session(),
                 query_session=query_session)
         except AttributeError:
@@ -79,7 +79,7 @@ class ResourceManager:
             return getattr(sessions, '${return_type}')(
                 provider_session=self._provider_manager.${method_name}(${arg0_name}),
                 authz_session=self._get_authz_session(),
-                authz_lookup_session=self._get_authz_lookup_session(),
+                override_lookup_session=self._get_override_lookup_session(),
                 hierarchy_session=self._get_hierarchy_session(),
                 query_session=query_session)
         except AttributeError:
@@ -92,8 +92,7 @@ class ResourceManager:
             return getattr(sessions, '${return_type}')(
                 provider_session=self._provider_manager.${method_name}(),
                 authz_session=self._get_authz_session(),
-                authz_lookup_session=self._get_authz_lookup_session(),
-                override_session=self._get_override_lookup_session(),
+                override_lookup_session=self._get_override_lookup_session(),
                 provider_manager=self._provider_manager)
         except AttributeError:
             raise OperationFailed()"""
@@ -105,8 +104,7 @@ class ResourceManager:
             return getattr(sessions, '${return_type}')(
                 provider_session=self._provider_manager.${method_name}(${arg0_name}),
                 authz_session=self._get_authz_session(),
-                authz_lookup_session=self._get_authz_lookup_session(),
-                override_session=self._get_override_lookup_session(),
+                override_lookup_session=self._get_override_lookup_session(),
                 provider_manager=self._provider_manager)
         except AttributeError:
             raise OperationFailed()"""
@@ -140,10 +138,10 @@ class ResourceProxyManager:
             query_session = None
         try:
             return getattr(sessions, '${return_type}')(
-                self._provider_manager.${method_name}(proxy),
-                self._get_authz_session(),
-                self._get_authz_lookup_session(),
-                proxy,
+                provider_session=self._provider_manager.${method_name}(proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                proxy=proxy,
                 hierarchy_session=self._get_hierarchy_session(proxy),
                 query_session=query_session)
         except AttributeError:
@@ -159,10 +157,10 @@ class ResourceProxyManager:
             query_session = None
         try:
             return getattr(sessions, '${return_type}')(
-                self._provider_manager.${method_name}(${arg0_name}, proxy),
-                self._get_authz_session(),
-                self._get_authz_lookup_session(),
-                proxy,
+                provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                proxy=proxy,
                 hierarchy_session=self._get_hierarchy_session(proxy),
                 query_session=query_session)
         except AttributeError:
@@ -173,10 +171,11 @@ class ResourceProxyManager:
         # osid.resource.ResourceManager.get_resource_lookup_session_template
         try:
             return getattr(sessions, '${return_type}')(
-                self._provider_manager.${method_name}(proxy),
-                self._get_authz_session(),
-                self._get_authz_lookup_session(),
-                proxy)
+                provider_session=self._provider_manager.${method_name}(proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager,
+                proxy=proxy)
         except AttributeError:
             raise OperationFailed()"""
 
@@ -185,10 +184,11 @@ class ResourceProxyManager:
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
         try:
             return getattr(sessions, '${return_type}')(
-                self._provider_manager.${method_name}(${arg0_name}, proxy),
-                self._get_authz_session(),
-                self._get_authz_lookup_session(),
-                proxy)
+                provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager,
+                proxy=proxy)
         except AttributeError:
             raise OperationFailed()"""
 
@@ -207,6 +207,17 @@ class ResourceLookupSession:
         self.use_comparative_${object_name_under}_view()
         self._auth_${cat_name_under}_ids = None
         self._unauth_${cat_name_under}_ids = None
+        self._overriding_${cat_name_under}_ids = None
+
+    def _get_overriding_${cat_name_under}_ids(self):
+        if self._overriding_${cat_name_under}_ids is None:
+            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
+        return self._overriding_${cat_name_under}_ids
+
+    def _try_overriding_${cat_name_under_plural}(self, query):
+        for ${cat_name_under}_id in self._get_overriding_${cat_name_under}_ids():
+            query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
+        return self._query_session.get_${object_name_under_plural}_by_query(query), query
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
         if self._can('lookup', ${cat_name_under}_id):
@@ -218,22 +229,19 @@ class ResourceLookupSession:
                 unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
         return unauth_list
 
-    def _get_auth_${cat_name_under}_ids(self):
-        return self._get_auth_catalog_ids('lookup')
-
     def _try_harder(self, query):
+        results, query = self._try_overriding_${cat_name_under_plural}(query)
+        if self._is_isolated_catalog_view():
+            if results.available() or self._is_comparative_object_view():
+                return results
+        if self._is_plenary_object_view():
+            return results
         if self._hierarchy_session is None or self._query_session is None:
-            # Should probably try to return empty result instead
-            # perhaps through a query.match_any(match = None)?
-            raise PermissionDenied()
+            return results
         if self._unauth_${cat_name_under}_ids is None:
             self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
-        if self._auth_${cat_name_under}_ids is None:
-            self._auth_${cat_name_under}_ids = self._get_auth_${cat_name_under}_ids()
         for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
             query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
-        for ${cat_name_under}_id in self._auth_${cat_name_under}_ids:
-            query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
         return self._query_session.get_${object_name_under_plural}_by_query(query)"""
 
     get_bin_id_template = """
@@ -252,7 +260,8 @@ class ResourceLookupSession:
     can_lookup_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.can_lookup_resources_template
-        return self._can('${func_name}')"""
+        return (self._can('${func_name}') or 
+                bool(self._get_overriding_${cat_name_under}_ids()))"""
 
     use_comparative_resource_view_template = """
         # Implemented from azosid template for -
@@ -270,90 +279,86 @@ class ResourceLookupSession:
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.use_federated_bin_view_template
         self._use_federated_catalog_view()
-        self._provider_session.${method_name}()"""
+        self._provider_session.${method_name}()
+        self._query_session.${method_name}()"""
 
     use_isolated_bin_view_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.use_isolated_bin_view_template
         self._use_isolated_catalog_view()
-        self._provider_session.${method_name}()"""
+        self._provider_session.${method_name}()
+        self._query_session.${method_name}()"""
 
     get_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resource_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
+        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
             raise PermissionDenied()
-        else:
-            query = self._query_session.get_${object_name_under}_query()
-            query.match_id(${arg0_name}, match=True)
-            results = self._try_harder(query)
-            if results.available() > 0:
-                return results.next()
-            else:
-                raise NotFound()"""
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_id(${arg0_name}, match=True)
+        results = self._try_harder(query)
+        if results.available():
+            return results.next()
+        raise NotFound()"""
 
     get_resources_by_ids_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_ids_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
+        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
             raise PermissionDenied()
-        else:
-            query = self._query_session.get_${object_name_under}_query()
-            for ${object_name_under}_id in (${arg0_name}):
-                query.match_id(${object_name_under}_id, match=True)
-            return self._try_harder(query)"""
+        query = self._query_session.get_${object_name_under}_query()
+        for ${object_name_under}_id in (${arg0_name}):
+            query.match_id(${object_name_under}_id, match=True)
+        return self._try_harder(query)"""
 
     get_resources_by_genus_type_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
+        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
             raise PermissionDenied()
-        else:
-            query = self._query_session.get_${object_name_under}_query()
-            query.match_genus_type(${arg0_name}, match=True)
-            return self._try_harder(query)"""
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_genus_type(${arg0_name}, match=True)
+        return self._try_harder(query)"""
 
     get_resources_by_parent_genus_type_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_parent_genus_type_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
+        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
             raise PermissionDenied()
-        else:
-            query = self._query_session.get_${object_name_under}_query()
-            query.match_parent_genus_type(${arg0_name}, match=True)
-            return self._try_harder(query)"""
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_parent_genus_type(${arg0_name}, match=True)
+        return self._try_harder(query)"""
 
     get_resources_by_record_type_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_by_record_type_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
+        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
             raise PermissionDenied()
-        else:
-            query = self._query_session.get_${object_name_under}_query()
-            query.match_record_type(${arg0_name}, match=True)
-            return self._try_harder(query)"""
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_record_type(${arg0_name}, match=True)
+        return self._try_harder(query)"""
 
     get_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.get_resources_template
         if self._can('lookup'):
             return self._provider_session.${method_name}()
-        elif self._is_isolated_catalog_view() or self._is_plenary_object_view():
+        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
             raise PermissionDenied()
-        else:
-            query = self._query_session.get_${object_name_under}_query()
-            query.match_any(match=True)
-            return self._try_harder(query)"""
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_any(match=True)
+        return self._try_harder(query)"""
+
 
 class ResourceQuerySession:
     import_statements_pattern = [
@@ -368,6 +373,17 @@ class ResourceQuerySession:
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
         self._unauth_${cat_name_under}_ids = None
+        self._overriding_${cat_name_under}_ids = None
+
+    def _get_overriding_${cat_name_under}_ids(self):
+        if self._overriding_${cat_name_under}_ids is None:
+            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('search')
+        return self._overriding_${cat_name_under}_ids
+
+    def _try_overriding_${cat_name_under_plural}(self, query):
+        for ${cat_name_under}_id in self._get_overriding_${cat_name_under}_ids():
+            query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
+        return self._query_session.get_${object_name_under_plural}_by_query(query), query
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
         if self._can('search', ${cat_name_under}_id):
@@ -380,15 +396,18 @@ class ResourceQuerySession:
         return unauth_list
     
     def _try_harder(self, query):
-        if self._hierarchy_session is None:
-            # Should probably try to return empty result instead
-            # perhaps through a query.match_any(match = None)?
-            raise PermissionDenied()
+        results, query = self._try_overriding_${cat_name_under_plural}(query)
+        if self._is_isolated_catalog_view():
+            if results.available():
+                return results
+        if self._hierarchy_session is None or self._query_session is None:
+            return results
         if self._unauth_${cat_name_under}_ids is None:
             self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
         for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
             query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
         return self._query_session.get_${object_name_under_plural}_by_query(query)
+
 
     class ${object_name}QueryWrapper(QueryWrapper):
         \"\"\"Wrapper for ${object_name}Queries to override match_${cat_name_under}_id method\"\"\"
@@ -399,7 +418,8 @@ class ResourceQuerySession:
     can_search_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceQuerySession.can_search_resources_template
-        return self._can('${func_name}')"""
+        return (self._can('${func_name}') or 
+                bool(self._get_overriding_${cat_name_under}_ids()))"""
 
     get_resource_query_template = """
         # Implemented from azosid template for -
@@ -420,7 +440,7 @@ class ResourceQuerySession:
                 ${arg0_name}._provider_query.match_${cat_name_under}_id(**kwargs)
         if self._can('search'):
             return self._provider_session.${method_name}(${arg0_name})
-        elif self._is_isolated_catalog_view():
+        if self._is_isolated_catalog_view() and not self._get_overriding_${cat_name_under}_ids():
             raise PermissionDenied()
         else:
             result = self._try_harder(${arg0_name})
@@ -456,30 +476,28 @@ class ResourceAdminSession:
         osid_sessions.OsidSession.__init__(self,  *args, **kwargs)
         self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
-        try:
-            self._${object_name_under}_${cat_name_under}_session = provider_manager.get_${object_name_under}_${cat_name_under}_session()
-        except errors.Unimplemented():
-            self._${object_name_under}_${cat_name_under}_session = None
+        self.get_${cat_name_under}_ids_for_${object_name_under} = None
+        self._overriding_${cat_name_under}_ids = None
+        if self._proxy is not None:
+            try:
+                self._object_catalog_session = provider_manager.get_${object_name_under}_${cat_name_under}_session(self._proxy)
+            except Unimplemented():
+                pass
+        else:
+            try:
+                self._object_catalog_session = provider_manager.get_${object_name_under}_${cat_name_under}_session()
+                self.get_${cat_name_under}_ids_by_${object_name_under} = session.get_${cat_name_under}_ids_by_${object_name_under}
+            except Unimplemented():
+                pass
+
+    def _get_overriding_${cat_name_under}_ids(self):
+        if self._overriding_${cat_name_under}_ids is None:
+            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
+        return self._overriding_${cat_name_under}_ids
 
     def _can_for_${object_name_under}(self, func_name, ${object_name_under}_id):
         \"\"\"Checks if agent can perform function for object\"\"\"
-        can_for_session = OsidSession._can(self, func_name)
-        if (can_for_session or 
-                self._${object_name_under}_${cat_name_under}_session is None or
-                self._override_lookup_session is None):
-            return can_for_session
-
-        override_auths = override_lookup_session.get_authorizations_for_agent_and_function(
-            self.get_effective_agent_id(),
-            self._get_function_id(func_name))
-        if not override_auths.available():
-            return False
-
-        ${cat_name_under}_ids = list(self._${object_name_under}_${cat_name_under}_session.get_${cat_name_under}_ids_for_${object_name_under}(${object_name_under}_id))
-        for auth in override_auths:
-            if auth.get_qualifier_id() in ${cat_name_under}_ids:
-                return True
-        return False"""
+        return self._can_for_object(func_name, ${object_name_under}_id, 'get_${cat_name_under}_ids_for_${object_name_under}')"""
 
     can_create_resources_template = """
         # Implemented from azosid template for -

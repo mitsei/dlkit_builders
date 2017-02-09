@@ -37,29 +37,15 @@ class OsidProfile:
         
         \"\"\"
         from ..utilities import BOOTSTRAP_VAULT_TYPE
-        vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(BOOTSTRAP_VAULT_TYPE)
+        try:
+            vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(BOOTSTRAP_VAULT_TYPE)
+        except Unimplemented:
+            return self._get_authz_manager().get_authorization_session()
         if vaults.available():
             vault = vaults.next()
+            return self._get_authz_manager().get_authorization_session_for_vault(vault.get_id())
         else:
-            raise errors.OperationFailed()
-        session = self._get_authz_manager().get_authorization_session_for_vault(vault.get_id())
-        return session
-
-    def _get_authz_lookup_session(self): ## DO WE REALLY NEED THIS STILL???
-        \"\"\"Gets the AuthorizationLookupSession for the default (bootstrap) typed Vault
-        
-        Assumes only one Vault of this Type, but it can have children
-        
-        \"\"\"
-        from ..utilities import BOOTSTRAP_VAULT_TYPE
-        vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(BOOTSTRAP_VAULT_TYPE)
-        if vaults.available():
-            vault = vaults.next()
-        else:
-            raise errors.OperationFailed()
-        session = self._get_authz_manager().get_authorization_lookup_session_for_vault(vault.get_id())
-        session.use_federated_vault_view()
-        return session
+            return self._get_authz_manager().get_authorization_session()
 
     def _get_override_lookup_session(self):
         \"\"\"Gets the AuthorizationLookupSession for the override typed Vault
@@ -68,12 +54,15 @@ class OsidProfile:
         
         \"\"\"
         from ..utilities import OVERRIDE_VAULT_TYPE
-        override_vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(OVERRIDE_VAULT_TYPE)
+        try:
+            override_vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(OVERRIDE_VAULT_TYPE)
+        except Unimplemented:
+            return None
         if override_vaults.available():
             vault = override_vaults.next()
         else:
             return None
-        session = self._get_authz_manager().get_authorization_lookup_session_for_vault(vault.get_id(), proxy=self._proxy)
+        session = self._get_authz_manager().get_authorization_lookup_session_for_vault(vault.get_id())
         session.use_isolated_vault_view()
         return session"""
 
@@ -180,11 +169,10 @@ class OsidSession:
     ]
 
     init = """
-    def __init__(self, provider_session, authz_session, override_lookup_session=None, authz_lookup_session=None, proxy=None, **kwargs):
+    def __init__(self, provider_session, authz_session, override_lookup_session=None, proxy=None, **kwargs):
         self._provider_session = provider_session
         self._authz_session = authz_session
         self._override_lookup_session = override_lookup_session
-        self._authz_lookup_session = authz_lookup_session  # DO WE STILL NEED THIS?
         self._proxy = proxy
         if 'hierarchy_session' in kwargs:
             self._hierarchy_session = kwargs['hierarchy_session']
@@ -194,6 +182,7 @@ class OsidSession:
             self._query_session = kwargs['query_session']
         else:
             self._query_session = None
+        self._object_catalog_session = None
         self._id_namespace = None
         self._qualifier_id = None
         self._authz_cache = dict() # Does this want to be a real cache???
@@ -228,12 +217,33 @@ class OsidSession:
             self._authz_cache[str(agent_id) + str(function_id) + str(qualifier_id)] = authz
             return authz
 
-    def _get_auth_catalog_ids(self, func_name):
+    def _can_for_object(self, func_name, object_id, method_name):
+        \"\"\"Checks if agent can perform function for object\"\"\"
+        can_for_session = self._can(func_name)
+        if (can_for_session or 
+                self._object_catalog_session is None or
+                self._override_lookup_session is None):
+            return can_for_session
+
+        override_auths = override_lookup_session.get_authorizations_for_agent_and_function(
+            self.get_effective_agent_id(),
+            self._get_function_id(func_name))
+        if not override_auths.available():
+            return False
+
+        if self._object_catalog_session is not None:
+            catalog_ids = list(getattr(self._object_catalog_session, method_name)(object_id))
+            for auth in override_auths:
+                if auth.get_qualifier_id() in catalog_ids:
+                    return True
+        return False
+
+    def _get_overriding_catalog_ids(self, func_name):
         function_id = Id(
             identifier=func_name,
             namespace=self._id_namespace,
             authority='ODL.MIT.EDU')
-        auths = self._authz_lookup_session.get_authorizations_for_agent_and_function(
+        auths =  self._override_lookup_session.get_authorizations_for_agent_and_function(
             self.get_effective_agent_id(),
             function_id)
         auth_id_list = []

@@ -16,39 +16,39 @@ class RepositoryManager:
         self._provider_manager = runtime.get_manager('REPOSITORY', provider_impl)
         # need to add version argument
 
-    def get_asset_composition_session_for_repository(self, repository_id, proxy):
+    def get_asset_composition_session_for_repository(self, repository_id):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         try:
             return getattr(sessions, 'AssetCompositionSession')(
-                self._provider_manager.get_asset_composition_session_for_repository(repository_id),
-                self._authz_session)
+                provider_session=self._provider_manager.get_asset_composition_session_for_repository(repository_id),
+                authz_session=self._authz_session)
         except AttributeError:
             raise OperationFailed('AssetCompositionSession not implemented in authz_adapter')
 
-    def get_asset_composition_design_session_for_repository(self, repository_id, proxy):
+    def get_asset_composition_design_session_for_repository(self, repository_id):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         try:
             return getattr(sessions, 'AssetCompositionDesignSession')(
-                self._provider_manager.get_asset_composition_design_session_for_repository(repository_id),
-                self._authz_session)
+                provider_session=self._provider_manager.get_asset_composition_design_session_for_repository(repository_id),
+                authz_session=self._authz_session)
         except AttributeError:
             raise OperationFailed('AssetCompositionDesignSession not implemented in authz_adapter')
 
-    def get_asset_content_lookup_session(self, proxy):
+    def get_asset_content_lookup_session(self):
         \"\"\"Pass through to provider get_asset_content_lookup_session\"\"\"
         try:
             return getattr(sessions, 'AssetContentLookupSession')(
-                self._provider_manager.get_asset_content_lookup_session(),
-                self._authz_session)
+                provider_session=self._provider_manager.get_asset_content_lookup_session(),
+                authz_session=self._authz_session)
         except AttributeError:
             raise OperationFailed('AssetContentLookupSession not implemented in authz_adapter')
 
-    def get_asset_content_lookup_session_for_repository(self, repository_id, proxy):
+    def get_asset_content_lookup_session_for_repository(self, repository_id):
         \"\"\"Pass through to provider get_asset_content_lookup_session_for_repository\"\"\"
         try:
             return getattr(sessions, 'AssetContentLookupSession')(
-                self._provider_manager.get_asset_content_lookup_session_for_repository(repository_id),
-                self._authz_session)
+                provider_session=self._provider_manager.get_asset_content_lookup_session_for_repository(repository_id),
+                authz_session=self._authz_session)
         except AttributeError:
             raise OperationFailed('AssetContentLookupSession not implemented in authz_adapter')"""
 
@@ -72,9 +72,9 @@ class RepositoryProxyManager:
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         try:
             return getattr(sessions, 'AssetCompositionSession')(
-                self._provider_manager.get_asset_composition_session_for_repository(repository_id, proxy),
-                self._get_authz_session(),
-                proxy)
+                provider_session=self._provider_manager.get_asset_composition_session_for_repository(repository_id, proxy),
+                authz_session=self._get_authz_session(),
+                proxy=proxy)
         except AttributeError:
             raise OperationFailed('AssetCompositionSession not implemented in authz_adapter')
 
@@ -82,9 +82,9 @@ class RepositoryProxyManager:
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         try:
             return getattr(sessions, 'AssetCompositionDesignSession')(
-                self._provider_manager.get_asset_composition_design_session_for_repository(repository_id, proxy),
-                self._get_authz_session(),
-                proxy)
+                provider_session=self._provider_manager.get_asset_composition_design_session_for_repository(repository_id, proxy),
+                authz_session=self._get_authz_session(),
+                proxy=proxy)
         except AttributeError:
             raise OperationFailed('AssetCompositionDesignSession not implemented in authz_adapter')
 
@@ -92,9 +92,9 @@ class RepositoryProxyManager:
         \"\"\"Pass through to provider get_asset_content_lookup_session\"\"\"
         try:
             return getattr(sessions, 'AssetContentLookupSession')(
-                self._provider_manager.get_asset_content_lookup_session(proxy),
-                self._get_authz_session(),
-                proxy)
+                provider_session=self._provider_manager.get_asset_content_lookup_session(proxy),
+                authz_session=self._get_authz_session(),
+                proxy=proxy)
         except AttributeError:
             raise OperationFailed('AssetContentLookupSession not implemented in authz_adapter')
 
@@ -102,9 +102,9 @@ class RepositoryProxyManager:
         \"\"\"Pass through to provider get_asset_content_lookup_session_for_repository\"\"\"
         try:
             return getattr(sessions, 'AssetContentLookupSession')(
-                self._provider_manager.get_asset_content_lookup_session_for_repository(repository_id, proxy),
-                self._get_authz_session(),
-                proxy)
+                provider_session=self._provider_manager.get_asset_content_lookup_session_for_repository(repository_id, proxy),
+                authz_session=self._get_authz_session(),
+                proxy=proxy)
         except AttributeError:
             raise OperationFailed('AssetContentLookupSession not implemented in authz_adapter')"""
 
@@ -145,7 +145,8 @@ class AssetAdminSession:
 
 class CompositionLookupSession:
 
-    init_template = """
+    # this is the pre-overriding athorization init template - delete soon:
+    old_init_template = """
     def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
         # Implemented from azosid template for -
         # osid.composition.CompositionLookupSession.__init__
@@ -185,6 +186,53 @@ class CompositionLookupSession:
             query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
         return self._query_session.get_${object_name_under_plural}_by_query(query)"""
 
+    init_template = """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
+        self.use_federated_${cat_name_under}_view()
+        self.use_comparative_${object_name_under}_view()
+        self._auth_${cat_name_under}_ids = None
+        self._unauth_${cat_name_under}_ids = None
+        self._overriding_${cat_name_under}_ids = None
+
+    def _get_overriding_${cat_name_under}_ids(self):
+        if self._overriding_${cat_name_under}_ids is None:
+            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
+        return self._overriding_${cat_name_under}_ids
+
+    def _try_overriding_${cat_name_under_plural}(self, query):
+        for ${cat_name_under}_id in self._get_overriding_${cat_name_under}_ids():
+            query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
+        return self._query_session.get_${object_name_under_plural}_by_query(query), query
+
+    def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
+        if self._can('lookup', ${cat_name_under}_id):
+            return [] # Don't go further - assumes authorizations inherited
+        else:
+            unauth_list = [str(${cat_name_under}_id)]
+        if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
+            for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
+                unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
+        return unauth_list
+
+    def _try_harder(self, query):
+        results, query = self._try_overriding_${cat_name_under_plural}(query)
+        if self._is_isolated_catalog_view():
+            if results.available() or self._is_comparative_object_view():
+                return results
+        if self._is_plenary_object_view():
+            return results
+        if self._hierarchy_session is None or self._query_session is None:
+            return results
+        if self._unauth_${cat_name_under}_ids is None:
+            self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
+        for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
+            query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        return self._query_session.get_${object_name_under_plural}_by_query(query)"""
+
+
     use_active_composition_view_template = """
         # Implemented from azosid template for -
         # osid.composition.CompositionLookupSession.use_active_composition_view
@@ -207,8 +255,8 @@ class CompositionLookupSession:
 
 class CompositionQuerySession:
     
-    # This should be an init_template:
-    init = """
+    # This is the old init impl - delete soon
+    old_init = """
     def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
         # Implemented from azosid template for -
         # osid.composition.CompositionLookupSession.__init__
@@ -252,6 +300,55 @@ class CompositionQuerySession:
 
         def match_repository_id(self, repository_id, match=True):
             self.cat_id_args_list.append({'repository_id': repository_id, 'match': match})"""
+
+    init_template = """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
+        self.use_federated_${cat_name_under}_view()
+        self._unauth_${cat_name_under}_ids = None
+        self._overriding_${cat_name_under}_ids = None
+
+    def _get_overriding_${cat_name_under}_ids(self):
+        if self._overriding_${cat_name_under}_ids is None:
+            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('search')
+        return self._overriding_${cat_name_under}_ids
+
+    def _try_overriding_${cat_name_under_plural}(self, query):
+        for ${cat_name_under}_id in self._get_overriding_${cat_name_under}_ids():
+            query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
+        return self._query_session.get_${object_name_under_plural}_by_query(query), query
+
+    def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
+        if self._can('search', ${cat_name_under}_id):
+            return [] # Don't go further - assumes authorizations inherited
+        else:
+            unauth_list = [str(${cat_name_under}_id)]
+        if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
+            for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
+                unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
+        return unauth_list
+    
+    def _try_harder(self, query):
+        results, query = self._try_overriding_${cat_name_under_plural}(query)
+        if self._is_isolated_catalog_view():
+            if results.available():
+                return results
+        if self._hierarchy_session is None or self._query_session is None:
+            return results
+        if self._unauth_${cat_name_under}_ids is None:
+            self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
+        for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
+            query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        return self._query_session.get_${object_name_under_plural}_by_query(query)
+
+
+    class ${object_name}QueryWrapper(QueryWrapper):
+        \"\"\"Wrapper for ${object_name}Queries to override match_${cat_name_under}_id method\"\"\"
+
+        def match_${cat_name_under}_id(self, ${cat_name_under}_id, match=True):
+            self._cat_id_args_list.append({'${cat_name_under}_id': ${cat_name_under}_id, 'match': match})"""
 
 
 class CompositionSearchSession:

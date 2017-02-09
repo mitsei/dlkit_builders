@@ -6,18 +6,18 @@ class AssessmentManager:
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
         return sessions.AssessmentTakenQuerySession(
-            self._provider_manager.get_assessment_taken_query_session_for_bank(bank_id),
-            self._authz_session)
+            provider_session=self._provider_manager.get_assessment_taken_query_session_for_bank(bank_id),
+            authz_session=sself._authz_session)
 
     def get_assessment_taken_admin_session(self):
         return sessions.AssessmentTakenAdminSession(
-            self._provider_manager.get_assessment_taken_admin_session(),
-            self._authz_session)
+            provider_session=self._provider_manager.get_assessment_taken_admin_session(),
+            authz_session=self._authz_session)
 
     def get_assessment_taken_admin_session_for_bank(self, bank_id=None):
         return sessions.AssessmentTakenAdminSession(
-            self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id),
-            self._authz_session)
+            provider_session=self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id),
+            authz_session=sself._authz_session)
 """
 
 class AssessmentProxyManager:
@@ -26,20 +26,21 @@ class AssessmentProxyManager:
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
         return sessions.AssessmentTakenQuerySession(
-            self._provider_manager.get_assessment_taken_query_session_for_bank(bank_id, proxy),
-            self._authz_session,
-            proxy)
+            provider_session=self._provider_manager.get_assessment_taken_query_session_for_bank(bank_id, proxy),
+            authz_session=sself._authz_session,
+            proxy=proxy)
 
     def get_assessment_taken_admin_session(self, proxy=None):
         return sessions.AssessmentTakenAdminSession(
-            self._provider_manager.get_assessment_taken_admin_session(proxy),
-            self._authz_session, proxy)
+            provider_session=self._provider_manager.get_assessment_taken_admin_session(proxy),
+            authz_session=sself._authz_session,
+            proxy=proxy)
 
     def get_assessment_taken_admin_session_for_bank(self, bank_id=None, proxy=None):
         return sessions.AssessmentTakenAdminSession(
-            self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id, proxy),
-            self._authz_session,
-            proxy)
+            provider_session=self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id, proxy),
+            authz_session=sself._authz_session,
+            proxy=proxy)
 """
 
 class MyAssessmentTakenSession:
@@ -447,8 +448,6 @@ class AssessmentBasicAuthoringSession:
 class AssessmentTakenLookupSession:
 
     get_assessments_taken_for_taker_and_assessment_offered = """
-        # Implemented from azosid template for -
-        # osid.assessment.AssessmentTakenLookupSession.get_assessments_taken_for_taker_and_assessment_offered
         if not self._can('lookup'):
             raise PermissionDenied()
         else:
