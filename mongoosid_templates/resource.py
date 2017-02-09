@@ -329,7 +329,7 @@ class ResourceQuerySession:
                     {'$$or': [{term: {'$$in': ${arg0_name}._query_terms[term]['$$in']}},
                              {term: {'$$nin': ${arg0_name}._query_terms[term]['$$nin']}}]})
             else:
-                and_list.append({term: resource_query._query_terms[term]})
+                and_list.append({term: ${arg0_name}._query_terms[term]})
         for term in ${arg0_name}._keyword_terms:
             or_list.append({term: ${arg0_name}._keyword_terms[term]})
         if or_list:
@@ -1512,7 +1512,7 @@ class Resource:
 
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='${object_name_upper}', **kwargs)
-        self._catalog_name = '${cat_name_under}'
+        self._catalog_name = '${cat_name}'
 ${instance_initers}"""
 
     is_group_template = """
@@ -1578,13 +1578,24 @@ class ResourceQuery:
 """
 
     clear_group_terms_template = """
+        # Implemented from template for osid.resource.ResourceQuery.clear_group_terms
         self._clear_terms('${var_name_mixed}')"""
 
     match_bin_id_template = """
+        # Implemented from template for osid.resource.ResourceQuery.match_bin_id
         self._add_match('assigned${cat_name}Ids', str(${arg0_name}), ${arg1_name})"""
 
     clear_bin_id_terms_template = """
+        # Implemented from template for osid.resource.ResourceQuery.clear_bin_id_terms
         self._clear_terms('assigned${cat_name}Ids')"""
+
+    match_avatar_id_template = """
+        # Implemented from template for osid.resource.ResourceQuery.match_avatar_id
+        self._add_match('${var_name_mixed}', str(${arg0_name}, ${arg1_name}))"""
+
+    clear_avatar_id_terms_template = """
+        # Implemented from template for osid.resource.ResourceQuery.clear_avatar_id
+        self._clear_terms('${var_name_mixed}')"""
 
 
 class ResourceSearch:
