@@ -571,7 +571,8 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              var_name = method['name'][4:]))
+                              var_name = method['name'][4:],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # CatalogHierarchySession methods that gets the root catalog Ids.
@@ -1283,7 +1284,8 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # ObjectLookupSession methods that returns an object (without id, where there appears to be one and only one).
@@ -1490,7 +1492,8 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # ObjectQuerySession methods that return objects by Query.
@@ -1660,7 +1663,8 @@ def map_session_patterns(interface, package, index):
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
                               var_name = method['name'],
-                              arg0_name = method['args'][0]['var_name']))
+                              arg0_name = method['args'][0]['var_name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # Session methods that return an authn hint for a given object id.
@@ -1679,7 +1683,8 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # ObjectAdminSession methods that return an authn hint for CrUD.
@@ -1695,7 +1700,8 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
         ##
         # ObjectAdminSession methods that return an authn hint for Manage Alias.
         elif (interface['shortname'].endswith('AdminSession') and
@@ -1709,7 +1715,8 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
-                              var_name = method['name']))        
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))        
 
         ##
         # ObjectAdminSession methods that gets object form for create where the
@@ -2167,7 +2174,8 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-16],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # ObjectHierarchySession methods that return root ids.
