@@ -9,14 +9,14 @@ class OsidProfile:
 class OsidManager:
 
     import_statements = [
-        'from ..osid.osid_errors import Unsupported',
+        'from ..osid.osid_errors import Unimplemented',
     ]  
 
 
 class OsidProxyManager:
 
     import_statements = [
-        'from .osid_errors import Unsupported',
+        'from .osid_errors import Unimplemented',
     ]  
 
 

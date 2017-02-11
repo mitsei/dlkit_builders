@@ -14,27 +14,27 @@ class TypeProfile:
 class TypeManager:
 
     import_statements = [
-        'from ..osid.osid_errors import Unsupported',
+        'from ..osid.osid_errors import Unimplemented',
     ]
 
     get_type_lookup_session = """
-        raise Unsupported()"""
+        raise Unimplemented()"""
 
     get_type_admin_session = """
-        raise Unsupported()"""
+        raise Unimplemented()"""
 
 
 class TypeProxyManager:
 
     import_statements = [
-        'from ..osid.osid_errors import Unsupported',
+        'from ..osid.osid_errors import Unimplemented',
     ]
 
     get_type_lookup_session = """
-        raise Unsupported()"""
+        raise Unimplemented()"""
 
     get_type_admin_session = """
-        raise Unsupported()"""
+        raise Unimplemented()"""
 
 
 class TypeList:
