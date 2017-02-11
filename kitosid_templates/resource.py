@@ -420,6 +420,12 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.create_resource
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
+    can_update_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceAdminSession.can_update_resources
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
     get_resource_form_for_update_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
@@ -456,6 +462,12 @@ class ResourceAdminSession:
             return self.update_${object_name_under}(${object_name_under}_form, *args, **kwargs)
         else:
             return self.create_${object_name_under}(${object_name_under}_form, *args, **kwargs)"""
+
+    can_delete_resources_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.ResourceAdminSession.can_delete_resources
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     delete_resource_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"

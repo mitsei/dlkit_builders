@@ -514,6 +514,13 @@ class ResourceAdminSession:
 
         return result"""
 
+    can_update_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceAdminSession.can_update_resources
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
     get_resource_form_for_update_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
     ]
@@ -612,6 +619,13 @@ class ResourceAdminSession:
             osid_object_map=${arg0_name}._my_map,
             runtime=self._runtime,
             proxy=self._proxy)"""
+
+    can_delete_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceAdminSession.can_delete_resources
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
 
     delete_resource_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
