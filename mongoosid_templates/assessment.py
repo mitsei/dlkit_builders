@@ -1438,7 +1438,7 @@ class AssessmentTaken:
 
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='ASSESSMENT_TAKEN', **kwargs)
-        self._catalog_name = 'bank'
+        self._catalog_name = 'Bank'
         self._assessment_sections = dict()"""
     
     additional_methods = """
