@@ -186,6 +186,7 @@ class OsidSession:
         self._id_namespace = None
         self._qualifier_id = None
         self._authz_cache = dict() # Does this want to be a real cache???
+        self._overriding_catalog_ids = None
         self._object_view = COMPARATIVE
         self._catalog_view = FEDERATED
 
@@ -239,17 +240,24 @@ class OsidSession:
         return False
 
     def _get_overriding_catalog_ids(self, func_name):
-        function_id = Id(
-            identifier=func_name,
-            namespace=self._id_namespace,
-            authority='ODL.MIT.EDU')
-        auths =  self._override_lookup_session.get_authorizations_for_agent_and_function(
-            self.get_effective_agent_id(),
-            function_id)
-        auth_id_list = []
-        for auth in auths:
-            auth_id_list.append(auth.get_qualifier_id())
-        return auth_id_list
+        if self._overriding_catalog_ids is None:
+            function_id = Id(
+                identifier=func_name,
+                namespace=self._id_namespace,
+                authority='ODL.MIT.EDU')
+            auths =  self._override_lookup_session.get_authorizations_for_agent_and_function(
+                self.get_effective_agent_id(),
+                function_id)
+            auth_id_list = []
+            for auth in auths:
+                cat_id_list.append(auth.get_qualifier_id())
+            self._overriding_catalog_ids = cat_id_list
+        return self._overriding_catalog_ids
+
+    def _check_lookup_conditions(self):
+        if  ((self._is_plenary_object_view() or self._is_isolated_catalog_view() or self._query_session is None) and
+                not self._get_overriding_catalog_ids()):
+            raise PermissionDenied()
 
     def _use_comparative_object_view(self):
         self._object_view = COMPARATIVE

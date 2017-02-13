@@ -207,16 +207,16 @@ class ResourceLookupSession:
         self.use_comparative_${object_name_under}_view()
         self._auth_${cat_name_under}_ids = None
         self._unauth_${cat_name_under}_ids = None
-        self._overriding_${cat_name_under}_ids = None
+        # self._overriding_${cat_name_under}_ids = None
 
-    def _get_overriding_${cat_name_under}_ids(self):
-        if self._overriding_${cat_name_under}_ids is None:
-            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
-        return self._overriding_${cat_name_under}_ids
+    # def _get_overriding_${cat_name_under}_ids(self):
+    #     if self._overriding_${cat_name_under}_ids is None:
+    #         self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
+    #     return self._overriding_${cat_name_under}_ids
 
     def _try_overriding_${cat_name_under_plural}(self, query):
-        for ${cat_name_under}_id in self._get_overriding_${cat_name_under}_ids():
-            query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
+        for catalog_id in self._get_overriding_catalog_ids():
+            query.match_${cat_name_under}_id(catalog_id, match=True)
         return self._query_session.get_${object_name_under_plural}_by_query(query), query
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
@@ -294,8 +294,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resource_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
-            raise PermissionDenied()
+        self._check_lookup_conditions() # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_id(${arg0_name}, match=True)
         results = self._try_harder(query)
@@ -308,8 +307,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_by_ids_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
-            raise PermissionDenied()
+        self._check_lookup_conditions() # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         for ${object_name_under}_id in (${arg0_name}):
             query.match_id(${object_name_under}_id, match=True)
@@ -320,8 +318,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
-            raise PermissionDenied()
+        self._check_lookup_conditions() # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_genus_type(${arg0_name}, match=True)
         return self._try_harder(query)"""
@@ -331,8 +328,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_by_parent_genus_type_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
-            raise PermissionDenied()
+        self._check_lookup_conditions() # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_parent_genus_type(${arg0_name}, match=True)
         return self._try_harder(query)"""
@@ -342,8 +338,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_by_record_type_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
-            raise PermissionDenied()
+        self._check_lookup_conditions() # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_record_type(${arg0_name}, match=True)
         return self._try_harder(query)"""
@@ -353,8 +348,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_template
         if self._can('lookup'):
             return self._provider_session.${method_name}()
-        if  (self._is_plenary_object_view() or self._is_isolated_catalog_view()) and not self._get_overriding_${cat_name_under}_ids():
-            raise PermissionDenied()
+        self._check_lookup_conditions() # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_any(match=True)
         return self._try_harder(query)"""
@@ -450,23 +444,23 @@ class ResourceQuerySession:
 
 class ResourceSearchSession:
 
+    # This still needs to be updated to work with authz overrides:
     get_resource_search_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from azosid template for -
         # osid.resource.ResourceSearchSession.get_resource_search_template
         if not self._can('search'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}()"""
+        return self._provider_session.${method_name}()"""
 
+    # This still needs to be updated to work with authz overrides:
     get_resources_by_search_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from azosid template for -
         # osid.resource.ResourceSearchSession.get_resources_by_search_template
         if not self._can('search'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
 
 class ResourceAdminSession:
@@ -476,18 +470,17 @@ class ResourceAdminSession:
         osid_sessions.OsidSession.__init__(self,  *args, **kwargs)
         self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
-        self.get_${cat_name_under}_ids_for_${object_name_under} = None
         self._overriding_${cat_name_under}_ids = None
         if self._proxy is not None:
             try:
                 self._object_catalog_session = provider_manager.get_${object_name_under}_${cat_name_under}_session(self._proxy)
-            except Unimplemented():
+            except Unimplemented:
                 pass
         else:
             try:
                 self._object_catalog_session = provider_manager.get_${object_name_under}_${cat_name_under}_session()
                 self.get_${cat_name_under}_ids_by_${object_name_under} = session.get_${cat_name_under}_ids_by_${object_name_under}
-            except Unimplemented():
+            except Unimplemented:
                 pass
 
     def _get_overriding_${cat_name_under}_ids(self):
@@ -510,62 +503,66 @@ class ResourceAdminSession:
         # This would like to be a real implementation someday:
         if ${arg0_name} == None:
             raise NullArgument() # Just 'cause the spec says to :)
-        else:
-            return self._can('${func_name}')"""
+        return self._can('${func_name}')"""
 
     get_resource_form_for_create_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.get_resource_form_for_create
         if not self._can('create'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     create_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.create_resource
         if not self._can('create'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
+
+    can_update_resources_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceAdminSession.can_update_resources
+        return (self._can('${func_name}') or 
+                bool(self._get_overriding_${cat_name_under}_ids()))"""
 
     get_resource_form_for_update_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.get_resource_form_for_update
         if not self._can_for_${object_name_under}('update', ${object_name_under}_id):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})
+        return self._provider_session.${method_name}(${arg0_name})
 
     def duplicate_${object_name_under}(self, ${object_name_under}_id):
         if not self._can('update'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.duplicate_${object_name_under}(${arg0_name})"""
+        return self._provider_session.duplicate_${object_name_under}(${arg0_name})"""
 
     update_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.update_resource
         if not self._can('update'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
+
+    can_delete_resources_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceAdminSession.can_delete_resources
+        return (self._can('${func_name}') or 
+                bool(self._get_overriding_${cat_name_under}_ids()))"""
 
     delete_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.delete_resource
         if not self._can_for_${object_name_under}('delete', ${object_name_under}_id):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     alias_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.alias_resources
         if not self._can_for_${object_name_under}('alias', ${object_name_under}_id):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
 class ResourceNotificationSession:
 
@@ -596,40 +593,35 @@ class ResourceNotificationSession:
         # osid.resource.ResourceNotificationSession.register_for_new_resources
         if not self._can('register'):
             raise PermissionDenied()
-        else:
-            self._provider_session.${method_name}()"""
+        self._provider_session.${method_name}()"""
 
     register_for_changed_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceNotificationSession.register_for_changed_resources
         if not self._can('register'):
             raise PermissionDenied()
-        else:
-            self._provider_session.${method_name}()"""
+        self._provider_session.${method_name}()"""
 
     register_for_changed_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceNotificationSession.register_for_changed_resource
         if not self._can('register'):
             raise PermissionDenied()
-        else:
-            self._provider_session.${method_name}(${arg0_name})"""
+        self._provider_session.${method_name}(${arg0_name})"""
 
     register_for_deleted_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceNotificationSession.register_for_deleted_resources
         if not self._can('register'):
             raise PermissionDenied()
-        else:
-            self._provider_session.${method_name}()"""
+        self._provider_session.${method_name}()"""
 
     register_for_deleted_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceNotificationSession.register_for_deleted_resource
         if not self._can('register'):
             raise PermissionDenied()
-        else:
-            self._provider_session.${method_name}(${arg0_name})"""
+        self._provider_session.${method_name}(${arg0_name})"""
 
 
 class ResourceBinSession:
@@ -651,48 +643,42 @@ class ResourceBinSession:
         # osid.resource.ResourceBinSession.get_resource_ids_by_bin
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_${object_name_under}_ids_by_${cat_name_under}(${cat_name_under}_id)"""
+        return self._provider_session.get_${object_name_under}_ids_by_${cat_name_under}(${cat_name_under}_id)"""
 
     get_resources_by_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_resources_by_bin_template
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_${object_name_under}_ids_by_${cat_name_under}(${cat_name_under}_id)"""
+        return self._provider_session.get_${object_name_under}_ids_by_${cat_name_under}(${cat_name_under}_id)"""
 
     get_resource_ids_by_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_resource_ids_by_bins
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_${object_name_under}_ids_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
+        return self._provider_session.get_${object_name_under}_ids_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
 
     get_resources_by_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_resources_by_bins
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_${object_name_plural_under}_ids_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
+        return self._provider_session.get_${object_name_plural_under}_ids_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
 
     get_bin_ids_by_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_bin_ids_by_resource
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_${cat_name_under}_ids_by_${object_name_under}(${object_name_under}_id)"""
+        return self._provider_session.get_${cat_name_under}_ids_by_${object_name_under}(${object_name_under}_id)"""
 
     get_bins_by_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_bins_by_resource
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_${cat_name_plural_under}_by_${object_name_under}(${object_name_under}_id)"""
+        return self._provider_session.get_${cat_name_plural_under}_by_${object_name_under}(${object_name_under}_id)"""
 
 class ResourceBinAssignmentSession:
 
@@ -718,32 +704,28 @@ class ResourceBinAssignmentSession:
         # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids
         if not self._can('assign'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assignable_${cat_name_under}_ids()"""
+        return self._provider_session.get_assignable_${cat_name_under}_ids()"""
 
     get_assignable_bin_ids_for_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource
         if not self._can('assign'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assignable_${cat_name_under}_ids_for_${object_name_under}(${object_name_under}_id)"""
+        return self._provider_session.get_assignable_${cat_name_under}_ids_for_${object_name_under}(${object_name_under}_id)"""
 
     assign_resource_to_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
         if not self._can('assign'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.assign_${object_name_under}_to_${cat_name_under}(${object_name_under}_id, ${cat_name_under}_id)"""
+        return self._provider_session.assign_${object_name_under}_to_${cat_name_under}(${object_name_under}_id, ${cat_name_under}_id)"""
 
     unassign_resource_from_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
         if not self._can('assign'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.unassign_${object_name_under}_from_${cat_name_under}(${object_name_under}_id, ${cat_name_under}_id)"""
+        return self._provider_session.unassign_${object_name_under}_from_${cat_name_under}(${object_name_under}_id, ${cat_name_under}_id)"""
 
 
 class ResourceAgentSession:
@@ -761,26 +743,22 @@ class ResourceAgentSession:
     get_resource_id_by_agent = """
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_resource_id_by_agent(agent_id)"""
+        return self._provider_session.get_resource_id_by_agent(agent_id)"""
 
     get_resource_by_agent = """
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_resource_by_agent(agent_id)"""
+        return self._provider_session.get_resource_by_agent(agent_id)"""
 
     get_agent_ids_by_resource = """
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_agent_ids_by_resource(resource_id)"""
+        return self._provider_session.get_agent_ids_by_resource(resource_id)"""
 
     get_agents_by_resource = """
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_agents_by_resource(resource_id)"""
+        return self._provider_session.get_agents_by_resource(resource_id)"""
 
 
 class ResourceAgentAssignmentSession:
@@ -801,14 +779,12 @@ class ResourceAgentAssignmentSession:
     assign_agent_to_resource = """
         if not self._can('assign'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.assign_agent_to_resource(agent_id, resource_id)"""
+        return self._provider_session.assign_agent_to_resource(agent_id, resource_id)"""
 
     unassign_agent_from_resource = """
         if not self._can('assign'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.unassign_agent_from_resource(agent_id, resource_id)"""
+        return self._provider_session.unassign_agent_from_resource(agent_id, resource_id)"""
 
 
 class BinLookupSession:
@@ -837,32 +813,28 @@ class BinLookupSession:
         # osid.resource.BinLookupSession.get_bin_template
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_bins_by_ids_template = """
         # Implemented from azosid template for -
         # osid.resource.BinLookupSession.get_bins_by_ids_template
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.BinLookupSession.get_bins_template
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}()"""
+        return self._provider_session.${method_name}()"""
 
     get_bins_by_genus_type_template = """
         # Implemented from azosid template for -
         # osid.resource.BinLookupSession.get_bins_by_genus_type_template
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
 
 class BinAdminSession:
@@ -887,56 +859,49 @@ class BinAdminSession:
         # This would like to be a real implementation someday:
         if ${arg0_name} == None:
             raise NullArgument() # Just 'cause the spec says to :)
-        else:
-            return self._can('admin')"""
+        return self._can('admin')"""
 
     get_bin_form_for_create_template = """
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.get_bin_form_for_create_template
         if not self._can('create'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     create_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.create_bin_template
         if not self._can('create'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_bin_form_for_update_template = """
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
         if not self._can('update'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     update_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.update_bin_template
         if not self._can('update'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     delete_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.delete_bin_template
         if not self._can('delete'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     alias_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.alias_bin_template
         if not self._can('alias'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg_list})"""
+        return self._provider_session.${method_name}(${arg_list})"""
 
 class BinHierarchySession:
 
@@ -964,128 +929,113 @@ class BinHierarchySession:
         # osid.resource.BinHierarchySession.get_bin_hierarchy
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}()"""
+        return self._provider_session.${method_name}()"""
 
     get_root_bin_ids_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.get_root_bin_ids
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}()"""
+        return self._provider_session.${method_name}()"""
 
     get_root_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.get_root_bins
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}()"""
+        return self._provider_session.${method_name}()"""
 
     has_parent_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.has_parent_bins
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     is_parent_of_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.is_parent_of_bin
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
     get_parent_bin_ids_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.get_parent_bin_ids
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_parent_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.get_parent_bins
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     is_ancestor_of_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.is_ancestor_of_bin
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
     has_child_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.has_child_bins
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     is_child_of_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.is_child_of_bin
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
     get_child_bin_ids_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.get_child_bin_ids
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_child_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.get_bin_hierarchy_id
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     is_descendant_of_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.is_descendant_of_bin
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
     get_bin_node_ids_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.get_bin_node_ids
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(
-                ${arg0_name},
-                ${arg1_name},
-                ${arg2_name},
-                ${arg3_name})"""
+        return self._provider_session.${method_name}(
+            ${arg0_name},
+            ${arg1_name},
+            ${arg2_name},
+            ${arg3_name})"""
 
     get_bin_nodes_template = """
         # Implemented from azosid template for -
         # osid.resource.BinHierarchySession.get_bin_nodes
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(
-                ${arg0_name},
-                ${arg1_name},
-                ${arg2_name},
-                ${arg3_name})"""
+        return self._provider_session.${method_name}(
+            ${arg0_name},
+            ${arg1_name},
+            ${arg2_name},
+            ${arg3_name})"""
 
 
 class BinHierarchyDesignSession:
@@ -1110,32 +1060,27 @@ class BinHierarchyDesignSession:
         # osid.resource.BinHierarchyDesignSession.add_root_bin_template
         if not self._can('modify'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     remove_root_bin_template = """
         if not self._can('modify'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     add_child_bin_template = """
         if not self._can('modify'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
     remove_child_bin_template = """
         if not self._can('modify'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
     remove_child_bins_template = """
         if not self._can('modify'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
 class BinQuerySession:
 
@@ -1158,13 +1103,11 @@ class BinQuerySession:
         # osid.resource.BinQuerySession.get_bin_query_template
         if not self._can('search'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}()"""
+        return self._provider_session.${method_name}()"""
 
     get_bins_by_query_template = """
         # Implemented from azosid template for -
         # osid.resource.BinQuerySession.get_bins_by_query_template
         if not self._can('search'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.${method_name}(${arg0_name})"""
+        return self._provider_session.${method_name}(${arg0_name})"""

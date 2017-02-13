@@ -50,9 +50,9 @@ class MyAssessmentTakenSession:
         ]
 
     init = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = provider_session.get_bank_id()
+    def __init__(self, **kwargs):
+        osid_sessions.OsidSession.__init__(self, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
         self._id_namespace = 'assessment.AssessmentTaken'
 """
 
@@ -62,32 +62,27 @@ class MyAssessmentTakenSession:
     get_assessments_started_during = """
         if not self._can('get_my'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assessments_started_during(start, end)"""
+        return self._provider_session.get_assessments_started_during(start, end)"""
 
     get_assessments_started = """
         if not self._can('get_my'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assessments_started_during()"""
+        return self._provider_session.get_assessments_started_during()"""
             
     get_assessments_in_progress_during = """
         if not self._can('get_my'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assessments_in_progress_during(start, end)"""
+        return self._provider_session.get_assessments_in_progress_during(start, end)"""
 
     get_assessments_in_progress = """
         if not self._can('get_my'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assessments_in_progress()"""
+        return self._provider_session.get_assessments_in_progress()"""
             
     get_assessments_completed = """
         if not self._can('get_my'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assessments_completed()"""
+        return self._provider_session.get_assessments_completed()"""
 
 
 class AssessmentSession:
@@ -97,9 +92,9 @@ class AssessmentSession:
         ]
 
     init = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = provider_session.get_bank_id()
+    def __init__(self, **kwargs):
+        osid_sessions.OsidSession.__init__(self, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
         self._id_namespace = 'assessment.Assessment'
 """
 
@@ -109,248 +104,207 @@ class AssessmentSession:
     has_assessment_begun = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.has_assessment_begun(assessment_taken_id)"""
+        return self._provider_session.has_assessment_begun(assessment_taken_id)"""
 
     is_assessment_over = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.is_assessment_over(assessment_taken_id)"""
+        return self._provider_session.is_assessment_over(assessment_taken_id)"""
 
     finished_assessment = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            self._provider_session.finished_assessment(assessment_taken_id)"""
+        self._provider_session.finished_assessment(assessment_taken_id)"""
 
     requires_synchronous_sections = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.requires_synchronous_sections(assessment_taken_id)"""
+        return self._provider_session.requires_synchronous_sections(assessment_taken_id)"""
 
     get_first_assessment_section = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_first_assessment_section(assessment_taken_id)"""
+        return self._provider_session.get_first_assessment_section(assessment_taken_id)"""
 
     has_next_assessment_section = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.has_next_assessment_section(assessment_section_id)"""
+        return self._provider_session.has_next_assessment_section(assessment_section_id)"""
 
     get_next_assessment_section = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_next_assessment_section(assessment_section_id)"""
+        return self._provider_session.get_next_assessment_section(assessment_section_id)"""
 
     has_previous_assessment_section = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.has_previous_assessment_section(assessment_section_id)"""
+        return self._provider_session.has_previous_assessment_section(assessment_section_id)"""
 
     get_previous_assessment_section = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_previous_assessment_section(assessment_section_id)"""
+        return self._provider_session.get_previous_assessment_section(assessment_section_id)"""
 
     get_assessment_section = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assessment_section(assessment_section_id)"""
+        return self._provider_session.get_assessment_section(assessment_section_id)"""
 
     get_assessment_sections = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assessment_sections(assessment_taken_id)"""
+        return self._provider_session.get_assessment_sections(assessment_taken_id)"""
 
     is_assessment_section_complete = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.is_assessment_section_complete(assessment_section_id)"""
+        return self._provider_session.is_assessment_section_complete(assessment_section_id)"""
 
     get_incomplete_assessment_sections = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.is_assessment_section_complete(assessment_taken_id)"""
+        return self._provider_session.is_assessment_section_complete(assessment_taken_id)"""
 
     has_assessment_section_begun = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.has_assessment_section_begun(assessment_section_id)"""
+        return self._provider_session.has_assessment_section_begun(assessment_section_id)"""
 
     is_assessment_section_over = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.is_assessment_section_over(assessment_section_id)"""
+        return self._provider_session.is_assessment_section_over(assessment_section_id)"""
 
     requires_synchronous_responses = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.requires_synchronous_responses(assessment_section_id)"""
+        return self._provider_session.requires_synchronous_responses(assessment_section_id)"""
 
     get_first_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_first_question(assessment_section_id)"""
+        return self._provider_session.get_first_question(assessment_section_id)"""
 
     has_next_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.has_next_question(assessment_section_id, item_id)"""
+        return self._provider_session.has_next_question(assessment_section_id, item_id)"""
 
     get_next_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_next_question(assessment_section_id, item_id)"""
+        return self._provider_session.get_next_question(assessment_section_id, item_id)"""
 
     has_previous_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.has_previous_question(assessment_section_id, item_id)"""
+        return self._provider_session.has_previous_question(assessment_section_id, item_id)"""
 
     get_previous_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_previous_question(assessment_section_id, item_id)"""
+        return self._provider_session.get_previous_question(assessment_section_id, item_id)"""
 
     get_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_question(assessment_section_id, item_id)"""
+        return self._provider_session.get_question(assessment_section_id, item_id)"""
 
     get_questions = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_questions(assessment_section_id)"""
+        return self._provider_session.get_questions(assessment_section_id)"""
 
     get_response_form = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_response_form(assessment_section_id, item_id)"""
+        return self._provider_session.get_response_form(assessment_section_id, item_id)"""
 
     submit_response = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.submit_response(assessment_section_id, item_id, answer_form)"""
+        return self._provider_session.submit_response(assessment_section_id, item_id, answer_form)"""
 
     skip_item = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.skip_item(assessment_section_id, item_id)"""
+        return self._provider_session.skip_item(assessment_section_id, item_id)"""
 
     is_question_answered = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.is_question_answered(assessment_section_id, item_id)"""
+        return self._provider_session.is_question_answered(assessment_section_id, item_id)"""
 
     get_unanswered_questions = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_unanswered_questions(assessment_section_id)"""
+        return self._provider_session.get_unanswered_questions(assessment_section_id)"""
 
     has_unanswered_questions = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.has_unanswered_questions(assessment_section_id)"""
+        return self._provider_session.has_unanswered_questions(assessment_section_id)"""
 
     get_first_unanswered_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_first_unanswered_question(assessment_section_id)"""
+        return self._provider_session.get_first_unanswered_question(assessment_section_id)"""
 
     has_next_unanswered_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.has_next_unanswered_question(assessment_section_id, item_id)"""
+        return self._provider_session.has_next_unanswered_question(assessment_section_id, item_id)"""
 
     get_next_unanswered_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_next_unanswered_question(assessment_section_id, item_id)"""
+        return self._provider_session.get_next_unanswered_question(assessment_section_id, item_id)"""
 
     has_previous_unanswered_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.has_previous_unanswered_question(assessment_section_id, item_id)"""
+        return self._provider_session.has_previous_unanswered_question(assessment_section_id, item_id)"""
 
     get_previous_unanswered_question = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_previous_unanswered_question(assessment_section_id, item_id)"""
+        return self._provider_session.get_previous_unanswered_question(assessment_section_id, item_id)"""
 
     get_response = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_response(assessment_section_id, item_id)"""
+        return self._provider_session.get_response(assessment_section_id, item_id)"""
 
     get_responses = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_responses(assessment_section_id)"""
+        return self._provider_session.get_responses(assessment_section_id)"""
 
     clear_response = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.clear_response(assessment_section_id, item_id)"""
+        return self._provider_session.clear_response(assessment_section_id, item_id)"""
 
     finish_assessment_section = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            self._provider_session.finish_assessment_section(assessment_section_id)"""
+        self._provider_session.finish_assessment_section(assessment_section_id)"""
 
     is_answer_available = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.is_answer_available(assessment_section_id, item_id)"""
+        return self._provider_session.is_answer_available(assessment_section_id, item_id)"""
 
     get_answers = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_answers(assessment_section_id, item_id)"""
+        return self._provider_session.get_answers(assessment_section_id, item_id)"""
 
     finish_assessment = """
         if not self._can('take'):
             raise PermissionDenied()
-        else:
-            self._provider_session.finish_assessment(assessment_taken_id)"""
+        self._provider_session.finish_assessment(assessment_taken_id)"""
 
 class AssessmentResultsSession:
 
@@ -359,9 +313,9 @@ class AssessmentResultsSession:
         ]
 
     init = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = provider_session.get_bank_id()
+    def __init__(self, **kwargs):
+        osid_sessions.OsidSession.__init__(self, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
         self._id_namespace = 'assessment.AssessmentResults'
 """
 
@@ -371,34 +325,30 @@ class AssessmentResultsSession:
     get_items = """
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_items(assessment_taken_id)"""
+        return self._provider_session.get_items(assessment_taken_id)"""
 
     get_responses = """
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_responses(assessment_taken_id)"""
+        return self._provider_session.get_responses(assessment_taken_id)"""
 
     are_results_available = """
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.are_results_available(assessment_taken_id)"""
+        return self._provider_session.are_results_available(assessment_taken_id)"""
 
     get_grade_entries = """
         if not self._can('access'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_grade_entries(assessment_taken_id)"""
+        return self._provider_session.get_grade_entries(assessment_taken_id)"""
 
 
 class AssessmentBasicAuthoringSession:
 
     init = """
-    def __init__(self, provider_session, authz_session, proxy=None):
-        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-        self._qualifier_id = provider_session.get_bank_id()
+    def __init__(self, **kwargs):
+        osid_sessions.OsidSession.__init__(self, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
         self._id_namespace = 'assessment.Assessment'
 """
 
@@ -410,45 +360,48 @@ class AssessmentBasicAuthoringSession:
         # osid.assessment.AssessmentBasicAuthoringSession.get_items
         if not self._can('author'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_items(assessment_id)"""
+        return self._provider_session.get_items(assessment_id)"""
 
     add_item = """
         # Implemented from azosid template for -
         # osid.assessment.AssessmentBasicAuthoringSession.add_item
         if not self._can('author'):
             raise PermissionDenied()
-        else:
-            self._provider_session.add_item(assessment_id, item_id)"""
+        self._provider_session.add_item(assessment_id, item_id)"""
 
     remove_item = """
         # Implemented from azosid template for -
         # osid.assessment.AssessmentBasicAuthoringSession.remove_item
         if not self._can('author'):
             raise PermissionDenied()
-        else:
-            self._provider_session.remove_item(assessment_id, item_id)"""
+        self._provider_session.remove_item(assessment_id, item_id)"""
 
     move_item = """
         # Implemented from azosid template for -
         # osid.assessment.AssessmentBasicAuthoringSession.move_item
         if not self._can('author'):
             raise PermissionDenied()
-        else:
-            self._provider_session.move_item(assessment_id, item_id, preceeding_item_id)"""
+        self._provider_session.move_item(assessment_id, item_id, preceeding_item_id)"""
 
     order_items = """
         # Implemented from azosid template for -
         # osid.assessment.AssessmentBasicAuthoringSession.order_items
         if not self._can('author'):
             raise PermissionDenied()
-        else:
-            self._provider_session.order_items(item_ids, assessment_id)"""
+        self._provider_session.order_items(item_ids, assessment_id)"""
 
 class AssessmentTakenLookupSession:
 
-    get_assessments_taken_for_taker_and_assessment_offered = """
+    old_get_assessments_taken_for_taker_and_assessment_offered = """
         if not self._can('lookup'):
             raise PermissionDenied()
-        else:
-            return self._provider_session.get_assessments_taken_for_taker_and_assessment_offered(resource_id, assessment_offered_id)"""
+        return self._provider_session.get_assessments_taken_for_taker_and_assessment_offered(resource_id, assessment_offered_id)"""
+
+    get_assessments_taken_for_taker_and_assessment_offered = """
+        if self._can('lookup'):
+            return self._provider_session.get_assessments_taken_for_taker_and_assessment_offered(resource_id, assessment_offered_id)
+        self._check_lookup_conditions() # raises PermissionDenied
+        query = self._query_session.get_assessment_taken_query()
+        query.match_taking_agent_id(resource_id, match=True)
+        query.match_assessment_offered_id(assessment_offered_id, match=True)
+        return self._try_harder(query)"""
