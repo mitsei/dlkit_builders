@@ -235,6 +235,9 @@ class AuthorizationAdminSession:
                                             "functionId": authorization_form._my_map['functionId'],
                                             "qualifierId": authorization_form._my_map['qualifierId'],
                                             "assignedVaultIds": authorization_form._my_map['assignedVaultIds']})
+            osid_map['startDate'] = authorization_form._my_map['startDate']
+            osid_map['endDate'] = authorization_form._my_map['endDate']
+            collection.save(osid_map)
         except errors.NotFound:
             insert_result = collection.insert_one(authorization_form._my_map)
 
