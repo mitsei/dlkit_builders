@@ -1101,6 +1101,13 @@ class BinLookupSession:
 
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
+    can_lookup_bins_template = """
+        # Implemented from template for
+        # osid.resource.BinLookupSession.can_lookup_bins
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
 
 class BinAdminSession:
 
@@ -1211,6 +1218,13 @@ class BinAdminSession:
 
         return cat_form"""
 
+    can_update_bins_template = """
+        # Implemented from template for
+        # osid.resource.BinAdminSession.can_update_bins
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
     update_bin_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
     ]
@@ -1238,6 +1252,13 @@ class BinAdminSession:
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned
         return objects.${return_type}(osid_object_map=${arg0_name}._my_map, runtime=self._runtime, proxy=self._proxy)"""
+
+    can_delete_bins_template = """
+        # Implemented from template for
+        # osid.resource.BinAdminSession.can_delete_bins
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
 
     delete_bin_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'

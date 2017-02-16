@@ -207,15 +207,15 @@ class ResourceLookupSession:
         self.use_comparative_${object_name_under}_view()
         self._auth_${cat_name_under}_ids = None
         self._unauth_${cat_name_under}_ids = None
-        self._overriding_${cat_name_under}_ids = None
-
-    def _get_overriding_${cat_name_under}_ids(self):
-        if self._overriding_${cat_name_under}_ids is None:
-            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
-        return self._overriding_${cat_name_under}_ids
+    #     self._overriding_${cat_name_under}_ids = None
+    #
+    # def _get_overriding_${cat_name_under}_ids(self):
+    #     if self._overriding_${cat_name_under}_ids is None:
+    #         self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
+    #     return self._overriding_${cat_name_under}_ids
 
     def _try_overriding_${cat_name_under_plural}(self, query):
-        for catalog_id in self._get_overriding_${cat_name_under}_ids():
+        for catalog_id in self._get_overriding_catalog_ids('lookup'):
             query.match_${cat_name_under}_id(catalog_id, match=True)
         return self._query_session.get_${object_name_under_plural}_by_query(query), query
 
@@ -261,7 +261,7 @@ class ResourceLookupSession:
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.can_lookup_resources_template
         return (self._can('${func_name}') or 
-                bool(self._get_overriding_${cat_name_under}_ids()))"""
+                bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     use_comparative_resource_view_template = """
         # Implemented from azosid template for -
@@ -369,15 +369,15 @@ class ResourceQuerySession:
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self.use_federated_${cat_name_under}_view()
         self._unauth_${cat_name_under}_ids = None
-        self._overriding_${cat_name_under}_ids = None
+        # self._overriding_${cat_name_under}_ids = None
 
-    def _get_overriding_${cat_name_under}_ids(self):
-        if self._overriding_${cat_name_under}_ids is None:
-            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('search')
-        return self._overriding_${cat_name_under}_ids
+    # def _get_overriding_${cat_name_under}_ids(self):
+    #     if self._overriding_${cat_name_under}_ids is None:
+    #         self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('search')
+    #     return self._overriding_${cat_name_under}_ids
 
     def _try_overriding_${cat_name_under_plural}(self, query):
-        for ${cat_name_under}_id in self._get_overriding_${cat_name_under}_ids():
+        for ${cat_name_under}_id in self._get_overriding_catalog_ids('search'):
             query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
         return self._query_session.get_${object_name_under_plural}_by_query(query), query
 
@@ -497,7 +497,8 @@ class ResourceAdminSession:
     can_create_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.can_create_resources
-        return self._can('${func_name}')"""
+        return (self._can('${func_name}') or
+                bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     can_create_resource_with_record_types_template = """
         # Implemented from azosid template for -
@@ -505,7 +506,8 @@ class ResourceAdminSession:
         # This would like to be a real implementation someday:
         if ${arg0_name} == None:
             raise NullArgument() # Just 'cause the spec says to :)
-        return self._can('${func_name}')"""
+        return (self._can('${func_name}') or
+                bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     get_resource_form_for_create_template = """
         # Implemented from azosid template for -
@@ -525,7 +527,7 @@ class ResourceAdminSession:
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.can_update_resources
         return (self._can('${func_name}') or 
-                bool(self._get_overriding_${cat_name_under}_ids()))"""
+                bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     get_resource_form_for_update_template = """
         # Implemented from azosid template for -
@@ -550,7 +552,7 @@ class ResourceAdminSession:
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.can_delete_resources
         return (self._can('${func_name}') or 
-                bool(self._get_overriding_${cat_name_under}_ids()))"""
+                bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     delete_resource_template = """
         # Implemented from azosid template for -
@@ -838,6 +840,11 @@ class BinLookupSession:
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name})"""
 
+    can_lookup_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinLookupSession.can_lookup_bins_template
+        return self._can('${func_name}')"""
+
 
 class BinAdminSession:
 
@@ -861,7 +868,7 @@ class BinAdminSession:
         # This would like to be a real implementation someday:
         if ${arg0_name} == None:
             raise NullArgument() # Just 'cause the spec says to :)
-        return self._can('admin')"""
+        return self._can('create')"""
 
     get_bin_form_for_create_template = """
         # Implemented from azosid template for -
@@ -884,12 +891,22 @@ class BinAdminSession:
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name})"""
 
+    can_update_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinAdminSession.can_update_bins
+        return self._can('${func_name}')"""
+
     update_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.update_bin_template
         if not self._can('update'):
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name})"""
+
+    can_delete_bins_template = """
+        # Implemented from azosid template for -
+        # osid.resource.BinAdminSession.can_delete_bins
+        return self._can('${func_name}')"""
 
     delete_bin_template = """
         # Implemented from azosid template for -

@@ -662,7 +662,11 @@ class ResourceAgentAssignmentSession:
 
 
 class BinLookupSession:
-
+    can_lookup_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.BinLookupSession.can_lookup_bins_template
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     use_comparative_bin_view_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
@@ -760,6 +764,18 @@ class BinLookupSession:
 
 class BinAdminSession:
 
+    can_create_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.BinAdminSession.can_create_bins
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+    can_create_bin_with_record_types_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.BinAdminSession.can_create_bin_with_record_types
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
     get_bin_form_for_create_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
@@ -791,6 +807,12 @@ class BinAdminSession:
         else:
             return self.${method_name}(${args_kwargs_or_nothing})"""
 
+    can_update_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.BinAdminSession.can_update_bins
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
     update_bin_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
@@ -809,6 +831,12 @@ class BinAdminSession:
             return self.update_${cat_name_under}(${cat_name_under}_form, *args, **kwargs)
         else:
             return self.create_${cat_name_under}(${cat_name_under}_form, *args, **kwargs)"""
+
+    can_delete_bins_template = """
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        # Implemented from kitosid template for -
+        # osid.resource.BinAdminSession.can_delete_bins
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
     delete_bin_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"

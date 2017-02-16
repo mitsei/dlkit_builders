@@ -1277,8 +1277,13 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('LookupSession') and
               method['name'].startswith('can_') and
               method['return_type'] == 'boolean'):
+            pattern = 'resource.ResourceLookupSession.can_lookup_resources'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinLookupSession.can_lookup_bins'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceLookupSession.can_lookup_resources',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -1485,8 +1490,14 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('QuerySession') and
               method['name'].startswith('can_search') and
               method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceQuerySession.can_search_resources'
+
+            # if interface['shortname'].startswith(index['package_catalog_caps']):
+            #     pattern = 'resource.BinQuerySession.can_query_bins'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceQuerySession.can_search_resources',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -1655,8 +1666,14 @@ def map_session_patterns(interface, package, index):
               method['name'].startswith('can_create_') and
               method['name'].endswith('_with_record_types') and
               method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceAdminSession.can_create_resource_with_record_types'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinAdminSession.can_create_bin_with_record_types'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceAdminSession.can_create_resource_with_record_types',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -1689,12 +1706,16 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that return an authn hint for create.
         elif (interface['shortname'].endswith('AdminSession') and
-              (method['name'].startswith('can_create_') or # Get rid of 2 of these someday
-               method['name'].startswith('can_create_') or
-               method['name'].startswith('can_create_')) and
-               method['return_type'] == 'boolean'):
+              method['name'].startswith('can_create_') and
+              method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceAdminSession.can_create_resources'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinAdminSession.can_create_bins'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceAdminSession.can_create_resources',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -1706,12 +1727,16 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that return an authn hint for Update.
         elif (interface['shortname'].endswith('AdminSession') and
-              (method['name'].startswith('can_update_') or # Get rid of 2 of these someday
-               method['name'].startswith('can_update_') or
-               method['name'].startswith('can_update_')) and
-               method['return_type'] == 'boolean'):
+              method['name'].startswith('can_update_') and
+              method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceAdminSession.can_update_resources'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinAdminSession.can_update_bins'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceAdminSession.can_update_resources',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -1723,12 +1748,16 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that return an authn hint for Delete.
         elif (interface['shortname'].endswith('AdminSession') and
-              (method['name'].startswith('can_delete_') or # Get rid of 2 of these someday
-               method['name'].startswith('can_delete_') or
-               method['name'].startswith('can_delete_')) and
-               method['return_type'] == 'boolean'):
+              method['name'].startswith('can_delete_') and
+              method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceAdminSession.can_delete_resources'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinAdminSession.can_delete_bins'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceAdminSession.can_delete_resources',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
@@ -1740,9 +1769,9 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that return an authn hint for Manage Alias.
         elif (interface['shortname'].endswith('AdminSession') and
-               method['name'].startswith('can_manage_') and
-               method['name'].endswith('_aliases') and
-               method['return_type'] == 'boolean'):
+              method['name'].startswith('can_manage_') and
+              method['name'].endswith('_aliases') and
+              method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceAdminSession.can_manage_resource_aliases',
                 kwargs = dict(interface_name = interface['shortname'],
