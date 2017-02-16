@@ -162,6 +162,7 @@ class Operable:
 
 class OsidSession:
     import_statements = [
+        'from ..osid.osid_errors import PermissionDenied',
         'COMPARATIVE = 0',
         'PLENARY = 1',
         'FEDERATED = 0',
@@ -226,7 +227,7 @@ class OsidSession:
                 self._override_lookup_session is None):
             return can_for_session
 
-        override_auths = override_lookup_session.get_authorizations_for_agent_and_function(
+        override_auths = self._override_lookup_session.get_authorizations_for_agent_and_function(
             self.get_effective_agent_id(),
             self._get_function_id(func_name))
         if not override_auths.available():
@@ -240,23 +241,23 @@ class OsidSession:
         return False
 
     def _get_overriding_catalog_ids(self, func_name):
-        if self._overriding_catalog_ids is None:
+        cat_id_list = []
+        if self._overriding_catalog_ids is None and self._override_lookup_session is not None:
             function_id = Id(
                 identifier=func_name,
                 namespace=self._id_namespace,
                 authority='ODL.MIT.EDU')
-            auths =  self._override_lookup_session.get_authorizations_for_agent_and_function(
+            auths = self._override_lookup_session.get_authorizations_for_agent_and_function(
                 self.get_effective_agent_id(),
                 function_id)
-            auth_id_list = []
             for auth in auths:
                 cat_id_list.append(auth.get_qualifier_id())
-            self._overriding_catalog_ids = cat_id_list
+        self._overriding_catalog_ids = cat_id_list
         return self._overriding_catalog_ids
 
     def _check_lookup_conditions(self):
         if  ((self._is_plenary_object_view() or self._is_isolated_catalog_view() or self._query_session is None) and
-                not self._get_overriding_catalog_ids()):
+                not self._get_overriding_catalog_ids('lookup')):
             raise PermissionDenied()
 
     def _use_comparative_object_view(self):

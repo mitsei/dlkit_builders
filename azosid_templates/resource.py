@@ -207,15 +207,15 @@ class ResourceLookupSession:
         self.use_comparative_${object_name_under}_view()
         self._auth_${cat_name_under}_ids = None
         self._unauth_${cat_name_under}_ids = None
-        # self._overriding_${cat_name_under}_ids = None
+        self._overriding_${cat_name_under}_ids = None
 
-    # def _get_overriding_${cat_name_under}_ids(self):
-    #     if self._overriding_${cat_name_under}_ids is None:
-    #         self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
-    #     return self._overriding_${cat_name_under}_ids
+    def _get_overriding_${cat_name_under}_ids(self):
+        if self._overriding_${cat_name_under}_ids is None:
+            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
+        return self._overriding_${cat_name_under}_ids
 
     def _try_overriding_${cat_name_under_plural}(self, query):
-        for catalog_id in self._get_overriding_catalog_ids():
+        for catalog_id in self._get_overriding_${cat_name_under}_ids():
             query.match_${cat_name_under}_id(catalog_id, match=True)
         return self._query_session.get_${object_name_under_plural}_by_query(query), query
 
@@ -481,7 +481,7 @@ class ResourceAdminSession:
         else:
             try:
                 self._object_catalog_session = provider_manager.get_${object_name_under}_${cat_name_under}_session()
-                self.get_${cat_name_under}_ids_by_${object_name_under} = session.get_${cat_name_under}_ids_by_${object_name_under}
+                self.get_${cat_name_under}_ids_by_${object_name_under} = self._object_catalog_session.get_${cat_name_under}_ids_by_${object_name_under}
             except Unimplemented:
                 pass
 
