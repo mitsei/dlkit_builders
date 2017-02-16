@@ -280,14 +280,16 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.use_federated_bin_view_template
         self._use_federated_catalog_view()
         self._provider_session.${method_name}()
-        self._query_session.${method_name}()"""
+        if self._query_session:
+            self._query_session.${method_name}()"""
 
     use_isolated_bin_view_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.use_isolated_bin_view_template
         self._use_isolated_catalog_view()
         self._provider_session.${method_name}()
-        self._query_session.${method_name}()"""
+        if self._query_session:
+            self._query_session.${method_name}()"""
 
     get_resource_template = """
         # Implemented from azosid template for -
