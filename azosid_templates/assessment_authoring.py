@@ -414,3 +414,10 @@ class AssessmentAuthoringProfile:
         # Implemented from azosid template for -
         # osid.assessment_authoring.AssessmentAuthoringProfile.supports_sequence_rule_lookup
         return self._provider_manager.supports_sequence_rule_lookup()"""
+
+
+class AssessmentPartAdminSession:
+    update_assessment_part = """
+        if not self._can('update'):
+            raise PermissionDenied()
+        return self._provider_session.update_assessment_part(assessment_part_id, assessment_part_form)"""
