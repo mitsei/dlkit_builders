@@ -2,7 +2,7 @@
 
 class ResourceProfile:
     import_statements_pattern = [
-        "from ..osid.osid_errors import Unsupported"
+        "from ..osid.osid_errors import Unimplemented"
     ]
 
     init_template = """
@@ -12,7 +12,7 @@ class ResourceProfile:
     def _get_hierarchy_session(self, proxy=None):
         try:
             return self._provider_manager.get_${cat_name_under}_hierarchy_session(proxy)
-        except Unsupported:
+        except Unimplemented:
             return None
 """
 
@@ -33,7 +33,7 @@ class ResourceProfile:
 
 class ResourceManager:
     import_statements_pattern = [
-        "from ..osid.osid_errors import Unsupported"
+        "from ..osid.osid_errors import Unimplemented"
     ]
 
     init_template = """
@@ -55,7 +55,7 @@ class ResourceManager:
         try:
             query_session = self._provider_manager.get_${object_name_under}_query_session()
             query_session.use_federated_${cat_name_under}_view()
-        except Unsupported:
+        except Unimplemented:
             query_session = None
         try:
             return getattr(sessions, '${return_type}')(
@@ -73,7 +73,7 @@ class ResourceManager:
         try:
             query_session = self._provider_manager.get_${object_name_under}_query_session_for_${cat_name_under}(${arg0_name})
             query_session.use_federated_${cat_name_under}_view()
-        except Unsupported:
+        except Unimplemented:
             query_session = None
         try:
             return getattr(sessions, '${return_type}')(
@@ -112,7 +112,7 @@ class ResourceManager:
 
 class ResourceProxyManager:
     import_statements_pattern = [
-        "from ..osid.osid_errors import Unsupported"
+        "from ..osid.osid_errors import Unimplemented"
     ]
 
     init_template = """
@@ -134,7 +134,7 @@ class ResourceProxyManager:
         try:
             query_session = self._provider_manager.get_${object_name_under}_query_session(proxy)
             query_session.use_federated_${cat_name_under}_view()
-        except Unsupported:
+        except Unimplemented:
             query_session = None
         try:
             return getattr(sessions, '${return_type}')(
@@ -153,7 +153,7 @@ class ResourceProxyManager:
         try:
             query_session = self._provider_manager.get_${object_name_under}_query_session_for_${cat_name_under}(${arg0_name}, proxy)
             query_session.use_federated_${cat_name_under}_view()
-        except Unsupported:
+        except Unimplemented:
             query_session = None
         try:
             return getattr(sessions, '${return_type}')(
