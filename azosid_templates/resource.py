@@ -436,12 +436,10 @@ class ResourceQuerySession:
                 ${arg0_name}._provider_query.match_${cat_name_under}_id(**kwargs)
         if self._can('search'):
             return self._provider_session.${method_name}(${arg0_name})
-        if self._is_isolated_catalog_view() and not self._get_overriding_catalog_ids('search'):
-            raise PermissionDenied()
-        else:
-            result = self._try_harder(${arg0_name})
-            ${arg0_name}._provider_query.clear_${cat_name_under}_terms()
-            return result"""
+        self._check_search_conditions()
+        result = self._try_harder(${arg0_name})
+        ${arg0_name}._provider_query.clear_${cat_name_under}_terms()
+        return result"""
 
 
 class ResourceSearchSession:
