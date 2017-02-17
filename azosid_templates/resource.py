@@ -469,20 +469,20 @@ class ResourceAdminSession:
 
     init_template = """
     def __init__(self, provider_manager, *args, **kwargs):
-        osid_sessions.OsidSession.__init__(self,  *args, **kwargs)
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
         self._id_namespace = '${pkg_name_replaced}.${object_name}'
         self._overriding_${cat_name_under}_ids = None
         if self._proxy is not None:
             try:
                 self._object_catalog_session = provider_manager.get_${object_name_under}_${cat_name_under}_session(self._proxy)
-            except Unimplemented:
+            except (Unimplemented, AttributeError):
                 pass
         else:
             try:
                 self._object_catalog_session = provider_manager.get_${object_name_under}_${cat_name_under}_session()
                 self.get_${cat_name_under}_ids_by_${object_name_under} = self._object_catalog_session.get_${cat_name_under}_ids_by_${object_name_under}
-            except Unimplemented:
+            except (Unimplemented, AttributeError):
                 pass
 
     def _get_overriding_${cat_name_under}_ids(self):
