@@ -527,6 +527,10 @@ class OsidSession:
 
     def _create_orchestrated_cat(self, foreign_catalog_id, db_name, cat_name):
         \"\"\"Creates a catalog in the current service orchestrated with a foreign service Id.\"\"\"
+        if (foreign_catalog_id.identifier_namespace == db_name + '.' + cat_name and
+            foreign_catalog_id.authority == self._authority):
+            # This is not a foreign catalog 
+            raise errors.NotFound()
         # Need to test if the catalog_id exists for the foreign catalog
         try:
             foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
