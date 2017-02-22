@@ -2,6 +2,19 @@
 
 from . import resource
 
+class RepositoryProfile:
+
+    get_coordinate_types_template = """
+        # Implemented from azosid template for -
+        # osid.repository.RepositoryProfile.get_coordinate_types
+        return self._provider_manager.${method_name}()"""
+
+    supports_coordinate_type_template = """
+        # Implemented from azosid template for -
+        # osid.repository.RepositoryProfile.supports_coordinate_type
+        return self._provider_manager.${method_name}()"""
+
+
 class RepositoryManager:
     # This is here temporarily until Tom adds missing methods to RepositoryManager
     
