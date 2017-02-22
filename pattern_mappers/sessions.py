@@ -571,7 +571,8 @@ def map_session_patterns(interface, package, index):
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
-                              var_name = method['name'][4:]))
+                              var_name = method['name'][4:],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # CatalogHierarchySession methods that gets the root catalog Ids.
@@ -1276,14 +1277,20 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('LookupSession') and
               method['name'].startswith('can_') and
               method['return_type'] == 'boolean'):
+            pattern = 'resource.ResourceLookupSession.can_lookup_resources'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinLookupSession.can_lookup_bins'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceLookupSession.can_lookup_resources',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-13],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # ObjectLookupSession methods that returns an object (without id, where there appears to be one and only one).
@@ -1483,14 +1490,21 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('QuerySession') and
               method['name'].startswith('can_search') and
               method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceQuerySession.can_search_resources'
+
+            # if interface['shortname'].startswith(index['package_catalog_caps']):
+            #     pattern = 'resource.BinQuerySession.can_query_bins'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceQuerySession.can_search_resources',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # ObjectQuerySession methods that return objects by Query.
@@ -1652,15 +1666,22 @@ def map_session_patterns(interface, package, index):
               method['name'].startswith('can_create_') and
               method['name'].endswith('_with_record_types') and
               method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceAdminSession.can_create_resource_with_record_types'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinAdminSession.can_create_bin_with_record_types'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceAdminSession.can_create_resource_with_record_types',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
                               var_name = method['name'],
-                              arg0_name = method['args'][0]['var_name']))
+                              arg0_name = method['args'][0]['var_name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # Session methods that return an authn hint for a given object id.
@@ -1679,29 +1700,78 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
-        # ObjectAdminSession methods that return an authn hint for CrUD.
+        # ObjectAdminSession methods that return an authn hint for create.
         elif (interface['shortname'].endswith('AdminSession') and
-              (method['name'].startswith('can_create_') or
-               method['name'].startswith('can_update_') or
-               method['name'].startswith('can_delete_')) and
-               method['return_type'] == 'boolean'):
+              method['name'].startswith('can_create_') and
+              method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceAdminSession.can_create_resources'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinAdminSession.can_create_bins'
+
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceAdminSession.can_create_resources',
+                pattern = pattern,
                 kwargs = dict(interface_name = interface['shortname'],
                               package_name = package['name'],
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
+
+        ##
+        # ObjectAdminSession methods that return an authn hint for Update.
+        elif (interface['shortname'].endswith('AdminSession') and
+              method['name'].startswith('can_update_') and
+              method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceAdminSession.can_update_resources'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinAdminSession.can_update_bins'
+
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = pattern,
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              object_name = interface['shortname'][:-12],
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
+
+        ##
+        # ObjectAdminSession methods that return an authn hint for Delete.
+        elif (interface['shortname'].endswith('AdminSession') and
+              method['name'].startswith('can_delete_') and
+              method['return_type'] == 'boolean'):
+
+            pattern = 'resource.ResourceAdminSession.can_delete_resources'
+
+            if interface['shortname'].startswith(index['package_catalog_caps']):
+                pattern = 'resource.BinAdminSession.can_delete_bins'
+
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = pattern,
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              object_name = interface['shortname'][:-12],
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
+
         ##
         # ObjectAdminSession methods that return an authn hint for Manage Alias.
         elif (interface['shortname'].endswith('AdminSession') and
-               method['name'].startswith('can_manage_') and
-               method['name'].endswith('_aliases') and
-               method['return_type'] == 'boolean'):
+              method['name'].startswith('can_manage_') and
+              method['name'].endswith('_aliases') and
+              method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceAdminSession.can_manage_resource_aliases',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1709,7 +1779,8 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-12],
-                              var_name = method['name']))        
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))        
 
         ##
         # ObjectAdminSession methods that gets object form for create where the
@@ -2167,7 +2238,8 @@ def map_session_patterns(interface, package, index):
                               module_name = interface['category'],
                               method_name = method['name'],
                               object_name = interface['shortname'][:-16],
-                              var_name = method['name']))
+                              var_name = method['name'],
+                              cat_name = index['package_catalog_caps']))
 
         ##
         # ObjectHierarchySession methods that return root ids.

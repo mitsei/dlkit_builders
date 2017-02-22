@@ -949,7 +949,7 @@ class Question:
     init = """
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='QUESTION', **kwargs)
-        self._catalog_name = 'bank'
+        self._catalog_name = 'Bank'
         if 'item_id' in kwargs:
             self._item_id = kwargs['item_id']
         else:
@@ -1438,7 +1438,7 @@ class AssessmentTaken:
 
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='ASSESSMENT_TAKEN', **kwargs)
-        self._catalog_name = 'bank'
+        self._catalog_name = 'Bank'
         self._assessment_sections = dict()"""
     
     additional_methods = """

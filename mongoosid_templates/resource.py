@@ -324,7 +324,12 @@ class ResourceQuerySession:
         and_list = list()
         or_list = list()
         for term in ${arg0_name}._query_terms:
-            and_list.append({term: ${arg0_name}._query_terms[term]})
+            if '$$in' in ${arg0_name}._query_terms[term] and '$$nin' in ${arg0_name}._query_terms[term]:
+                and_list.append(
+                    {'$$or': [{term: {'$$in': ${arg0_name}._query_terms[term]['$$in']}},
+                             {term: {'$$nin': ${arg0_name}._query_terms[term]['$$nin']}}]})
+            else:
+                and_list.append({term: ${arg0_name}._query_terms[term]})
         for term in ${arg0_name}._keyword_terms:
             or_list.append({term: ${arg0_name}._keyword_terms[term]})
         if or_list:
@@ -509,6 +514,13 @@ class ResourceAdminSession:
 
         return result"""
 
+    can_update_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceAdminSession.can_update_resources
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
     get_resource_form_for_update_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
     ]
@@ -607,6 +619,13 @@ class ResourceAdminSession:
             osid_object_map=${arg0_name}._my_map,
             runtime=self._runtime,
             proxy=self._proxy)"""
+
+    can_delete_resources_template = """
+        # Implemented from template for
+        # osid.resource.ResourceAdminSession.can_delete_resources
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
 
     delete_resource_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
@@ -1082,6 +1101,13 @@ class BinLookupSession:
 
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
+    can_lookup_bins_template = """
+        # Implemented from template for
+        # osid.resource.BinLookupSession.can_lookup_bins
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
 
 class BinAdminSession:
 
@@ -1192,6 +1218,13 @@ class BinAdminSession:
 
         return cat_form"""
 
+    can_update_bins_template = """
+        # Implemented from template for
+        # osid.resource.BinAdminSession.can_update_bins
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
     update_bin_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
     ]
@@ -1219,6 +1252,13 @@ class BinAdminSession:
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned
         return objects.${return_type}(osid_object_map=${arg0_name}._my_map, runtime=self._runtime, proxy=self._proxy)"""
+
+    can_delete_bins_template = """
+        # Implemented from template for
+        # osid.resource.BinAdminSession.can_delete_bins
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
 
     delete_bin_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
@@ -1507,7 +1547,7 @@ class Resource:
 
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='${object_name_upper}', **kwargs)
-        self._catalog_name = '${cat_name_under}'
+        self._catalog_name = '${cat_name}'
 ${instance_initers}"""
 
     is_group_template = """
@@ -1573,13 +1613,24 @@ class ResourceQuery:
 """
 
     clear_group_terms_template = """
+        # Implemented from template for osid.resource.ResourceQuery.clear_group_terms
         self._clear_terms('${var_name_mixed}')"""
 
     match_bin_id_template = """
+        # Implemented from template for osid.resource.ResourceQuery.match_bin_id
         self._add_match('assigned${cat_name}Ids', str(${arg0_name}), ${arg1_name})"""
 
     clear_bin_id_terms_template = """
+        # Implemented from template for osid.resource.ResourceQuery.clear_bin_id_terms
         self._clear_terms('assigned${cat_name}Ids')"""
+
+    match_avatar_id_template = """
+        # Implemented from template for osid.resource.ResourceQuery.match_avatar_id
+        self._add_match('${var_name_mixed}', str(${arg0_name}, ${arg1_name}))"""
+
+    clear_avatar_id_terms_template = """
+        # Implemented from template for osid.resource.ResourceQuery.clear_avatar_id
+        self._clear_terms('${var_name_mixed}')"""
 
 
 class ResourceSearch:

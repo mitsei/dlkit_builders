@@ -1,5 +1,7 @@
 """helper utilities for the authz adapter implementation"""
 
+from .primitives import Type
+
 class QueryWrapper(object):
     """Wrapper class to aid in QuerySessions"""
     def __init__(self, provider_query):
@@ -9,3 +11,11 @@ class QueryWrapper(object):
         self.__dict__ = provider_query.__dict__
         self._provider_query = provider_query
         self._cat_id_args_list = []
+
+BOOTSTRAP_VAULT_TYPE = Type(authority='ODL.MIT.EDU',
+                            namespace='authorization.Vault',
+                            identifier='bootstrap_vault')
+
+OVERRIDE_VAULT_TYPE = Type(authority='ODL.MIT.EDU',
+                            namespace='authorization.Vault',
+                            identifier='override_vault')

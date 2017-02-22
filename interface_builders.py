@@ -4,7 +4,7 @@ import json
 import shutil
 import string
 
-from binder_helpers import under_to_mixed, camel_to_mixed,\
+from binder_helpers import under_to_mixed, under_to_caps, camel_to_mixed,\
     remove_plural, camel_to_under, make_plural, camel_to_caps_under,\
     fix_reserved_word
 from build_controller import Utilities, BaseBuilder, Templates
@@ -517,7 +517,8 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 
     for data_name in persisted_data:
         mixed_name = under_to_mixed(data_name)
-        caps_name = mixed_name.title()
+        # caps_name = mixed_name.title()
+        caps_name = under_to_caps(data_name)
         mixed_singular = under_to_mixed(remove_plural(data_name))
 
         persisted_name = persisted_data[data_name]

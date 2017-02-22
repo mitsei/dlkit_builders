@@ -9,6 +9,7 @@ class AuthorizationSession:
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
         'LOOKUP_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'lookup\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
         'SEARCH_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'search\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
         'CREATE_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'create\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
@@ -19,7 +20,9 @@ class AuthorizationSession:
         'LOOKUP_BIN_FUNCTION_ID = Id(**{\'identifier\': \'lookup\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
         'ACCESS_BIN_HIERARCHY_FUNCTION_ID = Id(**{\'identifier\': \'access\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
         'MODIFY_BIN_HIERARCHY_FUNCTION_ID = Id(**{\'identifier\': \'modify\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
-        'ROOT_QUALIFIER_ID = Id(\'resource.Bin%3AROOT%40ODL.MIT.EDU\')'
+        'ROOT_QUALIFIER_ID = Id(\'resource.Bin%3AROOT%40ODL.MIT.EDU\')',
+        'BOOTSTRAP_VAULT_TYPE = Type(authority=\'ODL.MIT.EDU\', namespace=\'authorization.Vault\', identifier=\'bootstrap_vault\')',
+        'OVERRIDE_VAULT_TYPE = Type(authority=\'ODL.MIT.EDU\', namespace=\'authorization.Vault\', identifier=\'override_vault\')',
     ]
 
     init = """
@@ -28,11 +31,21 @@ class AuthorizationSession:
         cls.authz_mgr = Runtime().get_manager('AUTHORIZATION', implementation='MONGO_1')
         cls.vault_admin_session = cls.authz_mgr.get_vault_admin_session()
         cls.vault_lookup_session = cls.authz_mgr.get_vault_lookup_session()
+
         create_form = cls.vault_admin_session.get_vault_form_for_create([])
         create_form.display_name = 'Test Vault'
         create_form.description = 'Test Vault for AuthorizationLookupSession tests'
+        create_form.genus_type = BOOTSTRAP_VAULT_TYPE
         cls.vault = cls.vault_admin_session.create_vault(create_form)
+
+        create_form = cls.vault_admin_session.get_vault_form_for_create([])
+        create_form.display_name = 'Test Override Vault'
+        create_form.description = 'Test Override Vault for AuthorizationLookupSession tests'
+        create_form.genus_type = OVERRIDE_VAULT_TYPE
+        cls.override_vault = cls.vault_admin_session.create_vault(create_form)
+
         cls.authz_admin_session = cls.authz_mgr.get_authorization_admin_session_for_vault(cls.vault.ident)
+        cls.override_authz_admin_session = cls.authz_mgr.get_authorization_admin_session_for_vault(cls.override_vault.ident)
         cls.authz_lookup_session = cls.authz_mgr.get_authorization_lookup_session_for_vault(cls.vault.ident)
 
         # Set up Bin create authorization for current user
@@ -161,7 +174,7 @@ class AuthorizationSession:
         cls.authz_id_list.append(jane_lookup_authz.ident)
         
         # Set up Resource lookup authorizations for Jane
-        for num in [1, 5, 7]:
+        for num in [1, 5]:
             create_form = cls.authz_admin_session.get_authorization_form_for_create_for_agent(
                 AGENT_ID,
                 LOOKUP_RESOURCE_FUNCTION_ID,
@@ -170,6 +183,32 @@ class AuthorizationSession:
             create_form.display_name = 'Test Authorization ' + str(num)
             create_form.description = 'Test Authorization for AuthorizationLookupSession tests'
             authz = cls.authz_admin_session.create_authorization(create_form)
+            cls.authz_list.append(authz)
+            cls.authz_id_list.append(authz.ident)
+
+        # Set up Resource lookup override authorizations for Jane
+        for num in [7]:
+            create_form = cls.override_authz_admin_session.get_authorization_form_for_create_for_agent(
+                AGENT_ID,
+                LOOKUP_RESOURCE_FUNCTION_ID,
+                cls.bin_id_list[num],
+                [])
+            create_form.display_name = 'Test Authorization ' + str(num) + ' (override)'
+            create_form.description = 'Test Authorization for AuthorizationLookupSession tests'
+            authz = cls.override_authz_admin_session.create_authorization(create_form)
+            cls.authz_list.append(authz)
+            cls.authz_id_list.append(authz.ident)
+
+        # Set up Resource search override authorizations for Jane
+        for num in [7]:
+            create_form = cls.override_authz_admin_session.get_authorization_form_for_create_for_agent(
+                AGENT_ID,
+                SEARCH_RESOURCE_FUNCTION_ID,
+                cls.bin_id_list[num],
+                [])
+            create_form.display_name = 'Test Authorization ' + str(num) + ' (override)'
+            create_form.description = 'Test Authorization for AuthorizationLookupSession tests'
+            authz = cls.override_authz_admin_session.create_authorization(create_form)
             cls.authz_list.append(authz)
             cls.authz_id_list.append(authz.ident)
 

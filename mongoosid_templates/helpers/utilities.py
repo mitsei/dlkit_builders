@@ -215,8 +215,12 @@ def get_provider_session(provider_manager, session_method, proxy=None, *args, **
     else:
         return getattr(provider_manager, session_method)(proxy, *args, **kwargs)
 
-def format_catalog(catalog_name):
-    return catalog_name.replace('_', '').title()
+# Deprecated. Delete me:
+# def format_catalog(catalog_name):
+#     return catalog_name.replace('_', '').title()
+
+def caps_to_mixed(caps_string):
+    return caps_string[0].lower() + caps_string[1:]
 
 def now_map():
     now = DateTime.utcnow()

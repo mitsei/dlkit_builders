@@ -161,6 +161,33 @@ class AssessmentSession:
         pass"""
 
 
+class AssessmentResultsSession:
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.assessment_offered_list = list()
+        cls.assessment_offered_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_banks():
+            for obj in catalog.get_assessments():
+                catalog.delete_assessment(obj.ident)
+            cls.svc_mgr.delete_bank(catalog.ident)
+"""
+
+
+
 class ItemAdminSession:
     
     import_statements = [
@@ -415,13 +442,17 @@ class AssessmentBasicAuthoringSession:
     def setUpClass(cls):
         cls.assessment_offered_list = list()
         cls.assessment_offered_ids = list()
+        simple_sequence_record_type = Type(**{
+            'authority': 'ODL.MIT.EDU',
+            'namespace': 'osid-object',
+            'identifier': 'simple-child-sequencing'})
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         # cls.auth_svc_mgr = Runtime().get_service_manager('ASSESSMENT_AUTHORING', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
         create_form.description = 'Test Bank for AssessmentBasicAuthoringSession tests'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
-        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form = cls.catalog.get_assessment_form_for_create([simple_sequence_record_type])
         create_form.display_name = 'Test Assessment'
         create_form.description = 'Test Assessment for AssessmentBasicAuthoringSession tests'
         cls.assessment = cls.catalog.create_assessment(create_form)
@@ -440,10 +471,10 @@ class AssessmentBasicAuthoringSession:
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_items():
-                catalog.delete_item(obj.ident)
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
+            for obj in catalog.get_items():
+                catalog.delete_item(obj.ident)
             cls.svc_mgr.delete_bank(catalog.ident)
 """
     

@@ -1335,6 +1335,20 @@ def map_query_patterns(interface, package, index):
                               cat_name = index['package_catalog_caps']))
 
         ##
+        # Query methods that clear catalog id terms
+        elif (method['name'].endswith('_id_terms') and
+              method['name'].startswith('clear_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceQuery.clear_avatar_id_terms',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name[:-6],
+                              object_name = object_name,
+                              cat_name = index['package_catalog_caps']))
+
+        ##
         # Query methods that clear all terms (do we need one for each element type?)
         elif (method['name'].endswith('_terms') and
               var_name[:-6] in index[object_name + '.persisted_data'] and
@@ -1388,6 +1402,26 @@ def map_query_patterns(interface, package, index):
                               arg1_type_full = method['args'][1]['arg_type'],
                               cat_name = index['package_catalog_caps'],
                               object_name = object_name))
+
+        ##
+        # Query methods that match an object Id
+        elif (method['name'].startswith('match_') and
+              method['name'].endswith('_id') and
+              len(method['args']) == 2):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceQuery.match_avatar_id',
+                kwargs = dict(interface_name = interface['shortname'],
+                              package_name = package['name'],
+                              module_name = interface['category'],
+                              method_name = method['name'],
+                              var_name = var_name,
+                              arg0_name = method['args'][0]['var_name'],
+                              arg0_type_full = method['args'][0]['arg_type'],
+                              arg1_name = method['args'][1]['var_name'],
+                              arg1_type_full = method['args'][1]['arg_type'],
+                              cat_name = index['package_catalog_caps'],
+                              object_name = object_name))
+
 
         else:
             # uncomment the following line to print all unknown object patterns
