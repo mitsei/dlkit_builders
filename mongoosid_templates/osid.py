@@ -552,7 +552,6 @@ class OsidSession:
                             'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
             'genusTypeId': str(Type(**types.Genus().get_type_data('DEFAULT'))),
             'recordTypeIds': [] # Could this somehow inherit source catalog records?
-
         }
         collection.insert_one(catalog_map)
         return catalog_map
