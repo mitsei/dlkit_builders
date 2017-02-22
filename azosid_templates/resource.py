@@ -495,8 +495,7 @@ class ResourceAdminSession:
     can_create_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.can_create_resources
-        return (self._can('${func_name}') or
-                bool(self._get_overriding_catalog_ids('${func_name}')))"""
+        return self._can('${func_name}')"""
 
     can_create_resource_with_record_types_template = """
         # Implemented from azosid template for -
@@ -504,8 +503,7 @@ class ResourceAdminSession:
         # This would like to be a real implementation someday:
         if ${arg0_name} == None:
             raise NullArgument() # Just 'cause the spec says to :)
-        return (self._can('${func_name}') or
-                bool(self._get_overriding_catalog_ids('${func_name}')))"""
+        return self._can('${func_name}')"""
 
     get_resource_form_for_create_template = """
         # Implemented from azosid template for -
