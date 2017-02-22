@@ -920,7 +920,7 @@ class ResourceAgentSession:
             catalog_id,
             proxy,
             runtime,
-            db_name='assessment',
+            db_name='resource',
             cat_name='Bin',
             cat_class=objects.Bin)
         self._forms = dict()"""
@@ -973,7 +973,7 @@ class ResourceAgentAssignmentSession:
             catalog_id,
             proxy,
             runtime,
-            db_name='assessment',
+            db_name='resource',
             cat_name='Bin',
             cat_class=objects.Bin)
         self._forms = dict()"""
