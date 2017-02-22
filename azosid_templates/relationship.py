@@ -46,7 +46,7 @@ class RelationshipLookupSession:
         # Implemented from azosid template for -
         # osid.relationship.RelationshipLookupSession.get_relationships_for_source_on_date_template
         if self._can('lookup'):
-            return self._provider_session.${method_name}(${arg0_name})
+            return self._provider_session.${method_name}(${arg0_name}, ${arg1_name}, ${arg2_name})
         self._check_lookup_conditions() # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_source_id(${arg0_name}, match=True)
