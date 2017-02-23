@@ -597,7 +597,8 @@ class BaseBuilder(Utilities):
                 module_name = module
 
             if modules[module]['body'].strip() != '':
-                mode = 'wb'
+                mode = 'wb+'
+                self._make_dir(self._abc_pkg_path(), python=True)
                 with open(self._abc_module(module_name), mode) as write_file:
                     self._write_module_string(write_file,
                                               modules[module])
@@ -828,6 +829,10 @@ class Builder(Utilities):
         print "Creating pattern files"
         PatternBuilder().make_patterns()
 
+    def manager(self):
+        from managerutilbuilder import ManagerUtilBuilder
+        ManagerUtilBuilder(build_dir=self.build_dir).make()
+
     def services(self):
         from kitbuilder import KitBuilder
         KitBuilder(build_dir=self.build_dir).make()
@@ -855,6 +860,7 @@ if __name__ == '__main__':
         print "  mongo: build the mongo OSID impl"
         print "  stub: build developer stub impl"
         print "  services: build the dlkit convenience service impls"
+        print "  manager: build the manager_impls base classes"
         print "  tests: build the tests"
         print "  --all: build all of the above"
         print "  --buildto <directory>: the target build-to directory"
@@ -885,6 +891,7 @@ if __name__ == '__main__':
                     'stub',
                     'authz',
                     'services',
+                    'manager',
                     'tests']
         if not any(c in sys.argv for c in commands):
             usage()
@@ -938,6 +945,9 @@ if __name__ == '__main__':
                 non_test_build = True
             if 'services' in sys.argv:
                 builder.services()
+                non_test_build = True
+            if 'manager' in sys.argv:
+                builder.manager()
                 non_test_build = True
             if 'authz' in sys.argv:
                 builder.authz()
