@@ -542,19 +542,20 @@ class OsidSession:
         #     raise errors.NotFound()
         foreign_service_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
         foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
+        catalog_name = foreign_cat_name.lower()
         manager = self._get_provider_manager(foreign_service_name.upper())
-        lookup_session = getattr(manager, 'get_{0}_lookup_session'.format(foreign_cat_name.lower()))(proxy=self._proxy)
-        getattr(lookup_session, 'get_{0}'.format(foreign_cat_name.lower()))(foreign_catalog_id) # Raises NotFound
+        lookup_session = getattr(manager, 'get_{0}_lookup_session'.format(catalog_name))(proxy=self._proxy)
+        getattr(lookup_session, 'get_{0}'.format(catalog_name))(foreign_catalog_id) # Raises NotFound
         collection = MongoClientValidated(db_name,
                                           collection=cat_name,
                                           runtime=self._runtime)
         catalog_map = {
             '_id': ObjectId(foreign_catalog_id.get_identifier()),
-            'displayName': {'text': ('Orchestrated ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' ' + cat_name),
+            'displayName': {'text': ('Orchestrated ' + foreign_service_name + ' ' + cat_name),
                             'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
                             'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
                             'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-            'description': {'text': ('Orchestrated ' + cat_name + ' for the ' + foreign_catalog_id.get_identifier_namespace().split('.')[0] + ' service'),
+            'description': {'text': ('Orchestrated ' + cat_name + ' for the ' + foreign_service_name + ' service'),
                             'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
                             'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
                             'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
@@ -562,6 +563,14 @@ class OsidSession:
             'recordTypeIds': [] # Could this somehow inherit source catalog records?
         }
         collection.insert_one(catalog_map)
+        alias_id = Id(identifier=foreign_catalog_id.identifier,
+                      namespace=db_name + '.' + cat_name,
+                      authority=self._authority)
+        try:
+            admin_session = getattr(manager, 'get_{0}_admin_session'.format(catalog_name))(proxy=self._proxy)
+            getattr(admin_session, 'alias_{0}'.format(catalog_name))(foreign_catalog_id, alias_id)
+        except (errors.Unimplemented, AttributeError):
+            pass
         return catalog_map
 
     def _get_provider_manager(self, osid, local=False):
