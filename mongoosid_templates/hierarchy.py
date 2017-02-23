@@ -167,7 +167,8 @@ class HierarchyDesignSession:
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
+        # OsidSession.__init__(self)
+        OsidSession._init_catalog(self, proxy, runtime)  # to get the configured authority
         from .objects import Hierarchy
         self._catalog_class = Hierarchy
         self._session_name = 'HierarchyTraversalSession'
