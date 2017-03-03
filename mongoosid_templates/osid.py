@@ -415,6 +415,7 @@ class OsidSession:
 
     import_statements = [
         'import socket',
+        'import inflection',
         'import datetime',
         'from ..primitives import Id',
         'from ..primitives import Type',
@@ -541,7 +542,7 @@ class OsidSession:
         # except KeyError:
         #     raise errors.NotFound()
         foreign_service_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
-        foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
+        foreign_cat_name = inflection.underscore(foreign_catalog_id.namespace.split('.')[1])
         catalog_name = foreign_cat_name.lower()
         manager = self._get_provider_manager(foreign_service_name.upper())
         lookup_session = getattr(manager, 'get_{0}_lookup_session'.format(catalog_name))(proxy=self._proxy)
