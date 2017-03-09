@@ -221,9 +221,15 @@ class AssessmentSession:
         real_item_id = Id(question._my_map['itemId'])
         item = ils.get_item(real_item_id)
         item_map = item.object_map
+        all_answers = item_map['answers']
+        try:
+            all_answers += [wa.object_map for wa in item.get_wrong_answers()]
+        except AttributeError:
+            pass
+
         answer_record_types = []
-        if len(item_map['answers']) > 0:
-            for record_type_idstr in item_map['answers'][0]['recordTypeIds']:
+        if len(all_answers) > 0:
+            for record_type_idstr in all_answers[0]['recordTypeIds']:
                 identifier = Id(record_type_idstr).get_identifier()
                 if identifier in record_type_data_sets:
                     answer_record_types.append(Type(**record_type_data_sets[identifier]))
