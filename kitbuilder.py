@@ -307,9 +307,6 @@ DISABLED = -1"""
         self.make_osids()
 
     def module_body(self, interface):
-        if interface['shortname'] == ['AssetLookupSession']:
-            import pdb
-            pdb.set_trace()
         additional_methods = self._additional_methods(interface)
         inheritance = self._get_class_inheritance(interface)
         init_methods = self._make_init_methods(interface)
