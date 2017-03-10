@@ -59,7 +59,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         # Seed the inheritance list with this interface's abc_osid
         if self._is('tests'):
             inheritance = ['unittest.TestCase']
-        elif self.package['name'] != 'osid' and interface['category'] == 'managers':
+        elif not self._is('manager') and self.package['name'] != 'osid' and interface['category'] == 'managers':
             inheritance = []
             last_inheritance = [get_full_interface_class()]
         elif self._is('doc_dlkit'):
@@ -91,7 +91,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                                            inherit_category + '.' + i['name'] +
                                            unknown_module_protection)
 
-        if self._in(['mongo', 'stub', 'services', 'authz', 'tests']):
+        if self._in(['mongo', 'stub', 'services', 'authz', 'tests', 'manager']):
             # Check to see if there are any additional inheritances required
             # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
             # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
@@ -390,7 +390,6 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         for interface in self.package['interfaces']:
             if not self.build_this_interface(interface):
                 continue
-
             self._update_module_imports(modules, interface)
             self.update_module_body(modules, interface)
 

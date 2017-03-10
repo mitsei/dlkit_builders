@@ -196,7 +196,7 @@ class BaseBuilder(Utilities):
         def package_interface():
             return self._abc_pkg_name(package_name=self.package['name'] + '_' + interface['category'])
 
-        if self.package['name'] != 'osid' and interface['category'] == 'managers':
+        if not self._is('manager') and self.package['name'] != 'osid' and interface['category'] == 'managers':
             import_str = 'from dlkit.manager_impls.{} import {} as {}'.format(self._abc_pkg_name(),
                                                                               interface['category'],
                                                                               package_interface())
