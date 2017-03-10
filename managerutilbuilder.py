@@ -75,10 +75,10 @@ class ManagerUtilBuilder(InterfaceBuilder, BaseBuilder):
         self._append_pattern_imports(imports, interface)
 
         # Don't forget the OsidSession inheritance:
-        if (('OsidManager' in interface['inherit_shortnames'] or
-                interface['shortname'] == self.patterns['package_catalog_caps']) and
-                self.package['name'] != 'osid'):
-            self.append(imports, 'from . import osid')
+        # if (('OsidManager' in interface['inherit_shortnames'] or
+        #         interface['shortname'] == self.patterns['package_catalog_caps']) and
+        #         self.package['name'] != 'osid'):
+        #     self.append(imports, 'from . import osid')
 
         # And don't forget the osid_error import:
         # import_str = 'from ..osid.osid_errors import NullArgument, Unimplemented'
