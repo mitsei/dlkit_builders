@@ -11,16 +11,16 @@ from config import sessions_to_implement
 from interface_builders import InterfaceBuilder
 
 
-class MongoBuilder(InterfaceBuilder, BaseBuilder):
+class JSONBuilder(InterfaceBuilder, BaseBuilder):
     def __init__(self, build_dir=None, *args, **kwargs):
-        super(MongoBuilder, self).__init__(*args, **kwargs)
+        super(JSONBuilder, self).__init__(*args, **kwargs)
         if build_dir is None:
             build_dir = self._abs_path
         self._build_dir = build_dir
-        self._root_dir = self._build_dir + '/mongo'
-        self._template_dir = self._abs_path + '/builders/mongoosid_templates'
+        self._root_dir = self._build_dir + '/json'
+        self._template_dir = self._abs_path + '/builders/jsonosid_templates'
 
-        self._class = 'mongo'
+        self._class = 'json'
 
     def _clean_up_impl(self, impl, interface, method):
         if impl == '':
@@ -174,7 +174,7 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
         profile = serialize(profile)
 
         try:
-            from mongoosid_templates import package_profile
+            from jsonosid_templates import package_profile
             template = string.Template(package_profile.PROFILE_TEMPLATE)
         except (ImportError, AttributeError):
             return ''
@@ -202,13 +202,13 @@ class MongoBuilder(InterfaceBuilder, BaseBuilder):
         self.make_osids()
 
     def module_header(self, module):
-        return ('\"\"\"Mongodb implementations of ' + self.package['name'] + ' ' + module + '.\"\"\"\n\n' +
+        return ('\"\"\"JSON implementations of ' + self.package['name'] + ' ' + module + '.\"\"\"\n\n' +
                 '# pylint: disable=no-init\n' +
                 '#     Numerous classes don\'t require __init__.\n' +
                 '# pylint: disable=too-many-public-methods,too-few-public-methods\n' +
                 '#     Number of methods are defined in specification\n' +
                 '# pylint: disable=protected-access\n' +
-                '#     Access to protected methods allowed in package mongo package scope\n' +
+                '#     Access to protected methods allowed in package json package scope\n' +
                 '# pylint: disable=too-many-ancestors\n' +
                 '#     Inheritance defined in specification\n')
 
