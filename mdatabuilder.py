@@ -14,7 +14,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
         if build_dir is None:
             build_dir = self._abs_path
         self._build_dir = build_dir
-        self._root_dir = self._build_dir + '/mongo'
+        self._root_dir = self._build_dir + '/json'
         self._template_dir = self._abs_path + '/builders/mdata_templates'
 
         self._class = 'mdata'
@@ -86,7 +86,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                              '\n'.join(mdata_definitions)).encode('utf-8'))
 
     def _make_mdata_maps(self, interface):
-        from builders.mongoosid_templates import options
+        from builders.jsonosid_templates import options
         pd = interface['shortname'] + '.persisted_data'
         rt = interface['shortname'] + '.return_types'
         mdata = ('def get_' + camel_to_under(interface['shortname']) + 
@@ -231,7 +231,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
         self.make_osids()
 
     def module_header(self, module):
-        return ('\"\"\"Mongo osid metadata configurations for ' + self.package['name'] + ' service.\"\"\"\n\n' +
+        return ('\"\"\"JSON osid metadata configurations for ' + self.package['name'] + ' service.\"\"\"\n\n' +
                 'from .. import types\n' +
                 'from ..primitives import Type\n' +
                 'DEFAULT_LANGUAGE_TYPE = Type(**types.Language().get_type_data("DEFAULT"))\n' +

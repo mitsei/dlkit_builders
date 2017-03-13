@@ -5,7 +5,7 @@ class AuthorizationSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid.sessions import OsidSession',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'from . import objects'
     ]
 
@@ -146,9 +146,9 @@ class AuthorizationSession:
         return True"""
 
     is_authorized = """
-        collection = MongoClientValidated('authorization',
-                                          collection='Authorization',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('authorization',
+                                         collection='Authorization',
+                                         runtime=self._runtime)
 
         def is_parent_authorized(catalog_id):
             \"\"\"Recursively checks parents for implicit authorizations\"\"\"
@@ -207,9 +207,9 @@ class AuthorizationSession:
 class AuthorizationLookupSession:
 
     get_authorizations_for_agent_and_function = """
-        collection = MongoClientValidated('authorization',
-                                          collection='Authorization',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('authorization',
+                                         collection='Authorization',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'agentId': str(agent_id),
                   'functionId': str(function_id)},
@@ -227,9 +227,9 @@ class AuthorizationAdminSession:
     create_authorization = """
         # TODO: not using the create_resource template
         # because want to prevent duplicate authorizations
-        collection = MongoClientValidated('authorization',
-                                          collection='Authorization',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('authorization',
+                                         collection='Authorization',
+                                         runtime=self._runtime)
         if not isinstance(authorization_form, ABCAuthorizationForm):
             raise errors.InvalidArgument('argument type is not an AuthorizationForm')
         if authorization_form.is_for_update():
@@ -436,9 +436,9 @@ class AuthorizationQuery:
 
 class VaultLookupSession:
     get_vaults_by_genus_type = """
-        collection = MongoClientValidated('authorization',
-                                          collection='Vault',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('authorization',
+                                         collection='Vault',
+                                         runtime=self._runtime)
         result = collection.find({'genusTypeId': {'$in': [str(vault_genus_type)]}}).sort('_id', DESCENDING)
 
         return objects.VaultList(result, runtime=self._runtime)"""

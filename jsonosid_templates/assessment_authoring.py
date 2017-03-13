@@ -216,9 +216,9 @@ class AssessmentPartLookupSession:
         # NOT IN SPEC - Implemented from
         # osid.assessment_authoring.AssessmentPartLookupSession.additional_methods
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated('assessment_authoring',
-                                          collection='AssessmentPart',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='AssessmentPart',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'assessmentPartId': str(assessment_part_id)},
                  **self._view_filter()))
@@ -230,7 +230,7 @@ class AssessmentPartAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartForm as ABCAssessmentPartForm',
         'from dlkit.abstract_osid.id.primitives import Id as ABCId',
-        'from dlkit.mongo.assessment.assessment_utilities import get_assessment_part_lookup_session',
+        'from dlkit.json.assessment.assessment_utilities import get_assessment_part_lookup_session',
         'DESCENDING = -1',
         'ASCENDING = 1',
         'CREATED = True',
@@ -277,9 +277,9 @@ class AssessmentPartAdminSession:
         return obj_form"""
 
     get_assessment_part_form_for_update = """
-        collection = MongoClientValidated('assessment_authoring',
-                                          collection='AssessmentPart',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='AssessmentPart',
+                                         runtime=self._runtime)
         if not isinstance(assessment_part_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         if assessment_part_id.get_identifier_namespace() != 'assessment_authoring.AssessmentPart':
@@ -314,15 +314,15 @@ class AssessmentPartAdminSession:
 
         if not isinstance(assessment_part_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        collection = MongoClientValidated('assessment_authoring',
-                                          collection='AssessmentPart',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='AssessmentPart',
+                                         runtime=self._runtime)
         if collection.find({'assessmentPartId': str(assessment_part_id)}).count() != 0:
             raise errors.IllegalState('there are still AssessmentParts associated with this AssessmentPart')
 
-        collection = MongoClientValidated('assessment_authoring',
-                                          collection='AssessmentPart',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='AssessmentPart',
+                                         runtime=self._runtime)
         try:
             apls = get_assessment_part_lookup_session(runtime=self._runtime,
                                                       proxy=self._proxy)
@@ -353,9 +353,9 @@ class AssessmentPartItemSession:
         return lookup_session.get_items_by_ids(item_ids)"""
 
     old_get_assessment_part_items = """
-        collection = MongoClientValidated('assessment_authoring',
-                                          collection='AssessmentPart',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='AssessmentPart',
+                                         runtime=self._runtime)
         assessment_part = collection.find_one(
             dict({'_id': ObjectId(assessment_part_id.get_identifier())},
                  **self._view_filter()))
@@ -378,7 +378,7 @@ class AssessmentPart:
         'from ..id.objects import IdList',
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.mongo.assessment.assessment_utilities import get_assessment_part_lookup_session, get_item_lookup_session',
+        'from dlkit.json.assessment.assessment_utilities import get_assessment_part_lookup_session, get_item_lookup_session',
         """SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
     'authority': 'ODL.MIT.EDU',
     'namespace': 'osid-object',

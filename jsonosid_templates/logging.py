@@ -40,9 +40,9 @@ class LogEntryAdminSession:
     ]
 
     create_log_entry = """
-        collection = MongoClientValidated('logging',
-                                          collection='LogEntry',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('logging',
+                                         collection='LogEntry',
+                                         runtime=self._runtime)
         if not isinstance(log_entry_form, ABCLogEntryForm):
             raise errors.InvalidArgument('argument type is not an LogEntryForm')
         if log_entry_form.is_for_update():

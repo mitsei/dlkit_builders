@@ -813,9 +813,9 @@ class Builder(Utilities):
         print "Mapping OSIDs"
         Mapper().map_all('all')
 
-    def mongo(self):
-        from mongobuilder import MongoBuilder
-        MongoBuilder(build_dir=self.build_dir).make()
+    def json(self):
+        from jsonbuilder import JSONBuilder
+        JSONBuilder(build_dir=self.build_dir).make()
 
     def stub(self):
         from stubbuilder import StubBuilder
@@ -857,7 +857,7 @@ if __name__ == '__main__':
         print "  patterns: build the patterns"
         print "  #mdata: build the metadata files"
         print "  authz: build the authz_adapter impl"
-        print "  mongo: build the mongo OSID impl"
+        print "  json: build the JSON OSID impl (use MongoDB or Filesystem based on config)"
         print "  stub: build developer stub impl"
         print "  services: build the dlkit convenience service impls"
         print "  manager: build the manager_impls base classes"
@@ -874,7 +874,7 @@ if __name__ == '__main__':
         print "This will build the files to the directory specified, default of ./dlkit/."
         print ''
         print "examples:"
-        print "  python build_controller.py map patterns abc mdata mongo"
+        print "  python build_controller.py map patterns abc mdata json"
         print "  python build_controller.py --all"
 
     if len(sys.argv) == 1:
@@ -887,7 +887,7 @@ if __name__ == '__main__':
                     'patterns',
                     'abc',
                     'mdata',
-                    'mongo',
+                    'json',
                     'stub',
                     'authz',
                     'services',
@@ -918,7 +918,7 @@ if __name__ == '__main__':
             builder.map()
             builder.patterns()
             builder.abc()
-            builder.mongo()
+            builder.json()
             builder.mdata()
             builder.services()
             builder.authz()
@@ -937,8 +937,8 @@ if __name__ == '__main__':
             if 'abc' in sys.argv:
                 builder.abc()
                 non_test_build = True
-            if 'mongo' in sys.argv:
-                builder.mongo()
+            if 'json' in sys.argv:
+                builder.json()
                 non_test_build = True
             if 'mdata' in sys.argv:
                 builder.mdata()

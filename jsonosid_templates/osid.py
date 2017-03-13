@@ -6,6 +6,7 @@ class OsidProfile:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..primitives import Type',
+        'from ..utilities import set_json_client'
     ]
 
     init = """
@@ -15,19 +16,12 @@ class OsidProfile:
         self._config = None
 
     def _initialize_manager(self, runtime):
-        \"\"\"Sets the runtime, configuration and mongo client\"\"\"
+        \"\"\"Sets the runtime, configuration and json client\"\"\"
         if self._runtime is not None:
             raise errors.IllegalState('this manager has already been initialized.')
         self._runtime = runtime
         self._config = runtime.get_configuration()
-        if not MONGO_CLIENT.is_mongo_client_set():
-            try:
-                mongo_host_param_id = Id('parameter:mongoHostURI@mongo')
-                mongo_host = runtime.get_configuration().get_value_by_parameter(mongo_host_param_id).get_string_value()
-            except (AttributeError, KeyError, errors.NotFound):
-                MONGO_CLIENT.set_mongo_client(MongoClient())
-            else:
-                MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))
+        set_json_client(runtime)
 """
 
     get_id = """
@@ -115,7 +109,7 @@ class OsidManager:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import DisplayText',
         'from pymongo import MongoClient',
-        'from .. import MONGO_CLIENT',
+        'from .. import JSON_CLIENT',
         'from dlkit.abstract_osid.proxy.rules import Proxy as abc_proxy',
     ]  
 
@@ -423,7 +417,7 @@ class OsidSession:
         'from bson.objectid import ObjectId',
         'from importlib import import_module',
         'from ..locale.objects import Locale',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'from ..utilities import get_provider_manager',
         'from ..utilities import is_authenticated_with_proxy',
         'from ..utilities import get_authenticated_agent_id_with_proxy',
@@ -479,9 +473,9 @@ class OsidSession:
         if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
             self._catalog_identifier = catalog_id.get_identifier()
 
-            collection = MongoClientValidated(db_name,
-                                              collection=cat_name,
-                                              runtime=self._runtime)
+            collection = JSONClientValidated(db_name,
+                                             collection=cat_name,
+                                             runtime=self._runtime)
             try:
                 self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
             except errors.NotFound:
@@ -535,9 +529,9 @@ class OsidSession:
         # try:
         #     foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
         #     foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
-        #     collection = MongoClientValidated(foreign_db_name,
-        #                                       collection=foreign_cat_name,
-        #                                       runtime=self._runtime)
+        #     collection = JSONClientValidated(foreign_db_name,
+        #                                      collection=foreign_cat_name,
+        #                                      runtime=self._runtime)
         #     collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())})
         # except KeyError:
         #     raise errors.NotFound()
@@ -547,9 +541,9 @@ class OsidSession:
         manager = self._get_provider_manager(foreign_service_name.upper())
         lookup_session = getattr(manager, 'get_{0}_lookup_session'.format(catalog_name))(proxy=self._proxy)
         getattr(lookup_session, 'get_{0}'.format(catalog_name))(foreign_catalog_id) # Raises NotFound
-        collection = MongoClientValidated(db_name,
-                                          collection=cat_name,
-                                          runtime=self._runtime)
+        collection = JSONClientValidated(db_name,
+                                         collection=cat_name,
+                                         runtime=self._runtime)
         catalog_map = {
             '_id': ObjectId(foreign_catalog_id.get_identifier()),
             'displayName': {'text': ('Orchestrated ' + foreign_service_name + ' ' + cat_name),
@@ -588,9 +582,9 @@ class OsidSession:
         Only looks within the Id Alias namespace for the session package
 
         \"\"\"
-        collection = MongoClientValidated('id',
-                                          collection=pkg_name + 'Ids',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('id',
+                                         collection=pkg_name + 'Ids',
+                                         runtime=self._runtime)
         try:
             result = collection.find_one({'aliasIds': {'$in': [str(id_)]}})
         except errors.NotFound:
@@ -602,13 +596,13 @@ class OsidSession:
         \"\"\"Adds the given equivalent_id as an alias for primary_id if possible\"\"\"
         pkg_name = primary_id.get_identifier_namespace().split('.')[0]
         obj_name = primary_id.get_identifier_namespace().split('.')[1]
-        collection = MongoClientValidated(pkg_name,
-                                          collection=obj_name,
-                                          runtime=self._runtime)
+        collection = JSONClientValidated(pkg_name,
+                                         collection=obj_name,
+                                         runtime=self._runtime)
         collection.find_one({'_id': ObjectId(primary_id.get_identifier())}) # to raise NotFound
-        collection = MongoClientValidated('id',
-                                          collection=pkg_name + 'Ids',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('id',
+                                         collection=pkg_name + 'Ids',
+                                         runtime=self._runtime)
         try:
             result = collection.find_one({'aliasIds': {'$in': [str(equivalent_id)]}})
         except errors.NotFound:
@@ -725,9 +719,9 @@ class OsidSession:
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
         obj_name = obj_id.get_identifier_namespace().split('.')[1]
         catalog_key = 'assigned' + self._catalog_name + 'Ids'
-        collection = MongoClientValidated(pkg_name,
-                                          collection=obj_name,
-                                          runtime=self._runtime)
+        collection = JSONClientValidated(pkg_name,
+                                         collection=obj_name,
+                                         runtime=self._runtime)
         obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
         if catalog_key in obj_map:
             if str(cat_id) in obj_map[catalog_key]:
@@ -742,9 +736,9 @@ class OsidSession:
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
         obj_name = obj_id.get_identifier_namespace().split('.')[1]
         catalog_key = 'assigned' + self._catalog_name + 'Ids'
-        collection = MongoClientValidated(pkg_name,
-                                          collection=obj_name,
-                                          runtime=self._runtime)
+        collection = JSONClientValidated(pkg_name,
+                                         collection=obj_name,
+                                         runtime=self._runtime)
         obj_map = collection.find_one({'_id': ObjectId(obj_id.get_identifier())})
         if obj_map[catalog_key] == [str(cat_id)]:
             raise errors.OperationFailed('unassigning object from ${cat_name_under} would leave it unattached')

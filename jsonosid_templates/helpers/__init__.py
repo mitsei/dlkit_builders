@@ -1,6 +1,6 @@
 """Supporting objects to be instantiated at runtime"""
 
-from dlkit.abstract_osid.osid.errors import OperationFailed
+from dlkit.abstract_osid.osid.errors import OperationFailed, IllegalState
 from dlkit.primordium.id.primitives import Id
 import time
 import datetime
@@ -15,34 +15,35 @@ VMAP = {
     'd': 'deleted'
 }
 
-class MongoClientContainer:
+
+class JSONClientContainer:
 
     def __init__(self):
-        self._mongo_client = None
+        self._json_client = None
 
-    def is_mongo_client_set(self):
-        """Check to see if the mongo client has been set."""
-        return bool(self._mongo_client)
+    def is_json_client_set(self):
+        """Check to see if the JSON client has been set."""
+        return bool(self._json_client)
 
-    def set_mongo_client(self, mongo_client):
-        """Set the mongo client. Raises error if already set."""
-        if self.is_mongo_client_set():
-            raise OperationFailed('MongoClient already set')
-        self._mongo_client = mongo_client
+    def set_json_client(self, json_client):
+        """Set the JSON client. Replace if already set."""
+        # if self.is_json_client_set():
+        #     raise OperationFailed('JSONClient already set')
+        self._json_client = json_client
 
-    def get_mongo_client(self):
-        """Gets the mongo client. Raises error if no mongo client set."""
-        if not self.is_mongo_client_set():
-            raise OperationFailed('MongoClient not set')
-        return self._mongo_client
+    def get_json_client(self):
+        """Gets the JSON client. Raises error if no JSON client set."""
+        if not self.is_json_client_set():
+            raise OperationFailed('JSONClient not set')
+        return self._json_client
 
-    mongo_client = property(fget=get_mongo_client, fset=set_mongo_client)
+    json_client = property(fget=get_json_client, fset=set_json_client)
 
+JSON_CLIENT = JSONClientContainer()
 
-MONGO_CLIENT = MongoClientContainer()
 
 class MongoListener(Thread):
-    """A utility thread that listens for database changes for notification sessions"""
+    """A utility thread that listens for MongoDB database changes for notification sessions"""
 
     def __init__(self, wait_seconds=10, max_attempts=3):
         """Constructor"""
@@ -57,9 +58,9 @@ class MongoListener(Thread):
         """Initialize this listener. Finds most recent timestamp"""
         if self.is_alive():
             raise IllegalState('notification thread is already initialized')
-        if not MONGO_CLIENT.is_mongo_client_set() and runtime is not None:
-            set_mongo_client(runtime)
-        cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find().sort('ts', DESCENDING).limit(-1)
+        if not JSON_CLIENT.is_json_client_set() and runtime is not None:
+            JSON_CLIENT.set_json_client(runtime)
+        cursor = JSON_CLIENT.json_client['local']['oplog.rs'].find().sort('ts', DESCENDING).limit(-1)
         try:
             self.last_timestamp = cursor.next()['ts']
         except StopIteration:
@@ -106,12 +107,11 @@ class MongoListener(Thread):
         for notification_id in notifications_to_delete:
             del self.notifications[notification_id]
 
-
     def run(self):
         """main control loop for thread"""
         while True:
-            cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find(
-                {'ts':{'$gt': self.last_timestamp}})
+            cursor = JSON_CLIENT.json_client['local']['oplog.rs'].find(
+                {'ts': {'$gt': self.last_timestamp}})
             # http://stackoverflow.com/questions/30401063/pymongo-tailing-oplog
             cursor.add_option(2)  # tailable
             cursor.add_option(8)  # oplog_replay
