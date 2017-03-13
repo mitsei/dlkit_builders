@@ -148,6 +148,14 @@ def convert_dict_to_datetime(obj_map):
             converted_map[key] = datetime.datetime(**value)
         elif isinstance(value, dict):
             converted_map[key] = convert_dict_to_datetime(value)
+        elif isinstance(value, list):
+            updated_list = []
+            for item in value:
+                if isinstance(item, dict):
+                    updated_list.append(convert_dict_to_datetime(item))
+                else:
+                    updated_list.append(item)
+            converted_map[key] = updated_list
         else:
             converted_map[key] = value
     return converted_map
@@ -297,7 +305,7 @@ def set_json_client(runtime):
             raise AttributeError()
     except (AttributeError, KeyError, NotFound):
         try:
-            mongo_host_param_id = Id('parameter:mongoHostURI@mongo')
+            mongo_host_param_id = Id('parameter:mongoHostURI@json')
             mongo_host = runtime.get_configuration().get_value_by_parameter(mongo_host_param_id).get_string_value()
         except (AttributeError, KeyError, NotFound):
             JSON_CLIENT.set_json_client(MongoClient())
@@ -327,7 +335,7 @@ class JSONClientValidated(object):
         if self._impl('filesystem'):
             host_path = PROJECT_PATH
             try:
-                host_path_param_id = Id('parameter:dataStorePath@filesystem')
+                host_path_param_id = Id('parameter:dataStorePath@json')
                 if BOOTLOADER:
                     host_path = '{0}/{1}'.format(host_path,
                                                  runtime.get_configuration().get_value_by_parameter(host_path_param_id).get_string_value())
@@ -346,7 +354,7 @@ class JSONClientValidated(object):
             # use MongoDB as default
             db_prefix = ''
             try:
-                db_prefix_param_id = Id('parameter:mongoDBNamePrefix@mongo')
+                db_prefix_param_id = Id('parameter:mongoDBNamePrefix@json')
                 db_prefix = runtime.get_configuration().get_value_by_parameter(db_prefix_param_id).get_string_value()
             except (AttributeError, KeyError, NotFound):
                 pass
@@ -357,7 +365,7 @@ class JSONClientValidated(object):
                 self._mc = JSON_CLIENT.json_client[db_prefix + db][collection]
                 # add the collection index, if available in the configs
                 try:
-                    mongo_indexes_param_id = Id('parameter:indexes@mongo')
+                    mongo_indexes_param_id = Id('parameter:indexes@json')
                     mongo_indexes = runtime.get_configuration().get_value_by_parameter(mongo_indexes_param_id).get_object_value()
                     namespace = '{0}.{1}'.format(db, collection)
                     if namespace in mongo_indexes:
