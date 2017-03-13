@@ -243,7 +243,7 @@ def get_assessment_part_lookup_session(runtime, proxy, section=None):
     # This appears to share code with get_item_lookup_session
     try:
         config = runtime.get_configuration()
-        parameter_id = Id('parameter:magicAssessmentPartLookupSessions@mongo')
+        parameter_id = Id('parameter:magicAssessmentPartLookupSessions@json')
         import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
         module_path = '.'.join(import_path_with_class.split('.')[0:-1])
         magic_class = import_path_with_class.split('.')[-1]
@@ -264,7 +264,7 @@ def get_item_lookup_session(runtime=None, proxy=None):
     # This appears to share code with get_assessment_part_lookup_session
     try:
         config = runtime.get_configuration()
-        parameter_id = Id('parameter:magicItemLookupSessions@mongo')
+        parameter_id = Id('parameter:magicItemLookupSessions@json')
         import_path_with_class = config.get_value_by_parameter(parameter_id).get_string_value()
         module_path = '.'.join(import_path_with_class.split('.')[0:-1])
         magic_class = import_path_with_class.split('.')[-1]

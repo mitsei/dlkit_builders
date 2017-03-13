@@ -230,7 +230,7 @@ class AssessmentPartAdminSession:
         'from dlkit.abstract_osid.osid import errors',
         'from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartForm as ABCAssessmentPartForm',
         'from dlkit.abstract_osid.id.primitives import Id as ABCId',
-        'from dlkit.mongo.assessment.assessment_utilities import get_assessment_part_lookup_session',
+        'from dlkit.json.assessment.assessment_utilities import get_assessment_part_lookup_session',
         'DESCENDING = -1',
         'ASCENDING = 1',
         'CREATED = True',
@@ -378,7 +378,7 @@ class AssessmentPart:
         'from ..id.objects import IdList',
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.mongo.assessment.assessment_utilities import get_assessment_part_lookup_session, get_item_lookup_session',
+        'from dlkit.json.assessment.assessment_utilities import get_assessment_part_lookup_session, get_item_lookup_session',
         """SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
     'authority': 'ODL.MIT.EDU',
     'namespace': 'osid-object',
