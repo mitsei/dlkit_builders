@@ -17,7 +17,7 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
         if build_dir is None:
             build_dir = self._abs_path
         self._build_dir = build_dir
-        self._root_dir = self._build_dir + '/json'
+        self._root_dir = self._build_dir + '/json_'
         self._template_dir = self._abs_path + '/builders/jsonosid_templates'
 
         self._class = 'json'
