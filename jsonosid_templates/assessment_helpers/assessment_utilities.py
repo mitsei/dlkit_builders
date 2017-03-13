@@ -3,7 +3,7 @@ import importlib
 
 from dlkit.abstract_osid.osid.errors import NotFound, NullArgument, IllegalState
 from dlkit.abstract_osid.assessment.objects import Assessment as abc_assessment
-from ..utilities import get_provider_manager, MongoClientValidated
+from ..utilities import get_provider_manager, JSONClientValidated
 from dlkit.primordium.id.primitives import Id
 from dlkit.primordium.type.primitives import Type
 from bson import ObjectId
@@ -293,9 +293,9 @@ def get_first_successful_sequence_rule_for_part(part_id, rule_lookup_session):
 def get_assessment_section(section_id, runtime=None, proxy=None):
     """Gets a Section given a section_id"""
     from .mixins import LoadedSection
-    collection = MongoClientValidated('assessment',
-                                      collection='AssessmentSection',
-                                      runtime=runtime)
+    collection = JSONClientValidated('assessment',
+                                     collection='AssessmentSection',
+                                     runtime=runtime)
     result = collection.find_one(dict({'_id': ObjectId(section_id.get_identifier())}))
     return LoadedSection(osid_object_map=result, runtime=runtime, proxy=proxy)
 
@@ -333,9 +333,9 @@ def update_parent_sequence_map(child_part, delete=False):
         object_map = child_part.get_assessment()._my_map
         database = 'assessment'
         collection_type = 'Assessment'
-    collection = MongoClientValidated(database,
-                                      collection=collection_type,
-                                      runtime=child_part._runtime)
+    collection = JSONClientValidated(database,
+                                     collection=collection_type,
+                                     runtime=child_part._runtime)
     if delete:
         object_map['childIds'].remove(str(child_part.get_id()))
     else:

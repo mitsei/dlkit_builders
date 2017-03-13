@@ -12,7 +12,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
     """class that builds methods"""
     def __init__(self, method_class=None, template_dir=None, *args, **kwargs):
         """method_class differentiates between different variations, i.e. abc
-        looks different than mongo"""
+        looks different than json"""
         super(MethodBuilder, self).__init__()
 
     def _build_method_doc(self, method):
@@ -81,7 +81,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
         if 'package_name' in context:
             # Add keyword arguments to template kwargs that are particular
-            # to the mongo implementation
+            # to the json implementation
             context['app_name'] = self._app_name()
             context['implpkg_name'] = self._abc_pkg_name(abc=False, reserved_word=False)
             context['abcapp_name'] = self._app_name()
@@ -341,7 +341,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             package_name = self.package['name']
 
         for method in interface['methods']:
-            if self._in(['mongo', 'tests']):
+            if self._in(['json', 'tests']):
                 if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
                     method['name'] = 'read_to_buffer'
             elif self._in(['services']):
@@ -356,7 +356,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 if method['name'] == 'get_responses' and interface['shortname'] == 'AssessmentResultsSession':
                     method['name'] = 'get_assessment_taken_responses'
 
-            if (self._in(['mongo', 'services', 'authz', 'tests']) and
+            if (self._in(['json', 'services', 'authz', 'tests']) and
                     not build_this_method(package_name, interface, method)):
                 continue
             if self._is('doc_dlkit') and not self.build_this_method(interface, method):

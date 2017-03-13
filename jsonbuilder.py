@@ -194,7 +194,6 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
         self.append(imports, 'from .. import utilities')
         self._append_templated_imports(imports, interface)
 
-
     def build_this_interface(self, interface):
         return self._build_this_interface(interface)
 

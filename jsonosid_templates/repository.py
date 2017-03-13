@@ -96,9 +96,9 @@ class AssetLookupSession:
 
     additional_methods = """
     # def get_asset_content(self, asset_content_id):
-    #     collection = MongoClientValidated('repository',
-    #                                       collection='Asset',
-    #                                       runtime=self._runtime)
+    #     collection = JSONClientValidated('repository',
+    #                                      collection='Asset',
+    #                                      runtime=self._runtime)
     #     asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
     #     result = collection.find_one(
     #         dict({'assetContents._id': {'$in': [asset_content_identifier]}},
@@ -276,9 +276,9 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        collection = MongoClientValidated('repository',
-                                          collection='Asset',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('repository',
+                                         collection='Asset',
+                                         runtime=self._runtime)
         asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
         result = collection.find_one(
             dict({'assetContents._id': {'$in': [asset_content_identifier]}},
@@ -312,9 +312,9 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        collection = MongoClientValidated('repository',
-                                          collection='Asset',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('repository',
+                                         collection='Asset',
+                                         runtime=self._runtime)
         object_id_list = [ObjectId(self._get_id(i, 'repository').get_identifier()) for i in asset_content_ids]
 
         results = collection.find(
@@ -348,9 +348,9 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        collection = MongoClientValidated('repository',
-                                          collection='Asset',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('repository',
+                                         collection='Asset',
+                                         runtime=self._runtime)
         results = collection.find(
             dict({'assetContents.genusTypeId': {'$in': [str(asset_content_genus_type)]}},
                  **self._view_filter()))
@@ -424,9 +424,9 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        collection = MongoClientValidated('repository',
-                                          collection='Asset',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('repository',
+                                         collection='Asset',
+                                         runtime=self._runtime)
         result = collection.find_one(
             dict({'_id': ObjectId(self._get_id(asset_id, 'repository').get_identifier())},
                  **self._view_filter()))
@@ -454,9 +454,9 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        collection = MongoClientValidated('repository',
-                                          collection='Asset',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('repository',
+                                         collection='Asset',
+                                         runtime=self._runtime)
         result = collection.find_one(
             dict({'_id': ObjectId(self._get_id(asset_id, 'repository').get_identifier())},
                  **self._view_filter()))
@@ -469,7 +469,7 @@ class AssetAdminSession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'CREATED = True',
         'UPDATED = True',
     ]
@@ -478,9 +478,9 @@ class AssetAdminSession:
         # Implemented from template for
         # osid.repository.AssetAdminSession.create_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if ${arg0_name}.is_for_update():
@@ -511,9 +511,9 @@ class AssetAdminSession:
         # osid.repository.AssetAdminSession.get_asset_content_form_for_update_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .${return_module} import ${return_type}
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         document = collection.find_one({'${aggregated_objects_name_mixed}._id': ObjectId(${arg0_name}.get_identifier())})
@@ -531,9 +531,9 @@ class AssetAdminSession:
         # Implemented from template for
         # osid.repository.AssetAdminSession.update_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('argument type is not an ${arg0_type}')
         if not ${arg0_name}.is_for_update():
@@ -577,9 +577,9 @@ class AssetAdminSession:
         # osid.repository.AssetAdminSession.delete_asset_content_template
         from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}
         from .objects import ${aggregated_object_name}
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         ${object_name_under} = collection.find_one({'${aggregated_objects_name_mixed}._id': ObjectId(${arg0_name}.get_identifier())})
@@ -761,9 +761,9 @@ class AssetCompositionSession:
         return True"""
 
     old_get_composition_assets = """
-        collection = MongoClientValidated('repository',
-                                          collection='Composition',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('repository',
+                                         collection='Composition',
+                                         runtime=self._runtime)
         composition = collection.find_one(
             dict({'_id': ObjectId(composition_id.get_identifier())},
                  **self._view_filter()))
@@ -780,9 +780,9 @@ class AssetCompositionSession:
     get_composition_assets_template = """
         # Implemented from template for
         # osid.repository.AssetCompositionSession.get_composition_assets
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${containable_object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${containable_object_name}',
+                                         runtime=self._runtime)
         ${containable_object_name_under} = collection.find_one(
             dict({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())},
                  **self._view_filter()))
@@ -797,9 +797,9 @@ class AssetCompositionSession:
         return lookup_session.get_${object_name_plural_under}_by_ids(${object_name_under}_ids)"""
 
     old_get_compositions_by_asset = """
-        collection = MongoClientValidated('repository',
-                                          collection='Composition',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('repository',
+                                         collection='Composition',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'assetIds': {'$in': [str(asset_id)]}},
                  **self._view_filter())).sort('_id', DESCENDING)
@@ -808,9 +808,9 @@ class AssetCompositionSession:
     get_compositions_by_asset_template = """
         # Implemented from template for
         # osid.repository.AssetCompositionSession.get_compositions_by_asset
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${containable_object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${containable_object_name}',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'${object_name_mixed}Ids': {'$$in': [str(${object_name_under}_id)]}},
                  **self._view_filter())).sort('_id', DESCENDING)
@@ -882,13 +882,13 @@ class AssetCompositionDesignSession:
                 mgr = self._get_provider_manager('${object_package_name_replace_upper}')
                 admin_session = mgr.get_${object_name_under}_admin_session_for_${cat_name_under}(self._catalog_id, proxy=self._proxy)
                 ${object_name_under}_id = admin_session._get_${object_name_under}_id_with_enclosure(${object_name_under}_id)
-        collection = MongoClientValidated('${object_package_name_replace}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${object_package_name_replace}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         ${object_name_under} = collection.find_one({'_id': ObjectId(${object_name_under}_id.get_identifier())})
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${containable_object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${containable_object_name}',
+                                         runtime=self._runtime)
         ${containable_object_name_under} = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
         if '${object_name_mixed}Ids' in ${containable_object_name_under}:
             if str(${object_name_under}_id) not in ${containable_object_name_under}['${object_name_mixed}Ids']:
@@ -898,9 +898,9 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under})"""
 
     older_move_asset_ahead_template = """
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${containable_object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${containable_object_name}',
+                                         runtime=self._runtime)
         ${containable_object_name_under} = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
         if '${object_name_mixed}Ids' not in ${containable_object_name_under}:
             raise errors.NotFound('no ${object_name_plural} are assigned to this ${containable_object_name}')
@@ -916,9 +916,9 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under}_map)"""
 
     older_move_asset_behind_template = """
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${containable_object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${containable_object_name}',
+                                         runtime=self._runtime)
         ${containable_object_name_under} = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
         if '${object_name_mixed}Ids' not in ${containable_object_name_under}:
             raise errors.NotFound('no ${object_name_plural} are assigned to this ${containable_object_name}')
@@ -934,9 +934,9 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under}_map)"""
 
     older_order_assets_template = """
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${containable_object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${containable_object_name}',
+                                         runtime=self._runtime)
         ${containable_object_name_under} = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
         if '${object_name_mixed}Ids' not in ${containable_object_name_under}:
             raise errors.NotFound('no ${object_name_plural} are assigned to this ${containable_object_name}')
@@ -952,9 +952,9 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under}_map)"""
 
     older_remove_asset_template = """
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${containable_object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${containable_object_name}',
+                                         runtime=self._runtime)
         ${containable_object_name_under} = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
         try:
             ${containable_object_name_under}['${object_name_mixed}Ids'].remove(str(${object_name_under}_id))
@@ -975,9 +975,9 @@ class AssetCompositionDesignSession:
 
     def _get_${containable_object_name_under}_collection(self, ${containable_object_name_under}_id):
         \"\"\"Returns a Mongo Collection and ${containable_object_name} given a ${containable_object_name} Id\"\"\"
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${containable_object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${containable_object_name}',
+                                         runtime=self._runtime)
         ${containable_object_name_under}_map = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
         if '${object_name_mixed}Ids' not in ${containable_object_name_under}_map:
             raise errors.NotFound('no ${object_name_plural} are assigned to this ${containable_object_name}')
@@ -1125,7 +1125,7 @@ class AssetContent:
     import_statements = [
         'import gridfs',
         'from ..primitives import DataInputStream',
-        'from ..utilities import MongoClientValidated'
+        'from ..utilities import JSONClientValidated'
     ]
 
     has_url_template = """
@@ -1142,15 +1142,15 @@ class AssetContent:
         return self._my_map['${var_name_mixed}']"""
 
     get_data = """
-        dbase = MongoClientValidated('repository',
-                                     runtime=self._runtime).raw()
+        dbase = JSONClientValidated('repository',
+                                    runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
         return DataInputStream(filesys.get(self._my_map['data']))""" 
 
     additional_methods = """
     def _delete(self):
-        dbase = MongoClientValidated('repository',
-                                     runtime=self._runtime).raw()
+        dbase = JSONClientValidated('repository',
+                                    runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
         if self._my_map['data'] and filesys.exists(self._my_map['data']):
             filesys.delete(self._my_map['data'])
@@ -1163,7 +1163,7 @@ class AssetContentForm:
         'import gridfs',
         'from ..primitives import DataInputStream',
         'from dlkit.abstract_osid.osid import errors',
-        'from ..utilities import MongoClientValidated'
+        'from ..utilities import JSONClientValidated'
     ]
 
     set_url_template = """
@@ -1179,8 +1179,8 @@ class AssetContentForm:
     set_data = """
         if data is None:
             raise errors.NullArgument()
-        dbase = MongoClientValidated('repository',
-                                     runtime=self._runtime).raw()
+        dbase = JSONClientValidated('repository',
+                                    runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
         self._my_map['data'] = filesys.put(data._my_data)
         data._my_data.seek(0)
@@ -1192,8 +1192,8 @@ class AssetContentForm:
             raise errors.NoAccess()
         if self._my_map['data'] == self._data_default:
             pass
-        dbase = MongoClientValidated('repository',
-                                     runtime=self._runtime).raw()
+        dbase = JSONClientValidated('repository',
+                                    runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
         filesys.delete(self._my_map['data'])
         self._my_map['data'] = self._data_default
@@ -1372,9 +1372,9 @@ class AssetQuerySession:
             and_list.append(view_filter)
         if and_list:
             query_terms = {'$and': and_list}
-        collection = MongoClientValidated('repository',
-                                          collection='Asset',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('repository',
+                                         collection='Asset',
+                                         runtime=self._runtime)
         result = collection.find(query_terms).sort('_id', DESCENDING)
 
         # these are Asset results ... need to pull out the matching contents

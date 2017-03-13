@@ -53,7 +53,7 @@ class AssessmentSession:
         'from . import objects',
         #'from .rules import Response',
         'from ..osid.sessions import OsidSession',
-        'from ..utilities import MongoClientValidated',
+            'from ..utilities import JSONClientValidated',
 		'from ..utilities import get_registry',
         'SUBMITTED = True',
         'from importlib import import_module',
@@ -90,9 +90,9 @@ class AssessmentSession:
     
     ## This method has been deprecated and NOT updated:
     finished_assessment = """
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentTaken',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentTaken',
+                                         runtime=self._runtime)
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         assessment_taken_map = assessment_taken._my_map
         if assessment_taken.has_started() and not assessment_taken.has_ended():
@@ -371,9 +371,9 @@ class AssessmentSession:
         if assessment_taken.has_started() and not assessment_taken.has_ended():
             assessment_taken_map['completionTime'] = DateTime.utcnow()
             assessment_taken_map['ended'] = True
-            collection = MongoClientValidated('assessment',
-                                              collection='AssessmentTaken',
-                                              runtime=self._runtime)
+            collection = JSONClientValidated('assessment',
+                                             collection='AssessmentTaken',
+                                             runtime=self._runtime)
             collection.save(assessment_taken_map)
         else:
             raise errors.IllegalState()"""
@@ -477,7 +477,7 @@ class ItemAdminSession:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'UPDATED = True',
         'CREATED = True'
     ]
@@ -491,15 +491,15 @@ class ItemAdminSession:
     delete_item = """
         if not isinstance(item_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        collection = MongoClientValidated('assessment_authoring',
-                                          collection='AssessmentPart',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='AssessmentPart',
+                                         runtime=self._runtime)
         # This needs to be updated to actually check for AssessmentsTaken (and does that find even work?)
         if collection.find({'itemIds': str(item_id)}).count() != 0:
             raise errors.IllegalState('this Item is being used in one or more Assessments')
-        collection = MongoClientValidated('assessment',
-                                          collection='Item',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='Item',
+                                         runtime=self._runtime)
         item_map = collection.find_one({'_id': ObjectId(item_id.get_identifier())})
         objects.Item(osid_object_map=item_map,
                      runtime=self._runtime,
@@ -514,9 +514,9 @@ class ItemAdminSession:
     ]
 
     create_question = """
-        collection = MongoClientValidated('assessment',
-                                          collection='Item',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='Item',
+                                         runtime=self._runtime)
         if not isinstance(question_form, ABCQuestionForm):
             raise errors.InvalidArgument('argument type is not an QuestionForm')
         if question_form.is_for_update():
@@ -550,9 +550,9 @@ class ItemAdminSession:
     ]
 
     get_question_form_for_update = """
-        collection = MongoClientValidated('assessment',
-                                          collection='Item',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='Item',
+                                         runtime=self._runtime)
         if not isinstance(question_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
@@ -567,9 +567,9 @@ class ItemAdminSession:
     ]
 
     update_question = """
-        collection = MongoClientValidated('assessment',
-                                          collection='Item',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='Item',
+                                         runtime=self._runtime)
         if not isinstance(question_form, ABCQuestionForm):
             raise errors.InvalidArgument('argument type is not an QuestionForm')
         if not question_form.is_for_update():
@@ -602,7 +602,7 @@ class AssessmentAdminSession:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from bson.objectid import ObjectId',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'from .assessment_utilities import get_assessment_part_lookup_session',
         'UPDATED = True',
         'CREATED = True'
@@ -616,9 +616,9 @@ class AssessmentAdminSession:
     delete_assessment = """
         \"\"\"Delete all the children AssessmentParts recursively, too\"\"\"
         def remove_children_parts(parent_id):
-            part_collection = MongoClientValidated('assessment_authoring',
-                                                    collection='AssessmentPart',
-                                                    runtime=self._runtime)
+            part_collection = JSONClientValidated('assessment_authoring',
+                                                  collection='AssessmentPart',
+                                                  runtime=self._runtime)
             if 'assessment.Assessment' in parent_id:
                 query = {"assessmentId": parent_id}
             else:
@@ -642,14 +642,14 @@ class AssessmentAdminSession:
 
         if not isinstance(assessment_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentOffered',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentOffered',
+                                         runtime=self._runtime)
         if collection.find({'assessmentId': str(assessment_id)}).count() != 0:
             raise errors.IllegalState('there are still AssessmentsOffered associated with this Assessment')
-        collection = MongoClientValidated('assessment',
-                                          collection='Assessment',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='Assessment',
+                                         runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
         remove_children_parts(str(assessment_id))
         """
@@ -660,16 +660,16 @@ class AssessmentTakenLookupSession:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from . import objects',
-        'from ..utilities import MongoClientValidated'
+        'from ..utilities import JSONClientValidated'
     ]
     
     # This is hand-built, but there may be a pattern to try to map, specifically
     # getting objects for another package object and a persisted id thingy
     get_assessments_taken_for_taker_and_assessment_offered = """
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentTaken',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentTaken',
+                                         runtime=self._runtime)
 
         am = self._get_provider_manager('ASSESSMENT')
         aols = am.get_assessment_offered_lookup_session(proxy=self._proxy)
@@ -691,9 +691,9 @@ class AssessmentTakenLookupSession:
         return objects.AssessmentTakenList(result, runtime=self._runtime, proxy=self._proxy)"""
 
     get_assessments_taken_for_assessment = """
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentOffered',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentOffered',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'assessmentId': str(assessment_id)},
                  **self._view_filter())).sort('_id', DESCENDING)
@@ -701,9 +701,9 @@ class AssessmentTakenLookupSession:
             result,
             runtime=self._runtime)
 
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentTaken',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentTaken',
+                                         runtime=self._runtime)
         ao_ids = []
         for assessment_offered in assessments_offered:
             ao_ids.append(str(assessment_offered.get_id()))
@@ -720,7 +720,7 @@ class AssessmentOfferedAdminSession:
     
     deprecated_import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'UPDATED = True',
         'CREATED = True',
     ]
@@ -738,9 +738,9 @@ class AssessmentOfferedAdminSession:
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         ##
         #...Here:
-        collection = MongoClientValidated('assessment',
-                                          collection='Assessment',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='Assessment',
+                                         runtime=self._runtime)
         assessment_map = collection.find_one(
             {'$and': [{'_id': ObjectId(assessment_id.get_identifier())}, {'bankId': str(self._catalog_id)}]})
         ##
@@ -770,7 +770,7 @@ class AssessmentTakenAdminSession:
     
     deprecated_import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'UPDATED = True',
         'CREATED = True',
     ]
@@ -789,9 +789,9 @@ class AssessmentTakenAdminSession:
         # This impl differs from the usual create_osid_object method in that it
         # sets an agent id and default display name based on the underlying Assessment
         # and checks for exceeding max attempts...
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentTaken',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentTaken',
+                                         runtime=self._runtime)
         if not isinstance(assessment_taken_form, ABCAssessmentTakenForm):
             raise errors.InvalidArgument('argument type is not an AssessmentTakenForm')
         if assessment_taken_form.is_for_update():
@@ -948,7 +948,7 @@ class Question:
         '#from ..osid.objects import OsidObject',
         'from ..id.objects import IdList',
         'from ..primitives import Id',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'from bson.objectid import ObjectId',
     ]
 
@@ -979,9 +979,9 @@ class Question:
         
         \"\"\"
         if 'learningObjectiveIds' not in self._my_map: # Will this ever be the case?
-            collection = MongoClientValidated('assessment',
-                                              collection='Item',
-                                              runtime=self._runtime)
+            collection = JSONClientValidated('assessment',
+                                             collection='Item',
+                                             runtime=self._runtime)
             item_map = collection.find_one({'_id': ObjectId(Id(self._my_map['itemId']).get_identifier())})
             self._my_map['learningObjectiveIds'] = list(item_map['learningObjectiveIds'])
         return IdList(self._my_map['learningObjectiveIds'])
@@ -1429,7 +1429,7 @@ class AssessmentTaken:
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from ..osid.objects import OsidObject',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'from .assessment_utilities import get_first_part_id_for_assessment',
         'from .assessment_utilities import get_next_part_id',
         'from .assessment_utilities import get_assessment_section',
@@ -1544,9 +1544,9 @@ class AssessmentTaken:
         Should be called every time the sections map changes.
 
         \"\"\"
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentTaken',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentTaken',
+                                         runtime=self._runtime)
         collection.save(self._my_map)
 
     def get_object_map(self):
@@ -1710,9 +1710,9 @@ class AssessmentQuerySession:
 
         \"\"\"
         if 'assessmentOfferedId' in assessment_query._query_terms:
-            collection = MongoClientValidated('assessment',
-                                              collection='AssessmentOffered',
-                                              runtime=self._runtime)
+            collection = JSONClientValidated('assessment',
+                                             collection='AssessmentOffered',
+                                             runtime=self._runtime)
             match = '$in' in assessment_query._query_terms['assessmentOfferedId'].keys()
             if match:
                 match_identifiers = [ObjectId(Id(i).identifier) for i in assessment_query._query_terms['assessmentOfferedId']['$in']]
@@ -1727,9 +1727,9 @@ class AssessmentQuerySession:
 
             assessment_ids = [ObjectId(Id(r['assessmentId']).identifier) for r in result]
 
-            collection = MongoClientValidated('assessment',
-                                              collection='Assessment',
-                                              runtime=self._runtime)
+            collection = JSONClientValidated('assessment',
+                                             collection='Assessment',
+                                             runtime=self._runtime)
             result = collection.find({
                 "_id": {"$in": assessment_ids}
             })
@@ -1749,9 +1749,9 @@ class AssessmentQuerySession:
             if and_list:
                 query_terms = {'$and': and_list}
 
-            collection = MongoClientValidated('assessment',
-                                              collection='Assessment',
-                                              runtime=self._runtime)
+            collection = JSONClientValidated('assessment',
+                                             collection='Assessment',
+                                             runtime=self._runtime)
             result = collection.find(query_terms).sort('_id', DESCENDING)
             return objects.AssessmentList(result, runtime=self._runtime, proxy=self._proxy)"""
 
@@ -1832,9 +1832,9 @@ class AssessmentSection:
         ## should this be here, or elsewhere?
         ## Trying to make getting the section maps faster
         if 'questions' in self._my_map:
-            collection = MongoClientValidated('assessment',
-                                              collection='Item',
-                                              runtime=self._runtime)
+            collection = JSONClientValidated('assessment',
+                                             collection='Item',
+                                             runtime=self._runtime)
             questions = []
             for question in self._my_map['questions']:
                 item = collection.find_one({"_id": ObjectId(Id(question['itemId']).identifier)})
@@ -1991,9 +1991,9 @@ class AssessmentSection:
     #     Should be called every time the question map changes.
     # 
     #     \"\"\"
-    #     collection = MongoClientValidated('assessment',
-    #                                       collection='AssessmentSection',
-    #                                       runtime=self._runtime)
+    #     collection = JSONClientValidated('assessment',
+    #                                      collection='AssessmentSection',
+    #                                      runtime=self._runtime)
     #     if '_id' in self._my_map: # This is the first time:
     #         collection.save(self._my_map)
     #     else:
@@ -2055,9 +2055,9 @@ class AssessmentSection:
     #     assessment being taken on multiple devices are reasonably synchronized.
     # 
     #     \"\"\"
-    #     collection = MongoClientValidated('assessment',
-    #                                       collection='AssessmentSection',
-    #                                       runtime=self._runtime)
+    #     collection = JSONClientValidated('assessment',
+    #                                      collection='AssessmentSection',
+    #                                      runtime=self._runtime)
     #     self._my_map = collection.find_one({'_id': self._my_map['_id']})
     # 
     # def _update_questions(self):

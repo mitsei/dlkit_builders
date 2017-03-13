@@ -47,6 +47,7 @@ managers_to_implement = [
     'id',
     'learning',
     'logging',
+    'locale',
     'osid',
     'proxy',
     'relationship',

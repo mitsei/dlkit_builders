@@ -41,9 +41,9 @@ class GradeEntryAdminSession:
         return obj_form"""
 
     get_grade_entry_form_for_update = """
-        collection = MongoClientValidated('grading',
-                                          collection='GradeEntry',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('grading',
+                                         collection='GradeEntry',
+                                         runtime=self._runtime)
         if not isinstance(grade_entry_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         if grade_entry_id.get_identifier_namespace() != 'grading.GradeEntry':
@@ -335,9 +335,9 @@ class GradebookColumnAdminSession:
         if self._has_entries(gradebook_column_id):
             raise errors.IllegalState('Entries exist in this gradebook column. Cannot delete it.')
 
-        collection = MongoClientValidated('grading',
-                                          collection='GradebookColumn',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('grading',
+                                         collection='GradebookColumn',
+                                         runtime=self._runtime)
 
         gradebook_column_map = collection.find_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
 
@@ -348,9 +348,9 @@ class GradebookColumnAdminSession:
         """
 
     update_gradebook_column = """
-        collection = MongoClientValidated('grading',
-                                          collection='GradebookColumn',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('grading',
+                                         collection='GradebookColumn',
+                                         runtime=self._runtime)
         if not isinstance(gradebook_column_form, ABCGradebookColumnForm):
             raise errors.InvalidArgument('argument type is not an GradebookColumnForm')
         if not gradebook_column_form.is_for_update():
@@ -401,9 +401,9 @@ class GradeSystemAdminSession:
         """
 
     delete_grade_system = """
-        collection = MongoClientValidated('grading',
-                                          collection='GradeSystem',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('grading',
+                                         collection='GradeSystem',
+                                         runtime=self._runtime)
         if not isinstance(grade_system_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         grade_system_map = collection.find_one({'_id': ObjectId(grade_system_id.get_identifier())})

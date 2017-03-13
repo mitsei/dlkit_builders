@@ -10,7 +10,7 @@ from .objects import AssessmentSection, NULL_RESPONSE, UNANSWERED, QuestionList,
 from .assessment_utilities import get_level_delta_for_parts, get_provider_manager, get_default_part_map,\
     get_default_question_map, get_assessment_part_lookup_session, get_item_lookup_session
 from .objects import AssessmentSection
-from ..utilities import MongoClientValidated
+from ..utilities import JSONClientValidated
 
 
 class PartSequenceSection(object):
@@ -159,9 +159,9 @@ class AssessmentSessionSection(object):
         Should be called every time the question map changes.
 
         """
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentSection',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentSection',
+                                         runtime=self._runtime)
         if '_id' in self._my_map: # This is the first time:
             collection.save(self._my_map)
         else:
@@ -174,9 +174,9 @@ class AssessmentSessionSection(object):
         Will be called by AssessmentTaken._delete() for clean-up purposes.
 
         """
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentSection',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentSection',
+                                         runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(self.get_id().get_identifier())})
 
 
@@ -224,9 +224,9 @@ class AssessmentSessionSection(object):
         assessment being taken on multiple devices are reasonably synchronized.
 
         """
-        collection = MongoClientValidated('assessment',
-                                          collection='AssessmentSection',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('assessment',
+                                         collection='AssessmentSection',
+                                         runtime=self._runtime)
         self._my_map = collection.find_one({'_id': self._my_map['_id']})
 
     def _update_questions(self):

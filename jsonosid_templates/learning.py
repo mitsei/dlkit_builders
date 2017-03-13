@@ -4,7 +4,7 @@ class ObjectiveRequisiteSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'from bson.objectid import ObjectId',
         'from ..types import Relationship',
         'UPDATED = True',
@@ -38,9 +38,9 @@ class ObjectiveRequisiteSession:
                                                                                  requisite_type)
         destination_ids = [ObjectId(r.get_destination_id().identifier)
                            for r in requisite_relationships]
-        collection = MongoClientValidated('learning',
-                                          collection='Objective',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('learning',
+                                         collection='Objective',
+                                         runtime=self._runtime)
         result = collection.find({'_id': {'$$in': destination_ids}})
         return objects.${return_type}(result, runtime=self._runtime)"""
 
@@ -59,9 +59,9 @@ class ObjectiveRequisiteSession:
                                                                                       requisite_type)
         source_ids = [ObjectId(r.get_source_id().identifier)
                       for r in requisite_relationships]
-        collection = MongoClientValidated('learning',
-                                          collection='Objective',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('learning',
+                                         collection='Objective',
+                                         runtime=self._runtime)
         result = collection.find({'_id': {'$$in': source_ids}})
         return objects.${return_type}(result, runtime=self._runtime)"""
 
@@ -125,7 +125,7 @@ class ObjectiveAdminSession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
     ]
 
     delete_objective_import_templates = [
@@ -138,15 +138,15 @@ class ObjectiveAdminSession:
 
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${dependent_object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${dependent_object_name}',
+                                         runtime=self._runtime)
         if collection.find({'${object_name_mixed}Id': str(${arg0_name})}).count() != 0:
             raise errors.IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
 
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
 
@@ -156,16 +156,16 @@ class ActivityLookupSession:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from . import objects',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
     ]
 
     get_activities_for_objective_template = """
         # Implemented from template for
         # osid.learning.ActivityLookupSession.get_activities_for_objective_template
         # NOTE: This implementation currently ignores plenary view
-        collection = MongoClientValidated('${package_name_replace}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name_replace}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'${arg0_object_mixed}Id': str(${arg0_name})},
                  **self._view_filter()))

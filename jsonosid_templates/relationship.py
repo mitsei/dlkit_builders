@@ -7,7 +7,7 @@ class RelationshipLookupSession:
         'from ..primitives import Id',
         'from ..primitives import DateTime',
         'from ..osid.sessions import OsidSession',
-        'from ..utilities import MongoClientValidated',
+        'from ..utilities import JSONClientValidated',
         'from ..utilities import overlap',
         'from . import objects',
         'from bson.objectid import ObjectId',
@@ -40,9 +40,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name})},
                  **self._view_filter())).sort('_sort_id', ASCENDING)
@@ -61,9 +61,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   'genusTypeId': str(${arg1_name})},
@@ -83,9 +83,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'${destination_name_mixed}Id': str(${arg0_name})},
                  **self._view_filter())).sort('_sort_id', ASCENDING)
@@ -104,9 +104,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'${destination_name_mixed}Id': str(${arg0_name}),
                   'genusTypeId': str(${arg1_name})},
@@ -126,9 +126,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   '${destination_name_mixed}Id': str(${arg1_name})},
@@ -139,9 +139,9 @@ class RelationshipLookupSession:
         # Implemented from template for
         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers
         # NOTE: This implementation currently ignores plenary and effective views
-        collection = MongoClientValidated('${package_name}',
-                                          collection='${object_name}',
-                                          runtime=self._runtime)
+        collection = JSONClientValidated('${package_name}',
+                                         collection='${object_name}',
+                                         runtime=self._runtime)
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   '${destination_name_mixed}Id': str(${arg1_name}),
