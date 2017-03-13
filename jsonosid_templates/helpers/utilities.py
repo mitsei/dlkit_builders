@@ -684,7 +684,7 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
             mgr_str = 'Manager'
         else:
             mgr_str = 'ProxyManager'
-        module = import_module('dlkit.json.' + osid.lower() + '.managers')
+        module = import_module('dlkit.json_.' + osid.lower() + '.managers')
         manager_name = ''.join((osid.title()).split('_')) + mgr_str
         manager = getattr(module, manager_name)()
     except (ImportError, AttributeError):
