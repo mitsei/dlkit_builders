@@ -8,3 +8,4 @@ from dlkit.primordium.installation.primitives import Version
 from dlkit.primordium.transport.objects import DataInputStream
 from dlkit.primordium.calendaring.primitives import DateTime, Duration
 from dlkit.primordium.mapping.color_primitives import RGBColorCoordinate
+from dlkit.primordium.mapping.spatial_units import RectangularSpatialUnit
