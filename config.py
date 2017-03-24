@@ -5,6 +5,7 @@ packages_to_implement = [
     'authentication.process',
     'authentication',
     'authorization',
+    'cataloging',
     'commenting',
     'grading',
     'hierarchy',
@@ -41,6 +42,7 @@ managers_to_implement = [
     'authentication.process',
     'authentication',
     'authorization',
+    'cataloging',
     'commenting',
     'grading',
     'hierarchy',
@@ -103,6 +105,13 @@ sessions_to_implement = [
     'VaultLookupSession',
     'VaultAdminSession',
     'VaultQuerySession',
+    ### cataloging service:
+    'CatalogSession',
+    'CatalogAssignmentSession',
+    'CatalogLookupSession',
+    'CatalogAdminSession',
+    'CatalogHierarchySession',
+    'CatalogHierarchyDesignSession',
     ### commenting service:
     'CommentLookupSession',
     'CommentQuerySession',
@@ -230,6 +239,8 @@ objects_to_implement = [
     ### authorization service:
     'Authorization',
     'Vault',
+    ### ctaloging service:
+    'Catalog',
     ### commenting service:
     'Comment',
     'Book',

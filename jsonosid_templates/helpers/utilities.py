@@ -27,6 +27,8 @@ from . import JSON_CLIENT
 #     'd': 'deleted'
 # }
 
+
+## =======================================
 # This is for the Filesystem version of the JSON build
 # http://pythonhosted.org/PyInstaller/runtime-information.html#run-time-information
 if getattr(sys, 'frozen', False):
@@ -41,7 +43,7 @@ else:
 class Filler(object):
     pass
 
-
+## =======================================
 # MyIterator and ListFiller classes are for the Filesystem based impl
 class MyIterator(object):
     def __init__(self, data):

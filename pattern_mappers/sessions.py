@@ -2869,6 +2869,9 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
               method['name'].startswith('assign_') and
               method['name'].endswith('_to_' + index['package_catalog_under'])):
+            object_name = interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', '')
+            if object_name == '':
+                 object_name = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceBinAssignmentSession.assign_resource_to_bin',
                 kwargs = make_twargs(
@@ -2877,7 +2880,7 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=False,
-                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', ''),
+                    object_name=object_name,
                     arg_count=2))
 
         ##
@@ -2885,7 +2888,10 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
               method['name'].startswith('unassign_') and
               method['name'].endswith('_from_' + index['package_catalog_under'])):
-            index[interface['shortname'] + '.' + method['name']] = dict(
+             object_name = interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', '')
+             if object_name == '':
+                 object_name = 'Id'
+             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceBinAssignmentSession.unassign_resource_from_bin',
                 kwargs = make_twargs(
                     index,
@@ -2893,8 +2899,27 @@ def map_session_patterns(interface, package, index):
                     interface,
                     method, 
                     rtype=False,
-                    object_name=interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', ''),
+                    object_name=object_name,
                     arg_count=2))
+
+        ##
+        # ObjectCatalogAssignmentSession methods that reassign an object from one catalog to another.
+        elif (interface['shortname'].endswith(index['package_catalog_caps'] + 'AssignmentSession') and
+              method['name'].startswith('reassign_') and
+              method['name'].endswith('_to_' + index['package_catalog_under'])):
+             object_name = interface['shortname'].replace(index['package_catalog_caps'] + 'AssignmentSession', '')
+             if object_name == '':
+                 object_name = 'Id'
+             index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern = 'resource.ResourceBinAssignmentSession.reassign_resource_to_bin',
+                kwargs = make_twargs(
+                    index,
+                    package,
+                    interface,
+                    method, 
+                    rtype=False,
+                    object_name=object_name,
+                    arg_count=3))
 
 
 
