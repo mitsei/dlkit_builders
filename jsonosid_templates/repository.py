@@ -63,7 +63,7 @@ class RepositoryProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return sessions.AssetCompositionSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member
+        return sessions.AssetCompositionSession(catalog_id=repository_id, proxy=proxy, runtime=self._runtime) # pylint: disable=no-member
 
     @utilities.arguments_not_none
     def get_asset_composition_design_session_for_repository(self, repository_id, proxy):
@@ -73,13 +73,13 @@ class RepositoryProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return sessions.AssetCompositionDesignSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member
+        return sessions.AssetCompositionDesignSession(catalog_id=repository_id, proxy=proxy, runtime=self._runtime) # pylint: disable=no-member
 
     def get_asset_content_lookup_session(self, proxy):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
         if not self.supports_asset_lookup():  # should be asset_content_lookup
             raise errors.Unimplemented()
-        return sessions.AssetContentLookupSession(proxy, runtime=self._runtime) # pylint: disable=no-member
+        return sessions.AssetContentLookupSession(proxy=proxy, runtime=self._runtime) # pylint: disable=no-member
 
     @utilities.arguments_not_none
     def get_asset_content_lookup_session_for_repository(self, repository_id, proxy):
@@ -89,7 +89,7 @@ class RepositoryProxyManager:
         ##
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
-        return sessions.AssetContentLookupSession(repository_id, proxy, runtime=self._runtime) # pylint: disable=no-member"""
+        return sessions.AssetContentLookupSession(catalog_id=repository_id, proxy=proxy, runtime=self._runtime) # pylint: disable=no-member"""
 
 
 class AssetLookupSession:
