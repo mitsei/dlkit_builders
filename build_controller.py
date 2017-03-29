@@ -211,6 +211,36 @@ class BaseBuilder(Utilities):
     def _abc_pkg_path(self, abc=True):
         return self._app_name() + '/' + self._abc_pkg_name(abc)
 
+    def _additional_classes(self, interface):
+        # Look for additional classes defined in class patterns. These
+        # need to be coded in the impl_class as a string with the
+        # attribute name 'additional_classes_pattern'
+        # They will get automatically added after the current class.
+        additional_classes_template = self._get_extra_patterns(interface['shortname'],
+                                                               'additional_classes_template',
+                                                               default='')
+
+        # Here we further inspect the impl_class to identify any additional
+        # hand built methods to be included at the end of the class definition. These
+        # need to be coded in the impl_class as a string with the
+        # attribute name 'additional_methods'
+        # impl_class = self._impl_class(interface)
+        # if hasattr(impl_class, 'additional_methods'):
+        #     additional_classes += getattr(impl_class, 'additional_methods')
+
+        pattern = None
+        try:
+            pattern = self.patterns[interface['shortname'] + '.init_pattern']
+        except KeyError:
+            pass
+
+        if additional_classes_template != '' and pattern is not None:
+            context = self._get_init_context(pattern, interface)
+            template = string.Template(additional_classes_template)
+            return '\n\n' + template.substitute(context)
+
+        return None
+
     def _additional_methods(self, interface):
         additional_methods = ''
         # Look for additional methods defined in class patterns. These
@@ -526,9 +556,14 @@ class BaseBuilder(Utilities):
         init_methods = self._make_init_methods(interface)
         methods = self.make_methods(interface)
         additional_methods = self._additional_methods(interface)
+        additional_classes = self._additional_classes(interface)
 
         if additional_methods:
             methods += '\n' + additional_methods
+
+        if additional_classes:
+            # extra newlines generated in self._additional_classes
+            methods += additional_classes
 
         body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
                                                  self._wrap(self.class_doc(interface)),
