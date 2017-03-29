@@ -1806,6 +1806,7 @@ class Bin:
         #     #print 'KeyError: recordTypeIds key not found in ', self._my_map['displayName']['text']
         #     self._load_records([]) # In place for transition purposes"""
 
+
 class BinForm:
 
     import_statements_pattern = [
