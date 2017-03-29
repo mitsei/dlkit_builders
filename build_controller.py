@@ -237,7 +237,7 @@ class BaseBuilder(Utilities):
         if additional_classes_template != '' and pattern is not None:
             context = self._get_init_context(pattern, interface)
             template = string.Template(additional_classes_template)
-            return template.substitute(context) + '\n'
+            return '\n\n' + template.substitute(context)
 
         return None
 
@@ -562,7 +562,8 @@ class BaseBuilder(Utilities):
             methods += '\n' + additional_methods
 
         if additional_classes:
-            methods += '\n' + additional_classes
+            # extra newlines generated in self._additional_classes
+            methods += additional_classes
 
         body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
                                                  self._wrap(self.class_doc(interface)),
