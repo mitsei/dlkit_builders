@@ -389,8 +389,6 @@ def map_manager_patterns(interface, package, index):
                                 return_type_full = method['return_type']))
 
         else:
-            ## Uncomment the following line to print all unknown manager patterns
-            #print 'unknown manager pattern:', interface['fullname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = '',
                   kwargs = dict(interface_name = interface['shortname'],

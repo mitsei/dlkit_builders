@@ -9,9 +9,6 @@ def map_object_form_patterns(interface, package, index):
     index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceForm'
 
     for method in interface['methods']:
-        # Uncomment the following line to see which object raised an error.
-        #print interface['fullname'], method['name']
-
         var_name = method['name'].split('_', 1)[-1]
         
         ##
@@ -165,7 +162,7 @@ def map_object_form_patterns(interface, package, index):
               method['arg_types'][0] == 'string' and
               interface['shortname'][:-4] + '.return_types' in index and
               index[interface['shortname'][:-4] + '.return_types'][var_name] == 'osid.locale.DisplayText'):
-            print "FOUND DISPLAY TEXT", var_name
+            print("FOUND DISPLAY TEXT {0}".format(var_name))
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetForm.set_title',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -224,7 +221,7 @@ def map_object_form_patterns(interface, package, index):
         elif (method['name'].startswith('set_') and
               len(method['arg_types']) == 1 and
               method['arg_types'][0] in ['osid.calendaring.DateTime', 'timestamp']):
-            print "FOUND STRING", var_name
+            print("FOUND STRING {0}".format(var_name))
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'assessment.AssessmentOfferedForm.set_start_time',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -240,7 +237,7 @@ def map_object_form_patterns(interface, package, index):
         elif (method['name'].startswith('set_') and
               len(method['arg_types']) == 1 and
               method['arg_types'][0] == 'osid.calendaring.Duration'):
-            print "FOUND STRING", var_name
+            print("FOUND STRING {0}".format(var_name))
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'assessment.AssessmentOfferedForm.set_duration',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -416,8 +413,6 @@ def map_object_form_patterns(interface, package, index):
                               arg0_type_full = method['args'][0]['arg_type']))
 
         else:        
-            # uncomment the following line to print all unknown session patterns
-            #print 'unknown ObjectForm pattern:', interface['fullname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = '',
                   kwargs = dict(interface_name = interface['shortname'],
@@ -436,9 +431,6 @@ def map_object_patterns(interface, package, index):
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
 
-        # Uncomment the following line to see which object raised an error.
-        #print interface['fullname'], method['name']
-        
         if var_name.endswith('_id') or var_name.endswith('_ids'):
             var_name = '_'.join(var_name.split('_')[:-1])
         ##
@@ -446,18 +438,17 @@ def map_object_patterns(interface, package, index):
         # 'is_something_based_otherthing' question.  Perhaps only found
         # in learning Activities
         if (var_name in index[object_name + '.persisted_data'] and
-              method['name'].startswith('is_') and
-              '_based_' in method['name'] and
-              index[object_name + '.persisted_data'][var_name] == 'boolean'):
-#            print 'FOUND:', interface['shortname'], method['name']
+                method['name'].startswith('is_') and
+                '_based_' in method['name'] and
+                index[object_name + '.persisted_data'][var_name] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'learning.Activity.is_asset_based_activity',
-                kwargs = dict(interface_name = interface['shortname'],
-                              package_name = package['name'],
-                              module_name = interface['category'],
-                              method_name = method['name'],
-                              var_name = var_name,
-                              return_type_full = method['return_type']))
+                pattern='learning.Activity.is_asset_based_activity',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name,
+                            return_type_full=method['return_type']))
 
         ##
         # Object methods that get a persisted boolean value with an 
@@ -1244,8 +1235,6 @@ def map_object_patterns(interface, package, index):
                               arg0_type_full = method['args'][0]['arg_type']))
 
         else:
-            # uncomment the following line to print all unknown object patterns
-#            print 'unknown object pattern:', interface['fullname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = '',
                   kwargs = dict(interface_name = interface['shortname'],
@@ -1289,8 +1278,6 @@ def map_list_patterns(interface, package, index):
                               return_type_full = method['return_type']))
 
         else:
-            # uncomment the following line to print all unknown object patterns
-#            print 'unknown object pattern:', interface['fullname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = '',
                   kwargs = dict(interface_name = interface['shortname'],
@@ -1424,8 +1411,6 @@ def map_query_patterns(interface, package, index):
 
 
         else:
-            # uncomment the following line to print all unknown object patterns
-#            print 'unknown object pattern:', interface['fullname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = '',
                   kwargs = dict(interface_name = interface['shortname'],
@@ -1456,8 +1441,6 @@ def map_catalog_query_patterns(interface, package, index):
                               return_type_full = method['return_type']))
 
         else:
-            # uncomment the following line to print all unknown object patterns
-#            print 'unknown object pattern:', interface['fullname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = '',
                   kwargs = dict(interface_name = interface['shortname'],
@@ -1516,8 +1499,6 @@ def map_catalog_node_patterns(interface, package, index):
                               return_type_full = method['return_type']))
 
         else:
-            # uncomment the following line to print all unknown node patterns
-#            print 'unknown object pattern:', interface['fullname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = '',
                   kwargs = dict(interface_name = interface['shortname'],
@@ -1590,8 +1571,6 @@ def map_receiver_patterns(interface, package, index):
                               arg1_type_full = method['args'][0]['arg_type']))
 
         else:
-            # uncomment the following line to print all unknown node patterns
-#            print 'unknown receiver pattern:', interface['fullname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = '',
                   kwargs = dict(interface_name = interface['shortname'],

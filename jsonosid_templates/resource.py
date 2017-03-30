@@ -1796,27 +1796,13 @@ class Bin:
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, **kwargs):
-        # self._record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
-        osid_objects.OsidCatalog.__init__(self, object_name='${object_name_upper}', **kwargs)
-        # self._records = dict() # Now set in Extensible, including transition stuff below. Let's hope we've transitioned:
-        # This check is here for transition purposes:
-        # try:
-        #     self._load_records(osid_object_map['recordTypeIds'])
-        # except KeyError:
-        #     #print 'KeyError: recordTypeIds key not found in ', self._my_map['displayName']['text']
-        #     self._load_records([]) # In place for transition purposes"""
-
-    additional_classes_template = """
-    Foo ${object_name_upper}"""
+        osid_objects.OsidCatalog.__init__(self, object_name='${object_name_upper}', **kwargs)"""
 
 
 class BinForm:
 
     import_statements_pattern = [
-        'from . import default_mdata',
-        '#from ..osid.objects import OsidForm',
-        '#from ..osid.objects import OsidObjectForm',
-		'#from ..utilities import get_registry',
+        'from . import default_mdata'
     ]
 
     init_template = """
