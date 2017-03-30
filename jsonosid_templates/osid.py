@@ -1641,12 +1641,7 @@ class OsidList:
 
     def _get_next_object(self, object_class):
         \"\"\"stub\"\"\"
-        try:
-            next_object = OsidList.next(self)
-        except StopIteration:
-            raise
-        except Exception:  # Need to specify exceptions here!
-            raise
+        next_object = OsidList.next(self)
         if isinstance(next_object, dict):
             next_object = object_class(osid_object_map=next_object, runtime=self._runtime, proxy=self._proxy)
         elif isinstance(next_object, basestring) and object_class == Id:
@@ -1712,7 +1707,7 @@ class OsidQuery:
         try:
             # Try to get additional keyword fields from the runtime, if available:
             config = runtime.get_configuration()
-            parameter_id = Id('parameter:keywordFields@mongo')
+            parameter_id = Id('parameter:keywordFields@json_')
             additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
             self._keyword_fields += additional_keyword_fields[self._namespace]
         except (AttributeError, KeyError, errors.NotFound):
