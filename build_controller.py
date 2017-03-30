@@ -31,37 +31,40 @@ def remove_abs_path(path):
 
 
 class Utilities(object):
-    def _make_dir(self, target_dir, python=False):
-        if ABS_PATH not in target_dir:
-            target_dir = (ABS_PATH + target_dir).replace('//', '/')
-        if target_dir[-1] == '/':
-            target_dir = target_dir[0:-1]
-        if not os.path.exists(target_dir):
-            os.makedirs(target_dir)
+    def _make_dir(self, target_directory, python=False):
+        if ABS_PATH not in target_directory:
+            target_directory = os.path.join(ABS_PATH, target_directory)
+        if target_directory[-1] == '/':
+            target_directory = target_directory[0:-1]
+        if not os.path.exists(target_directory):
+            os.makedirs(target_directory)
         if python:
-            os.system('touch ' + target_dir + '/__init__.py')
+            os.system('touch ' + target_directory + '/__init__.py')
             # for every directory between ABS_PATH and target_dir, add __init__.py
-            intermediate_dirs = target_dir.replace(ABS_PATH, '').split('/')
+            intermediate_dirs = target_directory.replace(ABS_PATH, '').split('/')
             start_dir = ABS_PATH + '/'
             for dir_ in intermediate_dirs:
                 start_dir += dir_ + '/'
                 if not os.path.exists(start_dir + '__init__.py'):
                     os.system('touch ' + start_dir + '__init__.py')
-        return target_dir
+        return target_directory
 
     def _wrap(self, text):
         return text
 
-    def append(self, iterator, item):
+    @staticmethod
+    def append(iterator, item):
         if item not in iterator:
             iterator.append(item)
 
-    def first(self, package_path, char='.'):
+    @staticmethod
+    def first(package_path, char='.'):
         """a lot of builder patterns refer to the first item in a
         dot-separated path"""
         return package_path.split(char)[0]
 
-    def last(self, package_path, char='.'):
+    @staticmethod
+    def last(package_path, char='.'):
         """a lot of builder patterns refer to the last item in a
         dot-separated path"""
         return package_path.split(char)[-1]
@@ -74,9 +77,9 @@ class Utilities(object):
 class BaseBuilder(Utilities):
     """base builder with some shared items, like package_maps dir, etc."""
     def __init__(self,
-                 package_maps_dir='/builders/package_maps',
-                 pattern_maps_dir='/builders/pattern_maps',
-                 interface_maps_dir='/builders/interface_maps',
+                 package_maps_dir='package_maps',
+                 pattern_maps_dir='pattern_maps',
+                 interface_maps_dir='interface_maps',
                  *args, **kwargs):
         self._package_maps_dir = None
         self._pattern_maps_dir = None
@@ -214,8 +217,9 @@ class BaseBuilder(Utilities):
         # required and append to the appropriate module's import list.
         inherit_category = 'UNKNOWN_MODULE'
         for i in interface['inheritance']:
+            pkg_name = self._abc_pkg_name(package_name=i['pkg_name'], abc=self._is('abc'))
             import_str = ''
-            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+            inherit_category = self.get_interface_module(pkg_name, i['name'], True)
             if (i['pkg_name'] == self.package['name'] and
                     inherit_category == interface['category']):
                 pass
@@ -224,18 +228,11 @@ class BaseBuilder(Utilities):
                     import_str = 'from . import {0}'.format(i['pkg_name'])
 
                 if not self._is('services'):
-                    # original absolute import generator:
-                    # import_str = 'from {0}.{1} import {2} as {1}_{2}'.format(self._import_path(
-                    #                                                          self._app_name(package_name=i['pkg_name'])),
-                    #                                                          self._abc_pkg_name(package_name=i['pkg_name'],
-                    #                                                                             abc=False),
-                    #                                                          inherit_category)
-                    # new relative import generator:
                     import_str = 'from ..{1} import {2} as {1}_{2}'.format(self._import_path(
-                                                                             self._app_name(package_name=i['pkg_name'])),
-                                                                             self._abc_pkg_name(package_name=i['pkg_name'],
-                                                                                                abc=False),
-                                                                             inherit_category)
+                                                                           self._app_name(package_name=i['pkg_name'])),
+                                                                           self._abc_pkg_name(package_name=i['pkg_name'],
+                                                                                              abc=False),
+                                                                           inherit_category)
 
                 if inherit_category != 'UNKNOWN_MODULE':
                     self.append(imports, import_str)
@@ -314,7 +311,8 @@ class BaseBuilder(Utilities):
                     markers=dict(imports=[], body=''),
                     others_please_move=dict(imports=[], body=''))
 
-    def _flagged_for_implementation(self, interface):
+    @staticmethod
+    def _flagged_for_implementation(interface):
         """
         Check if this interface is meant to be implemented.
 
@@ -334,7 +332,8 @@ class BaseBuilder(Utilities):
                     test = True
         return test
 
-    def _import_path(self, path, limited=True):
+    @staticmethod
+    def _import_path(path, limited=True):
         if limited:
             return '.'.join(remove_abs_path(path).split('/')[-2::])
         else:
@@ -395,7 +394,8 @@ class BaseBuilder(Utilities):
             is_manager_session = True
         return is_manager_session
 
-    def _is_session(self, interface, type_):
+    @staticmethod
+    def _is_session(interface, type_):
         return '{}.is_{}_session'.format(camel_to_under(interface['shortname']),
                                          type_)
 
@@ -404,7 +404,8 @@ class BaseBuilder(Utilities):
         with open(self._package_pattern_file(), 'r') as read_file:
             return json.load(read_file)
 
-    def _order_module_imports(self, imports):
+    @staticmethod
+    def _order_module_imports(imports):
         # does not separate built-in libraries from third-party libraries
         docstrings = [imp for imp in imports if '"""' in imp or imp.startswith('#')]
         full_imports = [imp for imp in imports if imp.startswith('import ')]
@@ -760,11 +761,11 @@ class Templates(Utilities):
 
 
 class Builder(Utilities):
-    def __init__(self, build_dir='/dlkit'):
+    def __init__(self, build_dir='dlkit'):
         """configure the builder"""
         self._build_to_dir = None
         self.build_dir = build_dir
-        self._xosid_dir = '/xosid'
+        self._xosid_dir = 'xosid'
         super(Builder, self).__init__()
 
     @property
@@ -822,7 +823,7 @@ class Builder(Utilities):
     def tests(self, create_parent_dir=False):
         from testbuilder import TestBuilder
         if create_parent_dir:
-            TestBuilder(build_dir=self.build_dir + '/tests').make()
+            TestBuilder(build_dir=self.build_dir + './tests').make()
         else:
             TestBuilder(build_dir=self.build_dir).make()
 
@@ -938,6 +939,8 @@ if __name__ == '__main__':
                 builder.stub()
                 non_test_build = True
             if 'tests' in sys.argv:
+                if '--buildto' not in sys.argv:
+                    raise AttributeError('tests requires a --buildto when built individually')
                 builder.tests(non_test_build)
             if 'docs' in sys.argv:
                 builder.docs()

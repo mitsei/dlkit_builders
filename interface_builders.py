@@ -74,7 +74,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             for i in interface['inheritance']:
                 pkg_name = self._abc_pkg_name(package_name=i['pkg_name'], abc=self._is('abc'))
                 unknown_module_protection = ''
-                inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+                inherit_category = self.get_interface_module(pkg_name, i['name'], True)
                 if inherit_category == 'UNKNOWN_MODULE':
                     unknown_module_protection = '\"\"\"'
 
