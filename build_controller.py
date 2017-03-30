@@ -8,7 +8,6 @@ import sys
 import json
 import glob
 import string
-import textwrap
 
 from collections import OrderedDict
 from importlib import import_module
@@ -52,56 +51,6 @@ class Utilities(object):
 
     def _wrap(self, text):
         return text
-        # def _get_wrapper(new_spacing=4):
-        #     return textwrap.TextWrapper(subsequent_indent=(new_spacing + 4)*' ', width=120)
-        #
-        # result = []
-        # new_paragraph = False
-        # previous_line = ''
-        # for line in text.splitlines():
-        #     if new_paragraph:
-        #         if previous_line[:].strip()[0] == '#':
-        #             spacing = previous_line[:].split('#')[0]
-        #             wrapper = _get_wrapper(len(spacing))
-        #             new_line = spacing + '\n'.join(wrapper.wrap(line.strip()))
-        #         elif line[:].strip() != '' and line[:].lstrip(' ')[0] == '*':
-        #             wrapper = _get_wrapper()
-        #             new_line = '\n'.join(wrapper.wrap(line))
-        #         else:
-        #             spacing = len(line) - len(line[:].lstrip(' '))
-        #             previous_spacing = len(previous_line) - len(previous_line[:].lstrip(' '))
-        #             if spacing != 0 and previous_spacing != 0:
-        #                 wrapper = _get_wrapper(spacing)
-        #                 new_line = '\n'.join(wrapper.wrap(line))
-        #             elif spacing < previous_spacing and spacing != 0:
-        #                 wrapper = _get_wrapper(previous_spacing)
-        #                 new_line = previous_spacing * ' ' + '\n'.join(wrapper.wrap(line.lstrip(' ')))
-        #             elif previous_spacing == 0 and spacing != 0:
-        #                 # already indented
-        #                 wrapper = _get_wrapper(spacing)
-        #                 new_line = '\n'.join(wrapper.wrap(line))
-        #             else:
-        #                 wrapper = _get_wrapper(spacing + 4)
-        #                 new_line = (spacing + 4) * ' ' + '\n'.join(wrapper.wrap(line))
-        #     else:
-        #         spacing = len(line) - len(line[:].lstrip(' '))
-        #         wrapper = _get_wrapper(spacing)
-        #         new_line = '\n'.join(wrapper.wrap(line))
-        #
-        #     if line[:].strip() == '':
-        #         new_paragraph = False
-        #     else:
-        #         new_paragraph = True
-        #
-        #     if new_line[:].strip() != '':
-        #         result.append(new_line)
-        #     else:
-        #         result.append('\n')
-        #     # result.append(new_line)
-        #
-        #     previous_line = new_line
-        #
-        # return '\n'.join(result)
 
     def append(self, iterator, item):
         if item not in iterator:
@@ -604,15 +553,15 @@ class BaseBuilder(Utilities):
                 index = json.load(read_file)
         except IOError:
             if report_error:
-                print ('INTERFACE LOOKUP ERROR - interface map for \'' + pkg_name +
-                       '.' + interface_shortname + '\' not found.')
+                print('INTERFACE LOOKUP ERROR - interface map for "{0}.{1}" not found'.format(pkg_name,
+                                                                                              interface_shortname))
         else:
             try:
                 category = index[pkg_name + '.' + interface_shortname]
             except KeyError:
                 if report_error:
-                    print ('INTERFACE LOOKUP ERROR - category for \'' + pkg_name + '.'
-                           + interface_shortname + '\' not found.')
+                    print('INTERFACE LOOKUP ERROR - category for "{0}.{1}" not found.'.format(pkg_name,
+                                                                                              interface_shortname))
         return category
 
     def update_module_body(self, modules, interface):
@@ -682,10 +631,8 @@ class PatternBuilder(XOsidMapper, BaseBuilder):
                 self._make_impl_pattern_map(package=package,
                                             base_package=base_package)
             else:
-                print 'Could not find pattern map' + \
-                      self.first(package['name']) + \
-                      'required for processing package' + \
-                      package['name']
+                print('Could not find pattern map {0} required for processing package {1}.'.format(self.first(package['name']),
+                                                                                                   package['name']))
 
 
 class Templates(Utilities):
@@ -845,7 +792,7 @@ class Builder(Utilities):
     def map(self):
         """map all the xosid files"""
         from mappers import Mapper
-        print "Mapping OSIDs"
+        print("Mapping OSIDs")
         Mapper().map_all('all')
 
     def json(self):
@@ -861,7 +808,7 @@ class Builder(Utilities):
         MDataBuilder(build_dir=self.build_dir).make()
 
     def patterns(self):
-        print "Creating pattern files"
+        print("Creating pattern files")
         PatternBuilder().make_patterns()
 
     def manager(self):
@@ -882,35 +829,35 @@ class Builder(Utilities):
 if __name__ == '__main__':
 
     def usage():
-        print "Usage: python build_controller.py [commands]"
-        print "where:"
-        print "  [commands] is any set of supported commands"
-        print ""
-        print "Supported commands:"
-        print "  map: map the xosid files into pattern_maps/ and package_maps/"
-        print "  abc: build the abstract_osids"
-        print "  patterns: build the patterns"
-        print "  #mdata: build the metadata files"
-        print "  authz: build the authz_adapter impl"
-        print "  json: build the JSON OSID impl (use MongoDB or Filesystem based on config)"
-        print "  stub: build developer stub impl"
-        print "  services: build the dlkit convenience service impls"
-        print "  manager: build the manager_impls base classes"
-        print "  tests: build the tests"
-        print "  --all: build all of the above"
-        print "  --buildto <directory>: the target build-to directory"
-        print ""
-        print "This searches the ./xosid/ directory for *.xosid files, which are parsed into code."
-        print ""
-        print "NOTE: if Tests are built with the other apps, they will be in a sub-folder of the "
-        print "      buildto directory called \"tests/\". Otherwise they will be built into the "
-        print "      specified directory."
-        print ""
-        print "This will build the files to the directory specified, default of ./dlkit/."
-        print ''
-        print "examples:"
-        print "  python build_controller.py map patterns abc mdata json"
-        print "  python build_controller.py --all"
+        print("Usage: python build_controller.py [commands]")
+        print("where:")
+        print("  [commands] is any set of supported commands")
+        print("")
+        print("Supported commands:")
+        print("  map: map the xosid files into pattern_maps/ and package_maps/")
+        print("  abc: build the abstract_osids")
+        print("  patterns: build the patterns")
+        print("  #mdata: build the metadata files")
+        print("  authz: build the authz_adapter impl")
+        print("  json: build the JSON OSID impl (use MongoDB or Filesystem based on config)")
+        print("  stub: build developer stub impl")
+        print("  services: build the dlkit convenience service impls")
+        print("  manager: build the manager_impls base classes")
+        print("  tests: build the tests")
+        print("  --all: build all of the above")
+        print("  --buildto <directory>: the target build-to directory")
+        print("")
+        print("This searches the ./xosid/ directory for *.xosid files, which are parsed into code.")
+        print("")
+        print("NOTE: if Tests are built with the other apps, they will be in a sub-folder of the ")
+        print("      buildto directory called \"tests/\". Otherwise they will be built into the ")
+        print("      specified directory.")
+        print("")
+        print("This will build the files to the directory specified, default of ./dlkit/.")
+        print("")
+        print("examples:")
+        print("  python build_controller.py map patterns abc mdata json")
+        print("  python build_controller.py --all")
 
     if len(sys.argv) == 1:
         usage()

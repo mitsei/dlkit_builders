@@ -130,7 +130,7 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
                                                     self._abc_pkg_name(abc=False))
             old_profile = import_module(profile_module)
         except ImportError:
-            print 'Old Profile not found:', self._abc_pkg_name(abc=False)
+            print('Old Profile not found: {0}'.format(self._abc_pkg_name(abc=False)))
         else:
             if hasattr(old_profile, 'VERSIONCOMPONENTS'):
                 profile['VERSIONCOMPONENTS'] = old_profile.VERSIONCOMPONENTS

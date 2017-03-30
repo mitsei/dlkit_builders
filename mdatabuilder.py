@@ -26,8 +26,8 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
         if not self._package_to_be_implemented():
             return
 
-        print "Building {0} for {1}".format(self._class,
-                                            self.package['name'])
+        print("Building {0} for {1}".format(self._class,
+                                            self.package['name']))
 
         self.patterns = self._patterns()
 

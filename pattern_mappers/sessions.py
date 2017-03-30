@@ -71,12 +71,7 @@ def map_session_patterns(interface, package, index):
     elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession']):
         index[interface['shortname'] + '.init_pattern'] = 'repository.AssetCompositionDesignSession'
 
-
     for method in interface['methods']:
-        # Uncomment the following line to see which session raised an error.
-        #print interface['fullname'], method['name']
-        #print 'length args =', len(method['args'])
-        
         index['impl_log']['sessions'][interface['shortname']][method['name']] = ['mapped', 'unimplemented']
 
         ##################################################################
@@ -87,8 +82,8 @@ def map_session_patterns(interface, package, index):
         # CatalogLookupSession methods that returns a catalog with no id.
         # this matches the filing.DirectoryLookupSession first get directory method
         if (interface['shortname'] == index['package_catalog_caps'] + 'LookupSession' and
-            method['name'] == 'get_' + index['package_catalog_under'] and
-            len(method['args']) == 0):
+                method['name'] == 'get_' + index['package_catalog_under'] and
+                len(method['args']) == 0):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'filing.DirectoryLookupSession.get_directory',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1650,7 +1645,6 @@ def map_session_patterns(interface, package, index):
         
         
         elif (interface['shortname'].endswith('BatchAdminSession')):
-            #print 'FOUND BATCH ADMIN SESSION:', interface['fullname'], method['name']
             pass
 
 
@@ -1692,7 +1686,6 @@ def map_session_patterns(interface, package, index):
               method['name'].startswith('can_update_') and
               method['return_type'] == 'boolean' and
               'osid.id.Id' in method['arg_types']):
-            #print 'Found can_update_agent pattern in', interface['shortname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'authentication.AgentAdminSession.can_update_agent',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1792,7 +1785,6 @@ def map_session_patterns(interface, package, index):
             method['args'][0]['arg_type'] == 'osid.id.Id' and
             method['args'][0]['var_name'].split('_')[0] in index['package_objects_under']):
             object_name = index['package_objects_under_to_caps'][method['name'][4:method['name'].index('_form_')]]
-            #print 'ActivityAdminSession.get_activity_form_for_create', [method['args'][0]['var_name'][:-3]]
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'learning.ActivityAdminSession.get_activity_form_for_create',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1806,31 +1798,17 @@ def map_session_patterns(interface, package, index):
                               arg0_type_full = method['args'][0]['arg_type'],
                               arg1_name = method['args'][1]['var_name'],
                               arg1_type_full = method['args'][1]['arg_type']))
-            ##
-            # And record that we have found initialized and persisted data
-#            index[object_name + '.initialized_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']
-#            index[object_name + '.arg_detail'][method['args'][0]['var_name'][:-3]] = []
-#            index[object_name + '.persisted_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']            
-            ##
-            # And delete from instance data if they exist:
-#            if method['args'][0]['var_name'][:-3] in index[object_name + '.instance_data']:
-#                if interface['shortname'] == 'AssetAdminSession':
-#                    print 'DELETED INSTANCE', index[object_name + '.instance_data'][method['args'][0]['var_name'][:-3]]
-#                del index[object_name + '.instance_data'][method['args'][0]['var_name'][:-3]]
-            ## Uncomment following line to see where this initilization pattern is found:
-            #print 'FOUND INITIALIZED DATA in', interface['shortname'], method['name']
 
         ##
         # ObjectAdminSession get_x_form_for_create methods that draw relationships between two
         # osid objects where two object ids are included as the first two parameters.
         elif (interface['shortname'].endswith('AdminSession') and
-            method['name'][4:-16] in index['package_relationships_under'] and
-            method['name'].startswith('get_') and
-            method['name'].endswith('_form_for_create') and
-            len(method['args']) == 3 and 
-            method['args'][0]['arg_type'] == 'osid.id.Id' and
-            method['args'][1]['arg_type'] == 'osid.id.Id'):
-            #print interface['shortname'], method['name']
+                method['name'][4:-16] in index['package_relationships_under'] and
+                method['name'].startswith('get_') and
+                method['name'].endswith('_form_for_create') and
+                len(method['args']) == 3 and
+                method['args'][0]['arg_type'] == 'osid.id.Id' and
+                method['args'][1]['arg_type'] == 'osid.id.Id'):
             object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'relationship.RelationshipAdminSession.get_relationship_form_for_create',
@@ -1857,7 +1835,6 @@ def map_session_patterns(interface, package, index):
             method['name'].endswith('_form_for_create') and
             len(method['args']) == 2 and 
             method['args'][0]['arg_type'] == 'osid.id.Id'):
-            #print interface['shortname'], method['name']
             object_name = index['package_objects_under_to_caps'][method['name'][4:-16]]
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'commenting.CommentAdminSession.get_comment_form_for_create',
@@ -1873,32 +1850,11 @@ def map_session_patterns(interface, package, index):
                               arg1_name = method['args'][1]['var_name'],
                               arg1_type_full = method['args'][1]['arg_type']))
 
-            ##
-            # And record that we have found two initialized data elements which are also persisted:
-#            index[object_name + '.initialized_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']
-#            index[object_name + '.persisted_data'][method['args'][0]['var_name'][:-3]] = method['args'][0]['arg_type']
-#            index[object_name + '.arg_detail'][method['args'][0]['var_name'][:-3]] = []
-#            index[object_name + '.initialized_data'][method['args'][1]['var_name'][:-3]] = method['args'][1]['arg_type']
-#            index[object_name + '.persisted_data'][method['args'][1]['var_name'][:-3]] = method['args'][1]['arg_type']
-#            index[object_name + '.arg_detail'][method['args'][1]['var_name'][:-3]] = []
-            ##
-            # And delete from instance data if they exist:
-#            if method['args'][0]['var_name'][:-3] in index[object_name + '.instance_data']:
-#                if interface['shortname'] == 'AssetAdminSession':
-#                    print 'DELETED INSTANCE', index[object_name + '.instance_data'][method['args'][0]['var_name'][:-3]]
-#                del index[object_name + '.instance_data'][method['args'][0]['var_name'][:-3]]
-#            if method['args'][1]['var_name'][:-3] in index[object_name + '.instance_data']:
-#                if interface['shortname'] == 'AssetAdminSession':
-#                    print 'DELETED INSTANCE', index[object_name + '.instance_data'][method['args'][0]['var_name'][:-3]]
-#                del index[object_name + '.instance_data'][method['args'][1]['var_name'][:-3]]
-            ## Uncomment following line to see where this initilization pattern is found:
-            #print 'FOUND INITIALIZED DATA in', interface['shortname'], method['name']
-
         ##
         # ObjectAdminSession methods that gets object form for create.
         elif (interface['shortname'].endswith('AdminSession') and
-            method['name'].startswith('get_') and
-            method['name'].endswith('_form_for_create')):
+                method['name'].startswith('get_') and
+                method['name'].endswith('_form_for_create')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceAdminSession.get_resource_form_for_create',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1921,16 +1877,15 @@ def map_session_patterns(interface, package, index):
         # NOTE that this also asserts that the assessment.ItemAdminSession that 
         # creates Questions is of the same pattern.  Also a likely mistake :)
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('create_') and
-            method['name'][7:] == camel_to_under((method['return_type']).split('.')[-1]) and
-            method['return_type'].split('.')[-1] != interface['shortname'][:-12] and
-            (method['name'][7:] in index[interface['shortname'][:-12] + '.aggregate_data'] or
-            make_plural(method['name'][7:]) in index[interface['shortname'][:-12] + '.aggregate_data'] or
-            method['name'] == 'create_answer' or
-            method['name'] == 'create_question') and
-            len(method['args']) > 0):
-            #print 'FOUND CREATE', interface['shortname'], method['name'], method['name'][7:]
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('create_') and
+                method['name'][7:] == camel_to_under((method['return_type']).split('.')[-1]) and
+                method['return_type'].split('.')[-1] != interface['shortname'][:-12] and
+                (method['name'][7:] in index[interface['shortname'][:-12] + '.aggregate_data'] or
+                make_plural(method['name'][7:]) in index[interface['shortname'][:-12] + '.aggregate_data'] or
+                method['name'] == 'create_answer' or
+                method['name'] == 'create_question') and
+                len(method['args']) > 0):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetAdminSession.create_asset_content',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -1978,17 +1933,16 @@ def map_session_patterns(interface, package, index):
         # NOTE that this also asserts that the assessment ItemAdminSession that gets
         # update form for Questions is of the same pattern.  Also a likely mistake :)
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('get_') and
-            '_form_for_update' in method['name'] and
-            len(method['args']) == 1 and 
-            method['args'][0]['arg_type'] == 'osid.id.Id' and
-            method['name'][4:-16] != camel_to_under(interface['shortname'][:-12]) and
-            (method['name'][4:-16] in index[interface['shortname'][:-12] + '.aggregate_data'] or
-            make_plural(method['name'][4:-16]) in index[interface['shortname'][:-12] + '.aggregate_data'] or
-            method['name'] == 'get_answer_form_for_update' or
-            method['name'] == 'get_question_form_for_update')):
-            #print 'FOUND FORM FOR UPDATE', interface['shortname'], method['name']
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('get_') and
+                '_form_for_update' in method['name'] and
+                len(method['args']) == 1 and
+                method['args'][0]['arg_type'] == 'osid.id.Id' and
+                method['name'][4:-16] != camel_to_under(interface['shortname'][:-12]) and
+                (method['name'][4:-16] in index[interface['shortname'][:-12] + '.aggregate_data'] or
+                make_plural(method['name'][4:-16]) in index[interface['shortname'][:-12] + '.aggregate_data'] or
+                method['name'] == 'get_answer_form_for_update' or
+                method['name'] == 'get_question_form_for_update')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetAdminSession.get_asset_content_form_for_update',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2004,9 +1958,9 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that gets object form for update.
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('get_') and
-            method['name'].endswith('_form_for_update')):
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('get_') and
+                method['name'].endswith('_form_for_update')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceAdminSession.get_resource_form_for_update',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2019,7 +1973,6 @@ def map_session_patterns(interface, package, index):
                               arg0_name = method['args'][0]['var_name'],
                               arg0_type_full = method['args'][0]['arg_type']))
 
-
         ##
         # ObjectAdminSession methods that update objects that are aggregates of 
         # the primary object administered by the session. NOTE that this checks
@@ -2030,15 +1983,14 @@ def map_session_patterns(interface, package, index):
         # NOTE that this also asserts that the assessment ItemAdminSession that 
         # updates Questions is of the same pattern.  Also a likely mistake :)
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('update_') and
-            camel_to_under((method['arg_types'][0]).split('.')[-1]) == method['name'][7:] + '_form' and
-            method['name'][7:] != camel_to_under(interface['shortname'][:-12]) and
-            (method['name'][7:] in index[interface['shortname'][:-12] + '.aggregate_data'] or
-            make_plural(method['name'][7:]) in index[interface['shortname'][:-12] + '.aggregate_data'] or
-            method['name'] == 'update_answer' or
-            method['name'] == 'update_question')):
-            #print 'FOUND UPDATE', interface['shortname'], method['name']
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('update_') and
+                camel_to_under((method['arg_types'][0]).split('.')[-1]) == method['name'][7:] + '_form' and
+                method['name'][7:] != camel_to_under(interface['shortname'][:-12]) and
+                (method['name'][7:] in index[interface['shortname'][:-12] + '.aggregate_data'] or
+                make_plural(method['name'][7:]) in index[interface['shortname'][:-12] + '.aggregate_data'] or
+                method['name'] == 'update_answer' or
+                method['name'] == 'update_question')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetAdminSession.update_asset_content',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2055,10 +2007,10 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that update objects.
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('update_') and
-            camel_to_under((method['arg_types'][0]).split('.')[-1]) ==
-                        method['name'][7:] + '_form'):
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('update_') and
+                camel_to_under((method['arg_types'][0]).split('.')[-1]) ==
+                method['name'][7:] + '_form'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceAdminSession.update_resource',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2073,10 +2025,10 @@ def map_session_patterns(interface, package, index):
         ##
         # Exception for AssessmentPartAdminSession (ticket# 314)
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('update_') and
-            camel_to_under((method['arg_types'][1]).split('.')[-1]) ==
-                        method['name'][7:] + '_form'):
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('update_') and
+                camel_to_under((method['arg_types'][1]).split('.')[-1]) ==
+                            method['name'][7:] + '_form'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceAdminSession.update_resource',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2093,15 +2045,14 @@ def map_session_patterns(interface, package, index):
         # ObjectAdminSession methods that delete objects that are dependencies for 
         # one other object in the service package.
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] + '.dependent_objects' in index and
-            len(index[interface['shortname'][:-12] + '.dependent_objects']) == 1 and
-            camel_to_under(index[interface['shortname'][:-12] + '.dependent_objects'][0]) not in index[interface['shortname'][:-12] + '.aggregate_data'] and
-            make_plural(camel_to_under(index[interface['shortname'][:-12] + '.dependent_objects'][0])) not in index[interface['shortname'][:-12] + '.aggregate_data'] and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('delete_') and
-            camel_to_under(interface['shortname'][:-12]) == method['name'][7:] and
-            'osid.id.Id' in method['arg_types']):
-            #print 'DEPENDENT', camel_to_under(index[interface['shortname'][:-12] + '.dependent_objects'][0]), index[interface['shortname'][:-12] + '.aggregate_data']
+                interface['shortname'][:-12] + '.dependent_objects' in index and
+                len(index[interface['shortname'][:-12] + '.dependent_objects']) == 1 and
+                camel_to_under(index[interface['shortname'][:-12] + '.dependent_objects'][0]) not in index[interface['shortname'][:-12] + '.aggregate_data'] and
+                make_plural(camel_to_under(index[interface['shortname'][:-12] + '.dependent_objects'][0])) not in index[interface['shortname'][:-12] + '.aggregate_data'] and
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('delete_') and
+                camel_to_under(interface['shortname'][:-12]) == method['name'][7:] and
+                'osid.id.Id' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'learning.ObjectiveAdminSession.delete_objective',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2119,14 +2070,12 @@ def map_session_patterns(interface, package, index):
         # the primary object administered by the session. NOTE that this checks
         # for both singular and plural forms of the object name in the method name.
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('delete_') and
-            #camel_to_under(interface['shortname'][:-12]) == method['name'][7:] and
-            method['name'][7:] != camel_to_under(interface['shortname'][:-12]) and
-            'osid.id.Id' in method['arg_types'] and
-            (method['name'][7:] in index[interface['shortname'][:-12] + '.aggregate_data'] or
-            make_plural(method['name'][7:]) in index[interface['shortname'][:-12] + '.aggregate_data'])):
-            #print 'FOUND DELETE', interface['shortname'], method['name']
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('delete_') and
+                method['name'][7:] != camel_to_under(interface['shortname'][:-12]) and
+                'osid.id.Id' in method['arg_types'] and
+                (method['name'][7:] in index[interface['shortname'][:-12] + '.aggregate_data'] or
+                make_plural(method['name'][7:]) in index[interface['shortname'][:-12] + '.aggregate_data'])):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'repository.AssetAdminSession.delete_asset_content',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2142,10 +2091,10 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that delete objects.
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('delete_') and
-            camel_to_under(interface['shortname'][:-12]) == method['name'][7:] and
-            'osid.id.Id' in method['arg_types']):
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('delete_') and
+                camel_to_under(interface['shortname'][:-12]) == method['name'][7:] and
+                'osid.id.Id' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceAdminSession.delete_resource',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2160,9 +2109,9 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that delete all objects.
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('delete_') and
-            camel_to_under(interface['shortname'][:-12]) == remove_plural(method['name'][7:])):
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('delete_') and
+                camel_to_under(interface['shortname'][:-12]) == remove_plural(method['name'][7:])):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'learning.ProficiencyAdminSession.delete_proficiencies',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2174,9 +2123,9 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectAdminSession methods that alias objects.
         elif (interface['shortname'].endswith('AdminSession') and
-            interface['shortname'][:-12] != index['package_catalog_caps'] and
-            method['name'].startswith('alias_') and
-            camel_to_under(interface['shortname'][:-12]) == method['name'][6:]):
+                interface['shortname'][:-12] != index['package_catalog_caps'] and
+                method['name'].startswith('alias_') and
+                camel_to_under(interface['shortname'][:-12]) == method['name'][6:]):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'resource.ResourceAdminSession.alias_resource',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2187,16 +2136,14 @@ def map_session_patterns(interface, package, index):
                               arg0_name = method['args'][0]['var_name'],
                               arg1_name = method['args'][1]['var_name']))
 
-
         ##################################################################
         ## Catch the get_hierarchy and get_hierarchy_id methods         ##
         ##################################################################
-
         ##
         # ObjectHierarchySession methods that return hierarchy id.
         elif ('Hierarchy' in interface['shortname'] and
-              method['name'].startswith('get_') and
-              method['name'].endswith('_hierarchy_id')):
+                method['name'].startswith('get_') and
+                method['name'].endswith('_hierarchy_id')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.get_subject_hierarchy_id',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2210,8 +2157,8 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectHierarchySession methods that return hierarchy.
         elif ('Hierarchy' in interface['shortname'] and
-              method['name'].startswith('get_') and
-              method['name'].endswith('_hierarchy')):
+                method['name'].startswith('get_') and
+                method['name'].endswith('_hierarchy')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.get_subject_hierarchy',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2225,12 +2172,11 @@ def map_session_patterns(interface, package, index):
         ##################################################################
         ## Inspect this package's ObjectHierarchySession methods.       ##
         ##################################################################
-
         ##
         # ObjectHierarchySession methods that return an authorization hint.
         elif (interface['shortname'].endswith('HierarchySession') and
-              method['name'].startswith('can_access') and
-              method['return_type'] == 'boolean'):
+                method['name'].startswith('can_access') and
+                method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.can_access_subject_hierarchy',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2244,8 +2190,8 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectHierarchySession methods that return root ids.
         elif (interface['shortname'].endswith('HierarchySession') and
-              method['name'].startswith('get_root_') and
-              method['name'].endswith('_ids')):
+                method['name'].startswith('get_root_') and
+                method['name'].endswith('_ids')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.get_root_subject_ids',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2259,7 +2205,7 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectHierarchySession methods that return roots.
         elif (interface['shortname'].endswith('HierarchySession') and
-              method['name'].startswith('get_root_')):
+                method['name'].startswith('get_root_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.get_root_subjects',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2274,8 +2220,8 @@ def map_session_patterns(interface, package, index):
         # ObjectHierarchySession methods that checks whether an object
         # has a parent.
         elif (interface['shortname'].endswith('HierarchySession') and
-              method['name'].startswith('has_parent_') and
-              method['return_type'] == 'boolean'):
+                method['name'].startswith('has_parent_') and
+                method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.has_parent_subjects',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2291,8 +2237,8 @@ def map_session_patterns(interface, package, index):
         # ObjectHierarchySession methods that checks whether one object
         # is the parent of another.
         elif (interface['shortname'].endswith('HierarchySession') and
-              method['name'].startswith('is_parent_of') and
-              method['return_type'] == 'boolean'):
+                method['name'].startswith('is_parent_of') and
+                method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.is_parent_of_subject',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2308,8 +2254,8 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectHierarchySession methods that return parent ids.
         elif (interface['shortname'].endswith('HierarchySession') and
-              method['name'].startswith('get_parent_') and
-              method['name'].endswith('_ids')):
+                method['name'].startswith('get_parent_') and
+                method['name'].endswith('_ids')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.get_parent_subject_ids',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2324,7 +2270,7 @@ def map_session_patterns(interface, package, index):
         ##
         # ObjectHierarchySession methods that return parents.
         elif (interface['shortname'].endswith('HierarchySession') and
-              method['name'].startswith('get_parent_')):
+                method['name'].startswith('get_parent_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.get_parent_subjects',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -2340,8 +2286,8 @@ def map_session_patterns(interface, package, index):
         # ObjectHierarchySession methods that checks whether one object
         # is an ancestor of another.
         elif (interface['shortname'].endswith('HierarchySession') and
-              method['name'].startswith('is_ancestor_of') and
-              method['return_type'] == 'boolean'):
+                method['name'].startswith('is_ancestor_of') and
+                method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern = 'ontology.SubjectHierarchySession.is_ancestor_of_subject',
                 kwargs = dict(interface_name = interface['shortname'],
@@ -3358,9 +3304,6 @@ def map_session_patterns(interface, package, index):
         ##################################################################
 
         else:
-            
-            ## Uncomment the following line to print all unknown session patterns
-            #print 'unknown session pattern:', interface['fullname'], method['name']
             index[interface['shortname'] + '.' + method['name']] = dict(
                   pattern = '',
                   kwargs = dict(interface_name = interface['shortname'],

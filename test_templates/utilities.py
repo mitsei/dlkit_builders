@@ -49,14 +49,14 @@ def delete_objective_bank_by_name(display_name):
             ols = lm.get_objective_lookup_session_for_objective_bank(ob.ident)
             als = lm.get_activity_lookup_session_for_objective_bank(ob.ident)
             if ols.get_objectives().available() != 0:
-                print 'can not delete objective bank \'' + ob.display_name.text + '\'. It still contains objectives.'
+                print('can not delete objective bank "{0}". It still contains objectives.'.format(ob.display_name.text))
             elif als.get_activities().available() != 0:
-                print 'can not delete objective bank \'' + ob.display_name.text + '\'. It still contains activities.'
+                print('can not delete objective bank "{0}". It still contains activities.'.format(ob.display_name.text))
             else:
-                print 'deleting objective bank', ob
+                print('deleting objective bank {0}'.format(ob))
                 obas.delete_objective_bank(ob.ident)
     if not found:
-        print 'objective bank \'' + display_name + '\' not found.'
+        print('objective bank "{0}" not found.'.format(display_name))
 
 
 def create_objective(bank_id, display_name, description=None):
@@ -81,12 +81,14 @@ def get_repository_by_name(name):
             return r
     raise NotFound()
 
+
 def get_asset_by_repository_id_and_name(repository_id, name):
     als = RepositoryManager().get_asset_lookup_session_for_repository(repository_id)
     for a in als.get_assets():
         if a.display_name.text == name:
             return a
     raise NotFound()
+
 
 def create_sandbox_repository(display_name, description=None):
     if description is None:
@@ -104,6 +106,7 @@ def create_sandbox_repository(display_name, description=None):
     rfc.genus_type = DEFAULT_TYPE
     return ras.create_repository(rfc)
 
+
 def delete_repository_by_name(display_name):
     rm = RepositoryManager()
     ras = rm.get_repository_admin_session()
@@ -114,12 +117,12 @@ def delete_repository_by_name(display_name):
             found = True
             als = rm.get_asset_lookup_session_for_repository(r.ident)
             if als.get_assets().available() != 0:
-                print 'can not delete repository \'' + ob.display_name.text + '\'. It still contains assets.'
+                print('can not delete repository "{0}". It still contains assets.'.format(ob.display_name.text))
             else:
-                print 'deleting repository', r
+                print('deleting repository {0}'.format(r))
                 ras.delete_repository(r.ident)
     if not found:
-        print 'repository \'' + display_name + '\' not found.'
+        print('repository "{0}" not found.'.format(display_name))
 
 
 def create_asset(repository_id, display_name, description=None):
@@ -160,7 +163,7 @@ def create_sandbox_bank(display_name, description=None):
     bls = am.get_bank_lookup_session()
     for b in bls.get_banks():
         if b.display_name.text == display_name:
-            print 'A sandbox bank named', display_name, 'already exists.'
+            print('A sandbox bank named {0} already exists.'.format(display_name))
             return None
     bfc = bas.get_bank_form_for_create()
     bfc.display_name = display_name
@@ -168,12 +171,13 @@ def create_sandbox_bank(display_name, description=None):
     bfc.genus_type = DEFAULT_TYPE
     return bas.create_bank(bfc)
 
+
 def delete_bank_by_name(display_name):
     am = AssessmentManager()
-    bas = rm.get_bank_admin_session()
-    bls = rm.get_bank_lookup_session()
+    bas = am.get_bank_admin_session()
+    bls = am.get_bank_lookup_session()
     found = False
-    for b in rls.get_banks():
+    for b in bls.get_banks():
         if b.display_name.text == display_name:
             found = True
             ils = am.get_item_lookup_session_for_bank(b.ident)
@@ -181,16 +185,15 @@ def delete_bank_by_name(display_name):
             aols = am.get_assessment_offered_lookup_session_for_bank(b.ident)
             atls = am.get_assessment_taken_lookup_session_for_bank(b.ident)
             if ils.get_items().available() != 0:
-                print 'can not delete bank \'' + ob.display_name.text + '\'. It still contains items.'
+                print('can not delete bank "{0}". It still contains items.'.format(b.display_name.text))
             if als.get_assessments().available() != 0:
-                print 'can not delete bank \'' + ob.display_name.text + '\'. It still contains assessments.'
+                print('can not delete bank "{0}". It still contains assessments.'.format(b.display_name.text))
             if aols.get_assessments_offered().available() != 0:
-                print 'can not delete bank \'' + ob.display_name.text + '\'. It still contains offered assessments.'
+                print('can not delete bank "{0}". It still contains offered assessments.'.format(b.display_name.text))
             if atls.get_assessments_taken().available() != 0:
-                print 'can not delete bank \'' + ob.display_name.text + '\'. It still contains taken assessments.'
+                print('can not delete bank "{0}". It still contains taken assessments.'.format(b.display_name.text))
             else:
-                print 'deleting bank', b
+                print('deleting bank "{0}"'.format(b))
                 bas.delete_bank(b.ident)
     if not found:
-        print 'bank \'' + display_name + '\' not found.'
-
+        print('bank "{0}" not found.'.format(display_name))

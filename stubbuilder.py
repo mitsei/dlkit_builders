@@ -5,9 +5,7 @@ import datetime
 
 from importlib import import_module
 
-from binder_helpers import under_to_caps
 from build_controller import BaseBuilder
-from config import sessions_to_implement
 from interface_builders import InterfaceBuilder
 
 
@@ -130,7 +128,7 @@ class StubBuilder(InterfaceBuilder, BaseBuilder):
                                                     self._abc_pkg_name(abc=False))
             old_profile = import_module(profile_module)
         except ImportError:
-            print 'Old Profile not found:', self._abc_pkg_name(abc=False)
+            print('Old Profile not found: {0}'.format(self._abc_pkg_name(abc=False)))
         else:
             if hasattr(old_profile, 'VERSIONCOMPONENTS'):
                 profile['VERSIONCOMPONENTS'] = old_profile.VERSIONCOMPONENTS
@@ -140,36 +138,6 @@ class StubBuilder(InterfaceBuilder, BaseBuilder):
 
         profile['VERSIONCOMPONENTS'][2] += 1
         profile['RELEASEDATE'] = str(datetime.date.today())
-        # profile['SUPPORTS'].extend(['# Remove the # when implementations exist:',
-        #                             "#supports_journal_rollback",
-        #                             "#supports_journal_branching"])
-
-        # Find the Profile interface for this package
-        # if not any('OsidProfile' in i['inherit_shortnames'] for i in self.package['interfaces']):
-        #     return ''
-        # else:
-        #     profile_interface = [i for i in self.package['interfaces']
-        #                          if 'OsidProfile' in i['inherit_shortnames']][0]
-        # 
-        # for method in profile_interface['methods']:
-        #     if (len(method['args']) == 0 and
-        #             method['name'].startswith('supports_')):
-        #         supports_str = ''
-        #         # Check to see if support flagged in builder config OR
-        #         # Check to see if someone activated support by hand
-        #         if '-'+ method['name'] in old_supports:
-        #             supports_str += '-'
-        #         elif (under_to_caps(method['name'])[8:] + 'Session' in sessions_to_implement or
-        #                 method['name'] in old_supports):
-        #             pass
-        #         # Check to see if someone de-activated support by hand OR
-        #         elif method['name'] not in old_supports:
-        #             supports_str += '#'
-        #         else:  # Add check for session implementation flags here
-        #             supports_str += '#'
-        # 
-        #         supports_str += method['name']
-        #         profile['SUPPORTS'].append(str(supports_str))
 
         profile = serialize(profile)
 

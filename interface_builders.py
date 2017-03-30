@@ -367,7 +367,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
 
         self._copy_package_helpers()
 
-        print "Building {0} osid for {1}".format(self._class, self.package['name'])
+        print("Building {0} osid for {1}".format(self._class, self.package['name']))
 
         self.patterns = self._patterns()
 
@@ -414,11 +414,11 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 package = None
                 if (not os.path.exists(self._package_file(self.grab_osid_name(xosid_file)) or
                                        re_map)):
-                    print 'mapping', self.grab_osid_name(xosid_file), 'osid.'
+                    print('mapping {0} osid.'.format(self.grab_osid_name(xosid_file)))
                     package = self.make_xosid_map(xosid_file)
                 if (not os.path.exists(self._package_interface_file(self.grab_osid_name(xosid_file))) or
                         re_index):
-                    print 'indexing interfaces for', self.grab_osid_name(xosid_file), 'osid.'
+                    print('indexing interfaces for {0} osid.'.format(self.grab_osid_name(xosid_file)))
                     self.make_interface_map(xosid_file, package)
 
         for json_file in glob.glob(self.package_maps + '/*.json'):

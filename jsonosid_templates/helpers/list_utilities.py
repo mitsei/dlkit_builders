@@ -8,9 +8,9 @@ def move_id_ahead(element_id, reference_id, idstr_list):
         return idstr_list
     idstr_list.remove(str(element_id))
     reference_index = idstr_list.index(str(reference_id))
-    # print reference_index
     idstr_list.insert(reference_index, str(element_id))
     return idstr_list
+
 
 def move_id_behind(element_id, reference_id, idstr_list):
     """Moves element_id behind referece_id in the list"""
@@ -20,6 +20,7 @@ def move_id_behind(element_id, reference_id, idstr_list):
     reference_index = idstr_list.index(str(reference_id))
     idstr_list.insert(reference_index + 1, str(element_id))
     return idstr_list
+
 
 def order_ids(new_id_list, old_idstr_list):
     compare = (
