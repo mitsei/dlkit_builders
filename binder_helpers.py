@@ -237,7 +237,7 @@ def make_twargs(index,
 
 def get_cat_name_for_pkg(pkg):
     try:
-        read_file = open(ABS_PATH + '/builders/package_maps/' + pkg + '.json', 'r')
+        read_file = open(os.path.join(ABS_PATH, 'package_maps/', pkg + '.json'), 'r')
         package = json.load(read_file)
         read_file.close()
     except IOError:
@@ -245,7 +245,7 @@ def get_cat_name_for_pkg(pkg):
         return 'NoCatalog'
     for interface in package['interfaces']:
         if (interface['category'] == 'objects' and
-            'OsidCatalog' in interface['inherit_shortnames']):
+                'OsidCatalog' in interface['inherit_shortnames']):
             return interface['shortname']
     return 'NoCatalog'
 

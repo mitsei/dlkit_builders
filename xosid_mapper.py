@@ -62,6 +62,7 @@ OSID_ERRORS = ['ALREADY_EXISTS', 'NOT_FOUND', 'PERMISSION_DENIED',
 
 XOSID_NS = '{urn:inet:osid.org:schemas/osid/3}'
 
+
 class XOsidMapper(object):
     def __init__(self, indent_str='', xosid_ns=XOSID_NS, *args, **kwargs):
         self._indent_str = indent_str
