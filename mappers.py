@@ -42,13 +42,13 @@ class Mapper(XOsidMapper, BaseBuilder):
         package = None
         for xosid_file in glob.glob(self.xosid_dir + '/*' + self.xosid_ext):
             if map_type in make_package_keywords:
-                print 'mapping osid package', self.grab_osid_name(xosid_file) + '.'
+                print('mapping osid package {0}.'.format(self.grab_osid_name(xosid_file)))
                 package = self.make_xosid_map(xosid_file)
             if map_type in make_interface_keywords:
-                print 'creating interface map for', self.grab_osid_name(xosid_file), 'osid.'
+                print('creating interface map for {0} osid.'.format(self.grab_osid_name(xosid_file)))
                 self.make_interface_map(xosid_file, package)
             if map_type in make_impl_pattern_keywords:
-                print 'creating implementation pattern map for', self.grab_osid_name(xosid_file), 'osid.'
+                print('creating implementation pattern map for {0} osid.'.format(self.grab_osid_name(xosid_file)))
                 self.make_interface_map(xosid_file, package)
 
     def make_xosid_map(self, file_name):
@@ -65,10 +65,9 @@ class Mapper(XOsidMapper, BaseBuilder):
             for i in package['interfaces']:
                 osid_type_index[package['name'] + '.' + i['shortname']] = i['category']
                 if i['category'] == 'others_please_move':
-                    print 'Please move: ' + i['fullname']
+                    print('Please move: ' + i['fullname'])
             with open(self._package_interface_file(package), 'w') as write_file:
                 json.dump(osid_type_index, write_file, indent=3)
         else:
-            print 'No OSID package available.'
+            print('No OSID package available.')
         return osid_type_index
-    
