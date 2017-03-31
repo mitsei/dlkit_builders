@@ -1,17 +1,20 @@
 
 from .error_lists import session_errors
 
+
 class ProxyManager:
 
     init = """
     def __init__(self):
         osid_managers.OsidManager.__init__(self)"""
 
+
 class ProxyProxyManager:
 
     init = """
     def __init__(self):
         osid_managers.OsidProxyManager.__init__(self)"""
+
 
 class ProxySession:
 
@@ -39,6 +42,7 @@ class ProxySession:
         # Also need to deal with effective dates and Local
         return rules.Proxy(authentication=authentication,
                            effective_agent_id=effective_agent_id)"""
+
 
 class Proxy:
 
@@ -109,6 +113,7 @@ class Proxy:
             return self._format_type
         else:
             raise errors.IllegalState()"""
+
 
 class ProxyCondition:
 

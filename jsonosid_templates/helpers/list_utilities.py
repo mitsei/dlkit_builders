@@ -2,8 +2,9 @@
 from dlkit.abstract_osid.osid.errors import NotFound
 import collections
 
+
 def move_id_ahead(element_id, reference_id, idstr_list):
-    """Moves element_id ahead of referece_id in the list"""
+    """Moves element_id ahead of reference_id in the list"""
     if element_id == reference_id:
         return idstr_list
     idstr_list.remove(str(element_id))
@@ -13,7 +14,7 @@ def move_id_ahead(element_id, reference_id, idstr_list):
 
 
 def move_id_behind(element_id, reference_id, idstr_list):
-    """Moves element_id behind referece_id in the list"""
+    """Moves element_id behind reference_id in the list"""
     if element_id == reference_id:
         return idstr_list
     idstr_list.remove(str(element_id))
@@ -24,7 +25,7 @@ def move_id_behind(element_id, reference_id, idstr_list):
 
 def order_ids(new_id_list, old_idstr_list):
     compare = (
-        lambda new_id_list, old_idstr_list: collections.Counter(new_id_list) == 
+        lambda new_id_list, old_idstr_list: collections.Counter(new_id_list) ==
         collections.Counter(old_idstr_list))
     new_idstr_list = []
     for id_ in new_id_list:

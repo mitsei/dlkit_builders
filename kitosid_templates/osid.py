@@ -1,5 +1,6 @@
 # osid templates for kit_osid
 
+
 class OsidProfile:
 
     init = """
@@ -45,8 +46,10 @@ class OsidProfile:
     supports_proxy_record_type = """
         return self._provider_manager.supports_proxy_record_type(*args, **kwargs)"""
 
+
 class OsidManager:
     pass
+
 
 class Identifiable:
 
@@ -178,7 +181,7 @@ class OsidSession:
         if self.is_authenticated():
             return self._proxy.get_authentication().get_agent_id()
         else:
-            raise IllegalState()"""  
+            raise IllegalState()"""
 
     get_authenticated_agent = """
         if self.is_authenticated():
@@ -250,10 +253,7 @@ class OsidList:
         return self
 
     def next(self):
-        try:
-            next_object = self._iter_object.next()
-        except: 
-            raise
+        next_object = self._iter_object.next()
         if self._count != None:
             self._count -= 1
         return next_object
@@ -283,8 +283,6 @@ class OsidList:
 
 
 class Metadata:
-
-#    init = """ """
 
     get_element_id_template = """
         pass"""

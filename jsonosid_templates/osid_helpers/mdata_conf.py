@@ -40,12 +40,12 @@ JOURNAL_COMMENT = {
         'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
         'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
         'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-        }],
+    }],
     'syntax': 'STRING',
     'minimum_string_length': 0,
     'maximum_string_length': 256,
     'string_set': []
-    }
+}
 
 DISPLAY_NAME = {
     'element_label': 'Display Name',
@@ -59,12 +59,12 @@ DISPLAY_NAME = {
         'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
         'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
         'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-        }],
+    }],
     'syntax': 'STRING',
     'minimum_string_length': 0,
     'maximum_string_length': 256,
     'string_set': []
-    }
+}
 
 DESCRIPTION = {
     'element_label': 'Description',
@@ -78,12 +78,12 @@ DESCRIPTION = {
         'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
         'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
         'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-        }],
+    }],
     'syntax': 'STRING',
     'minimum_string_length': 0,
     'maximum_string_length': 1024,
     'string_set': []
-    }
+}
 
 GENUS_TYPE = {
     'element_label': 'Genus Type',
@@ -96,7 +96,7 @@ GENUS_TYPE = {
     'default_type_values': [str(DEFAULT_GENUS_TYPE)],
     'syntax': 'TYPE',
     'type_set': []
-    }
+}
 
 START_DATE = {
     'element_label': 'Start Date',
@@ -108,7 +108,7 @@ START_DATE = {
     'default_date_time_values': [MIN_DATETIME],
     'syntax': 'DATETIME',
     'date_time_set': [],
-    }
+}
 
 END_DATE = {
     'element_label': 'End Date',
@@ -120,7 +120,7 @@ END_DATE = {
     'default_date_time_values': [MAX_DATETIME],
     'syntax': 'DATETIME',
     'date_time_set': [],
-    }
+}
 
 SEQUESTERED = {
     'element_label': 'sequestered',
@@ -130,7 +130,7 @@ SEQUESTERED = {
     'linked': False,
     'array': False,
     'syntax': 'BOOLEAN',
-    }
+}
 
 PROVIDER = {
     'element_label': 'provider',
@@ -142,7 +142,7 @@ PROVIDER = {
     'default_id_values': [''],
     'syntax': 'ID',
     'id_set': [],
-    }
+}
 
 BRANDING = {
     'element_label': 'branding',
@@ -154,7 +154,7 @@ BRANDING = {
     'default_id_values': [],
     'syntax': 'ID',
     'id_set': [],
-    }
+}
 
 LICENSE = {
     'element_label': 'License',
@@ -168,9 +168,9 @@ LICENSE = {
         'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
         'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
         'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-        }],
+    }],
     'syntax': 'STRING',
     'minimum_string_length': 0,
     'maximum_string_length': None,
     'string_set': []
-    }
+}

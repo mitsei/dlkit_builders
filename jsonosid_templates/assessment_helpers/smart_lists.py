@@ -5,6 +5,7 @@ from dlkit.abstract_osid.assessment import objects as abc_assessment_objects
 from ..osid import objects as osid_objects
 from dlkit.primordium.osid.errors import BlockIteration
 
+
 class AssessmentTakenSectionList(abc_assessment_objects.AssessmentSectionList, osid_objects.OsidList):
     """Blocking list that takes an AssessmentTaken and iterates through underlying Assessment Sections"""
 
@@ -15,14 +16,13 @@ class AssessmentTakenSectionList(abc_assessment_objects.AssessmentSectionList, o
         if self._are_sections_sequential:
             osid_object.OsidList.__init__(self, self._assessment.get_sections(), proxy=proxy, **kwargs)
         else:
-            
-
+            pass
 
     def has_next(self):
         """Overrides osid_objects.OsidList.has_next()"""
         if self._sections_sequential:
-            pass # Do Somethign
-            mgr = utilities.
+            pass  # Do Somethign
+            # mgr = utilities.
         else:
             return osid_objects.OsidList.has_next(self)
 
@@ -48,9 +48,9 @@ class AssessmentTakenSectionList(abc_assessment_objects.AssessmentSectionList, o
             raise BlockIteration()
         else:
             pass
-            #next_object = ask self._assessment_taken???
+            # next_object = ask self._assessment_taken???
         if str(next_object.get_id()) not in self._assessment_taken._my_map['sections']:
-            
+            pass
 
     next_assessment_section = property(fget=get_next_assessment_section)
 
@@ -70,4 +70,3 @@ class AssessmentTakenSectionList(abc_assessment_objects.AssessmentSectionList, o
 
         """
         return self._get_next_n(n)
-

@@ -11,9 +11,10 @@ class RepositoryProfile:
         # osid.repository.RepositoryProfile.supports_coordinate_type
         return False"""
 
+
 class RepositoryManager:
     # This is here temporarily until Tom adds missing methods to RepositoryManager
-    
+
     additional_methods = """
     @utilities.arguments_not_none
     def get_asset_composition_session_for_repository(self, repository_id):
@@ -50,6 +51,7 @@ class RepositoryManager:
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         ##
         return sessions.AssetContentLookupSession(repository_id, runtime=self._runtime) # pylint: disable=no-member"""
+
 
 class RepositoryProxyManager:
     # This is here temporarily until Tom adds missing methods to RepositoryProxyManager
@@ -629,7 +631,7 @@ class CompositionLookupSession:
     def _view_filter(self):
         \"\"\"
         Overrides OsidSession._view_filter to add sequestering filter.
-        
+
         \"\"\"
         view_filter = OsidSession._view_filter(self)
         if self._sequestered_view == SEQUESTERED:
@@ -855,7 +857,6 @@ class AssetCompositionDesignSession:
             cat_class=objects.${cat_name})
         self._kwargs = kwargs"""
 
-
     old_can_compose_assets = """
         return True"""
 
@@ -872,7 +873,7 @@ class AssetCompositionDesignSession:
         from dlkit.abstract_osid.id.primitives import Id as ABCId
         if not isinstance(${object_name_under}_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and
                 ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         if ${object_name_under}_id.get_identifier_namespace() != '${object_namespace}':
@@ -908,7 +909,7 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under})"""
 
     move_asset_ahead_template = """
-        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and
                 ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
@@ -926,7 +927,7 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under})"""
 
     move_asset_behind_template = """
-        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and
                 ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
@@ -944,7 +945,7 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under})"""
 
     order_assets_template = """
-        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and
                 ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
@@ -963,7 +964,7 @@ class AssetCompositionDesignSession:
         collection.save(${containable_object_name_under})"""
 
     remove_asset_template = """
-        if (not isinstance(${containable_object_name_under}_id, ABCId) and 
+        if (not isinstance(${containable_object_name_under}_id, ABCId) and
                 ${containable_object_name_under}_id.get_identifier_namespace() != '${package_name_replace}.${containable_object_name}'):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${containable_object_name_under}_id)
@@ -993,7 +994,7 @@ class Asset:
         'from ..osid.markers import Extensible'
     ]
 
-    # Note: self._catalog_name = 'Repository' below is currently 
+    # Note: self._catalog_name = 'Repository' below is currently
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # repositoryId element and may be removed someday
     init = """
@@ -1011,7 +1012,7 @@ class Asset:
                 return self._composition[name]
             except AttributeError:
                 raise AttributeError()
-        #HOW TO PASS TO EXTENSIBLE!!!!"""
+        # HOW TO PASS TO EXTENSIBLE!!!!"""
 
     get_title_template = """
         # Implemented from template for osid.repository.Asset.get_title_template
@@ -1055,6 +1056,7 @@ class Asset:
 
     object_map = property(fget=get_object_map)"""
 
+
 class AssetForm:
 
     set_title_template = """
@@ -1093,6 +1095,7 @@ class AssetSearch:
     search_among_assets = """
         self._id_list = asset_ids"""
 
+
 class AssetSearchResults:
 
     import_statements = [
@@ -1112,6 +1115,7 @@ class AssetSearchResults:
             raise errors.IllegalState('List has already been retrieved.')
         self.retrieved = True
         return objects.AssetList(self._results, runtime=self._runtime)"""
+
 
 class AssetSearchSession:
 
@@ -1145,7 +1149,7 @@ class AssetContent:
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
-        return DataInputStream(filesys.get(self._my_map['data']))""" 
+        return DataInputStream(filesys.get(self._my_map['data']))"""
 
     additional_methods = """
     def _delete(self):
@@ -1161,6 +1165,7 @@ class AssetContent:
             if self._my_map['data'] and filesys.exists(self._my_map['data']):
                 filesys.delete(self._my_map['data'])
         osid_objects.OsidObject._delete(self)"""
+
 
 class AssetContentForm:
 
@@ -1210,13 +1215,13 @@ class AssetContentForm:
     #     metadata = dict(self._mdata['url'])
     #     metadata.update({'existing_string_values': [self._my_map['url']]})
     #     return Metadata(**metadata)
-    # 
+    #
     # url_metadata = property(fget=get_url_metadata)"""
 
 
 class Composition:
-    
-    ## This two methods are defined here because of an inconsistency with
+
+    # This two methods are defined here because of an inconsistency with
     # Naming conventions.  The pattern mapper expected get_child_ids.  The second
     # should otherwise come from the template for learning.Activity.get_asset_ids
     get_children_ids = """
@@ -1233,6 +1238,7 @@ class Composition:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+
 
 class CompositionForm:
     # per Tom Coppeto. We are moving composition design to the CompositionForm
@@ -1287,6 +1293,7 @@ class CompositionForm:
 
     children = property(fset=set_children, fdel=clear_children)"""
 
+
 class CompositionQuery:
     match_containing_composition_id = """
         self._add_match('_id', composition_id.identifier, match)"""
@@ -1322,6 +1329,7 @@ class CompositionSearch:
     search_among_compositions = """
         self._id_list = composition_ids"""
 
+
 class CompositionSearchResults:
 
     import_statements = [
@@ -1341,6 +1349,7 @@ class CompositionSearchResults:
             raise errors.IllegalState('List has already been retrieved.')
         self.retrieved = True
         return objects.CompositionList(self._results, runtime=self._runtime)"""
+
 
 class CompositionRepositorySession:
     get_repository_ids_by_composition = """

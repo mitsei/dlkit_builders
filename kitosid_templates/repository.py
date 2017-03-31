@@ -13,6 +13,7 @@ class RepositoryProfile:
         # osid.repository.RepositoryProfile.supports_coordinate_type
         return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
 
+
 class AssetAdminSession:
 
     # Why is this one not a template???
@@ -90,6 +91,7 @@ class CompositionLookupSession:
                 session.${method_name}()
             except AttributeError:
                 pass"""
+
 
 class AssetCompositionSession:
 

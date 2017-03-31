@@ -15,7 +15,7 @@ class OsidRecord(abc_osid_records.OsidRecord):
 
     def __init__(self):
         # This is set in implemented Records.  Should super __init__
-        #self._implemented_record_type_identifiers = None
+        # self._implemented_record_type_identifiers = None
         pass
 
     def __iter__(self):
@@ -42,5 +42,3 @@ class OsidRecord(abc_osid_records.OsidRecord):
 
         """
         return record_type.get_identifier() in self._implemented_record_type_identifiers
-
-

@@ -28,7 +28,7 @@ from . import JSON_CLIENT
 # }
 
 
-## =======================================
+# =======================================
 # This is for the Filesystem version of the JSON build
 # http://pythonhosted.org/PyInstaller/runtime-information.html#run-time-information
 if getattr(sys, 'frozen', False):
@@ -37,14 +37,16 @@ if getattr(sys, 'frozen', False):
 else:
     BOOTLOADER = False
     PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
-## =======================================
+# =======================================
 
 
 class Filler(object):
     pass
 
-## =======================================
+# =======================================
 # MyIterator and ListFiller classes are for the Filesystem based impl
+
+
 class MyIterator(object):
     def __init__(self, data):
         self._data = data
@@ -295,11 +297,11 @@ def splice_and_query(query):
         return new_query
     else:
         return query
-## =======================================
+# =======================================
 
 
 def set_json_client(runtime):
-    ## Default impl is MongoDB, but need to check if using Filesystem
+    # Default impl is MongoDB, but need to check if using Filesystem
     try:
         use_filesystem_param_id = Id('parameter:useFilesystem@json')
         use_filesystem = runtime.get_configuration().get_value_by_parameter(use_filesystem_param_id).get_boolean_value()
@@ -394,8 +396,8 @@ class JSONClientValidated(object):
         else:
             try:
                 if not result.acknowledged or result.inserted_id is None:
-                # if (('writeErrors' in result and len(result['writeErrors']) > 0) or
-                #         ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
+                    # if (('writeErrors' in result and len(result['writeErrors']) > 0) or
+                    #         ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
                     raise OperationFailed(str(result))
             except AttributeError:
                 # account for deprecated save() method
@@ -610,9 +612,9 @@ def remove_null_proxy_kwarg(func):
     """decorator, to remove a 'proxy' keyword argument. For wrapping certain Manager methods"""
     def wrapper(*args, **kwargs):
         if 'proxy' in kwargs:
-            #if kwargs['proxy'] is None:
+            # if kwargs['proxy'] is None:
             del kwargs['proxy']
-            #else:
+            # else:
             #    raise InvalidArgument('Manager sessions cannot be called with Proxies. Use ProxyManager instead')
         return func(*args, **kwargs)
     return wrapper
@@ -640,6 +642,7 @@ def arguments_not_none(func):
 def handle_simple_sequencing(func):
     """decorator, deal with simple sequencing cases"""
     from .assessment import assessment_utilities
+
     def wrapper(*args, **kwargs):
         # re-order these things because have to delete the part after
         # removing it from the parent sequence map
@@ -659,11 +662,11 @@ def handle_simple_sequencing(func):
 def get_provider_manager(osid, runtime=None, proxy=None, local=False):
     """
     Gets the most appropriate provider manager depending on config.
-    
+
     If local is True, then don't bother with the runtime/config and
     try to get the requested service manager directly from the local
     service implementations known to this mongodb implementation.
-    
+
     """
     if runtime is not None:
         if local:
@@ -738,12 +741,12 @@ def overlap(start1, end1, start2, end2):
 class OsidListList(list):
     """
     A morker class for initializing OsidLists with a list of other OsidLists
-    
+
     To use, load up this list with OsidLists of the same object type, and pass
     it as the argument to an OsidList of that same object type. The OsidList
     should exhaust all the contained OsidLists in order on iteration to return
     all the underlying objects as if they are part of one list.
-    
+
     """
     pass
 
@@ -801,10 +804,10 @@ def get_effective_agent_id_with_proxy(proxy):
 
 def get_effective_agent_with_proxy(proxy):
     """Given a Proxy, returns the effective Agent"""
-    #effective_agent_id = self.get_effective_agent_id()
+    # effective_agent_id = self.get_effective_agent_id()
     # This may want to be extended to get the Agent directly from the Authentication
     # if available and if not effective agent is available in the proxy
-    #return Agent(
+    # return Agent(
     #    identifier=effective_agent_id.get_identifier(),
     #    namespace=effective_agent_id.get_namespace(),
     #    authority=effective_agent_id.get_authority())
@@ -816,7 +819,7 @@ def get_locale_with_proxy(proxy):
 
     This assumes that instantiating a dlkit.mongo.locale.objects.Locale
     without constructor arguments wlll return the default Locale.
-    
+
     """
     from .locale.objects import Locale
     if proxy is not None:

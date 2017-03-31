@@ -10,7 +10,7 @@ class OsidProfile:
     ]
 
     init = """
-    
+
     def __init__(self):
         self._runtime = None
         self._config = None
@@ -103,6 +103,7 @@ class OsidProfile:
         # NEED TO IMPLEMENT
         raise errors.Unimplemented()"""
 
+
 class OsidManager:
 
     import_statements = [
@@ -111,12 +112,12 @@ class OsidManager:
         'from pymongo import MongoClient',
         'from .. import JSON_CLIENT',
         'from dlkit.abstract_osid.proxy.rules import Proxy as abc_proxy',
-    ]  
+    ]
 
     init = """
     def __init__(self):
         OsidProfile.__init__(self)"""
-    
+
     initialize = """
         OsidProfile._initialize_manager(self, runtime)"""
 
@@ -130,16 +131,17 @@ class OsidManager:
         else:
             return False"""
 
+
 class OsidProxyManager:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-    ]  
+    ]
 
     init = """
     def __init__(self):
         OsidProfile.__init__(self)"""
-    
+
     initialize = """
         OsidProfile._initialize_manager(self, runtime)"""
 
@@ -148,7 +150,7 @@ class OsidRuntimeManager:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-    ]  
+    ]
 
     init = """
     def __init__(self, configuration_key = None):
@@ -160,7 +162,7 @@ class Identifiable:
     import_statements = [
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
-    ]  
+    ]
 
     init = """
     _namespace = 'osid.Identifiable'
@@ -171,7 +173,7 @@ class Identifiable:
 
     def _set_authority(self, runtime):
         try:
-            authority_param_id = Id('parameter:authority@mongo')
+            authority_param_id = Id('parameter:authority@json')
             self._authority = runtime.get_configuration().get_value_by_parameter(
                 authority_param_id).get_string_value()
         except (AttributeError, KeyError, errors.NotFound):
@@ -197,7 +199,7 @@ class Extensible:
         'from importlib import import_module',
         'from ..utilities import get_provider_manager',
         'from ..utilities import get_registry',
-    ]  
+    ]
 
     init = """
     def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
@@ -298,6 +300,7 @@ class Extensible:
             type_list.append(Type(**self._record_type_data_sets[Id(type_idstr).get_identifier()]))
         return TypeList(type_list)"""
 
+
 class Temporal:
 
     import_statements = [
@@ -335,6 +338,7 @@ class Temporal:
             edate.second,
             edate.microsecond)"""
 
+
 class Containable:
 
     init = """
@@ -343,6 +347,7 @@ class Containable:
 
     is_sequestered = """
         return self._my_map['sequestered']"""
+
 
 class Sourceable:
 
@@ -360,7 +365,7 @@ class Sourceable:
         if 'providerId' not in self._my_map or not self._my_map['providerId']:
             raise errors.IllegalState('this sourceable object has no provider set')
         mgr = self._get_provider_manager('RESOURCE')
-        lookup_session = mgr.get_resource_lookup_session() # What about the Proxy?
+        lookup_session = mgr.get_resource_lookup_session()  # What about the Proxy?
         lookup_session.use_federated_bin_view()
         return lookup_session.get_resource(self.get_provider_id())"""
 
@@ -404,6 +409,7 @@ class Operable:
     is_operational = """
         # Someday I'll have a real implementation, but for now I just:
         return False"""
+
 
 class OsidSession:
 
@@ -524,7 +530,7 @@ class OsidSession:
         \"\"\"Creates a catalog in the current service orchestrated with a foreign service Id.\"\"\"
         if (foreign_catalog_id.identifier_namespace == db_name + '.' + cat_name and
                 foreign_catalog_id.authority == self._authority):
-            raise errors.NotFound() # This is not a foreign catalog 
+            raise errors.NotFound()  # This is not a foreign catalog
         # Need to test if the catalog_id exists for the foreign catalog
         # try:
         #     foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
@@ -640,7 +646,7 @@ class OsidSession:
                            identifier=cat_name.upper()),
                         proxy=self._proxy)
                 except (errors.OperationFailed, errors.Unsupported):
-                    return idstr_list # there is no hierarchy
+                    return idstr_list  # there is no hierarchy
             if h_session.has_children(cat_id):
                 for child_id in h_session.get_children(cat_id):
                     idstr_list += self._get_descendent_cat_idstrs(child_id, h_session)
@@ -649,7 +655,7 @@ class OsidSession:
         use_caching = False
         try:
             config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
+            parameter_id = Id('parameter:useCachingForQualifierIds@json')
             if config.get_value_by_parameter(parameter_id).get_boolean_value():
                 use_caching = True
             else:
@@ -671,7 +677,7 @@ class OsidSession:
         return catalog_ids
 
     def _is_phantom_root_federated(self):
-        return (self._catalog_view == FEDERATED and 
+        return (self._catalog_view == FEDERATED and
                 self._catalog_id.get_identifier() == '000000000000000000000000')
 
     def _use_comparative_object_view(self):
@@ -702,12 +708,12 @@ class OsidSession:
     def _view_filter(self):
         \"\"\"
         Returns the mongodb catalog filter for isolated or federated views.
-        
+
         This also searches across all underlying catalogs in federated
         catalog views. Real authz for controlling access to underlying
         catalogs will need to be managed in an adapter above the
         pay grade of this implementation.
-        
+
         \"\"\"
         if self._is_phantom_root_federated():
             return {}
@@ -749,7 +755,7 @@ class OsidSession:
         collection.save(obj_map)"""
 
     get_locale = """
-        return get_locale_with_proxy(self._proxy)"""  
+        return get_locale_with_proxy(self._proxy)"""
 
     is_authenticated = """
         return is_authenticate_with_proxy(self._proxy)"""
@@ -846,16 +852,18 @@ class OsidObject:
     is_of_genus_type = """
         return genus_type == Type(idstr=self._my_map['genusTypeId'])"""
 
+
 class OsidCatalog:
 
     init = """
     _namespace = 'osid.OsidCatalog'
-    
+
     def __init__(self, **kwargs):
         OsidObject.__init__(self, **kwargs)
         # Should we initialize Sourceable?
         # Should we initialize Federatable?
     """
+
 
 class OsidRule:
 
@@ -866,10 +874,11 @@ class OsidRule:
     get_rule_id = """
         # Someday I'll have a real implementation, but for now I just:
         raise errors.IllegalState()"""
-    
-    get_rule= """
+
+    get_rule = """
         # Someday I'll have a real implementation, but for now I just:
         raise errors.IllegalState()"""
+
 
 class OsidForm:
 
@@ -894,8 +903,8 @@ class OsidForm:
         self._identifier = str(uuid.uuid4())
         self._mdata = None
         self._for_update = None
-        self._runtime = None # This is now being set in Extensible by higher order objects
-        self._proxy = None # This is now being set in Extensible by higher order objects
+        self._runtime = None  # This is now being set in Extensible by higher order objects
+        self._proxy = None  # This is now being set in Extensible by higher order objects
         self._kwargs = kwargs
         self._locale_map = dict()
         locale = get_locale_with_proxy(proxy)
@@ -949,13 +958,11 @@ class OsidForm:
         # Please redesign, and move to utility module
         syntax = metadata.get_syntax
 
-        ##
         # First check if this is a required data element
         if metadata.is_required == True and not inpt:
             return False
 
-        valid = True # Innocent until proven guilty
-        ##
+        valid = True  # Innocent until proven guilty
         # Recursively run through all the elements of an array
         if array == True:
             if len(inpt) < metadata['minimum_elements']:
@@ -965,7 +972,7 @@ class OsidForm:
             else:
                 for element in array:
                     valid = (valid and self._is_valid_input(element, metadata, False))
-        ##
+
         # Run through all the possible syntax types
         elif syntax == 'ID':
             valid = self._is_valid_id(inpt)
@@ -1166,6 +1173,7 @@ class OsidForm:
         # See notes above
         return []"""
 
+
 class OsidExtensibleForm:
     import_statements = [
         'import importlib',
@@ -1173,10 +1181,7 @@ class OsidExtensibleForm:
 
     init = """
     def __init__(self, **kwargs):
-        # self._records = dict() # Moved to markers.Extensible
-        # self._supported_record_type_ids = [] # Moved to markers.Extensible
         osid_markers.Extensible.__init__(self, **kwargs)
-        # self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime) # Now in Extensible
 
     def _init_map(self, record_types):
         self._my_map['recordTypeIds'] = []
@@ -1211,6 +1216,7 @@ class OsidExtensibleForm:
         else:
             return False"""
 
+
 class OsidTemporalForm:
 
     import_statements = [
@@ -1219,7 +1225,7 @@ class OsidTemporalForm:
         'import datetime',
         'from . import default_mdata',
         'from .metadata import Metadata',
-        ]
+    ]
 
     init = """
     _namespace = "osid.OsidTemporalForm"
@@ -1293,6 +1299,7 @@ class OsidTemporalForm:
             'second': date.second,
             'microsecond': date.microsecond,
         }"""
+
 
 class OsidContainableForm:
 
@@ -1426,6 +1433,7 @@ class OsidFederateableForm:
     def __init__(self):
         pass"""
 
+
 class OsidOperableForm:
 
     init = """
@@ -1445,8 +1453,6 @@ class OsidOperableForm:
 
 class OsidObjectForm:
 
-    #inheritance = ['OsidObject']
-
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from . import default_mdata',
@@ -1458,7 +1464,7 @@ class OsidObjectForm:
     init = """
     _namespace = "osid.OsidObjectForm"
 
-    def __init__(self, osid_object_map=None, **kwargs): # removed record_types=None, runtime=None, 
+    def __init__(self, osid_object_map=None, **kwargs):  # removed record_types=None, runtime=None,
         self._display_name_default = None
         self._description_default = None
         self._genus_type_default = None
@@ -1544,6 +1550,7 @@ class OsidObjectForm:
             raise errors.NoAccess()
         self._my_map['genusTypeId'] = self._genus_type_default"""
 
+
 class OsidRelationshipForm:
 
     init = """
@@ -1561,7 +1568,7 @@ class OsidRelationshipForm:
 
 
 class OsidCatalogForm:
-    
+
     init = """
     def __init__(self, **kwargs):
         OsidSourceableForm.__init__(self)
@@ -1578,6 +1585,7 @@ class OsidCatalogForm:
         OsidFederateableForm._init_map(self)
         OsidObjectForm._init_map(self, record_types)
 """
+
 
 class OsidList:
     import_statements = [
@@ -1682,6 +1690,7 @@ class OsidList:
             for i in range(0, n):
                 self.next()"""
 
+
 class OsidQuery:
 
     import_statements = [
@@ -1707,7 +1716,7 @@ class OsidQuery:
         try:
             # Try to get additional keyword fields from the runtime, if available:
             config = runtime.get_configuration()
-            parameter_id = Id('parameter:keywordFields@json_')
+            parameter_id = Id('parameter:keywordFields@json')
             additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
             self._keyword_fields += additional_keyword_fields[self._namespace]
         except (AttributeError, KeyError, errors.NotFound):
@@ -1877,7 +1886,6 @@ class OsidIdentifiableQuery:
         self._clear_terms('_id')"""
 
 
-
 class OsidExtensibleQuery:
 
     import_statements = [
@@ -1905,6 +1913,7 @@ class OsidExtensibleQuery:
     match_record_type = """
         self._add_match('recordTypeIds', str(record_type), match)"""
 
+
 class OsidObjectQuery:
 
     import_statements = [
@@ -1931,11 +1940,12 @@ class OsidObjectQuery:
 
     clear_display_name_terms = """
         self._clear_terms('displayName.text')"""
-    
+
     match_description_arg_template = {
         1: 'DEFAULT_STRING_MATCH_TYPE',
         2: True
     }
+
     match_description = """
         self._match_display_text('description', description, string_match_type, match)"""
 
@@ -1951,11 +1961,13 @@ class OsidObjectQuery:
     clear_genus_type_terms = """
         self._clear_terms('genusTypeId')"""
 
+
 class OsidQueryInspector:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
     ]
+
 
 class OsidRecord:
 
@@ -1974,7 +1986,7 @@ class OsidRecord:
 
     implements_record_type = """
         return record_type.get_identifier() in self._implemented_record_type_identifiers"""
-    
+
 
 class Metadata:
 
@@ -2066,6 +2078,7 @@ class OsidNode:
             node_map['childNodes'].append(node.get_node_map())
         return node_map"""
 
+
 class Property:
 
     import_statements = [
@@ -2085,6 +2098,7 @@ class OsidSearchOrder:
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
     ]
+
 
 class OsidSearch:
 
@@ -2107,7 +2121,7 @@ class OsidSearch:
         try:
             # Try to get additional keyword fields from the runtime, if available:
             config = runtime.get_configuration()
-            parameter_id = Id('parameter:keywordFields@mongo')
+            parameter_id = Id('parameter:keywordFields@json')
             additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
             self._keyword_fields += additional_keyword_fields[self._namespace]
         except (AttributeError, KeyError, errors.NotFound):
@@ -2185,4 +2199,3 @@ class OsidTemporalQuery:
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
-

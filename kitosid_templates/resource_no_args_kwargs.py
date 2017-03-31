@@ -1,5 +1,6 @@
 # resource templates for kit_osid
 
+
 class ResourceProfile:
 
     supports_visible_federation_template = """
@@ -12,10 +13,6 @@ class ResourceProfile:
         # osid.resource.ResourceProfile.supports_resource_lookup
         return self._provider_manager.${method_name}()"""
 
-#    get_resource_record_types = """
-        # Implemented from kitosid template for -
-        # osid.resource.ResourceProfile.get_resource_record_types
-#        return self._provider_manager.${method_name}()"""
 
 class ResourceManager:
 
@@ -43,7 +40,6 @@ class ResourceManager:
             return DEFAULT
 
     def _get_provider_session(self, session):
-#        from osid_kit.osid_errors import Unimplemented
         if session in self._provider_sessions:
             return self._provider_sessions[session]
         else:
@@ -51,7 +47,7 @@ class ResourceManager:
                 get_session = getattr(self._provider_manager, 'get_' + session)
             except:
                 raise # Unimplemented???
-            else: 
+            else:
                 self._provider_sessions[session] = get_session()
                 ## DO WE NEED THESE VIEW INITERS???
                 if '${cat_name_under}_view' not in self._views:
@@ -173,6 +169,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_template
         return self._get_provider_session('${interface_name_under}', '${object_name_under}').${method_name}()"""
 
+
 class ResourceAdminSession:
 
     init_template = """
@@ -223,7 +220,6 @@ class ResourceAdminSession:
 
 class BinLookupSession:
 
-
     use_comparative_bin_view_template = """
         self._views[\'${cat_name_under}_view\'] = self.COMPARATIVE
         for session in self._provider_sessions:
@@ -240,20 +236,14 @@ class BinLookupSession:
             except AttributeError():
                 pass"""
 
-#    use_comparative_bin_view_template = None
-
-#    use_plenary_bin_view_template = None
-
     get_bin_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bin
-#        from .objects import ${cat_name}
         return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(${arg0_name}))"""
 
     get_bins_by_ids_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_ids
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${arg0_name})
         cat_list = []
         for cat in catalogs:
@@ -263,7 +253,6 @@ class BinLookupSession:
     get_bins_by_genus_type_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_genus_type
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${arg0_name})
         cat_list = []
         for cat in catalogs:
@@ -273,7 +262,6 @@ class BinLookupSession:
     get_bins_by_parent_genus_type_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_parent_genus_type
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${arg0_name})
         cat_list = []
         for cat in catalogs:
@@ -283,7 +271,6 @@ class BinLookupSession:
     get_bins_by_record_type_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_record_type
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${arg0_name})
         cat_list = []
         for cat in catalogs:
@@ -293,7 +280,6 @@ class BinLookupSession:
     get_bins_by_provider_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_by_provider
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}(${arg0_name})
         cat_list = []
         for cat in catalogs:
@@ -303,7 +289,6 @@ class BinLookupSession:
     get_bins_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinLookupSession.get_bins_template
-#        from .objects import ${cat_name}, ${cat_name}List
         catalogs = self._get_provider_session('${interface_name_under}').${method_name}()
         cat_list = []
         for cat in catalogs:
@@ -321,7 +306,6 @@ class BinAdminSession:
     create_bin_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.create_bin
-#        from .objects import ${cat_name}
         return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(${arg0_name}))"""
 
     get_bin_form_for_update_template = """
@@ -332,7 +316,6 @@ class BinAdminSession:
     update_bin_template = """
         # Implemented from kitosid template for -
         # osid.resource.BinAdminSession.update_bin
-#        from .objects import ${cat_name}
         # OSID spec does not require returning updated catalog
         return ${cat_name}(self._provider_manager, self._get_provider_session('${interface_name_under}').${method_name}(${arg0_name}))"""
 
@@ -341,37 +324,26 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.delete_bin
         self._get_provider_session('${interface_name_under}').${method_name}(${arg0_name})"""
 
+
 class ResourceList:
 
     get_next_resource_template = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resource
-        import sys
-#        from osid_kit.osid_errors import IllegalState, OperationFailed
-        try:
-            next_item = self.next()
-        except StopIteration:
-            raise IllegalState('no more elements available in this list')
-        except: #Need to specify exceptions here
-            raise OperationFailed()
-        else:
-            return next_item
-            
+        next_item = self.next()
+        return next_item
+
     def next(self):
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resource
         from .osid import OsidList
-        try:
-            next_item = OsidList.next(self)
-        except:
-            raise
+        next_item = OsidList.next(self)
         return next_item"""
-            
+
     get_next_resources_template = """
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resources
         import sys
-#        from osid_kit.osid_errors import IllegalState, OperationFailed
         if ${arg0_name} > self.available():
             # !!! This is not quite as specified (see method docs) !!!
             raise IllegalState('not enough elements available in this list')
@@ -399,23 +371,15 @@ class Bin:
                         ## THINK. WILL THIS EVER BE CALLED DIRECTLY
                         ## OUTSIDE OF A MANAGER?
     def __init__(self, provider_manager, catalog, **kwargs):
-#        if provider_manager:
         self._provider_manager = provider_manager
-#        else:
-#            import settings
-#            import importlib
-#            provider_module = importlib.import_module(settings.PROVIDER_MANAGER_MODULE_PATH)
-#            provider_manager_class = getattr(provider_module, '${pkg_name_caps}Manager')
-#            self._provider_manager = provider_manager_class()
         self._catalog = catalog
         self._catalog_id = catalog.get_id()
         self._provider_sessions = kwargs
-        self._osid_object = self._catalog # This so that the inherited osid 
+        self._osid_object = self._catalog # This so that the inherited osid
                                           # methods work.  Don't ask.
         self._views = dict()
 
     def _get_provider_session(self, session, session_object):
-#        from osid_kit.osid_errors import Unimplemented
         if session in self._provider_sessions:
             return self._provider_sessions[session]
         else:
@@ -429,154 +393,13 @@ class Bin:
 
     def get_${cat_name_under}_id(self):
         return self._catalog_id
-    
+
     def get_${cat_name_under}(self):
         return self
 
     def get_objective_hierarchy_id(self):
         return self._catalog_id
-    
+
     def get_objective_hierarchy(self):
         return self
 """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class OLD_Bin: # CAN PROBABLY DELETE THIS?!?!
-####################################################################################
-####################################################################################
-###################################################################################
-    init_template = """
-    COMPARATIVE = 0
-    PLENARY = 1
-    FEDERATED = 0
-    ISOLATED = 1
-###################################################################################
-
-    def __init__(self, provider_manager, catalog=None, **kwargs):
-        self._provider_manager = provider_manager
-        self._provider_sessions = kwargs
-        self._catalog = catalog
-        self._osid_object = self._catalog # This so that the inherited osid 
-                                          # methods work.  Don't ask.
-        self._catalog_view = self.FEDERATED
-        # THIS SHOULD BE IMPLEMENTED IN KIT BUILDER AS AN INITER?:
-        self._catalog_view = self.COMPARATIVE
-###################################################################################
-
-    def _get_provider_session(self, session, session_object):
-#        from osid_kit.osid_errors import Unimplemented
-        if session in self._provider_sessions:
-            return _provider_sessions[session]
-        else:
-            try:
-                get_session = getattr(self._provider_manager, 'get_' + session)
-            except:
-                raise # Unimplemented???
-            else: 
-                if getattr(self, object_session + '_view', ) == self.COMPARATIVE:
-                    self._provider_sessions[session].use_comparative_${object_name_under}_view()
-                else:
-                    self._provider_sessions[session].use_plenary_${object_name_under}_view()
-                if self._catalog_view == self.FEDERATED:
-                    self._provider_sessions[session].use_federated_${cat_name_under}_view()
-                else:
-                    self._provider_sessions[session].use_isolated_${cat_name_under}_view()
-                self._provider_sessions[session] = get_session(self._catalog_id)
-            return self._provider_sessions[session]
-###################################################################################
-
-    def get_${cat_name_under}_id(self):
-        return self._catalog.get_id()
-###################################################################################
-   
-    def get_${cat_name_under}(self):
-        return self._catalog
-${obj_view_methods}
-    def use_federated_${cat_name_under}_view():
-        self._catalog_view = self.FEDERATED
-        for session in self._provider_sessions:
-            try:
-                session.use_federated_${cat_name_under}_view()
-            except AttributeError():
-                pass
-###################################################################################
-
-    def use_isolated_${cat_name_under}_view():
-        self._catalog_view = self.ISOLATED
-        for session in self._provider_sessions:
-            try:
-                session.use_isolated_${cat_name_under}_view()
-            except AttributeError():
-                pass
-###################################################################################
-
-    # THE FOLLOWING SHOULD BE IMPLEMENTED AS AN init = STYLE.  
-    # BUILDERS NEED TO BE ALTERED TO ALLOW BOTH init and init_template
-    def use_comparative_agent_view():
-        self._object_view = self.COMPARATIVE
-        for session in self._provider_sessions:
-            try:
-                session.use_comparative_agent_view()
-            except AttributeError():
-                pass
-###################################################################################
-
-    def use_plenary_agent_view():
-        self._object_view = self.PLENARY
-        for session in self._provider_sessions:
-            try:
-                session.use_plenary_agent_view()
-            except AttributeError():
-                pass
-"""
-

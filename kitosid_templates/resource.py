@@ -1,7 +1,8 @@
 # resource templates for kit_osid
 
+
 class ResourceProfile:
-    
+
     init_template = """
     def __init__(self):
         self._provider_manager = None"""
@@ -29,6 +30,7 @@ class ResourceProfile:
         # Implemented from kitosid template for -
         # osid.resource.ResourceProfile.supports_resource_record_type_template
         return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
+
 
 class ResourceManager:
 
@@ -260,7 +262,7 @@ class ResourceProxyManager:
         # Implemented from kitosid template for -
         # osid.resource.ResourceProxyManager.get_resource_lookup_session_for_bin_template
         return ${package_name_caps}Manager.${method_name}(${args_kwargs_or_nothing})"""
-        
+
 
 class ResourceLookupSession:
 
@@ -353,6 +355,7 @@ class ResourceLookupSession:
         # Implemented from kitosid template for -
         # osid.resource.ResourceLookupSession.get_resources_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
 
 class ResourceQuerySession:
 
@@ -955,6 +958,7 @@ class BinHierarchySession:
         # osid.resource.BinHierarchySession.get_bin_nodes
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
+
 class BinHierarchyDesignSession:
 
     can_modify_bin_hierarchy_template = """
@@ -1029,7 +1033,6 @@ class BinQuerySession:
         # Implemented from kitosid template for -
         # osid.resource.BinQuerySession.get_bins_by_query_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
-
 
 
 class ResourceList:
@@ -1204,11 +1207,10 @@ class Bin:
 
     def use_mandatory_session_management(self):
         \"\"\"Session state will always be saved and can not be closed by consumers."\"\"
-        # Session state will be saved and can not be closed by consumers 
+        # Session state will be saved and can not be closed by consumers
         self._session_management = MANDATORY
 
     def disable_session_management(self):
         \"\"\"Session state will never be saved."\"\"
         self._session_management = DISABLED
         self.close_sessions()"""
-

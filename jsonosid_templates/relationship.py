@@ -1,5 +1,6 @@
 from .resource import ResourceAdminSession
 
+
 class RelationshipLookupSession:
 
     import_statements_pattern = [
@@ -149,6 +150,7 @@ class RelationshipLookupSession:
                  **self._view_filter())).sort('_sort_id', ASCENDING)
         return objects.${object_name}List(result, runtime=self._runtime)"""
 
+
 class RelationshipAdminSession:
 
     # For when we get Relatioship based init patterns figured out:
@@ -161,7 +163,7 @@ class RelationshipAdminSession:
         'from . import objects',
         'from dlkit.abstract_osid.osid import errors',
     ]
-    
+
     get_relationship_form_for_create_template = """
         # Implemented from template for
         # osid.relationship.RelationshipAdminSession.get_relationship_form_for_create
@@ -197,6 +199,7 @@ class RelationshipAdminSession:
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
+
 class Relationship:
 
     import_statements = [
@@ -206,6 +209,7 @@ class Relationship:
     get_source_id_template = """
         # Implemented from template for osid.relationship.Relationship.get_source_id
         return Id(self._my_map['${var_name_mixed}Id'])"""
+
 
 class RelationshipQuery:
 

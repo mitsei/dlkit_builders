@@ -120,6 +120,7 @@ class ObjectiveRequisiteAssignmentSession:
             'RELATIONSHIP').get_relationship_admin_session_for_family(
             self.get_objective_bank_id(), proxy=self._proxy)"""
 
+
 class ObjectiveAdminSession:
 
     import_statements_pattern = [
@@ -215,7 +216,6 @@ class ActivityAdminSession:
         return obj_form"""
 
 
-
 class Activity:
 
     import_statements_pattern = [
@@ -227,7 +227,6 @@ class Activity:
     import_statements = [
         'from ..id.objects import IdList',
     ]
-
 
     get_objective_id_template = """
         # Implemented from template for osid.learning.Activity.get_objective_id
@@ -364,6 +363,7 @@ class ObjectiveSequencingSession:
             cat_class=objects.ObjectiveBank)
         self._forms = dict()"""
 
+
 class ProficiencyForm:
 
     set_level = """
@@ -379,6 +379,7 @@ class ProficiencyForm:
         if not self._is_valid_id(grade_id):
             raise errors.InvalidArgument()
         self._my_map['levelId'] = str(grade_id)"""
+
 
 class ProficiencyQuery:
     init = """
@@ -426,6 +427,7 @@ class ProficiencyQuery:
         if not isinstance(objective_id, Id):
             raise errors.InvalidArgument()
         self._add_match('objectiveId', str(objective_id), match)"""
+
 
 class Proficiency:
     additional_methods = """

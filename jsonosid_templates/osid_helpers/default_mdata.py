@@ -17,7 +17,7 @@ DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data('DEFAULT'))
 #     'second': datetime.datetime.min.second,
 #     'microsecond': datetime.datetime.min.microsecond,
 # }
-# 
+#
 # MAX_DATETIME = {
 #     'year': datetime.datetime.max.year,
 #     'month': datetime.datetime.max.month,
@@ -27,6 +27,7 @@ DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data('DEFAULT'))
 #     'second': datetime.datetime.max.second,
 #     'microsecond': datetime.datetime.max.microsecond,
 # }
+
 
 def get_osid_form_mdata():
     """Return default mdata map for OsidForm"""
@@ -43,7 +44,7 @@ def get_osid_form_mdata():
                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                 'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-                }],
+            }],
             'syntax': 'STRING',
             'minimum_string_length': 0,
             'maximum_string_length': 256,
@@ -72,6 +73,7 @@ def get_osid_form_mdata():
 #     }
 # }
 
+
 def get_osid_object_mdata():
     """Return default mdata map for OsidObject"""
     return {
@@ -87,7 +89,7 @@ def get_osid_object_mdata():
                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                 'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-                }],
+            }],
             'syntax': 'STRING',
             'minimum_string_length': 0,
             'maximum_string_length': 256,
@@ -105,7 +107,7 @@ def get_osid_object_mdata():
                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                 'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-                }],
+            }],
             'syntax': 'STRING',
             'minimum_string_length': 0,
             'maximum_string_length': 1024,
@@ -176,6 +178,7 @@ def get_osid_object_mdata():
 #     }
 # }
 
+
 def get_osid_temporal_mdata():
     """Return default mdata map for OsidTemporal"""
     return {
@@ -189,7 +192,7 @@ def get_osid_temporal_mdata():
             'default_date_time_values': [datetime.datetime.min],
             'syntax': 'DATETIME',
             'date_time_set': [],
-            },
+        },
         'end_date': {
             'element_label': 'End Date',
             'instructions': 'enter a valid datetime object.',
@@ -228,6 +231,7 @@ def get_osid_temporal_mdata():
 #     }
 # }
 
+
 def get_osid_containable_mdata():
     """Return default mdata map for OsidContainable"""
     return {
@@ -255,6 +259,7 @@ def get_osid_containable_mdata():
 #         'syntax': 'BOOLEAN',
 #     }
 # }
+
 
 def get_osid_sourceable_mdata():
     """Return default mdata map for OsidSourceable"""
@@ -293,7 +298,7 @@ def get_osid_sourceable_mdata():
                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                 'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-                }],
+            }],
             'syntax': 'STRING',
             'minimum_string_length': 0,
             'maximum_string_length': None,

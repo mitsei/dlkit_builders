@@ -7,7 +7,7 @@ class ResourceProfile:
         'from . import sessions',
         'from dlkit.abstract_osid.osid import errors',
         'from . import profile',
-		'from ..utilities import get_registry',
+        'from ..utilities import get_registry',
     ]
 
     supports_visible_federation_template = """
@@ -41,14 +41,11 @@ class ResourceProfile:
                 supports = True
         return supports"""
 
+
 class ResourceManager:
 
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
-    #'from ..osid.osid_errors import Unimplemented',
-    #'from ..osid.osid_errors import NullArgument',
-    #'from ..osid.osid_errors import NotFound # pylint: disable=unused-import',
-    #'from ..osid.osid_errors import OperationFailed # pylint: disable=unused-import',
     ]
 
     init_template = """
@@ -69,7 +66,7 @@ class ResourceManager:
         ##
         # pylint: disable=no-member
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)"""
-        
+
     get_resource_admin_session_template = get_resource_lookup_session_template
 
     get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
@@ -89,14 +86,11 @@ class ResourceManager:
         # pylint: disable=no-member
         return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name})"""
 
+
 class ResourceProxyManager:
 
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
-    #'from ..osid.osid_errors import Unimplemented',
-    #'from ..osid.osid_errors import NullArgument',
-    #'from ..osid.osid_errors import NotFound # pylint: disable=unused-import',
-    #'from ..osid.osid_errors import OperationFailed # pylint: disable=unused-import',
     ]
 
     init_template = """
@@ -271,6 +265,7 @@ class ResourceLookupSession:
                                          runtime=self._runtime)
         result = collection.find(self._view_filter()).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
+
 
 class ResourceQuerySession:
 
@@ -544,12 +539,12 @@ class ResourceAdminSession:
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form
-    
+
     def _get_${object_name_under}_id_with_enclosure(self, enclosure_id):
         \"\"\"Create an ${object_name} with an enclosed foreign object.
-        
+
         return: (osid.id.Id) - the id of the new ${object_name}
-        
+
         \"\"\"
         mgr = self._get_provider_manager('${package_name_replace_upper}')
         query_session = mgr.get_${object_name_under}_query_session_for_${cat_name_under}(self._catalog_id, proxy=self._proxy)
@@ -656,17 +651,14 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.alias_resources_template
         self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
 
+
 class ResourceNotificationSession:
 
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..osid.sessions import OsidSession',
-        #'from ..primitives import Id',
-        #'from ..primitives import Type',
         'from ..utilities import JSONClientValidated',
-        #'from ..utilities import MongoListener',
         'from .. import MONGO_LISTENER'
-        #'from . import objects',
     ]
 
     init_template = """
@@ -761,6 +753,7 @@ class ResourceNotificationSession:
             MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = []
         if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['d'], list):
             self.MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())"""
+
 
 class ResourceBinSession:
 
@@ -1033,9 +1026,7 @@ class BinLookupSession:
         'DESCENDING = -1',
         'ASCENDING = 1',
         'COMPARATIVE = 0',
-        'PLENARY = 1',
-        #'CREATED = True',
-        #'UPDATED = True'
+        'PLENARY = 1'
     ]
 
     init_template = """
@@ -1087,7 +1078,6 @@ class BinLookupSession:
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
 
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
-
 
     get_bins_template = """
         # Implemented from template for
@@ -1295,15 +1285,12 @@ class BinAdminSession:
         # osid.resource.BinLookupSession.alias_bin_template
         self._alias_id(primary_id=${arg0_name}, equivalent_id=alias_id)"""
 
+
 class BinNotificationSession:
 
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..osid.sessions import OsidSession',
-        #'from ..primitives import Id',
-        #'from ..utilities import JSONClientValidated',
-        #'from . import objects',
-        #'from bson.objectid import ObjectId',
     ]
 
     init_template = """
@@ -1444,6 +1431,7 @@ class BinHierarchySession:
             ${arg2_name}=${arg2_name},
             ${arg3_name}=${arg3_name})._my_map, runtime=self._runtime, proxy=self._proxy)"""
 
+
 class BinHierarchyDesignSession:
 
     import_statements_pattern = [
@@ -1539,6 +1527,7 @@ class BinQuerySession:
 
         return objects.${return_type}(result, runtime=self._runtime)"""
 
+
 class Resource:
 
     import_statements_pattern = [
@@ -1546,10 +1535,10 @@ class Resource:
         'from ..primitives import Id',
         '#from ..id.objects import IdList',
         '#import importlib',
-		'from ..utilities import get_registry',
+        'from ..utilities import get_registry',
     ]
 
-    # Note: self._catalog_name = '${cat_name_under}' below is currently 
+    # Note: self._catalog_name = '${cat_name_under}' below is currently
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # ${cat_name}Id element and may be removed someday
     init_template = """
@@ -1602,12 +1591,13 @@ ${instance_initers}"""
 
     object_map = property(fget=get_object_map)"""
 
+
 class ResourceQuery:
 
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-		'from ..utilities import get_registry',
+        'from ..utilities import get_registry',
     ]
 
     init_template = """
@@ -1649,7 +1639,7 @@ class ResourceSearch:
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid import searches as osid_searches',
-		'from ..utilities import get_registry',
+        'from ..utilities import get_registry',
     ]
 
     init = """
@@ -1667,6 +1657,7 @@ class ResourceSearch:
 
     search_among_resources = """
         self._id_list = resource_ids"""
+
 
 class ResourceSearchResults:
 
@@ -1698,8 +1689,8 @@ class ResourceForm:
         'from ..primitives import Id',
         'from ..osid.metadata import Metadata',
         'from . import default_mdata',
-		'from ..utilities import get_registry',
-		'from ..utilities import update_display_text_defaults',
+        'from ..utilities import get_registry',
+        'from ..utilities import update_display_text_defaults',
     ]
 
     init_template = """
@@ -1767,7 +1758,6 @@ ${persisted_initers}"""
         return self._get_record(${arg0_name})"""
 
 
-
 class ResourceList:
 
     import_statements_pattern = [
@@ -1785,6 +1775,7 @@ class ResourceList:
     get_next_resources_template = """
         # Implemented from template for osid.resource.ResourceList.get_next_resources
         return self._get_next_n(${arg0_name})"""
+
 
 class Bin:
 
@@ -1833,7 +1824,7 @@ class BinQuery:
     import_statements_pattern = [
         'from ..primitives import Id',
         'from ..id.objects import IdList',
-		'from ..utilities import get_registry',
+        'from ..utilities import get_registry',
     ]
 
     init_template = """
