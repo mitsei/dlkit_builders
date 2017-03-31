@@ -36,3 +36,5 @@ This will build the files to the directory specified, default of `../dlkit/`.
 Examples:
   - `python build_controller.py map patterns abc mdata json`
   - `python build_controller.py --all`
+
+NOTE: there are no builder tests, so the Travis CI build just does a PEP8 check.
