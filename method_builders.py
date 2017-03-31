@@ -156,8 +156,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['return_type_list_object_under'] = camel_to_under(context['return_type_list_object'])
                 context['return_type_list_object_plural_under'] = make_plural(context['return_type_list_object_under'])
             if ('containable_object_name' in context and
-                    not 'containable_object_name_under' in context and
-                    not 'containable_object_name_upper' in context):
+                    'containable_object_name_under' not in context and
+                    'containable_object_name_upper' not in context):
                 context['containable_object_name_under'] = camel_to_under(context['containable_object_name'])
                 context['containable_object_name_plural'] = make_plural(context['containable_object_name'])
                 context['containable_object_name_plural_under'] = camel_to_under(context['containable_object_name_plural'])
@@ -169,8 +169,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['object_package_name_replace_upper'] = context['object_package_name_replace'].upper()
                 context['object_namespace_replace'] = '_'.join(context['object_namespace'].split('.'))
             if ('object_name' in context and
-                    not 'object_name_under' in context and
-                    not 'object_name_upper' in context):
+                    'object_name_under' not in context and
+                    'object_name_upper' not in context):
                 context['object_name_plural'] = make_plural(context['object_name'])
                 context['object_name_under'] = camel_to_under(context['object_name'])
                 context['object_name_mixed'] = camel_to_mixed(context['object_name'])
@@ -394,8 +394,10 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 def argless_clear(method):
     return method['name'].startswith('clear_') and method['args'] == []
 
+
 def argless_get(method):
     return method['name'].startswith('get_') and method['args'] == []
+
 
 def build_this_method(package_name, interface, method):
     if (interface['category'] == 'managers' and
@@ -414,8 +416,10 @@ def build_this_method(package_name, interface, method):
         return False
     return True
 
+
 def one_arg_set(method):
     return method['name'].startswith('set_') and len(method['args']) == 1
+
 
 def set_and_del_property(method):
     prop = '    '
@@ -429,6 +433,7 @@ def set_and_del_property(method):
     prop += ' = property(fset={}, fdel={})'.format(set_method,
                                                    clear_method)
     return prop
+
 
 def simple_property(prop_type, method, property_name=None):
     prop = '    '
@@ -452,6 +457,7 @@ def simple_property(prop_type, method, property_name=None):
                                          method_name)
     return prop
 
+
 def strip_prefixes(name):
     try:
         if name.index('get_') == 0:
@@ -469,6 +475,7 @@ def strip_prefixes(name):
                 return name.replace('clear_', '', 1)
             else:
                 raise ValueError
+
 
 def stripn(_string):
     return _string.strip('\n')

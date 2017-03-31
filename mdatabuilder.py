@@ -89,9 +89,9 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
         from builders.jsonosid_templates import options
         pd = interface['shortname'] + '.persisted_data'
         rt = interface['shortname'] + '.return_types'
-        mdata = ('def get_' + camel_to_under(interface['shortname']) + 
-                    '_mdata():\n    \"\"\"Return default mdata map for ' + 
-                    (interface['shortname']) +'\"\"\"\n    return {\n')
+        mdata = ('def get_' + camel_to_under(interface['shortname']) +
+                 '_mdata():\n    \"\"\"Return default mdata map for ' +
+                 interface['shortname'] + '\"\"\"\n    return {\n')
         if pd in self.patterns and self.patterns[pd] != {}:
             for data_name in self.patterns[pd]:
                 if self.patterns[pd][data_name] == 'OsidCatalog':
@@ -102,12 +102,12 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                     mdata += self._make_mdata_map(interface['shortname'],
                                                   data_name,
                                                   'DisplayText',
-                                                  options) #+ '\n'
+                                                  options)  # + '\n'
                 else:
                     mdata += self._make_mdata_map(interface['shortname'],
                                                   data_name,
                                                   self.patterns[pd][data_name],
-                                                  options) #+ '\n'
+                                                  options)  # + '\n'
         return mdata + '    }'
 
     def _make_mdata_map(self, interface_name, data_name, data_type, options):
@@ -211,7 +211,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
 
         if mdata is not None:
             return '        \'{0}\': {{{1}\n        }},\n'.format(data_name,
-                                                     mdata)
+                                                                  mdata)
         else:
             return ''
 

@@ -22,26 +22,28 @@ from djbuilder_settings import PATTERN_DIR as pattern_dir
 from djbuilder_settings import TEMPLATE_DIR as template_dir
 template_pkg = '.'.join(template_dir.split('/'))
 
-##
-# This is the entry point for counting mapped patterns across all mapped
-# osids
-def count_all(build_abc = False, re_index = False, re_map = False):
+
+def count_all(build_abc=False, re_index=False, re_map=False):
+    # This is the entry point for counting mapped patterns across all mapped
+    # osids
+
     total_count = [0, 0]
     for json_file in os.listdir(pattern_dir):
         if json_file.endswith('.json'):
             count_map = count(pattern_dir + '/' + json_file)
-            total_count[0] = total_count[0] + count_map[0]
-            total_count[1] = total_count[1] + count_map[1]
-    print 'Total', total_count[0], 'out of', total_count[1], 'methods mapped'
+            total_count[0] += count_map[0]
+            total_count[1] += count_map[1]
+    print('Total {0} out of {1} methods mapped.'.format(str(total_count[0]),
+                                                        str(total_count[1])))
 
-##
-# This is the entry point for counting mapped patterns in one osid map
+
 def count(file_name):
+    # This is the entry point for counting mapped patterns in one osid map
 
     read_file = open(file_name, 'r')
     pattern = json.load(read_file)
     read_file.close()
-    
+
     mapped = 0
     all_ = 0
 
@@ -54,12 +56,5 @@ def count(file_name):
 
     mapped = float(mapped)
     all_ = float(all_)
-    
-    if all_ > 0:
-        percent = (mapped/all_)*100
-    else:
-        percent = 0
-        
-    #print file_name, mapped, 'out of', all_, 'mapped', percent, '%'
-    
+
     return [mapped, all_]
