@@ -1,3 +1,0 @@
-        # Implemented from template for calendaring.ScheduleSlot.getWeekdayTime
-        from calendaring_kit.dj_calendaring import Time
-        return Time(self.myModel.${varName})

@@ -1,2 +1,0 @@
-        # Implemented from template for repository.AssetContent.getURL
-${stateCheck}        return self.myModel.${modelVariable}

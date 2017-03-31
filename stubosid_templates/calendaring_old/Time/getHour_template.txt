@@ -1,2 +1,0 @@
-        # Implemented from template for osid.calendar.Time.getHour
-        return self._${varName}
