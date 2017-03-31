@@ -1,5 +1,6 @@
 """repository templates for manager utils"""
 
+
 class RepositoryProfile:
 
     import_statements_pattern = [
