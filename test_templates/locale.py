@@ -58,6 +58,7 @@ class DisplayText:
     get_format_type = """
         pass"""
 
+
 class LocaleList:
 
     import_statements = [

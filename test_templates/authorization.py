@@ -157,7 +157,7 @@ class AuthorizationSession:
         cls.resource_mgr.add_child_bin(cls.bin_id_list[1], cls.bin_id_list[3])
         cls.resource_mgr.add_child_bin(cls.bin_id_list[1], cls.bin_id_list[4])
         cls.resource_mgr.add_child_bin(cls.bin_id_list[2], cls.bin_id_list[5])
-        
+
         cls.svc_mgr = Runtime().get_service_manager('AUTHORIZATION', proxy=PROXY, implementation='TEST_SERVICE')
         cls.catalog = cls.svc_mgr.get_vault(cls.vault.ident)
 
@@ -172,7 +172,7 @@ class AuthorizationSession:
         jane_lookup_authz = cls.authz_admin_session.create_authorization(create_form)
         cls.authz_list.append(jane_lookup_authz)
         cls.authz_id_list.append(jane_lookup_authz.ident)
-        
+
         # Set up Resource lookup authorizations for Jane
         for num in [1, 5]:
             create_form = cls.authz_admin_session.get_authorization_form_for_create_for_agent(
@@ -237,7 +237,7 @@ class AuthorizationSession:
             for authz in lookup_session.get_authorizations():
                 admin_session.delete_authorization(authz.ident)
             cls.vault_admin_session.delete_vault(vault.ident)
-            
+
         # The hierarchy should look like this. (t) indicates where lookup is
         # explicitely authorized:
         #
@@ -280,6 +280,7 @@ class AuthorizationSession:
         self.assertTrue(self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[7]))
 """
 
+
 class AuthorizationLookupSession:
 
     init = """
@@ -315,6 +316,7 @@ class AuthorizationLookupSession:
                 catalog.delete_authorization(obj.ident)
             cls.svc_mgr.delete_vault(catalog.ident)
 """
+
 
 class Authorization:
     pass

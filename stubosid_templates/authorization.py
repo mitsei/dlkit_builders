@@ -1,6 +1,6 @@
-# 
+#
 # class AuthorizationSession:
-# 
+#
 #     import_statements = [
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from ..primitives import Id',
@@ -10,7 +10,7 @@
 #         'import memcache',
 #         "mc = memcache.Client(['127.0.0.1:11211'], debug=0)"
 #     ]
-# 
+#
 #     init = """
 #     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
 #         self._catalog_class = objects.Vault
@@ -25,7 +25,7 @@
 #             cat_name='Vault',
 #             cat_class=objects.Vault)
 #         self._kwargs = kwargs
-# 
+#
 #     def _get_qualifier_idstrs(self, qualifier_id):
 #         key = 'hierarchy-qualifier-ids-{0}'.format(str(qualifier_id))
 #         if mc.get(key) is None:
@@ -52,7 +52,7 @@
 #         else:
 #             qualifier_ids = mc.get(key)
 #         return qualifier_ids
-# 
+#
 #     def _get_ancestor_idstrs(self, node):
 #         node_list = [str(node.get_id())]
 #         if node.has_parents():
@@ -60,10 +60,10 @@
 #                 node_list = node_list + self._get_ancestor_idstrs(parent_node)
 #         return node_list
 # """
-# 
+#
 #     can_access_authorizations = """
 #         return True"""
-# 
+#
 #     is_authorized = """
 #         collection = MongoClientValidated('authorization',
 #                                           collection='Authorization',
@@ -82,14 +82,14 @@
 #             return False
 #         else:
 #             return True"""
-# 
+#
 # class AuthorizationAdminSession:
-# 
+#
 #     import_statements = [
 #         'from dlkit.abstract_osid.id.primitives import Id as ABCId',
 #         'from dlkit.abstract_osid.type.primitives import Type as ABCType',
 # ]
-# 
+#
 #     create_authorization = """
 #         # TODO: not using the create_resource template
 #         # because want to prevent duplicate authorizations
@@ -107,7 +107,7 @@
 #             raise errors.Unsupported('authorization_form did not originate from this session')
 #         if not authorization_form.is_valid():
 #             raise errors.InvalidArgument('one or more of the form elements is invalid')
-# 
+#
 #         # try to check first here
 #         try:
 #             osid_map = collection.find_one({"agentId": authorization_form._my_map['agentId'],
@@ -116,16 +116,16 @@
 #                                             "assignedVaultIds": authorization_form._my_map['assignedVaultIds']})
 #         except errors.NotFound:
 #             insert_result = collection.insert_one(authorization_form._my_map)
-# 
+#
 #             self._forms[authorization_form.get_id().get_identifier()] = CREATED
 #             osid_map = collection.find_one({'_id': insert_result.inserted_id})
 #         result = objects.Authorization(
 #             osid_object_map=osid_map,
 #             runtime=self._runtime,
 #             proxy=self._proxy)
-# 
+#
 #         return result"""
-# 
+#
 #     get_authorization_form_for_create_for_agent = """
 #         if not isinstance(agent_id, ABCId):
 #             raise errors.InvalidArgument('argument is not a valid OSID Id')
@@ -161,7 +161,7 @@
 #         self._forms[obj_form.get_id().get_identifier()] = not CREATED
 #         return obj_form
 # """
-# 
+#
 #     get_authorization_form_for_create_for_resource = """
 #         if not isinstance(resource_id, ABCId):
 #             raise errors.InvalidArgument('argument is not a valid OSID Id')
@@ -196,22 +196,22 @@
 #         self._forms[obj_form.get_id().get_identifier()] = not CREATED
 #         return obj_form
 # """
-# 
+#
 # class AuthorizationForm:
-# 
+#
 #     import_statements = [
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from ..osid import objects as osid_objects',
 #     ]
-# 
+#
 #     init = """
 #     _namespace = 'authorization.Authorization'
-# 
+#
 #     def __init__(self, **kwargs):
 #         osid_objects.OsidRelationshipForm.__init__(self, object_name='AUTHORIZATION', **kwargs)
 #         self._mdata = default_mdata.get_authorization_mdata() # Don't know if we need default mdata for this
 #         self._init_metadata(**kwargs)
-# 
+#
 #         # self._records = dict()
 #         # self._supported_record_type_ids = []
 #         # if osid_object_map is not None:
@@ -222,14 +222,14 @@
 #         #     self._my_map = {}
 #         #     self._for_update = False
 #         #     self._init_form(**kwargs)
-# 
+#
 #         if not self.is_for_update():
 #             self._init_form(**kwargs)
-# 
+#
 #     def _init_metadata(self, **kwargs):
 #         \"\"\"Initialize form metadata\"\"\"
 #         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
-# 
+#
 #     def _init_form(self, record_types=None, **kwargs):
 #         \"\"\"Initialize form map\"\"\"
 #         osid_objects.OsidRelationshipForm._init_form(self, record_types=record_types)
@@ -240,8 +240,8 @@
 #             self._my_map['agentId'] = str(kwargs['agent_id'])
 #         if 'resource_id' in kwargs:
 #             self._my_map['resourceId'] = str(kwargs['resource_id'])"""
-# 
-# 
+#
+#
 # class Authorization:
 #     additional_methods = """
 #     def get_object_map(self):
@@ -267,15 +267,15 @@
 #             obj_map['endDate']['second'] = end_date.second
 #             obj_map['endDate']['microsecond'] = end_date.microsecond
 #         return osid_objects.OsidObject.get_object_map(self, obj_map)
-# 
+#
 #     object_map = property(fget=get_object_map)
 #     """
-# 
+#
 # class AuthorizationQuery:
 #     import_statements = [
 #         'from dlkit.abstract_osid.osid import errors',
 #     ]
-# 
+#
 #     init = """
 #     def __init__(self, runtime):
 #         self._namespace = 'authorization.Authorization'
@@ -287,21 +287,21 @@
 #             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
 #         osid_queries.OsidObjectQuery.__init__(self, runtime)
 # """
-# 
+#
 #     match_agent_id = """
 #         self._add_match('agentId', str(agent_id), bool(match))"""
-# 
+#
 #     match_function_id = """
 #         self._add_match('functionId', str(function_id), bool(match))"""
-# 
+#
 #     match_qualifier_id = """
 #         self._add_match('qualifierId', str(qualifier_id), bool(match))"""
-# 
+#
 # class VaultLookupSession:
 #     get_vaults_by_genus_type = """
 #         collection = MongoClientValidated('authorization',
 #                                           collection='Vault',
 #                                           runtime=self._runtime)
 #         result = collection.find({'genusTypeId': {'$in': [str(vault_genus_type)]}}).sort('_id', DESCENDING)
-# 
+#
 #         return objects.VaultList(result, runtime=self._runtime)"""

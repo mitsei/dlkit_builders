@@ -11,7 +11,7 @@ class SpatialUnit:
 
 
 class Coordinate:
-    
+
     init = """
 """
 

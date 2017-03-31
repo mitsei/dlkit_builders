@@ -5,7 +5,7 @@ class HierarchyTraversalSession:
         'from ..primitives import Id',
         'from ..primitives import Type',
         'from ..osid.sessions import OsidSession',
-        #'from ..osid.objects import OsidNode',
+        # 'from ..osid.objects import OsidNode',
         'from . import objects',
         'from ..id.objects import IdList',
     ]
@@ -154,6 +154,7 @@ class HierarchyTraversalSession:
                              'leaf': not self.has_children(id_),
                              'sequestered': False})"""
 
+
 class HierarchyDesignSession:
 
     import_statements = [
@@ -285,6 +286,7 @@ class HierarchyDesignSession:
         rfc.set_genus_type(self._relationship_type)
         self._ras.create_relationship(rfc)"""
 
+
 class HierarchyAdminSession:
     import_statements = [
         'from ..utilities import MongoClientValidated'
@@ -305,6 +307,7 @@ class HierarchyAdminSession:
 
         collection.delete_one({'_id': ObjectId(hierarchy_id.get_identifier())})"""
 
+
 class Hierarchy:
 
     import_statements = [
@@ -321,7 +324,7 @@ class HierarchyQuery:
 
 
 class Node:
-    
+
     get_parents = """
         return NodeList(self._my_map['parentNodes'])"""
 

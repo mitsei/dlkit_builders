@@ -20,13 +20,13 @@ MDATA = {
             'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
             'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
             'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-            }],
+        }],
         'syntax': 'STRING',
-        'minimum_string_length': 0, 
-        'maximum_string_length': 256, 
+        'minimum_string_length': 0,
+        'maximum_string_length': 256,
         'string_set': []
-        }
-    
+    },
+
     'display_label': {
         'element_label': 'Display Label',
         'instructions': 'Optional',
@@ -39,12 +39,12 @@ MDATA = {
             'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
             'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
             'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-            }],
+        }],
         'syntax': 'STRING',
-        'minimum_string_length': 0, 
-        'maximum_string_length': 1024, 
+        'minimum_string_length': 0,
+        'maximum_string_length': 1024,
         'string_set': []
-        }
+    },
 
     'description': {
         'element_label': 'Description',
@@ -58,13 +58,13 @@ MDATA = {
             'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
             'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
             'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-            }],
+        }],
         'syntax': 'STRING',
-        'minimum_string_length': 0, 
-        'maximum_string_length': 1024, 
+        'minimum_string_length': 0,
+        'maximum_string_length': 1024,
         'string_set': []
-        }
-    
+    },
+
     'domain': {
         'element_label': 'Domain',
         'instructions': 'Optional',
@@ -77,10 +77,10 @@ MDATA = {
             'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
             'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
             'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-            }],
+        }],
         'syntax': 'STRING',
-        'minimum_string_length': 0, 
-        'maximum_string_length': 1024, 
+        'minimum_string_length': 0,
+        'maximum_string_length': 1024,
         'string_set': []
-        }
     }
+}

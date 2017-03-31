@@ -1,5 +1,6 @@
 from .resource import ResourceLookupSession, ResourceQuerySession
 
+
 class RepositoryProfile:
 
     get_coordinate_types_template = """
@@ -99,6 +100,7 @@ class CompositionLookupSession:
         self.catalog.use_sequestered_composition_view()
         self.assertEqual(self.catalog.get_compositions().available(), 2)"""
 
+
 class CompositionQuerySession:
 
     init_template = ResourceQuerySession.init_template
@@ -116,6 +118,7 @@ class CompositionQuerySession:
         cfu = self.catalog.get_composition_form_for_update(self.composition_list[3].ident)
         cfu.set_sequestered(False)
         self.catalog.update_composition(cfu)"""
+
 
 class CompositionAdminSession:
 
@@ -184,6 +187,7 @@ class AssetCompositionSession:
     get_compositions_by_asset_template = """
         self.assertEqual(self.catalog.get_${containable_object_name_plural_under}_by_${object_name_under}(self.${object_name_under}_ids[0]).available(), 1)
         self.assertEqual(self.catalog.get_${containable_object_name_plural_under}_by_${object_name_under}(self.${object_name_under}_ids[0]).next().ident, self.${containable_object_name_under}.ident)"""
+
 
 class AssetCompositionDesignSession:
 
@@ -259,6 +263,7 @@ class AssetCompositionDesignSession:
         self.catalog.remove_asset(self.asset_ids[1], self.composition_ids[4])
         self.assertEqual(self.catalog.get_composition_assets(self.composition_ids[4]).available(), 3)"""
 
+
 class Asset:
 
     import_statements = [
@@ -275,6 +280,7 @@ class Asset:
 
     get_asset_contents_template = """
         pass"""
+
 
 class AssetForm:
 
@@ -297,13 +303,13 @@ class AssetContent:
         pass"""
 
     get_data = """
-        pass""" 
+        pass"""
 
 
 class AssetContentForm:
 
     import_statements = [
-        ]
+    ]
 
     set_url_template = """
         pass"""

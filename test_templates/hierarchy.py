@@ -40,6 +40,7 @@ class HierarchyTraversalSession:
     get_nodes = """
 """
 
+
 class HierarchyDesignSession:
 
     import_statements = [
@@ -72,10 +73,12 @@ class HierarchyAdminSession:
     delete_hierarchy = """
         pass"""
 
+
 class Hierarchy:
 
     import_statements = [
     ]
+
 
 class HierarchyQuery:
 

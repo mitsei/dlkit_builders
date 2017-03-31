@@ -1,0 +1,656 @@
+{
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/__init__.py": [
+    1480452591.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/awsosid_templates/__init__.py": [
+    1435584684.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/awsosid_templates/helpers/__init__.py": [
+    1435584684.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/awsosid_templates/helpers/primitives.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/awsosid_templates/helpers/types.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/awsosid_templates/osid_helpers/osid_errors.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/awsosid_templates/repository_helpers/settings.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/azosid_templates/__init__.py": [
+    1432060302.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/azosid_templates/helpers/primitives.py": [
+    1487792769.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/azosid_templates/osid_helpers/osid_errors.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/build_controller.py": [
+    1490895081.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/builder_templates/__init__.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/djosid_templates/__init__.py": [
+    1435584684.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/fedosid_templates/__init__.py": [
+    1432060302.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/jsonosid_templates/__init__.py": [
+    1490014977.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/jsonosid_templates/authentication_process.py": [
+    1490014977.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/jsonosid_templates/helpers/primitives.py": [
+    1490014977.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/jsonosid_templates/osid_helpers/osid_errors.py": [
+    1490014977.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/jsonosid_templates/package_profile.py": [
+    1490014977.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitdoc_templates/__init__.py": [
+    1435584684.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitdoc_templates/learning.py": [
+    1435584684.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitdoc_templates/ontology.py": [
+    1435584684.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitdoc_templates/osid.py": [
+    1435584684.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitdoc_templates/resource.py": [
+    1435584684.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitdocbuilder.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitosid_templates/__init__.py": [
+    1432060302.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitosid_templates/authorization.py": [
+    1449848666.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitosid_templates/commenting.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitosid_templates/osid_helpers/osid_errors.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitosid_templates/osid_helpers/primitives.py": [
+    1490014977.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitosid_templates/relationship.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/kitosid_templates/repository_no_args_kwargs.py": [
+    1432060302.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/managerdel_templates/__init__.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/managerdel_templates/helpers/primitives.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/managerdel_templates/osid_helpers/osid_errors.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/managerutil_templates/__init__.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/managerutil_templates/helpers/primitives.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/managerutil_templates/osid_helpers/osid_errors.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/mappers.py": [
+    1490895081.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/mdata_templates/__init__.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/mdata_templates/logging.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/osiddocbuilder.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/pattern_mappers/__init__.py": [
+    1432060302.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/__init__.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/assessment_authoring.py": [
+    1490905908.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/authentication.py": [
+    1490902650.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/authentication_process.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/authorization.py": [
+    1490905899.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/commenting.py": [
+    1490902559.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/error_lists.py": [
+    1490902526.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/filing.py": [
+    1490902519.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/grading.py": [
+    1490902509.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/helpers/__init__.py": [
+    1490898144.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/helpers/list_utilities.py": [
+    1490898066.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/helpers/primitives.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/helpers/profile.py": [
+    1490898000.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/helpers/proxy_example.py": [
+    1490900621.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/helpers/types.py": [
+    1490897913.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/helpers/utilities.py": [
+    1490900600.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/hierarchy.py": [
+    1490902429.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/id.py": [
+    1490902393.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/learning.py": [
+    1490905880.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/locale.py": [
+    1490901205.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/locale_helpers/types.py": [
+    1490900504.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/logging.py": [
+    1490905821.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/mapping.py": [
+    1490901135.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/old_osid.py": [
+    1490905805.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/ontology.py": [
+    1490900230.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/options.py": [
+    1490900223.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/osid.py": [
+    1490900852.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/osid_helpers/default_mdata.py": [
+    1490900452.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/osid_helpers/osid_errors.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/osid_helpers/record_templates.py": [
+    1490897442.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/osid_helpers/types.py": [
+    1490900443.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/package_profile.py": [
+    1483453781.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/proxy.py": [
+    1490900800.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/relationship.py": [
+    1490900711.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/repository.py": [
+    1490900788.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/resource.py": [
+    1490900699.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/resource_helpers/simple_agent.py": [
+    1490897386.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/type.py": [
+    1490898729.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/type_helpers/mdata_conf.py": [
+    1490900430.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/stubosid_templates/utilities.py": [
+    1490898620.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/__init__.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/assessment.py": [
+    1490900371.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/assessment_authoring.py": [
+    1490896854.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/authentication.py": [
+    1490896842.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/authentication_process.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/authorization.py": [
+    1490896835.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/commenting.py": [
+    1490896769.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/error_lists.py": [
+    1490896751.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/filing.py": [
+    1490896744.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/grading.py": [
+    1490896737.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/hierarchy.py": [
+    1490896712.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/id.py": [
+    1490896695.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/learning.py": [
+    1490896683.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/locale.py": [
+    1490896618.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/logging.py": [
+    1490896607.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/mapping.py": [
+    1490896574.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/old_osid.py": [
+    1490900330.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/options.py": [
+    1490896159.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/osid.py": [
+    1490900312.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/package_profile.py": [
+    1449845639.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/proxy.py": [
+    1490895986.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/relationship.py": [
+    1490895959.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/repository.py": [
+    1490900276.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/resource.py": [
+    1490900270.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/type.py": [
+    1490895671.0, 
+    [
+      "E501"
+    ]
+  ], 
+  "/Users/cjshaw/Documents/Projects/MC3/dlkit_builder/builders/test_templates/utilities.py": [
+    1490895646.0, 
+    [
+      "E501"
+    ]
+  ]
+}

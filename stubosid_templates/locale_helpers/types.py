@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from dlkit.abstract_osid.osid.errors import NotFound
 
+
 class Language:
 
     iso_major_language_types = {
@@ -334,7 +335,7 @@ class Language:
         'ZEN': 'Zenaga',
         'ZUL': 'Zulu',
         'ZUN': 'Zuni'
-        }
+    }
 
     iso_other_language_types = {
         # ISO Ancient Language Types
@@ -1033,12 +1034,12 @@ class Language:
         'ZNK': 'Manangkari',
         'ZRA': 'Kara (Korea)',
         'ZRP': 'Zarphatic'
-        }
+    }
 
     type_set = {
         'ISOMLT': iso_major_language_types,
         'ISOOLT': iso_other_language_types
-        }
+    }
 
     def get_type_data(self, name):
         if name in self.iso_major_language_types:
@@ -1058,8 +1059,9 @@ class Language:
             'display_name': lang_name + ' Language Type',
             'display_label': lang_name,
             'description': ('The display text language type for the ' +
-                                                    lang_name + ' language.')
-            }
+                            lang_name + ' language.')
+        }
+
 
 class Script:
 
@@ -1222,7 +1224,7 @@ class Script:
 
     type_set = {
         'ISOST': iso_script_types
-        }
+    }
 
     def get_type_data(self, name):
         return {
@@ -1233,8 +1235,9 @@ class Script:
             'display_name': self.iso_script_types[name] + ' Script Type',
             'display_label': self.iso_script_types[name],
             'description': ('The display text script type for the ' +
-                                    self.iso_script_types[name] + ' script.')
-            }
+                            self.iso_script_types[name] + ' script.')
+        }
+
 
 class Format:
 
@@ -1257,11 +1260,11 @@ class Format:
         'TEXTILE': 'Textile',
         'TROFF': 'troff',
         'Z': 'ZFormat'
-        }
+    }
 
     type_set = {
         'FT': format_types
-        }
+    }
 
     def get_type_data(self, name):
         try:
@@ -1273,10 +1276,11 @@ class Format:
                 'display_name': self.format_types[name] + ' Format Type',
                 'display_label': self.format_types[name],
                 'description': ('The display text format type for the ' +
-                                        self.format_types[name] + ' format.')
-                }
+                                self.format_types[name] + ' format.')
+            }
         except IndexError:
             raise NotFound('Format Type:' + name)
+
 
 class Time:
 
@@ -1327,21 +1331,21 @@ class Time:
     }
 
     super_fun_time_types = {
-    # Frakkin' Centon Time #
-    'COLONIAL': 'Colonial, Battlestar Galactica',
+        # Frakkin' Centon Time #
+        'COLONIAL': 'Colonial, Battlestar Galactica',
 
-    # New Earth Time #
-    'NET': 'NewEarth, New Earth',
+        # New Earth Time #
+        'NET': 'NewEarth, New Earth',
 
-    # Swatch Internet Time #
-    'SWATCH': 'Swatch, Swatch Internet'
+        # Swatch Internet Time #
+        'SWATCH': 'Swatch, Swatch Internet'
     }
 
     type_set = {
         'CTT': celestial_time_types,
         'ETT': earth_time_types,
         'SFTT': super_fun_time_types
-        }
+    }
 
     def get_type_data(self, name):
         if name in self.celestial_time_types:
@@ -1352,10 +1356,10 @@ class Time:
             namespace = 'time'
             domain = 'Earth Time Systems'
             time_name = self.earth_time_types[name]
-        elif name in self.superfun_time_types:
+        elif name in self.super_fun_time_types:
             namespace = 'time'
             domain = 'Alternative Time Systems'
-            time_name = self.superfun_time_types[name]
+            time_name = self.super_fun_time_types[name]
         else:
             raise NotFound('Time Type: ' + name)
 
@@ -1367,7 +1371,8 @@ class Time:
             'display_name': time_name + ' Time Type',
             'display_label': time_name,
             'description': ('The time type for ' + time_name + ' time.')
-            }
+        }
+
 
 class Calendar:
 
@@ -1577,10 +1582,10 @@ class Calendar:
 
         # Swedish Calendar #
         'SWEDISH': 'Swedish'
-        }
+    }
 
     alternate_calendar_types = {
-            # 360-day Calendar #
+        # 360-day Calendar #
         'C360': '360-day',
 
         # Astronomical Calendar #
@@ -1636,7 +1641,7 @@ class Calendar:
         'CT': calendar_types,
         'ACT': ancient_calendar_types,
         'ALTCT': alternate_calendar_types
-        }
+    }
 
     def get_type_data(self, name):
         if name in self.calendar_types:
@@ -1659,7 +1664,8 @@ class Calendar:
             'display_name': calendar_name + ' Calendar Type',
             'display_label': calendar_name,
             'description': ('The time type for the ' + calendar_name + ' calendar.')
-            }
+        }
+
 
 class Coordinate:
 
@@ -1733,7 +1739,7 @@ class Coordinate:
     type_set = {
         'CCT': celestial_coordinate_types,
         'GCT': geographic_coordinate_types
-        }
+    }
 
     def get_type_data(self, name):
         if name in self.celestial_coordinate_types:
@@ -1753,7 +1759,8 @@ class Coordinate:
             'display_name': coordinate_name + ' Type',
             'display_label': coordinate_name,
             'description': ('The type for the ' + coordinate_name + ' System.')
-            }
+        }
+
 
 class Currency:
 
@@ -2255,7 +2262,7 @@ class Currency:
 
         # Zimbabwe Dollar #
         'ZWL': 'Zimbabwe Dollar'
-        }
+    }
 
     iso_currency_element_types = {
         # Platinum #
@@ -2267,7 +2274,7 @@ class Currency:
         # Palladium #
         'XPD': 'Palladium',
 
-         # Silver #
+        # Silver #
         'XAG': 'Silver',
 
         # Gold #
@@ -2277,7 +2284,7 @@ class Currency:
     type_set = {
         'ISOCT': iso_currency_types,
         'ISOCET': iso_currency_element_types
-        }
+    }
 
     def get_type_data(self, name):
 
@@ -2297,19 +2304,20 @@ class Currency:
             'domain': 'ISO Currency Types',
             'display_name': type_name + ' Currency Type',
             'display_label': type_name,
-            'description': ('The ISO currency type for ' +  article +
-                                    type_name + '.')
-            }
+            'description': ('The ISO currency type for ' + article +
+                            type_name + '.')
+        }
+
 
 class Heading:
 
     heading_types = {
-    'DEGREE': 'Degree'
+        'DEGREE': 'Degree'
     }
 
     type_set = {
         'HT': heading_types
-        }
+    }
 
     def get_type_data(self, name):
 
@@ -2324,8 +2332,9 @@ class Heading:
             'display_name': self.heading_types[name] + ' Heading Type',
             'display_label': self.heading_types[name],
             'description': ('The heading type for the ' +
-                                    self.heading_types[name] + ' heading.')
-            }
+                            self.heading_types[name] + ' heading.')
+        }
+
 
 class String:
 
@@ -2345,7 +2354,7 @@ class String:
 
     type_set = {
         'SMT': string_match_types
-        }
+    }
 
     def get_type_data(self, name):
 
@@ -2360,19 +2369,20 @@ class String:
             'display_name': self.string_match_types[name] + ' String Match Type',
             'display_label': self.string_match_types[name],
             'description': ('The string match type for the ' +
-                                    self.string_match_types[name])
-            }
+                            self.string_match_types[name])
+        }
+
 
 class UnitSystem:
 
     jeffs_unit_system_types = {
         'METRIC': 'Metric',
         'ENGLISH': 'English'
-        }
+    }
 
     type_set = {
         'JUST': jeffs_unit_system_types
-        }
+    }
 
     def get_type_data(self, name):
 
@@ -2387,18 +2397,19 @@ class UnitSystem:
             'display_name': self.jeffs_unit_system_types[name] + ' Unit System Type',
             'display_label': self.jeffs_unit_system_types[name],
             'description': ('The unit system type for the ' +
-                                    self.jeffs_unit_system_types[name] + ' System')
-            }
+                            self.jeffs_unit_system_types[name] + ' System')
+        }
+
 
 class CalendarFormat:
 
     jeffs_calendar_format_types = {
         'MMDDYYYY': 'MM/DD/YYYY'
-        }
+    }
 
     type_set = {
         'JCALFT': jeffs_calendar_format_types
-        }
+    }
 
     def get_type_data(self, name):
 
@@ -2413,19 +2424,20 @@ class CalendarFormat:
             'display_name': self.jeffs_calendar_format_types[name] + ' Calendar Format Type',
             'display_label': self.jeffs_calendar_format_types[name],
             'description': ('The calendar format type for ' +
-                                    self.jeffs_calendar_format_types[name])
-            }
+                            self.jeffs_calendar_format_types[name])
+        }
+
 
 class TimeFormat:
 
     jeffs_time_format_types = {
         'HHMMSS': '24 Hour Clock (hh:mm:ss)',
         'HHMMSSAMPM': '12 Hour Clock (hh:mm:ss am/pm)'
-        }
+    }
 
     type_set = {
         'JTIMEFT': jeffs_time_format_types
-        }
+    }
 
     def get_type_data(self, name):
 
@@ -2440,19 +2452,19 @@ class TimeFormat:
             'display_name': self.jeffs_time_format_types[name] + ' Time Format Type',
             'display_label': self.jeffs_time_format_types[name],
             'description': ('The time format type for ' +
-                                    self.jeffs_time_format_types[name])
-            }
+                            self.jeffs_time_format_types[name])
+        }
 
 
 class CurrencyFormat:
 
     jeffs_currency_format_types = {
         'US': 'US ($1,234.56)'
-        }
+    }
 
     type_set = {
         'JCURFT': jeffs_currency_format_types
-        }
+    }
 
     def get_type_data(self, name):
 
@@ -2467,18 +2479,19 @@ class CurrencyFormat:
             'display_name': self.jeffs_currency_format_types[name] + ' Currency Format Type',
             'display_label': self.jeffs_currency_format_types[name],
             'description': ('The format type for the ' +
-                                    self.jeffs_currency_format_types[name] + ' currency')
-            }
+                            self.jeffs_currency_format_types[name] + ' currency')
+        }
+
 
 class CoordinateFormat:
 
     jeffs_coordinate_format_types = {
         'DMS': 'Degree/Minute/Second'
-        }
+    }
 
     type_set = {
         'JCRDFT': jeffs_coordinate_format_types
-        }
+    }
 
     def get_type_data(self, name):
 
@@ -2493,9 +2506,10 @@ class CoordinateFormat:
             'display_name': self.jeffs_coordinate_format_types[name] + ' Coordinate Format Type',
             'display_label': self.jeffs_coordinate_format_types[name],
             'description': ('The type for the ' +
-                                    self.jeffs_coordinate_format_types[name] +
-                                    ' Geographic coordinate format.')
-            }
+                            self.jeffs_coordinate_format_types[name] +
+                            ' Geographic coordinate format.')
+        }
+
 
 class NumericFormat:
 
@@ -2508,11 +2522,11 @@ class NumericFormat:
         'DOLLAR10.2': 'DOLLAR10.2 ($3,141.59, -$3,141.59)',
         'PCT9.2': 'PCT9.2 (3141.59%, -3141.59%)',
         'E8.1': 'E8.1, (3.1E+003, -3.1E+003)'
-        }
+    }
 
     type_set = {
         'GNUBNFT': gnu_basic_numeric_format_types
-        }
+    }
 
     def get_type_data(self, name):
         try:
@@ -2521,11 +2535,11 @@ class NumericFormat:
                 'namespace': 'Basic Numeric Formats',
                 'identifier': name,
                 'domain': 'Numeric Format Types',
-                'display_name': self.jeffs_numeric_format_types[name] + ' Numeric Format Type',
-                'display_label': self.jeffs_numeric_format_types[name],
+                'display_name': self.gnu_basic_numeric_format_types[name] + ' Numeric Format Type',
+                'display_label': self.gnu_basic_numeric_format_types[name],
                 'description': ('The type for the ' +
-                                        self.jeffs_numeric_format_types[name] +
-                                        ' numeric format.')
-                }
+                                self.gnu_basic_numeric_format_types[name] +
+                                ' numeric format.')
+            }
         except IndexError:
             raise NotFound('NumericFormat Type: ' + name)

@@ -1,7 +1,7 @@
 # from .resource import ResourceAdminSession
-# 
+#
 # class RelationshipLookupSession:
-# 
+#
 #     import_statements_pattern = [
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from ..primitives import Id',
@@ -16,17 +16,17 @@
 #         'CREATED = True',
 #         'UPDATED = True'
 #     ]
-# 
+#
 #     use_effective_relationship_view_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.use_effective_relationship_view
 #         self._use_effective_view()"""
-# 
+#
 #     use_any_effective_relationship_view_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.use_any_effective_relationship_view
 #         self._use_any_effective_view()"""
-# 
+#
 #     get_relationships_on_date_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_on_date
@@ -35,7 +35,7 @@
 #             if overlap(${arg0_name}, ${arg1_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
 #                 ${object_name_under}_list.append(${object_name_under})
 #         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_for_source_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_for_source
@@ -47,7 +47,7 @@
 #             dict({'${source_name_mixed}Id': str(${arg0_name})},
 #                  **self._view_filter())).sort('_sort_id', ASCENDING)
 #         return objects.${object_name}List(result, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_for_source_on_date_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_for_source_on_date
@@ -56,7 +56,7 @@
 #             if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
 #                 ${object_name_under}_list.append(${object_name_under})
 #         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_by_genus_type_for_source_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source
@@ -69,7 +69,7 @@
 #                   'genusTypeId': str(${arg1_name})},
 #                  **self._view_filter())).sort('_sort_id', ASCENDING)
 #         return objects.${object_name}List(result, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_by_genus_type_for_source_on_date_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source_on_date
@@ -78,7 +78,7 @@
 #             if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
 #                 ${object_name_under}_list.append(${object_name_under})
 #         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_for_destination_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
@@ -90,7 +90,7 @@
 #             dict({'${destination_name_mixed}Id': str(${arg0_name})},
 #                  **self._view_filter())).sort('_sort_id', ASCENDING)
 #         return objects.${object_name}List(result, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_for_destination_on_date_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_for_destination_on_date
@@ -99,7 +99,7 @@
 #             if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
 #                 ${object_name_under}_list.append(${object_name_under})
 #         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_by_genus_type_for_destination_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination
@@ -112,7 +112,7 @@
 #                   'genusTypeId': str(${arg1_name})},
 #                  **self._view_filter())).sort('_sort_id', ASCENDING)
 #         return objects.${object_name}List(result, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_by_genus_type_for_destination_on_date_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination_on_date
@@ -121,7 +121,7 @@
 #             if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
 #                 ${object_name_under}_list.append(${object_name_under})
 #         return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_for_peers_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_for_peers
@@ -134,7 +134,7 @@
 #                   '${destination_name_mixed}Id': str(${arg1_name})},
 #                  **self._view_filter())).sort('_sort_id', ASCENDING)
 #         return objects.${object_name}List(result, runtime=self._runtime)"""
-# 
+#
 #     get_relationships_by_genus_type_for_peers_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers
@@ -148,20 +148,20 @@
 #                   'genusTypeId': str(${arg2_name})},
 #                  **self._view_filter())).sort('_sort_id', ASCENDING)
 #         return objects.${object_name}List(result, runtime=self._runtime)"""
-# 
+#
 # class RelationshipAdminSession:
-# 
+#
 #     # For when we get Relatioship based init patterns figured out:
 #     new_import_statements_pattern = ResourceAdminSession.import_statements_pattern
-# 
+#
 #     # For when we get Relatioship based init patterns figured out:
 #     new_init_template = ResourceAdminSession.init_template
-# 
+#
 #     import_statements_pattern = [
 #         'from . import objects',
 #         'from dlkit.abstract_osid.osid import errors',
 #     ]
-#     
+#
 #     get_relationship_form_for_create_template = """
 #         # Implemented from template for
 #         # osid.relationship.RelationshipAdminSession.get_relationship_form_for_create
@@ -196,19 +196,19 @@
 #         obj_form._for_update = False
 #         self._forms[obj_form.get_id().get_identifier()] = not CREATED
 #         return obj_form"""
-# 
+#
 # class Relationship:
-# 
+#
 #     import_statements = [
 #         'from ..primitives import Id'
 #     ]
-# 
+#
 #     get_source_id_template = """
 #         # Implemented from template for osid.relationship.Relationship.get_source_id
 #         return Id(self._my_map['${var_name_mixed}Id'])"""
-# 
+#
 # class RelationshipQuery:
-# 
+#
 #     import_statements = [
 #         'from dlkit.abstract_osid.osid import errors'
 #     ]

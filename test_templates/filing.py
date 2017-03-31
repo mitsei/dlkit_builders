@@ -1,6 +1,6 @@
 
 class DirectoryAdminSession:
-    
+
     init = """ """
 
     get_file_form_for_create = """

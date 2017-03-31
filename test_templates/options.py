@@ -5,8 +5,8 @@ METADATA_INITER = """
                 self._namespace,
                 '${data_name}')}
         self._${data_name}_metadata.update(mdata_conf.${data_name_upper})"""
-             
-ID_METADATA ="""
+
+ID_METADATA = """
             'value': (bool(self.my_model.options['${data_name}_authority']['default']) and
                       bool(self.my_model.options['${data_name}_namespace']['default']) and
                       bool(self.my_model.options['${data_name}_identifier']['default'])),
@@ -88,7 +88,7 @@ OBJECT_MDATA = """
     'object_types': [],
     'object_set': [],"""
 
-#MODEL_FIELD_OPTIONS = """
+# MODEL_FIELD_OPTIONS = """
 #        verbose_name=options['${data_name}']['verbose_name'],
 #        help_text=options['${data_name}']['help_text'],
 #        blank=options['${data_name}']['blank'],
@@ -97,5 +97,3 @@ OBJECT_MDATA = """
 #        max_length=options['${data_name}']['max_length'],
 #        choices=options['${data_name}']['choices']
 #        """
-
-

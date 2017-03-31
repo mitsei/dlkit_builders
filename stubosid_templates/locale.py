@@ -87,7 +87,7 @@ class DisplayText:
     ##
     # This constructor should be calling a locale settings module,
     # which should be set to the default language, script and format
-    # types. 
+    # types.
     def __init__(self,
                  text,
                  language_type_identifier='ENG',
@@ -132,6 +132,7 @@ class DisplayText:
         # This could also be where the get_type functions go, instead of
         # during initialization since consumers will likely not be interested
         # in the locale types as often as they are in the text itself."""
+
 
 class LocaleList:
 

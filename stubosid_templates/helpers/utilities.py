@@ -15,6 +15,7 @@ from importlib import import_module
 
 from . import MONGO_CLIENT
 
+
 class Filler(object):
     pass
 
@@ -27,6 +28,7 @@ def set_mongo_client(runtime):
         MONGO_CLIENT.set_mongo_client(MongoClient())
     else:
         MONGO_CLIENT.set_mongo_client(MongoClient(mongo_host))
+
 
 class MongoClientValidated(object):
     """automatically validates the insert_one, find_one, and delete_one methods"""
@@ -58,8 +60,8 @@ class MongoClientValidated(object):
     def _validate_write(self, result):
         try:
             if not result.acknowledged or result.inserted_id is None:
-            # if (('writeErrors' in result and len(result['writeErrors']) > 0) or
-            #         ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
+                # if (('writeErrors' in result and len(result['writeErrors']) > 0) or
+                #         ('writeConcernErrors' in result and len(result['writeConcernErrors']) > 0)):
                 raise OperationFailed(str(result))
         except AttributeError:
             # account for deprecated save() method
@@ -117,16 +119,18 @@ class MongoClientValidated(object):
         self._validate_write(result)
         return result
 
+
 def remove_null_proxy_kwarg(func):
     """decorator, to remove a 'proxy' keyword argument. For wrapping certain Manager methods"""
     def wrapper(*args, **kwargs):
         if 'proxy' in kwargs:
-            #if kwargs['proxy'] is None:
+            # if kwargs['proxy'] is None:
             del kwargs['proxy']
-            #else:
+            # else:
             #    raise InvalidArgument('Manager sessions cannot be called with Proxies. Use ProxyManager instead')
         return func(*args, **kwargs)
     return wrapper
+
 
 def arguments_not_none(func):
     """decorator, to check if any arguments are None; raise exception if so"""
@@ -146,14 +150,15 @@ def arguments_not_none(func):
                 raise
     return wrapper
 
+
 def get_provider_manager(osid, runtime=None, proxy=None, local=False):
     """
     Gets the most appropriate provider manager depending on config.
-    
+
     If local is True, then don't bother with the runtime/config and
     try to get the requested service manager directly from the local
     service implementations known to this mongodb implementation.
-    
+
     """
     if runtime is not None:
         if local:
@@ -185,14 +190,17 @@ def get_provider_manager(osid, runtime=None, proxy=None, local=False):
         manager.initialize(runtime)
     return manager
 
+
 def get_provider_session(provider_manager, session_method, proxy=None, *args, **kwargs):
     if proxy is None:
         return getattr(provider_manager, session_method)(*args, **kwargs)
     else:
         return getattr(provider_manager, session_method)(proxy, *args, **kwargs)
 
+
 def format_catalog(catalog_name):
     return catalog_name.replace('_', '').title()
+
 
 def now_map():
     now = DateTime.utcnow()
@@ -205,6 +213,7 @@ def now_map():
         'second': now.second,
         'microsecond': now.microsecond,
     }
+
 
 def overlap(start1, end1, start2, end2):
     """
@@ -220,12 +229,12 @@ def overlap(start1, end1, start2, end2):
 class OsidListList(list):
     """
     A morker class for initializing OsidLists with a list of other OsidLists
-    
+
     To use, load up this list with OsidLists of the same object type, and pass
     it as the argument to an OsidList of that same object type. The OsidList
     should exhaust all the contained OsidLists in order on iteration to return
     all the underlying objects as if they are part of one list.
-    
+
     """
     pass
 
@@ -240,6 +249,7 @@ def get_registry(entry, runtime):
     except (ImportError, AttributeError, KeyError, NotFound):
         return {}
 
+
 def is_authenticated_with_proxy(proxy):
     """Given a Proxy, checks whether a user is authenticated"""
     if proxy is None:
@@ -249,6 +259,7 @@ def is_authenticated_with_proxy(proxy):
     else:
         return False
 
+
 def get_authenticated_agent_id_with_proxy(proxy):
     """Given a Proxy, returns the Id of the authenticated Agent"""
     if is_authenticated_with_proxy(proxy):
@@ -256,12 +267,14 @@ def get_authenticated_agent_id_with_proxy(proxy):
     else:
         raise IllegalState()
 
+
 def get_authenticated_agent_with_proxy(proxy):
     """Given a Proxy, returns the authenticated Agent"""
     if is_authenticated_with_proxy(proxy):
         return proxy.get_authentication().get_agent()
     else:
         raise IllegalState()
+
 
 def get_effective_agent_id_with_proxy(proxy):
     """Given a Proxy, returns the Id of the effective Agent"""
@@ -276,23 +289,25 @@ def get_effective_agent_id_with_proxy(proxy):
             namespace='authentication.Agent',
             authority='MIT-ODL')
 
+
 def get_effective_agent_with_proxy(proxy):
     """Given a Proxy, returns the effective Agent"""
-    #effective_agent_id = self.get_effective_agent_id()
+    # effective_agent_id = self.get_effective_agent_id()
     # This may want to be extended to get the Agent directly from the Authentication
     # if available and if not effective agent is available in the proxy
-    #return Agent(
+    # return Agent(
     #    identifier=effective_agent_id.get_identifier(),
     #    namespace=effective_agent_id.get_namespace(),
     #    authority=effective_agent_id.get_authority())
     raise Unimplemented()
+
 
 def get_locale_with_proxy(proxy):
     """Given a Proxy, returns the Locale
 
     This assumes that instantiating a dlkit.gst.locale.objects.Locale
     without constructor arguments wlll return the default Locale.
-    
+
     """
     from .locale.objects import Locale
     if proxy is not None:
@@ -300,6 +315,7 @@ def get_locale_with_proxy(proxy):
             if locale is not None:
                 return locale
     return Locale()
+
 
 def update_display_text_defaults(mdata, locale_map):
     for default_display_text in mdata['default_string_values']:

@@ -17,6 +17,7 @@ class AssessmentAuthoringManager:
         cls.svc_mgr.delete_bank(cls.catalog_id)
 """
 
+
 class AssessmentPartLookupSession:
 
     init = """
@@ -72,6 +73,7 @@ class AssessmentPartLookupSession:
     get_bank_id = """
         # this should not be here...
         pass"""
+
 
 class AssessmentPartItemSession:
 

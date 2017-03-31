@@ -18,6 +18,7 @@ class GradeSystemAdminSession:
     can_delete_grades = """
         pass"""
 
+
 class GradebookColumnLookupSession:
     # Until we figure out how to do Relationship init patterns properly:
     import_statements = [
@@ -156,4 +157,3 @@ class GradeEntryLookupSession:
                 catalog.delete_grade_system(obj.ident)
             cls.svc_mgr.delete_gradebook(catalog.ident)
 """
-    

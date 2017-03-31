@@ -133,6 +133,7 @@ class GradeSystemForm:
             raise errors.NoAccess()
         self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
 
+
 class GradeEntry:
 
     import_statements = [
@@ -173,6 +174,7 @@ class GradeEntry:
         if not self.overrides_calculated_entry():
             raise errors.IllegalState()
         return self._my_map['overriddenCalculatedEntryId']"""
+
 
 class GradeEntryForm:
 
@@ -223,7 +225,6 @@ class GradeEntryForm:
         self._ignored_for_calculations_default = self._mdata['ignored_for_calculations']['default_boolean_values'][0]
         self._score_default = self._mdata['score']['default_decimal_values'][0]
 
-
     def _init_form(self, record_types=None, **kwargs):
         osid_objects.OsidRelationshipForm._init_form(self, record_types=record_types)
         self._my_map['resourceId'] = str(kwargs['resource_id'])
@@ -235,7 +236,7 @@ class GradeEntryForm:
         self._my_map['gradebookColumnId'] = str(kwargs['gradebook_column_id'])
         self._my_map['assignedGradebookIds'] = [str(kwargs['gradebook_id'])]
         self._my_map['derived'] = False # This is probably not persisted data
-        self._my_map['timeGraded'] = None 
+        self._my_map['timeGraded'] = None
         self._my_map['overriddenCalculatedEntryId'] = '' # This will soon do something different
 """
 
@@ -271,7 +272,7 @@ class GradeEntryForm:
             raise errors.InvalidArgument()
         if not isinstance(score, Decimal):
             score = Decimal(str(score))
-        if (self._grade_system.get_numeric_score_increment() and 
+        if (self._grade_system.get_numeric_score_increment() and
                 score % self._grade_system.get_numeric_score_increment() != 0):
             raise errors.InvalidArgument('score must be in increments of ' + str(self._score_increment))
         self._my_map['score'] = float(score)
@@ -288,12 +289,14 @@ class GradeEntryForm:
         self._my_map['gradingAgentId'] = ''
         self._my_map['timeGraded'] = None"""
 
+
 class GradeEntryQuery:
     match_gradebook_column_id = """
         self._add_match('gradebookColumnId',
                         gradebook_column_id,
                         match)
     """
+
 
 class GradebookColumnLookupSession:
     import_statements = [
@@ -311,6 +314,7 @@ class GradebookColumnLookupSession:
         return GradebookColumnSummary(osid_object_map=summary_map,
                                       runtime=self._runtime,
                                       proxy=self._proxy)"""
+
 
 class GradebookColumnAdminSession:
 
@@ -381,11 +385,13 @@ class GradebookColumnAdminSession:
             proxy=self._proxy)
         """
 
+
 class GradebookColumnQuery:
 
     match_grade_system_id = """
         self._add_match('gradeSystemId', str(grade_system_id), bool(match))
     """
+
 
 class GradeSystemAdminSession:
 
@@ -425,7 +431,7 @@ class GradebookColumnSummary:
         'import numpy as np',
     ]
 
-    # Note: self._catalog_name = 'Gradebook below is currently 
+    # Note: self._catalog_name = 'Gradebook below is currently
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # gradebookId element and may be removed someday
     init = """

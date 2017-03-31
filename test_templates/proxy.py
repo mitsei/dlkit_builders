@@ -4,10 +4,12 @@ class ProxyManager:
     init = """
 """
 
+
 class ProxyProxyManager:
 
     init = """
 """
+
 
 class ProxySession:
 
@@ -22,6 +24,7 @@ class ProxySession:
 
     get_proxy = """
         pass"""
+
 
 class Proxy:
 
@@ -63,6 +66,7 @@ class Proxy:
 
     get_format_type = """
         pass"""
+
 
 class ProxyCondition:
 

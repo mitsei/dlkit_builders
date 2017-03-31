@@ -15,12 +15,14 @@ def get_objective_bank_by_name(name):
             return ob
     raise NotFound()
 
+
 def get_objective_by_bank_id_and_name(objective_bank_id, name):
     ols = LearningManager().get_objective_lookup_session_for_objective_bank(objective_bank_id)
     for o in ols.get_objectives():
         if o.display_name.text == name:
             return o
     raise NotFound()
+
 
 def create_sandbox_objective_bank(display_name, description=None):
     if description is None:
@@ -37,6 +39,7 @@ def create_sandbox_objective_bank(display_name, description=None):
     obfc.description = description
     obfc.genus_type = DEFAULT_TYPE
     return obas.create_objective_bank(obfc)
+
 
 def delete_objective_bank_by_name(display_name):
     lm = LearningManager()
@@ -72,7 +75,7 @@ def create_objective(bank_id, display_name, description=None):
     ofc.display_name = display_name
     ofc.description = description
     return oas.create_objective(ofc)
-    
+
 
 def get_repository_by_name(name):
     rls = RepositoryManager().get_repository_lookup_session()
@@ -138,7 +141,6 @@ def create_asset(repository_id, display_name, description=None):
     afc.display_name = display_name
     afc.description = description
     return aas.create_asset(afc)
-    
 
 
 def get_bank_by_name(name):
@@ -148,12 +150,14 @@ def get_bank_by_name(name):
             return b
     raise NotFound()
 
+
 def get_item_by_bank_id_and_name(bank_id, name):
     ils = AssessmentManager().get_item_lookup_session_for_bank(bank_id)
     for i in ils.get_items():
         if i.display_name.text == name:
             return i
     raise NotFound()
+
 
 def create_sandbox_bank(display_name, description=None):
     if description is None:
