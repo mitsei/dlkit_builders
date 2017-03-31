@@ -1151,9 +1151,15 @@ class AssetContent:
     def _delete(self):
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
-        filesys = gridfs.GridFS(dbase)
-        if self._my_map['data'] and filesys.exists(self._my_map['data']):
-            filesys.delete(self._my_map['data'])
+        try:
+            filesys = gridfs.GridFS(dbase)
+        except TypeError:
+            # Not MongoDB, perhaps filesystem. Assume this is then taken care of in
+            # an adapter.
+            pass
+        else:
+            if self._my_map['data'] and filesys.exists(self._my_map['data']):
+                filesys.delete(self._my_map['data'])
         osid_objects.OsidObject._delete(self)"""
 
 class AssetContentForm:

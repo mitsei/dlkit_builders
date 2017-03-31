@@ -64,7 +64,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 arg_number + '_abcpkg_name': self._abc_pkg_name(package_name=get_pkg_name(arg_type_full.strip('[]')),
                                                                 abc=False),
                 arg_number + '_module': self.get_interface_module(
-                    get_pkg_name(arg_type_full),
+                    self._abc_pkg_name(package_name=get_pkg_name(arg_type_full),
+                                       abc=False),
                     arg_type)
             }
             return arg_context
@@ -120,7 +121,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['return_type'] = context['return_type_full'].split('.')[-1]
                 context['return_pkg'] = get_pkg_name(context['return_type_full'])
                 context['return_module'] = self.get_interface_module(
-                    get_pkg_name(context['return_type_full']),
+                    self._abc_pkg_name(package_name=get_pkg_name(context['return_type_full']),
+                                       abc=False),
                     context['return_type_full'].split('.')[-1])
             if 'return_pkg' in context:
                 context['return_app_name'] = self._app_name(package_name=context['return_pkg'])
