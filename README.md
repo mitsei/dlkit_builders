@@ -9,7 +9,12 @@ xosid
  |- assessment.xml
 ```
 
-To run the builder, you can build all or a subset of `dlkit`:
+The `xosid` definitions are located [here](https://app.assembla.com/spaces/osid/git/source/master/definitions/xosid).
+
+To run the builder, you can build all or a subset of `dlkit`. The first time
+you run the builder, you will need to build `map`, `patterns`, `abc`, `manager`,
+and `mdata`. After that, depending on what you change, you could build just
+`json`, `authz`, or `services`. 
 
 ```
     Usage: python build_controller.py [commands]
