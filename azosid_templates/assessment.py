@@ -1,5 +1,6 @@
 # assessment templates for az_osid
 
+
 class AssessmentManager:
 
     old_get_assessment_taken_query_session_for_bank_to_delete = """
@@ -19,6 +20,7 @@ class AssessmentManager:
             provider_session=self._provider_manager.get_assessment_taken_admin_session_for_bank(bank_id),
             authz_session=sself._authz_session)
 """
+
 
 class AssessmentProxyManager:
 
@@ -43,11 +45,12 @@ class AssessmentProxyManager:
             proxy=proxy)
 """
 
+
 class MyAssessmentTakenSession:
-    
+
     import_statements = [
         'from ..osid.osid_errors import PermissionDenied'
-        ]
+    ]
 
     init = """
     def __init__(self, **kwargs):
@@ -68,7 +71,7 @@ class MyAssessmentTakenSession:
         if not self._can('get_my'):
             raise PermissionDenied()
         return self._provider_session.get_assessments_started_during()"""
-            
+
     get_assessments_in_progress_during = """
         if not self._can('get_my'):
             raise PermissionDenied()
@@ -78,7 +81,7 @@ class MyAssessmentTakenSession:
         if not self._can('get_my'):
             raise PermissionDenied()
         return self._provider_session.get_assessments_in_progress()"""
-            
+
     get_assessments_completed = """
         if not self._can('get_my'):
             raise PermissionDenied()
@@ -89,7 +92,7 @@ class AssessmentSession:
 
     import_statements = [
         'from ..osid.osid_errors import PermissionDenied'
-        ]
+    ]
 
     init = """
     def __init__(self, **kwargs):
@@ -306,11 +309,12 @@ class AssessmentSession:
             raise PermissionDenied()
         self._provider_session.finish_assessment(assessment_taken_id)"""
 
+
 class AssessmentResultsSession:
 
     import_statements = [
         'from ..osid.osid_errors import PermissionDenied'
-        ]
+    ]
 
     init = """
     def __init__(self, **kwargs):
@@ -390,6 +394,7 @@ class AssessmentBasicAuthoringSession:
             raise PermissionDenied()
         self._provider_session.order_items(item_ids, assessment_id)"""
 
+
 class AssessmentTakenLookupSession:
 
     old_get_assessments_taken_for_taker_and_assessment_offered = """
@@ -400,7 +405,7 @@ class AssessmentTakenLookupSession:
     get_assessments_taken_for_taker_and_assessment_offered = """
         if self._can('lookup'):
             return self._provider_session.get_assessments_taken_for_taker_and_assessment_offered(resource_id, assessment_offered_id)
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_assessment_taken_query()
         query.match_taking_agent_id(resource_id, match=True)
         query.match_assessment_offered_id(assessment_offered_id, match=True)

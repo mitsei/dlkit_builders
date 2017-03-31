@@ -1,5 +1,6 @@
 # resource templates for osid_federator implementations
 
+
 class ResourceProfile:
 
     supports_visible_federation_template = """
@@ -18,10 +19,6 @@ class ResourceProfile:
                 return True
         return False"""
 
-#    get_resource_record_types = """
-        # Implemented from fedosid template for -
-        # osid.resource.ResourceProfile.get_resource_record_types
-#        return self._provider_manager.${method_name}()"""
 
 class ResourceManager:
 
@@ -181,17 +178,17 @@ class ResourceLookupSession:
                 return self._provider_sessions[0].${method_name}()
         else:
             results = []
-            for ps in self._provider_sessions: 
+            for ps in self._provider_sessions:
                 if ps.can_lookup_${object_name_under_plural}():
                     # What to do with OPERATION_FAILED? Plenary vs Comparative?
                     results.append(ps.${method_name}())
         return ${return_type}(results)"""
 
+
 class ResourceAdminSession:
 
     init_template = """
     def __init__(self, provider_sessions):
-        ##
         # This implementation assumes that the first session in the
         # provider_sessions list is the one for the requested catalog,
         # or is the default catalog if no catalog was specified
@@ -245,23 +242,17 @@ class ResourceAdminSession:
         from osid_kit.osid_errors import PERMISSION_DENIED
         self._provider_session.${method_name}(${arg0_name}=${arg0_name}, ${arg1_name}=${arg1_name})"""
 
+
 class ResourceList:
 
     get_next_resource_template = """
         # Implemented from template for osid.resource.ResourceList.get_next_resource
-        import sys
         from osid_kit.osid_errors import ILLEGAL_STATE, OPERATION_FAILED
-        try:
-            next_object = self.next()
-        except StopIteration:
-            raise ILLEGAL_STATE('no more elements available in this list')
-        except: # Need to specify other exceptions here?
-            raise OPERATION_FAILED()
-        else:
-            return next_object"""
+        next_object = self.next()
+        return next_object"""
 
     get_next_resources_template = """
-    # Implemented from template for osid.resource.ResourceList.get_next_resources
+        # Implemented from template for osid.resource.ResourceList.get_next_resources
         import sys
         from osid_kit.osid_errors import ILLEGAL_STATE, OPERATION_FAILED
         if ${arg0_name} > self.available():
@@ -273,8 +264,7 @@ class ResourceList:
             while n < ${arg0_name}:
                 try:
                     next_objects.append(self.next())
-                except: # Need to specify exceptions here?
+                except:  # Need to specify exceptions here?
                     raise OPERATION_FAILED()
                 n += 1
             return next_objects"""
-

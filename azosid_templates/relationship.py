@@ -1,16 +1,10 @@
 
 from . import resource
 
+
 class RelationshipAdminSession:
 
     init_template = resource.ResourceAdminSession.init_template
-
-#     old_init_template = """
-#     def __init__(self, provider_session, authz_session, proxy=None):
-#         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-#         self._qualifier_id = provider_session.get_${cat_name_under}_id()
-#         self._id_namespace = '${pkg_name}.${object_name}'
-# """
 
     get_relationship_form_for_create_template = """
         # Implemented from azosid template for -
@@ -23,13 +17,6 @@ class RelationshipAdminSession:
 class RelationshipLookupSession:
 
     init_template = resource.ResourceLookupSession.init_template
-
-#     init_template = """
-#     def __init__(self, provider_session, authz_session, proxy=None):
-#         osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-#         self._qualifier_id = provider_session.get_${cat_name_under}_id()
-#         self._id_namespace = '${pkg_name}.${object_name}'
-# """
 
     get_relationships_for_source_template = """
         # Implemented from azosid template for -
@@ -52,5 +39,3 @@ class RelationshipLookupSession:
         query.match_source_id(${arg0_name}, match=True)
         query.match_date(${arg1_name}, ${arg2_name}, match=True)
         return self._try_harder(query)"""
-
-

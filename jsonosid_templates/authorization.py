@@ -93,7 +93,7 @@ class AuthorizationSession:
     #         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
     #
     #         key = 'ancestor-ids-{0}'.format(str(node.ident))
-    # 
+    #
     #         if mc.get(key) is None:
     #             ancestor_ids = get_ancestors(node)
     #             mc.set(key, ancestor_ids, time=30 * 60)
@@ -191,7 +191,7 @@ class AuthorizationSession:
                 {'agentId': str(agent_id),
                  'functionId': str(function_id),
                  'qualifierId': {'$in': idstr_list}})
-                 
+
         # Otherwise check for implicit authorization through inheritance:
         except errors.NotFound:
             if authority and identifier:

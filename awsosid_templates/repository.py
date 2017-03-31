@@ -1,10 +1,11 @@
 # repository templates for aws_adapter
 
+
 class RepositoryProfile:
 
     import_statements = [
         'from . import profile'
-        ]
+    ]
 
     supports_asset_lookup = """
         return 'supports_asset_lookup' in profile.SUPPORTS"""
@@ -18,11 +19,12 @@ class RepositoryProfile:
     supports_asset_admin = """
         return 'supports_asset_admin' in profile.SUPPORTS"""
 
+
 class RepositoryManager:
 
     import_statements = [
         'from .sessions import *'
-        ]
+    ]
 
     get_asset_lookup_session = """
         return AssetLookupSession(self._provider_manager.get_asset_lookup_session(), self._config_map)"""
@@ -55,7 +57,7 @@ class RepositoryProxyManager:
 
     import_statements = [
         'from .sessions import *'
-        ]
+    ]
 
     get_asset_lookup_session = """
         return AssetLookupSession(self._provider_manager.get_asset_lookup_session(proxy), self._config_map)"""
@@ -83,9 +85,8 @@ class RepositoryProxyManager:
         asset_lookup_session = self._provider_manager.get_asset_lookup_session_for_repository(repository_id, proxy)
         return AssetAdminSession(self._provider_manager.get_asset_admin_session_for_repository(repository_id, proxy), self._config_map, asset_lookup_session)"""
 
-class AssetLookupSession:
 
-    #import_statements = []
+class AssetLookupSession:
 
     get_asset = """
         return Asset(self._provider_session.get_asset(asset_id), self._config_map)"""
@@ -111,21 +112,18 @@ class AssetLookupSession:
 
 class AssetQuerySession:
 
-    #import_statements = []
-
     get_assets_by_query = """
         return AssetList(self._provider_session.get_assets_by_query(asset_query), self._config_map)"""
 
-class AssetSearchSession:
 
-    #import_statements = []
+class AssetSearchSession:
 
     get_assets_by_search = """
         return AssetList(self._provider_session.get_assets_by_search(asset_search), self._config_map)"""
 
 
 class AssetAdminSession:
-    
+
     import_statements = [
         'from .objects import Asset, AssetList, AssetContent, AssetContentForm',
         'from ..types import AWS_ASSET_CONTENT_RECORD_TYPE',
@@ -196,7 +194,7 @@ class AssetAdminSession:
         asset_content = self._get_asset_content(asset_content_id)
         if asset_content.has_url() and 'amazonaws.com' in asset_content.get_url():
             print "Still have to implement removing files from aws"
-            self._provider_session.delete_asset_content(asset_content_id)            
+            self._provider_session.delete_asset_content(asset_content_id)
         else:
             self._provider_session.delete_asset_content(asset_content_id)"""
 
@@ -214,6 +212,7 @@ class AssetAdminSession:
             raise NotFound('THe AWS Adapter could not find AssetContent ' + str(asset_content_id))
         return asset_content
     """
+
 
 class Asset:
 
@@ -311,13 +310,9 @@ class Asset:
 
 
 class AssetContent:
-    
+
     import_statements = [
         'from ..osid.osid_errors import *',
-        #'import boto',
-        #'import time',
-        #'from boto.s3.key import key',
-        #'from boto.cloudfront import distribution',
         'from ..primitives import *',
         'from .aws_utils import *',
         'from ..types import AWS_ASSET_CONTENT_RECORD_TYPE',
@@ -355,7 +350,7 @@ class AssetContent:
 
     get_data_length = """
         raise IllegalState()  # can we get a data length from AWS?"""
-        
+
     get_data = """
         raise Unimplemented()  # need to get data from aws"""
 
@@ -374,8 +369,9 @@ class AssetContent:
         obj_map['recordTypeIds'].append(str(AWS_ASSET_CONTENT_RECORD_TYPE))
         return obj_map"""
 
+
 class AssetContentForm:
-    
+
     import_statements = [
         'from ..osid.osid_errors import *',
         'from ..primitives import *',
@@ -475,7 +471,8 @@ class AssetContentForm:
 
     additional_methods = """
     def _clean_up(self):
-        pass # This is where we could deal with the un-updated form issue"""
+        pass  # This is where we could deal with the un-updated form issue"""
+
 
 class AssetList:
 
@@ -486,10 +483,10 @@ class AssetList:
 
     get_next_asset_content = """
         return self.next()
-            
+
     def next(self):
         return Asset(self._payload_list.next(), self._config_map)"""
-            
+
     get_next_assets = """
         if n is None:
             raise NullArgument()
@@ -511,13 +508,13 @@ class AssetContentList:
 
     get_next_asset_content = """
         return self.next()
-            
+
     def next(self):
         asset_content = self._payload_list.next()
         if asset_content.has_url() and 'amazonaws.com' in asset_content.get_url():
             return AssetContent(asset_content, self._config_map)
         return asset_content"""
-            
+
     get_next_asset_contents = """
         if n is None:
             raise NullArgument()

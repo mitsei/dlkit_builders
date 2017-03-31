@@ -24,6 +24,7 @@ class AuthorizationSession:
             )
         """
 
+
 class Authorization:
 
     model = """

@@ -1,6 +1,6 @@
 
 class Id:
-    
+
     init = """
     def __init__(self, authority, namespace, identifier):
         self._authority = authority
@@ -16,4 +16,3 @@ class Id:
 
     get_identifier = """
         return self._identifier"""
-

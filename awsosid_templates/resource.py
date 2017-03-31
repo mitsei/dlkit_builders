@@ -1,5 +1,6 @@
 # resource templates for aws osid
 
+
 class ResourceProfile:
 
     supports_visible_federation_template = """
@@ -12,13 +13,9 @@ class ResourceProfile:
         # osid.resource.ResourceProfile.supports_resource_lookup
         return self._provider_manager.${method_name}()"""
 
-#    get_resource_record_types = """
-        # Implemented from awsosid template for -
-        # osid.resource.ResourceProfile.get_resource_record_types
-#        return self._provider_manager.${method_name}()"""
 
 class ResourceManager:
-    
+
     import_statements_pattern = [
         'from . import settings',
         'import importlib'
@@ -41,7 +38,7 @@ class ResourceManager:
         parameter_id = Id('parameter:${pkg_name}ProviderImpl@aws-adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         self._provider_manager = runtime.get_manager('${pkg_name_upper}', provider_impl) # need to add version argument
-"""    
+"""
 
     get_resource_lookup_session_template = """
         # Implemented from awsosid template for -
@@ -87,12 +84,6 @@ class ResourceProxyManager:
 
 
 class ResourceLookupSession:
-
-#    init_template = """
-#    def __init__(self, provider_session, proxy = None):
-#        from ..osid import sessions as osid_sessions
-#        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-#"""
 
     get_bin_id_template = """
         # Implemented from awsosid template for -
@@ -159,14 +150,8 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_template
         return self._provider_session.${method_name}()"""
 
-class ResourceQuerySession:
 
-#    init_template = """
-#    def __init__(self, provider_session, proxy = None):
-#        from ..osid import sessions as osid_sessions
-#        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-#        self._id_namespace = '${pkg_name}.${object_name}'
-#"""
+class ResourceQuerySession:
 
     can_search_resources_template = """
         # Implemented from awsosid template for -
@@ -183,14 +168,8 @@ class ResourceQuerySession:
         # osid.resource.ResourceQuerySession.get_resources_by_query_template
         return self._provider_session.${method_name}(${arg0_name})"""
 
-class ResourceAdminSession:
 
-#    init_template = """
-#    def __init__(self, provider_session, proxy = None):
-#        from ..osid import sessions as osid_sessions
-#        osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-#        self._id_namespace = '${pkg_name}.${object_name}'
-#"""
+class ResourceAdminSession:
 
     can_create_resources_template = """
         # Implemented from awsosid template for -
@@ -232,6 +211,7 @@ class ResourceAdminSession:
         # osid.resource.ResourceAdminSession.alias_resources_template
         return self._provider_session.${method_name}(${arg0_name})"""
 
+
 class ResourceList:
 
     import_statements_pattern = [
@@ -246,13 +226,13 @@ class ResourceList:
             next_item = self.next()
         except StopIteration:
             raise IllegalState('no more elements available in this list')
-        except: #Need to specify exceptions here
+        except:  # Need to specify exceptions here
             raise OperationFailed()
         else:
             return next_item
-            
+
     def next(self):
-        from .${return_module} import ${return_type} 
+        from .${return_module} import ${return_type}
         try:
             next_item = OsidList.next(self)
         except:
@@ -260,9 +240,8 @@ class ResourceList:
         if isinstance(next_item, dict):
             next_item = ${return_type}(next_item)
         return next_item"""
-            
+
     get_next_resources_template = """
-    # Implemented from template for osid.resource.ResourceList.get_next_resources
         if ${arg0_name} > self.available():
             # !!! This is not quite as specified (see method docs) !!!
             raise IllegalState('not enough elements available in this list')
@@ -278,9 +257,9 @@ class ResourceList:
             return next_list"""
 
 
-# Can probably delete this:
 class BinLookupSession:
-    
+    # Can probably delete this:
+
     init_template = """
     def __init__(self, provider_session, authz_session, proxy = None):
         from ..osid import sessions as osid_sessions
@@ -324,8 +303,9 @@ class BinLookupSession:
         else:
             return self._provider_session.${method_name}()"""
 
-# Can probably delete this:
+
 class BinAdminSession:
+    # Can probably delete this:
 
     init_template = """
     def __init__(self, provider_session, authz_session, proxy = None):
@@ -398,4 +378,3 @@ class BinAdminSession:
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name})"""
-

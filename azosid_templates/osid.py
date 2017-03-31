@@ -1,5 +1,6 @@
 # osid templates for az_osid
 
+
 class OsidProfile:
 
     import_statements = [
@@ -32,9 +33,9 @@ class OsidProfile:
 
     def _get_authz_session(self):
         \"\"\"Gets the AuthorizationSession for the default (bootstrap) typed Vault
-        
+
         Assumes only one vault of this Type, but it can have children depending on underlying impl.
-        
+
         \"\"\"
         from ..utilities import BOOTSTRAP_VAULT_TYPE
         try:
@@ -49,9 +50,9 @@ class OsidProfile:
 
     def _get_override_lookup_session(self):
         \"\"\"Gets the AuthorizationLookupSession for the override typed Vault
-        
+
         Assumes only one
-        
+
         \"\"\"
         from ..utilities import OVERRIDE_VAULT_TYPE
         try:
@@ -105,6 +106,7 @@ class OsidProfile:
     supports_proxy_record_type = """
         pass"""
 
+
 class OsidManager:
 
     init = """
@@ -116,7 +118,7 @@ class OsidManager:
 
 
 class OsidProxyManager:
-    
+
     init = """
     def __init__(self):
         OsidProfile.__init__(self)"""
@@ -126,8 +128,6 @@ class OsidProxyManager:
 
 
 class Identifiable:
-
-#    init = """  """
 
     get_id = """
         pass"""
@@ -201,7 +201,7 @@ class OsidSession:
         \"\"\"Tests if the named function is authorized with agent and qualifier.
 
         Also, caches authz's in a dict.  It is expected that this will not grow to big, as
-        there are typically only a small number of qualifier + function combinations to 
+        there are typically only a small number of qualifier + function combinations to
         store for the agent.  However, if this becomes an issue, we can switch to something
         like cachetools.
 
@@ -222,7 +222,7 @@ class OsidSession:
     def _can_for_object(self, func_name, object_id, method_name):
         \"\"\"Checks if agent can perform function for object\"\"\"
         can_for_session = self._can(func_name)
-        if (can_for_session or 
+        if (can_for_session or
                 self._object_catalog_session is None or
                 self._override_lookup_session is None):
             return can_for_session
@@ -306,7 +306,7 @@ class OsidSession:
         if self.is_authenticated():
             return self._proxy.get_authentication().get_agent_id()
         else:
-            raise IllegalState()"""  
+            raise IllegalState()"""
 
     get_authenticated_agent = """
         if self.is_authenticated():
@@ -345,8 +345,6 @@ class OsidSession:
 
 class OsidObject:
 
-#    init = """  """
-
     get_display_name = """
         pass"""
 
@@ -361,13 +359,12 @@ class OsidRule:
 
     get_rule_id = """
         pass"""
-    
-    get_rule= """
+
+    get_rule = """
         pass"""
 
-class OsidForm:
 
-#    init = """ """
+class OsidForm:
 
     is_for_update = """
         pass"""
@@ -396,9 +393,8 @@ class OsidForm:
     get_invalid_metadata = """
         pass"""
 
-class OsidObjectForm:
 
-#    init = """ """
+class OsidObjectForm:
 
     get_display_name_metadata = """
         pass"""
@@ -421,17 +417,14 @@ class OsidObjectForm:
 
 class OsidList:
 
-#    init = """ """
-
     has_next = """
         pass"""
 
     available = """
         pass"""
 
-class Metadata:
 
-#    init = """ """
+class Metadata:
 
     get_element_id_template = """
         pass"""

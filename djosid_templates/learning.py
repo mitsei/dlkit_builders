@@ -36,9 +36,7 @@ ${import_str}        try:
         return self.my_model.${var_name}"""
 
     get_asset_ids = """
-        pass # IMPLEMENT ME NEXT!"""
+        pass  # IMPLEMENT ME NEXT!"""
 
     get_assets = """
-        pass # IMPLEMENT ME NEXT!"""
-
-
+        pass  # IMPLEMENT ME NEXT!"""

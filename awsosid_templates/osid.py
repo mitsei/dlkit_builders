@@ -1,8 +1,7 @@
 # osid templates for az_osid
 
-class OsidProfile:
 
-#    init = """ """
+class OsidProfile:
 
     get_id = """
         return self._provider_manager.get_id()"""
@@ -43,6 +42,7 @@ class OsidProfile:
     supports_proxy_record_type = """
         return self._provider_manager.supports_proxy_record_type(proxy_record_type)"""
 
+
 class OsidManager:
 
     import_statements = [
@@ -55,7 +55,7 @@ class OsidManager:
         self._my_runtime = None
         self._config_map = {}
 """
-    
+
     initialize = """
         if runtime is None:
             raise NullArgument()
@@ -109,7 +109,7 @@ class OsidProxyManager:
         self._my_runtime = None
         self._config_map = {}
 """
-    
+
     initialize = """
         if runtime is None:
             raise NullArgument()
@@ -156,10 +156,7 @@ class OsidProxyManager:
         return self._provider_manager.change_branch(branch_id)"""
 
 
-
 class Identifiable:
-
-#    init = """  """
 
     get_id = """
         return self._payload.get_id()"""
@@ -203,7 +200,7 @@ class OsidSession:
     def __init__(self, provider_session, config_map, proxy = None):
         self._provider_session = provider_session
         self._config_map = config_map
-        self._proxy = proxy # Proxy is not currently used, and will always 
+        self._proxy = proxy # Proxy is not currently used, and will always
                             # be None, but someday may come in handy. Manager
                             # set_session methods would need to be updated to
                             # pass proxy information to aws_adapter sessiosns.
@@ -216,7 +213,7 @@ class OsidSession:
         return self._provider_session.is_authenticated()"""
 
     get_authenticated_agent_id = """
-        return self._provider_session.get_authenticated_agent_id()"""  
+        return self._provider_session.get_authenticated_agent_id()"""
 
     get_authenticated_agent = """
         return self._provider_session.get_authenticated_agent()"""
@@ -257,7 +254,7 @@ class OsidObject:
 
 class OsidForm:
 
-    init = """ 
+    init = """
     def __init__(self, payload, config_map, repository_id):
         self._payload = payload
         self._config_map = config_map
@@ -283,9 +280,6 @@ class OsidForm:
     get_journal_comment_metadata = """
         return self._payload.get_journal_comment_metadata()"""
 
-    #set_comment = """
-    #    return self._payload.set_comment(comment)"""
-
     set_journal_comment = """
         return self._payload.set_comment(comment)"""
 
@@ -298,9 +292,8 @@ class OsidForm:
     get_invalid_metadata = """
         return self._payload.get_invalid_metadata()"""
 
-class OsidObjectForm:
 
-#    init = """ """
+class OsidObjectForm:
 
     get_display_name_metadata = """
         return self._payload.get_display_name_metadata()"""
@@ -346,4 +339,3 @@ class OsidList:
 
     available = """
         self._payload_list.available()"""
-

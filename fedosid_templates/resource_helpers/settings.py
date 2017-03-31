@@ -6,5 +6,5 @@ OSID_PACKAGE_PATH = 'osid_kit.osid_federator'
 # where the implementations' managers live. The first implementation
 # manager listed will be the one that deals with default catalogs.
 PROVIDER_MANAGER_MODULE_PATHS = [
-'resource_kit.dj_resource.managers'
+    'resource_kit.dj_resource.managers'
 ]
