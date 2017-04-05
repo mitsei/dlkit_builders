@@ -101,8 +101,8 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             patterns = self.patterns
         is_catalog_session = False
         if (interface['category'] == 'sessions' and
-            not interface['shortname'].startswith(patterns['package_catalog_caps']) and
-            package_name not in ['type']):
+                not interface['shortname'].startswith(patterns['package_catalog_caps']) and
+                package_name not in ['type']):
             is_catalog_session = True
         return is_catalog_session
 
@@ -115,7 +115,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         if package_name in ['type']:
             is_manager_session = True
         elif (interface['category'] == 'sessions' and
-            interface['shortname'].startswith(patterns['package_catalog_caps'])):
+                interface['shortname'].startswith(patterns['package_catalog_caps'])):
             is_manager_session = True
         return is_manager_session
 
@@ -129,7 +129,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
 
         if not (('OsidManager' in interface['inherit_shortnames'] or
                  'OsidProxyManager' in interface['inherit_shortnames']) and
-                 '_session' in method_name):
+                '_session' in method_name):
             if method_name == 'get_id':
                 method_sig = '   .. autoattribute:: ' + class_name + '.ident'
             elif method_name == 'get_identifier_namespace':
@@ -140,7 +140,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
                 method_sig = '   .. autoattribute:: ' + class_name + '.' + fix_reserved_word(method_name[4:])
             elif method_name.startswith('clear_') and method['args'] == []:
                 method_sig = '   .. autoattribute:: ' + class_name + '.' + fix_reserved_word(method_name[6:])
-            ##
+
             # And finally all the methods:
             else:
                 method_sig = '   .. automethod:: {0}.{1}'.format(class_name,
@@ -263,8 +263,8 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             build_me = False
 
         if (('OsidManager' in interface['inherit_shortnames'] or
-                 'OsidProxyManager' in interface['inherit_shortnames']) and
-                 '_session' in method['name']):
+             'OsidProxyManager' in interface['inherit_shortnames']) and
+                '_session' in method['name']):
             build_me = False
 
         return build_me

@@ -80,7 +80,7 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
         # The following method sig builder uses *args, **kwargs for all methods. It is used
         # by the dlkit builder to pass arguments in the blind.
         elif (method['args'] or interface_name.endswith('Manager') and
-                not 'Runtime' in interface_name):
+                'Runtime' not in interface_name):
             method_sig = '{}def {}(self, *args, **kwargs):'.format(self._ind,
                                                                    method['name'])
         else:
