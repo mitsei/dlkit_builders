@@ -1862,7 +1862,9 @@ class AssessmentSection:
                             'choiceIds' in response and
                             len(response['choiceIds']) > 0):
                         matching_answers = [a for a in item['answers']
-                                           if a['choiceIds'][0] == response['choiceIds'][0]]
+                                            if 'choiceIds' in a and
+                                            len(a['choiceIds']) > 0 and
+                                            a['choiceIds'][0] == response['choiceIds'][0]]
                         if len(matching_answers) > 0 and 'confusedLearningObjectiveIds' in matching_answers[0]:
                             response['confusedLearningObjectiveIds'] = matching_answers[0]['confusedLearningObjectiveIds']
 
