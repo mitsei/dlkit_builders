@@ -20,11 +20,11 @@ def reindent(text, i_indent):
 def wrap_and_indent(text, i_indent='', s_indent=None, width=72):
     """
     Wraps and indents with initial, subsequent strings and max width.
-    
+
     Wraps and indents a block of text given initial and subsequent indent
     strings and a max width.  Will also strip any leading or trailing spaces
     and lines (I believe, need to check this)
-    
+
     """
     if not s_indent:
         s_indent = i_indent
@@ -39,16 +39,16 @@ def wrap_and_indent(text, i_indent='', s_indent=None, width=72):
 def fix_reserved_word(word, is_module=False):
     """
     Replaces words that may be problematic
-    
+
     In particular the term 'type' is used in the osid spec, primarily as an argument
     parameter where a type is provided to a method.  'type' is a reserved word
-    in python, so we give ours a trailing underscore. If we come across any other 
+    in python, so we give ours a trailing underscore. If we come across any other
     osid things that are reserved word they can be dealt with here.
-    
+
     """
     if is_module:
         if word == 'logging':
-            word = 'logging_' # Still deciding this
+            word = 'logging_'  # Still deciding this
     else:
         if keyword.iskeyword(word):
             word += '_'
@@ -57,9 +57,8 @@ def fix_reserved_word(word, is_module=False):
     return word
 
 
-##
 # Takes a CamelCase string (standard OSID method name case) and returns a list.
-# Useful for parsing out words when inspecting methods for bindings, etc. It 
+# Useful for parsing out words when inspecting methods for bindings, etc. It
 # will also work for mixedCase strings.
 def camel_to_list(string):
     string = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', string)
@@ -86,7 +85,6 @@ def under_to_caps(string):
     return ''.join(words)
 
 
-##
 # Takes a CAPS_UNDER style string (standard OSID exception case) and return
 # a CamelCase version, for converting to Python exception convention
 def caps_under_to_camel(string):
@@ -97,12 +95,11 @@ def is_mixed_case(s):
     return s != s.lower() and s != s.upper() and not s[0].isupper()
 
 
-##
 # These two functions deal with plurals.  At times in the osid spec you will
-# find method names like 'hasThing' where the underlying model is really 
-# storing a bunch of things, and a 'getThings' call is available for that. 
+# find method names like 'hasThing' where the underlying model is really
+# storing a bunch of things, and a 'getThings' call is available for that.
 # These methods come in handy when inspecting for these kinds of patterns.
-# feel free to update the following singular to plural list as exceptions 
+# feel free to update the following singular to plural list as exceptions
 # to the "just add an 's' rule" are found.
 _singular_to_plural = {
     'Millenium': 'Millenia',
@@ -158,7 +155,6 @@ def remove_plural(string):
         return string[:-1]
 
 
-##
 # This little function is used to convert each osid method name
 # from camelCase to underscore_case to make the binding and impls
 # a little more Pythonic.
@@ -176,7 +172,6 @@ def camel_to_caps_under(name):
     return camel_to_under(name).upper()
 
 
-##
 # This function simply returns the package string, parsing and input
 # interface full name.
 def get_pkg_name(interface):
@@ -191,13 +186,11 @@ def get_pkg_name(interface):
         return '.'.join(interface_components[1:-1])
 
 
-##
 # Return the associated class name for a ProxyManager given a Manager name
 def proxy_manager_name(string):
     return string.split('Manager')[0] + 'ProxyManager'
 
 
-##
 # The SkipMethod exception is used for implementation builders like the
 # Kit builder where methods must occasionally be skipped for whatever reason.
 class SkipMethod(Exception):
@@ -229,8 +222,8 @@ def make_twargs(index,
         twargs['return_type_full'] = method['return_type']
     n = 0
     while n < arg_count:
-        twargs['arg' + str(n) +'_name'] = method['args'][n]['var_name']
-        twargs['arg' + str(n) +'_type_full'] = method['args'][n]['arg_type']
+        twargs['arg' + str(n) + '_name'] = method['args'][n]['var_name']
+        twargs['arg' + str(n) + '_type_full'] = method['args'][n]['arg_type']
         n += 1
     return twargs
 
@@ -251,15 +244,17 @@ def get_cat_name_for_pkg(pkg):
 
 
 def flagged_for_implementation(interface,
-        sessions_to_implement, objects_to_implement, variants_to_implement):
+                               sessions_to_implement,
+                               objects_to_implement,
+                               variants_to_implement):
     """
     Check if this interface is meant to be implemented.
-    
+
     """
     test = False
     if interface['category'] == 'managers':
         test = True
-    elif (interface['category'] == 'sessions' and 
+    elif (interface['category'] == 'sessions' and
             interface['shortname'] in sessions_to_implement):
         test = True
     elif interface['shortname'] in objects_to_implement:
@@ -275,9 +270,9 @@ def flagged_for_implementation(interface,
 def fix_bad_name(name, optional_match_term=None):
     """
     Occasionally there are bad names of things in the osid spec.
-    
+
     Here these can be overriden until they are fixed in the spec.
-    
+
     """
     bad_names_map = {
         'set_base_on_grades': 'set_based_on_grades',
@@ -302,8 +297,8 @@ def add_missing_args(method, interface_name):
     if (interface_name.endswith('Receiver') and
             method['name'].split('_')[0] in ['new', 'changed', 'deleted'] and
             len(method['args']) == 1):
-        method['args'] = ([{"arg_type": "osid.id.Id", 
-                            "var_name": "notification_id", 
+        method['args'] = ([{"arg_type": "osid.id.Id",
+                            "var_name": "notification_id",
                             "array": False}] + method['args'])
         method['arg_types'] = ['osid.id.Id'] + method['arg_types']
         method['arg_doc'] = '        arg:    notification_id (osid.id.Id): the notification ``Id``\n' + method['arg_doc']
@@ -316,92 +311,89 @@ def add_missing_methods(interface):
             'acknowledge_' + camel_to_under(interface['shortname'][:len('Session')]) not in interface['method_names']):
         object_name_under = camel_to_under(interface['shortname'][:-len('NotificationSession')])
         interface['methods'] = (interface['methods'] + [{
-               'name': 'reliable_' + object_name_under + '_notifications', 
-               'doc': {
-                  'headline': 'Reliable notifications are desired.', 
-                  'body': '        In reliable mode, notifications are to be acknowledged using\n        ``acknowledge_item_notification()`` .'
-               }, 
-               'arg_doc': '', 
-               'return_doc': '', 
-               'error_doc': '', 
-               'sphinx_param_doc': '', 
-               'sphinx_return_doc': '', 
-               'sphinx_error_doc': '', 
-               'compliance_doc': '        *compliance: mandatory -- This method is must be implemented.*\n', 
-               'impl_notes_doc': '', 
-               'args': [], 
-               'arg_types': [], 
-               'return_type': '', 
-               'errors': {}
-            }, 
-            {
-               'name': 'unreliable_' + object_name_under + '_notifications', 
-               'doc': {
-                  'headline': 'Unreliable notifications are desired.', 
-                  'body': '        In unreliable mode, notifications do not need to be\n        acknowledged.'
-               }, 
-               'arg_doc': '', 
-               'return_doc': '', 
-               'error_doc': '', 
-               'sphinx_param_doc': '', 
-               'sphinx_return_doc': '', 
-               'sphinx_error_doc': '', 
-               'compliance_doc': '        *compliance: mandatory -- This method is must be implemented.*\n', 
-               'impl_notes_doc': '', 
-               'args': [], 
-               'arg_types': [], 
-               'return_type': '', 
-               'errors': {}
-            }, 
-            {
-               'name': 'acknowledge_' + object_name_under + '_notification', 
-               'doc': {
-                  'headline': 'Acknowledge an ' + object_name_under + ' notification.', 
-                  'body': ''
-               }, 
-               'arg_doc': '        arg:    notification_id (osid.id.Id): the ``Id`` of the\n                notification\n', 
-               'return_doc': '', 
-               'error_doc': '        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure', 
-               'sphinx_param_doc': '        :param notification_id: the ``Id`` of the notification\n        :type notification_id: ``osid.id.Id``\n', 
-               'sphinx_return_doc': '', 
-               'sphinx_error_doc': '        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure', 
-               'compliance_doc': '        *compliance: mandatory -- This method must be implemented.*\n', 
-               'impl_notes_doc': '', 
-               'args': [
-                  {
-                     'arg_type': 'osid.id.Id', 
-                     'var_name': 'notification_id', 
-                     'array': False
-                  }
-               ], 
-               'arg_types': [
-                  'osid.id.Id'
-               ], 
-               'return_type': '', 
-               'errors': {
-                  'OPERATION_FAILED': 'Operational', 
-                  'PERMISSION_DENIED': 'User'
-               }
-            }] 
-        )
+            'name': 'reliable_' + object_name_under + '_notifications',
+            'doc': {
+                'headline': 'Reliable notifications are desired.',
+                'body': '        In reliable mode, notifications are to be acknowledged using\n        ``acknowledge_item_notification()`` .'
+            },
+            'arg_doc': '',
+            'return_doc': '',
+            'error_doc': '',
+            'sphinx_param_doc': '',
+            'sphinx_return_doc': '',
+            'sphinx_error_doc': '',
+            'compliance_doc': '        *compliance: mandatory -- This method is must be implemented.*\n',
+            'impl_notes_doc': '',
+            'args': [],
+            'arg_types': [],
+            'return_type': '',
+            'errors': {}
+        }, {
+            'name': 'unreliable_' + object_name_under + '_notifications',
+            'doc': {
+                'headline': 'Unreliable notifications are desired.',
+                'body': '        In unreliable mode, notifications do not need to be\n        acknowledged.'
+            },
+            'arg_doc': '',
+            'return_doc': '',
+            'error_doc': '',
+            'sphinx_param_doc': '',
+            'sphinx_return_doc': '',
+            'sphinx_error_doc': '',
+            'compliance_doc': '        *compliance: mandatory -- This method is must be implemented.*\n',
+            'impl_notes_doc': '',
+            'args': [],
+            'arg_types': [],
+            'return_type': '',
+            'errors': {}
+        }, {
+            'name': 'acknowledge_' + object_name_under + '_notification',
+            'doc': {
+                'headline': 'Acknowledge an ' + object_name_under + ' notification.',
+                'body': ''
+            },
+            'arg_doc': '        arg:    notification_id (osid.id.Id): the ``Id`` of the\n                notification\n',
+            'return_doc': '',
+            'error_doc': '        raise:  OperationFailed - unable to complete request\n        raise:  PermissionDenied - authorization failure',
+            'sphinx_param_doc': '        :param notification_id: the ``Id`` of the notification\n        :type notification_id: ``osid.id.Id``\n',
+            'sphinx_return_doc': '',
+            'sphinx_error_doc': '        :raise: ``OperationFailed`` -- unable to complete request\n        :raise: ``PermissionDenied`` -- authorization failure',
+            'compliance_doc': '        *compliance: mandatory -- This method must be implemented.*\n',
+            'impl_notes_doc': '',
+            'args': [
+                {
+                    'arg_type': 'osid.id.Id',
+                    'var_name': 'notification_id',
+                    'array': False
+                }
+            ],
+            'arg_types': [
+                'osid.id.Id'
+            ],
+            'return_type': '',
+            'errors': {
+                'OPERATION_FAILED': 'Operational',
+                'PERMISSION_DENIED': 'User'
+            }
+        }])
     elif interface['shortname'] == 'LoggingProfile':
         interface['method_names'].append('supports_log_entry_admin')
         interface['methods'].append({
-           "name": "supports_log_entry_admin",
-           "doc": {
-              "headline": "Tests if log entry admin is supported.",
-              "body": ""
-           },
-           "arg_doc": "",
-           "return_doc": "        return: (boolean) - ``true`` if log entry admin is supported,\n                ``false`` otherwise",
-           "error_doc": "",
-           "sphinx_param_doc": "",
-           "sphinx_return_doc": "        :return: ``true`` if log entry admin is supported, ``false`` otherwise\n        :rtype: ``boolean``",
-           "sphinx_error_doc": "",
-           "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n",
-           "impl_notes_doc": "",
-           "args": [],
-           "arg_types": [],
-           "return_type": "boolean",
-           "errors": {}
+            "name": "supports_log_entry_admin",
+            "doc": {
+                "headline": "Tests if log entry admin is supported.",
+                "body": ""
+            },
+            "arg_doc": "",
+            "return_doc": "        return: (boolean) - ``true`` if log entry admin is supported,\n                ``false`` otherwise",
+            "error_doc": "",
+            "sphinx_param_doc": "",
+            "sphinx_return_doc": "        :return: ``true`` if log entry admin is supported, ``false`` otherwise\n        :rtype: ``boolean``",
+            "sphinx_error_doc": "",
+            "compliance_doc": "        *compliance: mandatory -- This method must be implemented.*\n",
+            "impl_notes_doc": "",
+            "args": [],
+            "arg_types": [],
+            "return_type": "boolean",
+            "errors": {}
         })

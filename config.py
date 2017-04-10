@@ -59,7 +59,7 @@ managers_to_implement = [
 ]
 
 sessions_to_implement = [
-    ### assessment service:
+    # assessment service:
     'AssessmentSession',
     'AssessmentResultsSession',
     'ItemLookupSession',
@@ -90,14 +90,14 @@ sessions_to_implement = [
     'BankAdminSession',
     'BankHierarchySession',
     'BankHierarchyDesignSession',
-    ### assessment authoring:
+    # assessment authoring:
     'AssessmentPartLookupSession',
     'AssessmentPartAdminSession',
     'AssessmentPartItemSession',
     'AssessmentPartItemDesignSession',
     'SequenceRuleLookupSession',
     'SequenceRuleAdminSession',
-    ### authorization service:
+    # authorization service:
     'AuthorizationSession',
     'AuthorizationLookupSession',
     'AuthorizationAdminSession',
@@ -105,14 +105,14 @@ sessions_to_implement = [
     'VaultLookupSession',
     'VaultAdminSession',
     'VaultQuerySession',
-    ### cataloging service:
+    # cataloging service:
     'CatalogSession',
     'CatalogAssignmentSession',
     'CatalogLookupSession',
     'CatalogAdminSession',
     'CatalogHierarchySession',
     'CatalogHierarchyDesignSession',
-    ### commenting service:
+    # commenting service:
     'CommentLookupSession',
     'CommentQuerySession',
     'CommentAdminSession',
@@ -120,7 +120,7 @@ sessions_to_implement = [
     'BookAdminSession',
     'BookHierarchySession',
     'BookHierarchyDesignSession',
-    ### grading service:
+    # grading service:
     'GradebookLookupSession',
     'GradebookAdminSession',
     'GradeSystemLookupSession',
@@ -134,12 +134,12 @@ sessions_to_implement = [
     'GradebookColumnQuerySession',
     'GradebookColumnCalculationLookupSession',
     'GradebookColumnCalculationAdminSession',
-    ### hierarchy service:
+    # hierarchy service:
     'HierarchyLookupSession',
     'HierarchyAdminSession',
     'HierarchyTraversalSession',
     'HierarchyDesignSession',
-    ### learning service:
+    # learning service:
     'ObjectiveLookupSession',
     'ObjectiveQuerySession',
     'ObjectiveAdminSession',
@@ -161,18 +161,18 @@ sessions_to_implement = [
     'ProficiencyLookupSession',
     'ProficiencyAdminSession',
     'ProficiencyQuerySession',
-    ## logging service:
+    # logging service:
     'LoggingSession',
     'LogEntryLookupSession',
     'LogEntryAdminSession',
     'LogEntryQuerySession',
     'LogLookupSession',
     'LogAdminSession',
-    ## ontology service:
+    # ontology service:
     'SubjectHierarchyDesignSession',
-    ### proxy service
+    # proxy service
     'ProxySession',
-    ### relationship service
+    # relationship service
     'RelationshipLookupSession',
     'RelationshipQuerySession',
     'RelationshipAdminSession',
@@ -180,7 +180,7 @@ sessions_to_implement = [
     'FamilyAdminSession',
     'FamilyHierarchySession',
     'FamilyHierarchyDesignSession',
-    ### repository service
+    # repository service
     'AssetLookupSession',
     'AssetQuerySession',
     'AssetSearchSession',
@@ -201,7 +201,7 @@ sessions_to_implement = [
     'RepositoryQuerySession',
     'RepositoryHierarchySession',
     'RepositoryHierarchyDesignSession',
-    ## resource service
+    # resource service
     'ResourceLookupSession',
     'ResourceQuerySession',
     'ResourceSearchSession',
@@ -219,7 +219,7 @@ sessions_to_implement = [
 ]
 
 objects_to_implement = [
-    ### assessment service:
+    # assessment service:
     'Item',
     'Question',
     'Answer',
@@ -229,22 +229,22 @@ objects_to_implement = [
     'AssessmentTaken',
     'Response',
     'Bank',
-    ### assessment authoring service:
+    # assessment authoring service:
     'AssessmentPart',
     'SequenceRule',
-    ### authentication_process:
+    # authentication_process:
     'Authentication',
-    ### authentication:
+    # authentication:
     'Agent',
-    ### authorization service:
+    # authorization service:
     'Authorization',
     'Vault',
-    ### ctaloging service:
+    # ctaloging service:
     'Catalog',
-    ### commenting service:
+    # commenting service:
     'Comment',
     'Book',
-    ### grading service:
+    # grading service:
     'Grade',
     'GradeSystem',
     'GradeEntry',
@@ -252,40 +252,40 @@ objects_to_implement = [
     'GradebookColumnSummary',
     'GradebookColumnCalculation',
     'Gradebook',
-    ### hierarchy service
+    # hierarchy service
     'Node',
     'Hierarchy',
     'HierarchyNode',
-    ### id service
+    # id service
     'Id',
-    ### learning service
+    # learning service
     'Objective',
     'Activity',
     'ObjectiveBank',
     'Proficiency',
-    ### locale service
+    # locale service
     'Locale',
     'LocaleList',
-    ### logging service
+    # logging service
     'Log',
     'LogEntry',
-    ### ontology service
+    # ontology service
     'Subject',
-    ### proxy service
+    # proxy service
     'Proxy',
     'ProxyCondition',
-    ### relationship service
+    # relationship service
     'Relationship',
     'Family',
-    ### repository service
+    # repository service
     'Asset',
     'AssetContent',
     'Composition',
     'Repository',
-    ### resource service
+    # resource service
     'Resource',
     'Bin',
-    ### type service
+    # type service
     'Type',
 ]
 

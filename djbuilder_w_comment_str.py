@@ -50,11 +50,10 @@ def make_djosids(make_models=False):
            str(_implemented_method_count) + ' of ' +
            str(_total_method_count) + ' methods (' +
            "{0:.0f}%".format(float(_implemented_method_count) /
-                                  ( _total_method_count) * 100) +
+                             (_total_method_count) * 100) +
            ') implemented in ' +
            str(_implemented_interface_count) + ' of ' +
            str(_total_interface_count) + ' interfaces.')
-
 
 
 def make_djosid(file_name, make_models=False, make_package=True):
@@ -68,7 +67,7 @@ def make_djosid(file_name, make_models=False, make_package=True):
     global _package_interface_count
     global _package_implemented_interface_count
     global _package_implemented_method_count
-    global _package_method_count    
+    global _package_method_count
     _package_method_count = 0
     _package_implemented_method_count = 0
     _package_interface_count = 0
@@ -92,7 +91,7 @@ def make_djosid(file_name, make_models=False, make_package=True):
         import_str = ('import abc\nfrom ' + abc_pkg_name + ' import ' +
                       abc_prefix + package_name + '\n')
         if package_name != 'osid':
-            import_str = (import_str + 'from ' + app_name('osid') + 
+            import_str = (import_str + 'from ' + app_name('osid') +
                           ' import ' + pkg_name('osid') + '\n')
         import_str = import_str + '\n\n'
 
@@ -122,7 +121,7 @@ def make_djosid(file_name, make_models=False, make_package=True):
 
     # Save the model string to the models.py file in the appropriate Django app
     # making sure not to overwrite the osid_kit and type_kit models while we
-    # are still trying to figure things out.    
+    # are still trying to figure things out.
     if package_name != 'osid' and package_name != 'type' and make_models:
         print 'writing', app_name(package_name), 'Django models'
         write_file = open(app_name(package_name) + '/models.py', 'w')
@@ -134,7 +133,7 @@ def make_djosid(file_name, make_models=False, make_package=True):
     print 'writing', app_name(package_name), 'packages'
     if not os.path.exists(app_name(package_name) + '/' + pkg_name(package_name)):
         os.makedirs(app_name(package_name) + '/' + pkg_name(package_name))
-        os.system('touch ' + app_name(package_name) + '/' + 
+        os.system('touch ' + app_name(package_name) + '/' +
                   pkg_name(package_name) + '/__init__.py')
 
     for module_name in modules:
@@ -170,10 +169,10 @@ def license_iterator(root, package_name, version_str):
             title_str = (wrap_and_indent(child.text, indent_str) +
                          '\n' + indent_str + '\n' + indent_str + '\n')
         if child.tag == (ns + 'copyright'):
-            legal_str = (process_text(child) + '\n'
-                                 + indent_str + '\n' + indent_str + '\n')
+            legal_str = (process_text(child) + '\n' +
+                         indent_str + '\n' + indent_str + '\n')
         if child.tag == (ns + 'license'):
-            legal_str = legal_str + process_text(child) +'\n\n\n'
+            legal_str = legal_str + process_text(child) + '\n\n\n'
     return head_str + version_str + title_str + legal_str
 
 
@@ -220,17 +219,17 @@ def interface_iterator(root, package_name, package_root, make_package=False):
         if child.tag == (ns + 'description'):
             doc_str = doc_str + process_text(child)
         if child.tag == (ns + 'method'):
-            method_list.append(dict(method_name = child.get(ns + 'name'),
-                                   return_type = get_return_type(child),
-                                   param_list = get_param_list(child)))
+            method_list.append(dict(method_name=child.get(ns + 'name'),
+                                    return_type=get_return_type(child),
+                                    param_list=get_param_list(child)))
             method_str = method_str + method_iterator(child, package_name,
-                                    interface_str, inherit_list, root,
-                                    package_root) + '\n\n'
+                                                      interface_str, inherit_list, root,
+                                                      package_root) + '\n\n'
     if inherit_str:
         inherit_str = '(' + inherit_str + ')'
     class_str = 'class ' + interface_str + inherit_str + ':'
     init_methods = make_init_methods(package_name, interface_str,
-                                    inherit_list, method_list, package_root)
+                                     inherit_list, method_list, package_root)
     if init_methods:
         init_methods = init_methods + '\n'
     if not method_str:
@@ -238,9 +237,9 @@ def interface_iterator(root, package_name, package_root, make_package=False):
         _package_implemented_interface_count += 1
     _package_interface_count += 1
 
-    return dict(interfaceBody = (doc_str + '\n\n' + class_str + '\n\n' +
-                init_methods + method_str + '\n'),
-                module_name = spiType(inherit_list, interface_str))
+    return dict(interfaceBody=(doc_str + '\n\n' + class_str + '\n\n' +
+                               init_methods + method_str + '\n'),
+                module_name=spiType(inherit_list, interface_str))
 
 
 def model_iterator(root, package_name, package_root):
@@ -262,14 +261,14 @@ def model_iterator(root, package_name, package_root):
                 inherit_str = append_impl_str(impl_name, inherit_str)
         if child.tag == (ns + 'method'):
             method_list.append(dict(method_name=child.get(ns + 'name'),
-                                   return_type=get_return_type(child),
-                                   param_list=get_param_list(child)))
+                                    return_type=get_return_type(child),
+                                    param_list=get_param_list(child)))
     inherit_str = append_impl_str('models.Model', inherit_str)
     if inherit_str:
         inherit_str = '(' + inherit_str + ')'
     class_str = 'class ' + interface_str + inherit_str + ':'
     model_str = make_models(package_name, interface_str,
-                                    inherit_list, method_list, package_root)
+                            inherit_list, method_list, package_root)
     if model_str:
         return (class_str + '\n' + model_str + '\n')
     else:
@@ -412,8 +411,8 @@ def process_text(root, i_indent='# ', s_indent=None):
         if child.tag == (ns + 'copyrightSymbol'):
             iter_str = iter_str + ' (c) ' + ' '.join(child.tail.split()) + ' '
         if child.tag == (ns + 'pbreak'):
-            make_str = (make_str + wrap_and_indent(iter_str, 
-                                    i_indent, s_indent)) + '\n' + i_indent + '\n'
+            make_str = (make_str + wrap_and_indent(iter_str,
+                        i_indent, s_indent)) + '\n' + i_indent + '\n'
             iter_str = ' '.join(child.tail.split())
         if child.tag == (ns + 'heading'):
             iter_str = iter_str + ' '.join(str(child.text).split())
@@ -427,15 +426,15 @@ def process_text(root, i_indent='# ', s_indent=None):
             iter_str = iter_str + '' + ' '.join(str(child.tail).split()) + ''
         if child.tag == (ns + 'code'):
             make_str = (make_str + wrap_and_indent(iter_str,
-                                        i_indent, s_indent)).strip() + '\n'
+                        i_indent, s_indent)).strip() + '\n'
             iter_str = reindent(child.text.strip(), i_indent + '  ')
             make_str = make_str + iter_str + i_indent + '\n'
             iter_str = ' '.join(child.tail.split())
         if child.tag == (ns + 'outline'):
-            make_str = (make_str + wrap_and_indent(iter_str, 
-                                        i_indent, s_indent)).strip() + '\n'
+            make_str = (make_str + wrap_and_indent(iter_str,
+                        i_indent, s_indent)).strip() + '\n'
             iter_str = make_outline(child, i_indent + '  * ',
-                                         i_indent + '    ')
+                                    i_indent + '    ')
             make_str = make_str + iter_str.strip()
             iter_str = ' '.join(child.tail.split())
     return make_str + wrap_and_indent(iter_str, i_indent, s_indent)
@@ -460,7 +459,7 @@ def make_outline(root, i_indent, s_indent=None):
     return outline_str
 
 
-# This little function simply appends the class inheritance string (impl_str) 
+# This little function simply appends the class inheritance string (impl_str)
 # with each of the osid classes (impl's) sent to it by the method iterator
 def append_impl_str(impl, impl_str):
     if impl_str:
@@ -516,8 +515,8 @@ def spiType(inherit_list, interface_str):
     elif ('OsidSession' in inherit_list or
           camel_to_list(interface_str)[-1] == 'Session'):
         return 'sessions'
-    elif ('OsidProfile' in inherit_list or 
-          'OsidManager' in inherit_list or 
+    elif ('OsidProfile' in inherit_list or
+          'OsidManager' in inherit_list or
           'OsidProxyManager' in inherit_list):
         return 'managers'
     elif ('OsidPrimitive' in inherit_list):

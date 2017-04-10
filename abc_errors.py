@@ -1,6 +1,6 @@
 # THIS SHOULD BE REDONE TO MATCH THE STYLE OF THE GENERATED ABC OSIDS!
 # obcosid_errors
-# for complete documentation go to 
+# for complete documentation go to
 # http://osid.org/specifications/meta/Errors.html
 
 # Errors are specified in each method specification. Only the specified errors are permitted
@@ -18,7 +18,7 @@
 # the error may vary from method to method in accordance with the OSID specification.
 
 # User
-# User errors are only permitted where specified in method signatures and should be handled 
+# User errors are only permitted where specified in method signatures and should be handled
 # directly by a consumer application.
 
 
@@ -34,13 +34,13 @@ class PermissionDenied(Exception):
     pass
 
 
-# Operational	
-# Operational errors result from failures in the system. These errors are only permitted 
+# Operational
+# Operational errors result from failures in the system. These errors are only permitted
 # where specified and should be handled directly by the consumer application.
 
 class ConfigurationError(Exception):
     pass
-    
+
 
 class OperationFailed(Exception):
     pass
@@ -50,9 +50,10 @@ class TransactionFailure(Exception):
     pass
 
 # ConsumerContract
-# Errors in programming resulting from an incorrect use of the OSIDs. Application code 
-# should be checked for accuracy. These errors should be avoided by using the defined 
+# Errors in programming resulting from an incorrect use of the OSIDs. Application code
+# should be checked for accuracy. These errors should be avoided by using the defined
 # interoperability and flow control tests.
+
 
 class IllegalState(Exception):
     pass
@@ -60,7 +61,7 @@ class IllegalState(Exception):
 
 class InvalidArgument(Exception):
     pass
-    
+
 
 class InvalidMethod(Exception):
     pass
