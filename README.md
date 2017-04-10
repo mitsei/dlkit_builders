@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mitsei/dlkit_builders.svg?branch=master)](https://travis-ci.org/mitsei/dlkit_builders)
+
 This builder generates `dlkit` from the `xosid` `xml` packages. It assumes
 the `xosid` packages defined in `config.py` are located in a sibling
 directory to this, like:
