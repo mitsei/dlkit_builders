@@ -14,11 +14,12 @@ def get_aws_s3_handle(config_map):
 
     """
 
-    url = 'https://' + config_map['s3_bucket'] + '.s3.amazonaws.com' # https://mitodl-repository.s3.amazonaws.com
+    url = 'https://' + config_map['s3_bucket'] + '.s3.amazonaws.com'  # https://mitodl-repository.s3.amazonaws.com
     connection = boto.connect_s3(config_map['put_public_key'], config_map['put_private_key'])
     bucket = connection.create_bucket(config_map['s3_bucket'])
     repo = Key(bucket)
-    return (repo, url)
+    return repo, url
+
 
 def get_signed_url(url, config_map):
     """ Convenience function for getting cloudfront signed URL given a saved URL
@@ -32,7 +33,7 @@ def get_signed_url(url, config_map):
 
     """
     current_time = int(time.time())
-    expires_in = 300  #seconds
+    expires_in = 300  # seconds
     expires = current_time + expires_in
     s3_bucket = config_map['s3_bucket']
 

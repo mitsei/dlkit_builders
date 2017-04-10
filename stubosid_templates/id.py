@@ -1,6 +1,6 @@
 
 class Id:
-    
+
     init = """
     def __init__(self, authority, namespace, identifier):
         self._authority = authority
@@ -16,11 +16,12 @@ class Id:
     get_identifier = """
         return self._identifier"""
 
+
 class IdList:
 
     import_statements = [
-    'from dlkit.abstract_osid.osid import errors',
-    'from ..primitives import Id',
+        'from dlkit.abstract_osid.osid import errors',
+        'from ..primitives import Id',
     ]
 
     get_next_id = """

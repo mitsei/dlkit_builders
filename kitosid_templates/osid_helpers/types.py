@@ -4,6 +4,7 @@
 from .osid_errors import NotFound
 from .settings import LANGUAGETYPE, SCRIPTTYPE, FORMATTYPE
 
+
 class Language(object):
     """Language type"""
     def get_type_data(self, name):
@@ -13,6 +14,7 @@ class Language(object):
         else:
             raise NotFound('DEFAULT Language Type')
 
+
 class Script(object):
     """Script type"""
     def get_type_data(self, name):
@@ -21,6 +23,7 @@ class Script(object):
             return SCRIPTTYPE
         else:
             raise NotFound('DEFAULT Script Type')
+
 
 class Format(object):
     """Format type"""

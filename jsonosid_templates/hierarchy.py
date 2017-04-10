@@ -5,14 +5,12 @@ class HierarchyTraversalSession:
         'from ..primitives import Id',
         'from ..primitives import Type',
         'from ..osid.sessions import OsidSession',
-        #'from ..osid.objects import OsidNode',
         'from . import objects',
         'from ..id.objects import IdList',
     ]
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        #OsidSession.__init__(self)
         OsidSession._init_catalog(self, proxy, runtime)  # to get the configured authority
         from .objects import Hierarchy
         self._catalog_class = Hierarchy
@@ -155,6 +153,7 @@ class HierarchyTraversalSession:
                              'leaf': not self.has_children(id_),
                              'sequestered': False})"""
 
+
 class HierarchyDesignSession:
 
     import_statements = [
@@ -167,7 +166,6 @@ class HierarchyDesignSession:
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        # OsidSession.__init__(self)
         OsidSession._init_catalog(self, proxy, runtime)  # to get the configured authority
         from .objects import Hierarchy
         self._catalog_class = Hierarchy
@@ -198,7 +196,7 @@ class HierarchyDesignSession:
         ident = Id(authority=self._authority,
                    namespace='hierarchy.Hierarchy',
                    identifier=str(ObjectId(seed_str[:12])))
-        return HierarchyLookupSession(proxy, runtime).get_hierarchy(ident).get_id() # Return the actual Id
+        return HierarchyLookupSession(proxy, runtime).get_hierarchy(ident).get_id()  # Return the actual Id
 
     def _create_catalog_hierarchy(self, catalog_id, proxy, runtime):
         \"\"\"Creates a catalog hierarchy\"\"\"
@@ -287,6 +285,7 @@ class HierarchyDesignSession:
         rfc.set_genus_type(self._relationship_type)
         self._ras.create_relationship(rfc)"""
 
+
 class HierarchyAdminSession:
     import_statements = [
         'from ..utilities import JSONClientValidated'
@@ -307,6 +306,7 @@ class HierarchyAdminSession:
 
         collection.delete_one({'_id': ObjectId(hierarchy_id.get_identifier())})"""
 
+
 class Hierarchy:
 
     import_statements = [
@@ -323,7 +323,7 @@ class HierarchyQuery:
 
 
 class Node:
-    
+
     get_parents = """
         return NodeList(self._my_map['parentNodes'])"""
 

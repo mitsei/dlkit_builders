@@ -1,5 +1,6 @@
 """Test templates for resource interfaces"""
 
+
 class ResourceProfile:
 
     import_statements_pattern = [
@@ -31,6 +32,7 @@ class ResourceProfile:
 
     supports_resource_record_type_template = """
         self.assertTrue(isinstance(self.mgr.${method_name}(DEFAULT_TYPE), bool))"""
+
 
 class ResourceManager:
 
@@ -223,7 +225,8 @@ class ResourceLookupSession:
         self.catalog.alias_${object_name_under}(self.${object_name_under}_ids[0], ALIAS_ID)
         obj = self.catalog.get_${object_name_under}(ALIAS_ID)
         self.assertEqual(obj.get_id(), self.${object_name_under}_ids[0])"""
-        
+
+
 class ResourceQuerySession:
 
     import_statements_pattern = [
@@ -339,6 +342,7 @@ class ResourceAdminSession:
     alias_resource_template = """
         pass"""
 
+
 class ResourceNotificationSession:
 
     # Placeholder: still need to write a real ResourceNotificationSession tess
@@ -346,6 +350,7 @@ class ResourceNotificationSession:
 
     # Placeholder: still need to write a real ResourceNotificationSession tess
     init_template = ResourceLookupSession.init_template
+
 
 class ResourceBinSession:
 
@@ -525,7 +530,6 @@ class ResourceAgentAssignmentSession:
         self.catalog.unassign_agent_from_resource(AGENT_ID_1, self.resource_ids[1])
         with self.assertRaises(errors.NotFound):
             self.catalog.get_resource_by_agent(AGENT_ID_1)"""
-        
 
 
 class BinLookupSession:
@@ -591,6 +595,7 @@ class BinLookupSession:
 
     get_bins_template = """
         catalogs = self.svc_mgr.${method_name}()"""
+
 
 class BinAdminSession:
 
@@ -668,6 +673,7 @@ class BinAdminSession:
 
     alias_bin_template = """
         pass"""
+
 
 class BinHierarchySession:
 
@@ -777,6 +783,7 @@ class BinHierarchySession:
         nodes = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
         # add some tests on the returned node"""
 
+
 class BinHierarchyDesignSession:
 
     import_statements_pattern = [
@@ -849,6 +856,7 @@ class Resource:
     get_resource_record_template = """
         pass"""
 
+
 class ResourceQuery:
 
     import_statements_pattern = [
@@ -859,6 +867,7 @@ class ResourceQuery:
 
     clear_group_terms_template = """
         pass"""
+
 
 class ResourceForm:
 
@@ -901,6 +910,7 @@ class ResourceList:
     get_next_resources_template = """
         pass"""
 
+
 class Bin:
 
     import_statements_pattern = [
@@ -908,6 +918,7 @@ class Bin:
 
     init_template = """
 """
+
 
 class BinForm:
 

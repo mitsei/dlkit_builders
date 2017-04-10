@@ -45,25 +45,27 @@ class OsidProfile:
     supports_proxy_record_type = """
         pass"""
 
+
 class OsidManager:
 
     import_statements = [
-    ]  
+    ]
 
     init = """
 """
-    
+
     initialize = """
         pass"""
+
 
 class OsidProxyManager:
 
     import_statements = [
-    ]  
+    ]
 
     init = """
 """
-    
+
     initialize = """
         pass"""
 
@@ -71,7 +73,7 @@ class OsidProxyManager:
 class OsidRuntimeManager:
 
     import_statements = [
-    ]  
+    ]
 
     init = """
 """
@@ -80,7 +82,7 @@ class OsidRuntimeManager:
 class Identifiable:
 
     import_statements = [
-    ]  
+    ]
 
     init = """
 """
@@ -95,7 +97,7 @@ class Identifiable:
 class Extensible:
 
     import_statements = [
-    ]  
+    ]
 
     init = """
 """
@@ -105,6 +107,7 @@ class Extensible:
 
     get_record_types = """
         pass"""
+
 
 class Temporal:
 
@@ -123,6 +126,7 @@ class Temporal:
     get_end_date = """
         pass"""
 
+
 class Containable:
 
     init = """
@@ -130,6 +134,7 @@ class Containable:
 
     is_sequestered = """
         pass"""
+
 
 class Operable:
 
@@ -155,13 +160,13 @@ class OsidSession:
 """
 
     get_locale = """
-        pass"""  
+        pass"""
 
     is_authenticated = """
         pass"""
 
     get_authenticated_agent_id = """
-        pass"""  
+        pass"""
 
     get_authenticated_agent = """
         pass"""
@@ -182,7 +187,7 @@ class OsidSession:
 class OsidObject:
 
     import_statements = [
-        ]
+    ]
 
     init = """
 """
@@ -199,6 +204,7 @@ class OsidObject:
     is_of_genus_type = """
         pass"""
 
+
 class OsidRule:
 
     has_rule = """
@@ -206,14 +212,15 @@ class OsidRule:
 
     get_rule_id = """
         pass"""
-    
-    get_rule= """
+
+    get_rule = """
         pass"""
+
 
 class OsidForm:
 
     import_statements = [
-        ]
+    ]
 
     init = """
 """
@@ -245,15 +252,17 @@ class OsidForm:
     get_invalid_metadata = """
         pass"""
 
+
 class OsidExtensibleForm:
 
     init = """
 """
 
+
 class OsidTemporalForm:
 
     import_statements = [
-        ]
+    ]
 
     init = """
 """
@@ -280,7 +289,7 @@ class OsidTemporalForm:
 class OsidObjectForm:
 
     import_statements = [
-        ]
+    ]
 
     init = """
 """
@@ -312,10 +321,12 @@ class OsidObjectForm:
     clear_genus_type = """
         pass"""
 
+
 class OsidRelationshipForm:
 
     init = """
 """
+
 
 class OsidList:
 
@@ -331,6 +342,7 @@ class OsidList:
     skip = """
         pass"""
 
+
 class OsidQuery:
 
     import_statements = [
@@ -339,6 +351,7 @@ class OsidQuery:
     init = """
 """
 
+
 class OsidIdentifiableQuery:
 
     import_statements = [
@@ -346,9 +359,10 @@ class OsidIdentifiableQuery:
 
     match_id = """
         pass"""
-    
+
     clear_id_terms = """
         pass"""
+
 
 class OsidExtensibleQuery:
 
@@ -357,6 +371,7 @@ class OsidExtensibleQuery:
 
     init = """
 """
+
 
 class OsidObjectQuery:
 
@@ -371,7 +386,7 @@ class OsidObjectQuery:
 
     clear_display_name_terms = """
         pass"""
-    
+
     match_description = """
         pass"""
 
@@ -381,17 +396,18 @@ class OsidObjectQuery:
     clear_description_terms = """
         pass"""
 
+
 class OsidQueryInspector:
 
     import_statements = [
     ]
 
-class OsidRecord:
 
+class OsidRecord:
 
     implements_record_type = """
         pass"""
-    
+
 
 class Metadata:
 
@@ -454,6 +470,7 @@ class OsidSearchOrder:
 
     import_statements = [
     ]
+
 
 class OsidSearch:
 

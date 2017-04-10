@@ -105,9 +105,10 @@ class ObjectiveRequisiteAssignmentSession:
             cls.svc_mgr.delete_objective_bank(catalog.ident)
 """
 
-    assign_objective_requisite_template= """
+    assign_objective_requisite_template = """
         self.catalog.assign_objective_requisite(self.objective.ident, self.requisite_ids[0])
     """
+
 
 class ObjectiveHierarchyDesignSession:
     init = """
@@ -244,7 +245,6 @@ class ObjectiveHierarchySession:
     """
 
 
-
 class ObjectiveAdminSession:
 
     import_statements_pattern = [
@@ -257,6 +257,7 @@ class ObjectiveAdminSession:
 class ObjectiveSequencingSession:
     import_statements_pattern = [
     ]
+
 
 class ActivityLookupSession:
 
@@ -347,6 +348,7 @@ class ActivityObjectiveBankSession:
             cls.svc_mgr.delete_objective_bank(catalog.ident)
     """
 
+
 class ActivityAdminSession:
 
     import_statements_pattern = [
@@ -356,7 +358,6 @@ class ActivityAdminSession:
         pass"""
 
 
-
 class Activity:
 
     import_statements_pattern = [
@@ -364,7 +365,6 @@ class Activity:
 
     import_statements = [
     ]
-
 
     get_objective_id_template = """
         pass"""
@@ -392,4 +392,3 @@ class ActivityForm:
 
     clear_assets_template = """
         pass"""
-

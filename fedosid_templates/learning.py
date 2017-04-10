@@ -9,5 +9,3 @@ class Activity:
 
     is_asset_based_activity_template = """
         pass"""
-
-

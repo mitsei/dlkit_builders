@@ -10,7 +10,7 @@ COMMON_METADATA = """
             'syntax': self.my_model.moptions['${data_name}']['syntax'],
             'array': self.my_model.moptions['${data_name}']['array'],"""
 
-ID_METADATA ="""
+ID_METADATA = """
             'value': (bool(self.my_model.options['${data_name}_authority']['default']) and
                       bool(self.my_model.options['${data_name}_namespace']['default']) and
                       bool(self.my_model.options['${data_name}_identifier']['default'])),
@@ -65,5 +65,3 @@ MODEL_FIELD_OPTIONS = """
         max_length=options['${data_name}']['max_length'],
         choices=options['${data_name}']['choices']
         """
-
-

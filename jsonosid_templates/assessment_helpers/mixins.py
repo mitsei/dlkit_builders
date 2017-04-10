@@ -23,7 +23,7 @@ class PartSequenceSection(object):
         check_parent = True
         rule = self._get_first_successful_sequence_rule_for_part(part)
         part_id = part.get_id()
-        if rule is not None: # A SequenceRule trumps everything.
+        if rule is not None:  # A SequenceRule trumps everything.
             next_part = rule.get_next_assessment_part()
             level = level + get_level_delta_for_parts(part, next_part)
             check_parent = False
@@ -39,7 +39,7 @@ class PartSequenceSection(object):
                 check_parent = False
             except StopIteration:
                 pass
-        else: # check to see if this part has a sibling that could be next
+        else:  # check to see if this part has a sibling that could be next
             sibling_ids = []
             if part.has_parent_part():
                 parent = part.get_assessment_part()
@@ -58,7 +58,7 @@ class PartSequenceSection(object):
                     else:
                         check_parent = False
 
-        if check_parent and part.has_parent_part(): # We are at a lowest leaf and need to check parent
+        if check_parent and part.has_parent_part():  # We are at a lowest leaf and need to check parent
             next_part = self.get_next_part_for_part(
                 part.get_assessment_part(),
                 level - 1,
@@ -73,9 +73,10 @@ class PartSequenceSection(object):
         rule_lookup_session = mgr.get_sequence_rule_lookup_session(proxy=self._proxy)
         rule_lookup_session.use_federated_bank_view()
         for rule in rule_lookup_session.get_sequence_rules_for_assessment_part(part.get_id()):
-            if rule._evaluates_true(): # Or wherever this wants to be evaluated
+            if rule._evaluates_true():  # Or wherever this wants to be evaluated
                 return rule
         return None
+
 
 class AssessmentSessionSection(object):
     """Adds records to support AssessmentSession functionality."""
@@ -94,7 +95,7 @@ class AssessmentSessionSection(object):
             # this has to happen before _initialize_part_map(),
             # otherwise Parts won't be able to work...
             self._save()
-        if 'questions' not in self._my_map: # This is the first instantiation
+        if 'questions' not in self._my_map:  # This is the first instantiation
             self._initialize_part_map()
 
     def _initialize_part_map(self):
@@ -131,10 +132,10 @@ class AssessmentSessionSection(object):
 
     def _load_simple_section_questions(self, item_ids):
         """For loading the simple section case (common)
-        
-        just load the questions for the section, and insert the one part 
+
+        just load the questions for the section, and insert the one part
         into assessment part map.
-        
+
         """
         self._insert_part_map(
             get_default_part_map(self._assessment_part_id,
@@ -162,11 +163,11 @@ class AssessmentSessionSection(object):
         collection = JSONClientValidated('assessment',
                                          collection='AssessmentSection',
                                          runtime=self._runtime)
-        if '_id' in self._my_map: # This is the first time:
+        if '_id' in self._my_map:  # This is the first time:
             collection.save(self._my_map)
         else:
             insert_result = collection.insert_one(self._my_map)
-            self._my_map = collection.find_one({'_id': insert_result.inserted_id}) # To get the _id
+            self._my_map = collection.find_one({'_id': insert_result.inserted_id})  # To get the _id
 
     def _delete(self):
         """Deletes this AssessmentSection from database.
@@ -178,7 +179,6 @@ class AssessmentSessionSection(object):
                                          collection='AssessmentSection',
                                          runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(self.get_id().get_identifier())})
-
 
     # Model for question map to be constructed through taking an assessment section:
     #
@@ -232,12 +232,12 @@ class AssessmentSessionSection(object):
     def _update_questions(self):
         """Updates questions known to this Section"""
         if self.is_simple_section():
-            return # we don't need to go through any this for simple sections
-        ## ideally, we would update the parts map and questions list
-        ## at the same time as _get_parts(), to not run into the
-        ## issue where magic parts are initialized (with items)
-        ## ignorant of their "sibling" magic part items...
-        ## because the section hasn't been updated or saved to database
+            return  # we don't need to go through any this for simple sections
+        # ideally, we would update the parts map and questions list
+        # at the same time as _get_parts(), to not run into the
+        # issue where magic parts are initialized (with items)
+        # ignorant of their "sibling" magic part items...
+        # because the section hasn't been updated or saved to database
         part_list = self._get_parts()
         if len(part_list) > len(self._my_map['assessmentParts']):
             self._update_assessment_parts_map(part_list)
@@ -270,8 +270,8 @@ class AssessmentSessionSection(object):
                 finished = True
             else:
                 if part.has_items():
-                    ## THIS is a hack -- to get around repeated items within the same
-                    ## section....
+                    # THIS is a hack -- to get around repeated items within the same
+                    # section....
                     for item_id in part.get_item_ids():
                         if str(item_id) not in self._item_id_list:
                             self._item_id_list.append(str(item_id))
@@ -287,7 +287,7 @@ class AssessmentSessionSection(object):
         """
         for part in part_list:
             # perhaps look for a "level offset"?
-            level = part._level_in_section # plus or minus "level offset"?
+            level = part._level_in_section  # plus or minus "level offset"?
             if str(part.get_id()) not in self._part_ids():
                 self._insert_part_map(get_default_part_map(
                     part.get_id(), level, part.are_items_sequential()),
@@ -304,7 +304,7 @@ class AssessmentSessionSection(object):
                  when running this on the last question, you want to get
                  the indices relative to the second level 1, not including
                  the first two parts
-            
+
             self._my_map['assessmentParts'] = [
                 {'assessmentPartId': <idstr of a part. Might be a 'magic' id>,
                  'level': 1,
@@ -384,15 +384,15 @@ class AssessmentSessionSection(object):
                         part_id,
                         display_elements))
                     index += 1
-                    
-            else: # skip through all remaining questions for this part
+
+            else:  # skip through all remaining questions for this part
                 part_id = part.get_id()
                 part_map = self._get_part_map(part_id)
                 while (len(self._my_map['questions']) > index and
                        self._my_map['questions'][index]['assessmentPartId'] == part_map['assessmentPartId']):
                     index += 1
-            
-    def _get_assessment_part_lookup_session(self): # get_assessment_part_lookup_session should be mixed in
+
+    def _get_assessment_part_lookup_session(self):  # get_assessment_part_lookup_session should be mixed in
         if self._assessment_part_lookup_session is None:
             session = get_assessment_part_lookup_session(self._runtime,
                                                          self._proxy,
@@ -406,7 +406,7 @@ class AssessmentSessionSection(object):
             pass
         return self._assessment_part_lookup_session
 
-    def _get_item_lookup_session(self): # get_item_lookup_session should be mixed in
+    def _get_item_lookup_session(self):  # get_item_lookup_session should be mixed in
         if self._item_lookup_session is None:
             session = get_item_lookup_session(self._runtime, self._proxy)
             session.use_federated_bank_view()
@@ -440,7 +440,7 @@ class AssessmentSessionSection(object):
 
     def get_item_ids_for_assessment_part(self, assessment_part_id):
         """convenience method returns item ids associated with an assessment_part_id"""
-        item_ids =[]
+        item_ids = []
         for question_map in self._my_map['questions']:
             if question_map['assessmentPartId'] == str(assessment_part_id):
                 item_ids.append(Id(question_map['itemId']))
@@ -465,16 +465,16 @@ class AssessmentSessionSection(object):
                 ils = self._get_item_lookup_session()
                 return ils.get_item(Id(question._my_map['itemId']))
         """
-        question_map = self._get_question_map(question_id) # Throws NotFound()
+        question_map = self._get_question_map(question_id)  # Throws NotFound()
         real_question_id = Id(question_map['questionId'])
         return self._get_item_lookup_session().get_item(real_question_id)
 
     def has_started(self):
         """Checks if the taker has started taking this Section
-        
+
         Meaning that the taker has retrieved the first question or all questions
         for the first time
-        
+
         """
         if self._my_map['actualStartTime'] is None:
             return False
@@ -525,7 +525,7 @@ class AssessmentSessionSection(object):
 
     def get_question(self, question_id=None, question_map=None):
         if question_id is not None:
-            question_map = self._get_question_map(question_id) # Throws NotFound()
+            question_map = self._get_question_map(question_id)  # Throws NotFound()
         real_question_id = Id(question_map['questionId'])
         display_elements = question_map['displayElements']
         item = self._get_item_lookup_session().get_item(real_question_id)
@@ -552,7 +552,7 @@ class AssessmentSessionSection(object):
         # don't use the self._get_item() convenience method here
         # because we need to preserve the magic params (if any) present
         # in the questionId
-        question_map = self._get_question_map(question_id) # will raise NotFound()
+        question_map = self._get_question_map(question_id)  # will raise NotFound()
         ils = self._get_item_lookup_session()
         item = ils.get_item(Id(question_map['questionId']))
         answers = list(item.get_answers())
@@ -560,7 +560,7 @@ class AssessmentSessionSection(object):
             answers += list(item.get_wrong_answers())
         except AttributeError:
             pass
-        return answers # Should this return and AnswerList?
+        return answers  # Should this return and AnswerList?
 
     def get_first_question(self):
         if self._my_map['actualStartTime'] is None:
@@ -578,8 +578,8 @@ class AssessmentSessionSection(object):
                                      is set to sequential items
 
         """
-        self._update_questions() # Make sure questions list is current
-        question_map = self._get_question_map(question_id) # will raise NotFound()
+        self._update_questions()  # Make sure questions list is current
+        question_map = self._get_question_map(question_id)  # will raise NotFound()
         questions = list(self._my_map['questions'])
         if reverse:
             questions = questions[::-1]
@@ -604,9 +604,9 @@ class AssessmentSessionSection(object):
 
     def submit_response(self, question_id, answer_form=None):
         """Updates assessmentParts map to insert an item response.
-        
+
         answer_form is None indicates that the current response is to be cleared
-        
+
         """
         if answer_form is None:
             response = {'missingResponse': NULL_RESPONSE,
@@ -621,16 +621,16 @@ class AssessmentSessionSection(object):
                 response['isCorrect'] = None
         response['submissionTime'] = DateTime.utcnow()
 
-        question_map = self._get_question_map(question_id) # will raise NotFound()
+        question_map = self._get_question_map(question_id)  # will raise NotFound()
         if ('missingResponse' in question_map['responses'][0] and
-             question_map['responses'][0]['missingResponse'] == UNANSWERED):
-            question_map['responses'] = [] # clear unanswered response
+                question_map['responses'][0]['missingResponse'] == UNANSWERED):
+            question_map['responses'] = []  # clear unanswered response
         question_map['responses'].insert(0, response)
         self._save()
 
     def get_response(self, question_id):
         """Gets the response for question_id"""
-        question_map = self._get_question_map(question_id) # will raise NotFound()
+        question_map = self._get_question_map(question_id)  # will raise NotFound()
         return self._get_response_from_question_map(question_map)
 
     def get_responses(self):
@@ -654,7 +654,7 @@ class AssessmentSessionSection(object):
 
     def is_question_answered(self, question_id):
         """has the question matching item_id been answered and not skipped"""
-        question_map = self._get_question_map(question_id) # will raise NotFound()
+        question_map = self._get_question_map(question_id)  # will raise NotFound()
         if 'missingResponse' in question_map['responses'][0]:
             return False
         else:
@@ -678,7 +678,7 @@ class AssessmentSessionSection(object):
             except errors.IllegalState:
                 pass
         else:
-            return item.get_feedback() # raises IllegalState
+            return item.get_feedback()  # raises IllegalState
 
     def get_confused_learning_objective_ids(self, question_id):
         """get confused objective ids available for the question"""
@@ -714,7 +714,7 @@ class AssessmentSessionSection(object):
 
     def finish(self):
         """Declare this section finished"""
-        self._my_map['over'] = True # finished == over?
+        self._my_map['over'] = True  # finished == over?
         self._my_map['completionTime'] = DateTime.utcnow()
         self._save()
 
@@ -723,15 +723,15 @@ class AssessmentSessionSection(object):
         if 'over' in self._my_map and self._my_map['over']:
             return True
         return False
-        
+
     def is_complete(self):
         """Check all Questions for completeness
-        
-        For now, completeness simply means that all questions have been 
+
+        For now, completeness simply means that all questions have been
         responded to and not skipped or cleared.
-        
+
         """
-        self._update_questions() # Make sure questions list is current
+        self._update_questions()  # Make sure questions list is current
         for question_map in self._my_map['questions']:
             if 'missingResponse' in question_map['responses'][0]:
                 return False

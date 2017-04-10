@@ -2,6 +2,7 @@
 
 from . import resource
 
+
 class RepositoryProfile:
 
     get_coordinate_types_template = """
@@ -17,11 +18,10 @@ class RepositoryProfile:
 
 class RepositoryManager:
     # This is here temporarily until Tom adds missing methods to RepositoryManager
-    
+
     init = """
     def __init__(self):
         RepositoryProfile.__init__(self, 'RepositoryManager')
-
 
     def initialize(self, runtime):
         osid_managers.OsidManager.initialize(self, runtime)
@@ -154,50 +154,10 @@ class AssetAdminSession:
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name})"""
 
+
 class CompositionLookupSession:
 
     init_template = resource.ResourceLookupSession.init_template
-
-    # this is the pre-overriding athorization init template - delete soon:
-    # old_init_template = """
-    # def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
-    #     # Implemented from azosid template for -
-    #     # osid.composition.CompositionLookupSession.__init__
-    #     osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-    #     if 'hierarchy_session' in kwargs:
-    #         self._hierarchy_session = kwargs['hierarchy_session']
-    #     else:
-    #         self._hierarchy_session = None
-    #     if 'query_session' in kwargs:
-    #         self._query_session = kwargs['query_session']
-    #     else:
-    #         self._query_session = None
-    #     self._qualifier_id = provider_session.get_${cat_name_under}_id()
-    #     self._id_namespace = '${pkg_name_replaced}.${object_name}'
-    #     self.use_federated_${cat_name_under}_view()
-    #     self.use_comparative_${object_name_under}_view()
-    #     self._unauth_${cat_name_under}_ids = None
-    # 
-    # def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
-    #     if self._can('lookup', ${cat_name_under}_id):
-    #         return [] # Don't go further - assumes authorizations inherited
-    #     else:
-    #         unauth_list = [str(${cat_name_under}_id)]
-    #     if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
-    #         for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
-    #             unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
-    #     return unauth_list
-    # 
-    # def _try_harder(self, query):
-    #     if self._hierarchy_session is None or self._query_session is None:
-    #         # Should probably try to return empty result instead
-    #         # perhaps through a query.match_any(match = None)?
-    #         raise PermissionDenied()
-    #     if self._unauth_${cat_name_under}_ids is None:
-    #         self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
-    #     for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
-    #         query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
-    #     return self._query_session.get_${object_name_under_plural}_by_query(query)"""
 
     use_active_composition_view_template = """
         # Implemented from azosid template for -
@@ -219,66 +179,11 @@ class CompositionLookupSession:
         # osid.composition.CompositionLookupSession.use_unsequestered_composition_view_template
         return self._provider_session.${method_name}()"""
 
+
 class CompositionQuerySession:
-    
+
     init_template = resource.ResourceQuerySession.init_template
 
-    # This is the old init impl - delete soon
-    # old_init = """
-    # def __init__(self, provider_session, authz_session, proxy=None, **kwargs):
-    #     # Implemented from azosid template for -
-    #     # osid.composition.CompositionLookupSession.__init__
-    #     osid_sessions.OsidSession.__init__(self, provider_session, authz_session, proxy)
-    #     if 'hierarchy_session' in kwargs:
-    #         self._hierarchy_session = kwargs['hierarchy_session']
-    #     else:
-    #         self._hierarchy_session = None
-    #     if 'query_session' in kwargs:
-    #         self._query_session = kwargs['query_session']
-    #     else:
-    #         self._query_session = None
-    #     self._qualifier_id = provider_session.get_repository_id()
-    #     self._id_namespace = 'repository.Composition'
-    #     self.use_federated_repository_view()
-    #     self._unauth_repository_ids = None
-    # 
-    # def _get_unauth_repository_ids(self, repository_id):
-    #     if self._can('lookup', repository_id):
-    #         return [] # Don't go further - assumes authorizations inherited
-    #     else:
-    #         unauth_list = [str(repository_id)]
-    #     if self._hierarchy_session.has_child_repositories(repository_id):
-    #         for child_repository_id in self._hierarchy_session.get_child_repository_ids(repository_id):
-    #             unauth_list = unauth_list + self._get_unauth_repository_ids(child_repository_id)
-    #     return unauth_list
-    # 
-    # def _try_harder(self, query):
-    #     if self._hierarchy_session is None or self._query_session is None:
-    #         # Should probably try to return empty result instead
-    #         # perhaps through a query.match_any(match = None)?
-    #         raise PermissionDenied()
-    #     if self._unauth_repository_ids is None:
-    #         self._unauth_repository_ids = self._get_unauth_repository_ids(self._qualifier_id)
-    #     for repository_id in self._unauth_repository_ids:
-    #         query.match_repository_id(repository_id, match=False)
-    #     return self._query_session.get_compositions_by_query(query)
-    # 
-    # class CompositionQueryWrapper(QueryWrapper):
-    #     \"\"\"Wrapper for CompositionQueries to override match_repository_id method\"\"\"
-    # 
-    #     def match_repository_id(self, repository_id, match=True):
-    #         self.cat_id_args_list.append({'repository_id': repository_id, 'match': match})"""
-
-# Don't think we need this. Search sessions inherit Query sessions, so the 
-# corresponding Query session __init__ should be invoked:
-# class CompositionSearchSession:
-# 
-#     init = """
-#     def __init__(self, **kwargs):
-#         osid_sessions.OsidSession.__init__(self, **kwargs)
-#         self._qualifier_id = self._provider_session.get_repository_id()
-#         self._id_namespace = 'repository.Composition'
-# """
 
 class AssetCompositionSession:
 
@@ -303,6 +208,7 @@ class AssetCompositionSession:
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name})"""
+
 
 # Still need to update to work with authz override!
 class AssetCompositionDesignSession:
@@ -346,6 +252,7 @@ class AssetCompositionDesignSession:
             raise PermissionDenied()
         else:
             return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
 
 class AssetLookupSession:
 
@@ -476,6 +383,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
         else:
             return self._provider_session.get_asset_contents_by_genus_type_for_asset(asset_content_genus_type,
                                                                                      asset_id)"""
+
 
 class AssetQuerySession:
     additional_methods = """

@@ -1,8 +1,8 @@
 
 class ProxySession:
 
-    #import_statements = [
-    #]
+    # import_statements = [
+    # ]
 
     init = """
     def __init__(self, provider_session, authz_session, proxy=None):

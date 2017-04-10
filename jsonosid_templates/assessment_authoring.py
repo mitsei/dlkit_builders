@@ -198,7 +198,7 @@ class AssessmentAuthoringProxyManager:
 
 
 class AssessmentPartLookupSession:
-    
+
     additional_methods = """
     @utilities.arguments_not_none
     def get_assessment_parts_for_assessment_part(self, assessment_part_id):
@@ -223,6 +223,7 @@ class AssessmentPartLookupSession:
             dict({'assessmentPartId': str(assessment_part_id)},
                  **self._view_filter()))
         return objects.AssessmentPartList(result, runtime=self._runtime)"""
+
 
 class AssessmentPartAdminSession:
     import_statements = [
@@ -333,6 +334,7 @@ class AssessmentPartAdminSession:
         except AttributeError:
             collection.delete_one({'_id': ObjectId(assessment_part_id.get_identifier())})"""
 
+
 class AssessmentPartItemSession:
 
     import_statements = [
@@ -371,7 +373,7 @@ class AssessmentPartItemSession:
 
 
 class AssessmentPart:
-    
+
     # Is there a way to template this so that all sub-package objects get a catalog import?
     import_statements = [
         'from ..assessment.objects import Bank, ItemList',
@@ -390,7 +392,7 @@ class AssessmentPart:
 
     has_parent_part = """
         return bool('assessmentPartId' in self._my_map and self._my_map['assessmentPartId'])"""
-    
+
     additional_methods = """
     def get_child_ids(self):
         \"\"\"Gets the child ``Ids`` of this assessment part.\"\"\"

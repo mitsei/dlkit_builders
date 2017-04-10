@@ -50,6 +50,7 @@ class ResourceProfile:
                 supports = True
         return supports"""
 
+
 class ResourceManager:
 
     get_resource_lookup_session_template = """
@@ -144,38 +145,38 @@ class ResourceLookupSession:
         from .${return_module} import ${return_type}
         try:
             return ${return_type}(self.my_catalog_model)
-        except: 
+        except:
             raise OperationFailed()"""
 
     can_lookup_resources_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.can_lookup_resources
-        # NOTE: It is expected that real authentication hints will be 
+        # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
     use_comparative_resource_view_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.use_comparative_resource_view
         self._object_view = self.COMPARATIVE"""
 
     use_plenary_resource_view_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.use_plenary_resource_view
         self._object_view = self.PLENARY"""
 
     use_federated_bin_view_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.use_federated_bin_view
         self._catalog_view = self.FEDERATED"""
 
     use_isolated_bin_view_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.use_isolated_bin_view
         self._catalog_view = self.ISOLATED"""
 
     get_resource_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resource
         # NOTE: This implementation currently ignores plenary view
         from django.db.models.base import ObjectDoesNotExist
@@ -198,7 +199,7 @@ class ResourceLookupSession:
         return ${return_type}(result)"""
 
     get_resources_by_ids_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_ids
         # NOTE: This implementation currently ignores plenary view
         from .models import ${object_name} as ${object_name}Model
@@ -210,9 +211,9 @@ class ResourceLookupSession:
         for i in ${arg0_name}:
             t = t + (i.get_identifier(),)
         if self._catalog_view == self.ISOLATED:
-            result = ${object_name}Model.objects.filter(identifier__in(t), 
+            result = ${object_name}Model.objects.filter(identifier__in(t),
                     ${object_name_under}_${cat_name_lower}__${cat_name_under}_identifier=self._catalog_identifier)
-            count = ${object_name}Model.objects.filter(identifier__in(t), 
+            count = ${object_name}Model.objects.filter(identifier__in(t),
                     ${object_name_under}_${cat_name_lower}__${cat_name_under}_identifier=self._catalog_identifier).count()
         else:
             result = ${object_name}Model.objects.filter(identifier__in(t))
@@ -220,7 +221,7 @@ class ResourceLookupSession:
         return ${return_type}(result, count)"""
 
     get_resources_by_genus_type_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type
         # NOTE: This implementation currently ignores plenary view
         from .models import ${object_name} as ${object_name}Model
@@ -249,21 +250,21 @@ class ResourceLookupSession:
         return ${return_type}(result, count)"""
 
     get_resources_by_parent_genus_type_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_parent_genus_type
         # WILL THIS DEPEND ON A TYPE HIERARCHY SERVICE???
         from .${return_module} import ${return_type}
         return ${return_type}([])"""
 
     get_resources_by_record_type_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources_by_record_type
         # STILL NEED TO FIGURE OUT HOW TO DO RECORDS!!!
         from .${return_module} import ${return_type}
         return ${return_type}([])"""
 
     get_resources_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.get_resources
         # NOTE: This implementation currently ignores plenary view
         from .models import ${object_name} as ${object_name}Model
@@ -278,6 +279,7 @@ class ResourceLookupSession:
             result = ${object_name}Model.objects.all()
             count = ${object_name}Model.objects.all().count()
         return ${return_type}(result, count)"""
+
 
 class ResourceAdminSession:
 
@@ -310,8 +312,8 @@ class ResourceAdminSession:
         OsidSession.__init__(self, *args, **kwargs)
         self._forms = dict()
 
-    ## PERHAPS THIS CAN GO INTO THE MODEL???
-    ## OR IT MIGHT GO IN A defoult_model MODULE.
+    # PERHAPS THIS CAN GO INTO THE MODEL???
+    # OR IT MIGHT GO IN A defoult_model MODULE.
     class Default${cat_name}Model():
         def __init__(self, catalog_id):
             from . import profile
@@ -327,16 +329,16 @@ class ResourceAdminSession:
 """
 
     can_create_resources_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.can_create_resources
-        # NOTE: It is expected that real authentication hints will be 
+        # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
     can_create_resource_with_record_types_template = """
-        # Implemented from template for 
+        # Implemented from template for
         # osid.resource.ResourceLookupSession.can_create_resource_with_record_types
-        # NOTE: It is expected that real authentication hints will be 
+        # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
@@ -457,6 +459,7 @@ class ResourceAdminSession:
         # NEED TO FIGURE OUT HOW TO IMPLEMENT THIS SOMEDAY
         raise Unimplemented()"""
 
+
 class Resource:
 
     init_template = """
@@ -514,6 +517,7 @@ ${import_str}        try:
         else:
             return osidObject"""
 
+
 class ResourceForm:
 
     init_template = """
@@ -559,7 +563,7 @@ ${metadata_initers}"""
             raise NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_${arg0_type}(${arg0_name}, 
+        if not self._is_valid_${arg0_type}(${arg0_name},
                                      self.get_${arg0_name}_metadata()):
             raise InvalidArgument()
         self.my_model.${var_name} = ${arg0_name}"""
@@ -577,7 +581,7 @@ ${metadata_initers}"""
             raise NullArgument()
         if self.get_${var_name}_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_${arg0_type}(${arg0_name}, 
+        if not self._is_valid_${arg0_type}(${arg0_name},
                                 self.get_${arg0_name}_metadata()):
             raise InvalidArgument()
         self.my_model.${var_name}_authority = ${arg0_name}.get_authority()
@@ -593,6 +597,7 @@ ${metadata_initers}"""
         self.my_model.${var_name}_namespace = self._${var_name}_default['namespace']
         self.my_model.${var_name}_identifier = self._${var_name}_default['identifier']"""
 
+
 class ResourceList:
 
     get_next_resource_template = """
@@ -607,10 +612,10 @@ class ResourceList:
             raise OperationFailed()
         else:
             return next_item
-            
+
     def next(self):
         from ..osid.objects import OsidList
-        from .${return_module} import ${return_type} 
+        from .${return_module} import ${return_type}
         from django.db import models
         try:
             next_item = OsidList.next(self)
@@ -619,9 +624,9 @@ class ResourceList:
         if isinstance(next_item, models.Model):
             next_item = ${return_type}(next_item)
         return next_item"""
-            
+
     get_next_resources_template = """
-    # Implemented from template for osid.resource.ResourceList.get_next_resources
+        # Implemented from template for osid.resource.ResourceList.get_next_resources
         import sys
         from ..osid.osid_errors import IllegalState, OperationFailed
         if ${arg0_name} > self.available():
@@ -633,10 +638,11 @@ class ResourceList:
             while x < ${arg0_name}:
                 try:
                     next_list.append(self.next())
-                except: #Need to specify exceptions here
+                except:  # Need to specify exceptions here
                     raise OperationFailed()
                 x = x + 1
             return next_list"""
+
 
 class Bin:
 
@@ -645,15 +651,8 @@ class Bin:
 
     def __init__(self, osid_catalog_model):
         self.my_model = osid_catalog_model
-        
-        ### WE MAY NO LONGER NEED TO INIT MODELS HERE???
-#        self._init_model()
-        
-        
-#    def _init_model(self):
-#        from ..osid.objects import OsidObject
-#        OsidObject._init_model(self)
 """
+
 
 class BinForm:
 

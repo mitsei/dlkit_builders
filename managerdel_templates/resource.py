@@ -1,5 +1,6 @@
 """resource templates for manager utils"""
 
+
 class ResourceProfile:
 
     init_template = """
@@ -24,6 +25,7 @@ class ResourceProfile:
 
     supports_resource_record_type_template = """
         return self._provider_manager.${method_name}(${arg0_name})"""
+
 
 class ResourceManager:
 

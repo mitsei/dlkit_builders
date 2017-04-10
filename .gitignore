@@ -38,3 +38,6 @@ pattern_maps
 
 # settings files
 *_settings.py
+
+htmlcov/
+.cache/

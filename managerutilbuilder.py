@@ -99,7 +99,7 @@ class ManagerUtilBuilder(InterfaceBuilder, BaseBuilder):
     def build_this_interface(self, interface):
         # Check to see if interface should be implemented
         if (interface['category'] == 'managers' and
-              self.package['name'] in managers_to_implement):
+                self.package['name'] in managers_to_implement):
             pass
         elif interface['shortname'] in ['OsidList', 'TypeList', 'Sourceable']:
             pass

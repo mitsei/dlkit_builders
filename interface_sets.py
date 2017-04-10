@@ -132,15 +132,15 @@ SEARCH_ORDERS = set(['OsidSearchOrder',
 
 SEARCHES = set(['OsidSearch',
                'OsidSearchResults'])
-              
+
 RULES = set(['OsidCondition',
-            'OsidInput',
-            'OsidResult'
-            ##### NEEED MORE ????
-            ##### SHOULD I CONSIDER RE-ORGANIZING EVERYTHING
-            ##### AROUND OBJECTS, RULES, RELATIONSHIPS, ETC????
-            ])
-            
+             'OsidInput',
+             'OsidResult'
+             # NEEED MORE ????
+             # SHOULD I CONSIDER RE-ORGANIZING EVERYTHING
+             # AROUND OBJECTS, RULES, RELATIONSHIPS, ETC????
+             ])
+
 METADATA = set(['Metadata'])
 
 RECEIVERS = set(['OsidReceiver'])
@@ -150,4 +150,3 @@ PRIMITIVES = set(['OsidPrimitives',
 
 PROPERTIES = set(['Property',
                   'PropertyList'])
-

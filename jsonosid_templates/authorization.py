@@ -58,9 +58,9 @@ class AuthorizationSession:
     #     if use_caching:
     #         import memcache
     #         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
-    # 
+    #
     #         key = 'hierarchy-qualifier-ids-{0}'.format(str(qualifier_id))
-    # 
+    #
     #         if mc.get(key) is None:
     #             qualifier_ids = generate_qualifier_ids()
     #             mc.set(key, qualifier_ids, time=30 * 60)
@@ -69,7 +69,7 @@ class AuthorizationSession:
     #     else:
     #         qualifier_ids = generate_qualifier_ids()
     #     return qualifier_ids
-    # 
+    #
     # def _get_ancestor_idstrs(self, node):
     #     def get_ancestors(internal_node):
     #         node_list = [str(internal_node.get_id())]
@@ -77,11 +77,11 @@ class AuthorizationSession:
     #             for parent_node in internal_node.get_parents():
     #                 node_list += self._get_ancestor_idstrs(parent_node)
     #         return list(set(node_list))
-    # 
+    #
     #     use_caching = False
     #     try:
     #         config = self._runtime.get_configuration()
-    #         parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
+    #         parameter_id = Id('parameter:useCachingForQualifierIds@json')
     #         if config.get_value_by_parameter(parameter_id).get_boolean_value():
     #             use_caching = True
     #         else:
@@ -91,9 +91,9 @@ class AuthorizationSession:
     #     if use_caching:
     #         import memcache
     #         mc = memcache.Client(['127.0.0.1:11211'], debug=0)
-    # 
+    #
     #         key = 'ancestor-ids-{0}'.format(str(node.ident))
-    # 
+    #
     #         if mc.get(key) is None:
     #             ancestor_ids = get_ancestors(node)
     #             mc.set(key, ancestor_ids, time=30 * 60)
@@ -114,7 +114,7 @@ class AuthorizationSession:
         \"\"\"Returns True if caching is enabled per configuration, false otherwise.\"\"\"
         try:
             config = self._runtime.get_configuration()
-            parameter_id = Id('parameter:useCachingForQualifierIds@mongo')
+            parameter_id = Id('parameter:useCachingForQualifierIds@json')
             if config.get_value_by_parameter(parameter_id).get_boolean_value():
                 return True
             else:
@@ -124,9 +124,9 @@ class AuthorizationSession:
 
     def _get_parent_id_list(self, qualifier_id, hierarchy_id):
         \"\"\"Returns list of parent id strings for qualifier_id in hierarchy.
-        
+
         Uses memcache if caching is enabled.
-        
+
         \"\"\"
         if self._caching_enabled():
             import memcache
@@ -191,7 +191,7 @@ class AuthorizationSession:
                 {'agentId': str(agent_id),
                  'functionId': str(function_id),
                  'qualifierId': {'$in': idstr_list}})
-                 
+
         # Otherwise check for implicit authorization through inheritance:
         except errors.NotFound:
             if authority and identifier:
@@ -203,6 +203,7 @@ class AuthorizationSession:
                 return False
         else:
             return True"""
+
 
 class AuthorizationLookupSession:
 
@@ -217,12 +218,13 @@ class AuthorizationLookupSession:
         return objects.AuthorizationList(result, runtime=self._runtime)
 """
 
+
 class AuthorizationAdminSession:
 
     import_statements = [
         'from dlkit.abstract_osid.id.primitives import Id as ABCId',
         'from dlkit.abstract_osid.type.primitives import Type as ABCType',
-]
+    ]
 
     create_authorization = """
         # TODO: not using the create_resource template
@@ -274,8 +276,8 @@ class AuthorizationAdminSession:
             if not isinstance(arg, ABCType):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if authorization_record_types == []:
-            ## WHY are we passing vault_id = self._catalog_id below, seems redundant:
-            ## We probably also don't need to send agent_id. The form can now get that from the proxy
+            # WHY are we passing vault_id = self._catalog_id below, seems redundant:
+            # We probably also don't need to send agent_id. The form can now get that from the proxy
             obj_form = objects.AuthorizationForm(
                 vault_id=self._catalog_id,
                 agent_id=agent_id,
@@ -334,6 +336,7 @@ class AuthorizationAdminSession:
         return obj_form
 """
 
+
 class AuthorizationForm:
 
     import_statements = [
@@ -346,19 +349,8 @@ class AuthorizationForm:
 
     def __init__(self, **kwargs):
         osid_objects.OsidRelationshipForm.__init__(self, object_name='AUTHORIZATION', **kwargs)
-        self._mdata = default_mdata.get_authorization_mdata() # Don't know if we need default mdata for this
+        self._mdata = default_mdata.get_authorization_mdata()  # Don't know if we need default mdata for this
         self._init_metadata(**kwargs)
-
-        # self._records = dict()
-        # self._supported_record_type_ids = []
-        # if osid_object_map is not None:
-        #     self._for_update = True
-        #     self._my_map = osid_object_map
-        #     self._load_records(osid_object_map['recordTypeIds'])
-        # else:
-        #     self._my_map = {}
-        #     self._for_update = False
-        #     self._init_map(**kwargs)
 
         if not self.is_for_update():
             self._init_map(**kwargs)
@@ -408,6 +400,7 @@ class Authorization:
     object_map = property(fget=get_object_map)
     """
 
+
 class AuthorizationQuery:
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
@@ -433,6 +426,7 @@ class AuthorizationQuery:
 
     match_qualifier_id = """
         self._add_match('qualifierId', str(qualifier_id), bool(match))"""
+
 
 class VaultLookupSession:
     get_vaults_by_genus_type = """

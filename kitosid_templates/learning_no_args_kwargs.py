@@ -26,6 +26,7 @@ class ActivityLookupSession:
         # osid.resource.ActivityLookupSession.get_activities_for_objectives
         return self._get_provider_session('${interface_name_under}', '${object_name_under}').${method_name}(${arg0_name})"""
 
+
 class ActivityAdminSession:
 
     get_activity_form_for_create = """
@@ -33,8 +34,9 @@ class ActivityAdminSession:
         # osid.learning.ActivityAdminSession.get_activity_form_for_create
         return self._get_provider_session('activity_admin_session', 'activity').get_activity_form_for_create(objective_id, activity_record_types)"""
 
+
 class ObjectiveRequisiteSession:
-    
+
     can_lookup_objective_prerequisites_template = """
         # Implemented from kitosid template for -
         # osid.learning.ObjectiveRequisiteSession.can_lookup_objective_prerequisites
@@ -92,5 +94,3 @@ class ObjectiveRequisiteAssignmentSession:
         # Implemented from kitosid template for -
         # osid.learning.ObjectiveRequisiteAssignmentSession.unassign_equivalent_objective
         return self._get_provider_session('${interface_name_under}', '${object_name_under}').${method_name}(${arg0_name}, ${arg1_name})"""
-
-

@@ -157,7 +157,7 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
                 supports_str = ''
                 # Check to see if support flagged in builder config OR
                 # Check to see if someone activated support by hand
-                if '-'+ method['name'] in old_supports:
+                if '-{0}'.format(method['name']) in old_supports:
                     supports_str += '-'
                 elif (under_to_caps(method['name'])[8:] + 'Session' in sessions_to_implement or
                         method['name'] in old_supports):

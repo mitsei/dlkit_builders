@@ -8,11 +8,13 @@ class AuthorizationAdminSession:
             qualifier_id,
             authorization_record_types)"""
 
+
 class VaultLookupSession:
     get_vaults_by_genus_type = """
         if not self._can('lookup'):
             raise PermissionDenied()
         return self._provider_session.get_vaults_by_genus_type(vault_genus_type)"""
+
 
 class AuthorizationSession:
     is_authorized = """

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
-##
 # This module contains simple implementation of common osid services
 # that are used by many other service definitions.  It exists so as to
-# allow DLKit developers and deployers to stand up the least number of 
-# django-aware service kits neccessary to support consumer application 
-# functionality.  The minimum should consist of any service kits being 
-# directly used plus the osid_kit. It is recommended that in a production 
+# allow DLKit developers and deployers to stand up the least number of
+# django-aware service kits neccessary to support consumer application
+# functionality.  The minimum should consist of any service kits being
+# directly used plus the osid_kit. It is recommended that in a production
 # implementation all required django service implementations be installed
 
 from ..osid import markers as osid_markers
@@ -52,13 +51,14 @@ class Id(abc_id, osid_markers.OsidPrimitive):
 
 class Type(abc_type, osid_markers.OsidPrimitive):
 
-    def __init__(self, authority,
-                       namespace,
-                       identifier,
-                       display_name = '',
-                       display_label = '',
-                       description = '',
-                       domain = ''):
+    def __init__(self,
+                 authority,
+                 namespace,
+                 identifier,
+                 display_name='',
+                 display_label='',
+                 description='',
+                 domain=''):
 
         self._authority = authority
         self._namespace = namespace
@@ -92,17 +92,18 @@ class Type(abc_type, osid_markers.OsidPrimitive):
 
 
 class DisplayText(abc_displaytext, osid_markers.OsidPrimitive):
-    ##
-    # Unless types are explicitely provided, This common DisplayText 
-    # implementation will only built the default language, script and format 
+    # Unless types are explicitly provided, This common DisplayText
+    # implementation will only built the default language, script and format
     # types as defined in the profile. So language_type_identifier,
     # script_type_identifier, and format_type_identifier will be ignored.
-    def __init__(self, text, language_type_identifier = None,
-                             script_type_identifier = None,
-                             format_type_identifier = None,
-                             language_type = None,
-                             script_type = None,
-                             format_type = None):
+    def __init__(self,
+                 text,
+                 language_type_identifier=None,
+                 script_type_identifier=None,
+                 format_type_identifier=None,
+                 language_type=None,
+                 script_type=None,
+                 format_type=None):
         from osid_kit.dj_osid import profile
         try:
             from type_kit.dj_type.primitives import Type
@@ -136,7 +137,7 @@ class DisplayText(abc_displaytext, osid_markers.OsidPrimitive):
 
 """
 class Version(abc_version, osid_markers.OsidPrimitive):
-    
+
     def __init__(self, components, scheme = None):
         try:
             from type_kit.dj_type.primitives import Type

@@ -32,6 +32,7 @@ class ActivityLookupSession:
         # osid.resource.ActivityLookupSession.get_activities_for_objectives
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
+
 class ActivityAdminSession:
 
     get_activity_form_for_create_template = """
@@ -39,6 +40,7 @@ class ActivityAdminSession:
         # Implemented from -
         # osid.learning.ActivityAdminSession.get_activity_form_for_create_template
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
 
 class ObjectiveAdminSession:
 
@@ -48,8 +50,9 @@ class ObjectiveAdminSession:
         # osid.learning.ObjectiveAdminSession.delete_objective
         self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
 
+
 class ObjectiveRequisiteSession:
-    
+
     can_lookup_objective_prerequisites_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
         # Implemented from kitosid template for -
@@ -118,5 +121,3 @@ class ObjectiveRequisiteAssignmentSession:
         # Implemented from kitosid template for -
         # osid.learning.ObjectiveRequisiteAssignmentSession.unassign_equivalent_objective
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
-
-

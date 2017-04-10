@@ -2,22 +2,21 @@
 class Locale:
 
     init = """
-    ##
-    # This constructor should probably be referencing a locale settings 
+    # This constructor should probably be referencing a locale settings
     # module for default values.
-    def __init__(self, language_type_identifier = 'ENG', 
-                       script_type_identifier = 'LATN', 
-                       calendar_type_identifier = 'ISO_8601', 
-                       time_type_identifier = 'UTC', 
-                       currency_type_identifier = 'USD', 
-                       unit_system_type_identifier = 'ENGLISH', 
-                       numeric_format_type_identifier = 'F8.2', 
-                       calendar_format_type_identifier = 'MMDDYYYY', 
-                       time_format_type_type_identifier = 'HHMMSS', 
-                       currency_format_type_identifier = 'US', 
+    def __init__(self, language_type_identifier = 'ENG',
+                       script_type_identifier = 'LATN',
+                       calendar_type_identifier = 'ISO_8601',
+                       time_type_identifier = 'UTC',
+                       currency_type_identifier = 'USD',
+                       unit_system_type_identifier = 'ENGLISH',
+                       numeric_format_type_identifier = 'F8.2',
+                       calendar_format_type_identifier = 'MMDDYYYY',
+                       time_format_type_type_identifier = 'HHMMSS',
+                       currency_format_type_identifier = 'US',
                        coordinate_format_type_identifier = 'DMS'
                 ):
-        
+
         self._language_type_identifier = language_type_identifier
         self._script_type_identifier = script_type_identifier
         self._calendar_type_identifier = calendar_type_identifier
@@ -90,10 +89,9 @@ class Locale:
 class DisplayText:
 
     init = """
-    ##
     # This constructor should be calling a locale settings module,
     # which should be set to the default language, script and format
-    # types. 
+    # types.
     def __init__(self, text, language_type_identifier = 'ENG',
                              script_type_identifier = 'LATN',
                              format_type_identifier = 'PLAIN',

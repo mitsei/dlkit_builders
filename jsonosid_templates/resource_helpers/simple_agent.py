@@ -20,11 +20,11 @@ class Identifiable(abc_markers.Identifiable):
     def __init__(self, id_):
         self.id_ = id_
 
-    def get_id():
+    def get_id(self):
         """Returns an Id"""
         return self.id_
 
-    def is_current():
+    def is_current(self):
         """Immutable and always current"""
         return True
 
@@ -32,11 +32,11 @@ class Identifiable(abc_markers.Identifiable):
 class Extensible(abc_markers.Extensible):
     """Simple Extensible"""
 
-    def get_record_types():
+    def get_record_types(self):
         """None here"""
         return TypeList([])
 
-    def has_record_type(record_type):
+    def has_record_type(self, record_type):
         """I said, none here!"""
         return False
 
@@ -48,7 +48,7 @@ class Browsable(abc_markers.Browsable):
         """Not required by customer"""
         raise errors.OperationFailed('oops, forgot to implement')
 
-    def get_properties_by_record_type(record_type):
+    def get_properties_by_record_type(self, record_type):
         """Not required by customer"""
         raise errors.OperationFailed('oops, forgot to implement')
 
@@ -56,21 +56,21 @@ class Browsable(abc_markers.Browsable):
 class OsidObject(abcOsidObject, Identifiable, Extensible, Browsable):
     """Simple Identifiable"""
 
-    def get_display_name():
+    def get_display_name(self):
         """Creates a display name"""
-        return DisplayText(text = self.id_.get_identifier(),
-                           language_type = DEFAULT_LANGUAGE_TYPE,
-                           script_type = DEFAULT_SCRIPT_TYPE,
-                           format_type = DEFAULT_FORMAT_TYPE,)
+        return DisplayText(text=self.id_.get_identifier(),
+                           language_type=DEFAULT_LANGUAGE_TYPE,
+                           script_type=DEFAULT_SCRIPT_TYPE,
+                           format_type=DEFAULT_FORMAT_TYPE,)
 
-    def get_description():
+    def get_description(self):
         """Creates a description"""
-        return DisplayText(text = 'Agent representing ' + str(self.id_),
-                           language_type = DEFAULT_LANGUAGE_TYPE,
-                           script_type = DEFAULT_SCRIPT_TYPE,
-                           format_type = DEFAULT_FORMAT_TYPE,)
+        return DisplayText(text='Agent representing ' + str(self.id_),
+                           language_type=DEFAULT_LANGUAGE_TYPE,
+                           script_type=DEFAULT_SCRIPT_TYPE,
+                           format_type=DEFAULT_FORMAT_TYPE,)
 
-    def get_genus_type():
+    def get_genus_type(self):
         """Returns the genus type"""
         return DEFAULT_GENUS_TYPE
 
@@ -107,4 +107,3 @@ class Agent(abcAgent, OsidObject):
 
         """
         raise errors.Unsupported()
-

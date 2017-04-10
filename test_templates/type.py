@@ -73,6 +73,7 @@ class TypeAdminSession:
     delete_type = """
         pass"""
 
+
 class TypeForm:
 
     import_statements = [
@@ -128,6 +129,7 @@ class TypeList:
 
     get_next_types = """
         pass"""
+
 
 class Type:
 

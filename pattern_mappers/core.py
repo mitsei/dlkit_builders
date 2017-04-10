@@ -1,6 +1,6 @@
 from binder_helpers import make_plural
 
-##
+
 # Investigate all the methods in the core osid service.  It is assumed
 # that most, of not all of these will need to be implemented by hand.
 def map_osid_patterns(interface, package, index):
@@ -9,153 +9,151 @@ def map_osid_patterns(interface, package, index):
         var_name = method['name'].split('_', 1)[-1]
 
         if (interface['shortname'] == 'Metadata' and
-            'supports_' not in method['name'] and
-            len(method['errors']) == 0):
+                'supports_' not in method['name'] and
+                len(method['errors']) == 0):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'osid.Metadata.get_element_id',
-                kwargs = dict(interface_name = interface['shortname'],
-                              package_name = package['name'],
-                              module_name = interface['category'],
-                              method_name = method['name'],
-                              var_name = var_name,
-                              return_type_full = method['return_type']))
+                pattern='osid.Metadata.get_element_id',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name,
+                            return_type_full=method['return_type']))
 
         elif (interface['shortname'] == 'Metadata' and
-            'supports_' not in method['name'] and
-            len(method['errors']) == 1 and
-            'ILLEGAL_STATE' in method['errors']):
+                'supports_' not in method['name'] and
+                len(method['errors']) == 1 and
+                'ILLEGAL_STATE' in method['errors']):
             error_string_list = method['error_doc'].split()
             syntax_list = []
             for s in error_string_list:
                 if s.strip('`').isupper() and s.strip('`') != 'ILLEGAL_STATE':
                     syntax_list.append(s.strip('`'))
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'osid.Metadata.get_minimum_cardinal',
-                kwargs = dict(interface_name = interface['shortname'],
-                              package_name = package['name'],
-                              module_name = interface['category'],
-                              method_name = method['name'],
-                              var_name = var_name,
-                              syntax_list = '[\'' + '\', \''.join(syntax_list) + '\']',
-                              return_type_full = method['return_type']))
+                pattern='osid.Metadata.get_minimum_cardinal',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name,
+                            syntax_list='[\'' + '\', \''.join(syntax_list) + '\']',
+                            return_type_full=method['return_type']))
 
         elif (interface['shortname'] == 'Metadata' and
-              method['name'].startswith('supports_') and
-              len(method['errors']) == 2 and
-              'NULL_ARGUMENT' in method['errors']):
+                method['name'].startswith('supports_') and
+                len(method['errors']) == 2 and
+                'NULL_ARGUMENT' in method['errors']):
             error_string_list = method['error_doc'].split()
             syntax_list = []
             for s in error_string_list:
-                if s.isupper() and not s in ['ILLEGAL_STATE', 'NULL_ARGUMENT']:
+                if s.isupper() and s not in ['ILLEGAL_STATE', 'NULL_ARGUMENT']:
                     syntax_list.append(s)
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'osid.Metadata.supports_coordinate_type',
-                kwargs = dict(interface_name = interface['shortname'],
-                              package_name = package['name'],
-                              module_name = interface['category'],
-                              method_name = method['name'],
-                              var_name = make_plural(var_name),
-                              syntax_list = '[\'' + '\', \''.join(syntax_list) + '\']',
-                              return_type_full = method['return_type'],
-                              arg0_name = method['args'][0]['var_name']))
+                pattern='osid.Metadata.supports_coordinate_type',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=make_plural(var_name),
+                            syntax_list='[\'' + '\', \''.join(syntax_list) + '\']',
+                            return_type_full=method['return_type'],
+                            arg0_name=method['args'][0]['var_name']))
 
         elif (interface['shortname'] == 'Metadata' and
-              method['name'].startswith('get_existing_')):
+                method['name'].startswith('get_existing_')):
             error_string_list = method['error_doc'].split()
             syntax_list = []
             for s in error_string_list:
-                if s.isupper() and not s in ['ILLEGAL_STATE', 'NULL_ARGUMENT']:
+                if s.isupper() and s not in ['ILLEGAL_STATE', 'NULL_ARGUMENT']:
                     syntax_list.append(s)
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'osid.Metadata.get_existing_cardinal_values',
-                kwargs = dict(interface_name = interface['shortname'],
-                              package_name = package['name'],
-                              module_name = interface['category'],
-                              method_name = method['name'],
-                              var_name = make_plural(var_name),
-                              syntax_list = '[\'' + '\', \''.join(syntax_list) + '\']',
-                              return_type_full = method['return_type'],
-                              arg0_name = method['args'][0]['var_name']))
+                pattern='osid.Metadata.get_existing_cardinal_values',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=make_plural(var_name),
+                            syntax_list='[\'' + '\', \''.join(syntax_list) + '\']',
+                            return_type_full=method['return_type'],
+                            arg0_name=method['args'][0]['var_name']))
 
-        else: 
+        else:
             index[interface['shortname'] + '.' + method['name']] = dict(
-                  pattern = '',
-                  kwargs = dict(interface_name = interface['shortname'],
-                                package_name = package['name'],
-                                module_name = interface['category'],
-                                method_name = method['name']))
+                pattern='',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name']))
     return index
 
-##
+
 # Investigate all the methods in the osid.type service.  It is assumed
 # that most, of not all of these will need to be implemented by hand.
 def map_type_patterns(interface, package, index):
 
     object_name = 'Type'
     for method in interface['methods']:
-        
+
         if method['name'] == 'get_next_type':
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceList.get_next_resource',
-                kwargs = dict(interface_name = interface['shortname'],
-                              package_name = package['name'],
-                              module_name = interface['category'],
-                              method_name = method['name'],
-                              return_type_full = method['return_type']))
+                pattern='resource.ResourceList.get_next_resource',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            return_type_full=method['return_type']))
 
         elif method['name'] == 'get_next_types':
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceList.get_next_resources',
-                kwargs = dict(interface_name = interface['shortname'],
-                              package_name = package['name'],
-                              module_name = interface['category'],
-                              method_name = method['name'],
-                              arg0_name = method['args'][0]['var_name'],
-                              return_type_full = method['return_type']))
+                pattern='resource.ResourceList.get_next_resources',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            arg0_name=method['args'][0]['var_name'],
+                            return_type_full=method['return_type']))
 
         else:
             index[interface['shortname'] + '.' + method['name']] = dict(
-                  pattern = '',
-                  kwargs = dict(interface_name = interface['shortname'],
-                                  package_name = package['name'],
-                                module_name = interface['category'],
-                                  method_name = method['name']))
+                pattern='',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name']))
     return index
 
 
-##
 # Investigate all the methods in the osid.id service.  It is assumed
 # that most, of not all of these will need to be implemented by hand.
 def map_id_patterns(interface, package, index):
 
     object_name = 'Id'
     for method in interface['methods']:
-        
+
         if method['name'] == 'get_next_id':
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceList.get_next_resource',
-                kwargs = dict(interface_name = interface['shortname'],
-                              package_name = package['name'],
-                              module_name = interface['category'],
-                              method_name = method['name'],
-                              return_type_full = method['return_type']))
+                pattern='resource.ResourceList.get_next_resource',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            return_type_full=method['return_type']))
 
         elif method['name'] == 'get_next_ids':
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern = 'resource.ResourceList.get_next_resources',
-                kwargs = dict(interface_name = interface['shortname'],
-                              package_name = package['name'],
-                              module_name = interface['category'],
-                              method_name = method['name'],
-                              arg0_name = method['args'][0]['var_name'],
-                              return_type_full = method['return_type']))
+                pattern='resource.ResourceList.get_next_resources',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            arg0_name=method['args'][0]['var_name'],
+                            return_type_full=method['return_type']))
 
         else:
             index[interface['shortname'] + '.' + method['name']] = dict(
-                  pattern = '',
-                  kwargs = dict(interface_name = interface['shortname'],
-                                  package_name = package['name'],
-                                module_name = interface['category'],
-                                  method_name = method['name']))
+                pattern='',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name']))
     return index
-

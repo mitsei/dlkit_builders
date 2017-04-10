@@ -6,13 +6,14 @@
 from dlkit.abstract_osid.osid.errors import NotFound
 from .profile import LANGUAGETYPE, SCRIPTTYPE, FORMATTYPE
 
+
 class NoneType(object):
     """Enumerator for None or Null Types"""
 
     none_types = {
         'NONE': 'None',
         'NULL': 'Null',
-        }
+    }
 
     def __init__(self):
         self.type_set = {
@@ -35,13 +36,14 @@ class NoneType(object):
         except IndexError:
             raise NotFound('NoneType: ' + name)
 
+
 class Genus(object):
     """Enumerator for Genus Types"""
 
     generic_types = {
         'DEFAULT': 'Default',
         'UNKNOWN': 'Unkown'
-        }
+    }
 
     def __init__(self):
         self.type_set = {
@@ -64,6 +66,7 @@ class Genus(object):
         except IndexError:
             raise NotFound('GenusType: ' + name)
 
+
 class Language(object):
     """Gets default Language Types"""
 
@@ -73,6 +76,7 @@ class Language(object):
             return LANGUAGETYPE
         else:
             raise NotFound('DEFAULT Language Type')
+
 
 class Script(object):
     """Gets default Script Types"""

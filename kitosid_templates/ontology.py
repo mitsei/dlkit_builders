@@ -6,9 +6,9 @@ class SubjectHierarchySession:
         self._provider_session = provider_session
 """
 
-    get_subject_hierarchy_id_template = None # Need to put one of these elsewhere
+    get_subject_hierarchy_id_template = None  # Need to put one of these elsewhere
 
-    get_subject_hierarchy_template = None # Need to put one of these elsewhere
+    get_subject_hierarchy_template = None  # Need to put one of these elsewhere
 
     can_access_subject_hierarchy_template = """
         \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"

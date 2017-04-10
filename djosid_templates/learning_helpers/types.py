@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-### THIS STILL NEEDS LOTS OF WORK AND PERSONAL REFLECTION ###
+# THIS STILL NEEDS LOTS OF WORK AND PERSONAL REFLECTION ###
 from osid_kit.dj_osid.types import GenusType as OsidGenusType
+
 
 class GenusType(OsidGenusType):
 
@@ -22,6 +23,6 @@ class GenusType(OsidGenusType):
             'domain': 'Generic Types',
             'display_name': self.generic_types[name] + ' Generic Type',
             'display_label': self.generic_types[name],
-            'description': ('The ' +  self.generic_types[name] + 
-                                ' Type. This type has no symantic meaning.')
-            }
+            'description': ('The ' + self.generic_types[name] +
+                            ' Type. This type has no symantic meaning.')
+        }

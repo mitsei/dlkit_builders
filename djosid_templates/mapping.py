@@ -16,7 +16,7 @@ class SpatialUnit:
 
 
 class Coordinate:
-    
+
     init = """
     def __init__(self, coordinate_type,
                        values,

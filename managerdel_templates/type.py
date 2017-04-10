@@ -1,8 +1,8 @@
 
 class TypeProfile:
 
-    #import_statements = [
-    #]
+    # import_statements = [
+    # ]
 
     supports_type_lookup = """
         return False"""
@@ -43,7 +43,7 @@ class TypeList:
         'from ..osid.osid_errors import IllegalState, OperationFailed',
         'from ..osid.objects import OsidList',
         'from ..primitives import Type',
-        ]
+    ]
 
     get_next_type = """
         try:

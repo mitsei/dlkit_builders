@@ -255,11 +255,11 @@ class AssessmentSession:
     get_answers = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_provider_session('assessment_session').get_answers(*args, **kwargs)"""
- 
+
     finish_assessment = """
         \"\"\"Pass through to provider method\"\"\"
         self._get_provider_session('assessment_session').finish_assessment(*args, **kwargs)"""
- 
+
 
 class AssessmentResultsSession:
 
@@ -327,6 +327,7 @@ class AssessmentBasicAuthoringSession:
             self._get_sub_package_provider_session(
                 'assessment_authoring', 'assessment_part_item_design_session').order_items(*args, **kwargs)"""
 
+
 class AssessmentTakenLookupSession:
 
     get_assessments_taken_for_taker_and_assessment_offered = """
@@ -372,7 +373,6 @@ class AssessmentPartItemDesignSession:
         'from .osid_errors import InvalidArgument'
     ]
 
-
     can_design_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
@@ -385,12 +385,12 @@ class AssessmentPartItemDesignSession:
                                                       'assessment_part_item_design_session').get_items(*args, **kwargs)"""
 
     add_item = None
-    
+
     move_item_ahead = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_item_design_session').move_item_ahead(*args, **kwargs)"""
-    
+
     move_item_behind = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
@@ -399,6 +399,7 @@ class AssessmentPartItemDesignSession:
     remove_items = None
 
     order_items = None
+
 
 class AssessmentPartLookupSession:
     get_assessment_part = """
@@ -436,6 +437,7 @@ class AssessmentPartLookupSession:
                     provider_session.use_unsequestered_assessment_part_view()
                 except AttributeError:
                     pass"""
+
 
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """

@@ -1,5 +1,0 @@
-        # Implemented from template for osid.logging.LogEntry.getPriority
-        from type_kit.dj_type import Type
-        return Type(self.myModel.${modelVariable}Authority,
-                  self.myModel.${modelVariable}Namespace,
-                  self.myModel.${modelVariable}Identifier)

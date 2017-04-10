@@ -1,6 +1,6 @@
 """Supporting objects to be instantiated at runtime"""
 
-from dlkit.abstract_osid.osid.errors import OperationFailed
+from dlkit.abstract_osid.osid.errors import OperationFailed, IllegalState
 from dlkit.primordium.id.primitives import Id
 import time
 import datetime
@@ -14,6 +14,7 @@ VMAP = {
     'u': 'changed',
     'd': 'deleted'
 }
+
 
 class MongoClientContainer:
 
@@ -38,8 +39,8 @@ class MongoClientContainer:
 
     mongo_client = property(fget=get_mongo_client, fset=set_mongo_client)
 
-
 MONGO_CLIENT = MongoClientContainer()
+
 
 class MongoListener(Thread):
     """A utility thread that listens for database changes for notification sessions"""
@@ -58,7 +59,7 @@ class MongoListener(Thread):
         if self.is_alive():
             raise IllegalState('notification thread is already initialized')
         if not MONGO_CLIENT.is_mongo_client_set() and runtime is not None:
-            set_mongo_client(runtime)
+            MONGO_CLIENT.set_mongo_client(runtime)
         cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find().sort('ts', DESCENDING).limit(-1)
         try:
             self.last_timestamp = cursor.next()['ts']
@@ -106,12 +107,11 @@ class MongoListener(Thread):
         for notification_id in notifications_to_delete:
             del self.notifications[notification_id]
 
-
     def run(self):
         """main control loop for thread"""
         while True:
             cursor = MONGO_CLIENT.mongo_client['local']['oplog.rs'].find(
-                {'ts':{'$gt': self.last_timestamp}})
+                {'ts': {'$gt': self.last_timestamp}})
             # http://stackoverflow.com/questions/30401063/pymongo-tailing-oplog
             cursor.add_option(2)  # tailable
             cursor.add_option(8)  # oplog_replay

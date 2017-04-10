@@ -1,6 +1,7 @@
 
 from .error_lists import session_errors
 
+
 class LoggingSession:
 
     import_statements = [
@@ -8,7 +9,7 @@ class LoggingSession:
         'from dlkit.abstract_osid.osid import errors',
         'from . import objects',
         'from ..osid.sessions import OsidSession'
-        ]
+    ]
 
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
@@ -24,7 +25,7 @@ class LoggingSession:
         self._content_types = lm.get_content_types()"""
 
     can_log = """
-        # NOTE: It is expected that real authentication hints will be 
+        # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
@@ -33,6 +34,7 @@ class LoggingSession:
             raise errors.Unsupported()
         lefc = self._leas.get_content_form_for_create([])
         lefc.set_timestamp(DateTime.utcnow())"""
+
 
 class LogEntryAdminSession:
     import_statements_pattern = [
@@ -69,13 +71,14 @@ class LogEntryAdminSession:
 
         return result"""
 
+
 class LogEntry:
 
     import_statements_pattern = [
         'from ..primitives import *',
         'from ..osid.osid_errors import *',
     ]
-    
+
     get_priority_template = """
         # Implemented from template for osid.logging.LogEntry.get_priority
         if not self._my_map['${var_name_mixed}']:
@@ -102,6 +105,7 @@ class LogEntry:
         return obj_map
 
     object_map = property(fget=get_object_map)"""
+
 
 class LogEntryForm:
 
@@ -133,17 +137,17 @@ class LogEntryForm:
         self._my_map['assignedLogIds'] = [str(kwargs['log_id'])]
         self._my_map['agentId'] = self._agent_default
 """
-    
+
     set_priority_template = """
         # Implemented from template for osid.logging.LogEntryForm.set_priority
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
-        if not self._is_valid_type(${arg0_name}, 
+        if not self._is_valid_type(${arg0_name},
                                 self.get_${var_name}_metadata()):
             raise errors.InvalidArgument()
         self._my_map['${var_name_mixed}'] = str(${arg0_name})"""
 
+
 class LogEntryQuery:
     match_agent_id = """
         self._add_match("agentId", str(agent_id), match)"""
-

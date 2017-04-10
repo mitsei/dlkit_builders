@@ -1,5 +1,6 @@
 # learning templates for az_osid
 
+
 class ObjectiveAdminSession:
 
     delete_objective_template = """
@@ -8,6 +9,7 @@ class ObjectiveAdminSession:
         if not self._can_for_${object_name_under}('delete', ${object_name_under}_id):
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name})"""
+
 
 class ActivityLookupSession:
 
@@ -20,7 +22,6 @@ class ActivityLookupSession:
         query = self._query_session.get_${object_name_under}_query()
         query.match_${arg0_object_under}_id(${arg0_name}, match=True)
         return self._try_harder(query)"""
-
 
     get_activities_for_objectives_template = """
         # Implemented from azosid template for -
@@ -42,4 +43,3 @@ class ActivityAdminSession:
         if not self._can('create'):
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
-

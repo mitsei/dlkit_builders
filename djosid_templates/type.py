@@ -43,4 +43,3 @@ class Type:
     get_domain = """
         from ..locale.primitives import DisplayText
         return DisplayText(self._domain)"""
-

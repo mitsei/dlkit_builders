@@ -23,7 +23,7 @@ def make_all():
 #    print "Building Django Service Implementations..."
 #    from builders.djbuilder import make_djosids
 #    make_djosids()
-    
+
 #    print "Building Django Models..."
 #    from builders.djmodelbuilder import make_djmodels
 #    make_djmodels()
@@ -50,8 +50,8 @@ def make_all():
     from builders.kitdocsourcebuilder import make_kitdocs
     make_kitdocs()
 
-    #from builders.djmodelbuilder import make_djmodels
-    #make_djmodels()
+    # from builders.djmodelbuilder import make_djmodels
+    # make_djmodels()
 
     from builders.mapcount import count_all
     count_all()

@@ -1,2 +1,0 @@
-        # Implemented from template for osid.calendaring.Event.hasSponsors
-        return self.myModel.${modelVariable}

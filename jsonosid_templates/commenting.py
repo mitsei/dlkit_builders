@@ -1,6 +1,7 @@
 from .resource import ResourceLookupSession
 from .resource import ResourceQuerySession
 
+
 class CommentLookupSession:
 
     import_statements_pattern = ResourceLookupSession.import_statements_pattern
@@ -54,6 +55,7 @@ class CommentAdminSession:
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
+
 class Comment:
 
     import_statements = [
@@ -90,6 +92,7 @@ class Comment:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+
 
 class CommentQuery:
 

@@ -1,20 +1,20 @@
 
 class AssessmentManager:
-    
+
     import_statements = [
         'from . import sessions',
     ]
-    
+
     awkward_get_assessment_taken_query_session_for_bank_to_delete = """
         if not self.supports_assessment_taken_query():
             raise errors.Unimplemented()
         return sessions.AssessmentTakenQuerySession(bank_id, runtime=self._runtime)
-    
+
     def get_assessment_taken_admin_session(self):
         if not self.supports_assessment_taken_admin():
             raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(runtime=self._runtime)
-    
+
     def get_assessment_taken_admin_session_for_bank(self, bank_id):
         if not self.supports_assessment_taken_admin():
             raise errors.Unimplemented()
@@ -26,17 +26,17 @@ class AssessmentProxyManager:
     import_statements = [
         'from . import sessions',
     ]
-    
+
     awkward_get_assessment_taken_query_session_for_bank_to_delete = """
         if not self.supports_assessment_taken_query():
             raise errors.Unimplemented()
         return sessions.AssessmentTakenQuerySession(bank_id, proxy, runtime=self._runtime)
-    
+
     def get_assessment_taken_admin_session(self, proxy):
         if not self.supports_assessment_taken_admin():
             raise errors.Unimplemented()
         return sessions.AssessmentTakenAdminSession(proxy=proxy, runtime=self._runtime)
-    
+
     def get_assessment_taken_admin_session_for_bank(self, bank_id, proxy):
         if not self.supports_assessment_taken_admin():
             raise errors.Unimplemented()
@@ -44,7 +44,7 @@ class AssessmentProxyManager:
 
 
 # class AssessmentSession:
-#     
+#
 #     import_statements = [
 #         'from ..primitives import Id',
 #         'from ..primitives import Type',
@@ -60,7 +60,7 @@ class AssessmentProxyManager:
 #         'from .assessment_utilities import get_assessment_section as get_section_util',
 #         'from .assessment_utilities import check_effective',
 #     ]
-#     
+#
 #     init = """
 #     def __init__(self, catalog_id=None, proxy=None, runtime=None):
 #         OsidSession.__init__(self)
@@ -76,18 +76,18 @@ class AssessmentProxyManager:
 #             cat_class=objects.Bank)
 #         self._forms = dict()
 #         self._assessments_taken = dict()"""
-# 
+#
 #     can_take_assessments = """
 #         # NOTE: It is expected that real authentication hints will be
 #         # handled in a service adapter above the pay grade of this impl.
 #         return True"""
-#     
+#
 #     has_assessment_begun = """
 #         return self._get_assessment_taken(assessment_taken_id).has_started()"""
-#     
+#
 #     is_assessment_over = """
 #         return self._get_assessment_taken(assessment_taken_id).has_ended()"""
-#     
+#
 #     ## This method has been deprecated and NOT updated:
 #     finished_assessment = """
 #         collection = MongoClientValidated('assessment',
@@ -101,14 +101,14 @@ class AssessmentProxyManager:
 #             collection.save(assessment_taken_map)
 #         else:
 #             raise errors.IllegalState()"""
-# 
+#
 #     requires_synchronous_sections = """
 #         return self._get_assessment_taken(assessment_taken_id).get_assessment_offered().are_sections_sequential()"""
-#     
+#
 #     get_first_assessment_section = """
 #         assessment_taken = self._get_assessment_taken(assessment_taken_id)
 #         return assessment_taken._get_first_assessment_section()"""
-#    
+#
 #     has_next_assessment_section = """
 #         try:
 #             self.get_next_assessment_section(assessment_section_id)
@@ -116,11 +116,11 @@ class AssessmentProxyManager:
 #             return False
 #         else:
 #             return True"""
-#     
+#
 #     get_next_assessment_section = """
 #         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
 #         return assessment_taken._get_next_assessment_section(assessment_section_id)"""
-#     
+#
 #     has_previous_assessment_section = """
 #         try:
 #             self.get_previous_assessment_section(assessment_section_id)
@@ -128,51 +128,51 @@ class AssessmentProxyManager:
 #             return False
 #         else:
 #             return True"""
-#     
+#
 #     get_previous_assessment_section = """
 #         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
 #         return assessment_taken._get_previous_assessment_section(assessment_section_id)"""
-#     
+#
 #     get_assessment_section = """
 #         return get_section_util(assessment_section_id, runtime=self._runtime, proxy=self._proxy)"""
-# 
+#
 #     get_assessment_sections = """
 #         assessment_taken = self._get_assessment_taken(assessment_taken_id)
 #         return assessment_taken._get_assessment_sections()"""
-#     
+#
 #     is_assessment_section_complete = """
 #         return self.get_assessment_section(assessment_section_id).is_complete()"""
-#     
+#
 #     get_incomplete_assessment_sections = """
 #         section_list = []
 #         for section in self.get_assessment_sections(assessment_taken_id):
 #             if not section.is_complete():
 #                 section_list.append(section)
 #         return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)"""
-#     
+#
 #     ## Has this method has been deprecated???
 #     ## IMPLEMENT ME PROPERLY!
 #     has_assessment_section_begun = """
 #         return get_section_util(assessment_section_id,
 #                                 runtime=self._runtime)._assessment_taken.has_started()"""
-#     
+#
 #     ## Has this method has been deprecated???
 #     is_assessment_section_over = """
 #         return get_section_util(assessment_section_id,
 #                                 runtime=self._runtime).is_over()"""
-#     
+#
 #     ## This method has been deprecated:
 #     finished_assessment_section = """
 #             raise errors.IllegalState()
 #         self.finished_assessment(assessment_section_id)"""
-#     
+#
 #     ## Has this method has been deprecated???
 #     requires_synchronous_responses = """
 #         return self.get_assessment_section(assessment_section_id).are_items_sequential()"""
-#     
+#
 #     get_first_question = """
 #         return self.get_assessment_section(assessment_section_id).get_first_question()"""
-# 
+#
 #     has_next_question = """
 #         try:
 #             self.get_next_question(assessment_section_id, item_id)
@@ -180,10 +180,10 @@ class AssessmentProxyManager:
 #             return False
 #         else:
 #             return True"""
-#    
+#
 #     get_next_question = """
 #         return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id)"""
-#     
+#
 #     has_previous_question = """
 #         try:
 #             self.get_previous_question(assessment_section_id, item_id)
@@ -191,25 +191,25 @@ class AssessmentProxyManager:
 #             return False
 #         else:
 #             return True"""
-# 
+#
 #     get_previous_question = """
 #         return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id, reverse=True)"""
-# 
+#
 #     get_question = """
 #         return self.get_assessment_section(assessment_section_id).get_question(question_id=item_id)"""
-#     
+#
 #     get_questions = """
 #         # Does this want to return a blocking list of available questions?
 #         return self.get_assessment_section(assessment_section_id).get_questions()"""
-# 
+#
 #     get_response_form_import_templates = [
 #         'from dlkit.abstract_osid.id.primitives import Id as ABCId'
 #     ]
-# 
+#
 #     get_response_form = """
 #         if not isinstance(item_id, ABCId):
 #             raise errors.InvalidArgument('argument is not a valid OSID Id')
-# 
+#
 #         ##
 #         # This is a little hack to get the answer record types from the Item's
 #         # first Answer record types. Should really get it from item genus types somehow:
@@ -234,7 +234,7 @@ class AssessmentProxyManager:
 #                     answer_record_types.append(Type(**record_type_data_sets[identifier]))
 #         # Thus endith the hack.
 #         ##
-# 
+#
 #         obj_form = objects.AnswerForm(
 #             bank_id=self._catalog_id,
 #             record_types=answer_record_types,
@@ -246,11 +246,11 @@ class AssessmentProxyManager:
 #         obj_form._for_update = False # This may be redundant
 #         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
 #         return obj_form"""
-# 
+#
 #     submit_response_import_templates = [
 #         'from dlkit.abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
 #     ]
-# 
+#
 #     submit_response = """
 #         if not isinstance(answer_form, ABCAnswerForm):
 #             raise errors.InvalidArgument('argument type is not an AnswerForm')
@@ -259,7 +259,7 @@ class AssessmentProxyManager:
 #         if answer_form.is_for_update():
 #             raise errors.InvalidArgument('the AnswerForm is for update only, not submit')
 #         ##
-# 
+#
 #         try:
 #             if self._forms[answer_form.get_id().get_identifier()] == SUBMITTED:
 #                 raise errors.IllegalState('answer_form already used in a submit transaction')
@@ -270,27 +270,27 @@ class AssessmentProxyManager:
 #         answer_form._my_map['_id'] = ObjectId()
 #         self.get_assessment_section(assessment_section_id).submit_response(item_id, answer_form)
 #         self._forms[answer_form.get_id().get_identifier()] = SUBMITTED"""
-#     
+#
 #     skip_item = """
 #         # add conditional: if the assessment or part allows us to skip:
 #         self.get_assessment_section(assessment_section_id).submit_response(item_id, None)"""
-#     
+#
 #     is_question_answered = """
 #         return self.get_assessment_section(assessment_section_id).is_question_answered(item_id)"""
-#     
+#
 #     get_unanswered_questions = """
 #         return self.get_assessment_section(assessment_section_id).get_questions(answered=False)"""
-#     
+#
 #     has_unanswered_questions = """
 #         # There's probably a more efficient way to implement this:
 #         return bool(self.get_unanswered_questions(assessment_section_id).available())"""
-#     
+#
 #     get_first_unanswered_question = """
 #         questions = self.get_unanswered_questions(assessment_section_id)
 #         if not questions.available():
 #             raise errors.IllegalState('There are no more unanswered questions available')
 #         return questions.next()"""
-#     
+#
 #     has_next_unanswered_question = """
 #         # There's probably a more efficient way to implement this:
 #         try:
@@ -299,7 +299,7 @@ class AssessmentProxyManager:
 #             return False
 #         else:
 #             return True"""
-#     
+#
 #     get_next_unanswered_question = """
 #         # Or this could call through to get_next_question in the section
 #         questions = self.get_unanswered_questions(assessment_section_id)
@@ -310,7 +310,7 @@ class AssessmentProxyManager:
 #                 else:
 #                     raise errors.IllegalState('No next unanswered question is available')
 #         raise errors.NotFound('item_id is not found in Section')"""
-#     
+#
 #     has_previous_unanswered_question = """
 #         # There's probably a more efficient way to implement this:
 #         try:
@@ -319,7 +319,7 @@ class AssessmentProxyManager:
 #             return False
 #         else:
 #             return True"""
-#     
+#
 #     get_previous_unanswered_question = """
 #         # Or this could call through to get_next_question in the section with reverse=True
 #         questions = self.get_unanswered_questions(assessment_section_id)
@@ -332,33 +332,33 @@ class AssessmentProxyManager:
 #             else:
 #                 previous_question = question
 #         raise errors.NotFound('item_id is not found in Section')"""
-#     
+#
 #     get_response = """
 #         return self.get_assessment_section(assessment_section_id).get_response(question_id=item_id)"""
-# 
+#
 #     get_responses = """
 #         return self.get_assessment_section(assessment_section_id).get_responses()"""
-#    
+#
 #     clear_response = """
 #         if (not self.has_assessment_section_begun(assessment_section_id) or
 #                 self.is_assessment_section_over(assessment_section_id)):
 #             raise errors.IllegalState()
 #         # Should probably check to see if responses can be cleared, but how?
 #         self.get_assessment_section(assessment_section_id).submit_response(item_id, None)"""
-#     
+#
 #     finish_assessment_section = """
 #         if (not self.has_assessment_section_begun(assessment_section_id) or
 #                 self.is_assessment_section_over(assessment_section_id)):
 #             raise errors.IllegalState()
 #         self.get_assessment_section(assessment_section_id).finish()"""
-#     
+#
 #     ## This is no longer needed:
 #     finish = """
 #         self.finished_assessment(assessment_section_id)
-#     
+#
 #     def finish_assessment_section(self, assessment_section_id):
 #         self.finish(assessment_section_id)"""
-#     
+#
 #     finish_assessment = """
 #         assessment_taken = self._get_assessment_taken(assessment_taken_id)
 #         assessment_taken_map = assessment_taken._my_map
@@ -371,7 +371,7 @@ class AssessmentProxyManager:
 #             collection.save(assessment_taken_map)
 #         else:
 #             raise errors.IllegalState()"""
-# 
+#
 #     is_answer_available = """
 #         # Note: we need more settings elsewhere to indicate answer available conditions
 #         # This makes the simple assumption that answers are available only when
@@ -382,14 +382,14 @@ class AssessmentProxyManager:
 #             return False
 #         else:
 #             return True"""
-#     
+#
 #     get_answers = """
 #         if self.is_answer_available(assessment_section_id, item_id):
 #             return self.get_assessment_section(assessment_section_id).get_answers(question_id=item_id)
 #         raise errors.IllegalState()"""
-# 
+#
 #     additional_methods = """
-# 
+#
 #     def _get_assessment_taken(self, assessment_taken_id):
 #         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
 #         if assessment_taken_id not in self._assessments_taken:
@@ -399,9 +399,9 @@ class AssessmentProxyManager:
 #             self._assessments_taken[assessment_taken_id] = (
 #                 lookup_session.get_assessment_taken(assessment_taken_id))
 #         return self._assessments_taken[assessment_taken_id]"""
-# 
+#
 # class AssessmentResultsSession:
-# 
+#
 #     import_statements = [
 #         'from .assessment_utilities import get_assessment_section',
 #         'from .assessment_utilities import get_item_lookup_session',
@@ -410,7 +410,7 @@ class AssessmentProxyManager:
 #         'from .objects import ItemList',
 #         'from .objects import ResponseList',
 #     ]
-# 
+#
 #     init = """
 #     def __init__(self, catalog_id=None, proxy=None, runtime=None):
 #         OsidSession.__init__(self)
@@ -424,12 +424,12 @@ class AssessmentProxyManager:
 #             db_name='assessment',
 #             cat_name='Bank',
 #             cat_class=objects.Bank)"""
-# 
+#
 #     can_access_assessment_results = """
 #         # NOTE: It is expected that real authentication hints will be
 #         # handled in a service adapter above the pay grade of this impl.
 #         return True"""
-# 
+#
 #     get_items = """
 #         mgr = self._get_provider_manager('ASSESSMENT', local=True)
 #         taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
@@ -442,7 +442,7 @@ class AssessmentProxyManager:
 #                 for question in section._my_map['questions']:
 #                     item_list.append(ils.get_item(question['questionId']))
 #         return ItemList(item_list)"""
-# 
+#
 #     get_responses = """
 #         mgr = self._get_provider_manager('ASSESSMENT', local=True)
 #         taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
@@ -456,17 +456,17 @@ class AssessmentProxyManager:
 #                                                  proxy=self._proxy)
 #                 response_list.append(section.get_responses())
 #         return ResponseList(response_list)"""
-# 
+#
 #     are_results_available = """
 #         # not implemented yet
 #         return False"""
-# 
+#
 #     get_grade_entries = """
 #         # not implemented yet and are_results_available is False
 #         raise IllegalState()"""
-# 
+#
 # class ItemAdminSession:
-#     
+#
 #     import_statements = [
 #         'from ..primitives import Id',
 #         'from dlkit.abstract_osid.osid import errors',
@@ -475,13 +475,13 @@ class AssessmentProxyManager:
 #         'UPDATED = True',
 #         'CREATED = True'
 #     ]
-#     
+#
 #     # This method is hand implemented to raise errors.and error if the item
 #     # is found to be associated with an assessment
 #     delete_item_import_templates = [
 #         'from dlkit.abstract_osid.id.primitives import Id as ABCId'
 #     ]
-# 
+#
 #     delete_item = """
 #         if not isinstance(item_id, ABCId):
 #             raise errors.InvalidArgument('the argument is not a valid OSID Id')
@@ -499,14 +499,14 @@ class AssessmentProxyManager:
 #                      runtime=self._runtime,
 #                      proxy=self._proxy)._delete()
 #         collection.delete_one({'_id': ObjectId(item_id.get_identifier())})"""
-#     
+#
 #     # These methods overwrite the canonical aggregate object admin methods to
 #     # deal with authoring Questions with are special: ie. there is only one per
 #     # Item.  Perhaps we will see this pattern again and can make templates.
 #     create_question_import_templates = [
 #         'from dlkit.abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
 #     ]
-# 
+#
 #     create_question = """
 #         collection = MongoClientValidated('assessment',
 #                                           collection='Item',
@@ -538,11 +538,11 @@ class AssessmentProxyManager:
 #         return objects.Question(osid_object_map=question_form._my_map,
 #                                 runtime=self._runtime,
 #                                 proxy=self._proxy)"""
-# 
+#
 #     get_question_form_for_update_import_templates = [
 #         'from dlkit.abstract_osid.id.primitives import Id as ABCId'
 #     ]
-# 
+#
 #     get_question_form_for_update = """
 #         collection = MongoClientValidated('assessment',
 #                                           collection='Item',
@@ -555,11 +555,11 @@ class AssessmentProxyManager:
 #                                         proxy=self._proxy)
 #         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 #         return obj_form"""
-# 
+#
 #     update_question_import_templates = [
 #         'from dlkit.abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
 #     ]
-# 
+#
 #     update_question = """
 #         collection = MongoClientValidated('assessment',
 #                                           collection='Item',
@@ -588,10 +588,10 @@ class AssessmentProxyManager:
 #         return objects.Question(osid_object_map=question_form._my_map,
 #                                 runtime=self._runtime,
 #                                 proxy=self._proxy)"""
-# 
-# 
+#
+#
 # class AssessmentAdminSession:
-#     
+#
 #     import_statements = [
 #         'from ..primitives import Id',
 #         'from dlkit.abstract_osid.osid import errors',
@@ -601,12 +601,12 @@ class AssessmentProxyManager:
 #         'UPDATED = True',
 #         'CREATED = True'
 #         ]
-# 
+#
 #     delete_assessment_import_templates = [
 #         'from dlkit.abstract_osid.id.primitives import Id as ABCId',
 #         'from ..assessment_authoring import objects as assessment_authoring_objects'
 #     ]
-# 
+#
 #     delete_assessment = """
 #         \"\"\"Delete all the children AssessmentParts recursively, too\"\"\"
 #         def remove_children_parts(parent_id):
@@ -617,7 +617,7 @@ class AssessmentProxyManager:
 #                 query = {"assessmentId": parent_id}
 #             else:
 #                 query = {"assessmentPartId": parent_id}
-# 
+#
 #             # need to account for magic parts ...
 #             for part in part_collection.find(query):
 #                 part = assessment_authoring_objects.AssessmentPart(osid_object_map=part,
@@ -633,7 +633,7 @@ class AssessmentProxyManager:
 #                 except AttributeError:
 #                     part_collection.delete_one({'_id': ObjectId(part.ident.get_identifier())})
 #                 remove_children_parts(str(part.ident))
-# 
+#
 #         if not isinstance(assessment_id, ABCId):
 #             raise errors.InvalidArgument('the argument is not a valid OSID Id')
 #         collection = MongoClientValidated('assessment',
@@ -647,16 +647,16 @@ class AssessmentProxyManager:
 #         collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
 #         remove_children_parts(str(assessment_id))
 #         """
-# 
+#
 # class AssessmentTakenLookupSession:
-#     
+#
 #     import_statements = [
 #         'from ..primitives import Id',
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from . import objects',
 #         'from ..utilities import MongoClientValidated'
 #     ]
-#     
+#
 #     # This is hand-built, but there may be a pattern to try to map, specifically
 #     # getting objects for another package object and a persisted id thingy
 #     get_assessments_taken_for_taker_and_assessment_offered = """
@@ -664,7 +664,7 @@ class AssessmentProxyManager:
 #         collection = MongoClientValidated('assessment',
 #                                           collection='AssessmentTaken',
 #                                           runtime=self._runtime)
-# 
+#
 #         am = self._get_provider_manager('ASSESSMENT')
 #         aols = am.get_assessment_offered_lookup_session(proxy=self._proxy)
 #         aols.use_federated_bank_view()
@@ -677,13 +677,13 @@ class AssessmentProxyManager:
 #         except errors.IllegalState:
 #             # no deadline set
 #             pass
-# 
+#
 #         result = collection.find(
 #             dict({'assessmentOfferedId': str(assessment_offered_id),
 #                   'takingAgentId': str(resource_id)},
 #                   **self._view_filter())).sort('_id', DESCENDING)
 #         return objects.AssessmentTakenList(result, runtime=self._runtime, proxy=self._proxy)"""
-# 
+#
 #     get_assessments_taken_for_assessment = """
 #         collection = MongoClientValidated('assessment',
 #                                           collection='AssessmentOffered',
@@ -694,31 +694,31 @@ class AssessmentProxyManager:
 #         assessments_offered = objects.AssessmentOfferedList(
 #             result,
 #             runtime=self._runtime)
-# 
+#
 #         collection = MongoClientValidated('assessment',
 #                                           collection='AssessmentTaken',
 #                                           runtime=self._runtime)
 #         ao_ids = []
 #         for assessment_offered in assessments_offered:
 #             ao_ids.append(str(assessment_offered.get_id()))
-# 
+#
 #         result = collection.find(
 #             dict({'assessmentOfferedId': {'$in': ao_ids}},
 #                  **self._view_filter())).sort('_id', DESCENDING)
 #         return objects.AssessmentTakenList(result,
 #                                            runtime=self._runtime,
 #                                            proxy=self._proxy)"""
-# 
-# 
+#
+#
 # class AssessmentOfferedAdminSession:
-#     
+#
 #     deprecated_import_statements = [
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from ..utilities import MongoClientValidated',
 #         'UPDATED = True',
 #         'CREATED = True',
 #     ]
-#     
+#
 #     deprecated_get_assessment_offered_form_for_create = """
 #         ##
 #         # This impl differs from the usual get_osid_object_form_for_create method in that it
@@ -759,25 +759,25 @@ class AssessmentProxyManager:
 #         obj_form._for_update = False
 #         self._forms[obj_form.get_id().get_identifier()] = not CREATED
 #         return obj_form"""
-# 
+#
 # class AssessmentTakenAdminSession:
-#     
+#
 #     deprecated_import_statements = [
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from ..utilities import MongoClientValidated',
 #         'UPDATED = True',
 #         'CREATED = True',
 #     ]
-# 
+#
 #     import_statements = [
 #         'from dlkit.primordium.calendaring.primitives import DateTime'
 #     ]
-# 
+#
 #     create_assessment_taken_import_templates = [
 #         'from dlkit.abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm',
 #         'from ..osid.osid_errors import PermissionDenied'
 #     ]
-#     
+#
 #     create_assessment_taken = """
 #         ##
 #         # This impl differs from the usual create_osid_object method in that it
@@ -813,21 +813,21 @@ class AssessmentProxyManager:
 #         except AttributeError:
 #             pass
 #         assessment_taken_form._my_map['takingAgentId'] = str(self.get_effective_agent_id())
-# 
+#
 #         insert_result = collection.insert_one(assessment_taken_form._my_map)
 #         self._forms[assessment_taken_form.get_id().get_identifier()] = CREATED
 #         return objects.AssessmentTaken(
 #             osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
 #             runtime=self._runtime,
 #             proxy=self._proxy)"""
-# 
+#
 #     get_assessment_taken_form_for_create = """
 #         if not isinstance(assessment_offered_id, ABCId):
 #             raise errors.InvalidArgument('argument is not a valid OSID Id')
 #         for arg in assessment_taken_record_types:
 #             if not isinstance(arg, ABCType):
 #                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
-# 
+#
 #         am = self._get_provider_manager('ASSESSMENT')
 #         aols = am.get_assessment_offered_lookup_session(proxy=self._proxy)
 #         aols.use_federated_bank_view()
@@ -840,7 +840,7 @@ class AssessmentProxyManager:
 #         except errors.IllegalState:
 #             # no deadline set
 #             pass
-# 
+#
 #         if assessment_taken_record_types == []:
 #             ## WHY are we passing bank_id = self._catalog_id below, seems redundant:
 #             obj_form = objects.AssessmentTakenForm(
@@ -860,9 +860,9 @@ class AssessmentProxyManager:
 #         obj_form._for_update = False
 #         self._forms[obj_form.get_id().get_identifier()] = not CREATED
 #         return obj_form"""
-# 
+#
 # class AssessmentBasicAuthoringSession:
-#     
+#
 #     import_statements = [
 #         #'from bson.objectid import ObjectId',
 #         'from dlkit.abstract_osid.osid import errors',
@@ -871,7 +871,7 @@ class AssessmentProxyManager:
 #         'from ..osid.sessions import OsidSession',
 #         'from .assessment_utilities import get_first_part_id_for_assessment',
 #     ]
-#     
+#
 #     init = """
 #     def __init__(self, catalog_id=None, proxy=None, runtime=None):
 #         OsidSession.__init__(self)
@@ -891,7 +891,7 @@ class AssessmentProxyManager:
 #         self._part_item_design_session = mgr.get_assessment_part_item_design_session_for_bank(self._catalog_id, proxy=self._proxy)
 #         self._part_item_session.use_federated_bank_view()
 #         self._first_part_index = {}
-# 
+#
 #     def _get_first_part_id(self, assessment_id):
 #         \"\"\"\This session implemenation assumes all items are assigned to the first assessment part"\"\"
 #         if assessment_id not in self._first_part_index:
@@ -902,40 +902,40 @@ class AssessmentProxyManager:
 #                 create=True,
 #                 bank_id=self._catalog_id)
 #         return self._first_part_index[assessment_id]"""
-#     
+#
 #     can_author_assessments = """
 #         # NOTE: It is expected that real authentication hints will be
 #         # handled in a service adapter above the pay grade of this impl.
 #         return True"""
-#     
+#
 #     get_items = """
 #         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
 #             raise errors.InvalidArgument
 #         return self._part_item_session.get_assessment_part_items(self._get_first_part_id(assessment_id))"""
-#     
+#
 #     add_item = """
 #         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
 #             raise errors.InvalidArgument
 #         self._part_item_design_session.add_item(item_id, self._get_first_part_id(assessment_id))"""
-#     
+#
 #     remove_item = """
 #         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
 #             raise errors.InvalidArgument
 #         self._part_item_design_session.remove_item(item_id, self._get_first_part_id(assessment_id))"""
-#     
+#
 #     move_item = """
 #         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
 #             raise errors.InvalidArgument
 #         self._part_item_design_session.move_item_behind(item_id, self._get_first_part_id(assessment_id), preceeding_item_id)"""
-#     
+#
 #     order_items = """
 #         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
 #             raise errors.InvalidArgument
 #         self._part_item_design_session.order_items(item_ids, self._get_first_part_id(assessment_id))"""
-# 
-# 
+#
+#
 # class Question:
-#     
+#
 #     import_statements = [
 #         '#from ..osid.objects import OsidObject',
 #         'from ..id.objects import IdList',
@@ -943,7 +943,7 @@ class AssessmentProxyManager:
 #         'from ..utilities import MongoClientValidated',
 #         'from bson.objectid import ObjectId',
 #     ]
-# 
+#
 #     init = """
 #     def __init__(self, **kwargs):
 #         osid_objects.OsidObject.__init__(self, object_name='QUESTION', **kwargs)
@@ -953,22 +953,22 @@ class AssessmentProxyManager:
 #         else:
 #             self._item_id = Id(kwargs['osid_object_map']['itemId'])
 #         """
-#     
+#
 #     additional_methods = """
 #     ##
 #     # Overide osid.Identifiable.get_id() method to cast this question id as its item id:
 #     def get_id(self):
 #         return self._item_id
-#     
+#
 #     id_ = property(fget=get_id)
 #     ident = property(fget=get_id)
-#     
-# 
+#
+#
 #     def get_learning_objective_ids(self):
 #         \"\"\" This method mirrors that in the Item.
-#         
+#
 #         So that questions can also be inspected for learning objectives
-#         
+#
 #         \"\"\"
 #         if 'learningObjectiveIds' not in self._my_map: # Will this ever be the case?
 #             collection = MongoClientValidated('assessment',
@@ -977,9 +977,9 @@ class AssessmentProxyManager:
 #             item_map = collection.find_one({'_id': ObjectId(Id(self._my_map['itemId']).get_identifier())})
 #             self._my_map['learningObjectiveIds'] = list(item_map['learningObjectiveIds'])
 #         return IdList(self._my_map['learningObjectiveIds'])
-# 
+#
 #     learning_objective_ids = property(fget=get_learning_objective_ids)
-# 
+#
 #     def get_learning_objectives(self):
 #         \"\"\" This method also mirrors that in the Item.\"\"\"
 #         # This is pretty much identicial to the method in assessment.Item!
@@ -987,9 +987,9 @@ class AssessmentProxyManager:
 #         lookup_session = mgr.get_objective_lookup_session(proxy=getattr(self, "_proxy", None))
 #         lookup_session.use_federated_objective_bank_view()
 #         return lookup_session.get_objectives_by_ids(self.get_learning_objective_ids())
-# 
+#
 #     learning_objectives = property(fget=get_learning_objectives)
-# 
+#
 #     def get_object_map(self):
 #         obj_map = dict(self._my_map)
 #         del obj_map['itemId']
@@ -1000,37 +1000,37 @@ class AssessmentProxyManager:
 #             except UnicodeEncodeError:
 #                 lo_ids = self.get_learning_objective_ids()
 #                 obj_map['learningObjectiveIds'] = [unicode(lo_id) for lo_id in lo_ids]
-# 
+#
 #         obj_map = osid_objects.OsidObject.get_object_map(self, obj_map)
 #         obj_map['id'] = str(self.get_id())
 #         return obj_map
-# 
+#
 #     object_map = property(fget=get_object_map)"""
-# 
+#
 # class Answer:
-# 
+#
 #     additional_methods = """
 #     def get_object_map(self):
 #         obj_map = dict(self._my_map)
 #         del obj_map['itemId']
 #         return osid_objects.OsidObject.get_object_map(self, obj_map)
-# 
+#
 #     object_map = property(fget=get_object_map)"""
-# 
+#
 # class Item:
-#     
+#
 #     get_question_id = """
 #         self.get_question().get_id()"""
-#     
+#
 #     get_question = """
 #         question_map = dict(self._my_map['question'])
 #         question_map['learningObjectiveIds'] = self._my_map['learningObjectiveIds']
 #         return Question(osid_object_map=question_map,
 #                         runtime=self._runtime,
 #                         proxy=self._proxy)"""
-#     
+#
 #     additional_methods = """
-#     
+#
 #     def get_configuration(self):
 #         config = dict()
 #         try:
@@ -1043,7 +1043,7 @@ class AssessmentProxyManager:
 #             except AttributeError:
 #                 pass
 #         return config # SHould this method build a real OSID configuration instead?
-#     
+#
 #     def get_object_map(self):
 #         obj_map = dict(self._my_map)
 #         if obj_map['question']:
@@ -1052,9 +1052,9 @@ class AssessmentProxyManager:
 #         for answer in self.get_answers():
 #             obj_map['answers'].append(answer.get_object_map())
 #         return osid_objects.OsidObject.get_object_map(self, obj_map)
-# 
+#
 #     object_map = property(fget=get_object_map)
-# 
+#
 #     def _delete(self):
 #         try:
 #             self.get_question()._delete()
@@ -1064,121 +1064,121 @@ class AssessmentProxyManager:
 #             for answer in self.get_answers():
 #                 answer._delete()
 #             osid_objects.OsidObject._delete(self)
-# 
+#
 #     def is_feedback_available(self):
 #         \"\"\"is general feedback available for this Item
-# 
+#
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         return False
-# 
+#
 #     def get_feedback(self):
 #         \"\"\"get general feedback for this Item
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         if self.is_feedback_available():
 #             pass # what is feedback anyway? Just a DisplayText or something more?
 #         raise errors.IllegalState()
-# 
+#
 #     def is_solution_available(self):
 #         \"\"\"is a solution available for this Item (is this different than feedback?)
-# 
+#
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         return False
-# 
+#
 #     def get_solution(self):
 #         \"\"\"get general feedback for this Item (is this different than feedback?)
-# 
+#
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         if self.is_solution_available():
 #             pass
 #         raise errors.IllegalState()
-# 
+#
 #     def is_feedback_available_for_response(self, response):
 #         \"\"\"is feedback available for a particular response
-# 
+#
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         return False
-# 
+#
 #     def get_feedback_for_response(self, response):
 #         \"\"\"get feedback for a particular response
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         if self.is_feedback_available_for_response(response):
 #             pass # what is feedback anyway? Just a DisplayText or something more?
 #         raise errors.IllegalState()
-# 
+#
 #     def is_correctness_available_for_response(self, response):
 #         \"\"\"is a measure of correctness available for a particular response
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         return False
-# 
+#
 #     def is_response_correct(self, response):
 #         \"\"\"returns True if response evaluates to an Item Answer that is 100 percent correct
-# 
+#
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         if self.is_correctness_available_for_response(response):
 #             pass # return True or False
 #         raise errors.IllegalState()
-# 
+#
 #     def get_correctness_for_response(self, response):
 #         \"\"\"get measure of correctness available for a particular response
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         if self.is_correctness_available_for_response(response):
 #             pass # return a correctness score 0 thru 100
 #         raise errors.IllegalState()
-# 
+#
 #     def are_confused_learning_objective_ids_available_for_response(self, response):
 #         \"\"\"is a learning objective available for a particular response
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         return False
-# 
+#
 #     def get_confused_learning_objective_ids_for_response(self, response):
 #         \"\"\"get learning objectives for a particular response
-# 
+#
 #         to be overriden in a record extension
-# 
+#
 #         \"\"\"
 #         if self.are_confused_learning_objective_ids_available_for_response(response):
 #             pass # return Objective IdList
 #         raise errors.IllegalState()"""
-# 
-# 
+#
+#
 # class Assessment:
-# 
+#
 #     import_statements = [
 #         "from .assessment_utilities import SIMPLE_SEQUENCE_RECORD_TYPE"
 #     ]
-# 
+#
 #     additional_methods = """
 #     def has_children(self):
 #         \"\"\"This method can be overwritten by a record extension.\"\"\"
 #         return self._supports_simple_sequencing() and self._my_map['childIds']
-# 
+#
 #     def get_child_ids(self):
 #         \"\"\"This method can be overwritten by a record extension.\"\"\"
 #         if self._supports_simple_sequencing():
 #             return IdList(self._my_map['childIds'])
 #         else:
 #             raise errors.IllegalState()
-# 
+#
 #     def has_next_assessment_part(self, assessment_part_id):
 #         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
 #         if not self.supports_child_ordering or not self.supports_simple_child_sequencing:
@@ -1189,7 +1189,7 @@ class AssessmentProxyManager:
 #             else:
 #                 return False
 #         raise errors.NotFound('the Part with Id ' + str(assessment_part_id) + ' is not a child of this Part')
-# 
+#
 #     def get_next_assessment_part_id(self, assessment_part_id=None):
 #         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
 #         if assessment_part_id is None:
@@ -1202,56 +1202,56 @@ class AssessmentProxyManager:
 #                                 sequestered=True)[0]
 #         # if self.has_next_assessment_part(assessment_part_id):
 #         #     return Id(self._my_map['childIds'][self._my_map['childIds'].index(str(assessment_part_id)) + 1])
-# 
+#
 #     def get_next_assessment_part(self, assessment_part_id):
 #         next_part_id = self.get_next_assessment_part_id(assessment_part_id)
 #         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
 #         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
 #         lookup_session.use_federated_bank_view()
 #         return lookup_session.get_assessment_part(next_part_id)
-# 
+#
 #     def are_items_sequential(self):
 #         \"\"\"This method can be overwritten by a record extension.\"\"\"
 #         return False
-# 
+#
 #     def are_items_shuffled(self):
 #         \"\"\"This method can be overwritten by a record extension.\"\"\"
 #         return False
-# 
+#
 #     def _supports_simple_sequencing(self):
 #         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])
-# 
+#
 #     def get_object_map(self):
 #         obj_map = dict(self._my_map)
 #         if 'itemIds' in obj_map:
 #             del obj_map['itemIds']
 #         return osid_objects.OsidObject.get_object_map(self, obj_map)
-# 
+#
 #     object_map = property(fget=get_object_map)"""
-# 
-# 
+#
+#
 # class AssessmentForm:
-# 
+#
 #     import_statements = [
 #         "from .assessment_utilities import SIMPLE_SEQUENCE_RECORD_TYPE"
 #     ]
-# 
+#
 #     init = """
 #     _namespace = 'assessment.Assessment'
-# 
+#
 #     def __init__(self, **kwargs):
 #         osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT', **kwargs)
 #         self._mdata = default_mdata.get_assessment_mdata()
 #         self._init_metadata(**kwargs)
 #         if not self.is_for_update():
 #             self._init_form(**kwargs)
-# 
+#
 #     def _init_metadata(self, **kwargs):
 #         \"\"\"Initialize form metadata\"\"\"
 #         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
 #         self._rubric_default = self._mdata['rubric']['default_id_values'][0]
 #         self._level_default = self._mdata['level']['default_id_values'][0]
-# 
+#
 #     def _init_form(self, record_types=None, **kwargs):
 #         \"\"\"Initialize form map\"\"\"
 #         osid_objects.OsidObjectForm._init_form(self, record_types=record_types)
@@ -1260,26 +1260,26 @@ class AssessmentProxyManager:
 #         self._my_map['levelId'] = self._level_default
 #         if self._supports_simple_sequencing():
 #             self._my_map['childIds'] = []"""
-# 
+#
 #     additional_methods = """
 #     def _supports_simple_sequencing(self):
 #         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])
-# 
+#
 #     def set_children(self, child_ids):
 #         \"\"\"Set the children IDs\"\"\"
 #         if not self._supports_simple_sequencing():
 #             raise errors.IllegalState()
 #         self._my_map['childIds'] = [str(i) for i in child_ids]"""
-# 
+#
 # class AssessmentOffered:
-#     
+#
 #     import_statements = [
 #         'from ..primitives import Id',
 #         'from ..primitives import DateTime',
 #         'from ..primitives import Duration',
 #         'from dlkit.abstract_osid.osid import errors',
 #         ]
-#     
+#
 #     additional_methods = """
 #     def get_display_name(self):
 #         # Overrides osid.objects.OsidObject.get_display_name to default to Assessment's
@@ -1289,7 +1289,7 @@ class AssessmentProxyManager:
 #             return osid_objects.OsidObject.get_display_name(self)
 #         else:
 #             return self.get_assessment().get_display_name()
-#     
+#
 #     def get_description(self):
 #         # Overrides osid.objects.OsidObject.get_description to default to Assessment's
 #         # description if none has been authored for this AssessmentOffered
@@ -1298,7 +1298,7 @@ class AssessmentProxyManager:
 #             return osid_objects.OsidObject.get_description(self)
 #         else:
 #             return self.get_assessment().get_description()
-# 
+#
 #     def get_object_map(self):
 #         obj_map = dict(self._my_map)
 #         if obj_map['startTime'] is not None:
@@ -1327,55 +1327,55 @@ class AssessmentProxyManager:
 #         if obj_map['description']['text'] == '':
 #             obj_map['description']['text'] = self.get_description().get_text()
 #         return obj_map
-# 
+#
 #     object_map = property(fget=get_object_map)
-# 
+#
 #     def are_sections_sequential(self):
 #         \"\"\"This method can be overwritten by a record extension.\"\"\"
 #         if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
 #             return True
 #         return True
-# 
+#
 #     def are_sections_shuffled(self):
 #         \"\"\"This method can be overwritten by a record extension.\"\"\"
 #         if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
 #             return False
 #         return False"""
-#     
+#
 #     has_start_time_template = """
 #         # Implemented from template for osid.assessment.AssessmentOffered.has_start_time_template
 #         return bool(self._my_map['${var_name_mixed}'])"""
-#     
+#
 #     get_start_time_template = """
 #         # Implemented from template for osid.assessment.AssessmentOffered.get_start_time_template
 #         if not bool(self._my_map['${var_name_mixed}']):
 #             raise errors.IllegalState()
 #         dt = self._my_map['${var_name_mixed}']
 #         return DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)"""
-#     
+#
 #     has_duration_template = """
 #         # Implemented from template for osid.assessment.AssessmentOffered.has_duration_template
 #         return bool(self._my_map['${var_name_mixed}'])"""
-#     
+#
 #     get_duration_template = """
 #         # Implemented from template for osid.assessment.AssessmentOffered.get_duration_template
 #         if not bool(self._my_map['${var_name_mixed}']):
 #             raise errors.IllegalState()
 #         return Duration(**self._my_map['${var_name_mixed}'])"""
-# 
+#
 #     are_items_sequential = """
 #         if self._my_map['itemsSequential'] is None:
 #             return self.get_assessment().are_items_sequential()
 #         return bool(self._my_map['itemsSequential'])"""
-# 
+#
 #     are_items_shuffled = """
 #         if self._my_map['itemsShuffled'] is None:
 #             return self.get_assessment().are_items_shuffled()
 #         return bool(self._my_map['itemsShuffled'])"""
-# 
-# 
+#
+#
 # class AssessmentOfferedForm:
-#     
+#
 #     set_start_time_template = """
 #         # Implemented from template for osid.assessment.AssessmentOfferedForm.set_start_time_template
 #         if self.get_${var_name}_metadata().is_read_only():
@@ -1385,14 +1385,14 @@ class AssessmentProxyManager:
 #                 self.get_${var_name}_metadata()):
 #             raise errors.InvalidArgument()
 #         self._my_map['${var_name_mixed}'] = ${arg0_name}"""
-#     
+#
 #     # This looks just like the generic one. Need to find in the pattern?
 #     clear_start_time_template = """
 #         if (self.get_${var_name}_metadata().is_read_only() or
 #                 self.get_${var_name}_metadata().is_required()):
 #             raise errors.NoAccess()
 #         self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
-#     
+#
 #     set_duration_template = """
 #         # Implemented from template for osid.assessment.AssessmentOfferedForm.set_duration_template
 #         if self.get_${var_name}_metadata().is_read_only():
@@ -1405,15 +1405,15 @@ class AssessmentProxyManager:
 #         map['seconds'] = ${arg0_name}.seconds
 #         map['microseconds'] = ${arg0_name}.microseconds
 #         self._my_map['${var_name_mixed}'] = map"""
-# 
+#
 # class AssessmentOfferedQuery:
-#     
+#
 #     match_start_time_template = """
 #         self._match_minimum_date_time('${var_name_mixed}', ${arg0_name}, match)
 #         self._match_maximum_date_time('${var_name_mixed}', ${arg1_name}, match)"""
-# 
+#
 # class AssessmentTaken:
-#     
+#
 #     import_statements = [
 #         'from ..primitives import Id',
 #         'from dlkit.abstract_osid.osid import errors',
@@ -1427,15 +1427,15 @@ class AssessmentProxyManager:
 #         'from ..primitives import DateTime, DisplayText',
 #         'ASSESSMENT_AUTHORITY = \'assessment-session\''
 #     ]
-# 
+#
 #     init = """
 #     _namespace = 'assessment.AssessmentTaken'
-# 
+#
 #     def __init__(self, **kwargs):
 #         osid_objects.OsidObject.__init__(self, object_name='ASSESSMENT_TAKEN', **kwargs)
 #         self._catalog_name = 'bank'
 #         self._assessment_sections = dict()"""
-#     
+#
 #     additional_methods = """
 #     def get_display_name(self):
 #         # Overrides osid.objects.OsidObject.get_display_name to default to AssessmentOffered's
@@ -1445,7 +1445,7 @@ class AssessmentProxyManager:
 #             return OsidObject.get_display_name(self)
 #         else:
 #             return self.get_assessment_offered().get_display_name()
-# 
+#
 #     def get_description(self):
 #         # Overrides osid.objects.OsidObject.get_description to default to AssessmentOffered's
 #         # description if none has been authored for this AssessmentTaken
@@ -1454,7 +1454,7 @@ class AssessmentProxyManager:
 #             return OsidObject.get_description(self)
 #         else:
 #             return self.get_assessment_offered().get_description()
-# 
+#
 #     def _update_available_sections(self):
 #         # THIS IS NOT RIGHT. LOOPS WITH _get_first_assessment_section
 #         if ('sections' not in self._my_map or not self._my_map['sections']):
@@ -1467,14 +1467,14 @@ class AssessmentProxyManager:
 #                 section_id = self._get_next_assessment_section(section_id).get_id()
 #             except errors.IllegalState:
 #                 finished = True
-# 
+#
 #     def _create_section(self, part_id):
 #         from .mixins import LoadedSection
 #         init_map = {'assessmentPartId': str(part_id),
 #                     'assessmentTakenId': str(self.get_id()),
 #                     'recordTypeIds': []}
 #         return LoadedSection(osid_object_map=init_map, runtime=self._runtime, proxy=self._proxy)
-# 
+#
 #     def _get_first_assessment_section(self):
 #         \"\"\"Gets the first section for this Taken's Assessment.\"\"\"
 #         if ('sections' not in self._my_map or not self._my_map['sections']):
@@ -1489,13 +1489,13 @@ class AssessmentProxyManager:
 #             return first_section
 #         else:
 #             return self._get_assessment_section(Id(self._my_map['sections'][0]))
-# 
+#
 #     def _get_next_assessment_section(self, assessment_section_id):
-#         \"\"\"Gets the next section following section_id. 
-#         
+#         \"\"\"Gets the next section following section_id.
+#
 #         Assumes that section list exists in taken and section_id is in section list.
 #         Assumes that Section parts only exist as children of Assessments
-#         
+#
 #         \"\"\"
 #         if self._my_map['sections'][-1] == str(assessment_section_id):
 #             # section_id represents the last seen section
@@ -1511,7 +1511,7 @@ class AssessmentProxyManager:
 #         else:
 #             return self._get_assessment_section(
 #                 Id(self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1]))
-# 
+#
 #     def _get_assessment_section(self, assessment_section_id):
 #         if assessment_section_id not in self._assessment_sections:
 #             self._assessment_sections[assessment_section_id] = (
@@ -1519,25 +1519,25 @@ class AssessmentProxyManager:
 #                                        runtime=self._runtime,
 #                                        proxy=self._proxy))
 #         return self._assessment_sections[assessment_section_id]
-# 
+#
 #     def _get_assessment_sections(self):
 #         \"\"\"Gets a SectionList of all Sections currently known to this AssessmentTaken\"\"\"
 #         section_list = []
 #         for section_idstr in self._my_map['sections']:
 #             section_list.append(self._get_assessment_section(Id(section_idstr)))
 #         return AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)
-# 
+#
 #     def _save(self):
 #         \"\"\"Saves the current state of this AssessmentTaken.
-# 
+#
 #         Should be called every time the sections map changes.
-# 
+#
 #         \"\"\"
 #         collection = MongoClientValidated('assessment',
 #                                           collection='AssessmentTaken',
 #                                           runtime=self._runtime)
 #         collection.save(self._my_map)
-# 
+#
 #     def get_object_map(self):
 #         obj_map = dict(self._my_map)
 #         if obj_map['actualStartTime'] is not None:
@@ -1568,37 +1568,37 @@ class AssessmentProxyManager:
 #         if obj_map['description']['text'] == '':
 #             obj_map['description']['text'] = self.get_description().get_text()
 #         return obj_map
-# 
+#
 #     object_map = property(fget=get_object_map)
-# 
+#
 #     def _delete(self):
 #         if 'sections' in self._my_map:
 #             for section_id in self._my_map['sections']:
 #                 section = get_assessment_section(Id(section_id), runtime=self._runtime, proxy=self._proxy)
 #                 section._delete()"""
-# 
+#
 #     get_taker_id = """
 #         if self._my_map['takerId']:
 #             return Id(self._my_map['takerId'])
 #         else:
 #             return Id(self._my_map['takingAgentId'])"""
-#     
+#
 #     get_taker = """
 #         raise errors.Unimplemented()"""
-#     
+#
 #     get_taking_agent_id = """
 #         return Id(self._my_map['takingAgentId'])"""
-#     
+#
 #     get_taking_agent = """
 #         raise errors.Unimplemented()"""
-#     
+#
 #     has_started = """
 #         assessment_offered = self.get_assessment_offered()
 #         if assessment_offered.has_start_time():
 #             return DateTime.utcnow() >= assessment_offered.get_start_time()
 #         else:
 #             return True"""
-#     
+#
 #     get_actual_start_time = """
 #         if not self.has_started():
 #             raise errors.IllegalState('this assessment has not yet started')
@@ -1606,7 +1606,7 @@ class AssessmentProxyManager:
 #             raise errors.IllegalState('this assessment has not yet been started by the taker')
 #         else:
 #             return self._my_map['actualStartTime']"""
-#     
+#
 #     has_ended = """
 #         assessment_offered = self.get_assessment_offered()
 #         now = DateTime.utcnow()
@@ -1625,14 +1625,14 @@ class AssessmentProxyManager:
 #             return now >= self._my_map['actualStartTime'] + assessment_offered.get_duration()
 #         else:
 #             return False"""
-#     
+#
 #     get_completion_time = """
 #         if not self.has_ended():
 #             raise errors.IllegalState('this assessment has not yet ended')
 #         if not self._my_map['completionTime']:
 #             raise errors.OperationFailed('someone forgot to set the completion time')
 #         return self._my_map['completionTime']"""
-#     
+#
 #     get_time_spent = """
 #         # Take another look at this. Not sure it's correct:
 #         if not self.has_started or not self.has_ended():
@@ -1641,19 +1641,19 @@ class AssessmentProxyManager:
 #             return self.get_completion_time() - self.get_actual_start_time()
 #         else:
 #             raise errors.IllegalState()"""
-#     
+#
 #     # This is not right.  Needs to be calculated?
 #     get_completion_template = """
 #         # Implemented from template for osid.assessment.AssessmentTaken.get_completion_template
 #         return int(self._my_map['${var_name_mixed}'])"""
-#     
+#
 #     get_score_template = """
 #         # Implemented from template for osid.assessment.AssessmentTaken.get_score_template
 #         return float(self._my_map['${var_name_mixed}'])"""
-# 
-# 
+#
+#
 # class AssessmentTakenForm:
-#     
+#
 #     ##
 #     # These import statements are here to make sure that the DisplayText related default
 #     # types are available for initializing data:
@@ -1664,20 +1664,20 @@ class AssessmentProxyManager:
 #         'default_script_type = Type(**types.Script().get_type_data(\'DEFAULT\'))',
 #         'default_format_type = Type(**types.Format().get_type_data(\'DEFAULT\'))'
 #     ]
-# 
-# 
+#
+#
 # class AssessmentTakenQuery:
 #     match_taking_agent_id = """
 #         self._add_match('takingAgentId', str(agent_id), bool(match))"""
-# 
-# 
+#
+#
 # class AssessmentQuery:
 #     match_item_id = """
 #         self._add_match('itemIds', str(item_id), match)"""
-# 
-# 
+#
+#
 # class AssessmentSection:
-# 
+#
 #     import_statements = [
 #         'from ..primitives import Id',
 #         'from .assessment_utilities import get_default_question_map',
@@ -1689,15 +1689,15 @@ class AssessmentProxyManager:
 #         'UNANSWERED = 0',
 #         'NULL_RESPONSE = 1',
 #     ]
-# 
+#
 #     init = """
 #     _namespace = 'assessment.AssessmentSection'
-# 
+#
 #     def __init__(self, **kwargs):
 #         osid_objects.OsidObject.__init__(self, object_name='AssessmentSection', **kwargs)
 #         self._assessment_part_id = Id(self._my_map['assessmentPartId'])
 #         self._assessment_taken_id = Id(self._my_map['assessmentTakenId'])
-# 
+#
 #         assessment_mgr = self._get_provider_manager('ASSESSMENT', local=True)
 #         if self._proxy:
 #             taken_lookup_session = assessment_mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
@@ -1705,7 +1705,7 @@ class AssessmentProxyManager:
 #             taken_lookup_session = assessment_mgr.get_assessment_taken_lookup_session()
 #         taken_lookup_session.use_federated_bank_view()
 #         self._assessment_taken = taken_lookup_session.get_assessment_taken(self._assessment_taken_id)
-# 
+#
 #         authoring_mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
 #         if self._proxy:
 #             part_lookup_session = authoring_mgr.get_assessment_part_lookup_session(proxy=self._proxy)
@@ -1714,19 +1714,19 @@ class AssessmentProxyManager:
 #         part_lookup_session.use_unsequestered_assessment_part_view()
 #         part_lookup_session.use_federated_bank_view()
 #         self._assessment_part = part_lookup_session.get_assessment_part(self._assessment_part_id)
-# 
+#
 #     def get_object_map(self, obj_map=None):
 #         if obj_map is None:
 #             obj_map = dict(self._my_map)
 #         del obj_map['_id']
-# 
+#
 #         obj_map.update(
 #             {'type': self._namespace.split('.')[-1],
 #              'id': str(self.get_id())})
 #         return obj_map
-# 
+#
 #     object_map = property(get_object_map)
-# 
+#
 #     # Let's give the Part attributes to the Section
 #     def __getattribute__(self, name):
 #         if not name.startswith('_') and name not in ['ident', 'get_id', 'id_']:
@@ -1735,23 +1735,23 @@ class AssessmentProxyManager:
 #             except AttributeError:
 #                 return object.__getattribute__(self, name)
 #         return object.__getattribute__(self, name)"""
-# 
-# 
+#
+#
 #     ## Moved all of this to mixins.py:
 #     #     from original init:
 #     #
 #     #     self._assessment_parts = dict()
-#     # 
+#     #
 #     #     if '_id' not in self._my_map:
 #     #         # could happen if not created with items -- then self._initialize_part_map()
 #     #         # will not call self._save(). But we need to assign it an ID
 #     #         # this has to happen before _initialize_part_map(),
 #     #         # otherwise Parts won't be able to work...
 #     #         self._save()
-#     # 
+#     #
 #     #     if 'questions' not in self._my_map: # This is the first instantiation
 #     #         self._initialize_part_map()
-#     # 
+#     #
 #     # def _initialize_part_map(self):
 #     #     \"\"\"Sets up assessmentPartMap with as much information as is initially available.\"\"\"
 #     #     self._my_map['assessmentParts'] = []
@@ -1763,40 +1763,40 @@ class AssessmentProxyManager:
 #     #     else:
 #     #         # This goes down the winding path...
 #     #         self._update_questions()
-#     # 
+#     #
 #     # def _get_part_map(self, part_id):
 #     #     \"\"\" from self._my_map['assessmentParts'], return the one part map
 #     #     with ID that matches the one passed in\"\"\"
 #     #     return [p for p in self._my_map['assessmentParts']
 #     #             if p['assessmentPartId'] == str(part_id)][0]
-#     # 
+#     #
 #     # def _insert_part_map(self, part_map, index=-1):
 #     #     \"\"\" add a part map to self._my_map['assessmentParts']\"\"\"
 #     #     if index == -1:
 #     #         self._my_map['assessmentParts'].append(part_map)
 #     #     else:
 #     #         self._my_map['assessmentParts'].insert(index, part_map)
-#     # 
+#     #
 #     # def _part_ids(self):
 #     #     \"\"\"convenience method to return a list of the part Ids in this section\"\"\"
 #     #     return [p['assessmentPartId'] for p in self._my_map['assessmentParts']]
-#     # 
+#     #
 #     # def _load_simple_section_questions(self, item_ids):
 #     #     \"\"\"For the simple section case (common)
-#     #     
-#     #     just load the questions for the section, and insert the one part 
+#     #
+#     #     just load the questions for the section, and insert the one part
 #     #     into assessment part map.
-#     #     
+#     #
 #     #     \"\"\"
 #     #     # old style:
 #     #     self._insert_part_map(
 #     #         get_default_part_map(self._assessment_part_id,
 #     #                              0,
 #     #                              self._assessment_part.are_items_sequential()))
-#     #     
+#     #
 #     #     # self._my_map['assessmentParts'][str(self._assessment_part_id)] = get_default_part_map(
 #     #     #    self._assessment_part_id, 0, self._assessment_part.are_items_sequential())
-#     # 
+#     #
 #     #     lookup_session = self._get_item_lookup_session()
 #     #     items = lookup_session.get_items_by_ids(item_ids)
 #     #     display_num = 1
@@ -1809,12 +1809,12 @@ class AssessmentProxyManager:
 #     #             [display_num]))
 #     #         display_num += 1
 #     #     self._save()
-#     # 
+#     #
 #     # def _save(self):
 #     #     \"\"\"Saves the current state of this AssessmentSection.
-#     # 
+#     #
 #     #     Should be called every time the question map changes.
-#     # 
+#     #
 #     #     \"\"\"
 #     #     collection = MongoClientValidated('assessment',
 #     #                                       collection='AssessmentSection',
@@ -1824,26 +1824,26 @@ class AssessmentProxyManager:
 #     #     else:
 #     #         insert_result = collection.insert_one(self._my_map)
 #     #         self._my_map = collection.find_one({'_id': insert_result.inserted_id}) # To get the _id
-# 
-# 
+#
+#
 #     get_assessment_taken_id = """
 #         return self._assessment_taken_id"""
-# 
+#
 #     get_assessment_taken = """
 #         return self._assessment_taken"""
-# 
+#
 #     has_allocated_time = """
 #         return bool(self._assessment_part.get_allocated_time())"""
-#     
+#
 #     get_allocated_time = """
 #         return self._assessment_part.get_allocated_time()"""
-#     
+#
 #     are_items_sequential = """
 #         return self._assessment_part.are_items_sequential()"""
-#     
+#
 #     are_items_shuffled = """
 #         return self._assessment_part.are_items_shuffled()"""
-# 
+#
 #     #additional_methods = """
 #     # # Model for question map to be constructed through taking an assessment section:
 #     # #
@@ -1858,41 +1858,41 @@ class AssessmentProxyManager:
 #     # #                    <or {'missingResponse': UNANSWERED} if no attempts have yet been made on question>,
 #     # #                    <etc for additional attempts>...]
 #     # #       }, <etc for additional questions>...]
-#     # 
+#     #
 #     # def _is_simple_section(self):
 #     #     \"\"\"Tests if this section is simple (ie, items assigned directly to Section Part).\"\"\"
 #     #     item_ids = self._get_assessment_part(self._assessment_part_id).get_item_ids()
 #     #     if item_ids.available():
 #     #         return True
 #     #     return False
-#     # 
+#     #
 #     # def _get_assessment_part(self, part_id):
 #     #     \"\"\"Gets an AssessmentPart given a part_id\"\"\"
 #     #     if part_id not in self._assessment_parts:
 #     #         lookup_session = self._get_assessment_part_lookup_session()
 #     #         self._assessment_parts[part_id] = lookup_session.get_assessment_part(part_id)
 #     #     return self._assessment_parts[part_id]
-#     # 
+#     #
 #     # def _update(self):
 #     #     \"\"\"Updates AssessmentSection to latest state in database.
-#     # 
+#     #
 #     #     Should be called prior to major object events to assure that an
 #     #     assessment being taken on multiple devices are reasonably synchronized.
-#     # 
+#     #
 #     #     \"\"\"
 #     #     collection = MongoClientValidated('assessment',
 #     #                                       collection='AssessmentSection',
 #     #                                       runtime=self._runtime)
 #     #     self._my_map = collection.find_one({'_id': self._my_map['_id']})
-#     # 
+#     #
 #     # def _update_questions(self):
 #     #     \"\"\"Updates questions known to this Section\"\"\"
-#     # 
+#     #
 #     #     # Original method for updating questions:
 #     #     # if self._update_part_map():
 #     #     #     self._update_question_map()
 #     #     #     self._save()
-#     # 
+#     #
 #     #     if self._is_simple_section():
 #     #         return # we don't need to go through any this for simple sections
 #     #     part_list, level_list = self._get_parts_and_levels()
@@ -1900,7 +1900,7 @@ class AssessmentProxyManager:
 #     #         self._update_assessment_parts_map(part_list, level_list)
 #     #         self._update_questions_list(part_list)
 #     #         self._save()
-#     # 
+#     #
 #     # def _get_parts_and_levels(self):
 #     #     def get_part_level(target_part_id):
 #     #         \"\"\"Gets the level of the target part\"\"\"
@@ -1908,7 +1908,7 @@ class AssessmentProxyManager:
 #     #             if str(p.ident) == str(target_part_id):
 #     #                 return level_list[index]
 #     #         return 0
-#     # 
+#     #
 #     #     part_list = []
 #     #     level_list = []
 #     #     finished = False
@@ -1935,36 +1935,36 @@ class AssessmentProxyManager:
 #     #                         part_id))
 #     #                 level_list.append(level)
 #     #     return part_list, level_list
-#     # 
+#     #
 #     # def _update_assessment_parts_map(self, part_list, level_list):
 #     #     \"\"\"Updates the part map.
-#     # 
+#     #
 #     #     Called before question list gets updated if it is determined that the
 #     #     sections assessmentPart map is out of date with the current part list.
-#     # 
+#     #
 #     #     \"\"\"
 #     #     def add_part(new_part_index):
 #     #         self._insert_part_map(get_default_part_map(
 #     #             part_id, level, part.are_items_sequential()),
 #     #             index=new_part_index)
-#     # 
+#     #
 #     #     for part in part_list:
 #     #         part_id = part.get_id()
 #     #         level = level_list[part_list.index(part)]
 #     #         if str(part.get_id()) not in self._part_ids():
 #     #             add_part(part_list.index(part))
-#     #          
+#     #
 #     # # Original method of updating assessment part map:
 #     # # def _update_part_map(self, part_id=None):
 #     # #     \"\"\"Updates the part map, called before question map gets updated\"\"\"
-#     # #     
+#     # #
 #     # #     def get_part_level(target_part_id):
 #     # #         \"\"\"Gets the level of the target part\"\"\"
 #     # #         for p in self._my_map['assessmentParts']:
 #     # #             if p['assessmentPartId'] == str(target_part_id):
 #     # #                 return p['level']
 #     # #         return 0
-#     # # 
+#     # #
 #     # #     def insert_part_map():
 #     # #         \"\"\"Inserts new part in appropriate position\"\"\"
 #     # #         prev_part_ids = [p['assessmentPartId'] for p in self._my_map['assessmentParts']]
@@ -1979,7 +1979,7 @@ class AssessmentProxyManager:
 #     # #         self._my_map['assessmentParts'].insert(part_index, get_default_part_map(
 #     # #             part_id, absolute_level, part.are_items_sequential()))
 #     # #         return True
-#     # # 
+#     # #
 #     # #     if part_id is None:
 #     # #         part_id = self._assessment_part_id
 #     # #     if part_id == self._assessment_part_id and self._is_simple_section():
@@ -2007,19 +2007,19 @@ class AssessmentProxyManager:
 #     # #                     if insert_part_map():
 #     # #                         number_updates += 1
 #     # #     return number_updates > 0
-#     # 
+#     #
 #     # def _update_questions_list(self, part_list):
-#     # 
+#     #
 #     #     def get_question_display_elements(question_part_map):
 #     #         \"\"\"Get the parts only in this route.
-#     # 
+#     #
 #     #         Go backwards until you find a part with level 1?
 #     #         stop there, so that you don't get shifted to the previous part
 #     #         i.e. [level 1, level 2, level 1, level 2]
 #     #              when running this on the last question, you want to get
 #     #              the indices relative to the second level 1, not including
 #     #              the first two parts
-#     #         
+#     #
 #     #         self._my_map['assessmentParts'] = [
 #     #             {'assessmentPartId': <idstr of a part. Might be a 'magic' id>,
 #     #              'level': 1,
@@ -2035,7 +2035,7 @@ class AssessmentProxyManager:
 #     #         \"\"\"
 #     #         my_display_elements = []
 #     #         parts_in_same_route = {}
-#     # 
+#     #
 #     #         original_question_level = question_part_map['level']
 #     #         if question_part_map['level'] > 1:
 #     #             question_map = question_part_map
@@ -2055,13 +2055,13 @@ class AssessmentProxyManager:
 #     #                     found_target_question = True
 #     #         else:
 #     #             level_1_part = question_part_map
-#     # 
+#     #
 #     #         # get all level 1 parts to get the first index
 #     #         all_level_1_parts = [p
 #     #                              for p in self._my_map['assessmentParts']
 #     #                              if p['level'] == 1]
 #     #         my_display_elements.append(all_level_1_parts.index(level_1_part) + 1)
-#     # 
+#     #
 #     #         for level, waypoints in parts_in_same_route.iteritems():
 #     #             # for each part in the route at a given level, sum up the number of questions
 #     #             # that have appeared in that part
@@ -2071,16 +2071,16 @@ class AssessmentProxyManager:
 #     #                 count = 1
 #     #             else:
 #     #                 count = 0
-#     # 
+#     #
 #     #             for waypoint in waypoints:
 #     #                 waypoint_questions = [q
 #     #                                       for q in self._my_map['questions']
 #     #                                       if q['assessmentPartId'] == waypoint['assessmentPartId']]
 #     #                 count += len(waypoint_questions)
 #     #             my_display_elements.append(count)
-#     # 
+#     #
 #     #         return my_display_elements
-#     # 
+#     #
 #     #     index = 0
 #     #     for part in part_list:
 #     #         if (len(self._my_map['questions']) == index or
@@ -2099,15 +2099,15 @@ class AssessmentProxyManager:
 #     #                     part_id,
 #     #                     display_elements))
 #     #                 index += 1
-#     #                 
+#     #
 #     #         else: # skip through all remaining questions for this part
 #     #             part_id = part.get_id()
 #     #             part_map = self._get_part_map(part_id)
 #     #             while (len(self._my_map['questions']) > index and
 #     #                    self._my_map['questions'][index]['assessmentPartId'] == part_map['assessmentPartId']):
 #     #                 index += 1
-#     # 
-#     # 
+#     #
+#     #
 #     # # def _update_question_map(self):
 #     # #     def get_question_display_elements(question_part_map):
 #     # #         # only get the parts in this route
@@ -2133,7 +2133,7 @@ class AssessmentProxyManager:
 #     # #         #
 #     # #         my_display_elements = []
 #     # #         parts_in_same_route = {}
-#     # # 
+#     # #
 #     # #         if question_part_map['level'] > 1:
 #     # #             question_map = question_part_map
 #     # #             search_index = self._my_map['assessmentParts'].index(question_part_map)
@@ -2151,13 +2151,13 @@ class AssessmentProxyManager:
 #     # #                     found_target_question = True
 #     # #         else:
 #     # #             level_1_part = question_part_map
-#     # # 
+#     # #
 #     # #         # get all level 1 parts to get the first index
 #     # #         all_level_1_parts = [p
 #     # #                              for p in self._my_map['assessmentParts']
 #     # #                              if p['level'] == 1]
 #     # #         my_display_elements.append(all_level_1_parts.index(level_1_part) + 1)
-#     # # 
+#     # #
 #     # #         for level, waypoints in parts_in_same_route.iteritems():
 #     # #             # for each part in the route at a given level, sum up the number of questions
 #     # #             # that have appeared in that part
@@ -2167,16 +2167,16 @@ class AssessmentProxyManager:
 #     # #                 count = 1
 #     # #             else:
 #     # #                 count = 0
-#     # # 
+#     # #
 #     # #             for waypoint in waypoints:
 #     # #                 waypoint_questions = [q
 #     # #                                       for q in self._my_map['questions']
 #     # #                                       if q['assessmentPartId'] == waypoint['assessmentPartId']]
 #     # #                 count += len(waypoint_questions)
 #     # #             my_display_elements.append(count)
-#     # # 
+#     # #
 #     # #         return my_display_elements
-#     # # 
+#     # #
 #     # #     index = 0
 #     # #     for part_map in self._my_map['assessmentParts']:
 #     # #         if (len(self._my_map['questions']) == index or
@@ -2194,12 +2194,12 @@ class AssessmentProxyManager:
 #     # #                     Id(part_id),
 #     # #                     display_elements))
 #     # #                 index += 1
-#     # #                 
+#     # #
 #     # #         else: # skip through all remaining questions for this part
 #     # #             while (len(self._my_map['questions']) > index and
 #     # #                    self._my_map['questions'][index]['assessmentPartId'] == part_map['assessmentPartId']):
 #     # #                 index += 1
-#     #         
+#     #
 #     # def _get_assessment_part_lookup_session(self):
 #     #     session = get_assessment_part_lookup_session(self._runtime,
 #     #                                                  self._proxy,
@@ -2207,17 +2207,17 @@ class AssessmentProxyManager:
 #     #     session.use_unsequestered_assessment_part_view()
 #     #     session.use_federated_bank_view()
 #     #     return session
-#     # 
+#     #
 #     # def _get_item_lookup_session(self):
 #     #     session = get_item_lookup_session(self._runtime, self._proxy)
 #     #     session.use_federated_bank_view()
 #     #     return session
-#     # 
+#     #
 #     # def _get_question_map(self, question_id):
 #     #     \"\"\"get question map from questions matching question_id
-#     # 
+#     #
 #     #     This can make sense of both Section assigned Ids or normal Question/Item Ids
-#     # 
+#     #
 #     #     \"\"\"
 #     #     if question_id.get_authority() == ASSESSMENT_AUTHORITY:
 #     #         key = '_id'
@@ -2229,7 +2229,7 @@ class AssessmentProxyManager:
 #     #         if question_map[key] == match_value:
 #     #             return question_map
 #     #     raise errors.NotFound()
-#     # 
+#     #
 #     # def _get_question_ids_for_assessment_part(self, assessment_part_id):
 #     #     \"\"\"convenience method returns question ids associated with an assessment_part_id\"\"\"
 #     #     question_ids =[]
@@ -2237,7 +2237,7 @@ class AssessmentProxyManager:
 #     #         if question_map['assessmentPartId'] == str(assessment_part_id):
 #     #             question_ids.append(self._get_question(question_map=question_map).get_id())
 #     #     return question_ids
-#     # 
+#     #
 #     # def _get_item_ids_for_assessment_part(self, assessment_part_id):
 #     #     \"\"\"convenience method returns item ids associated with an assessment_part_id\"\"\"
 #     #     item_ids =[]
@@ -2245,35 +2245,35 @@ class AssessmentProxyManager:
 #     #         if question_map['assessmentPartId'] == str(assessment_part_id):
 #     #             item_ids.append(Id(question_map['itemId']))
 #     #     return item_ids
-#     # 
+#     #
 #     # def _is_question_sequential(self, question_map):
 #     #     \"\"\"determine if sequential rules apply to question for getting next question
-#     # 
+#     #
 #     #     Currently only checks the assessment part's items sequential
-#     # 
+#     #
 #     #     \"\"\"
 #     #     return [pm['requiresSequentialItems'] for
 #     #             pm in self._my_map['assessmentParts'] if
 #     #             pm['assessmentPartId'] == question_map['assessmentPartId']][0]
-#     # 
+#     #
 #     # def _get_item(self, question_id):
 #     #     \"\"\"we need a middle-man method to convert the unique "assessment-session"
 #     #         authority question_ids into "real" itemIds\"\"\"
 #     #     question = self._get_question(question_id)
 #     #     ils = self._get_item_lookup_session()
 #     #     return ils.get_item(Id(question._my_map['itemId']))
-#     # 
+#     #
 #     # def _get_questions(self, answered=None, honor_sequential=True, update=True):
 #     #     \"\"\"gets all available questions for this section
-#     # 
+#     #
 #     #     if answered == False: only return next unanswered question
 #     #     if answered == True: only return next answered question
 #     #     if answered in None: return next question whether answered or not
 #     #     if honor_sequential == True: only return questions if section or part
 #     #                                  is set to sequential items
-#     # 
+#     #
 #     #     \"\"\"
-#     # 
+#     #
 #     #     def update_question_list():
 #     #         \"\"\"Supportive function to aid readability of _get_questions.\"\"\"
 #     #         latest_question_response = question_map['responses'][0]
@@ -2281,11 +2281,11 @@ class AssessmentProxyManager:
 #     #         # take missingResponse == UNANSWERED or NULL_RESPONSE as an unanswered question
 #     #         if 'missingResponse' not in latest_question_response:
 #     #             question_answered = True
-#     # 
+#     #
 #     #         if answered is None or answered == question_answered:
 #     #             question_list.append(self._get_question(question_map=question_map))
 #     #         return question_answered
-#     # 
+#     #
 #     #     prev_question_answered = True
 #     #     question_list = []
 #     #     if update:
@@ -2297,7 +2297,7 @@ class AssessmentProxyManager:
 #     #         else:
 #     #             update_question_list()
 #     #     return QuestionList(question_list, runtime=self._runtime, proxy=self._proxy)
-#     # 
+#     #
 #     # def _get_question(self, question_id=None, question_map=None):
 #     #     if question_id is not None:
 #     #         question_map = self._get_question_map(question_id) # Throws NotFound()
@@ -2305,7 +2305,7 @@ class AssessmentProxyManager:
 #     #     display_elements = question_map['displayElements']
 #     #     item = self._get_item_lookup_session().get_item(real_question_id)
 #     #     question = item.get_question()
-#     # 
+#     #
 #     #     # Try to set a new display name and label
 #     #     try:
 #     #         if len(display_elements) > 0:
@@ -2313,16 +2313,16 @@ class AssessmentProxyManager:
 #     #             question.set_display_label('.'.join(new_display_name))
 #     #     except AttributeError:
 #     #         pass
-#     # 
+#     #
 #     #     # Claim authority over this question:
 #     #     question._authority = ASSESSMENT_AUTHORITY
-#     # 
+#     #
 #     #     # Override Item Id of this question (this is the Id that Questions report)
 #     #     question._item_id = Id(namespace='assessment.Item',
 #     #                            identifier=str(question_map['_id']),
 #     #                            authority=ASSESSMENT_AUTHORITY)
 #     #     return question
-#     # 
+#     #
 #     # def _get_answers(self, question_id):
 #     #     # don't use the self._get_item() convenience method here
 #     #     # because we need to preserve the magic params (if any) present
@@ -2336,20 +2336,20 @@ class AssessmentProxyManager:
 #     #     except AttributeError:
 #     #         pass
 #     #     return answers # Should this return and AnswerList?
-#     # 
+#     #
 #     # def _get_first_question(self):
 #     #     return self._get_question(question_map=self._my_map['questions'][0])
-#     # 
+#     #
 #     # def _get_next_question(self, question_id, answered=None, reverse=False, honor_sequential=True):
 #     #     \"\"\"Inspects question map to return the next available question.
-#     # 
+#     #
 #     #     if answered == False: only return next unanswered question
 #     #     if answered == True: only return next answered question
 #     #     if answered in None: return next question whether answered or not
 #     #     if reverse == True: go backwards - effectively get_previous_question
 #     #     if honor_sequential == True: only return questions if section or part
 #     #                                  is set to sequential items
-#     # 
+#     #
 #     #     \"\"\"
 #     #     self._update_questions() # Make sure questions list is current
 #     #     question_map = self._get_question_map(question_id) # will raise NotFound()
@@ -2374,12 +2374,12 @@ class AssessmentProxyManager:
 #     #         if answered is None or question_answered == answered:
 #     #             return self._get_question(question_map=question_map)
 #     #     raise errors.IllegalState('No ' + error_text + ' question matching parameters was found')
-#     # 
+#     #
 #     # def _submit_response(self, question_id, answer_form=None):
 #     #     \"\"\"Updates assessmentParts map to insert an item response.
-#     #     
+#     #
 #     #     answer_form is None indicates that the current response is to be cleared
-#     #     
+#     #
 #     #     \"\"\"
 #     #     if answer_form is None:
 #     #         response = {'missingResponse': NULL_RESPONSE,
@@ -2393,37 +2393,37 @@ class AssessmentProxyManager:
 #     #         except (errors.IllegalState, errors.NotFound):
 #     #             pass
 #     #     response['submissionTime'] = DateTime.utcnow()
-#     # 
+#     #
 #     #     question_map = self._get_question_map(question_id) # will raise NotFound()
 #     #     if ('missingResponse' in question_map['responses'][0] and
 #     #          question_map['responses'][0]['missingResponse'] == UNANSWERED):
 #     #         question_map['responses'] = [] # clear unanswered response
 #     #     question_map['responses'].insert(0, response)
 #     #     self._save()
-#     # 
+#     #
 #     # def _get_response(self, question_id):
 #     #     \"\"\"Gets the response for question_id\"\"\"
 #     #     question_map = self._get_question_map(question_id) # will raise NotFound()
 #     #     return self._get_response_from_question_map(question_map)
-#     # 
+#     #
 #     # def _get_responses(self):
 #     #     \"\"\"Gets list of the latest responses\"\"\"
 #     #     response_list = []
 #     #     for question_map in self._my_map['questions']:
 #     #         response_list.append(self._get_response_from_question_map(question_map))
 #     #     return ResponseList(response_list)
-#     # 
+#     #
 #     # def _get_response_from_question_map(self, question_map):
 #     #     \"\"\"Gets the a Response from the provided question_map\"\"\"
 #     #     return self._get_response_from_response_map(question_map['responses'][0],
 #     #                                                 question_map['responses'][1:])
-#     # 
+#     #
 #     # def _get_response_from_response_map(self, response_map, additional_attempts=None):
 #     #     return Response(osid_object_map=response_map,
 #     #                     additional_attempts=additional_attempts,
 #     #                     runtime=self._runtime,
 #     #                     proxy=self._proxy)
-#     # 
+#     #
 #     # def _is_question_answered(self, question_id):
 #     #     \"\"\"has the question matching item_id been answered and not skipped\"\"\"
 #     #     question_map = self._get_question_map(question_id) # will raise NotFound()
@@ -2431,7 +2431,7 @@ class AssessmentProxyManager:
 #     #         return False
 #     #     else:
 #     #         return True
-#     # 
+#     #
 #     # def _is_feedback_available(self, question_id):
 #     #     \"\"\"is feedback available for item\"\"\"
 #     #     response = self._get_response(question_id)
@@ -2439,7 +2439,7 @@ class AssessmentProxyManager:
 #     #     if response.is_answered():
 #     #         return item.is_feedback_available_for_response(response)
 #     #     return item.is_feedback_available()
-#     # 
+#     #
 #     # def _get_feedback(self, question_id):
 #     #     \"\"\"get feedback for item\"\"\"
 #     #     response = self._get_response(question_id)
@@ -2451,7 +2451,7 @@ class AssessmentProxyManager:
 #     #             pass
 #     #     else:
 #     #         return item.get_feedback() # raises IllegalState
-#     # 
+#     #
 #     # def _get_confused_learning_objective_ids(self, question_id):
 #     #     \"\"\"get confused objective ids available for the question\"\"\"
 #     #     response = self._get_response(question_id)
@@ -2459,7 +2459,7 @@ class AssessmentProxyManager:
 #     #         item = self._get_item(response.get_item_id())
 #     #         return item.get_confused_learning_objective_ids_for_response(response)
 #     #     raise errors.IllegalState()
-#     # 
+#     #
 #     # def _is_correctness_available(self, question_id):
 #     #     \"\"\"is a measure of correctness available for the question\"\"\"
 #     #     response = self._get_response(question_id)
@@ -2467,7 +2467,7 @@ class AssessmentProxyManager:
 #     #         item = self._get_item(response.get_item_id())
 #     #         return item.is_correctness_available_for_response(response)
 #     #     return False
-#     # 
+#     #
 #     # def _is_correct(self, question_id):
 #     #     \"\"\"is the question answered correctly\"\"\"
 #     #     response = self._get_response(question_id=question_id)
@@ -2475,7 +2475,7 @@ class AssessmentProxyManager:
 #     #         item = self._get_item(response.get_item_id())
 #     #         return item.is_response_correct(response)
 #     #     raise errors.IllegalState()
-#     # 
+#     #
 #     # def _get_correctness(self, question_id):
 #     #     \"\"\"get measure of correctness for the question\"\"\"
 #     #     response = self._get_response(question_id)
@@ -2483,35 +2483,35 @@ class AssessmentProxyManager:
 #     #         item = self._get_item(response.get_item_id())
 #     #         return item.get_correctness_for_response(response)
 #     #     raise errors.IllegalState()
-#     # 
+#     #
 #     # def _finish(self):
 #     #     \"\"\"Declare this section finished\"\"\"
 #     #     self._my_map['over'] = True # finished == over?
 #     #     self._my_map['completionTime'] = DateTime.utcnow()
 #     #     self._save()
-#     # 
+#     #
 #     # def _is_over(self):
 #     #     \"\"\"Check if this section is over\"\"\"
 #     #     if 'over' in self._my_map and self._my_map['over']:
 #     #         return True
 #     #     return False
-#     #     
+#     #
 #     # def _is_complete(self):
 #     #     \"\"\"Check all Questions for completeness
-#     #     
-#     #     For now, completeness simply means that all questions have been 
+#     #
+#     #     For now, completeness simply means that all questions have been
 #     #     responded to and not skipped or cleared.
-#     #     
+#     #
 #     #     \"\"\"
 #     #     self._update_questions() # Make sure questions list is current
 #     #     for question_map in self._my_map['questions']:
 #     #         if 'missingResponse' in question_map['responses'][0]:
 #     #             return False
 #     #     return True"""
-# 
-# 
+#
+#
 # class Response:
-#     
+#
 #     import_statements = [
 #         'from ..primitives import Id',
 #         'from dlkit.abstract_osid.osid import errors',
@@ -2520,10 +2520,10 @@ class AssessmentProxyManager:
 #         'UNANSWERED = 0',
 #         'NULL_SUBMISSION = 1',
 #     ]
-#     
+#
 #     init = """
 #     _namespace = 'assessment.Response'
-#     
+#
 #     def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, section=None, **kwargs):
 #         from .objects import Answer
 #         self._submission_time = osid_object_map['submissionTime']
@@ -2546,7 +2546,7 @@ class AssessmentProxyManager:
 #         if 'isCorrect' in osid_object_map:
 #             self._is_correct = osid_object_map['isCorrect']
 #         self._records = dict()
-# 
+#
 #         # Consider that responses may want to have their own records separate
 #         # from the enclosed Answer records:
 #         self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', runtime)
@@ -2555,19 +2555,19 @@ class AssessmentProxyManager:
 #         else:
 #             record_type_ids = []
 #         self._load_records(record_type_ids)
-# 
+#
 #     def _load_records(self, record_type_idstrs):
 #         for record_type_idstr in record_type_idstrs:
 #             self._init_record(record_type_idstr)
-# 
+#
 #     def __iter__(self):
 #         for attr in dir(self):
 #             if not attr.startswith('__'):
 #                 yield attr
-#     
+#
 #     def __getitem__(self, item):
 #         return getattr(self, item)
-#     
+#
 #     def __getattr__(self, name):
 #         if self._my_answer == UNANSWERED:
 #             raise errors.IllegalState('this Item has not been attempted')
@@ -2578,10 +2578,10 @@ class AssessmentProxyManager:
 #                 return getattr(self._my_answer, name)
 #             except:
 #                 raise"""
-#     
+#
 #     get_item_id = """
 #         return self._item_id"""
-#     
+#
 #     get_item = """
 #         # So, for now we're assuming that what should be returned here is the question.
 #         # We could change this class impl to "know" if it came from a ResponseLookupSession call
@@ -2601,53 +2601,53 @@ class AssessmentProxyManager:
 #             else:
 #                 raise errors.NotFound()
 #         return item.get_question()"""
-#     
+#
 #     get_response_record = """
 #         if not self.has_record_type(item_record_type):
 #             raise errors.Unsupported()
 #         if str(item_record_type) not in self._records:
 #             raise errors.Unimplemented()
 #         return self._records[str(item_record_type)]"""
-# 
+#
 #     additional_methods = """
 #     def is_answered(self):
 #         if self._my_answer in [UNANSWERED, NULL_SUBMISSION]:
 #             return False
 #         return True
-# 
+#
 #     def is_unanswered(self):
 #         if self._my_answer == UNANSWERED:
 #             return True
 #         return False
-# 
+#
 #     def is_null_submission(self):
 #         if self._my_answer == NULL_SUBMISSION:
 #             return True
 #         return False
-# 
+#
 #     def get_submission_time(self):
 #         if self._submission_time is not None:
 #             return self._submission_time
 #         raise errors.IllegalState('Item was not attempted')
-# 
+#
 #     def get_additional_attempts(self):
 #         from .objects import ResponseList
 #         return ResponseList(self._additional_attempts, self._runtime, self._proxy)
-# 
+#
 #     def is_correct(self):
 #         if self._is_correct is not None:
 #             return self._is_correct
 #         raise errors.IllegalState('do not know if this response is correct')"""
-# 
-# 
+#
+#
 # class ItemQuery:
-# 
+#
 #     match_learning_objective_id = """
 #         self._add_match('learningObjectiveIds', str(objective_id), bool(match))"""
-# 
+#
 #     clear_learning_objective_id_terms = """
 #         self._clear_terms('learningObjectiveIds')"""
-# 
+#
 #     match_any_learning_objective = """
 #         match_key = 'learningObjectiveIds'
 #         param = '$exists'
@@ -2660,19 +2660,19 @@ class AssessmentProxyManager:
 #         else:
 #             self._query_terms[match_key] = {param: flag}
 #         self._query_terms[match_key]['$nin'] = [[], ['']]"""
-# 
+#
 #     clear_learning_objective_terms = """
 #         self._clear_terms('learningObjectiveIds')"""
-# 
+#
 # class ItemSearch:
-# 
+#
 #     import_statements = [
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from ..primitives import Id',
 #         'from dlkit.mongo.osid import searches as osid_searches',
 #       'from ..utilities import get_registry',
 #     ]
-# 
+#
 #     init = """
 #     def __init__(self, runtime):
 #         self._namespace = 'assessment.Item'
@@ -2687,45 +2687,45 @@ class AssessmentProxyManager:
 #         osid_searches.OsidSearch.__init__(self, runtime)"""
 #     search_among_items = """
 #         self._id_list = item_ids"""
-# 
+#
 # class ItemSearchResults:
-# 
+#
 #     import_statements = [
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from . import objects',
 #     ]
-# 
+#
 #     init = """
 #     def __init__(self, results, runtime):
 #         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
 #         self._results = results
 #         self._runtime = runtime
 #         self.retrieved = False"""
-# 
+#
 #     get_items = """
 #         if self.retrieved:
 #             raise errors.IllegalState('List has already been retrieved.')
 #         self.retrieved = True
 #         return objects.ItemList(self._results, runtime=self._runtime)"""
-# 
-# 
+#
+#
 # class ItemSearchSession:
-# 
+#
 #     import_statements = [
 #         'from . import searches',
 #     ]
-# 
+#
 # class BankForm:
 #     get_bank_form_record = """
 #         # this should be templated from Resource, but
 #         # would have to update pattern mappers
 #         return self._get_record(bank_record_type)"""
-# 
+#
 # class BankQuery:
 #     import_statements = [
 #         'from bson import ObjectId'
 #     ]
-# 
+#
 #     match_ancestor_bank_id = """
 #         # matches when the bank_id param is an ancestor of
 #         # any bank
@@ -2733,4 +2733,4 @@ class AssessmentProxyManager:
 #         identifiers = [ObjectId(i.identifier) for i in bank_descendants]
 #         self._query_terms['_id'] = {'$in': identifiers}
 #         """
-# 
+#

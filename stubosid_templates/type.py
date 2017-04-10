@@ -201,6 +201,7 @@ class TypeAdminSession:
         if result['n'] == 0:
             raise errors.NotFound()"""
 
+
 class TypeForm:
 
     import_statements = [
@@ -235,17 +236,17 @@ class TypeForm:
         self._display_name_metadata.update(mdata_conf.display_name)
         self._display_label_metadata = {
             'element_id': Id(authority = self._authority,
-                             namespace = self._namespace, 
+                             namespace = self._namespace,
                              identifier = 'description')}
         self._display_label_metadata.update(mdata_conf.display_label)
         self._description_metadata = {
             'element_id': Id(authority = self._authority,
-                             namespace = self._namespace, 
+                             namespace = self._namespace,
                              identifier = 'description')}
         self._description_metadata.update(mdata_conf.description)
         self._domain_metadata = {
             'element_id': Id(authority = self._authority,
-                             namespace = self._namespace, 
+                             namespace = self._namespace,
                              identifier = 'description')}
         self._domain_metadata.update(mdata_conf.domain)
 
@@ -263,7 +264,7 @@ class TypeForm:
     set_display_name = """
         if self.get_display_name_metadata().is_read_only():
             raise errors.NoAccess()
-        if not self._is_valid_string(display_name, 
+        if not self._is_valid_string(display_name,
                                      self.get_display_name_metadata()):
             raise errors.InvalidArgument()
         self._my_map['displayName']['text'] = display_name"""
@@ -281,7 +282,7 @@ class TypeForm:
     set_display_label = """
         if self.get_display_label_metadata().is_read_only():
             raise errors.NoAccess()
-        if not self._is_valid_string(display_label, 
+        if not self._is_valid_string(display_label,
                                      self.get_display_label_metadata()):
             raise errors.InvalidArgument()
         self._my_map['displayLabel']['text'] = display_label"""
@@ -299,7 +300,7 @@ class TypeForm:
     set_description = """
         if self.get_description_metadata().is_read_only():
             raise errors.NoAccess()
-        if not self._is_valid_string(description, 
+        if not self._is_valid_string(description,
                                      self.get_description_metadata()):
             raise errors.InvalidArgument()
         self._my_map['description']['text'] = description"""
@@ -317,12 +318,12 @@ class TypeForm:
     set_domain = """
         if self.get_domain_metadata().is_read_only():
             raise errors.NoAccess()
-        if not self._is_valid_string(domain, 
+        if not self._is_valid_string(domain,
                                      self.get_domain_metadata()):
             raise errors.InvalidArgument()
         self._my_map['domain']['text'] = domain"""
 
-    clear_description = """
+    clear_domain = """
         if (self.get_domain_metadata().is_read_only() or
             self.get_domain_metadata().is_required()):
             raise errors.NoAccess()
@@ -337,13 +338,14 @@ class TypeList:
 
     get_next_type = """
         return self.next()
-            
+
     def next(self):
         from .primitives import Type
         return self._get_next_object(Type)"""
 
     get_next_types = """
         return self._get_next_n(n)"""
+
 
 class Type:
 
@@ -370,7 +372,7 @@ class Type:
             self._my_map['domain'] = self.display_text_map(domain)
         else:
             raise errors.NullArgument()
-    
+
     def display_text_map(self, string):
         from .profile import LANGUAGETYPE, SCRIPTTYPE, FORMATTYPE
         from ..primitives import Id
@@ -469,4 +471,3 @@ class OldObsoleteTypeCanBeDeleted:
                            language_type = Type(**types.Language().get_type_data('DEFAULT')),
                            script_type = Type(**types.Script().get_type_data('DEFAULT')),
                            format_type = Type(**types.Format().get_type_data('DEFAULT')))"""
-

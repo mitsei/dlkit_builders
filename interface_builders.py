@@ -227,7 +227,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             if not self._is('authz'):
                 if object_name in self.patterns['package_relationships_caps']:
                     init_object = 'osid_objects.OsidRelationshipForm'
-                else: # maybe need to check for other init objects, like Rules?
+                else:  # maybe need to check for other init objects, like Rules?
                     init_object = 'osid_objects.OsidObjectForm'
 
                 for inherit_object in interface['inherit_shortnames']:
@@ -438,6 +438,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             if os.path.exists(error_file):
                 shutil.copyfile(error_file, self._root_dir + '/osid/errors.py')
 
+
 # Assemble the initializers for metadata managed by Osid Object Forms
 def make_metadata_initers(interface_name, persisted_data, initialized_data, return_types):
 
@@ -460,7 +461,7 @@ def make_metadata_initers(interface_name, persisted_data, initialized_data, retu
 
         if (persisted_data[data_name] != 'OsidCatalog' and
                 data_name not in initialized_data):
-            #template = string.Template(METADATA_INITER)
+            # template = string.Template(METADATA_INITER)
             if persisted_data[data_name] == 'boolean':
                 default += default_string(data_name, 'boolean')
             elif (persisted_data[data_name] == 'string' and
@@ -491,14 +492,15 @@ def make_metadata_initers(interface_name, persisted_data, initialized_data, retu
             elif persisted_data[data_name] == 'decimal':
                 default += default_string(data_name, 'decimal')
 
-            #initer += template.substitute({'data_name': data_name,
+            # initer += template.substitute({'data_name': data_name,
             #                               'data_name_upper': data_name_upper})
-    #if initer:
+    # if initer:
     #    initer += '\n'
     if default:
         default += '\n'
-    #return imports + initer + default
+    # return imports + initer + default
     return imports + default
+
 
 # Assemble the initializers for persistance data managed by Osid Object Forms
 # initialized with the form.
@@ -507,7 +509,7 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 
     singular_data_types = ['osid.id.Id', 'osid.type.Type', 'string', 'decimal',
                            'boolean', 'OsidCatalog', 'osid.calendaring.DateTime',
-                           'timestamp','osid.calendaring.Duration',
+                           'timestamp', 'osid.calendaring.Duration',
                            'osid.transport.DataInputStream']
 
     append_ids = ['osid.id.Id', 'osid.type.Type']
@@ -540,7 +542,7 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
                                                                                         data_name)
             else:
                 initers += '        self._my_map[\'{}\'] = self._{}_default\n'.format(mixed_name,
-                                                                                        data_name)
+                                                                                      data_name)
         elif persisted_name in plural_data_types:
             initers += '        self._my_map[\'{}Ids\'] = self._{}_default\n'.format(mixed_singular,
                                                                                      data_name)
@@ -553,7 +555,6 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
             initers += '        self._my_map[\'{}\'] = []\n'.format(mixed_name)
         else:
             initers += '        self._my_map[\'{}\'] = None\n'.format(mixed_name)
-
 
     initialize_to_none = ['boolean', 'osid.calendaring.DateTime', 'timestamp',
                           'osid.calendaring.Duration']
@@ -584,8 +585,6 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
     return initers
 
 
-
 # Return the associated class name for a ProxyManager given a Manager name
 def proxy_manager_name(string_):
     return string_.split('Manager')[0] + 'ProxyManager'
-

@@ -1,17 +1,18 @@
 from abcbinder_settings import XOSIDNAMESPACEURI as ns
 from binder_helpers import wrap_and_indent
 
-def make_models(osidPackage, interfaceName, inheritList, methodList, 
-                      packageRoot):
-    # inheritList is a list of full interface names (like 'osid.type.Type').
-    # inheritList[element].split('.')[-1] provides the interface name.
-    # inheritList[element].split('.')[-2] provides the interface package name.
-    # methodList is a dict which includes a 'methodName': a 'returnType':
+
+def make_models(osid_package, interface_name, inherit_list, method_list,
+                package_root):
+    # inherit_list is a list of full interface names (like 'osid.type.Type').
+    # inherit_list[element].split('.')[-1] provides the interface name.
+    # inherit_list[element].split('.')[-2] provides the interface package name.
+    # method_list is a dict which includes a 'methodName': a 'returnType':
     # and a 'paramList':. The 'methodName': is camelCase and the 'returnType':
-    # is the full interface name of the return type..  The 'paramList': is a 
+    # is the full interface name of the return type..  The 'paramList': is a
     # list that will at least include 'self' and any additional parameter
     # names.  paramList does not include information about parameter types.
-    # Should it?.  packageRoot is the ElementTree root of the entire osid 
+    # Should it?.  package_root is the ElementTree root of the entire osid
     # package to be used for braoder inspections.
     import os
     from binder_helpers import camel_to_list
@@ -19,247 +20,244 @@ def make_models(osidPackage, interfaceName, inheritList, methodList,
     from binder_helpers import get_param_list
     from binder_helpers import make_plural
     from osid_kit.osid_meta import OSID_Language_Primitives
-    
-    interfaceShortName = interfaceName.split('.')[-1]
 
-    # First, deal with interfaces that directly inherit from OsidObject 
+    interface_short_name = interface_name.split('.')[-1]
+
+    # First, deal with interfaces that directly inherit from OsidObject
     # and write more do when I know what I'm doing
-    if 'OsidObject' in inheritList and osidPackage != 'osid':
+    if 'OsidObject' in inherit_list and osid_package != 'osid':
         import string
-        commentStr = 'Variables yet to consider:\n'
-        modelTableStr = ''  ###### All these variables want to be moved up???###
-        instanceVarStr = ''
-        foreignTablesStr = ''
-        modelStr = ''
-        implementedVars = []
-        
+        comment_str = 'Variables yet to consider:\n'
+        model_table_str = ''  # All these variables want to be moved up???###
+        instance_var_str = ''
+        foreign_tables_str = ''
+        model_str = ''
+        implemented_vars = []
+
         print '\n'
-        print osidPackage, interfaceName
+        print osid_package, interface_name
         ##
         # First, iterate though the corresponding Form interface to develop
         # a list of variable names for data that should be persisted.
-        for child in packageRoot:
+        for child in package_root:
             if child.tag == (ns + 'interface'):
-                interfaceToTest = child.get(ns + 'name').split('.')[-1]
-                interfaceToTestList = camel_to_list(interfaceToTest)
-                interfaceShortNameToTest = ''.join(interfaceToTestList[:-1])
-                if (interfaceShortNameToTest == interfaceShortName and
-                    'Form' in interfaceToTestList and
-                    'Record' not in interfaceToTestList):
-                    formMethodNameList = []
-                    for grandChild in child:
-                        if grandChild.tag == (ns + 'method'):
-                            formMethodNameList.append(grandChild.get(ns + 'name'))
-                    formVariables = []
-                    for formMethodName in formMethodNameList:
-                        var = camel_to_list(formMethodName)[1:]
+                interface_to_test = child.get(ns + 'name').split('.')[-1]
+                interface_to_test_list = camel_to_list(interface_to_test)
+                interface_short_name_to_test = ''.join(interface_to_test_list[:-1])
+                if (interface_short_name_to_test == interface_short_name and
+                        'Form' in interface_to_test_list and
+                        'Record' not in interface_to_test_list):
+                    form_method_name_list = []
+                    for grand_child in child:
+                        if grand_child.tag == (ns + 'method'):
+                            form_method_name_list.append(grand_child.get(ns + 'name'))
+                    form_variables = []
+                    for form_method_name in form_method_name_list:
+                        var = camel_to_list(form_method_name)[1:]
                         var[0] = var[0].lower()
-                        if ''.join(var) not in formVariables:
-                            formVariables.append(''.join(var))
+                        if ''.join(var) not in form_variables:
+                            form_variables.append(''.join(var))
                     variables = []
-                    variablesInfo = []
-                    allVariables = []
-                    allVariablesInfo = []
-                    for method in methodList:
+                    variables_info = []
+                    all_variables = []
+                    all_variables_info = []
+                    for method in method_list:
                         var = camel_to_list(method['methodName'])[1:]
                         var[0] = var[0].lower()
-                        allVariables.append(''.join(var))
-                        allVariablesInfo.append(dict(varName = ''.join(var),
-                                           returnType = method['returnType']))
+                        all_variables.append(''.join(var))
+                        all_variables_info.append(dict(varName=''.join(var),
+                                                  returnType=method['returnType']))
                         if ''.join(var) not in variables:
                             variables.append(''.join(var))
-                            variablesInfo.append(dict(varName = ''.join(var),
-                                               returnType = method['returnType']))
+                            variables_info.append(dict(varName=''.join(var),
+                                                  returnType=method['returnType']))
 #                    print variables
-#                    print formVariables
-                    for v in variablesInfo:
+#                    print form_variables
+                    for v in variables_info:
 
-                        ##
                         # First, look for variables that represent osid things
                         # that are stored by Ids
-                        if ((v['varName'] in formVariables or
-                            v['varName'] + 'Id' in formVariables) and
-                            v['varName'] + 'Id' in variables and
-                            v['varName'] not in implementedVars and
-                            v['varName'] + 'Id' not in implementedVars):
-                            modelTableStr = (modelTableStr +
-    '    ' + v['varName'] + 'Authority = models.CharField(max_length=128)\n' +
-    '    ' + v['varName'] + 'NameSpace = models.CharField(max_length=128)\n' +
-    '    ' + v['varName'] + 'Identifier = models.CharField(max_length=64)\n')
-                            implementedVars.append(v['varName'])
-                            implementedVars.append(v['varName'] + 'Id')
+                        if ((v['varName'] in form_variables or
+                             v['varName'] + 'Id' in form_variables) and
+                                v['varName'] + 'Id' in variables and
+                                v['varName'] not in implemented_vars and
+                                v['varName'] + 'Id' not in implemented_vars):
+                            model_table_str = (
+                                model_table_str +
+                                '    ' + v['varName'] + 'Authority = models.CharField(max_length=128)\n' +
+                                '    ' + v['varName'] + 'NameSpace = models.CharField(max_length=128)\n' +
+                                '    ' + v['varName'] + 'Identifier = models.CharField(max_length=64)\n')
+                            implemented_vars.append(v['varName'])
+                            implemented_vars.append(v['varName'] + 'Id')
 
-                        ##
                         # Next, look for model variables that return boolean
                         # and don't represent fields that returns an object Id
                         elif (v['returnType'] == 'Id' and
-                              v['varName'] + 'Id' in implementedVars):
-                              implementedVars.append(v['varName'])
+                                v['varName'] + 'Id' in implemented_vars):
+                            implemented_vars.append(v['varName'])
 
-                        ##
                         # Next, look for model variables that return boolean
                         # and don't represent fields that returns an object Id
-                        elif (v['varName'] in formVariables and
+                        elif (v['varName'] in form_variables and
                               v['returnType'] == 'boolean' and
-                              allVariables.count(v['varName']) == 1 and
-                              v['varName'] not in implementedVars):
-                            modelTableStr = (modelTableStr +
-    '    ' + v['varName'] + ' = models.NullBooleanField(null = True)\n')
-                            implementedVars.append(v['varName'])
+                              all_variables.count(v['varName']) == 1 and
+                              v['varName'] not in implemented_vars):
+                            model_table_str = (
+                                model_table_str +
+                                '    ' + v['varName'] + ' = models.NullBooleanField(null = True)\n')
+                            implemented_vars.append(v['varName'])
 
-                        ##
                         # Next, look for model variables that return boolean
                         # and may represent fields that returns an object Id
-                        elif (v['varName'] in formVariables and
+                        elif (v['varName'] in form_variables and
                               v['returnType'] == 'boolean' and
-                              allVariables.count(v['varName']) > 1 and
-                              v['varName'] not in implementedVars):
-                            for a in allVariablesInfo:
+                              all_variables.count(v['varName']) > 1 and
+                              v['varName'] not in implemented_vars):
+                            for a in all_variables_info:
                                 if (a['returnType'] == 'osid.id.Id' and
-                                    a['varName'] not in implementedVars):
-                                    modelTableStr = (modelTableStr +
-    '    ' + v['varName'] + 'Authority = models.CharField(max_length=128)\n' +
-    '    ' + v['varName'] + 'NameSpace = models.CharField(max_length=128)\n' +
-    '    ' + v['varName'] + 'Identifier = models.CharField(max_length=64)\n')
-                            implementedVars.append(v['varName'])
+                                        a['varName'] not in implemented_vars):
+                                    model_table_str = (
+                                        model_table_str +
+                                        '    ' + v['varName'] + 'Authority = models.CharField(max_length=128)\n' +
+                                        '    ' + v['varName'] + 'NameSpace = models.CharField(max_length=128)\n' +
+                                        '    ' + v['varName'] + 'Identifier = models.CharField(max_length=64)\n')
+                            implemented_vars.append(v['varName'])
 
-                        ##
                         # Look for methods that return Time objects
-                        elif (v['varName'] in formVariables and
-                             v['returnType'] == 'osid.calendaring.Time'):
-                            modelTableStr = (modelTableStr +
-    '    ' + v['varName'] + ' = models.TimeField()\n')
-                            implementedVars.append(v['varName'])
+                        elif (v['varName'] in form_variables and
+                              v['returnType'] == 'osid.calendaring.Time'):
+                            model_table_str = (
+                                model_table_str +
+                                '    ' + v['varName'] + ' = models.TimeField()\n')
+                            implemented_vars.append(v['varName'])
 
-                        ##
                         # Look for methods that return DateTime objects
-                        elif (v['varName'] in formVariables and
-                             v['returnType'] == 'osid.calendaring.DateTime'):
-                            modelTableStr = (modelTableStr +
-    '    ' + v['varName'] + ' = models.DateTimeField()\n')
-                            implementedVars.append(v['varName'])
+                        elif (v['varName'] in form_variables and
+                              v['returnType'] == 'osid.calendaring.DateTime'):
+                            model_table_str = (
+                                model_table_str +
+                                '    ' + v['varName'] + ' = models.DateTimeField()\n')
+                            implemented_vars.append(v['varName'])
 
-                        ##
                         # Look for integers or cardinals
-                        elif (v['varName'] in formVariables and
-                             (v['returnType'] == 'integer' or
-                              v['returnType'] == 'cardinal')):
-                            modelTableStr = (modelTableStr +
-    '    ' + v['varName'] + ' = models.IntegerField()\n')
-                            implementedVars.append(v['varName'])
+                        elif (v['varName'] in form_variables and
+                              (v['returnType'] == 'integer' or
+                               v['returnType'] == 'cardinal')):
+                            model_table_str = (
+                                model_table_str +
+                                '    ' + v['varName'] + ' = models.IntegerField()\n')
+                            implemented_vars.append(v['varName'])
 
-                        ##
                         # Look for decimals
-                        elif (v['varName'] in formVariables and
+                        elif (v['varName'] in form_variables and
                               v['returnType'] == 'decimal'):
-                            modelTableStr = (modelTableStr +
-    '    ' + v['varName'] + ' = models.DecimalField()\n')
-                            implementedVars.append(v['varName'])
+                            model_table_str = (
+                                model_table_str +
+                                '    ' + v['varName'] + ' = models.DecimalField()\n')
+                            implemented_vars.append(v['varName'])
 
-                        ##
-                        # Look for strings 
-                        elif (v['varName'] in formVariables and
+                        # Look for strings
+                        elif (v['varName'] in form_variables and
                               v['returnType'] == 'string'):
-                            modelTableStr = (modelTableStr +
-    '    ' + v['varName'] + ' = models.CharField(max_length=256)\n')# WHAT SHOULD MAX LENGTH BE!!!!!!
-                            implementedVars.append(v['varName'])
+                            model_table_str = (
+                                model_table_str +
+                                '    ' + v['varName'] + ' = models.CharField(max_length=256)\n')  # WHAT SHOULD MAX LENGTH BE!!!!!!
+                            implemented_vars.append(v['varName'])
 
-                        ##
-                        # Look for things that return IdLists and make 
+                        # Look for things that return IdLists and make
                         # foreign key tables while we're at it.
                         elif (make_plural(''.join(camel_to_list(v['varName'])[0:-1]))
-                                           in formVariables and
-                              v['returnType'] == 'osid.id.IdList'):
-                            varName = camel_to_list(v['varName'])[0:-1]
-                            varName[0] = varName[0].title()
-                            foreignTablesStr = (foreignTablesStr +
-    'class ' + interfaceName + '_' + ''.join(varName) + '(models.Model):\n' +
-    '    ' + interfaceName.lower() + ' = models.ForeignKey(' + interfaceName + ')\n' +
-    '    authority = models.CharField(max_length=128)\n' +
-    '    nameSpace = models.CharField(max_length=128)\n' +
-    '    identifier = models.CharField(max_length=64)\n\n')
-                            print '    ', v['varName']
-                            implementedVars.append(v['varName'])
-                            implementedVars.append(''.join(camel_to_list(v['varName'])[0:-1]))
-                            implementedVars.append(make_plural(''.join(camel_to_list(v['varName'])[0:-1])))
+                                in form_variables and
+                                v['returnType'] == 'osid.id.IdList'):
+                            var_name = camel_to_list(v['varName'])[0:-1]
+                            var_name[0] = var_name[0].title()
+                            foreign_tables_str = (
+                                foreign_tables_str +
+                                'class ' + interface_name + '_' + ''.join(var_name) + '(models.Model):\n' +
+                                '    ' + interface_name.lower() + ' = models.ForeignKey(' + interface_name + ')\n' +
+                                '    authority = models.CharField(max_length=128)\n' +
+                                '    nameSpace = models.CharField(max_length=128)\n' +
+                                '    identifier = models.CharField(max_length=64)\n\n')
+                            print('    {0}'.format(v['varName']))
+                            implemented_vars.append(v['varName'])
+                            implemented_vars.append(''.join(camel_to_list(v['varName'])[0:-1]))
+                            implemented_vars.append(make_plural(''.join(camel_to_list(v['varName'])[0:-1])))
 
-                        ##
                         # Look for those pesky somethingBasedSomethingelse
                         # boolean checks that may only occur in learning
                         # Activity objects
-                        elif ('Based' + interfaceName in v['varName'] and
+                        elif ('Based' + interface_name in v['varName'] and
                               v['returnType'] == 'boolean'):
-                            modelTableStr = (modelTableStr +
-    '    ' + v['varName'] + ' = models.NullBooleanField(null = True)\n')
-                            implementedVars.append(v['varName'])
+                            model_table_str = (
+                                model_table_str +
+                                '    ' + v['varName'] + ' = models.NullBooleanField(null = True)\n')
+                            implemented_vars.append(v['varName'])
 
-                        ##
                         # There seem to be some methods that return IdLists
                         # that don't have setters in the corresponding
-                        # Form objects. For the time-being we will make 
+                        # Form objects. For the time-being we will make
                         # foreign-key tables for them as well.
                         elif v['returnType'] == 'osid.id.IdList':
-                            varName = camel_to_list(v['varName'])[0:-1]
-                            varName[0] = varName[0].title()
-                            foreignTablesStr = (foreignTablesStr +
-    'class ' + interfaceName + '_' + ''.join(varName) + '(models.Model):\n' +
-    '    ' + interfaceName.lower() + ' = models.ForeignKey(' + interfaceName + ')\n' +
-    '    authority = models.CharField(max_length=128)\n' +
-    '    nameSpace = models.CharField(max_length=128)\n' +
-    '    identifier = models.CharField(max_length=64)\n\n')
-                            implementedVars.append(v['varName'])
-                            implementedVars.append(''.join(camel_to_list(v['varName'])[0:-1]))
-                            implementedVars.append(make_plural(''.join(camel_to_list(v['varName'])[0:-1])))
+                            var_name = camel_to_list(v['varName'])[0:-1]
+                            var_name[0] = var_name[0].title()
+                            foreign_tables_str = (
+                                foreign_tables_str +
+                                'class ' + interface_name + '_' + ''.join(var_name) + '(models.Model):\n' +
+                                '    ' + interface_name.lower() + ' = models.ForeignKey(' + interface_name + ')\n' +
+                                '    authority = models.CharField(max_length=128)\n' +
+                                '    nameSpace = models.CharField(max_length=128)\n' +
+                                '    identifier = models.CharField(max_length=64)\n\n')
+                            implemented_vars.append(v['varName'])
+                            implemented_vars.append(''.join(camel_to_list(v['varName'])[0:-1]))
+                            implemented_vars.append(make_plural(''.join(camel_to_list(v['varName'])[0:-1])))
 
-                        ##
-                        # Look for method variables that deal with DisplayText 
-                        elif (v['varName'] in formVariables and
+                        # Look for method variables that deal with DisplayText
+                        elif (v['varName'] in form_variables and
                               v['returnType'] == 'osid.locale.DisplayText'):
-                            modelTableStr = (modelTableStr +         # HOW LONG FOR STRINGS
-    '    ' + v['varName'] + ' = models.CharField(max_length=512)\n') # PERHAPS SETTINGS FOR LONG, MED, SHORT?
-                            implementedVars.append(v['varName'])
+                            model_table_str = (
+                                model_table_str +         # HOW LONG FOR STRINGS
+                                '    ' + v['varName'] + ' = models.CharField(max_length=512)\n')  # PERHAPS SETTINGS FOR LONG, MED, SHORT?
+                            implemented_vars.append(v['varName'])
 
-                        ##
-                        # Check for templates for customized modelTableStrs
-                        # foreignTableStrs and instanceTableStrs. Some of 
-                        # these may simply be empty strings for the sole 
+                        # Check for templates for customized model_table_strs
+                        # foreign_table_strs and instanceTableStrs. Some of
+                        # these may simply be empty strings for the sole
                         # purpose of logging uncaught model implementations in
-                        # the implementedVars list.
-                        elif v['varName'] not in implementedVars:
-                            if os.path.exists('dj_osid_templates/' + osidPackage + 
-                                         '/model/model_tables/' + v['varName'] + '.txt'):
-                                f = open('dj_osid_templates/' + osidPackage + 
+                        # the implemented_vars list.
+                        elif v['varName'] not in implemented_vars:
+                            if os.path.exists('dj_osid_templates/' + osid_package +
+                                              '/model/model_tables/' + v['varName'] + '.txt'):
+                                f = open('dj_osid_templates/' + osid_package +
                                          '/model/model_tables/' + v['varName'] + '.txt', 'r')
-                                modelTableStr = modelTableStr + f.read()
+                                model_table_str += f.read()
                                 f.close()
-                                implementedVars.append(v['varName'])
-                            if os.path.exists('dj_osid_templates/' + osidPackage + 
-                                         '/model/foreign_tables/' + v['varName'] + '.txt'):
-                                f = open('dj_osid_templates/' + osidPackage + 
+                                implemented_vars.append(v['varName'])
+                            if os.path.exists('dj_osid_templates/' + osid_package +
+                                              '/model/foreign_tables/' + v['varName'] + '.txt'):
+                                f = open('dj_osid_templates/' + osid_package +
                                          '/model/foreign_tables/' + v['varName'] + '.txt', 'r')
-                                foreignTableStr = foreignTableStr + f.read()
+                                foreign_tables_str += f.read()
                                 f.close()
-                                implementedVars.append(v['varName'])
-                            if os.path.exists('dj_osid_templates/' + osidPackage + 
-                                         '/model/instance_vars/' + v['varName'] + '.txt'):
-                                f = open('dj_osid_templates/' + osidPackage + 
+                                implemented_vars.append(v['varName'])
+                            if os.path.exists('dj_osid_templates/' + osid_package +
+                                              '/model/instance_vars/' + v['varName'] + '.txt'):
+                                f = open('dj_osid_templates/' + osid_package +
                                          '/model/instance_vars/' + v['varName'] + '.txt', 'r')
-                                instanceVarStr = instanceVarStr + f.read()
+                                instance_var_str += f.read()
                                 f.close()
-                                implementedVars.append(v['varName'])
+                                implemented_vars.append(v['varName'])
 
-                        print implementedVars
-                    for v in variablesInfo:
-                        if v['varName'] not in implementedVars:
-                            commentStr = commentStr + v['varName'] + ', '
-                    if commentStr:
-                        commentStr = wrap_and_indent(commentStr.strip(), '    # ')
-                    if modelTableStr or commentStr:
-                        modelStr = (commentStr + '\n' + modelTableStr + '\n' + 
-                                            instanceVarStr + '\n' + foreignTablesStr + '\n')
-                    return modelStr
+                        print(implemented_vars)
+                    for v in variables_info:
+                        if v['varName'] not in implemented_vars:
+                            comment_str = comment_str + v['varName'] + ', '
+                    if comment_str:
+                        comment_str = wrap_and_indent(comment_str.strip(), '    # ')
+                    if model_table_str or comment_str:
+                        model_str = (comment_str + '\n' + model_table_str + '\n' +
+                                     instance_var_str + '\n' + foreign_tables_str + '\n')
+                    return model_str
 
 #                            print v['varName']
-#                            print formVariables
+#                            print form_variables
 #                            print variables
-

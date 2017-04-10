@@ -22,14 +22,15 @@ class RelationshipLookupSession:
     get_relationships_by_genus_type_for_peers_template = """
         pass"""
 
+
 class RelationshipAdminSession:
 
-    
     import_statements_pattern = [
     ]
-    
+
     get_relationship_form_for_create_template = """
         pass"""
+
 
 class Relationship:
 
@@ -38,6 +39,7 @@ class Relationship:
 
     get_source_id_template = """
         pass"""
+
 
 class RelationshipQuery:
 

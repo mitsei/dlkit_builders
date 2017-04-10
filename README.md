@@ -9,7 +9,12 @@ xosid
  |- assessment.xml
 ```
 
-To run the builder, you can build all or a subset of `dlkit`:
+The `xosid` definitions are located [here](https://app.assembla.com/spaces/osid/git/source/master/definitions/xosid).
+
+To run the builder, you can build all or a subset of `dlkit`. The first time
+you run the builder, you will need to build `map`, `patterns`, `abc`, `manager`,
+and `mdata`. After that, depending on what you change, you could build just
+`json`, `authz`, or `services`. 
 
 ```
     Usage: python build_controller.py [commands]
@@ -28,7 +33,7 @@ To run the builder, you can build all or a subset of `dlkit`:
       manager: build the manager_impls base classes
       tests: build the tests. You should always use this with the --buildto flag.
       --all: build all of the above. Tests will be placed into a ../tests/ directory.
-      --buildto <directory>: the target build-to directory (relative to the current one)
+      --buildto <directory>: the target build-to directory (this will be sibling to this script, ../<directory)
 ```
 
 This will build the files to the directory specified, default of `../dlkit/`.
@@ -36,3 +41,6 @@ This will build the files to the directory specified, default of `../dlkit/`.
 Examples:
   - `python build_controller.py map patterns abc mdata json`
   - `python build_controller.py --all`
+  - `python build_controller.py json --buildto dlkit_testing`
+
+NOTE: there are no builder tests, so the Travis CI build just does a PEP8 check.

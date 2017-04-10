@@ -1,6 +1,6 @@
 
 class Id:
-    
+
     init = """
 """
 
@@ -12,6 +12,7 @@ class Id:
 
     get_identifier = """
         pass"""
+
 
 class IdList:
 

@@ -33,7 +33,7 @@ class Agent:
             return DisplayText('anonymous_user')
         else:
             return DisplayText(self.my_user.username)
-        
+
     ##
     # Override get_description method to return something
     def get_description(self):

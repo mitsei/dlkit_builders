@@ -1,5 +1,6 @@
 """resource templates for manager utils"""
 
+
 class ResourceProfile:
 
     import_statements_pattern = [
@@ -21,13 +22,13 @@ class ResourceProfile:
             raise NullArgument()
         return False"""
 
+
 class ResourceManager:
 
     import_statements_pattern = [
-    'from ..osid.osid_errors import Unimplemented',
-    'from ..osid.osid_errors import NullArgument',
+        'from ..osid.osid_errors import Unimplemented',
+        'from ..osid.osid_errors import NullArgument',
     ]
-
 
     get_resource_lookup_session_template = """
         raise Unimplemented()"""
@@ -60,10 +61,9 @@ class ResourceManager:
 class ResourceProxyManager:
 
     import_statements_pattern = [
-    'from ..osid.osid_errors import Unimplemented',
-    'from ..osid.osid_errors import NullArgument',
+        'from ..osid.osid_errors import Unimplemented',
+        'from ..osid.osid_errors import NullArgument',
     ]
-
 
     get_resource_lookup_session_template = """
         if proxy is None:

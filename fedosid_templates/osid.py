@@ -1,8 +1,7 @@
 # osid templates for az_osid
 
-class OsidProfile:
 
-#    init = """ """
+class OsidProfile:
 
     get_id = """
         pass"""
@@ -43,9 +42,8 @@ class OsidProfile:
     supports_proxy_record_type = """
         pass"""
 
-class Identifiable:
 
-#    init = """  """
+class Identifiable:
 
     get_id = """
         pass"""
@@ -96,7 +94,7 @@ class OsidSession:
         pass"""
 
     get_authenticated_agent_id = """
-        pass"""  
+        pass"""
 
     get_authenticated_agent = """
         pass"""
@@ -116,8 +114,6 @@ class OsidSession:
 
 class OsidObject:
 
-#    init = """  """
-
     get_display_name = """
         pass"""
 
@@ -132,13 +128,12 @@ class OsidRule:
 
     get_rule_id = """
         pass"""
-    
-    get_rule= """
+
+    get_rule = """
         pass"""
 
-class OsidForm:
 
-#    init = """ """
+class OsidForm:
 
     is_for_update = """
         pass"""
@@ -167,9 +162,8 @@ class OsidForm:
     get_invalid_metadata = """
         pass"""
 
-class OsidObjectForm:
 
-#    init = """ """
+class OsidObjectForm:
 
     get_display_name_metadata = """
         pass"""
@@ -192,16 +186,15 @@ class OsidObjectForm:
 
 class OsidList:
 
-# Initially we will create a federated OsidList that is initialized with
-# one or more iterators (other object lists).  Eventually we might replace
-# this with an implmentation that deals with threads.
+    # Initially we will create a federated OsidList that is initialized with
+    # one or more iterators (other object lists).  Eventually we might replace
+    # this with an implmentation that deals with threads.
 
     init = """
     def __init__(self, osid_lists = []):
-        ##
         # This implementation expects to be called with a list of OsidList
         # objects.
-        self._osid_lists = osid_lists # A list of OsidList objects
+        self._osid_lists = osid_lists  # A list of OsidList objects
         self._index = 0  # The index of the OsidList currently being worked on
 
     def __iter__(self):
@@ -238,9 +231,8 @@ class OsidList:
             n += 1
         return available"""
 
-class Metadata:
 
-#    init = """ """
+class Metadata:
 
     get_element_id_template = """
         pass"""

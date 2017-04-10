@@ -162,7 +162,7 @@ class OsidSourceBuilder(InterfaceBuilder, BaseBuilder):
                                                  self._wrap(format_module_docstring('\n'.join(detail_docs))))
         else:
             method_doc = '{0}\n\n{1}\n\n{2}\n\n'.format(self._wrap('{0}{1}'.format(self._dind,
-                                                                            method['doc']['headline'])),
+                                                                                   method['doc']['headline'])),
                                                         self._wrap(method['doc']['body']),
                                                         self._wrap(
                                                             format_module_docstring('\n'.join(detail_docs))))

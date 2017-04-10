@@ -1,3 +1,0 @@
-        # Implemented from template for osid.calendar.Event.getDuration
-        #### This is not right!!!! ####
-        return self._${varName}

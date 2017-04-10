@@ -84,10 +84,9 @@ class Locale:
 class DisplayText:
 
     init = """
-    ##
     # This constructor should be calling a locale settings module,
     # which should be set to the default language, script and format
-    # types. 
+    # types.
     def __init__(self,
                  text,
                  language_type_identifier='ENG',
@@ -133,6 +132,7 @@ class DisplayText:
         # during initialization since consumers will likely not be interested
         # in the locale types as often as they are in the text itself."""
 
+
 class LocaleList:
 
     import_statements = [
@@ -140,14 +140,8 @@ class LocaleList:
     ]
 
     get_next_locale = """
-        try:
-            next_item = self.next()
-        except StopIteration:
-            raise errors.IllegalState('no more elements available in this list')
-        except: #Need to specify exceptions here
-            raise errors.OperationFailed()
-        else:
-            return next_item
+        next_item = self.next()
+        return next_item
 
     def next(self):
         return self._get_next_object(Locale)"""

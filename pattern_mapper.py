@@ -11,27 +11,33 @@ from pattern_mappers.objects import map_object_form_patterns,\
 
 
 def append_caps(value, caps_list):
-    if not value in caps_list:
+    if value not in caps_list:
         caps_list.append(value)
+
 
 def append_under(value, under_list):
     if not camel_to_under(value) in under_list:
         under_list.append(camel_to_under(value))
 
+
 def idify(value):
     return value + '_id'
+
 
 def is_id_version_of(method_1, method_2):
     return method_1['name'] == idify(method_2['name'])
 
+
 def map_under_to_camel(camel_value, under_to_camel_map):
     under_to_camel_map[camel_to_under(camel_value)] = camel_value
+
 
 def update_admin_data_sessions_in_index(package, index):
     for interface in package['interfaces']:
         # Now, Look at data patterns that are indicated in AdminSessions
         if interface['shortname'].endswith('AdminSession'):
             map_admin_session_data_patterns(interface, package, index)
+
 
 def update_object_data_patterns_in_index(package, index):
     osid_objects = ['OsidObject', 'OsidRule', 'OsidRelationship',
@@ -43,6 +49,7 @@ def update_object_data_patterns_in_index(package, index):
         if any(oo in interface['inherit_shortnames'] for oo in osid_objects):
             map_object_data_patterns(interface, package, index)
 
+
 def update_object_form_patterns_in_index(package, index):
     object_forms = ['OsidObjectForm', 'OsidRuleForm', 'OsidRelationshipForm',
                     'OsidGovernatorForm', 'OsidEnablerForm']
@@ -52,6 +59,7 @@ def update_object_form_patterns_in_index(package, index):
         # NOTE THAT OsidRuleForm IS HERE AS WELL. MAY NEED TO BE SPLIT OUT
         if any(of in interface['inherit_shortnames'] for of in object_forms):
             map_object_form_data_patterns(interface, package, index)
+
 
 def update_relationships_detail(relationships, interface,
                                 source=None, dest=None,
@@ -154,7 +162,7 @@ def map_patterns(package, index, base_package=None):
                                                 interface,
                                                 source_unknown=True,
                                                 dest_unknown=True)
-                print 'found relationship: ', interface['fullname']
+                print('found relationship: {0}'.format(interface['fullname']))
                 if interface['shortname'] == 'Relationship':
                     update_relationships_detail(relationships_detail,
                                                 interface)
@@ -169,7 +177,8 @@ def map_patterns(package, index, base_package=None):
                                                     interface,
                                                     source=second_method,
                                                     dest=fourth_method)
-                        print '    2 args source =', second_method['name'][4:], 'dest =', fourth_method['name'][4:]
+                        print('    2 args source = {0}, dest = {1}'.format(second_method['name'][4:],
+                                                                           fourth_method['name'][4:]))
                     elif (is_id_version_of(first_method, second_method) and
                             third_method['name'].endswith('_id')):
                         update_relationships_detail(relationships_detail,
@@ -177,7 +186,8 @@ def map_patterns(package, index, base_package=None):
                                                     source=second_method,
                                                     dest=third_method,
                                                     dest_unknown=True)
-                        print '    1 arg source =', second_method['name'][4:], 'dest =', third_method['name'][4:-3]
+                        print('    1 arg source = {0}, dest = {1}'.format(second_method['name'][4:],
+                                                                          third_method['name'][4:-3]))
                     elif (first_method['name'].endswith('_id') and
                             is_id_version_of(second_method, third_method)):
                         update_relationships_detail(relationships_detail,
@@ -185,11 +195,12 @@ def map_patterns(package, index, base_package=None):
                                                     source=first_method,
                                                     dest=third_method,
                                                     source_unknown=True)
-                        print '    1 arg source =', first_method['name'][4:-3], 'dest =', third_method['name'][4:]
+                        print('    1 arg source = {0}, dest = {1}'.format(first_method['name'][4:-3],
+                                                                          third_method['name'][4:]))
                     else:
-                        print '    source and destination not found'
+                        print('    source and destination not found')
                 else:
-                    print '    source and destination not found. less than 4 methods'
+                    print('    source and destination not found. less than 4 methods')
             # Find OsidRule names in this package AND ADD THEM TO OBJECTS AS WELL, FOR NOW
             elif 'OsidRule' in interface['inherit_shortnames']:
                 append_caps(interface['shortname'], rule_names_caps)
@@ -274,7 +285,7 @@ def map_patterns(package, index, base_package=None):
             map_catalog_patterns(interface, package, index)
         elif 'OsidCatalogQuery' in interface['inherit_shortnames']:
             map_catalog_query_patterns(interface, package, index)
-        elif ('OsidNode' in interface['inherit_shortnames'] and 
+        elif ('OsidNode' in interface['inherit_shortnames'] and
                 interface['shortname'][:-4] == index['package_catalog_caps']):
             map_catalog_node_patterns(interface, package, index)
 

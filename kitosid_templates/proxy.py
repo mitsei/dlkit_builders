@@ -19,9 +19,10 @@ class ProxyManager:
                 get_session = getattr(self._provider_manager, 'get_' + session)
             except:
                 raise # Unimplemented???
-            else: 
+            else:
                 self._provider_sessions[session] = get_session()
             return self._provider_sessions[session]"""
+
 
 class ProxySession:
 
@@ -31,12 +32,12 @@ class ProxySession:
 
     get_proxy_condition = """
         \"\"\"Pass through to provider method\"\"\"
-        # Implemented from 
+        # Implemented from
         # osid.proxy.ProxySession.get_proxy_condition
         return self._get_provider_session('proxy_session').get_proxy_condition()"""
 
     get_proxy = """
         \"\"\"Pass through to provider method\"\"\"
-        # Implemented from 
+        # Implemented from
         # osid.proxy.ProxySession.get_proxy
         return self._get_provider_session('proxy_session').get_proxy(*args, **kwargs)"""

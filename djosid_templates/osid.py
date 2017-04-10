@@ -90,6 +90,7 @@ class OsidProfile:
         # NEED TO IMPLEMENT
         pass"""
 
+
 class Identifiable:
 
     init = """
@@ -130,7 +131,7 @@ class Operable:
         return self.is_operational() and (not self.is_disabled() or is_enabled())"""
 
     is_enabled = """
-        # Someday I'll have a real implementation, but for now I just: 
+        # Someday I'll have a real implementation, but for now I just:
         return False"""
 
     is_disabled = """
@@ -144,7 +145,7 @@ class Operable:
 
 class OsidSession:
 
-    # This initter is temporary. Only exists to get user ID information 
+    # This initter is temporary. Only exists to get user ID information
     # For testing AuthZ. Eventually this will be replaces with Django session
     # stuff
     init = """
@@ -187,7 +188,7 @@ class OsidSession:
         from .osid_errors import IllegalState
         if not self.is_authenticated:
             raise IllegalState()
-        return Agent(self._user).get_id()"""  
+        return Agent(self._user).get_id()"""
 
     get_authenticated_agent = """
         from ..authentication.objects import Agent
@@ -234,7 +235,7 @@ class OsidObject:
     format_type_identifier = profile.FORMATTYPE['identifier']
     options = OrderedDict()
     moptions = OrderedDict()
-    
+
     options['display_name'] = {
         'verbose_name': 'display name',
         'help_text': 'display name is required. enter no more than 128 characters',
@@ -243,7 +244,7 @@ class OsidObject:
         'editable': True,
         'max_length': 128,
         'choices': OrderedDict(),
-        }
+    }
     moptions['display_name'] = dict(options['display_name'])
     moptions['display_name'].update({
         'linked': False,
@@ -251,7 +252,7 @@ class OsidObject:
         'syntax': 'STRING',
         'min_length': 0,
         'match_types': []
-        })
+    })
 
     options['description'] = {
         'verbose_name': 'description',
@@ -261,7 +262,7 @@ class OsidObject:
         'editable': True,
         'max_length': 256,
         'choices': OrderedDict(),
-        }
+    }
     moptions['description'] = dict(options['description'])
     moptions['description'].update({
         'linked': False,
@@ -269,7 +270,7 @@ class OsidObject:
         'syntax': 'STRING',
         'min_length': 0,
         'match_types': []
-        })
+    })
     options['genus_type_authority'] = {
         'verbose_name': 'genus type authority',
         'help_text': '',
@@ -278,7 +279,7 @@ class OsidObject:
         'default': 'default',
         'max_length': 128,
         'choices': OrderedDict(),
-        }
+    }
     options['genus_type_namespace'] = {
         'verbose_name': 'genus type namespace',
         'help_text': '',
@@ -287,7 +288,7 @@ class OsidObject:
         'default': 'default',
         'max_length': 128,
         'choices': OrderedDict(),
-        }
+    }
     options['genus_type_identifier'] = {
         'verbose_name': 'genus type identifier',
         'help_text': '',
@@ -296,7 +297,7 @@ class OsidObject:
         'default': 'default',
         'max_length': 64,
         'choices': OrderedDict(),
-        }
+    }
     moptions['genus_type'] = {
         'verbose_name': 'genus type',
         'help_text': 'accepts an osid.type.Type object',
@@ -304,7 +305,7 @@ class OsidObject:
         'editable': True,
         'syntax': 'TYPE',
         'type_set': [],
-        }
+    }
     options['language_type_identifier'] = {
         'verbose_name': 'language type identifier',
         'help_text': '',
@@ -313,7 +314,7 @@ class OsidObject:
         'default': language_type_identifier,
         'max_length': 64,
         'choices': OrderedDict(),
-        }
+    }
     options['script_type_identifier'] = {
         'verbose_name': 'script type identifier',
         'help_text': '',
@@ -322,7 +323,7 @@ class OsidObject:
         'default': script_type_identifier,
         'max_length': 64,
         'choices': OrderedDict(),
-        }
+    }
     options['format_type_identifier'] = {
         'verbose_name': 'format type identifier',
         'help_text': '',
@@ -331,7 +332,7 @@ class OsidObject:
         'default': format_type_identifier,
         'max_length': 64,
         'choices': OrderedDict(),
-        }
+    }
 
     identifier = models.AutoField(primary_key=True)
     display_name = models.CharField(**options['display_name'])
@@ -342,10 +343,10 @@ class OsidObject:
     language_type_identifier = models.CharField(**options['language_type_identifier'])
     script_type_identifier = models.CharField(**options['script_type_identifier'])
     format_type_identifier = models.CharField(**options['format_type_identifier'])
-    
+
     class Meta:
         abstract = True
-    
+
     def __unicode__(self):
         return '' + str(self.display_name) + ' (identifier:' + str(self.identifier) + ')'
 """
@@ -401,11 +402,12 @@ class OsidRule:
         from .osid_errors import IllegalState
         # Someday I'll have a real implementation, but for now I just:
         raise IllegalState()"""
-    
-    get_rule= """
+
+    get_rule = """
         from .osid_errors import IllegalState
         # Someday I'll have a real implementation, but for now I just:
         raise IllegalState()"""
+
 
 class OsidForm:
 
@@ -418,7 +420,6 @@ class OsidForm:
         self._for_update = None
 
     def _init_metadata(self):
-#        from .markers import Identifiable
         try:
             from ..id.primitives import Id
         except:
@@ -440,15 +441,14 @@ class OsidForm:
              'linked': False,
              'syntax': 'STRING',
              'array': False,
-             'minimum_string_length': 0,   # Should these values come from 
+             'minimum_string_length': 0,   # Should these values come from
              'maximum_string_length': 256} # a settings file somewhere?
         self._validation_messages = {}
 
-    ##
-    # Override get_id as implemented in Identifiable for the purpose of 
-    # returning an Id unique to this form for submission purposed as 
+    # Override get_id as implemented in Identifiable for the purpose of
+    # returning an Id unique to this form for submission purposed as
     # recommended in the osid documentation. This implementation
-    # substitutes the intialized Python uuid4 identifier, and the 
+    # substitutes the intialized Python uuid4 identifier, and the
     # form namespace from the calling Osid Form thing.
     def get_id(self):
         try:
@@ -458,21 +458,19 @@ class OsidForm:
         return Id(identifier = self._identifier,
                    namespace = self._namespace,
                    authority = self._authority)
-                  
-    ##
-    # The _is_valid_input method takes two arguments, the user input to 
+
+    # The _is_valid_input method takes two arguments, the user input to
     # be checked and the associated _form metadata structure (not an osid.Metadata
     # object) that will store the  validation requirements.
     def _is_valid_input(self, input, metadata, array):
         syntax = metadata.get_syntax
 
-        ##
         # First check if this is a required data element
         if metadata.is_required == True and not input:
             return False
-            
-        valid = True # Innocent until proven guilty        
-        ##
+
+        valid = True  # Innocent until proven guilty
+
         # Recursively run through all the elements of an array
         if array == True:
             if len(input) < metadata['minimum_elements']:
@@ -481,9 +479,9 @@ class OsidForm:
                 valid = False
             else:
                 for element in array:
-                    validation['valid'] = (validation['valid'] and 
+                    validation['valid'] = (validation['valid'] and
                         self._is_valid_input(element, metadata, False, validation))
-        ##
+
         # Run through all the possible syntax types
         elif syntax == 'ID':
             valid = self._is_valid_id(input)
@@ -492,7 +490,7 @@ class OsidForm:
         else:
             raise OperationFailed('no validation function available for ' + syntax)
 
-        return valid 
+        return valid
 
     def _is_valid_id(self, input):
         from dlkit.abstract_osid.id.primitives import Id
@@ -526,7 +524,7 @@ class OsidForm:
 
     get_default_locale = """
         from ..locale.objects import Locale
-        # If no constructor arguments are given it is expected that the 
+        # If no constructor arguments are given it is expected that the
         # locale service will return the default Locale.
         return Locale()"""
 
@@ -551,7 +549,7 @@ class OsidForm:
             raise NullArgument()
         if self.get_comment_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_string(comment, 
+        if not self._is_valid_string(comment,
                                      self.get_comment_metadata()):
             raise InvalidArgument()
         self._comment = comment"""
@@ -566,7 +564,7 @@ class OsidForm:
             # change this to extract the error messages into DisplayTexts
             self._validation_messages = e.message_dict
             valid = False
-        if not self._is_valid_string(self._comment, 
+        if not self._is_valid_string(self._comment,
                                      self.get_comment_metadata()):
             self._validation_messages['comment'] = [u'Please enter a valid comment']
         return valid"""
@@ -581,6 +579,7 @@ class OsidForm:
         ## Probably in a dict.
         return 'not yet implemented'"""
 
+
 class OsidObjectForm:
 
     inheritance = ['OsidObject']
@@ -588,7 +587,7 @@ class OsidObjectForm:
     init = """
     _namespace = "dj_osid.OsidObjectForm"
 
-    ## In real world use this will never get called:
+    # In real world use this will never get called:
     def __init__(self, osid_object_model=False):
         OsidForm.__init__(self)
         if osid_object_model:
@@ -665,7 +664,7 @@ class OsidObjectForm:
             raise NullArgument()
         if self.get_display_name_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_string(display_name, 
+        if not self._is_valid_string(display_name,
                                      self.get_display_name_metadata()):
             raise InvalidArgument()
         self.my_model.display_name = display_name"""
@@ -687,7 +686,7 @@ class OsidObjectForm:
             raise NullArgument()
         if self.get_description_metadata().is_read_only():
             raise NoAccess()
-        if not self._is_valid_string(description, 
+        if not self._is_valid_string(description,
                                      self.get_description_metadata()):
             raise InvalidArgument()
         self.my_model.description = description"""
@@ -716,7 +715,7 @@ class OsidList:
     def next(self):
         try:
             next_object = self._iter_object.next()
-        except: 
+        except:
             raise
         if self._count != None:
             self._count -= 1
@@ -743,82 +742,83 @@ class OsidList:
             return 0  # Don't know what to do here"""
 
     skip = """
-        ### STILL NEED TO IMPLEMENT THIS ###
+        # STILL NEED TO IMPLEMENT THIS ###
         pass"""
+
 
 class Metadata:
 
     init = """
     def __init__(self, element_id,
                        element_label,
-                       instructions = '', 
-                       required = None, 
-                       value = None, # has_value boolean
-                       read_only = None, 
-                       linked = None, 
-                       syntax = None, 
-                       array = None,
-                       units = None, 
-                       minimum_elements = None, 
-                       maximum_elements = None, 
-                       minimum_cardinal = None, 
-                       maximum_cardinal = None, 
-                       cardinal_set = [], 
-                       coordinate_set = [], 
-                       coordinate_types = [], 
-                       axes_for_coordinate_type = None, 
-                       minimum_coordinate_values = [], 
-                       maximum_coordinate_values = [], 
-                       minimum_currency = None, 
-                       maximum_currency = None, 
-                       currency_set = [], 
-                       currency_types = [], 
-                       minimum_date_time = None, 
-                       maximum_date_time = None, 
-                       date_time_set = [], 
-                       date_time_resolution = None, 
-                       calendar_types = [], 
-                       time_types = [], 
-                       minimum_decimal = None, 
-                       maximum_decimal = None, 
-                       decimal_set = [], 
-                       decimal_scale = None, 
-                       minimum_duration = None, 
-                       maximum_duration = None, 
-                       duration_set = [], 
-                       duration_unit_types = [], 
-                       minimum_distance = None, 
-                       maximum_distance = None, 
-                       distance_set = [], 
-                       distance_resolution = None, 
-                       heading_set = [], 
-                       heading_types = [], 
-                       axes_for_heading_type = None, 
-                       minimum_heading_values = [], 
-                       maximum_heading_values = [], 
-                       minimum_integer = None, 
-                       maximum_integer = None, 
-                       integer_set = [], 
-                       spatial_unit_set = [], 
-                       patial_unit_record_types = [], 
-                       minimum_speed = None, 
-                       maximum_speed = None, 
-                       speed_set = [], 
-                       minimum_string_length = None, 
-                       maximum_string_length = None, 
-                       string_set = [], 
-                       string_match_types = [], 
-                       string_format = None, 
-                       minimum_time = None, 
-                       maximum_time = None, 
-                       time_set = [], 
-                       time_resolution = None, 
-                       id_set = [], 
-                       type_set = [], 
-                       maximum_version = None, 
-                       minimum_version = None, 
-                       version_set = [], 
-                       object_types = []):
+                       instructions='',
+                       required=None,
+                       value=None,  # has_value boolean
+                       read_only=None,
+                       linked=None,
+                       syntax=None,
+                       array=None,
+                       units=None,
+                       minimum_elements=None,
+                       maximum_elements=None,
+                       minimum_cardinal=None,
+                       maximum_cardinal=None,
+                       cardinal_set=[],
+                       coordinate_set=[],
+                       coordinate_types=[],
+                       axes_for_coordinate_type=None,
+                       minimum_coordinate_values=[],
+                       maximum_coordinate_values=[],
+                       minimum_currency=None,
+                       maximum_currency=None,
+                       currency_set=[],
+                       currency_types=[],
+                       minimum_date_time=None,
+                       maximum_date_time=None,
+                       date_time_set=[],
+                       date_time_resolution=None,
+                       calendar_types=[],
+                       time_types=[],
+                       minimum_decimal=None,
+                       maximum_decimal=None,
+                       decimal_set=[],
+                       decimal_scale=None,
+                       minimum_duration=None,
+                       maximum_duration=None,
+                       duration_set=[],
+                       duration_unit_types=[],
+                       minimum_distance=None,
+                       maximum_distance=None,
+                       distance_set=[],
+                       distance_resolution=None,
+                       heading_set=[],
+                       heading_types=[],
+                       axes_for_heading_type=None,
+                       minimum_heading_values=[],
+                       maximum_heading_values=[],
+                       minimum_integer=None,
+                       maximum_integer=None,
+                       integer_set=[],
+                       spatial_unit_set=[],
+                       patial_unit_record_types=[],
+                       minimum_speed=None,
+                       maximum_speed=None,
+                       speed_set=[],
+                       minimum_string_length=None,
+                       maximum_string_length=None,
+                       string_set=[],
+                       string_match_types=[],
+                       string_format=None,
+                       minimum_time=None,
+                       maximum_time=None,
+                       time_set=[],
+                       time_resolution=None,
+                       id_set=[],
+                       type_set=[],
+                       maximum_version=None,
+                       minimum_version=None,
+                       version_set=[],
+                       object_types=[]):
 
         self._element_id = element_id
         self._element_label = element_label
@@ -837,9 +837,9 @@ class Metadata:
         self._cardinal_set = cardinal_set
         self._coordinate_set = coordinate_set
         self._coordinate_types = coordinate_types
-        self._axes_for_coordinate_type = axes_for_coordinate_type # This may be algorithm
-        self._minimum_coordinate_values = minimum_coordinate_values 
-        self._maximum_coordinate_values = maximum_coordinate_values 
+        self._axes_for_coordinate_type = axes_for_coordinate_type  # This may be algorithm
+        self._minimum_coordinate_values = minimum_coordinate_values
+        self._maximum_coordinate_values = maximum_coordinate_values
         self._minimum_currency = minimum_currency
         self._maximum_currency = maximum_currency
         self._currency_set = currency_set
@@ -864,7 +864,7 @@ class Metadata:
         self._distance_resolution = distance_resolution
         self._heading_set = heading_set
         self._heading_types = heading_types
-        self._axes_for_heading_type = axes_for_heading_type # This may be an algorithm
+        self._axes_for_heading_type = axes_for_heading_type  # This may be an algorithm
         self._minimum_heading_values = minimum_heading_values
         self._maximum_heading_values = maximum_heading_values
         self._minimum_integer = minimum_integer

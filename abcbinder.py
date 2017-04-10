@@ -79,11 +79,11 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
         return '{0}\n{1}\n{2}__metaclass__ = abc.ABCMeta\n\n{3}\n{4}{5}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                                                   self.class_doc(interface),
-                                                                                   self._ind,
-                                                                                   self._additional_methods(interface),
-                                                                                   self.make_methods(interface),
-                                                                                   self.additional_classes(interface))
+                                                                                      self.class_doc(interface),
+                                                                                      self._ind,
+                                                                                      self._additional_methods(interface),
+                                                                                      self.make_methods(interface),
+                                                                                      self.additional_classes(interface))
 
     def module_header(self, module):
         return ('\"\"\"Implementations of ' + self.package['name'] +
@@ -116,8 +116,8 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
 
 def eq_methods(interface_name):
-    return (
-"""    def __hash__(self):
+    return ("""
+    def __hash__(self):
         return hash((self.get_authority(),
                      self.get_identifier_namespace(),
                      self.get_identifier()))
@@ -141,8 +141,8 @@ def eq_methods(interface_name):
 
 
 def str_methods():
-    return (
-"""    def __str__(self):
+    return ("""
+    def __str__(self):
         \"\"\"Provides serialized version of Id\"\"\"
         return self._escape(self._escape(self.get_identifier_namespace()) + ':' +
                             self._escape(self.get_identifier()) + '@' +
@@ -160,8 +160,7 @@ def str_methods():
 
 
 def asset_content_lookup_session():
-    return (
-"""
+    return ("""
 
 
 class AssetContentLookupSession:
@@ -434,7 +433,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList
+        return  # osid.repository.AssetContentList
 
     @abc.abstractmethod
     def get_asset_contents_by_genus_type_for_asset(self, asset_content_genus_type, asset_id):
@@ -457,5 +456,4 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList"""
-)
+        return  # osid.repository.AssetContentList""")

@@ -196,14 +196,14 @@ class AssessmentAuthoringProxyManager:
         # pylint: disable=no-member
         return sessions.AssessmentPartItemDesignSession(bank_id, proxy=proxy, runtime=self._runtime)"""
 
-# 
+#
 # class AssessmentPartLookupSession:
-#     
+#
 #     additional_methods = """
 #     @utilities.arguments_not_none
 #     def get_assessment_parts_for_assessment_part(self, assessment_part_id):
 #         \"\"\"Gets an ``AssessmentPart`` for the given assessment part.
-# 
+#
 #         arg:    assessment_part_id (osid.id.Id): an assessment part ``Id``
 #         return: (osid.assessment.authoring.AssessmentPartList) - the
 #                 returned ``AssessmentPart`` list
@@ -211,7 +211,7 @@ class AssessmentAuthoringProxyManager:
 #         raise:  OperationFailed - unable to complete request
 #         raise:  PermissionDenied - authorization failure
 #         *compliance: mandatory -- This method must be implemented.*
-# 
+#
 #         \"\"\"
 #         # NOT IN SPEC - Implemented from
 #         # osid.assessment_authoring.AssessmentPartLookupSession.additional_methods
@@ -223,7 +223,7 @@ class AssessmentAuthoringProxyManager:
 #             dict({'assessmentPartId': str(assessment_part_id)},
 #                  **self._view_filter()))
 #         return objects.AssessmentPartList(result, runtime=self._runtime)"""
-# 
+#
 # class AssessmentPartAdminSession:
 #     import_statements = [
 #         'from . import objects',
@@ -240,7 +240,7 @@ class AssessmentAuthoringProxyManager:
 #         'SEQUESTERED = 0',
 #         'UNSEQUESTERED = 1',
 #     ]
-# 
+#
 #     get_assessment_part_form_for_create_for_assessment_part = """
 #         if not isinstance(assessment_part_id, ABCId):
 #             raise errors.InvalidArgument('argument is not a valid OSID Id')
@@ -275,7 +275,7 @@ class AssessmentAuthoringProxyManager:
 #         obj_form._for_update = False
 #         self._forms[obj_form.get_id().get_identifier()] = not CREATED
 #         return obj_form"""
-# 
+#
 #     get_assessment_part_form_for_update = """
 #         collection = MongoClientValidated('assessment_authoring',
 #                                           collection='AssessmentPart',
@@ -288,7 +288,7 @@ class AssessmentAuthoringProxyManager:
 #             else:
 #                 assessment_part_id = self._get_assessment_part_id_with_enclosure(assessment_part_id)
 #         result = collection.find_one({'_id': ObjectId(assessment_part_id.get_identifier())})
-# 
+#
 #         mdata = {}
 #         if not result['assessmentPartId']:
 #             pass
@@ -304,14 +304,14 @@ class AssessmentAuthoringProxyManager:
 #                                               proxy=self._proxy,
 #                                               mdata=mdata)
 #         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-# 
+#
 #         return obj_form"""
-# 
+#
 #     delete_assessment_part = """
 #         # Should be implemented from template for
 #         # osid.learning.ObjectiveAdminSession.delete_objective_template
 #         # but need to handle magic part delete ...
-# 
+#
 #         if not isinstance(assessment_part_id, ABCId):
 #             raise errors.InvalidArgument('the argument is not a valid OSID Id')
 #         collection = MongoClientValidated('assessment_authoring',
@@ -319,7 +319,7 @@ class AssessmentAuthoringProxyManager:
 #                                           runtime=self._runtime)
 #         if collection.find({'assessmentPartId': str(assessment_part_id)}).count() != 0:
 #             raise errors.IllegalState('there are still AssessmentParts associated with this AssessmentPart')
-# 
+#
 #         collection = MongoClientValidated('assessment_authoring',
 #                                           collection='AssessmentPart',
 #                                           runtime=self._runtime)
@@ -332,13 +332,13 @@ class AssessmentAuthoringProxyManager:
 #             part.delete()
 #         except AttributeError:
 #             collection.delete_one({'_id': ObjectId(assessment_part_id.get_identifier())})"""
-# 
+#
 # class AssessmentPartItemSession:
-# 
+#
 #     import_statements = [
 #         'ISOLATED = 1',
 #     ]
-# 
+#
 #     get_assessment_part_items = """
 #         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
 #         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
@@ -351,7 +351,7 @@ class AssessmentAuthoringProxyManager:
 #         lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
 #         lookup_session.use_federated_bank_view()
 #         return lookup_session.get_items_by_ids(item_ids)"""
-# 
+#
 #     old_get_assessment_part_items = """
 #         collection = MongoClientValidated('assessment_authoring',
 #                                           collection='AssessmentPart',
@@ -368,10 +368,10 @@ class AssessmentAuthoringProxyManager:
 #         lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
 #         lookup_session.use_federated_bank_view()
 #         return lookup_session.get_items_by_ids(item_ids)"""
-# 
-# 
+#
+#
 # class AssessmentPart:
-#     
+#
 #     # Is there a way to template this so that all sub-package objects get a catalog import?
 #     import_statements = [
 #         'from ..assessment.objects import Bank, ItemList',
@@ -384,53 +384,53 @@ class AssessmentAuthoringProxyManager:
 #     'namespace': 'osid-object',
 #     'identifier': 'simple-child-sequencing'})""",
 #     ]
-# 
+#
 #     is_section = """
 #         return not self.is_sequestered()"""
-# 
+#
 #     has_parent_part = """
 #         return bool('assessmentPartId' in self._my_map and self._my_map['assessmentPartId'])"""
-#     
+#
 #     additional_methods = """
 #     def get_child_ids(self):
 #         \"\"\"Gets the child ``Ids`` of this assessment part.\"\"\"
 #         return IdList(self._my_map['childIds'])
-# 
+#
 #     def supports_item_ordering(self):
 #         \"\"\"This method can be overridden by a record extension. Must be immutable\"\"\"
 #         return False
-# 
+#
 #     def supports_simple_item_sequencing(self):
 #         \"\"\"This method can be overridden by a record extension. Must be immutable\"\"\"
 #         return False
-# 
+#
 #     def has_children(self):
 #         \"\"\"This method can be overwritten by a record extension.\"\"\"
 #         return bool(self._supports_simple_sequencing() and self._my_map['childIds'])
-# 
+#
 #     def are_items_sequential(self):
 #         \"\"\"This can be overridden by a record extension\"\"\"
 #         return False
-# 
+#
 #     def are_items_shuffled(self):
 #         \"\"\"This can be overridden by a record extension\"\"\"
 #         return False
-# 
+#
 #     def are_children_sequential(self):
 #         \"\"\"This can be overridden by a record extension\"\"\"
 #         return False
-# 
+#
 #     def are_children_shuffled(self):
 #         \"\"\"This can be overridden by a record extension\"\"\"
 #         return False
-# 
+#
 #     # This method is probably not required
 #     def has_items(self):
 #         \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
 #         if 'itemIds' in self._my_map and self._my_map['itemIds']:
 #             return True
 #         return False
-# 
+#
 #     def get_items(self):
 #         \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
 #         ils = get_item_lookup_session(runtime=self._runtime, proxy=self._proxy)
@@ -440,7 +440,7 @@ class AssessmentAuthoringProxyManager:
 #             for idstr in self._my_map['itemIds']:
 #                 items.append(ils.get_item(Id(idstr)))
 #         return ItemList(items, runtime=self._runtime, proxy=self._proxy)
-# 
+#
 #     def get_item_ids(self):
 #         \"\"\"This is out of spec, but required for adaptive assessment parts?\"\"\"
 #         item_ids = []
@@ -448,10 +448,10 @@ class AssessmentAuthoringProxyManager:
 #             for idstr in self._my_map['itemIds']:
 #                 item_ids.append(idstr)
 #         return IdList(item_ids)
-# 
+#
 #     def _supports_simple_sequencing(self):
 #         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])
-# 
+#
 #     def has_next_assessment_part(self, assessment_part_id):
 #         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
 #         if not self.supports_child_ordering or not self.supports_simple_child_sequencing:
@@ -462,17 +462,17 @@ class AssessmentAuthoringProxyManager:
 #             else:
 #                 return False
 #         raise errors.NotFound('the Part with Id ' + str(assessment_part_id) + ' is not a child of this Part')
-# 
+#
 #     def get_next_assessment_part_id(self, assessment_part_id):
 #         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
 #         if self.has_next_assessment_part(assessment_part_id):
 #             return Id(self._my_map['childIds'][self._my_map['childIds'].index(str(assessment_part_id)) + 1])
-# 
+#
 #     def get_next_assessment_part(self, assessment_part_id):
 #         next_part_id = self.get_next_assessment_part_id(assessment_part_id)
 #         lookup_session = self._get_assessment_part_lookup_session()
 #         return lookup_session.get_assessment_part(next_part_id)
-# 
+#
 #     def _get_assessment_part_lookup_session(self):
 #         \"\"\"need to account for magic parts\"\"\"
 #         section = getattr(self, '_assessment_section', None)
@@ -482,27 +482,27 @@ class AssessmentAuthoringProxyManager:
 #         session.use_unsequestered_assessment_part_view()
 #         session.use_federated_bank_view()
 #         return session"""
-# 
+#
 #     get_assessment_part = """
 #         lookup_session = self._get_assessment_part_lookup_session()
 #         return lookup_session.get_assessment_part(self.get_assessment_part_id())"""
-# 
+#
 #     get_child_assessment_part_ids = """
 #         return IdList(self._my_map['childIds'])"""
-# 
+#
 #     get_child_assessment_parts = """
 #         # only returned unsequestered children?
 #         lookup_session = self._get_assessment_part_lookup_session()
 #         lookup_session.use_sequestered_assessment_part_view()
 #         return lookup_session.get_assessment_parts_by_ids(self.get_child_ids())"""
-# 
-# 
+#
+#
 # class AssessmentPartForm:
-# 
+#
 #     # Why is this a special initter?
 #     init = """
 #     _namespace = 'assessment_authoring.AssessmentPart'
-# 
+#
 #     def __init__(self, **kwargs):
 #         osid_objects.OsidContainableForm.__init__(self)
 #         osid_objects.OsidOperableForm.__init__(self)
@@ -511,7 +511,7 @@ class AssessmentAuthoringProxyManager:
 #         self._init_metadata(**kwargs)
 #         if not self.is_for_update():
 #             self._init_form(**kwargs)
-# 
+#
 #     def _init_metadata(self, **kwargs):
 #         \"\"\"Initialize form metadata\"\"\"
 #         osid_objects.OsidContainableForm._init_metadata(self)
@@ -542,7 +542,7 @@ class AssessmentAuthoringProxyManager:
 #             'syntax': 'ID',
 #             'id_set': []
 #         }
-# 
+#
 #     def _init_form(self, record_types=None, **kwargs):
 #         \"\"\"Initialize form map\"\"\"
 #         osid_objects.OsidContainableForm._init_form(self)
@@ -565,53 +565,53 @@ class AssessmentAuthoringProxyManager:
 #         self._my_map['itemsShuffled'] = self._items_shuffled_default
 #         if self._supports_simple_sequencing():
 #             self._my_map['childIds'] = []"""
-# 
+#
 #     # Need to add metadata as well, but perhaps these should be in record extension
 #     additional_methods = """
 #     def set_items_sequential(self, sequential):
 #         if not self._supports_simple_sequencing:
 #             raise AttributeError('This Assessment Part does not support simple child sequencing')
 #         self._my_map['itemsSequential'] = sequential
-# 
+#
 #     def set_items_shuffled(self, shuffled):
 #         if not self._supports_simple_sequencing:
 #             raise AttributeError('This Assessment Part does not support simple child sequencing')
 #         self._my_map['itemsShuffled'] = shuffled
-# 
+#
 #     def set_children_sequential(self, sequential): # This should be set in a record
 #         if not self._supports_simple_sequencing:
 #             raise AttributeError('This Assessment Part does not support simple child sequencing')
 #         self._my_map['childrenSequential'] = sequential
-# 
+#
 #     def set_children_shuffled(self, shuffled):
 #         if not self._supports_simple_sequencing:
 #             raise AttributeError('This Assessment Part does not support simple child sequencing')
 #         self._my_map['childrenShuffled'] = shuffled
-# 
+#
 #     def get_children_metadata(self):
 #         \"\"\"Gets the metadata for children.
-# 
+#
 #         return: (osid.Metadata) - metadata for the children
 #         *compliance: mandatory -- This method must be implemented.*
-# 
+#
 #         \"\"\"
 #         if not self._supports_simple_sequencing:
 #             raise AttributeError('This Assessment Part does not support simple child sequencing')
 #         metadata = dict(self._mdata['children'])
 #         metadata.update({'existing_children_values': self._my_map['childIds']})
 #         return Metadata(**metadata)
-# 
+#
 #     children_metadata = property(fget=get_children_metadata)
-# 
+#
 #     @utilities.arguments_not_none
 #     def set_children(self, child_ids):
 #         \"\"\"Sets the children.
-# 
+#
 #         arg:    child_ids (osid.id.Id[]): the children``Ids``
 #         raise:  InvalidArgument - ``child_ids`` is invalid
 #         raise:  NoAccess - ``Metadata.isReadOnly()`` is ``true``
 #         *compliance: mandatory -- This method must be implemented.*
-# 
+#
 #         \"\"\"
 #         if not self._supports_simple_sequencing():
 #             raise AttributeError('This Assessment Part does not support simple child sequencing')
@@ -626,14 +626,14 @@ class AssessmentAuthoringProxyManager:
 #             if str(object_id) not in idstr_list:
 #                 idstr_list.append(str(object_id))
 #         self._my_map['childIds'] = idstr_list
-# 
+#
 #     def clear_children(self):
 #         \"\"\"Clears the children.
-# 
+#
 #         raise:  NoAccess - ``Metadata.isRequired()`` or
 #                 ``Metadata.isReadOnly()`` is ``true``
 #         *compliance: mandatory -- This method must be implemented.*
-# 
+#
 #         \"\"\"
 #         if not self._supports_simple_sequencing():
 #             raise AttributeError('This Assessment Part does not support simple child sequencing')
@@ -641,8 +641,8 @@ class AssessmentAuthoringProxyManager:
 #                 self.get_children_metadata().is_required()):
 #             raise errors.NoAccess()
 #         self._my_map['childIds'] = self._children_default
-# 
+#
 #     children = property(fset=set_children, fdel=clear_children)
-# 
+#
 #     def _supports_simple_sequencing(self):
 #         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])"""

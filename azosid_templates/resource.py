@@ -1,5 +1,6 @@
 # resource templates for az_osid
 
+
 class ResourceProfile:
     import_statements_pattern = [
         "from ..osid.osid_errors import Unimplemented"
@@ -31,6 +32,7 @@ class ResourceProfile:
         # osid.resource.ResourceProfile.get_resource_record_types
         return self._provider_manager.${method_name}()"""
 
+
 class ResourceManager:
     import_statements_pattern = [
         "from ..osid.osid_errors import Unimplemented"
@@ -47,7 +49,7 @@ class ResourceManager:
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         self._provider_manager = runtime.get_manager('${pkg_name_replaced_upper}', provider_impl)
         # need to add version argument
-"""    
+"""
 
     get_resource_lookup_session_template = """
         # Implemented from azosid template for -
@@ -260,7 +262,7 @@ class ResourceLookupSession:
     can_lookup_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceLookupSession.can_lookup_resources_template
-        return (self._can('${func_name}') or 
+        return (self._can('${func_name}') or
                 bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     use_comparative_resource_view_template = """
@@ -390,7 +392,7 @@ class ResourceQuerySession:
             for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
                 unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
         return unauth_list
-    
+
     def _try_harder(self, query):
         results, query = self._try_overriding_${cat_name_under_plural}(query)
         if self._is_isolated_catalog_view():
@@ -414,13 +416,13 @@ class ResourceQuerySession:
     can_search_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceQuerySession.can_search_resources_template
-        return (self._can('${func_name}') or 
+        return (self._can('${func_name}') or
                 bool(self._get_overriding_${cat_name_under}_ids()))"""
 
     get_resource_query_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceQuerySession.get_resource_query_template
-        if (not self._can('search') and 
+        if (not self._can('search') and
                 self._is_isolated_catalog_view()):
             raise PermissionDenied()
         else:
@@ -522,7 +524,7 @@ class ResourceAdminSession:
     can_update_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.can_update_resources
-        return (self._can('${func_name}') or 
+        return (self._can('${func_name}') or
                 bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     get_resource_form_for_update_template = """
@@ -547,7 +549,7 @@ class ResourceAdminSession:
     can_delete_resources_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.can_delete_resources
-        return (self._can('${func_name}') or 
+        return (self._can('${func_name}') or
                 bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     delete_resource_template = """
@@ -563,6 +565,7 @@ class ResourceAdminSession:
         if not self._can_for_${object_name_under}('alias', ${object_name_under}_id):
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
 
 class ResourceNotificationSession:
 
@@ -680,6 +683,7 @@ class ResourceBinSession:
             raise PermissionDenied()
         return self._provider_session.get_${cat_name_plural_under}_by_${object_name_under}(${object_name_under}_id)"""
 
+
 class ResourceBinAssignmentSession:
 
     init_template = """
@@ -788,7 +792,7 @@ class ResourceAgentAssignmentSession:
 
 
 class BinLookupSession:
-    
+
     init_template = """
     def __init__(self, *args, **kwargs):
         osid_sessions.OsidSession.__init__(self, *args, **kwargs)
@@ -917,6 +921,7 @@ class BinAdminSession:
         if not self._can('alias'):
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg_list})"""
+
 
 class BinHierarchySession:
 
@@ -1096,6 +1101,7 @@ class BinHierarchyDesignSession:
         if not self._can('modify'):
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name})"""
+
 
 class BinQuerySession:
 

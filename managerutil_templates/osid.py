@@ -10,21 +10,21 @@ class OsidManager:
 
     import_statements = [
         'from ..osid.osid_errors import Unimplemented',
-    ]  
+    ]
 
 
 class OsidProxyManager:
 
     import_statements = [
         'from .osid_errors import Unimplemented',
-    ]  
+    ]
 
 
 class Sourceable:
 
     import_statements = [
         'from .osid_errors import Unimplemented',
-    ]  
+    ]
 
 
 class OsidList:

@@ -1,0 +1,8 @@
+# Core project/common application testing requirements
+
+pytest
+pytest-pep8
+# pytest-pylint
+pytest-cov
+envoy==0.0.3
+

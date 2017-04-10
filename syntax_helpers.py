@@ -20,13 +20,15 @@ SYNTAX_MAP = {
     'osid.calendaring.Time': 'TIME',
     'osid.type.Type': 'TYPE',
     'osid.installation.Version': 'VERSION',
-    }
+}
+
 
 def get_syntax_for_arg_type(arg_type):
     """returns the osid sytax string for a given argument type."""
     if arg_type in SYNTAX_MAP:
         return SYNTAX_MAP[arg_type]
     return 'OBJECT'
+
 
 def syntax_to_under(syntax):
     """returns underscore string for given syntax string."""

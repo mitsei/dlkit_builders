@@ -10,7 +10,7 @@ class OsidProfile:
     ]
 
     init = """
-    
+
     def __init__(self):
         self._runtime = None
         self._configs = None
@@ -72,33 +72,35 @@ class OsidProfile:
     supports_proxy_record_type = """
         raise errors.Unimplemented()"""
 
+
 class OsidManager:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from dlkit.primordium.id.primitives import Id',
         'from dlkit.primordium.type.primitives import Type',
-    ]  
+    ]
 
     init = """
     def __init__(self):
         OsidProfile.__init__(self)"""
-    
+
     initialize = """
         OsidProfile._initialize_manager(self, runtime)"""
 
     additional_methods = """"""
 
+
 class OsidProxyManager:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-    ]  
+    ]
 
     init = """
     def __init__(self):
         OsidProfile.__init__(self)"""
-    
+
     initialize = """
         OsidProfile._initialize_manager(self, runtime)"""
 
@@ -107,7 +109,7 @@ class OsidRuntimeManager:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
-    ]  
+    ]
 
     init = """
     def __init__(self, configuration_key = None):
@@ -119,7 +121,7 @@ class Identifiable:
     import_statements = [
         'from dlkit.primordium.id.primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
-    ]  
+    ]
 
     init = """
     _namespace = 'osid.Identifiable'
@@ -151,7 +153,7 @@ class Identifiable:
 class Extensible:
 
     import_statements = [
-    ]  
+    ]
 
     init = """
     def __init__(self, runtime=None, proxy=None, **kwargs):
@@ -168,6 +170,7 @@ class Extensible:
     #         type_list.append(Type(**self._record_type_data_sets[Id(type_idstr).get_identifier()]))
     #     return TypeList(type_list)"""
 
+
 class Temporal:
 
     import_statements = [
@@ -182,7 +185,7 @@ class Temporal:
     # is_effective = """
     #     now = DateTime.utcnow()
     #     return self.get_start_date() <= now and self.get_end_date() >= now"""
-    # 
+    #
     # get_start_date = """
     #     sdate = self._my_map['startDate']
     #     return DateTime(
@@ -193,7 +196,7 @@ class Temporal:
     #         sdate.minute,
     #         sdate.second,
     #         sdate.microsecond)"""
-    # 
+    #
     # get_end_date = """
     #     edate = self._my_map['endDate']
     #     return DateTime(
@@ -206,13 +209,14 @@ class Temporal:
     #         edate.microsecond)"""
 
 # class Containable:
-# 
+#
     # init = """
     # def __init__(self):
     #     self._my_map = {}"""
-    # 
+    #
     # is_sequestered = """
     #     return self._my_map['sequestered']"""
+
 
 class Sourceable:
 
@@ -225,7 +229,7 @@ class Sourceable:
     #     if 'providerId' not in self._my_map or not self._my_map['providerId']:
     #         raise errors.IllegalState('this sourceable object has no provider set')
     #     return Id(self._my_map['providerId'])"""
-    # 
+    #
     # get_provider = """
     #     if 'providerId' not in self._my_map or not self._my_map['providerId']:
     #         raise errors.IllegalState('this sourceable object has no provider set')
@@ -233,7 +237,7 @@ class Sourceable:
     #     lookup_session = mgr.get_resource_lookup_session() # What about the Proxy?
     #     lookup_session.use_federated_bin_view()
     #     return lookup_session.get_resource(self.get_provider_id())"""
-    # 
+    #
     # get_branding_ids = """
     #     from ..id.objects import IdList
     #     if 'brandingIds' not in self._my_map:
@@ -242,13 +246,13 @@ class Sourceable:
     #     for idstr in self._my_map['brandingIds']:
     #         id_list.append(Id(idstr))
     #     return IdList(id_list)"""
-    # 
+    #
     # get_branding = """
     #     mgr = self._get_provider_session('REPOSITORY')
     #     lookup_session = mgr.get_asset_lookup_session()
     #     lookup_session.get_federated_repository_view()
     #     return lookup_session.get_assets_by_ids(self.get_branding_ids())"""
-    # 
+    #
     # get_license = """
     #     if 'license' in self._my_map:
     #         license_text = self._my_map['license']
@@ -270,6 +274,7 @@ class Operable:
 
     is_operational = """
         return True"""
+
 
 class OsidSession:
 
@@ -296,26 +301,26 @@ class OsidSession:
                 self._authority = 'STUB_IMPL.MIT.EDU'"""
 
     # get_locale = """
-    #     return get_locale_with_proxy(self._proxy)"""  
-    # 
+    #     return get_locale_with_proxy(self._proxy)"""
+    #
     # is_authenticated = """
     #     return is_authenticate_with_proxy(self._proxy)"""
-    # 
+    #
     # get_authenticated_agent_id = """
     #     return get_authenticated_agent_id_with_proxy(self._proxy)"""
-    # 
+    #
     # get_authenticated_agent = """
     #     return get_authenticated_agent_with_proxy(self._proxy)"""
-    # 
+    #
     # get_effective_agent_id = """
     #     return get_effective_agent_id_with_proxy(self._proxy)"""
-    # 
+    #
     # get_effective_agent = """
     #     return get_effective_agent_id_with_proxy(self._proxy) # Currently raises Unimplemented"""
-    # 
+    #
     # supports_transactions = """
     #     return False"""
-    # 
+    #
     # startTransaction = """
     #     if not supports_transactions:
     #         raise errors.Unsupported('transactions ore not supported for this session')"""
@@ -334,10 +339,10 @@ class OsidObject:
 
     # get_display_name = """
     #     return DisplayText(self._my_map['displayName'])"""
-    # 
+    #
     # get_description = """
     #     return DisplayText(self._my_map['description'])"""
-    # 
+    #
     # get_genus_type = """
     #     try:
     #         # Try to stand up full Type objects if they can be found
@@ -347,20 +352,22 @@ class OsidObject:
     #     except:
     #         # If that doesn't work, return the id only type, still useful for comparison.
     #         return Type(idstr=self._my_map['genusTypeId'])"""
-    # 
+    #
     # is_of_genus_type = """
     #     return genus_type == Type(idstr=self._my_map['genusTypeId'])"""
+
 
 class OsidCatalog:
 
     init = """
     _namespace = 'osid.OsidCatalog'
-    
+
     def __init__(self, **kwargs):
         OsidObject.__init__(self, **kwargs)
         # Should we initialize Sourceable?
         # Should we initialize Federatable?
     """
+
 
 class OsidRule:
 
@@ -370,10 +377,11 @@ class OsidRule:
     get_rule_id = """
         # Someday I'll have a real implementation, but for now I just:
         raise errors.IllegalState()"""
-    
-    get_rule= """
+
+    get_rule = """
         # Someday I'll have a real implementation, but for now I just:
         raise errors.IllegalState()"""
+
 
 class OsidForm:
 
@@ -670,6 +678,7 @@ class OsidForm:
         # See notes above
         return []"""
 
+
 class OsidExtensibleForm:
     import_statements = [
         'import importlib',
@@ -681,18 +690,18 @@ class OsidExtensibleForm:
     #     # self._supported_record_type_ids = [] # Moved to markers.Extensible
     #     osid_markers.Extensible.__init__(self, **kwargs)
     #     # self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime) # Now in Extensible
-    # 
+    #
     # def _init_form(self, record_types):
     #     self._my_map['recordTypeIds'] = []
     #     if record_types is not None:
     #         self._init_records(record_types)
     #     self._supported_record_type_ids = self._my_map['recordTypeIds']
-    # 
+    #
     # def _get_record(self, record_type):
     #     \"\"\"This overrides _get_record in osid.Extensible.
-    # 
+    #
     #     Perhaps we should leverage it somehow?
-    # 
+    #
     #     \"\"\"
     #     if (not self.has_record_type(record_type) and
     #             record_type.get_identifier() not in self._record_type_data_sets):
@@ -702,7 +711,7 @@ class OsidExtensibleForm:
     #         if record_initialized and str(record_type) not in self._my_map['recordTypeIds']:
     #             self._my_map['recordTypeIds'].append(str(record_type))
     #     return self._records[str(record_type)]
-    # 
+    #
     # def _init_record(self, record_type_idstr):
     #     \"\"\"Override this from osid.Extensible because Forms use a different
     #     attribute in record_type_data.\"\"\"
@@ -716,7 +725,7 @@ class OsidExtensibleForm:
     #         return False"""
 
 # class OsidTemporalForm:
-# 
+#
 #     import_statements = [
 #         'from ..primitives import Id',
 #         'from dlkit.abstract_osid.osid import errors',
@@ -724,13 +733,13 @@ class OsidExtensibleForm:
 #         'from . import default_mdata',
 #         'from .metadata import Metadata',
 #         ]
-# 
+#
 #     init = """
 #     _namespace = "osid.OsidTemporalForm"
-# 
+#
 #     def __init__(self):
 #         self._mdata = None
-# 
+#
 #     def _init_metadata(self, **kwargs):
 #         # pylint: disable=attribute-defined-outside-init
 #         # this method is called from descendent __init__
@@ -739,19 +748,19 @@ class OsidExtensibleForm:
 #         self._mdata['end_date'].update({
 #             'default_date_time_values': [datetime.datetime.utcnow() + datetime.timedelta(weeks=9999)]
 #         })
-# 
+#
 #     def _init_form(self):
 #         # pylint: disable=attribute-defined-outside-init
 #         # this method is called from descendent __init__
 #         self._my_map['startDate'] = self._mdata['start_date']['default_date_time_values'][0]
 #         self._my_map['endDate'] = self._mdata['end_date']['default_date_time_values'][0]
 # """
-# 
+#
 #     get_start_date_metadata = """
 #         metadata = dict(self._mdata['start_date'])
 #         metadata.update({'existing_date_time_values': self._my_map['startDate']})
 #         return Metadata(**metadata)"""
-# 
+#
 #     set_start_date = """
 #         if self.get_start_date_metadata().is_read_only():
 #             raise errors.NoAccess()
@@ -759,18 +768,18 @@ class OsidExtensibleForm:
 #             raise errors.InvalidArgument()
 #         #self._my_map['startDate'] = self._get_date_map(date)
 #         self._my_map['startDate'] = date"""
-# 
+#
 #     clear_start_date = """
 #         if (self.get_start_date_metadata().is_read_only() or
 #                 self.get_start_date_metadata().is_required()):
 #             raise errors.NoAccess()
 #         self._my_map['startDate'] = self._mdata['start_date']['default_date_time_values'][0]"""
-# 
+#
 #     get_end_date_metadata = """
 #         metadata = dict(self._mdata['end_date'])
 #         metadata.update({'existing_date_time_values': self._my_map['endDate']})
 #         return Metadata(**metadata)"""
-# 
+#
 #     set_end_date = """
 #         if self.get_end_date_metadata().is_read_only():
 #             raise errors.NoAccess()
@@ -778,13 +787,13 @@ class OsidExtensibleForm:
 #             raise errors.InvalidArgument()
 #         #self._my_map['endDate'] = self._get_date_map(date)
 #         self._my_map['endDate'] = date"""
-# 
+#
 #     clear_end_date = """
 #         if (self.get_end_date_metadata().is_read_only() or
 #                 self.get_end_date_metadata().is_required()):
 #             raise errors.NoAccess()
 #         self._my_map['endDate'] = self._mdata['end_date']['default_date_time_values'][0]"""
-# 
+#
 #     additional_methods = """
 #     # This should go in a utility module:
 #     def _get_date_map(self, date):
@@ -799,24 +808,24 @@ class OsidExtensibleForm:
 #         }"""
 
 # class OsidContainableForm:
-# 
+#
     # init = """
     # def __init__(self):
     #     self._mdata = None
     #     self._sequestered_default = None
     #     self._sequestered = None
-    # 
+    #
     # def _init_metadata(self):
     #     self._mdata.update(default_mdata.get_osid_containable_mdata())
     #     self._sequestered_default = self._mdata['sequestered']['default_boolean_values'][0]
     #     self._sequestered = self._sequestered_default
-    # 
+    #
     # def _init_form(self):
     #     self._my_map['sequestered'] = self._sequestered_default"""
-    # 
+    #
     # get_sequestered_metadata = """
     #     return Metadata(**self._mdata['sequestered'])"""
-    # 
+    #
     # set_sequestered = """
     #     if sequestered is None:
     #         raise errors.NullArgument()
@@ -825,7 +834,7 @@ class OsidExtensibleForm:
     #     if not isinstance(sequestered, bool):
     #         raise errors.InvalidArgument()
     #     self._my_map['sequestered'] = sequestered"""
-    # 
+    #
     # clear_sequestered = """
     #     if (self.get_sequestered_metadata().is_read_only() or
     #             self.get_sequestered_metadata().is_required()):
@@ -834,7 +843,7 @@ class OsidExtensibleForm:
 
 
 # class OsidSourceableForm:
-# 
+#
     # init = """
     # def __init__(self):
     #     self._mdata = None
@@ -842,7 +851,7 @@ class OsidExtensibleForm:
     #     self._branding_default = None
     #     self._license_default = None
     #     self._catalog_id = None  # Why is this here?
-    # 
+    #
     # def _init_metadata(self):
     #     # pylint: disable=attribute-defined-outside-init
     #     # this method is called from descendent __init__
@@ -851,7 +860,7 @@ class OsidExtensibleForm:
     #     self._provider_default = self._mdata['provider']['default_id_values'][0]
     #     self._branding_default = self._mdata['branding']['default_id_values']
     #     self._license_default = self._mdata['license']['default_string_values'][0]
-    # 
+    #
     # def _init_form(self, **kwargs):
     #     if 'effective_agent_id' in kwargs:
     #         try:
@@ -869,30 +878,30 @@ class OsidExtensibleForm:
     #         self._my_map['providerId'] = self._provider_default
     #     self._my_map['brandingIds'] = self._branding_default
     #     self._my_map['license'] = dict(self._license_default)"""
-    # 
+    #
     # get_provider_metadata = """
     #     metadata = dict(self._mdata['provider'])
     #     metadata.update({'existing_id_values': self._my_map['providerId']})
     #     return Metadata(**metadata)"""
-    # 
+    #
     # set_provider = """
     #     if self.get_provider_metadata().is_read_only():
     #         raise errors.NoAccess()
     #     if not self._is_valid_id(provider_id):
     #         raise errors.InvalidArgument()
     #     self._my_map['providerId'] = str(provider_id)"""
-    # 
+    #
     # clear_provider = """
     #     if (self.get_provider_metadata().is_read_only() or
     #             self.get_provider_metadata().is_required()):
     #         raise errors.NoAccess()
     #     self._my_map['providerId'] = self._provider_default"""
-    # 
+    #
     # get_branding_metadata = """
     #     metadata = dict(self._mdata['branding'])
     #     metadata.update({'existing_id_values': self._my_map['brandingIds']})
     #     return Metadata(**metadata)"""
-    # 
+    #
     # set_branding = """
     #     if self.get_branding_metadata().is_read_only():
     #         raise errors.NoAccess()
@@ -902,21 +911,21 @@ class OsidExtensibleForm:
     #     for asset_id in asset_ids:
     #         branding_ids.append(str(asset_id))
     #     self._my_map['brandingIds'] = branding_ids"""
-    # 
+    #
     # clear_branding = """
     #     if (self.get_branding_metadata().is_read_only() or
     #             self.get_branding_metadata().is_required()):
     #         raise errors.NoAccess()
     #     self._my_map['brandingIds'] = self._branding_default"""
-    # 
+    #
     # get_license_metadata = """
     #     metadata = dict(self._mdata['license'])
     #     metadata.update({'existing_string_values': self._my_map['license']})
     #     return Metadata(**metadata)"""
-    # 
+    #
     # set_license = """
     #     self._my_map['license'] = self._get_display_text(license, self.get_license_metadata())"""
-    # 
+    #
     # clear_license = """
     #     if (self.get_license_metadata().is_read_only() or
     #             self.get_license_metadata().is_required()):
@@ -930,6 +939,7 @@ class OsidFederateableForm:
     def __init__(self):
         pass"""
 
+
 class OsidOperableForm:
 
     init = """
@@ -939,7 +949,7 @@ class OsidOperableForm:
 
 class OsidObjectForm:
 
-    #inheritance = ['OsidObject']
+    # inheritance = ['OsidObject']
 
     # import_statements = [
     #     'from dlkit.abstract_osid.osid import errors',
@@ -951,53 +961,54 @@ class OsidObjectForm:
 
     init = """
     _namespace = '# osid.OsidObjectForm'"""
-    # 
+    #
     #     get_display_name_metadata = """
     #         metadata = dict(self._mdata['display_name'])
     #         metadata.update({'existing_string_values': self._my_map['displayName']['text']})
     #         return Metadata(**metadata)"""
-    # 
+    #
     #     set_display_name = """
     #         self._my_map['displayName'] = self._get_display_text(display_name, self.get_display_name_metadata())"""
-    # 
+    #
     #     clear_display_name = """
     #         if (self.get_display_name_metadata().is_read_only() or
     #                 self.get_display_name_metadata().is_required()):
     #             raise errors.NoAccess()
     #         self._my_map['displayName'] = dict(self._display_name_default)"""
-    # 
+    #
     #     get_description_metadata = """
     #         metadata = dict(self._mdata['description'])
     #         metadata.update({'existing_string_values': self._my_map['description']['text']})
     #         return Metadata(**metadata)"""
-    # 
+    #
     #     set_description = """
     #         self._my_map['description'] = self._get_display_text(description, self.get_description_metadata())"""
-    # 
+    #
     #     clear_description = """
     #         if (self.get_description_metadata().is_read_only() or
     #                 self.get_description_metadata().is_required()):
     #             raise errors.NoAccess()
     #         self._my_map['description'] = dict(self._description_default)"""
-    # 
+    #
     #     get_genus_type_metadata = """
     #         metadata = dict(self._mdata['genus_type'])
     #         metadata.update({'existing_string_values': self._my_map['genusTypeId']})
     #         return Metadata(**metadata)"""
-    # 
+    #
     #     set_genus_type = """
     #         if self.get_genus_type_metadata().is_read_only():
     #             raise errors.NoAccess()
     #         if not self._is_valid_type(genus_type):
     #             raise errors.InvalidArgument()
     #         self._my_map['genusTypeId'] = str(genus_type)"""
-    # 
+    #
     #     clear_genus_type = """
     #         if (self.get_genus_type_metadata().is_read_only() or
     #                 self.get_genus_type_metadata().is_required()):
     #             raise errors.NoAccess()
     #         self._my_map['genusTypeId'] = self._genus_type_default"""
-    
+
+
 class OsidRelationshipForm:
 
     init = """
@@ -1007,12 +1018,13 @@ class OsidRelationshipForm:
 
 
 class OsidCatalogForm:
-    
+
     init = """
     def __init__(self, **kwargs):
         OsidSourceableForm.__init__(self)
         OsidFederateableForm.__init__(self)
         OsidObjectForm.__init__(self, **kwargs)"""
+
 
 class OsidList:
     import_statements = [
@@ -1123,7 +1135,7 @@ class OsidList:
                 self.next()"""
 
 # class OsidQuery:
-# 
+#
     # import_statements = [
     #     'import re',
     #     'from ..primitives import Type',
@@ -1132,7 +1144,7 @@ class OsidList:
     #     'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))',
     #     'from .. import utilities',
     # ]
-    # 
+    #
     # init = """
     # def __init__(self, runtime):
     #     self._records = dict()
@@ -1152,7 +1164,7 @@ class OsidList:
     #         self._keyword_fields += additional_keyword_fields[self._namespace]
     #     except (AttributeError, KeyError, errors.NotFound):
     #         pass
-    # 
+    #
     # def _get_string_match_value(self, string, string_match_type):
     #     \"\"\"Gets the match value\"\"\"
     #     if string_match_type == Type(**get_string_type_data(\'EXACT\')):
@@ -1163,7 +1175,7 @@ class OsidList:
     #         return re.compile('.*' + string + '.*')
     #     elif string_match_type == Type(**get_string_type_data(\'WORDIGNORECASE\')):
     #         return re.compile('.*' + string + '.*', re.I)
-    # 
+    #
     # @utilities.arguments_not_none
     # def _add_match(self, match_key, match_value, match=True):
     #     \"\"\"Adds a match key/value\"\"\"
@@ -1178,13 +1190,13 @@ class OsidList:
     #             self._query_terms[match_key][inin] = [match_value]
     #     else:
     #         self._query_terms[match_key] = {inin: [match_value]}
-    # 
+    #
     # @utilities.arguments_not_none
     # def _match_display_text(self, element_key, string, string_match_type, match):
     #     \"\"\"Matches a display text value\"\"\"
     #     match_value = self._get_string_match_value(string, string_match_type)
     #     self._add_match(element_key + '.text', match_value, match)
-    # 
+    #
     # @utilities.arguments_not_none
     # def _match_minimum_decimal(self, match_key, decimal_value, match=True):
     #     \"\"\"Matches a minimum decimal value\"\"\"
@@ -1196,7 +1208,7 @@ class OsidList:
     #         self._query_terms[match_key][gtelt] = decimal_value
     #     else:
     #         self._query_terms[match_key] = {gtelt: decimal_value}
-    # 
+    #
     # @utilities.arguments_not_none
     # def _match_maximum_decimal(self, match_key, decimal_value, match=True):
     #     \"\"\"Matches a minimum decimal value\"\"\"
@@ -1208,7 +1220,7 @@ class OsidList:
     #         self._query_terms[match_key][ltegt] = decimal_value
     #     else:
     #         self._query_terms[match_key] = {ltegt: decimal_value}
-    # 
+    #
     # @utilities.arguments_not_none
     # def _match_minimum_date_time(self, match_key, date_time_value, match=True):
     #     \"\"\"Matches a minimum date time value\"\"\"
@@ -1220,7 +1232,7 @@ class OsidList:
     #         self._query_terms[match_key][gtelt] = date_time_value
     #     else:
     #         self._query_terms[match_key] = {gtelt: date_time_value}
-    # 
+    #
     # @utilities.arguments_not_none
     # def _match_maximum_date_time(self, match_key, date_time_value, match=True):
     #     \"\"\"Matches a maximum date time value\"\"\"
@@ -1232,14 +1244,14 @@ class OsidList:
     #         self._query_terms[match_key][gtelt] = date_time_value
     #     else:
     #         self._query_terms[match_key] = {gtelt: date_time_value}
-    # 
+    #
     # def _clear_terms(self, match_key):
     #     \"\"\"clears all match_key term values\"\"\"
     #     try:
     #         del self._query_terms[match_key]
     #     except KeyError:
     #         pass
-    # 
+    #
     # def _clear_minimum_terms(self, match_key):
     #     \"\"\"clears minimum match_key term values\"\"\"
     #     try: # clear match = True case
@@ -1255,7 +1267,7 @@ class OsidList:
     #             del self._query_terms[match_key]
     #     except KeyError:
     #         pass
-    # 
+    #
     # def _clear_maximum_terms(self, match_key):
     #     \"\"\"clears maximum match_key term values\"\"\"
     #     try: # clear match = True case
@@ -1271,12 +1283,12 @@ class OsidList:
     #             del self._query_terms[match_key]
     #     except KeyError:
     #         pass"""
-    # 
+    #
     # match_keyword_arg_template = {
     #     1: 'DEFAULT_STRING_MATCH_TYPE',
     #     2: True
     # }
-    # 
+    #
     # match_keyword = """
     #     # Note: this currently ignores match argument
     #     match_value = self._get_string_match_value(keyword, string_match_type)
@@ -1284,10 +1296,10 @@ class OsidList:
     #         if field_name not in self._keyword_terms:
     #             self._keyword_terms[field_name] = {'$in': list()}
     #         self._keyword_terms[field_name]['$in'].append(match_value)"""
-    # 
+    #
     # clear_keyword_terms = """
     #     self._keyword_terms = {}"""
-    # 
+    #
     # match_any = """
     #     match_key = '_id'
     #     param = '$exists'
@@ -1299,33 +1311,32 @@ class OsidList:
     #         self._query_terms[match_key][param] = flag
     #     else:
     #         self._query_terms[match_key] = {param: flag}"""
-    # 
+    #
     # clear_any_terms = """
     #     # How to implement this?"""
 
 
 # class OsidIdentifiableQuery:
-# 
+#
     # import_statements = [
     #     'from bson.objectid import ObjectId'
     # ]
-    # 
+    #
     # match_id = """
     #     self._add_match('_id', ObjectId(id_.get_identifier()))"""
-    # 
+    #
     # clear_id_terms = """
     #     self._clear_terms('_id')"""
 
 
-
 # class OsidExtensibleQuery:
-# 
+#
     # import_statements = [
     #     'from dlkit.abstract_osid.osid import errors',
     #     'import importlib',
     #     'from ..primitives import Id',
     # ]
-    # 
+    #
     # init = """
     # def _load_records(self, record_type_idstrs):
     #     \"\"\"Loads query records\"\"\"
@@ -1334,62 +1345,63 @@ class OsidList:
     #             self._init_record(record_type_idstr)
     #         except (ImportError, KeyError):
     #             pass
-    # 
+    #
     # def _init_record(self, record_type_idstr):
     #     \"\"\"Initializes a query record\"\"\"
     #     record_type_data = self._all_supported_record_type_data_sets[Id(record_type_idstr).get_identifier()]
     #     module = importlib.import_module(record_type_data['module_path'])
     #     record = getattr(module, record_type_data['query_record_class_name'])
     #     self._records[record_type_idstr] = record(self)"""
-    # 
+    #
     # match_record_type = """
     #     self._add_match('recordTypeIds', str(record_type), match)"""
 
 # class OsidObjectQuery:
-# 
+#
     # import_statements = [
     #     'from dlkit.abstract_osid.osid import errors',
     #     'from ..primitives import Type',
     #     'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
     #     'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))'
     # ]
-    # 
+    #
     # init = """
     # def __init__(self, runtime):
     #     OsidQuery.__init__(self, runtime)"""
-    # 
+    #
     # match_display_name_arg_template = {
     #     1: 'DEFAULT_STRING_MATCH_TYPE',
     #     2: True
     # }
-    # 
+    #
     # match_display_name = """
     #     self._match_display_text('displayName', display_name, string_match_type, match)"""
-    # 
+    #
     # match_any_display_name = """
     #     raise errors.Unimplemented()"""
-    # 
+    #
     # clear_display_name_terms = """
     #     self._clear_terms('displayName.text')"""
-    # 
+    #
     # match_description_arg_template = {
     #     1: 'DEFAULT_STRING_MATCH_TYPE',
     #     2: True
     # }
     # match_description = """
     #     self._match_display_text('description', description, string_match_type, match)"""
-    # 
+    #
     # match_genus_type = """
     #     self._add_match('genusTypeId', str(genus_type), match)"""
-    # 
+    #
     # match_any_description = """
     #     raise errors.Unimplemented()"""
-    # 
+    #
     # clear_description_terms = """
     #     self._clear_terms('description.text')"""
-    # 
+    #
     # clear_genus_type_terms = """
     #     self._clear_terms('genusTypeId')"""
+
 
 class OsidQueryInspector:
 
@@ -1398,23 +1410,24 @@ class OsidQueryInspector:
     ]
 
 # class OsidRecord:
-# 
+#
     # consider_init = """
     # def __init__(self):
     #     # This is set in implemented Records.  Should super __init__
     #     self._implemented_record_type_identifiers = None
-    # 
+    #
     # def __iter__(self):
     #     for attr in dir(self):
     #         if not attr.startswith('__'):
     #             yield attr
-    # 
+    #
     # def __getitem__(self, item):
     #     return getattr(self, item)"""
-    # 
+    #
     # implements_record_type = """
     #     return record_type.get_identifier() in self._implemented_record_type_identifiers"""
-    # 
+    #
+
 
 class Metadata:
 
@@ -1452,49 +1465,49 @@ class Metadata:
 
 
 # class OsidNode:
-# 
+#
     # import_statements = [
     #     'from dlkit.primordium.id.primitives import Id',
     # ]
-    # 
+    #
     # init = """
     # def __init__(self, node_map):
     #     self._my_map = node_map
-    # 
+    #
     # def get_id(self):
     #     \"\"\"Override markers.identifiable.get_id\"\"\"
     #     return Id(self._my_map['id'])
-    # 
+    #
     # id_ = property(fget=get_id)
-    # 
+    #
     # ident = property(fget=get_id)"""
-    # 
+    #
     # is_root = """
     #     return self._my_map['root']"""
-    # 
+    #
     # has_parents = """
     #     return bool(self._my_map['parentNodes'])"""
-    # 
+    #
     # get_parent_ids = """
     #     id_list = []
     #     from ..id.objects import IdList
     #     for parent_node in self._my_map['parentNodes']:
     #         id_list.append(parent_node['id'])
     #     return IdList(id_list)"""
-    # 
+    #
     # is_leaf = """
     #     return self._my_map['leaf']"""
-    # 
+    #
     # has_children = """
     #     return bool(self._my_map['childNodes'])"""
-    # 
+    #
     # get_child_ids = """
     #     id_list = []
     #     from ..id.objects import IdList
     #     for child_node in self._my_map['childNodes']:
     #         id_list.append(child_node['id'])
     #     return IdList(id_list)"""
-    # 
+    #
     # additional_methods = """
     # def get_node_map(self):
     #     node_map = dict(self._my_map)
@@ -1505,6 +1518,7 @@ class Metadata:
     #     for node in self._my_map['childNodes']:
     #         node_map['childNodes'].append(node.get_node_map())
     #     return node_map"""
+
 
 class Property:
 
@@ -1527,12 +1541,12 @@ class OsidSearchOrder:
     ]
 
 # class OsidSearch:
-# 
+#
 #     import_statements = [
 #         'from dlkit.abstract_osid.osid import errors',
 #         'from dlkit.primordium.id.primitives import Id',
 #     ]
-# 
+#
 #     init = """
 #     def __init__(self, runtime):
 #         self._records = dict()
@@ -1554,43 +1568,43 @@ class OsidSearchOrder:
 #             pass
 #         self._limit_result_set_start = None
 #         self._limit_result_set_end = None"""
-# 
+#
 #     limit_result_set = """
 #         if not isinstance(start, int) or not isinstance(end, int):
 #             raise errors.InvalidArgument('start and end arguments must be integers.')
 #         if end <= start:
 #             raise errors.InvalidArgument('End must be greater than start.')
-# 
+#
 #         # because Python is 0 indexed
 #         # Spec says that passing in (1, 25) should include 25 entries (1 - 25)
 #         # Python indices 0 - 24
 #         # Python [#:##] stops before the last index, but does not include it
 #         self._limit_result_set_start = start - 1
 #         self._limit_result_set_end = end
-# 
+#
 #     @property
 #     def start(self):
 #         return self._limit_result_set_start
-# 
+#
 #     @property
 #     def end(self):
 #         return self._limit_result_set_end"""
-# 
-# 
+#
+#
 # class OsidSearchResults:
-# 
+#
 #     import_statements = [
 #     ]
-# 
+#
 #     get_result_size = """
 #         return self._results.count(True)"""
 
 
 # class OsidTemporalQuery:
     # import_statements = [
-    # 
+    #
     # ]
-    # 
+    #
     # match_date = """
     #     if match:
     #         if to < from_:
@@ -1603,7 +1617,7 @@ class OsidSearchOrder:
     #         }
     #     else:
     #         raise errors.InvalidArgument('match = False not currently supported')"""
-    # 
+    #
     # match_start_date = """
     #     if match:
     #         if end < start:
@@ -1614,7 +1628,7 @@ class OsidSearchOrder:
     #         }
     #     else:
     #         raise errors.InvalidArgument('match = False not currently supported')"""
-    # 
+    #
     # match_end_date = """
     #     if match:
     #         if end < start:
@@ -1625,4 +1639,4 @@ class OsidSearchOrder:
     #         }
     #     else:
     #         raise errors.InvalidArgument('match = False not currently supported')"""
-    # 
+    #

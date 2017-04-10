@@ -2,6 +2,7 @@
 
 from .primitives import Type
 
+
 class QueryWrapper(object):
     """Wrapper class to aid in QuerySessions"""
     def __init__(self, provider_query):
@@ -17,5 +18,5 @@ BOOTSTRAP_VAULT_TYPE = Type(authority='ODL.MIT.EDU',
                             identifier='bootstrap_vault')
 
 OVERRIDE_VAULT_TYPE = Type(authority='ODL.MIT.EDU',
-                            namespace='authorization.Vault',
-                            identifier='override_vault')
+                           namespace='authorization.Vault',
+                           identifier='override_vault')
