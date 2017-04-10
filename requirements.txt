@@ -4,5 +4,5 @@ inflection==0.3.1
 logilab-common==0.63.2
 pylint==1.4.3
 pymongo==3.0.2
-six==1.9.0
+six>=1.9.0
 wsgiref==0.1.2
