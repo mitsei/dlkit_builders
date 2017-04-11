@@ -280,6 +280,8 @@ def fix_bad_name(name, optional_match_term=None):
         'clear_input_start_score_range': 'clear_input_score_start_range',
         'osid.repository.CompositionSearchSession': 'osid.repository.CompositionQuerySession',
         'osid.repository.CompositionQuerySession': 'osid.repository.CompositionQuerySession',
+        'supports_authorizatin_batch': 'supports_authorization_batch',
+        'supports_authorizatin_rules': 'supports_authorization_rules',
     }
 
     if optional_match_term == 'get_composition_query_session':

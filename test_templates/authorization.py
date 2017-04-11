@@ -320,3 +320,40 @@ class AuthorizationLookupSession:
 
 class Authorization:
     pass
+
+class AuthorizationQuerySession:
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.authorization_list = list()
+        cls.authorization_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('AUTHORIZATION', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_vault_form_for_create([])
+        create_form.display_name = 'Test Vault'
+        create_form.description = 'Test Vault for AuthorizationQuerySession tests'
+        cls.catalog = cls.svc_mgr.create_vault(create_form)
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
+            create_form = cls.catalog.get_authorization_form_for_create_for_agent(
+                AGENT_ID,
+                LOOKUP_RESOURCE_FUNCTION_ID,
+                Id(**{\'identifier\': str(color), \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',}),
+                [])
+            create_form.display_name = 'Test Authorization ' + color
+            create_form.description = (
+                'Test Authorization for AuthorizationQuerySession tests, did I mention green')
+            obj = cls.catalog.create_authorization(create_form)
+            cls.authorization_list.append(obj)
+            cls.authorization_ids.append(obj.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        #for obj in cls.catalog.get_authorizations():
+        #    cls.catalog.delete_authorization(obj.ident)
+        #for catalog in cls.catalogs:
+        #    cls.svc_mgr.delete_vault(catalog.ident)
+        for catalog in cls.svc_mgr.get_vaults():
+            for obj in catalog.get_authorizations():
+                catalog.delete_authorization(obj.ident)
+            cls.svc_mgr.delete_vault(catalog.ident)
+"""
