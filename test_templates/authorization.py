@@ -321,6 +321,7 @@ class AuthorizationLookupSession:
 class Authorization:
     pass
 
+
 class AuthorizationQuerySession:
 
     init = """
