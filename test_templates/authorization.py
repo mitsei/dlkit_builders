@@ -28,7 +28,7 @@ class AuthorizationSession:
     init = """
     @classmethod
     def setUpClass(cls):
-        cls.authz_mgr = Runtime().get_manager('AUTHORIZATION', implementation='MONGO_1')
+        cls.authz_mgr = Runtime().get_manager('AUTHORIZATION', implementation='JSON_1')
         cls.vault_admin_session = cls.authz_mgr.get_vault_admin_session()
         cls.vault_lookup_session = cls.authz_mgr.get_vault_lookup_session()
 
