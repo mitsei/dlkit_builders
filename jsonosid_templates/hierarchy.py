@@ -10,11 +10,13 @@ class HierarchyTraversalSession:
     ]
 
     init = """
+    _session_namespace = 'hierarchy.HierarchyTraversalSession'
+
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession._init_catalog(self, proxy, runtime)  # to get the configured authority
+        OsidSession.__init__(self)
+        OsidSession._init_catalog(self, proxy, runtime)
         from .objects import Hierarchy
         self._catalog_class = Hierarchy
-        self._session_name = 'HierarchyTraversalSession'
         self._catalog_name = 'Hierarchy'
         if 'relationship_type' in kwargs:
             self._relationship_type = kwargs['relationship_type']
@@ -165,11 +167,12 @@ class HierarchyDesignSession:
     ]
 
     init = """
+    _session_namespace = 'hierarchy.HierarchyDesignSession'
+
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)  # to get the configured authority
         from .objects import Hierarchy
         self._catalog_class = Hierarchy
-        self._session_name = 'HierarchyTraversalSession'
         self._catalog_name = 'Hierarchy'
         if catalog_id.get_identifier_namespace() == 'CATALOG':
             self._set_relationship_type(type_identifier=catalog_id.get_identifier().lower() + '.parent.child',

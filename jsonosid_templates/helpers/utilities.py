@@ -17,9 +17,13 @@ from .osid.osid_errors import NullArgument, NotFound,\
     OperationFailed, Unimplemented, IllegalState, InvalidArgument
 from dlkit.primordium.calendaring.primitives import DateTime
 from dlkit.primordium.id.primitives import Id
+from dlkit.primordium.type.primitives import Type
 from importlib import import_module
 
 from . import JSON_CLIENT
+
+from . import types
+PHANTOM_ROOT_IDENTIFIER = '000000000000000000000000'
 
 # VMAP = {
 #     'i': 'new',
@@ -834,13 +838,22 @@ def update_display_text_defaults(mdata, locale_map):
         default_display_text.update(locale_map)
 
 
-# This may not be needed anymore, Time will tell
-def simple_sequencing_error_check(assessment_part_id, next_assessment_part_id, *args, **kwargs):
-    """This may not be needed anymore. Time will tell"""
-    mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=None, proxy=None, local=True)
-    for child_part_id in [assessment_part_id, next_assessment_part_id]:
-        child_part = mgr.get_assessment_part_lookup_session().get_assessment_part(child_part_id)
-        if child_part.has_parent_part() and child_part.get_assessment_part().supports_simple_child_sequencing():
-            raise IllegalState('AssessmentPart only supports simple sequencing')
-        elif child_part.get_assessment().supports_simple_child_sequencing():
-            raise IllegalState('Assessment only supports simple sequencing')
+def make_catalog_map(cat_name, identifier=PHANTOM_ROOT_IDENTIFIER, default_text='Default'):
+    return ({
+        '_id': ObjectId(identifier),
+        'displayName': {'text': default_text + ' ' + cat_name,
+                        'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                        'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                        'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))), },
+        'description': {'text': default_text + ' ' + cat_name,
+                        'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
+                        'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
+                        'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))), },
+        'genusTypeId': str(Type(**types.Genus().get_type_data('DEFAULT'))),
+        'recordTypeIds': []
+    })
+
+
+def camel_to_under(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()

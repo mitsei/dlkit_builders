@@ -64,7 +64,6 @@ class AssessmentSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Bank
-        self._session_name = 'AssessmentSession'
         self._catalog_name = 'Bank'
         OsidSession._init_object(
             self, catalog_id,
@@ -419,7 +418,6 @@ class AssessmentResultsSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Bank
-        self._session_name = 'AssessmentResultsSession'
         self._catalog_name = 'Bank'
         OsidSession._init_object(
             self, catalog_id,
@@ -884,7 +882,6 @@ class AssessmentBasicAuthoringSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Bank
-        self._session_name = 'AssessmentSession'
         self._catalog_name = 'Bank'
         OsidSession._init_object(
             self,

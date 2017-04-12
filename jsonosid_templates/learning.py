@@ -14,7 +14,6 @@ class ObjectiveRequisiteSession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         self._catalog_class = objects.Objective
-        self._session_name = 'ObjectiveRequisiteSession'
         self._catalog_name = 'ObjectiveBank'
         OsidSession._init_object(
             self,
@@ -77,7 +76,6 @@ class ObjectiveRequisiteAssignmentSession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         self._catalog_class = objects.Objective
-        self._session_name = 'ObjectiveRequisiteAssignmentSession'
         self._catalog_name = 'ObjectiveBank'
         OsidSession._init_object(
             self,
@@ -295,7 +293,6 @@ class ObjectiveHierarchySession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
         self._catalog_class = objects.Objective
-        self._session_name = 'ObjectiveHierarchySession'
         self._catalog_name = 'ObjectiveBank'
         OsidSession._init_object(
             self,
@@ -320,7 +317,6 @@ class ObjectiveHierarchyDesignSession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
         self._catalog_class = objects.Objective
-        self._session_name = 'ObjectiveHierarchyDesignSession'
         self._catalog_name = 'ObjectiveBank'
         OsidSession._init_object(
             self,
@@ -351,7 +347,6 @@ class ObjectiveSequencingSession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         self._catalog_class = objects.Objective
-        self._session_name = 'ObjectiveSequencingSession'
         self._catalog_name = 'ObjectiveBank'
         OsidSession._init_object(
             self,

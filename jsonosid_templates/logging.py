@@ -15,7 +15,6 @@ class LoggingSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Log
-        self._session_name = 'LoggingSession'
         self._catalog_name = 'Log'
         OsidSession._init_object(self, catalog_id, proxy, runtime, db_name='logging', cat_name='Log', cat_class=objects.Log)
         self._forms = dict()

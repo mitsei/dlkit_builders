@@ -368,15 +368,3 @@ def remove_from_parent_sequence_map(assessment_part_admin_session, assessment_pa
     apls.use_unsequestered_assessment_part_view()
     child_part = apls.get_assessment_part(assessment_part_id)
     update_parent_sequence_map(child_part, delete=True)
-
-
-# This may not be needed anymore, Time will tell
-def simple_sequencing_error_check(assessment_part_id, next_assessment_part_id, *args, **kwargs):
-    """This may not be needed anymore. Time will tell"""
-    mgr = get_provider_manager('ASSESSMENT_AUTHORING', runtime=None, proxy=None, local=True)
-    for child_part_id in [assessment_part_id, next_assessment_part_id]:
-        child_part = mgr.get_assessment_part_lookup_session().get_assessment_part(child_part_id)
-        if child_part.has_parent_part() and child_part.get_assessment_part().supports_simple_child_sequencing():
-            raise IllegalState('AssessmentPart only supports simple sequencing')
-        elif child_part.get_assessment().supports_simple_child_sequencing():
-            raise IllegalState('Assessment only supports simple sequencing')

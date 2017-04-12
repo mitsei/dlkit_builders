@@ -12,7 +12,6 @@ class AuthorizationSession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         self._catalog_class = objects.Vault
-        self._session_name = 'AuthorizationSession'
         self._catalog_name = 'Vault'
         OsidSession._init_object(
             self,

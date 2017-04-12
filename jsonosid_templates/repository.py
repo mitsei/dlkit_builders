@@ -144,7 +144,6 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.Repository
-        self._session_name = 'AssetContentLookupSession'
         self._catalog_name = 'Repository'
         OsidSession._init_object(
             self,
@@ -614,7 +613,6 @@ class CompositionLookupSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
-        self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
@@ -675,7 +673,6 @@ class CompositionQuerySession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.Repository
-        self._session_name = 'CompositionQuerySession'
         self._catalog_name = 'Repository'
         OsidSession._init_object(
             self,
@@ -727,7 +724,6 @@ class AssetCompositionSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.Repository
-        self._session_name = 'AssetCompositionSession'
         self._catalog_name = 'Repository'
         OsidSession._init_object(
             self,
@@ -743,7 +739,6 @@ class AssetCompositionSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
-        self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
@@ -829,7 +824,6 @@ class AssetCompositionDesignSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.Repository
-        self._session_name = 'AssetCompositionDesignSession'
         self._catalog_name = 'Repository'
         OsidSession._init_object(
             self,
@@ -845,7 +839,6 @@ class AssetCompositionDesignSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
-        self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
