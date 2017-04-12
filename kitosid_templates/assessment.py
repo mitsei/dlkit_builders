@@ -54,6 +54,14 @@ class AssessmentAuthoringProfile:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_lookup()"""
 
+    supports_assessment_part_item = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_item()"""
+
+    supports_assessment_part_item_design = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_item_design()"""
+
     supports_sequence_rule_admin = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').supports_sequence_rule_admin()"""

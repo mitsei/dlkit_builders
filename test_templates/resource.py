@@ -41,9 +41,10 @@ class ResourceManager:
     ]
 
     init_template = """
+    # Implemented from resource.ResourceManager
     @classmethod
     def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${pkg_name} manager tests'
@@ -57,18 +58,26 @@ class ResourceManager:
 """
 
     get_resource_lookup_session_template = """
-        if self.mgr.supports_${support_check}():
-            self.mgr.${method_name}()"""
+        # if self.mgr.supports_${support_check}():
+        #     self.mgr.${method_name}()
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}()"""
 
     get_resource_lookup_session_for_bin_template = """
-        if self.mgr.supports_${support_check}():
-            self.mgr.${method_name}(self.catalog_id)
+        # if self.mgr.supports_${support_check}():
+        #     self.mgr.${method_name}(self.catalog_id)
+        # with self.assertRaises(errors.NullArgument):
+        #     self.mgr.${method_name}()
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.catalog_id)
         with self.assertRaises(errors.NullArgument):
-            self.mgr.${method_name}()"""
+            self.svc_mgr.${method_name}()"""
 
     get_resource_batch_manager_template = """
-        if self.mgr.supports_${support_check}():
-            self.mgr.${method_name}()"""
+        # if self.mgr.supports_${support_check}():
+        #     self.mgr.${method_name}()
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}()"""
 
 
 class ResourceProxyManager:
@@ -86,7 +95,7 @@ class ResourceProxyManager:
         create_form.description = 'Test ${cat_name} for ${pkg_name} proxy manager tests'
         catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.catalog_id = catalog.get_id()
-        cls.mgr = Runtime().get_proxy_manager('${pkg_name_upper}', 'TEST_MONGO_1', (3, 0, 0))
+        # cls.mgr = Runtime().get_proxy_manager('${pkg_name_upper}', 'TEST_MONGO_1', (3, 0, 0))
 
     @classmethod
     def tearDownClass(cls):
@@ -94,20 +103,30 @@ class ResourceProxyManager:
 """
 
     get_resource_lookup_session_template = """
-        if self.mgr.supports_${support_check}():
-            self.mgr.${method_name}(PROXY)
+        # if self.mgr.supports_${support_check}():
+        #     self.mgr.${method_name}(PROXY)
+        # with self.assertRaises(errors.NullArgument):
+        #     self.mgr.${method_name}()
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(PROXY)
         with self.assertRaises(errors.NullArgument):
-            self.mgr.${method_name}()"""
+            self.svc_mgr.${method_name}()"""
 
     get_resource_lookup_session_for_bin_template = """
-        if self.mgr.supports_${support_check}():
-            self.mgr.${method_name}(self.catalog_id, PROXY)
+        # if self.mgr.supports_${support_check}():
+        #     self.mgr.${method_name}(self.catalog_id, PROXY)
+        # with self.assertRaises(errors.NullArgument):
+        #     self.mgr.${method_name}()
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.catalog_id, PROXY)
         with self.assertRaises(errors.NullArgument):
-            self.mgr.${method_name}()"""
+            self.svc_mgr.${method_name}()"""
 
     get_resource_batch_proxy_manager_template = """
-        if self.mgr.supports_${support_check}():
-            self.mgr.${method_name}()"""
+        # if self.mgr.supports_${support_check}():
+        #     self.mgr.${method_name}()
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}()"""
 
 
 class ResourceLookupSession:
