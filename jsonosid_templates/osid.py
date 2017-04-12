@@ -415,7 +415,7 @@ class OsidSession:
 
     import_statements = [
         'import socket',
-        'import inflection',
+        '# import inflection',
         'import datetime',
         'from ..primitives import Id',
         'from ..primitives import Type',
@@ -423,6 +423,7 @@ class OsidSession:
         'from bson.objectid import ObjectId',
         'from importlib import import_module',
         'from ..locale.objects import Locale',
+        'from ..utilities import PHANTOM_ROOT_IDENTIFIER',
         'from ..utilities import JSONClientValidated',
         'from ..utilities import get_provider_manager',
         'from ..utilities import is_authenticated_with_proxy',
@@ -431,6 +432,8 @@ class OsidSession:
         'from ..utilities import get_effective_agent_id_with_proxy',
         'from ..utilities import get_effective_agent_with_proxy',
         'from ..utilities import get_locale_with_proxy',
+        'from ..utilities import make_catalog_map',
+        'from ..utilities import camel_to_under',
         'from .. import types',
         'COMPARATIVE = 0',
         'PLENARY = 1',
@@ -455,6 +458,8 @@ class OsidSession:
         self._catalog_view = ISOLATED
         self._effective_view = ANY_EFFECTIVE
         self._authority = 'ODL.MIT.EDU'
+        self._cataloging_manager = None
+        self._catalog_session = None
 
     def _init_proxy_and_runtime(self, proxy, runtime):
         self._proxy = proxy
@@ -468,15 +473,23 @@ class OsidSession:
                 self._authority = 'ODL.MIT.EDU'
 
     def _init_catalog(self, proxy=None, runtime=None):
-        \"\"\"Initialize this object as an OsidCatalog.\"\"\"
+        \"\"\"Initialize this session as an OsidCatalog based session.\"\"\"
         self._init_proxy_and_runtime(proxy, runtime)
+        osid_name = self._session_namespace.split('.')[0]
+        try:
+            config = self._runtime.get_configuration()
+            parameter_id = Id('parameter:' + osid_name + 'CatalogingProviderImpl@mongo')
+            provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+            self._cataloging_manager = self._runtime.get_manager('CATALOGING', provider_impl) # need to add version argument
+        except (AttributeError, KeyError, errors.NotFound):
+            pass
 
     def _init_object(self, catalog_id, proxy, runtime, db_name, cat_name, cat_class):
-        \"\"\"Initialize this object as an OsidObject.\"\"\"
+        \"\"\"Initialize this session an OsidObject based session.\"\"\"
         self._catalog_identifier = None
         self._init_proxy_and_runtime(proxy, runtime)
 
-        if catalog_id is not None and catalog_id.get_identifier() != '000000000000000000000000':
+        if catalog_id is not None and catalog_id.get_identifier() != PHANTOM_ROOT_IDENTIFIER:
             self._catalog_identifier = catalog_id.get_identifier()
 
             collection = JSONClientValidated(db_name,
@@ -490,20 +503,8 @@ class OsidSession:
                 else:
                     raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
         else:
-            self._catalog_identifier = '000000000000000000000000'
-            self._my_catalog_map = {
-                '_id': ObjectId(self._catalog_identifier),
-                'displayName': {'text': 'Default ' + cat_name,
-                                'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'description': {'text': 'The Default ' + cat_name,
-                                'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                                'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                                'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-                'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
-                'recordTypeIds': [] # Could this somehow inherit source catalog records?
-            }
+            self._catalog_identifier = PHANTOM_ROOT_IDENTIFIER
+            self._my_catalog_map = make_catalog_map(cat_name, identifier=self._catalog_identifier)
         self._catalog = cat_class(osid_object_map=self._my_catalog_map, runtime=self._runtime, proxy=self._proxy)
         self._catalog._authority = self._authority  # there should be a better way...
         self._catalog_id = self._catalog.get_id()
@@ -511,58 +512,27 @@ class OsidSession:
 
     def _get_phantom_root_catalog(self, cat_name, cat_class):
         \"\"\"Get's the catalog id corresponding to the root of all implementation catalogs.\"\"\"
-        catalog_map = {
-            '_id': ObjectId('000000000000000000000000'),
-            'displayName': {'text': 'Default ' + cat_name,
-                            'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                            'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                            'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-            'description': {'text': 'The Default ' + cat_name,
-                            'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                            'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                            'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-            'genusType': str(Type(**types.Genus().get_type_data('DEFAULT'))),
-            'recordTypeIds': [] # Could this somehow inherit source catalog records?
-        }
+        catalog_map = make_catalog_map(cat_name, identifier=PHANTOM_ROOT_IDENTIFIER)
         return cat_class(osid_object_map=catalog_map, runtime=self._runtime, proxy=self._proxy)
 
     def _create_orchestrated_cat(self, foreign_catalog_id, db_name, cat_name):
         \"\"\"Creates a catalog in the current service orchestrated with a foreign service Id.\"\"\"
         if (foreign_catalog_id.identifier_namespace == db_name + '.' + cat_name and
                 foreign_catalog_id.authority == self._authority):
-            raise errors.NotFound()  # This is not a foreign catalog
-        # Need to test if the catalog_id exists for the foreign catalog
-        # try:
-        #     foreign_db_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
-        #     foreign_cat_name = foreign_catalog_id.get_identifier_namespace().split('.')[1]
-        #     collection = JSONClientValidated(foreign_db_name,
-        #                                      collection=foreign_cat_name,
-        #                                      runtime=self._runtime)
-        #     collection.find_one({'_id': ObjectId(foreign_catalog_id.get_identifier())})
-        # except KeyError:
-        #     raise errors.NotFound()
+            raise errors.NotFound() # This is not a foreign catalog
         foreign_service_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
-        foreign_cat_name = inflection.underscore(foreign_catalog_id.namespace.split('.')[1])
-        catalog_name = foreign_cat_name.lower()
+        # foreign_cat_name = inflection.underscore(foreign_catalog_id.namespace.split('.')[1])
+        # catalog_name = foreign_cat_name.lower()
+        catalog_name = camel_to_under(foreign_catalog_id.namespace.split('.')[1])
         manager = self._get_provider_manager(foreign_service_name.upper())
         lookup_session = getattr(manager, 'get_{0}_lookup_session'.format(catalog_name))(proxy=self._proxy)
         getattr(lookup_session, 'get_{0}'.format(catalog_name))(foreign_catalog_id) # Raises NotFound
         collection = JSONClientValidated(db_name,
                                          collection=cat_name,
                                          runtime=self._runtime)
-        catalog_map = {
-            '_id': ObjectId(foreign_catalog_id.get_identifier()),
-            'displayName': {'text': ('Orchestrated ' + foreign_service_name + ' ' + cat_name),
-                            'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                            'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                            'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-            'description': {'text': ('Orchestrated ' + cat_name + ' for the ' + foreign_service_name + ' service'),
-                            'languageTypeId': str(Type(**types.Language().get_type_data('DEFAULT'))),
-                            'scriptTypeId': str(Type(**types.Script().get_type_data('DEFAULT'))),
-                            'formatTypeId': str(Type(**types.Format().get_type_data('DEFAULT'))),},
-            'genusTypeId': str(Type(**types.Genus().get_type_data('DEFAULT'))),
-            'recordTypeIds': [] # Could this somehow inherit source catalog records?
-        }
+        foreign_identifier = ObjectId(foreign_catalog_id.get_identifier())
+        default_text = 'Orchestrated ' + foreign_service_name
+        catalog_map = make_catalog_map(cat_name, identifier=foreign_identifier, default_text=default_text)
         collection.insert_one(catalog_map)
         alias_id = Id(identifier=foreign_catalog_id.identifier,
                       namespace=db_name + '.' + cat_name,

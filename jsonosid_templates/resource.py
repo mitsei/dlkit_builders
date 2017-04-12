@@ -151,7 +151,6 @@ class ResourceLookupSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
-        self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
@@ -282,7 +281,6 @@ class ResourceQuerySession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
-        self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
@@ -358,7 +356,6 @@ class ResourceSearchSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
-        self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
@@ -425,7 +422,6 @@ class ResourceAdminSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
-        self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
@@ -665,7 +661,6 @@ class ResourceNotificationSession:
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
-        self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         OsidSession._init_object(
             self,
@@ -762,7 +757,7 @@ class ResourceBinSession:
     ]
 
     init_template = """
-    _session_name = '${interface_name}'
+    _session_namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
@@ -837,9 +832,10 @@ class ResourceBinAssignmentSession:
     ]
 
     init_template = """
+    _session_namespace = '${implpkg_name}.${interface_name}'
+
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
-        self._session_name = '${interface_name}'
         self._catalog_name = '${cat_name}'
         self._forms = dict()
         self._kwargs = kwargs"""
@@ -913,10 +909,11 @@ class ResourceAgentSession:
     ]
 
     init = """
+    _session_namespace = 'resource.ResourceAgentSession'
+
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Bin
-        self._session_name = 'ResourceAgentSession'
         self._catalog_name = 'Bin'
         OsidSession._init_object(
             self,
@@ -966,10 +963,11 @@ class ResourceAgentSession:
 class ResourceAgentAssignmentSession:
 
     init = """
+    _session_namespace = 'resource.ResourceAgentAssignmentSession'
+
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Bin
-        self._session_name = 'ResourceAgentAssignmentSession'
         self._catalog_name = 'Bin'
         OsidSession._init_object(
             self,
@@ -1022,6 +1020,7 @@ class BinLookupSession:
         'from ..osid.sessions import OsidSession',
         'from . import objects',
         'from ..utilities import JSONClientValidated',
+        'from ..utilities import PHANTOM_ROOT_IDENTIFIER',
         'from bson.objectid import ObjectId',
         'DESCENDING = -1',
         'ASCENDING = 1',
@@ -1030,31 +1029,41 @@ class BinLookupSession:
     ]
 
     init_template = """
-    _session_name = '${interface_name}'
+    _session_namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         OsidSession._init_catalog(self, proxy, runtime)
+        if self._cataloging_manager is not None:
+            self._catalog_session = self._cataloging_manager.get_catalog_lookup_session()
+            self._catalog_session.use_comparative_catalog_view()
         self._catalog_view = COMPARATIVE
         self._kwargs = kwargs"""
 
     use_comparative_bin_view_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.use_comparative_bin_view
-        self._catalog_view = COMPARATIVE"""
+        self._catalog_view = COMPARATIVE
+        if self._catalog_session is not None:
+            self._catalog_session.use_comparative_catalog_view()"""
 
     use_plenary_bin_view_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.use_plenary_bin_view
-        self._catalog_view = PLENARY"""
+        self._catalog_view = PLENARY
+        if self._catalog_session is not None:
+            self._catalog_session.use_plenary_catalog_view()"""
 
     get_bin_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bin
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalog(catalog_id=${arg0_name})
         collection = JSONClientValidated('${package_name}',
                                          collection='${cat_name}',
                                          runtime=self._runtime)
         # Need to consider how to best deal with the "phantom root" catalog issue
-        if ${arg0_name}.get_identifier() == '000000000000000000000000':
+        if ${arg0_name}.get_identifier() == PHANTOM_ROOT_IDENTIFIER:
             return self._get_phantom_root_catalog(cat_class=objects.${cat_name}, cat_name='${cat_name}')
         try:
             result = collection.find_one({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name_replace}').get_identifier())})
@@ -1069,6 +1078,8 @@ class BinLookupSession:
         # osid.resource.BinLookupSession.get_bins_by_ids_template
         # NOTE: This implementation currently ignores plenary view
         # Also, this should be implemented to use get_${cat_name}() instead of direct to database
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalogs_by_ids(catalog_ids=${arg0_name})
         catalog_id_list = []
         for i in ${arg0_name}:
             catalog_id_list.append(ObjectId(i.get_identifier()))
@@ -1083,6 +1094,8 @@ class BinLookupSession:
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bins_template
         # NOTE: This implementation currently ignores plenary view
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalogs()
         collection = JSONClientValidated('${package_name}',
                                          collection='${cat_name}',
                                          runtime=self._runtime)
@@ -1094,6 +1107,8 @@ class BinLookupSession:
         # Implemented from template for
         # osid.resource.BinLookupSession.get_bins_by_genus_type_template
         # NOTE: This implementation currently ignores plenary view
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalogs_by_genus_type(catalog_genus_type=${arg0_name})
         collection = JSONClientValidated('${package_name}',
                                          collection='${cat_name}',
                                          runtime=self._runtime)
@@ -1106,6 +1121,8 @@ class BinLookupSession:
         # osid.resource.BinLookupSession.can_lookup_bins
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
+        if self._catalog_session is not None:
+            return self._catalog_session.can_lookup_catalogs()
         return True"""
 
 
@@ -1123,10 +1140,13 @@ class BinAdminSession:
     ]
 
     init_template = """
-    _session_name = '${interface_name}'
+    _session_namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         OsidSession._init_catalog(self, proxy, runtime)
+        if self._cataloging_manager is not None:
+            self._catalog_session = self._cataloging_manager.get_catalog_admin_session()
         self._forms = dict()
         self._kwargs = kwargs"""
 
@@ -1135,6 +1155,8 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.can_create_bins
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
+        if self._catalog_session is not None:
+            return self._catalog_session.can_create_catalogs()
         return True"""
 
     can_create_bin_with_record_types_template = """
@@ -1142,6 +1164,8 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.can_create_bin_with_record_types
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
+        if self._catalog_session is not None:
+            return self._catalog_session.can_create_catalogs_with_record_types(catalog_record_types=${arg0_name})
         return True"""
 
     get_bin_form_for_create_import_templates = [
@@ -1151,6 +1175,8 @@ class BinAdminSession:
     get_bin_form_for_create_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.get_bin_form_for_create_template
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalog_form_for_create(catalog_record_types=${arg0_name})
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
@@ -1175,6 +1201,8 @@ class BinAdminSession:
     create_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.create_bin_template
+        if self._catalog_session is not None:
+            return self._catalog_session.create_catalog(catalog_form=${arg0_name})
         collection = JSONClientValidated('${package_name}',
                                          collection='${cat_name}',
                                          runtime=self._runtime)
@@ -1206,6 +1234,8 @@ class BinAdminSession:
     get_bin_form_for_update_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.get_bin_form_for_update_template
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalog_form_for_update(catalog_id=${arg0_name})
         collection = JSONClientValidated('${package_name}',
                                          collection='${cat_name}',
                                          runtime=self._runtime)
@@ -1223,6 +1253,8 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.can_update_bins
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
+        if self._catalog_session is not None:
+            return self._catalog_session.can_update_catalogs()
         return True"""
 
     update_bin_import_templates = [
@@ -1232,6 +1264,8 @@ class BinAdminSession:
     update_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.update_bin_template
+        if self._catalog_session is not None:
+            return self._catalog_session.update_catalog(catalog_form=${arg0_name})
         collection = JSONClientValidated('${package_name}',
                                          collection='${cat_name}',
                                          runtime=self._runtime)
@@ -1258,6 +1292,8 @@ class BinAdminSession:
         # osid.resource.BinAdminSession.can_delete_bins
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
+        if self._catalog_session is not None:
+            return self._catalog_session.can_delete_catalogs()
         return True"""
 
     delete_bin_import_templates = [
@@ -1267,6 +1303,8 @@ class BinAdminSession:
     delete_bin_template = """
         # Implemented from template for
         # osid.resource.BinAdminSession.delete_bin_template
+        if self._catalog_session is not None:
+            return self._catalog_session.delete_catalog(catalog_id=${arg0_name})
         collection = JSONClientValidated('${package_name}',
                                          collection='${cat_name}',
                                          runtime=self._runtime)
@@ -1283,6 +1321,8 @@ class BinAdminSession:
     alias_bin_template = """
         # Implemented from template for
         # osid.resource.BinLookupSession.alias_bin_template
+        if self._catalog_session is not None:
+            return self._catalog_session.alias_catalog(catalog_id=${arg0_name}, alias_id=${arg1_name})
         self._alias_id(primary_id=${arg0_name}, equivalent_id=alias_id)"""
 
 
@@ -1294,9 +1334,10 @@ class BinNotificationSession:
     ]
 
     init_template = """
-    _session_name = '${interface_name}'
+    _session_namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         OsidSession._init_catalog(self, proxy, runtime)
         self._kwargs = kwargs"""
 
@@ -1313,46 +1354,58 @@ class BinHierarchySession:
     ]
 
     init_template = """
-    _session_name = '${interface_name}'
+    _session_namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         OsidSession._init_catalog(self, proxy, runtime)
         self._forms = dict()
         self._kwargs = kwargs
-        hierarchy_mgr = self._get_provider_manager('HIERARCHY')
-        self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
-            Id(authority='${pkg_name_upper}',
-               namespace='CATALOG',
-               identifier='${cat_name_upper}'),
-             proxy=self._proxy
-        )"""
+        if self._cataloging_manager is not None:
+            self._catalog_session = self._cataloging_manager.get_catalog_hierarchy_session()
+        else:
+            hierarchy_mgr = self._get_provider_manager('HIERARCHY')
+            self._hierarchy_session = hierarchy_mgr.get_hierarchy_traversal_session_for_hierarchy(
+                Id(authority='${pkg_name_upper}',
+                   namespace='CATALOG',
+                   identifier='${cat_name_upper}'),
+                proxy=self._proxy)"""
 
     can_access_bin_hierarchy_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.can_access_bin_hierarchy
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
+        if self._catalog_session is not None:
+            return self._catalog_session.can_access_catalog_hierarchy()
         return True"""
 
     get_bin_hierarchy_id_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_bin_hierarchy_id
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalog_hierarchy_id()
         return self._hierarchy_session.get_hierarchy_id()"""
 
     get_bin_hierarchy_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_bin_hierarchy
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalog_hierarchy()
         return self._hierarchy_session.get_hierarchy()"""
 
     get_root_bin_ids_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_root_bin_ids
+        if self._catalog_session is not None:
+            return self._catalog_session.get_root_catalog_ids()
         return self._hierarchy_session.get_roots()"""
 
     get_root_bins_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_root_bins
+        if self._catalog_session is not None:
+            return self._catalog_session.get_root_catalogs()
         return ${cat_name}LookupSession(
             self._proxy,
             self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_root_${cat_name_under}_ids()))"""
@@ -1360,21 +1413,29 @@ class BinHierarchySession:
     has_parent_bins_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.has_parent_bins
+        if self._catalog_session is not None:
+            return self._catalog_session.has_parent_catalogs(catalog_id=${arg0_name})
         return self._hierarchy_session.has_parents(id_=${arg0_name})"""
 
     is_parent_of_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.is_parent_of_bin
+        if self._catalog_session is not None:
+            return self._catalog_session.is_parent_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
         return self._hierarchy_session.is_parent(id_=${arg1_name}, parent_id=${arg0_name})"""
 
     get_parent_bin_ids_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_parent_bin_ids
+        if self._catalog_session is not None:
+            return self._catalog_session.git_parent_catalog_ids()
         return self._hierarchy_session.get_parents(id_=${arg0_name})"""
 
     get_parent_bins_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_parent_bins
+        if self._catalog_session is not None:
+            return self._catalog_session.git_parent_catalogs(catalog_id=${arg0_name})
         return ${cat_name}LookupSession(
             self._proxy,
             self._runtime).get_${cat_name_plural_under}_by_ids(
@@ -1383,26 +1444,36 @@ class BinHierarchySession:
     is_ancestor_of_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.is_ancestor_of_bin
+        if self._catalog_session is not None:
+            return self._catalog_session.is_ancestor_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
         return self._hierarchy_session.is_ancestor(id_=${arg0_name}, ancestor_id=${arg1_name})"""
 
     has_child_bins_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.has_child_bins
+        if self._catalog_session is not None:
+            return self._catalog_session.has_child_catalogs(catalog_id=${arg0_name})
         return self._hierarchy_session.has_children(id_=${arg0_name})"""
 
     is_child_of_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.is_child_of_bin
+        if self._catalog_session is not None:
+            return self._catalog_session.is_child_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
         return self._hierarchy_session.is_child(id_=${arg1_name}, child_id=${arg0_name})"""
 
     get_child_bin_ids_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_child_bin_ids
+        if self._catalog_session is not None:
+            return self._catalog_session.get_child_catalog_ids(catalog_id=${arg0_name})
         return self._hierarchy_session.get_children(id_=${arg0_name})"""
 
     get_child_bins_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_child_bins
+        if self._catalog_session is not None:
+            return self._catalog_session.get_child_catalogs(catalog_id=${arg0_name})
         return ${cat_name}LookupSession(
             self._proxy,
             self._runtime).get_${cat_name_plural_under}_by_ids(
@@ -1411,11 +1482,19 @@ class BinHierarchySession:
     is_descendant_of_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.is_descendant_of_bin
+        if self._catalog_session is not None:
+            return self._catalog_session.is_descendant_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
         return self._hierarchy_session.is_descendant(id_=${arg0_name}, descendant_id=${arg1_name})"""
 
     get_bin_node_ids_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchySession.get_bin_node_ids
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalog_node_ids(
+                catalog_id=${arg0_name},
+                ancestor_levels=${arg1_name},
+                descendant_levels=${arg2_name},
+                include_siblings=${arg3_name})
         return self._hierarchy_session.get_nodes(
             id_=${arg0_name},
             ancestor_levels=${arg1_name},
@@ -1444,50 +1523,65 @@ class BinHierarchyDesignSession:
     ]
 
     init_template = """
-    _session_name = '${interface_name}'
+    _session_namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         OsidSession._init_catalog(self, proxy, runtime)
         self._forms = dict()
         self._kwargs = kwargs
-        hierarchy_mgr = self._get_provider_manager('HIERARCHY')
-        self._hierarchy_session = hierarchy_mgr.get_hierarchy_design_session_for_hierarchy(
-            Id(authority='${pkg_name_upper}',
-               namespace='CATALOG',
-               identifier='${cat_name_upper}'),
-            proxy=self._proxy
-        )"""
+        if self._cataloging_manager is not None:
+            self._catalog_session = self._cataloging_manager.get_catalog_hierarchy_design_session()
+        else:
+            hierarchy_mgr = self._get_provider_manager('HIERARCHY')
+            self._hierarchy_session = hierarchy_mgr.get_hierarchy_design_session_for_hierarchy(
+                Id(authority='${pkg_name_upper}',
+                   namespace='CATALOG',
+                   identifier='${cat_name_upper}'),
+                proxy=self._proxy)"""
 
     can_modify_bin_hierarchy_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchyDesignSession.can_modify_objective_bank_hierarchy
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
+        if self._catalog_session is not None:
+            return self._catalog_session.can_modify_catalog_hierarchy()
         return True"""
 
     add_root_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchyDesignSession.add_root_bin_template
+        if self._catalog_session is not None:
+            return self._catalog_session.add_root_catalog(catalog_id=${arg0_name})
         return self._hierarchy_session.add_root(id_=${arg0_name})"""
 
     remove_root_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchyDesignSession.remove_root_bin_template
+        if self._catalog_session is not None:
+            return self._catalog_session.remove_root_catalog(catalog_id=${arg0_name})
         return self._hierarchy_session.remove_root(id_=${arg0_name})"""
 
     add_child_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchyDesignSession.add_child_bin_template
+        if self._catalog_session is not None:
+            return self._catalog_session.add_child_catalog(catalog_id=${arg0_name}, child_id=${arg1_name})
         return self._hierarchy_session.add_child(id_=${arg0_name}, child_id=${arg1_name})"""
 
     remove_child_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchyDesignSession.remove_child_bin_template
+        if self._catalog_session is not None:
+            return self._catalog_session.remove_child_catalog(catalog_id=${arg0_name}, child_id=${arg1_name})
         return self._hierarchy_session.remove_child(id_=${arg0_name}, child_id=${arg1_name})"""
 
     remove_child_bins_template = """
         # Implemented from template for
         # osid.resource.ResourceHierarchyDesignSession.remove_child_bin_template
+        if self._catalog_session is not None:
+            return self._catalog_session.remove_child_catalogs(catalog_id=${arg0_name})
         return self._hierarchy_session.remove_children(id_=${arg0_name})"""
 
 
@@ -1497,7 +1591,7 @@ class BinQuerySession:
     ]
 
     init_template = """
-    _session_name = '${interface_name}'
+    _session_namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
@@ -1788,6 +1882,13 @@ class Bin:
 
     def __init__(self, **kwargs):
         osid_objects.OsidCatalog.__init__(self, object_name='${object_name_upper}', **kwargs)"""
+
+# Someday we need to support templating for additional_methods_pattern:
+#     additional_methods_pattern = """
+# class CatalogBased${object_name_upper}(abc_resource_objects.Bin, osid_objects.OsidCatalog):
+#     \"\"\"A ${object_name_upper} that is constructed with a cataloging.Catalog object.\"\"\"
+#     def __init__(self, catalog):
+#         self._catalog = catalog"""
 
 
 class BinForm:
