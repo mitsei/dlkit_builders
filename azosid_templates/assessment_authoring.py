@@ -61,7 +61,7 @@ class AssessmentAuthoringProfile:
     ]
 
     init = """
-    def __init__(self, interface_name):
+    def __init__(self):
         osid_managers.OsidProfile.__init__(self)
 
     def _get_hierarchy_session(self, proxy=None):
