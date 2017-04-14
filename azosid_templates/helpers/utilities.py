@@ -11,6 +11,7 @@ OVERRIDE_VAULT_TYPE = Type(authority='ODL.MIT.EDU',
                            namespace='authorization.Vault',
                            identifier='override_vault')
 
+
 class QueryWrapper(object):
     """Wrapper class to aid in QuerySessions"""
     def __init__(self, provider_query):
