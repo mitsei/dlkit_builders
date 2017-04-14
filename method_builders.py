@@ -83,6 +83,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         if 'package_name' in context:
             # Add keyword arguments to template kwargs that are particular
             # to the json implementation
+            fixed_package_name = fix_reserved_word(self.package['name'], is_module=True)
             context['app_name'] = self._app_name()
             context['implpkg_name'] = self._abc_pkg_name(abc=False, reserved_word=False)
             context['abcapp_name'] = self._app_name()
@@ -91,7 +92,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             context['interface_name_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
             context['package_name_caps'] = self.replace(self.package['name'].title(), desired='')
             context['package_name_upper'] = self.package['name'].upper()
-            context['package_name_replace'] = self.replace(self.package['name'])
+            context['package_name_replace'] = self.replace(fixed_package_name)
             context['package_name_replace_upper'] = self.replace(self.package['name']).upper()
 
             if method['args']:
