@@ -171,3 +171,52 @@ class AssessmentPartItemDesignSession:
             for obj in catalog.get_items():
                 catalog.delete_item(obj.ident)
             cls.svc_mgr.delete_bank(catalog.ident)"""
+
+
+class SequenceRuleLookupSession:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.sequence_rule_list = list()
+        cls.sequence_rule_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for SequenceRuleLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for SequenceRuleLookupSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        create_form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident, [])
+        create_form.display_name = 'Test Assessment Part 1'
+        create_form.description = 'Test Assessment Part for SequenceRuleLookupSession tests'
+        assessment_part_1 = cls.catalog.create_assessment_part_for_assessment(create_form)
+
+        create_form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident, [])
+        create_form.display_name = 'Test Assessment Part 2'
+        create_form.description = 'Test Assessment Part for SequenceRuleLookupSession tests'
+        assessment_part_2 = cls.catalog.create_assessment_part_for_assessment(create_form)
+
+        for num in [0, 1]:
+            create_form = cls.catalog.get_sequence_rule_form_for_create(assessment_part_1,
+                                                                        assessment_part_2,
+                                                                        [])
+            create_form.display_name = 'Test Sequence Rule ' + str(num)
+            create_form.description = 'Test Sequence Rule for SequenceRuleLookupSession tests'
+            obj = cls.catalog.create_sequence_rule(create_form)
+            cls.sequence_rule_list.append(obj)
+            cls.sequence_rule_ids.append(obj.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_banks():
+            for obj in catalog.get_sequence_rules():
+                catalog.delete_sequence_rule(obj.ident)
+            for obj in catalog.get_assessment_parts():
+                catalog.delete_assessment_part(obj.ident)
+            for obj in catalog.get_assessments():
+                catalog.delete_assessment(obj.ident)
+            cls.svc_mgr.delete_bank(catalog.ident)
+"""
