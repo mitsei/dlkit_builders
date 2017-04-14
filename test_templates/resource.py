@@ -50,7 +50,7 @@ class ResourceManager:
         create_form.description = 'Test ${cat_name} for ${pkg_name} manager tests'
         catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.catalog_id = catalog.get_id()
-        cls.mgr = Runtime().get_manager('${pkg_name_upper}', 'TEST_MONGO_1', (3, 0, 0))
+        # cls.mgr = Runtime().get_manager('${pkg_name_upper}', 'TEST_MONGO_1', (3, 0, 0))
 
     @classmethod
     def tearDownClass(cls):

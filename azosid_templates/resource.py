@@ -7,15 +7,19 @@ class ResourceProfile:
     ]
 
     init_template = """
-    def __init__(self, interface_name):
+    def __init__(self):
         osid_managers.OsidProfile.__init__(self)
 
     def _get_hierarchy_session(self, proxy=None):
+        if proxy is not None:
+            try:
+                return self._provider_manager.get_${cat_name_under}_hierarchy_session(proxy)
+            except Unimplemented:
+                return None
         try:
-            return self._provider_manager.get_${cat_name_under}_hierarchy_session(proxy)
+            return self._provider_manager.get_${cat_name_under}_hierarchy_session()
         except Unimplemented:
-            return None
-"""
+            return None"""
 
     supports_visible_federation_template = """
         # Implemented from azosid template for -
@@ -119,7 +123,7 @@ class ResourceProxyManager:
 
     init_template = """
     def __init__(self):
-        ${pkg_name_replaced_caps}Profile.__init__(self, '${interface_name}')
+        ${pkg_name_replaced_caps}Profile.__init__(self)
 
     def initialize(self, runtime):
         osid_managers.OsidProxyManager.initialize(self, runtime)

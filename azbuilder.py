@@ -18,8 +18,19 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
             impl = '{}raise Unimplemented()'.format(self._dind)
         return impl
 
+    def _get_method_decorators(self, method, interface, args):
+        # This should be re-implemented to template patterns somehow
+        decorators = []
+        if len(args) > 1:
+            decorators.append('{0}@raise_null_argument'.format(self._ind))
+        return decorators
+
     def _compile_method(self, args, decorators, method_sig, method_doc, method_impl):
-        return method_sig + '\n' + method_impl
+        if decorators:
+            decorators = '\n'.join(decorators)
+            return decorators + '\n' + method_sig + '\n' + method_impl
+        else:
+            return method_sig + '\n' + method_impl
 
     def _get_method_args(self, method, interface):
         args = ['self']
@@ -70,6 +81,7 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
             # Add the osid_error import
             self.append(imports,
                         'from ..osid.osid_errors import PermissionDenied, NullArgument, Unimplemented')
+        self.append(imports, 'from ..utilities import raise_null_argument')
 
         self._append_templated_imports(imports, interface)
 
