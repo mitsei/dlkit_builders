@@ -2,6 +2,7 @@
 
 from assessment import AssessmentManager, AssessmentProxyManager
 
+
 class AssessmentAuthoringManager(AssessmentManager):
     """All AssessmentAuthoringManager methods implemented in AssessmentManager"""
 
