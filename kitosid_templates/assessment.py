@@ -367,6 +367,16 @@ class AssessmentPartAdminSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_admin_session').delete_assessment_part(*args, **kwargs)"""
 
+    can_create_assessment_parts = """
+        \"\"\"Pass through to provider AssessmentPartAdminSession.can_create_assessment_parts\"\"\"
+            return self._get_sub_package_provider_session('assessment_authoring',
+                                                          'assessment_part_admin_session').can_create_assessment_parts()"""
+
+    can_create_assessment_part_with_record_types = """
+        \"\"\"Pass through to provider AssessmentPartAdminSession.can_create_assessment_part_with_record_types\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').can_create_assessment_part_with_record_types(*args, **kwargs)"""
+
 
 class AssessmentPartItemSession:
     get_assessment_part_items = """
