@@ -200,8 +200,8 @@ class SequenceRuleLookupSession:
         assessment_part_2 = cls.catalog.create_assessment_part_for_assessment(create_form)
 
         for num in [0, 1]:
-            create_form = cls.catalog.get_sequence_rule_form_for_create(assessment_part_1,
-                                                                        assessment_part_2,
+            create_form = cls.catalog.get_sequence_rule_form_for_create(assessment_part_1.ident,
+                                                                        assessment_part_2.ident,
                                                                         [])
             create_form.display_name = 'Test Sequence Rule ' + str(num)
             create_form.description = 'Test Sequence Rule for SequenceRuleLookupSession tests'
