@@ -47,6 +47,8 @@ class AssessmentPartLookupSession:
             cls.assessment_part_list.append(obj)
             cls.assessment_part_ids.append(obj.ident)
 
+        cls.assessment = cls.catalog.get_assessment(cls.assessment.ident)
+
     @classmethod
     def tearDownClass(cls):
         #for obj in cls.catalog.get_assessment_parts():
@@ -66,7 +68,19 @@ class AssessmentPartLookupSession:
 
     def test_get_assessment(self):
         \"\"\"tests get_assessment\"\"\"
-        self.assertEqual(self.assessment_part_list[0].get_assessment().object_map,
+        def check_equal(val1, val2):
+            self.assertEqual(val1, val2)
+
+        def check_dict_equal(dict1, dict2):
+            for item in dict1.items():
+                key = item[0]
+                value = item[1]
+                if isinstance(value, dict):
+                    check_dict_equal(value, dict2[key])
+                else:
+                    check_equal(value, dict2[key])
+
+        check_dict_equal(self.assessment_part_list[0].get_assessment().object_map,
                          self.assessment.object_map)
 """
 
@@ -144,6 +158,8 @@ class AssessmentPartItemDesignSession:
             cls.item_list.append(obj)
             cls.item_ids.append(obj.ident)
             cls.catalog.add_item(obj.ident, cls.assessment_part.ident)
+
+        cls.assessment = cls.catalog.get_assessment(cls.assessment.ident)
 
     @classmethod
     def tearDownClass(cls):
