@@ -433,7 +433,7 @@ class AssessmentPartLookupSession:
     can_lookup_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
-                                                      'assessment_part_lookup_session').can_lookup_assessment_parts(*args, **kwargs)"""
+                                                      'assessment_part_lookup_session').can_lookup_assessment_parts()"""
 
     use_sequestered_assessment_part_view = """
         \"\"\"Pass through to provider AssessmentPartLookupSession.use_sequestered_assessment_part_view\"\"\"
