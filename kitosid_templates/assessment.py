@@ -430,6 +430,11 @@ class AssessmentPartLookupSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_lookup_session').get_assessment_parts()"""
 
+    can_lookup_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').can_lookup_assessment_parts(*args, **kwargs)"""
+
     use_sequestered_assessment_part_view = """
         \"\"\"Pass through to provider AssessmentPartLookupSession.use_sequestered_assessment_part_view\"\"\"
         # Does this need to be re-implemented to match the other non-sub-package view setters?
