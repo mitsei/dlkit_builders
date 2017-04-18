@@ -392,3 +392,73 @@ class ActivityForm:
 
     clear_assets_template = """
         pass"""
+
+
+class ProficiencyQuerySession:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.proficiency_list = list()
+        cls.proficiency_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ProficiencyQuerySession tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+
+        form = cls.catalog.get_objective_form_for_create([])
+        form.display_name = "Test LO"
+        objective = cls.catalog.create_objective(form)
+
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
+            create_form = cls.catalog.get_proficiency_form_for_create(objective.ident, AGENT_ID, [])
+            create_form.display_name = 'Test Proficiency ' + color
+            create_form.description = (
+                'Test Proficiency for ProficiencyQuerySession tests, did I mention green')
+            obj = cls.catalog.create_proficiency(create_form)
+            cls.proficiency_list.append(obj)
+            cls.proficiency_ids.append(obj.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_objective_banks():
+            for obj in catalog.get_proficiencies():
+                catalog.delete_proficiency(obj.ident)
+            for obj in catalog.get_objectives():
+                catalog.delete_objective(obj.ident)
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
+
+
+class ProficiencyLookupSession:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.proficiency_list = list()
+        cls.proficiency_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ProficiencyLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+
+        form = cls.catalog.get_objective_form_for_create([])
+        form.display_name = "Test LO"
+        objective = cls.catalog.create_objective(form)
+
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
+            create_form = cls.catalog.get_proficiency_form_for_create(objective.ident, AGENT_ID, [])
+            create_form.display_name = 'Test Proficiency ' + color
+            create_form.description = (
+                'Test Proficiency for ProficiencyLookupSession tests, did I mention green')
+            obj = cls.catalog.create_proficiency(create_form)
+            cls.proficiency_list.append(obj)
+            cls.proficiency_ids.append(obj.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_objective_banks():
+            for obj in catalog.get_proficiencies():
+                catalog.delete_proficiency(obj.ident)
+            for obj in catalog.get_objectives():
+                catalog.delete_objective(obj.ident)
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
