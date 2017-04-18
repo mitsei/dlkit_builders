@@ -36,7 +36,7 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
     def _get_method_args(self, method, interface):
         args = ['self']
-        args += [a['var_name'] for a in method['args']]
+        args += [a['var_name'].strip() for a in method['args']]
         return args
 
     @staticmethod
@@ -65,8 +65,8 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
     def _make_method_impl(self, method, interface):
         if method['return_type'].strip():
-            return '{}return # {}'.format(self._dind,
-                                          method['return_type'])
+            return '{}return  # {}'.format(self._dind,
+                                           method['return_type'])
         else:
             return '{}pass'.format(self._dind)
 
@@ -78,12 +78,16 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
-        return '{0}\n{1}\n{2}__metaclass__ = abc.ABCMeta\n\n{3}\n{4}{5}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                                                      self.class_doc(interface),
-                                                                                      self._ind,
-                                                                                      self._additional_methods(interface),
-                                                                                      self.make_methods(interface),
-                                                                                      self.additional_classes(interface))
+        end_methods = '{0}\n{1}\n{2}'.format(self._additional_methods(interface),
+                                             self.make_methods(interface),
+                                             self.additional_classes(interface))
+        if end_methods.strip() == '':
+            end_methods = end_methods.strip()
+
+        return '\n\n{0}\n{1}\n{2}__metaclass__ = abc.ABCMeta\n{3}'.format(self.class_sig(interface, inheritance),
+                                                                          self.class_doc(interface),
+                                                                          self._ind,
+                                                                          end_methods)
 
     def module_header(self, module):
         return ('\"\"\"Implementations of ' + self.package['name'] +
@@ -102,7 +106,7 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
                 '#     Argument signature defined in specification.\n' +
                 '# pylint: disable=duplicate-code\n' +
                 '#     All apparent duplicates have been inspected. They aren\'t.\n' +
-                'import abc\n')
+                'import abc')
 
     def write_license_file(self):
         with open(self._abc_module('license'), 'w') as write_file:

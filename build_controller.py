@@ -469,8 +469,8 @@ class BaseBuilder(Utilities):
         pass
 
     def _write_module_string(self, write_file, module):
-        write_file.write('{0}\n\n\n{1}'.format('\n'.join(self._order_module_imports(module['imports'])),
-                                               module['body']).encode('utf-8'))
+        write_file.write('{0}\n{1}\n'.format('\n'.join(self._order_module_imports(module['imports'])),
+                                             module['body'].strip()).encode('utf-8'))
 
     def build_this_interface(self, interface):
         pass
@@ -515,10 +515,10 @@ class BaseBuilder(Utilities):
             # extra newlines generated in self._additional_classes
             methods += additional_classes
 
-        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                 self._wrap(self.class_doc(interface)),
-                                                 self._wrap(init_methods),
-                                                 methods)
+        body = '\n\n{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                     self._wrap(self.class_doc(interface)),
+                                                     self._wrap(init_methods),
+                                                     methods)
         return body
 
     def module_header(self, module):
