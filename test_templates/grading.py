@@ -157,3 +157,45 @@ class GradeEntryLookupSession:
                 catalog.delete_grade_system(obj.ident)
             cls.svc_mgr.delete_gradebook(catalog.ident)
 """
+
+
+class GradeEntryQuerySession:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.grade_entry_list = list()
+        cls.grade_entry_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+        create_form.display_name = 'Test Gradebook'
+        create_form.description = 'Test Gradebook for GradeEntryQuerySession tests'
+        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+
+        form = cls.catalog.get_grade_system_form_for_create([])
+        form.display_name = 'Test grade system'
+        grade_system = cls.catalog.create_grade_system(form)
+
+        form = cls.catalog.get_gradebook_column_form_for_create([])
+        form.display_name = 'Test gradebook column'
+        form.set_grade_system(grade_system.ident)
+        gradebook_column = cls.catalog.create_gradebook_column(form)
+
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
+            create_form = cls.catalog.get_grade_entry_form_for_create(gradebook_column.ident, AGENT_ID, [])
+            create_form.display_name = 'Test GradeEntry ' + color
+            create_form.description = (
+                'Test GradeEntry for GradeEntryQuerySession tests, did I mention green')
+            obj = cls.catalog.create_grade_entry(create_form)
+            cls.grade_entry_list.append(obj)
+            cls.grade_entry_ids.append(obj.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_gradebooks():
+            for obj in catalog.get_grade_entries():
+                catalog.delete_grade_entry(obj.ident)
+            for obj in catalog.get_gradebook_columns():
+                catalog.delete_gradebook_column(obj.ident)
+            for obj in catalog.get_grade_systems():
+                catalog.delete_grade_system(obj.ident)
+            cls.svc_mgr.delete_gradebook(catalog.ident)"""
