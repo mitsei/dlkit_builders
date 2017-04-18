@@ -4,6 +4,25 @@ class AssessmentAuthoringManager:
     init = """
     @classmethod
     def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for assessment.authoring manager tests'
+        catalog = cls.svc_mgr.create_bank(create_form)
+        cls.catalog_id = catalog.get_id()
+        cls.mgr = Runtime().get_manager('ASSESSMENT_AUTHORING', 'TEST_JSON_1', (3, 0, 0))
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_bank(cls.catalog_id)
+"""
+
+
+class AssessmentAuthoringProxyManager:
+    """Tests for AssessmentAuthoringProxyManager"""
+    init = """
+    @classmethod
+    def setUpClass(cls):
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
@@ -51,10 +70,6 @@ class AssessmentPartLookupSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_assessment_parts():
-        #    cls.catalog.delete_assessment_part(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_bank(catalog.ident)
         cls.catalog.use_unsequestered_assessment_part_view()
         for obj in cls.catalog.get_assessment_parts():
             cls.catalog.delete_assessment_part(obj.ident)

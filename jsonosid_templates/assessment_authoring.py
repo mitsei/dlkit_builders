@@ -648,3 +648,29 @@ class AssessmentPartForm:
 
     def _supports_simple_sequencing(self):
         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])"""
+
+
+class SequenceRuleAdminSession:
+    get_sequence_rule_form_for_create = """
+        for arg in sequence_rule_record_types:
+            if not isinstance(arg, ABCId):
+                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
+        if sequence_rule_record_types == []:
+            obj_form = objects.SequenceRuleForm(
+                bank_id=self._catalog_id,
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy,
+                next_assessment_part_id=next_assessment_part_id,
+                assessment_part_id=assessment_part_id)
+        else:
+            obj_form = objects.SequenceRuleForm(
+                bank_id=self._catalog_id,
+                record_types=sequence_rule_record_types,
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy,
+                next_assessment_part_id=next_assessment_part_id,
+                assessment_part_id=assessment_part_id)
+        self._forms[obj_form.get_id().get_identifier()] = not CREATED
+        return obj_form"""

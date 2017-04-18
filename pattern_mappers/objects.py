@@ -5,7 +5,6 @@ OSID_Calendaring_Primitives = ['osid.calendaring.Time', 'osid.calendaring.DateTi
 
 
 def map_object_form_patterns(interface, package, index):
-
     object_name = interface['shortname'][:-4]
     index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceForm'
 
@@ -400,7 +399,6 @@ def map_object_form_patterns(interface, package, index):
 
 
 def map_object_patterns(interface, package, index):
-
     object_name = interface['shortname']
     index[object_name + '.init_pattern'] = 'resource.Resource'
 
