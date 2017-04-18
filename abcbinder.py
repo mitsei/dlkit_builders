@@ -139,7 +139,6 @@ def eq_methods(interface_name):
         if result is NotImplemented:
             return result
         return not result
-
 """)
 
 
@@ -158,13 +157,11 @@ def str_methods():
     def _unescape(self, string):
         \"\"\"Private method for un-escaping : and @\"\"\"
         return string.replace("%40", "@").replace("%3A", ":").replace("%25", "%")
-
 """)
 
 
 def asset_content_lookup_session():
     return ("""
-
 
 class AssetContentLookupSession:
     \"\"\"This session defines methods for retrieving asset contents.
@@ -198,7 +195,6 @@ class AssetContentLookupSession:
     \"\"\"
     __metaclass__ = abc.ABCMeta
 
-
     @abc.abstractmethod
     def get_repository_id(self):
         \"\"\"Gets the ``Repository``  ``Id`` associated with this session.
@@ -210,7 +206,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.id.Id
+        return  # osid.id.Id
 
     repository_id = property(fget=get_repository_id)
 
@@ -226,7 +222,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.Repository
+        return  # osid.repository.Repository
 
     repository = property(fget=get_repository)
 
@@ -247,7 +243,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # boolean
+        return  # boolean
 
     @abc.abstractmethod
     def use_comparative_asset_content_view(self):
@@ -326,7 +322,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContent
+        return  # osid.repository.AssetContent
 
     @abc.abstractmethod
     def get_asset_contents_by_ids(self, asset_content_ids):
@@ -352,7 +348,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList
+        return  # osid.repository.AssetContentList
 
     @abc.abstractmethod
     def get_asset_contents_by_genus_type(self, asset_content_genus_type):
@@ -373,7 +369,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList
+        return  # osid.repository.AssetContentList
 
     @abc.abstractmethod
     def get_asset_contents_by_parent_genus_type(self, asset_content_genus_type):
@@ -394,7 +390,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList
+        return  # osid.repository.AssetContentList
 
     @abc.abstractmethod
     def get_asset_contents_by_record_type(self, asset_content_record_type):
@@ -415,7 +411,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList
+        return  # osid.repository.AssetContentList
 
     @abc.abstractmethod
     def get_asset_contents_for_asset(self, asset_id):
@@ -459,4 +455,5 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return  # osid.repository.AssetContentList""")
+        return  # osid.repository.AssetContentList+
+""")

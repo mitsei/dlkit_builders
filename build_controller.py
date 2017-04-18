@@ -77,7 +77,7 @@ class Utilities(object):
             if line.isspace():
                 result.append('')
                 continue
-            result.append(line)
+            result.append(line.rstrip())
         return '\n'.join(result).strip('\n')
 
     @staticmethod
