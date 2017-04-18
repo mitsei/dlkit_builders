@@ -198,6 +198,7 @@ class ResourceLookupSession:
         self.catalog.${method_name}()"""
 
     get_resource_template = """
+        # From test_templates/resource.py ResourceLookupSession.get_resource_template
         self.catalog.use_isolated_${cat_name_under}_view()
         obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
         self.assertEqual(obj.ident, self.${object_name_under}_list[0].ident)
@@ -206,35 +207,40 @@ class ResourceLookupSession:
         self.assertEqual(obj.ident, self.${object_name_under}_list[0].ident)"""
 
     get_resources_by_ids_template = """
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        # From test_templates/resource.py ResourceLookupSession.get_resources_by_ids_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}(self.${object_name_under}_ids)
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}(self.${object_name_under}_ids)"""
 
     get_resources_by_genus_type_template = """
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        # From test_templates/resource.py ResourceLookupSession.get_resources_by_genus_type_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}(DEFAULT_TYPE)
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}(DEFAULT_TYPE)"""
 
     get_resources_by_parent_genus_type_template = """
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        # From test_templates/resource.py ResourceLookupSession.get_resources_by_parent_genus_type_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}(DEFAULT_TYPE)
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}(DEFAULT_TYPE)"""
 
     get_resources_by_record_type_template = """
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        # From test_templates/resource.py ResourceLookupSession.get_resources_by_record_type_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}(DEFAULT_TYPE)
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}(DEFAULT_TYPE)"""
 
     get_resources_template = """
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        # From test_templates/resource.py ResourceLookupSession.get_resources_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}()
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
@@ -297,6 +303,7 @@ class ResourceQuerySession:
         query = self.catalog.${method_name}()"""
 
     get_resources_by_query_template = """
+        # From test_templates/resource.py ResourceQuerySession::get_resources_by_query_template
         # Need to add some tests with string types
         query = self.catalog.get_${object_name_under}_query()
         query.match_display_name('orange')
@@ -654,19 +661,23 @@ class BinAdminSession:
 """
 
     can_create_bins_template = """
+        # From test_templates/resource.py BinAdminSession.can_create_bins_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
 
     can_create_bin_with_record_types_template = """
+        # From test_templates/resource.py BinAdminSession.can_create_bin_with_record_types_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(DEFAULT_TYPE), bool))"""
 
     get_bin_form_for_create_template = """
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        # From test_templates/resource.py BinAdminSession.get_bin_form_for_create_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         catalog_form = self.svc_mgr.${method_name}([])
         self.assertTrue(isinstance(catalog_form, ${return_type}))
         self.assertFalse(catalog_form.is_for_update())"""
 
     create_bin_template = """
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        # From test_templates/resource.py BinAdminSession.create_bin_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         catalog_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
         catalog_form.display_name = 'Test ${cat_name}'
         catalog_form.description = 'Test ${cat_name} for ${interface_name}.${method_name} tests'
@@ -674,17 +685,20 @@ class BinAdminSession:
         self.assertTrue(isinstance(new_catalog, ${return_type}))"""
 
     get_bin_form_for_update_template = """
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        # From test_templates/resource.py BinAdminSession.get_bin_form_for_update_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         catalog_form = self.svc_mgr.${method_name}(self.catalog.ident)
         self.assertTrue(isinstance(catalog_form, ${return_type}))
         self.assertTrue(catalog_form.is_for_update())"""
 
     update_bin_template = """
+        # From test_templates/resource.py BinAdminSession.update_bin_template
         catalog_form = self.svc_mgr.get_${cat_name_under}_form_for_update(self.catalog.ident)
         # Update some elements here?
         self.svc_mgr.${method_name}(catalog_form)"""
 
     delete_bin_template = """
+        # From test_templates/resource.py BinAdminSession.delete_bin_template
         cat_id = self.catalog_to_delete.ident
         self.svc_mgr.${method_name}(cat_id)
         with self.assertRaises(errors.NotFound):
