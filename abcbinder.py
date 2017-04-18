@@ -39,13 +39,12 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
         args += [a['var_name'].strip() for a in method['args']]
         return args
 
-    @staticmethod
-    def _get_method_doc(method):
-        return filter(None, [method['sphinx_param_doc'].strip('\n'),
-                             method['sphinx_return_doc'].strip('\n'),
-                             method['sphinx_error_doc'].strip('\n') + '\n',
-                             method['compliance_doc'].strip('\n'),
-                             method['impl_notes_doc'].strip('\n')])
+    def _get_method_doc(self, method):
+        return filter(None, [self.remove_whitespace_from_doc(method['sphinx_param_doc']),
+                             self.remove_whitespace_from_doc(method['sphinx_return_doc']),
+                             self.remove_whitespace_from_doc(method['sphinx_error_doc']) + '\n',
+                             self.remove_whitespace_from_doc(method['compliance_doc']),
+                             self.remove_whitespace_from_doc(method['impl_notes_doc'])])
 
     def _make_method(self, method, interface):
         decorator = self._ind + '@abc.abstractmethod'

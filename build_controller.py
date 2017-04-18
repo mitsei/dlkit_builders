@@ -50,7 +50,7 @@ class Utilities(object):
         return target_directory
 
     def _wrap(self, text):
-        return text
+        return self.remove_whitespace_from_doc(text)
 
     @staticmethod
     def append(iterator, item):
@@ -68,6 +68,17 @@ class Utilities(object):
         """a lot of builder patterns refer to the last item in a
         dot-separated path"""
         return package_path.split(char)[-1]
+
+    @staticmethod
+    def remove_whitespace_from_doc(doc_string):
+        # from https://qnalist.com/questions/7179595/regex-to-remove-lines-made-of-only-whitespace
+        result = []
+        for line in doc_string.split('\n'):
+            if line.isspace():
+                result.append('')
+                continue
+            result.append(line)
+        return '\n'.join(result).strip('\n')
 
     @staticmethod
     def replace(path, original='.', desired='_'):
