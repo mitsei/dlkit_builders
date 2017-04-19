@@ -19,7 +19,8 @@ class ResourceProfile:
         try:
             return self._provider_manager.get_${cat_name_under}_hierarchy_session()
         except Unimplemented:
-            return None"""
+            return None
+"""
 
     supports_visible_federation_template = """
         # Implemented from azosid template for -
@@ -227,7 +228,7 @@ class ResourceLookupSession:
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
         if self._can('lookup', ${cat_name_under}_id):
-            return [] # Don't go further - assumes authorizations inherited
+            return []  # Don't go further - assumes authorizations inherited
         else:
             unauth_list = [str(${cat_name_under}_id)]
         if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
@@ -302,7 +303,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resource_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_id(${arg0_name}, match=True)
         results = self._try_harder(query)
@@ -315,7 +316,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_by_ids_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         for ${object_name_under}_id in (${arg0_name}):
             query.match_id(${object_name_under}_id, match=True)
@@ -326,7 +327,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_by_genus_type_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_genus_type(${arg0_name}, match=True)
         return self._try_harder(query)"""
@@ -336,7 +337,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_by_parent_genus_type_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_parent_genus_type(${arg0_name}, match=True)
         return self._try_harder(query)"""
@@ -346,7 +347,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_by_record_type_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_record_type(${arg0_name}, match=True)
         return self._try_harder(query)"""
@@ -356,7 +357,7 @@ class ResourceLookupSession:
         # osid.resource.ResourceLookupSession.get_resources_template
         if self._can('lookup'):
             return self._provider_session.${method_name}()
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_any(match=True)
         return self._try_harder(query)"""
@@ -389,7 +390,7 @@ class ResourceQuerySession:
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
         if self._can('search', ${cat_name_under}_id):
-            return [] # Don't go further - assumes authorizations inherited
+            return []  # Don't go further - assumes authorizations inherited
         else:
             unauth_list = [str(${cat_name_under}_id)]
         if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
@@ -409,7 +410,6 @@ class ResourceQuerySession:
         for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
             query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
         return self._query_session.get_${object_name_under_plural}_by_query(query)
-
 
     class ${object_name}QueryWrapper(QueryWrapper):
         \"\"\"Wrapper for ${object_name}Queries to override match_${cat_name_under}_id method\"\"\"
@@ -507,8 +507,8 @@ class ResourceAdminSession:
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.can_create_resource_with_record_types
         # This would like to be a real implementation someday:
-        if ${arg0_name} == None:
-            raise NullArgument() # Just 'cause the spec says to :)
+        if ${arg0_name} is None:
+            raise NullArgument()  # Just 'cause the spec says to :)
         return self._can('${func_name}')"""
 
     get_resource_form_for_create_template = """
@@ -636,7 +636,7 @@ class ResourceBinSession:
     init_template = """
     def __init__(self, *args, **kwargs):
         osid_sessions.OsidSession.__init__(self, *args, **kwargs)
-        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This could be better
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')  # This could be better
         self._id_namespace = '${pkg_name_replaced}.${object_name}${cat_name}'
 """
 
@@ -693,7 +693,7 @@ class ResourceBinAssignmentSession:
     init_template = """
     def __init__(self, *args, **kwargs):
         osid_sessions.OsidSession.__init__(self, *args, **kwargs)
-        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU') # This could be better
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')  # This could be better
         self._id_namespace = '${pkg_name_replaced}.${object_name}${cat_name}'
 """
 
@@ -782,7 +782,7 @@ class ResourceAgentAssignmentSession:
         return self._can('assign')"""
 
     can_assign_agents_to_resource = """
-        return False # don't have enough information yet"""
+        return False  # don't have enough information yet"""
 
     assign_agent_to_resource = """
         if not self._can('assign'):
@@ -870,8 +870,8 @@ class BinAdminSession:
         # Implemented from azosid template for -
         # osid.resource.BinAdminSession.can_create_bin_with_record_types_template
         # This would like to be a real implementation someday:
-        if ${arg0_name} == None:
-            raise NullArgument() # Just 'cause the spec says to :)
+        if ${arg0_name} is None:
+            raise NullArgument()  # Just 'cause the spec says to :)
         return self._can('create')"""
 
     get_bin_form_for_create_template = """

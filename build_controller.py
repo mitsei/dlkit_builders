@@ -526,10 +526,16 @@ class BaseBuilder(Utilities):
             # extra newlines generated in self._additional_classes
             methods += additional_classes
 
-        body = '\n\n{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                     self._wrap(self.class_doc(interface)),
-                                                     self._wrap(init_methods),
-                                                     methods)
+        if init_methods:
+            init_methods = self._wrap(init_methods) + '\n'
+
+        if methods:
+            methods = '\n{0}\n'.format(methods)
+
+        body = '\n\n{0}\n{1}\n{2}{3}'.format(self.class_sig(interface, inheritance),
+                                             self._wrap(self.class_doc(interface)),
+                                             init_methods,
+                                             methods)
         return body
 
     def module_header(self, module):

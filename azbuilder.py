@@ -34,7 +34,7 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
 
     def _get_method_args(self, method, interface):
         args = ['self']
-        args += [a['var_name'] for a in method['args']]
+        args += [a['var_name'].strip() for a in method['args']]
         return args
 
     def _get_method_sig(self, method, interface):
@@ -105,4 +105,4 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
                 '# pylint: disable=too-many-public-methods\n' +
                 '#     Number of methods are defined in specification\n' +
                 '# pylint: disable=too-many-ancestors\n' +
-                '#     Inheritance defined in specification\n')
+                '#     Inheritance defined in specification')

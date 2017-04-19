@@ -18,7 +18,7 @@ class ActivityLookupSession:
         # osid.learning.ActivityLookupSession.get_activities_for_objective_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         query.match_${arg0_object_under}_id(${arg0_name}, match=True)
         return self._try_harder(query)"""
@@ -28,7 +28,7 @@ class ActivityLookupSession:
         # osid.learning.ActivityLookupSession.get_activities_for_objectives_template
         if self._can('lookup'):
             return self._provider_session.${method_name}(${arg0_name})
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_${object_name_under}_query()
         for ${object_name_under}_id in (${arg0_name}):
             query.match_${arg0_object_under}_id(${object_name_under}_id, match=True)

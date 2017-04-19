@@ -258,6 +258,7 @@ class AssetLookupSession:
 
     # This still needs to be updated to work with authz overrides
     additional_methods = """
+
 # This still needs to be updated to work with authz overrides
 class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSession, osid_sessions.OsidSession):
     \"\"\"Adapts underlying AssetContentLookupSession methods with authorization checks
@@ -275,7 +276,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
 
     def _get_unauth_repository_ids(self, repository_id):
         if self._can('lookup', repository_id):
-            return [] # Don't go further - assumes authorizations inherited
+            return []  # Don't go further - assumes authorizations inherited
         else:
             unauth_list = [str(repository_id)]
         if self._hierarchy_session.has_child_repositories(repository_id):
@@ -329,7 +330,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
     def get_asset_content(self, asset_content_id):
         if self._can('lookup'):
             return self._provider_session.get_asset_content(asset_content_id)
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_asset_content_query()
         query.match_id(asset_content_id, match=True)
         results = self._try_harder(query)
@@ -341,7 +342,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
     def get_asset_contents_by_ids(self, asset_content_ids):
         if self._can('lookup'):
             return self._provider_session.get_asset_contents_by_ids(asset_content_ids)
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_asset_content_query()
         for asset_content_id in (asset_content_ids):
             query.match_id(asset_content_id, match=True)
@@ -350,7 +351,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
     def get_asset_contents_by_genus_type(self, asset_content_genus_type):
         if self._can('lookup'):
             return self._provider_session.get_asset_contents_by_genus_type(asset_content_genus_type)
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_asset_content_query()
         query.match_genus_type(asset_content_genus_type, match=True)
         return self._try_harder(query)
@@ -358,7 +359,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
     def get_asset_contents_by_parent_genus_type(self, asset_content_genus_type):
         if self._can('lookup'):
             return self._provider_session.get_asset_contents_by_parent_genus_type(asset_content_genus_type)
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_asset_content_query()
         query.match_parent_genus_type(asset_content_genus_type, match=True)
         return self._try_harder(query)
@@ -366,7 +367,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
     def get_asset_contents_by_record_type(self, asset_content_record_type):
         if self._can('lookup'):
             return self._provider_session.get_asset_contents_by_record_type(asset_content_record_type)
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_asset_content_query()
         query.match_record_type(asset_content_record_type, match=True)
         return self._try_harder(query)

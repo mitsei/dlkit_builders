@@ -9,7 +9,7 @@ class AssessmentPartLookupSession:
         # osid.assessment_authoring.AssessmentPartLookupSession.additional_methods
         if self._can('lookup'):
             return self._provider_session.get_assessment_parts_for_assessment_part(assessment_part_id)
-        self._check_lookup_conditions() # raises PermissionDenied
+        self._check_lookup_conditions()  # raises PermissionDenied
         query = self._query_session.get_assessment_part_query()
         query.match_assessment_part_id(assessment_part_id, match=True)
         return self._try_harder(query)"""

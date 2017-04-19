@@ -26,7 +26,7 @@ class OsidProfile:
         config = self._my_runtime.get_configuration()
         parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-        return self._my_runtime.get_manager('AUTHORIZATION', provider_impl) # need to add version argument
+        return self._my_runtime.get_manager('AUTHORIZATION', provider_impl)  # need to add version argument
 
     def _get_vault_lookup_session(self):
         return self._get_authz_manager().get_vault_lookup_session()
@@ -186,7 +186,7 @@ class OsidSession:
         self._object_catalog_session = None
         self._id_namespace = None
         self._qualifier_id = None
-        self._authz_cache = dict() # Does this want to be a real cache???
+        self._authz_cache = dict()  # Does this want to be a real cache???
         self._overriding_catalog_ids = None
         self._object_view = COMPARATIVE
         self._catalog_view = FEDERATED
@@ -327,10 +327,10 @@ class OsidSession:
                 authority='MIT-OEIT')"""
 
     get_effective_agent = """
-        #effective_agent_id = self.get_effective_agent_id()
+        # effective_agent_id = self.get_effective_agent_id()
         # This may want to be extended to get the Agent directly from the Authentication
         # if available and if not effective agent is available in the proxy
-        #return Agent(
+        # return Agent(
         #    identifier=effective_agent_id.get_identifier(),
         #    namespace=effective_agent_id.get_namespace(),
         #    authority=effective_agent_id.get_authority())
