@@ -144,10 +144,12 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                     for sub_inf in sub_package['interfaces']:
                         sub_interface_name = sub_inf['shortname']
                         if self._is_matching_interface(interface, sub_inf):
-                            sub_package_methods += '\n\n{}##Implemented from {} - {}\n'.format(self._ind,
-                                                                                               sub_package['name'],
-                                                                                               sub_interface_name)
-                            sub_package_methods += self.make_methods(sub_inf)
+                            sub_methods = self.make_methods(sub_inf)
+                            if sub_methods != '':
+                                sub_package_methods += '\n\n{}# -- Implemented from {} - {}\n\n'.format(self._ind,
+                                                                                                        sub_package['name'],
+                                                                                                        sub_interface_name)
+                                sub_package_methods += sub_methods
 
         return sub_package_methods
 
@@ -259,7 +261,9 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
         elif interface['shortname'] == self.patterns['package_catalog_caps']:
             new_methods, new_imports = self._grab_service_methods(self._is_catalog_session)
 
-        new_imports += self._get_sub_package_imports(interface)
+        sub_package_imports = self._get_sub_package_imports(interface)
+        if len(sub_package_imports) > 0:
+            new_imports += sub_package_imports
 
         for imp in new_imports:
             self.append(imports, imp)
@@ -275,7 +279,6 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
 
     def _write_module_string(self, write_file, module):
         constant_declarations = """
-
 DEFAULT = 0
 COMPARATIVE = 0
 PLENARY = 1
@@ -288,9 +291,9 @@ SEQUESTERED = 1
 AUTOMATIC = 0
 MANDATORY = 1
 DISABLED = -1"""
-        write_file.write('{0}{1}\n\n\n{2}'.format('\n'.join(self._order_module_imports(module['imports'])),
-                                                  constant_declarations,
-                                                  module['body']).encode('utf-8'))
+        write_file.write('{0}{1}\n{2}'.format('\n'.join(self._order_module_imports(module['imports'])),
+                                              constant_declarations,
+                                              module['body']).encode('utf-8'))
 
     def build_this_interface(self, interface):
         # only build managers and catalogs
@@ -328,17 +331,24 @@ DISABLED = -1"""
             methods += new_methods
 
         if not init_methods.strip() and not methods.strip():
-            init_methods = '{0}pass'.format(self._ind)
+            init_methods = '{0}pass\n'.format(self._ind)
+        elif init_methods:
+            init_methods = self._wrap(init_methods) + '\n'
 
         if additional_methods:
-            methods += '\n' + additional_methods
+            methods += additional_methods
 
-        methods += self._get_sub_package_methods(interface)
+        sub_package_methods = self._get_sub_package_methods(interface)
+        if sub_package_methods != '':
+            methods += sub_package_methods
 
-        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                 self._wrap(self.class_doc(interface)),
-                                                 self._wrap(init_methods),
-                                                 methods)
+        if methods:
+            methods = '\n{0}\n'.format(methods)
+
+        body = '\n\n{0}\n{1}\n{2}{3}'.format(self.class_sig(interface, inheritance),
+                                             self._wrap(self.class_doc(interface)),
+                                             init_methods,
+                                             methods)
         return body
 
     def module_header(self, module):
@@ -354,7 +364,7 @@ DISABLED = -1"""
                 '# pylint: disable=no-self-use,unused-argument\n' +
                 '#     to catch unimplemented methods.\n' +
                 '# pylint: disable=super-init-not-called\n' +
-                '#     it just isn\'t.\n')
+                '#     it just isn\'t.')
 
     def update_module_body(self, modules, interface):
         modules[self.package['name']]['body'] += self.module_body(interface)

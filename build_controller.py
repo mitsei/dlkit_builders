@@ -421,7 +421,10 @@ class BaseBuilder(Utilities):
         docstrings = [imp for imp in imports if '"""' in imp or imp.startswith('#')]
         full_imports = [imp for imp in imports if imp.startswith('import ')]
         local_imports = [imp for imp in imports if imp.startswith('from .') or imp.startswith('from dlkit')]
-        constants = [imp for imp in imports if 'import' not in imp and imp not in docstrings]
+        constants = [imp for imp in imports
+                     if 'import' not in imp and
+                     imp not in docstrings and
+                     imp.strip() != '']
         partial_third_party_imports = [imp for imp in imports
                                        if imp not in full_imports and
                                        imp not in local_imports and

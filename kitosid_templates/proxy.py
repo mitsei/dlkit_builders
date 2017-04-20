@@ -18,7 +18,7 @@ class ProxyManager:
             try:
                 get_session = getattr(self._provider_manager, 'get_' + session)
             except:
-                raise # Unimplemented???
+                raise  # Unimplemented???
             else:
                 self._provider_sessions[session] = get_session()
             return self._provider_sessions[session]"""

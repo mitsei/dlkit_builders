@@ -54,13 +54,11 @@ class OsidManager:
 class Identifiable:
 
     init = """
-    def __init__(self, osid_object): # I will never be called :(
+    def __init__(self, osid_object):  # I will never be called :(
         self._osid_object = osid_object"""
 
     get_id = """
-        return self._osid_object.get_id()
-
-    id_ = property(get_id) """
+        return self._osid_object.get_id()"""
 
     is_current = """
         return self._osid_object.is_current()
@@ -71,7 +69,7 @@ class Identifiable:
 class Extensible:
 
     init = """
-    def __init__(self, osid_object): # I will never be called :(
+    def __init__(self, osid_object):  # I will never be called :(
         self._osid_object = osid_object"""
 
     get_record_types = """
@@ -84,7 +82,7 @@ class Extensible:
 class Browsable:
 
     init = """
-    def __init__(self, osid_object): # I will never be called :(
+    def __init__(self, osid_object):  # I will never be called :(
         self._osid_object = osid_object"""
 
     get_properties = """
@@ -97,7 +95,7 @@ class Browsable:
 class Sourceable:
 
     init = """
-    def __init__(self, osid_object): # I will never be called :(
+    def __init__(self, osid_object):  # I will never be called :(
         self._osid_object = osid_object"""
 
     get_provider_id = """
@@ -202,11 +200,11 @@ class OsidSession:
                       authority='MIT-OEIT')"""
 
     get_effective_agent = """
-        #from dlkit.services_impls.authentication.objects import Agent # This may want to be in Primordium?
-        #effective_agent_id = self.get_effective_agent_id()
+        # from dlkit.services_impls.authentication.objects import Agent # This may want to be in Primordium?
+        # effective_agent_id = self.get_effective_agent_id()
         # This may want to be extended to get the Agent directly from the Authentication
         # if available and if not effective agent is available in the proxy
-        #return Agent(identifier=effective_agent_id.get_identifier(),
+        # return Agent(identifier=effective_agent_id.get_identifier(),
         #             namespace=effective_agent_id.get_identifier_namespace(),
         #             authority=effective_agent_id.get_authority())
         raise Unimplemented()"""
@@ -243,7 +241,7 @@ class OsidList:
     def __init__(self, iter_object=None, count=None):
         if iter_object is None:
             iter_object = []
-        if count != None:
+        if count is not None:
             self._count = count
         elif isinstance(iter_object, dict) or isinstance(iter_object, list):
             self._count = len(iter_object)
@@ -254,7 +252,7 @@ class OsidList:
 
     def next(self):
         next_object = self._iter_object.next()
-        if self._count != None:
+        if self._count is not None:
             self._count -= 1
         return next_object
 
@@ -262,7 +260,7 @@ class OsidList:
         return self.available()"""
 
     has_next = """
-        if self._count != None:
+        if self._count is not None:
             # If count is available, use it
             return bool(self._count)
         else:
@@ -270,7 +268,7 @@ class OsidList:
             return True"""
 
     available = """
-        if self._count != None:
+        if self._count is not None:
             # If count is available, use it
             return self._count
         else:
@@ -278,7 +276,7 @@ class OsidList:
             return 0  # Don't know what to do here"""
 
     skip = """
-        ### STILL NEED TO IMPLEMENT THIS ###
+        # STILL NEED TO IMPLEMENT THIS ###
         pass"""
 
 

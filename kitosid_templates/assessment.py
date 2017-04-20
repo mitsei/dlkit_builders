@@ -387,6 +387,7 @@ class AssessmentPartAdminSession:
     get_assessment_part_form_for_update = """
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_admin_session').get_assessment_part_form_for_update(*args, **kwargs)
+
     def get_assessment_part_form(self, *args, **kwargs):
         \"\"\"Pass through to provider AssessmentPartAdminSession.get_assessment_part_form_for_update\"\"\"
         # This method might be a bit sketchy. Time will tell.
@@ -562,8 +563,8 @@ class Bank:
         self._provider_manager = provider_manager
         self._catalog = catalog
         self._runtime = runtime
-        osid.OsidObject.__init__(self, self._catalog) # This is to initialize self._object
-        osid.OsidSession.__init__(self, proxy) # This is to initialize self._proxy
+        osid.OsidObject.__init__(self, self._catalog)  # This is to initialize self._object
+        osid.OsidSession.__init__(self, proxy)  # This is to initialize self._proxy
         self._catalog_id = catalog.get_id()
         self._provider_sessions = kwargs
         self._session_management = AUTOMATIC
