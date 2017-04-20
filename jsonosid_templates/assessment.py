@@ -1885,10 +1885,9 @@ class AssessmentSection:
                     'responded': responded
                 })
 
-                if is_correct is not None:
-                    question_map.update({
-                        'isCorrect': is_correct
-                    })
+                question_map.update({
+                    'isCorrect': is_correct
+                })
 
                 questions.append(question_map)
 
