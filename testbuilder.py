@@ -62,8 +62,8 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
         return text
 
     def _write_module_string(self, write_file, module):
-        write_file.write('{0}\n\n\n{1}'.format('\n'.join(module['imports']),
-                                               module['body']).encode('utf-8'))
+        write_file.write('{0}\n{1}\n'.format('\n'.join(self._order_module_imports(module['imports'])),
+                                             module['body'].strip()).encode('utf-8'))
 
     def build_this_interface(self, interface):
         return self._build_this_interface(interface)
@@ -80,8 +80,8 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
         self.make_osids()
 
     def module_header(self, module):
-        return '\"\"\"Unit tests of {0} {1}.\"\"\"\n'.format(self.package['name'],
-                                                             module)
+        return '\"\"\"Unit tests of {0} {1}.\"\"\"'.format(self.package['name'],
+                                                           module)
 
     def write_modules(self, modules):
         # Finally, iterate through the completed package module structure and

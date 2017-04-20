@@ -9,17 +9,16 @@ class ResourceProfile:
         'REQUEST = proxy_example.TestRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
-        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)',
         'from dlkit.primordium.type.primitives import Type',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
         'from dlkit.abstract_osid.type.objects import TypeList as abc_type_list',
     ]
 
     init_template = """
     @classmethod
     def setUpClass(cls):
-        cls.mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-"""
+        cls.mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')"""
 
     supports_visible_federation_template = """
         self.assertTrue(isinstance(self.mgr.supports_visible_federation(), bool))"""
@@ -54,8 +53,7 @@ class ResourceManager:
 
     @classmethod
     def tearDownClass(cls):
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)
-"""
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)"""
 
     get_resource_lookup_session_template = """
         # if self.mgr.supports_${support_check}():
@@ -99,8 +97,7 @@ class ResourceProxyManager:
 
     @classmethod
     def tearDownClass(cls):
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)
-"""
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)"""
 
     get_resource_lookup_session_template = """
         # if self.mgr.supports_${support_check}():
