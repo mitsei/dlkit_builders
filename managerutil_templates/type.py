@@ -50,7 +50,7 @@ class TypeList:
             next_item = self.next()
         except StopIteration:
             raise IllegalState('no more elements available in this list')
-        except: #Need to specify exceptions here
+        except:  # Need to specify exceptions here
             raise OperationFailed()
         else:
             return next_item
@@ -76,7 +76,7 @@ class TypeList:
             while i < n:
                 try:
                     next_list.append(self.next())
-                except: #Need to specify exceptions here
+                except:  # Need to specify exceptions here
                     raise OperationFailed()
                 i += 1
             return next_list"""

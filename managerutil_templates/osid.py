@@ -33,7 +33,7 @@ class OsidList:
     def __init__(self, iter_object=None, count=None, db_prefix='', runtime=None):
         if iter_object is None:
             iter_object = []
-        if count != None:
+        if count is not None:
             self._count = count
         elif isinstance(iter_object, dict) or isinstance(iter_object, list):
             self._count = len(iter_object)
@@ -52,7 +52,7 @@ class OsidList:
             next_object = self._iter_object.next()
         except:
             raise
-        if self._count != None:
+        if self._count is not None:
             self._count -= 1
         return next_object
 
@@ -61,7 +61,7 @@ class OsidList:
 """
 
     has_next = """
-        if self._count != None:
+        if self._count is not None:
             # If count is available, use it
             return bool(self._count)
         else:
@@ -69,7 +69,7 @@ class OsidList:
             return True"""
 
     available = """
-        if self._count != None:
+        if self._count is not None:
             # If count is available, use it
             return self._count
         else:
@@ -77,5 +77,5 @@ class OsidList:
             return 0  # Don't know what to do here"""
 
     skip = """
-        ### STILL NEED TO IMPLEMENT THIS ###
+        # STILL NEED TO IMPLEMENT THIS ###
         pass"""

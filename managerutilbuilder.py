@@ -19,7 +19,7 @@ class ManagerUtilBuilder(InterfaceBuilder, BaseBuilder):
 
     def _get_method_args(self, method, interface):
         args = ['self']
-        args += ['{0}=None'.format(a['var_name']) for a in method['args']]
+        args += ['{0}=None'.format(a['var_name'].strip()) for a in method['args']]
         return args
 
     def _get_method_sig(self, method, interface):

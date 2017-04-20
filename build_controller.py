@@ -922,6 +922,7 @@ if __name__ == '__main__':
             builder.mdata()
             builder.services()
             builder.authz()
+            builder.manager()
             builder.tests(True)
             builder.docs()
         else:
