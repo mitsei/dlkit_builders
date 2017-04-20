@@ -353,9 +353,11 @@ def update_parent_sequence_map(child_part, delete=False):
     collection = JSONClientValidated(database,
                                      collection=collection_type,
                                      runtime=child_part._runtime)
-    if delete:
+    if delete and 'childIds' in object_map:
         object_map['childIds'].remove(str(child_part.get_id()))
-    else:
+    elif not delete:
+        if 'childIds' not in object_map:
+            object_map['childIds'] = []
         object_map['childIds'].append(str(child_part.get_id()))
     collection.save(object_map)
 

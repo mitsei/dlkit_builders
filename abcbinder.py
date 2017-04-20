@@ -36,16 +36,15 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
     def _get_method_args(self, method, interface):
         args = ['self']
-        args += [a['var_name'] for a in method['args']]
+        args += [a['var_name'].strip() for a in method['args']]
         return args
 
-    @staticmethod
-    def _get_method_doc(method):
-        return filter(None, [method['sphinx_param_doc'].strip('\n'),
-                             method['sphinx_return_doc'].strip('\n'),
-                             method['sphinx_error_doc'].strip('\n') + '\n',
-                             method['compliance_doc'].strip('\n'),
-                             method['impl_notes_doc'].strip('\n')])
+    def _get_method_doc(self, method):
+        return filter(None, [self.remove_whitespace_from_doc(method['sphinx_param_doc']),
+                             self.remove_whitespace_from_doc(method['sphinx_return_doc']),
+                             self.remove_whitespace_from_doc(method['sphinx_error_doc']) + '\n',
+                             self.remove_whitespace_from_doc(method['compliance_doc']),
+                             self.remove_whitespace_from_doc(method['impl_notes_doc'])])
 
     def _make_method(self, method, interface):
         decorator = self._ind + '@abc.abstractmethod'
@@ -65,8 +64,8 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
     def _make_method_impl(self, method, interface):
         if method['return_type'].strip():
-            return '{}return # {}'.format(self._dind,
-                                          method['return_type'])
+            return '{}return  # {}'.format(self._dind,
+                                           method['return_type'])
         else:
             return '{}pass'.format(self._dind)
 
@@ -78,12 +77,16 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
-        return '{0}\n{1}\n{2}__metaclass__ = abc.ABCMeta\n\n{3}\n{4}{5}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                                                      self.class_doc(interface),
-                                                                                      self._ind,
-                                                                                      self._additional_methods(interface),
-                                                                                      self.make_methods(interface),
-                                                                                      self.additional_classes(interface))
+        end_methods = '{0}\n{1}\n{2}'.format(self._additional_methods(interface),
+                                             self.make_methods(interface),
+                                             self.additional_classes(interface))
+        if end_methods.strip() == '':
+            end_methods = end_methods.strip()
+
+        return '\n\n{0}\n{1}\n{2}__metaclass__ = abc.ABCMeta\n{3}'.format(self.class_sig(interface, inheritance),
+                                                                          self.class_doc(interface),
+                                                                          self._ind,
+                                                                          end_methods)
 
     def module_header(self, module):
         return ('\"\"\"Implementations of ' + self.package['name'] +
@@ -102,7 +105,7 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
                 '#     Argument signature defined in specification.\n' +
                 '# pylint: disable=duplicate-code\n' +
                 '#     All apparent duplicates have been inspected. They aren\'t.\n' +
-                'import abc\n')
+                'import abc')
 
     def write_license_file(self):
         with open(self._abc_module('license'), 'w') as write_file:
@@ -136,7 +139,6 @@ def eq_methods(interface_name):
         if result is NotImplemented:
             return result
         return not result
-
 """)
 
 
@@ -155,13 +157,11 @@ def str_methods():
     def _unescape(self, string):
         \"\"\"Private method for un-escaping : and @\"\"\"
         return string.replace("%40", "@").replace("%3A", ":").replace("%25", "%")
-
 """)
 
 
 def asset_content_lookup_session():
     return ("""
-
 
 class AssetContentLookupSession:
     \"\"\"This session defines methods for retrieving asset contents.
@@ -195,7 +195,6 @@ class AssetContentLookupSession:
     \"\"\"
     __metaclass__ = abc.ABCMeta
 
-
     @abc.abstractmethod
     def get_repository_id(self):
         \"\"\"Gets the ``Repository``  ``Id`` associated with this session.
@@ -207,7 +206,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.id.Id
+        return  # osid.id.Id
 
     repository_id = property(fget=get_repository_id)
 
@@ -223,7 +222,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.Repository
+        return  # osid.repository.Repository
 
     repository = property(fget=get_repository)
 
@@ -244,7 +243,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # boolean
+        return  # boolean
 
     @abc.abstractmethod
     def use_comparative_asset_content_view(self):
@@ -323,7 +322,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContent
+        return  # osid.repository.AssetContent
 
     @abc.abstractmethod
     def get_asset_contents_by_ids(self, asset_content_ids):
@@ -349,7 +348,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList
+        return  # osid.repository.AssetContentList
 
     @abc.abstractmethod
     def get_asset_contents_by_genus_type(self, asset_content_genus_type):
@@ -370,7 +369,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList
+        return  # osid.repository.AssetContentList
 
     @abc.abstractmethod
     def get_asset_contents_by_parent_genus_type(self, asset_content_genus_type):
@@ -391,7 +390,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList
+        return  # osid.repository.AssetContentList
 
     @abc.abstractmethod
     def get_asset_contents_by_record_type(self, asset_content_record_type):
@@ -412,7 +411,7 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return # osid.repository.AssetContentList
+        return  # osid.repository.AssetContentList
 
     @abc.abstractmethod
     def get_asset_contents_for_asset(self, asset_id):
@@ -456,4 +455,5 @@ class AssetContentLookupSession:
         *compliance: mandatory -- This method must be implemented.*
 
         \"\"\"
-        return  # osid.repository.AssetContentList""")
+        return  # osid.repository.AssetContentList+
+""")

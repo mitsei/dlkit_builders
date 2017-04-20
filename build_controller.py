@@ -50,7 +50,7 @@ class Utilities(object):
         return target_directory
 
     def _wrap(self, text):
-        return text
+        return self.remove_whitespace_from_doc(text)
 
     @staticmethod
     def append(iterator, item):
@@ -68,6 +68,17 @@ class Utilities(object):
         """a lot of builder patterns refer to the last item in a
         dot-separated path"""
         return package_path.split(char)[-1]
+
+    @staticmethod
+    def remove_whitespace_from_doc(doc_string):
+        # from https://qnalist.com/questions/7179595/regex-to-remove-lines-made-of-only-whitespace
+        result = []
+        for line in doc_string.split('\n'):
+            if line.isspace():
+                result.append('')
+                continue
+            result.append(line.rstrip())
+        return '\n'.join(result).strip('\n')
 
     @staticmethod
     def replace(path, original='.', desired='_'):
@@ -469,8 +480,8 @@ class BaseBuilder(Utilities):
         pass
 
     def _write_module_string(self, write_file, module):
-        write_file.write('{0}\n\n\n{1}'.format('\n'.join(self._order_module_imports(module['imports'])),
-                                               module['body']).encode('utf-8'))
+        write_file.write('{0}\n{1}\n'.format('\n'.join(self._order_module_imports(module['imports'])),
+                                             module['body'].strip()).encode('utf-8'))
 
     def build_this_interface(self, interface):
         pass
@@ -515,10 +526,10 @@ class BaseBuilder(Utilities):
             # extra newlines generated in self._additional_classes
             methods += additional_classes
 
-        body = '{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
-                                                 self._wrap(self.class_doc(interface)),
-                                                 self._wrap(init_methods),
-                                                 methods)
+        body = '\n\n{0}\n{1}\n{2}\n{3}\n\n\n'.format(self.class_sig(interface, inheritance),
+                                                     self._wrap(self.class_doc(interface)),
+                                                     self._wrap(init_methods),
+                                                     methods)
         return body
 
     def module_header(self, module):

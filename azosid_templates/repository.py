@@ -21,7 +21,7 @@ class RepositoryManager:
 
     init = """
     def __init__(self):
-        RepositoryProfile.__init__(self, 'RepositoryManager')
+        RepositoryProfile.__init__(self)
 
     def initialize(self, runtime):
         osid_managers.OsidManager.initialize(self, runtime)
@@ -73,7 +73,7 @@ class RepositoryProxyManager:
 
     init = """
     def __init__(self):
-        RepositoryProfile.__init__(self, 'RepositoryProxyManager')
+        RepositoryProfile.__init__(self)
 
     def initialize(self, runtime):
         osid_managers.OsidProxyManager.initialize(self, runtime)

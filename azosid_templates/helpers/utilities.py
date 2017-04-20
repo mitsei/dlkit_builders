@@ -1,6 +1,15 @@
 """helper utilities for the authz adapter implementation"""
 
 from .primitives import Type
+from dlkit.abstract_osid.osid.errors import NullArgument
+
+BOOTSTRAP_VAULT_TYPE = Type(authority='ODL.MIT.EDU',
+                            namespace='authorization.Vault',
+                            identifier='bootstrap_vault')
+
+OVERRIDE_VAULT_TYPE = Type(authority='ODL.MIT.EDU',
+                           namespace='authorization.Vault',
+                           identifier='override_vault')
 
 
 class QueryWrapper(object):
@@ -13,10 +22,15 @@ class QueryWrapper(object):
         self._provider_query = provider_query
         self._cat_id_args_list = []
 
-BOOTSTRAP_VAULT_TYPE = Type(authority='ODL.MIT.EDU',
-                            namespace='authorization.Vault',
-                            identifier='bootstrap_vault')
 
-OVERRIDE_VAULT_TYPE = Type(authority='ODL.MIT.EDU',
-                           namespace='authorization.Vault',
-                           identifier='override_vault')
+def raise_null_argument(func):
+    """decorator, to intercept num argument TypeError and raise as NullArgument"""
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except TypeError as ex:
+            if 'takes exactly' in ex.args[0]:
+                raise NullArgument('Wrong number of arguments provided: ' + str(ex.args[0]))
+            else:
+                raise
+    return wrapper

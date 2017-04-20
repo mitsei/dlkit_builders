@@ -267,6 +267,7 @@ def map_patterns(package, index, base_package=None):
             interface_category_map[cat](interface, package, index)
         # THIS ONE MAY NEED TO BE SPLIT UP, BUT WE'LL TRY IT FOR NOW:
         elif ('OsidObjectForm' in interface['inherit_shortnames'] or
+              'OsidRuleForm' in interface['inherit_shortnames'] or
               'OsidRelationshipForm' in interface['inherit_shortnames']):
             map_object_form_patterns(interface, package, index)
         # THIS ONE MAY ALSO NEED TO BE SPLIT UP, BUT WE'LL TRY IT FOR NOW:

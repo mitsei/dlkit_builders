@@ -160,43 +160,25 @@ class ResourceManager:
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_manager_template
-        if self._session_management != DISABLED:
-            self._get_provider_session(\'${return_type_under}\', *args, **kwargs)
-        return self"""
+        return self._provider_manager.${method_name}(*args, **kwargs)"""
 
     get_resource_lookup_session_for_bin_managertemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_manager_template
-        if self._session_management != DISABLED:
-            self._get_provider_session(\'${return_type_under}\', *args, **kwargs)
-        return self"""
+        return self._provider_manager.${method_name}(*args, **kwargs)"""
 
     get_resource_lookup_session_catalogtemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_catalog_template
-        session = self._instantiate_session(method_name='${method_name}', proxy=self._proxy, *args, **kwargs)
-        return ${cat_name}(
-            self._provider_manager,
-            session.get_${cat_name_under}(),
-            self._runtime,
-            self._proxy, ${method_session_name}=session)"""
+        return self._provider_manager.${method_name}(*args, **kwargs)"""
 
     get_resource_lookup_session_for_bin_catalogtemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_catalog_template
-        if self._proxy:
-            session = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
-        else:
-            session = self._provider_manager.${method_name}(${args_kwargs_or_nothing})
-        return ${cat_name}(
-            self._provider_manager,
-            self.get_${cat_name_under}(*args, **kwargs),
-            self._runtime,
-            self._proxy,
-            ${return_type_under}=session)"""
+        return self._provider_manager.${method_name}(*args, **kwargs)"""
 
     get_resource_admin_session_managertemplate = get_resource_lookup_session_managertemplate
 
@@ -210,43 +192,25 @@ class ResourceManager:
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_manager_template
-        if self._session_management != DISABLED:
-            self._get_provider_session(\'${return_type_under}\', *args, **kwargs)
-        return self"""
+        return self._provider_manager.${method_name}(*args, **kwargs)"""
 
     get_resource_notification_session_for_bin_managertemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_for_bin_manager_template
-        if self._session_management != DISABLED:
-            self._get_provider_session(\'${return_type_under}\', *args, **kwargs)
-        return self"""
+        return self._provider_manager.${method_name}(*args, **kwargs)"""
 
     get_resource_notification_session_catalogtemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_catalog_template
-        session = self._instantiate_session(method_name='${method_name}', proxy=self._proxy, *args, **kwargs)
-        return ${cat_name}(
-            self._provider_manager,
-            session.get_${cat_name_under}(),
-            self._runtime,
-            self._proxy, ${method_session_name}=session)"""
+        return self._provider_manager.${method_name}(*args, **kwargs)"""
 
     get_resource_notification_session_for_bin_catalogtemplate = """
         \"\"\"Pass through to provider ${method_name}\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_for_bin_catalog_template
-        if self._proxy:
-            session = self._provider_manager.${method_name}(proxy=self._proxy, *args, **kwargs)
-        else:
-            session = self._provider_manager.${method_name}(${args_kwargs_or_nothing})
-        return ${cat_name}(
-            self._provider_manager,
-            self.get_${cat_name_under}(*args, **kwargs),
-            self._runtime,
-            self._proxy,
-            ${return_type_under}=session)"""
+        return self._provider_manager.${method_name}(*args, **kwargs)"""
 
 
 class ResourceProxyManager:

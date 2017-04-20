@@ -21,6 +21,42 @@ class AssessmentManager:
         return Bank(self._provider_manager, session.get_bank(), self._runtime, self._proxy, assessment_taken_admin_session = session)"""
 
 
+class AssessmentAuthoringManager:
+    get_sequence_rule_lookup_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_lookup_session(*args, **kwargs)"""
+
+    get_sequence_rule_lookup_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_lookup_session_for_bank(*args, **kwargs)"""
+
+    get_assessment_part_lookup_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_lookup_session(*args, **kwargs)"""
+
+    get_assessment_part_lookup_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_lookup_session_for_bank(*args, **kwargs)"""
+
+
+class AssessmentAuthoringProxyManager:
+    get_sequence_rule_lookup_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_sequence_rule_lookup_session(*args, **kwargs)"""
+
+    get_sequence_rule_lookup_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_sequence_rule_lookup_session_for_bank(*args, **kwargs)"""
+
+    get_assessment_part_lookup_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_lookup_session(*args, **kwargs)"""
+
+    get_assessment_part_lookup_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_lookup_session_for_bank(*args, **kwargs)"""
+
+
 class AssessmentAuthoringProfile:
     get_assessment_part_record_types = """
         \"\"\"Pass through to provider method\"\"\"
@@ -53,6 +89,14 @@ class AssessmentAuthoringProfile:
     supports_assessment_part_lookup = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_lookup()"""
+
+    supports_assessment_part_item = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_item()"""
+
+    supports_assessment_part_item_design = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_item_design()"""
 
     supports_sequence_rule_admin = """
         \"\"\"Pass through to provider method\"\"\"
@@ -359,6 +403,16 @@ class AssessmentPartAdminSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_admin_session').delete_assessment_part(*args, **kwargs)"""
 
+    can_create_assessment_parts = """
+        \"\"\"Pass through to provider AssessmentPartAdminSession.can_create_assessment_parts\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').can_create_assessment_parts()"""
+
+    can_create_assessment_part_with_record_types = """
+        \"\"\"Pass through to provider AssessmentPartAdminSession.can_create_assessment_part_with_record_types\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').can_create_assessment_part_with_record_types(*args, **kwargs)"""
+
 
 class AssessmentPartItemSession:
     get_assessment_part_items = """
@@ -411,6 +465,11 @@ class AssessmentPartLookupSession:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_lookup_session').get_assessment_parts()"""
+
+    can_lookup_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').can_lookup_assessment_parts()"""
 
     use_sequestered_assessment_part_view = """
         \"\"\"Pass through to provider AssessmentPartLookupSession.use_sequestered_assessment_part_view\"\"\"
