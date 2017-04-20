@@ -97,14 +97,13 @@ class TypeAdminSession:
     get_type_form_for_create = """
         from dlkit.abstract_osid.type.primitives import Type as ABCType
         from .objects import TypeForm
-#        from bson.objectid import ObjectId
         collection = self._db['Type']
         CREATED = True
         if not isinstance(type_, ABCType):
             raise errors.InvalidArgument('argument is not a Type')
         result = collection.find_one({'$and': [{'namespace': type_.get_identifier_namespace()},
-                                                {'identifier': type_.get_identifier()},
-                                                {'authority': type_.get_authority()}]})
+                                               {'identifier': type_.get_identifier()},
+                                               {'authority': type_.get_authority()}]})
         if result is not None:
             raise errors.AlreadyExists()
         form = TypeForm(type_=type_, update=False)
@@ -129,7 +128,7 @@ class TypeAdminSession:
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         try:
             id_ = collection.insert_one(type_form._my_map)
-        except: # what exceptions does mongodb insert raise?
+        except:  # what exceptions does mongodb insert raise?
             raise errors.OperationFailed()
         from .primitives import Type
         self._forms[type_form.get_id().get_identifier()] = CREATED
@@ -145,14 +144,13 @@ class TypeAdminSession:
         from dlkit.abstract_osid.type.primitives import Type as ABCType
         from .objects import TypeForm
         from .primitives import Type
-#        from bson.objectid import ObjectId
         collection = self._db['Type']
         UPDATED = True
         if not isinstance(type_, ABCType):
             return InvalidArgument('the argument is not a valid OSID Type')
         result = collection.find_one({'$and': [{'namespace': type_.get_identifier_namespace()},
-                                                {'identifier': type_.get_identifier()},
-                                                {'authority': type_.get_authority()}]})
+                                               {'identifier': type_.get_identifier()},
+                                               {'authority': type_.get_authority()}]})
         if result is None:
             raise errors.NotFound()
         type_form = TypeForm(type_=Type(result), update=True)
@@ -176,7 +174,7 @@ class TypeAdminSession:
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         try:
             result = collection.save(type_form._my_map)
-        except: # what exceptions does mongodb save raise?
+        except:  # what exceptions does mongodb save raise?
             raise errors.OperationFailed()
         self._forms[type_form.get_id().get_identifier()] = UPDATED"""
 
@@ -230,24 +228,24 @@ class TypeForm:
         from ..osid.objects import OsidForm
         OsidForm._init_metadata(self)
         self._display_name_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace,
-                             identifier = 'display_name')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='display_name')}
         self._display_name_metadata.update(mdata_conf.display_name)
         self._display_label_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace,
-                             identifier = 'description')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='description')}
         self._display_label_metadata.update(mdata_conf.display_label)
         self._description_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace,
-                             identifier = 'description')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='description')}
         self._description_metadata.update(mdata_conf.description)
         self._domain_metadata = {
-            'element_id': Id(authority = self._authority,
-                             namespace = self._namespace,
-                             identifier = 'description')}
+            'element_id': Id(authority=self._authority,
+                             namespace=self._namespace,
+                             identifier='description')}
         self._domain_metadata.update(mdata_conf.domain)
 
     def _init_map(self):
@@ -271,7 +269,7 @@ class TypeForm:
 
     clear_display_name = """
         if (self.get_display_name_metadata().is_read_only() or
-            self.get_display_name_metadata().is_required()):
+                self.get_display_name_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['displayName'] = self._display_name_metadata['default_string_values'][0]"""
 
@@ -289,7 +287,7 @@ class TypeForm:
 
     clear_display_label = """
         if (self.get_display_label_metadata().is_read_only() or
-            self.get_display_label_metadata().is_required()):
+                self.get_display_label_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['displayLabel'] = self._display_label_metadata['default_string_values'][0]"""
 
@@ -325,7 +323,7 @@ class TypeForm:
 
     clear_description = """
         if (self.get_domain_metadata().is_read_only() or
-            self.get_domain_metadata().is_required()):
+                self.get_domain_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['domain'] = self._domain_metadata['default_string_values'][0]"""
 
@@ -350,18 +348,19 @@ class TypeList:
 class Type:
 
     init = """
-    def __init__(self, type_map=None,
-                       identifier=None,
-                       authority=None,
-                       namespace=None,
-                       display_name=None,
-                       display_label=None,
-                       description=None,
-                       domain=None):
+    def __init__(self,
+                 type_map=None,
+                 identifier=None,
+                 authority=None,
+                 namespace=None,
+                 display_name=None,
+                 display_label=None,
+                 description=None,
+                 domain=None):
         if type_map is not None:
             self._my_map = type_map
         elif (authority is not None and namespace is not None and identifier is not None and
-            display_name is not None and description is not None and domain is not None):
+                display_name is not None and description is not None and domain is not None):
             self._my_map = {}
             self._my_map['authority'] = authority
             self._my_map['namespace'] = namespace
@@ -424,7 +423,7 @@ class OldObsoleteTypeCanBeDeleted:
         if type_map is not None:
             from .. import types
         elif (authority is not None and namespace is not None and identifier is not None and
-            display_name is not None and description is not None and domain is not None):
+                display_name is not None and description is not None and domain is not None):
             self._authority = authority
             self._namespace = namespace
             self._identifier = identifier
@@ -446,28 +445,28 @@ class OldObsoleteTypeCanBeDeleted:
 
     get_display_name = """
         from ..primitives import DisplayText
-        return DisplayText(text = self._display_name,
-                           language_type = Type(**types.Language().get_type_data('DEFAULT')),
-                           script_type = Type(**types.Script().get_type_data('DEFAULT')),
-                           format_type = Type(**types.Format().get_type_data('DEFAULT')))"""
+        return DisplayText(text=self._display_name,
+                           language_type=Type(**types.Language().get_type_data('DEFAULT')),
+                           script_type=Type(**types.Script().get_type_data('DEFAULT')),
+                           format_type=Type(**types.Format().get_type_data('DEFAULT')))"""
 
     get_display_label = """
         from ..primitives import DisplayText
-        return DisplayText(text = self._display_label,
-                           language_type = Type(**types.Language().get_type_data('DEFAULT')),
-                           script_type = Type(**types.Script().get_type_data('DEFAULT')),
-                           format_type = Type(**types.Format().get_type_data('DEFAULT')))"""
+        return DisplayText(text=self._display_label,
+                           language_type=Type(**types.Language().get_type_data('DEFAULT')),
+                           script_type=Type(**types.Script().get_type_data('DEFAULT')),
+                           format_type=Type(**types.Format().get_type_data('DEFAULT')))"""
 
     get_description = """
         from ..locale.primitives import DisplayText
-        return DisplayText(text = self._description,
-                           language_type = Type(**types.Language().get_type_data('DEFAULT')),
-                           script_type = Type(**types.Script().get_type_data('DEFAULT')),
-                           format_type = Type(**types.Format().get_type_data('DEFAULT')))"""
+        return DisplayText(text=self._description,
+                           language_type=Type(**types.Language().get_type_data('DEFAULT')),
+                           script_type=Type(**types.Script().get_type_data('DEFAULT')),
+                           format_type=Type(**types.Format().get_type_data('DEFAULT')))"""
 
     get_domain = """
         from ..primitives import DisplayText
-        return DisplayText(text = self._domain,
-                           language_type = Type(**types.Language().get_type_data('DEFAULT')),
-                           script_type = Type(**types.Script().get_type_data('DEFAULT')),
-                           format_type = Type(**types.Format().get_type_data('DEFAULT')))"""
+        return DisplayText(text=self._domain,
+                           language_type=Type(**types.Language().get_type_data('DEFAULT')),
+                           script_type=Type(**types.Script().get_type_data('DEFAULT')),
+                           format_type=Type(**types.Format().get_type_data('DEFAULT')))"""

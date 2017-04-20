@@ -25,7 +25,7 @@ class LoggingSession:
         return True"""
 
     log = """
-        if not content_type in self._content_types:
+        if content_type not in self._content_types:
             raise errors.Unsupported()
         lefc = self._leas.get_content_form_for_create([])
         lefc.set_timestamp(DateTime.utcnow())"""
@@ -138,7 +138,7 @@ class LogEntryForm:
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_type(${arg0_name},
-                                self.get_${var_name}_metadata()):
+                                   self.get_${var_name}_metadata()):
             raise errors.InvalidArgument()
         self._my_map['${var_name_mixed}'] = str(${arg0_name})"""
 

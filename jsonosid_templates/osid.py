@@ -29,7 +29,7 @@ class OsidProfile:
 
     get_display_name = """
         return DisplayText(
-            text = profile.DISPLAYNAME,
+            text=profile.DISPLAYNAME,
             language_type=Type(**profile.LANGUAGETYPE),
             script_type=Type(**profile.SCRIPTTYPE),
             format_type=Type(**profile.FORMATTYPE))"""
@@ -42,16 +42,16 @@ class OsidProfile:
             format_type=Type(**profile.FORMATTYPE))"""
 
     get_version = """
-        ## THIS ALL NEEDS TO BE FIXED:
-        #try:
+        # THIS ALL NEEDS TO BE FIXED:
+        # try:
         #    from ..installation.primitives import Version
-        #except:
+        # except:
         #    from .common import Version
-        #try:
+        # try:
         #    from ..type.primitives import Type
-        #except:
+        # except:
         #    from .common import Type
-        #return Version(
+        # return Version(
         #    components=profile.VERSIONCOMPONENTS,
         #    scheme=Type(**profile.VERSIONSCHEME))
         raise errors.Unimplemented()"""
@@ -61,16 +61,16 @@ class OsidProfile:
         raise errors.Unimplemented()"""
 
     supports_osid_version = """
-        ## THIS ALL NEEDS TO BE FIXED:
-        #try:
+        # THIS ALL NEEDS TO BE FIXED:
+        # try:
         #    from ..installation.primitives import Version
-        #except:
+        # except:
         #    from .common import Version
-        #try:
+        # try:
         #    from ..type.primitives import Type
-        #except:
+        # except:
         #    from .common import Type
-        #return Version(
+        # return Version(
         #    components=profile.OSIDVERSION,
         #    scheme=Type(**profile.VERSIONSCHEME))
         raise errors.Unimplemented()"""
@@ -153,7 +153,7 @@ class OsidRuntimeManager:
     ]
 
     init = """
-    def __init__(self, configuration_key = None):
+    def __init__(self, configuration_key=None):
         self._configuration_key = configuration_key"""
 
 
@@ -480,7 +480,7 @@ class OsidSession:
             config = self._runtime.get_configuration()
             parameter_id = Id('parameter:' + osid_name + 'CatalogingProviderImpl@mongo')
             provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-            self._cataloging_manager = self._runtime.get_manager('CATALOGING', provider_impl) # need to add version argument
+            self._cataloging_manager = self._runtime.get_manager('CATALOGING', provider_impl)  # need to add version argument
         except (AttributeError, KeyError, errors.NotFound):
             pass
 
@@ -519,14 +519,14 @@ class OsidSession:
         \"\"\"Creates a catalog in the current service orchestrated with a foreign service Id.\"\"\"
         if (foreign_catalog_id.identifier_namespace == db_name + '.' + cat_name and
                 foreign_catalog_id.authority == self._authority):
-            raise errors.NotFound() # This is not a foreign catalog
+            raise errors.NotFound()  # This is not a foreign catalog
         foreign_service_name = foreign_catalog_id.get_identifier_namespace().split('.')[0]
         # foreign_cat_name = inflection.underscore(foreign_catalog_id.namespace.split('.')[1])
         # catalog_name = foreign_cat_name.lower()
         catalog_name = camel_to_under(foreign_catalog_id.namespace.split('.')[1])
         manager = self._get_provider_manager(foreign_service_name.upper())
         lookup_session = getattr(manager, 'get_{0}_lookup_session'.format(catalog_name))(proxy=self._proxy)
-        getattr(lookup_session, 'get_{0}'.format(catalog_name))(foreign_catalog_id) # Raises NotFound
+        getattr(lookup_session, 'get_{0}'.format(catalog_name))(foreign_catalog_id)  # Raises NotFound
         collection = JSONClientValidated(db_name,
                                          collection=cat_name,
                                          runtime=self._runtime)
@@ -575,7 +575,7 @@ class OsidSession:
         collection = JSONClientValidated(pkg_name,
                                          collection=obj_name,
                                          runtime=self._runtime)
-        collection.find_one({'_id': ObjectId(primary_id.get_identifier())}) # to raise NotFound
+        collection.find_one({'_id': ObjectId(primary_id.get_identifier())})  # to raise NotFound
         collection = JSONClientValidated('id',
                                          collection=pkg_name + 'Ids',
                                          runtime=self._runtime)
@@ -740,7 +740,7 @@ class OsidSession:
         return get_effective_agent_id_with_proxy(self._proxy)"""
 
     get_effective_agent = """
-        return get_effective_agent_id_with_proxy(self._proxy) # Currently raises Unimplemented"""
+        return get_effective_agent_id_with_proxy(self._proxy)  # Currently raises Unimplemented"""
 
     supports_transactions = """
         return False"""
@@ -787,7 +787,7 @@ class OsidObject:
             # catalogs do not have this attribute
             pass
 
-        try: # Need to implement records for catalogs one of these days
+        try:  # Need to implement records for catalogs one of these days
             for record in self._records:
                 try:
                     self._records[record]._update_object_map(obj_map)
@@ -929,12 +929,12 @@ class OsidForm:
         syntax = metadata.get_syntax
 
         # First check if this is a required data element
-        if metadata.is_required == True and not inpt:
+        if metadata.is_required and not inpt:
             return False
 
         valid = True  # Innocent until proven guilty
         # Recursively run through all the elements of an array
-        if array == True:
+        if array:
             if len(inpt) < metadata['minimum_elements']:
                 valid = False
             elif len(inpt) > metadata['maximum_elements']:
@@ -1229,7 +1229,7 @@ class OsidTemporalForm:
             raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_start_date_metadata()):
             raise errors.InvalidArgument()
-        #self._my_map['startDate'] = self._get_date_map(date)
+        # self._my_map['startDate'] = self._get_date_map(date)
         self._my_map['startDate'] = date"""
 
     clear_start_date = """
@@ -1248,7 +1248,7 @@ class OsidTemporalForm:
             raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_end_date_metadata()):
             raise errors.InvalidArgument()
-        #self._my_map['endDate'] = self._get_date_map(date)
+        # self._my_map['endDate'] = self._get_date_map(date)
         self._my_map['endDate'] = date"""
 
     clear_end_date = """
@@ -1629,7 +1629,7 @@ class OsidList:
     def next(self):
         \"\"\"next method for iterator.\"\"\"
         next_object = self._iter_object.next()
-        if self._count != None:
+        if self._count is not None:
             self._count -= 1
         return next_object
 
@@ -1638,7 +1638,7 @@ class OsidList:
         return self.available()"""
 
     has_next = """
-        if self._count != None:
+        if self._count is not None:
             # If count is available, use it
             return bool(self._count)
         else:
@@ -1646,7 +1646,7 @@ class OsidList:
             return True"""
 
     available = """
-        if self._count != None:
+        if self._count is not None:
             # If count is available, use it
             return self._count
         else:
@@ -1781,11 +1781,11 @@ class OsidQuery:
 
     def _clear_minimum_terms(self, match_key):
         \"\"\"clears minimum match_key term values\"\"\"
-        try: # clear match = True case
+        try:  # clear match = True case
             del self._query_terms[match_key]['$gte']
         except KeyError:
             pass
-        try: # clear match = False case
+        try:  # clear match = False case
             del self._query_terms[match_key]['$lt']
         except KeyError:
             pass
@@ -1797,11 +1797,11 @@ class OsidQuery:
 
     def _clear_maximum_terms(self, match_key):
         \"\"\"clears maximum match_key term values\"\"\"
-        try: # clear match = True case
+        try:  # clear match = True case
             del self._query_terms[match_key]['$lte']
         except KeyError:
             pass
-        try: # clear match = False case
+        try:  # clear match = False case
             del self._query_terms[match_key]['$gt']
         except KeyError:
             pass

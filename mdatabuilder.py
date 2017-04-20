@@ -19,6 +19,29 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
 
         self._class = 'mdata'
 
+    @staticmethod
+    def _default_types():
+        return ('DEFAULT_LANGUAGE_TYPE = Type(**types.Language().get_type_data("DEFAULT"))\n' +
+                'DEFAULT_SCRIPT_TYPE = Type(**types.Script().get_type_data("DEFAULT"))\n' +
+                'DEFAULT_FORMAT_TYPE = Type(**types.Format().get_type_data("DEFAULT"))\n' +
+                'DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data("DEFAULT"))')
+
+    def _get_templated_imports(self):
+        # check template directory to see if there is an override
+        import_str = ''
+        if os.path.isfile('{0}/{1}.py'.format(self._template_dir,
+                                              self.replace(self.package['name']))):
+            mocked_interface = {
+                'shortname': self.package['name'].title()
+            }
+            impl_class = self._impl_class(mocked_interface)
+            if hasattr(impl_class, 'import_statements'):
+                for import_statement in getattr(impl_class, 'import_statements'):
+                    import_str += '\n{0}'.format(import_statement)
+            if hasattr(impl_class, 'init'):
+                import_str += '\n{0}\n'.format(getattr(impl_class, 'init'))
+        return import_str
+
     def _make_mdata(self, file_name):
         with open(file_name, 'r') as read_file:
             self.package = json.load(read_file)
@@ -36,11 +59,10 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
 
         mdata_definitions = []
 
-        ##
         # The real work starts here.  Iterate through all interfaces to build
         # all the model classes for this osid package.
         for interface in self.package['interfaces']:
-            ##
+
             # Check to see if this interface is meant to be implemented.
             if self.package['name'] != 'osid' and not self._build_this_interface(interface):
                 continue
@@ -52,38 +74,30 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                     interface['shortname'] == self.patterns['package_catalog_caps']):
                 impl_class = self._impl_class(interface)
 
-                ##
                 # Build all mdata maps, checking to see if there is a hand built
                 # mdata implementation available
                 if not hasattr(impl_class, 'mdata'):
                     mdata_maps = self._make_mdata_maps(interface)
                 else:
                     mdata_maps = getattr(impl_class, 'mdata')
-                ##
+
                 # Assemble complete mdata string to be saved as mdata.py
                 mdata = '\n{0}\n'.format(mdata_maps)
 
-                ##
                 # Finally, save the mdata to the appropriate mdata_conf.py file.
                 if mdata.strip() != '':
                     mdata_definitions.append(mdata)
 
-        # check template directory to see if there is an override
-        if os.path.isfile('{0}/{1}.py'.format(self._template_dir,
-                                              self.replace(self.package['name']))):
-            mocked_interface = {
-                'shortname': self.package['name'].title()
-            }
-            impl_class = self._impl_class(mocked_interface)
-            if hasattr(impl_class, 'import_statements'):
-                for import_statement in getattr(impl_class, 'import_statements'):
-                    import_str += '\n{0}'.format(import_statement)
-            if hasattr(impl_class, 'init'):
-                import_str += '\n\n{0}'.format(getattr(impl_class, 'init'))
+        import_str += self._get_templated_imports()
+        import_str += self._default_types()
+
+        if len(mdata_definitions) > 0:
+            mdata_definitions = '\n\n{0}'.format('\n'.join(mdata_definitions))
+        else:
+            mdata_definitions = '\n'
 
         with open(self._abc_module('default_mdata'), 'wb') as write_file:
-            write_file.write((import_str + '\n\n' +
-                             '\n'.join(mdata_definitions)).encode('utf-8'))
+            write_file.write((import_str + mdata_definitions).encode('utf-8'))
 
     def _make_mdata_maps(self, interface):
         from builders.jsonosid_templates import options
@@ -233,8 +247,4 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
     def module_header(self, module):
         return ('\"\"\"JSON osid metadata configurations for ' + self.package['name'] + ' service.\"\"\"\n\n' +
                 'from .. import types\n' +
-                'from ..primitives import Type\n' +
-                'DEFAULT_LANGUAGE_TYPE = Type(**types.Language().get_type_data("DEFAULT"))\n' +
-                'DEFAULT_SCRIPT_TYPE = Type(**types.Script().get_type_data("DEFAULT"))\n' +
-                'DEFAULT_FORMAT_TYPE = Type(**types.Format().get_type_data("DEFAULT"))\n' +
-                'DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data("DEFAULT"))')
+                'from ..primitives import Type\n')
