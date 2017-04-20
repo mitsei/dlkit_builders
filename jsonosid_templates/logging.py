@@ -1,7 +1,3 @@
-
-from .error_lists import session_errors
-
-
 class LoggingSession:
 
     import_statements = [

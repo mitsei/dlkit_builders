@@ -896,7 +896,7 @@ class ResourceBinAssignmentSession:
         self.assign_${object_name_under}_to_${cat_name_under}(${arg0_name}, ${arg2_name})
         try:
             self.unassign_${object_name_under}_from_${cat_name_under}(${arg0_name}, ${arg1_name})
-        except: # something went wrong, roll back assignment to ${arg2_name}
+        except:  # something went wrong, roll back assignment to ${arg2_name}
             self.unassign_${object_name_under}_from_${cat_name_under}(${arg0_name}, ${arg2_name})
             raise"""
 

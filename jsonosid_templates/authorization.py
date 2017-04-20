@@ -311,7 +311,7 @@ class AuthorizationAdminSession:
             if not isinstance(arg, ABCType):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
         if authorization_record_types == []:
-            ## WHY are we passing vault_id = self._catalog_id below, seems redundant:
+            # WHY are we passing vault_id = self._catalog_id below, seems redundant:
             obj_form = objects.AuthorizationForm(
                 vault_id=self._catalog_id,
                 resource_id=resource_id,
@@ -396,8 +396,7 @@ class Authorization:
             obj_map['endDate']['microsecond'] = end_date.microsecond
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
-    object_map = property(fget=get_object_map)
-    """
+    object_map = property(fget=get_object_map)"""
 
 
 class AuthorizationQuery:

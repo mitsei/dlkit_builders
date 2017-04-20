@@ -55,7 +55,7 @@ DISPLAY_TEXT_MDATA = """
                 'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
                 'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
                 'formatTypeId': str(DEFAULT_FORMAT_TYPE),
-                }],
+            }],
             'syntax': 'STRING',
             'minimum_string_length': 0,
             'maximum_string_length': ${max_length},

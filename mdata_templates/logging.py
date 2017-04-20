@@ -15,12 +15,12 @@ MIN_DATETIME = {
 }"""
 
     LOG_ENTRY_TIMESTAMP = """
-    'element_label': 'timestamp',
-    'instructions': 'enter a valid datetime object.',
-    'required': False,
-    'read_only': False,
-    'linked': False,
-    'array': False,
-    'default_date_time_values': [MIN_DATETIME],
-    'syntax': 'DATETIME',
-    'date_time_set': []"""
+            'element_label': 'timestamp',
+            'instructions': 'enter a valid datetime object.',
+            'required': False,
+            'read_only': False,
+            'linked': False,
+            'array': False,
+            'default_date_time_values': [MIN_DATETIME],
+            'syntax': 'DATETIME',
+            'date_time_set': []"""

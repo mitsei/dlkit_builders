@@ -33,8 +33,8 @@ class CommentAdminSession:
             if not isinstance(arg, ABC${arg1_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg1_type}')
         if ${arg1_name} == []:
-            ## WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
-            ## Probably don't need to send effective_agent_id, since the form can get that from proxy.
+            # WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
+            # Probably don't need to send effective_agent_id, since the form can get that from proxy.
             obj_form = objects.${return_type}(
                 ${cat_name_under}_id=self._catalog_id,
                 ${arg0_name}=${arg0_name},

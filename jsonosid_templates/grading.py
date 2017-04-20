@@ -193,7 +193,7 @@ class GradeEntryForm:
         self._mdata = default_mdata.get_grade_entry_mdata()
         self._effective_agent_id = kwargs['effective_agent_id']
 
-        mgr = self._get_provider_manager('GRADING') # What about the Proxy?
+        mgr = self._get_provider_manager('GRADING')  # What about the Proxy?
         lookup_session = mgr.get_gradebook_column_lookup_session(proxy=getattr(self, "_proxy", None))
         lookup_session.use_federated_gradebook_view()
         if 'gradebook_column_id' in kwargs:
@@ -255,7 +255,7 @@ class GradeEntryForm:
 
     clear_grade = """
         if not self._grade_system.is_based_on_grades():
-            return # do nothing, spec does not raise error
+            return  # do nothing, spec does not raise error
         if (self.get_grade_metadata().is_read_only() or
                 self.get_grade_metadata().is_required()):
             raise errors.NoAccess()
@@ -281,7 +281,7 @@ class GradeEntryForm:
 
     clear_score = """
         if self._grade_system.is_based_on_grades():
-            return # do nothing, spec does not raise error
+            return  # do nothing, spec does not raise error
         if (self.get_score_metadata().is_read_only() or
                 self.get_score_metadata().is_required()):
             raise errors.NoAccess()
@@ -324,8 +324,7 @@ class GradebookColumnAdminSession:
         gels = grading_manager.get_grade_entry_lookup_session(proxy=getattr(self, "_proxy", None))
         gels.use_federated_gradebook_view()
         entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
-        return entries.available() > 0
-        """
+        return entries.available() > 0"""
 
     delete_gradebook_column = """
         if not isinstance(gradebook_column_id, ABCId):
@@ -403,8 +402,7 @@ class GradeSystemAdminSession:
         querier = gcqs.get_gradebook_column_query()
         querier.match_grade_system_id(grade_system_id, match=True)
         columns = gcqs.get_gradebook_columns_by_query(querier)
-        return columns.available() > 0
-        """
+        return columns.available() > 0"""
 
     delete_grade_system = """
         collection = JSONClientValidated('grading',
