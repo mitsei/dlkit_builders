@@ -497,15 +497,16 @@ class AssetAdminSession:
         ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_mixed}Id']).get_identifier()
         ${object_name_under} = collection.find_one(
             {'$$and': [{'_id': ObjectId(${object_name_under}_id)},
-                       {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
+                      {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
         ${object_name_under}['${aggregated_objects_name_mixed}'].append(${arg0_name}._my_map)
         result = collection.save(${object_name_under})
 
         self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
         from .${return_module} import ${aggregated_object_name}
-        return ${return_type}(osid_object_map=${arg0_name}._my_map,
-                              runtime=self._runtime,
-                              proxy=self._proxy)"""
+        return ${return_type}(
+            osid_object_map=${arg0_name}._my_map,
+            runtime=self._runtime,
+            proxy=self._proxy)"""
 
     get_asset_content_form_for_update_template = """
         # Implemented from template for
@@ -518,12 +519,13 @@ class AssetAdminSession:
         if not isinstance(${arg0_name}, ABC${arg0_type}):
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         document = collection.find_one({'${aggregated_objects_name_mixed}._id': ObjectId(${arg0_name}.get_identifier())})
-        for sub_doc in document['${aggregated_objects_name_mixed}']: # There may be a MongoDB shortcut for this
+        for sub_doc in document['${aggregated_objects_name_mixed}']:  # There may be a MongoDB shortcut for this
             if sub_doc['_id'] == ObjectId(${arg0_name}.get_identifier()):
                 result = sub_doc
-        obj_form = ${return_type}(osid_object_map=result,
-                                  runtime=self._runtime,
-                                  proxy=self._proxy)
+        obj_form = ${return_type}(
+            osid_object_map=result,
+            runtime=self._runtime,
+            proxy=self._proxy)
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
@@ -549,7 +551,7 @@ class AssetAdminSession:
         ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_under}Id']).get_identifier()
         ${object_name_under} = collection.find_one(
             {'$$and': [{'_id': ObjectId(${object_name_under}_id)},
-                       {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
+                      {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
         index = 0
         found = False
         for i in ${object_name_under}['${aggregated_objects_name_mixed}']:
@@ -563,15 +565,16 @@ class AssetAdminSession:
             raise errors.NotFound()
         try:
             collection.save(${object_name_under})
-        except: # what exceptions does mongodb save raise?
+        except:  # what exceptions does mongodb save raise?
             raise errors.OperationFailed()
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         from .objects import ${aggregated_object_name}
 
-        return ${aggregated_object_name}(osid_object_map=${arg0_name}._my_map,
-                                         runtime=self._runtime,
-                                         proxy=self._proxy)"""
+        return ${aggregated_object_name}(
+            osid_object_map=${arg0_name}._my_map,
+            runtime=self._runtime,
+            proxy=self._proxy)"""
 
     delete_asset_content_template = """
         # Implemented from template for
@@ -594,9 +597,10 @@ class AssetAdminSession:
             found = True
         if not found:
             raise errors.OperationFailed()
-        ${aggregated_object_name}(osid_object_map=${aggregated_object_name_under}_map,
-                                  runtime=self._runtime,
-                                  proxy=self._proxy)._delete()
+        ${aggregated_object_name}(
+            osid_object_map=${aggregated_object_name_under}_map,
+            runtime=self._runtime,
+            proxy=self._proxy)._delete()
         collection.save(${object_name_under})"""
 
 

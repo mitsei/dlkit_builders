@@ -245,7 +245,7 @@ class AssessmentSession:
             assessment_section_id=assessment_section_id,
             runtime=self._runtime,
             proxy=self._proxy)
-        obj_form._for_update = False # This may be redundant
+        obj_form._for_update = False  # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form"""
 
@@ -391,12 +391,11 @@ class AssessmentSession:
         raise errors.IllegalState()"""
 
     additional_methods = """
-
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
         if assessment_taken_id not in self._assessments_taken:
             mgr = self._get_provider_manager('ASSESSMENT')
-            lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy) # Should this be _for_bank?
+            lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)  # Should this be _for_bank?
             lookup_session.use_federated_bank_view()
             self._assessments_taken[assessment_taken_id] = (
                 lookup_session.get_assessment_taken(assessment_taken_id))
@@ -535,7 +534,7 @@ class ItemAdminSession:
         if item['question'] is None:
             item['question'] = question_form._my_map
         else:
-            item['question'] = question_form._my_map # Let's just assume we can overwrite it
+            item['question'] = question_form._my_map  # Let's just assume we can overwrite it
         collection.save(item)
         self._forms[question_form.get_id().get_identifier()] = CREATED
         return objects.Question(osid_object_map=question_form._my_map,
@@ -584,7 +583,7 @@ class ItemAdminSession:
         item['question'] = question_form._my_map
         try:
             collection.save(item)
-        except: # what exceptions does mongodb save raise?
+        except:  # what exceptions does mongodb save raise?
             raise errors.OperationFailed()
         self._forms[question_form.get_id().get_identifier()] = UPDATED
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
@@ -685,7 +684,7 @@ class AssessmentTakenLookupSession:
         result = collection.find(
             dict({'assessmentOfferedId': str(assessment_offered_id),
                   'takingAgentId': str(resource_id)},
-                  **self._view_filter())).sort('_id', DESCENDING)
+                 **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result, runtime=self._runtime, proxy=self._proxy)"""
 
     get_assessments_taken_for_assessment = """
@@ -724,7 +723,7 @@ class AssessmentOfferedAdminSession:
     ]
 
     deprecated_get_assessment_offered_form_for_create = """
-        ##
+
         # This impl differs from the usual get_osid_object_form_for_create method in that it
         # sets a default display name based on the underlying Assessment...
         from dlkit.abstract_osid.id.primitives import Id as ABCId
@@ -734,16 +733,16 @@ class AssessmentOfferedAdminSession:
         for arg in assessment_offered_record_types:
             if not isinstance(arg, ABCType):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
-        ##
+
         #...Here:
         collection = JSONClientValidated('assessment',
                                          collection='Assessment',
                                          runtime=self._runtime)
         assessment_map = collection.find_one(
             {'$and': [{'_id': ObjectId(assessment_id.get_identifier())}, {'bankId': str(self._catalog_id)}]})
-        ##
+
         if assessment_offered_record_types == []:
-            ## WHY are we passing bank_id = self._catalog_id below, seems redundant:
+            # WHY are we passing bank_id = self._catalog_id below, seems redundant:
             obj_form = objects.AssessmentOfferedForm(
                 bank_id=self._catalog_id,
                 assessment_id=assessment_id,
@@ -784,7 +783,6 @@ class AssessmentTakenAdminSession:
     ]
 
     create_assessment_taken = """
-        ##
         # This impl differs from the usual create_osid_object method in that it
         # sets an agent id and default display name based on the underlying Assessment
         # and checks for exceeding max attempts...
@@ -802,7 +800,7 @@ class AssessmentTakenAdminSession:
             raise errors.Unsupported('assessment_taken_form did not originate from this session')
         if not assessment_taken_form.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
-        ##
+
         # ...here:
         assessment_offered_id = Id(assessment_taken_form._my_map['assessmentOfferedId'])
         aols = AssessmentOfferedLookupSession(
@@ -849,7 +847,7 @@ class AssessmentTakenAdminSession:
             pass
 
         if assessment_taken_record_types == []:
-            ## WHY are we passing bank_id = self._catalog_id below, seems redundant:
+            # WHY are we passing bank_id = self._catalog_id below, seems redundant:
             obj_form = objects.AssessmentTakenForm(
                 bank_id=self._catalog_id,
                 assessment_offered_id=assessment_offered_id,

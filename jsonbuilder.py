@@ -232,17 +232,23 @@ def serialize(var_dict):
     purely string based..."""
     return_dict = {}
     ppr = pprint.PrettyPrinter(indent=4)
-    ppr_list = pprint.PrettyPrinter(indent=5)
 
     for k, v in var_dict.iteritems():
         if isinstance(v, basestring):
             return_dict[k] = k + ' = "' + str(v) + '"'
         elif isinstance(v, list) and len(v) <= 3:  # this is stupid and horrible, I know
             return_dict[k] = k + ' = ' + str(v)
-        elif isinstance(v, list) or isinstance(v, dict):
-            if isinstance(v, list):
-                return_dict[k] = k + ' = \\\n    ' + ppr_list.pformat(v)
-                continue
+        elif isinstance(v, list):
+            # manually do lists instead of using pprint because
+            # the first line indentation was breaking pep8 checks
+            return_dict[k] = '{0} = [  # \'{1}\'\n'.format(k, v[0][2::])
+            for value in v[1::]:
+                if '#' in value:
+                    return_dict[k] += '    # \'{0}\',\n'.format(value.replace('#', ''))
+                else:
+                    return_dict[k] += '    \'{0}\',\n'.format(value)
+            return_dict[k] += ']'
+        elif isinstance(v, dict):
             return_dict[k] = k + ' = ' + ppr.pformat(v)
 
     return return_dict

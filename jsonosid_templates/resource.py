@@ -682,7 +682,7 @@ class ResourceNotificationSession:
             db_prefix = runtime.get_configuration().get_value_by_parameter(db_prefix_param_id).get_string_value()
         except (AttributeError, KeyError, errors.NotFound):
             pass
-        self._ns='{0}${pkg_name_replaced}.${object_name}'.format(db_prefix)
+        self._ns = '{0}${pkg_name_replaced}.${object_name}'.format(db_prefix)
 
         if self._ns not in MONGO_LISTENER.receivers:
             MONGO_LISTENER.receivers[self._ns] = dict()
@@ -731,7 +731,7 @@ class ResourceNotificationSession:
     register_for_changed_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_changed_resource
-        if MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] == False:
+        if not MONGO_LISTENER.receivers[self._ns][self._receiver]['u']:
             MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = []
         if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['u'], list):
             MONGO_LISTENER.receivers[self._ns][self._receiver]['u'].append(${arg0_name}.get_identifier())"""
@@ -744,7 +744,7 @@ class ResourceNotificationSession:
     register_for_deleted_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceNotificationSession.register_for_deleted_resource
-        if MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] == False:
+        if not MONGO_LISTENER.receivers[self._ns][self._receiver]['d']:
             MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = []
         if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['d'], list):
             self.MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())"""
@@ -879,7 +879,7 @@ class ResourceBinAssignmentSession:
         # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
-        lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
+        lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
         self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
 
     unassign_resource_from_bin_template = """
@@ -887,7 +887,7 @@ class ResourceBinAssignmentSession:
         # osid.resource.ResourceBinAssignmentSession.unassign_resource_from_bin
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
-        cat = lookup_session.get_${cat_name_under}(${arg1_name}) # to raise NotFound
+        cat = lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
         self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
 
     reassign_resource_to_bin_template = """
@@ -1184,13 +1184,13 @@ class BinAdminSession:
             result = objects.${return_type}(
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id(),
-                proxy=self._proxy) ## Probably don't need effective agent id now that we have proxy in form.
+                proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
         else:
             result = objects.${return_type}(
                 record_types=${arg0_name},
                 runtime=self._runtime,
                 effective_agent_id=self.get_effective_agent_id(),
-                proxy=self._proxy) ## Probably don't need effective agent id now that we have proxy in form.
+                proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
         self._forms[result.get_id().get_identifier()] = not CREATED
         return result"""
 
@@ -1280,7 +1280,7 @@ class BinAdminSession:
             raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
-        collection.save(${arg0_name}._my_map) # save is deprecated - change to replace_one
+        collection.save(${arg0_name}._my_map)  # save is deprecated - change to replace_one
 
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
 
@@ -1943,7 +1943,7 @@ class BinQuery:
             Id(authority='${pkg_name_upper}',
                namespace='CATALOG',
                identifier='${cat_name_upper}')
-        ) # What about the Proxy?
+        )  # What about the Proxy?
         descendants = []
         if hts.has_children(catalog_id):
             for child_id in hts.get_children(catalog_id):
