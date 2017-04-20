@@ -16,7 +16,7 @@ class AssessmentAuthoringManager:
         ``supports_assessment_part_lookup()`` is ``true``.*
 
         \"\"\"
-        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+        if not self.supports_assessment_part_lookup():  # This is kludgy, but only until Tom fixes spec
             raise errors.Unimplemented()
         if self._proxy_in_args(*args, **kwargs):
             raise errors.InvalidArgument('A Proxy object was received but not expected.')
@@ -42,13 +42,12 @@ class AssessmentAuthoringManager:
         ``supports_visible_federation()`` are ``true``.*
 
         \"\"\"
-        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+        if not self.supports_assessment_part_lookup():  # This is kludgy, but only until Tom fixes spec
             raise errors.Unimplemented()
         if self._proxy_in_args(*args, **kwargs):
             raise errors.InvalidArgument('A Proxy object was received but not expected.')
-        ##
+
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
-        ##
         # pylint: disable=no-member
         return sessions.AssessmentPartItemSession(bank_id, runtime=self._runtime)
 
@@ -65,7 +64,7 @@ class AssessmentAuthoringManager:
         ``supports_assessment_part_lookup()`` is ``true``.*
 
         \"\"\"
-        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+        if not self.supports_assessment_part_lookup():  # This is kludgy, but only until Tom fixes spec
             raise errors.Unimplemented()
         if self._proxy_in_args(*args, **kwargs):
             raise errors.InvalidArgument('A Proxy object was received but not expected.')
@@ -91,13 +90,12 @@ class AssessmentAuthoringManager:
         ``supports_visible_federation()`` are ``true``.*
 
         \"\"\"
-        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+        if not self.supports_assessment_part_lookup():  # This is kludgy, but only until Tom fixes spec
             raise errors.Unimplemented()
         if self._proxy_in_args(*args, **kwargs):
             raise errors.InvalidArgument('A Proxy object was received but not expected.')
-        ##
+
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
-        ##
         # pylint: disable=no-member
         return sessions.AssessmentPartItemDesignSession(bank_id, runtime=self._runtime)"""
 
@@ -119,7 +117,7 @@ class AssessmentAuthoringProxyManager:
         ``supports_assessment_part_lookup()`` is ``true``.*
 
         \"\"\"
-        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+        if not self.supports_assessment_part_lookup():  # This is kludgy, but only until Tom fixes spec
             raise errors.Unimplemented()
         # pylint: disable=no-member
         return sessions.AssessmentPartItemSession(proxy=proxy, runtime=self._runtime)
@@ -143,11 +141,10 @@ class AssessmentAuthoringProxyManager:
         ``supports_visible_federation()`` are ``true``.*
 
         \"\"\"
-        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+        if not self.supports_assessment_part_lookup():  # This is kludgy, but only until Tom fixes spec
             raise errors.Unimplemented()
-        ##
+
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
-        ##
         # pylint: disable=no-member
         return sessions.AssessmentPartItemSession(bank_id, proxy=proxy, runtime=self._runtime)
 
@@ -164,7 +161,7 @@ class AssessmentAuthoringProxyManager:
         ``supports_assessment_part_lookup()`` is ``true``.*
 
         \"\"\"
-        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+        if not self.supports_assessment_part_lookup():  # This is kludgy, but only until Tom fixes spec
             raise errors.Unimplemented()
         # pylint: disable=no-member
         return sessions.AssessmentPartItemDesignSession(proxy=proxy, runtime=self._runtime)
@@ -188,11 +185,10 @@ class AssessmentAuthoringProxyManager:
         ``supports_visible_federation()`` are ``true``.*
 
         \"\"\"
-        if not self.supports_assessment_part_lookup(): # This is kludgy, but only until Tom fixes spec
+        if not self.supports_assessment_part_lookup():  # This is kludgy, but only until Tom fixes spec
             raise errors.Unimplemented()
-        ##
+
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
-        ##
         # pylint: disable=no-member
         return sessions.AssessmentPartItemDesignSession(bank_id, proxy=proxy, runtime=self._runtime)"""
 
@@ -265,7 +261,7 @@ class AssessmentPartAdminSession:
                 mdata['sequestered']['default_boolean_values'] = [False]
             else:
                 mdata['sequestered']['default_boolean_values'] = [True]
-        ## WHY are we passing bank_id = self._catalog_id below, seems redundant:
+        # WHY are we passing bank_id = self._catalog_id below, seems redundant:
         obj_form = objects.AssessmentPartForm(
             bank_id=self._catalog_id,
             record_types=assessment_part_record_types,
@@ -457,7 +453,7 @@ class AssessmentPart:
     def has_next_assessment_part(self, assessment_part_id):
         \"\"\"This supports the basic simple sequence case. Can be overriden in a record for other cases\"\"\"
         if not self.supports_child_ordering or not self.supports_simple_child_sequencing:
-            raise AttributeError() # Only available through a record extension
+            raise AttributeError()  # Only available through a record extension
         if 'childIds' in self._my_map and str(assessment_part_id) in self._my_map['childIds']:
             if self._my_map['childIds'][-1] != str(assessment_part_id):
                 return True
@@ -556,7 +552,7 @@ class AssessmentPartForm:
                 self._my_map['sequestered'] = kwargs['mdata']['sequestered']['default_boolean_values'][0]
         else:
             self._my_map['assessmentPartId'] = self._assessment_part_default
-            self._my_map['sequestered'] = False # Parts under Assessments must be "Sections"
+            self._my_map['sequestered'] = False  # Parts under Assessments must be "Sections"
         if 'assessment_id' in kwargs:
             self._my_map['assessmentId'] = str(kwargs['assessment_id'])
         else:
@@ -580,7 +576,7 @@ class AssessmentPartForm:
             raise AttributeError('This Assessment Part does not support simple child sequencing')
         self._my_map['itemsShuffled'] = shuffled
 
-    def set_children_sequential(self, sequential): # This should be set in a record
+    def set_children_sequential(self, sequential):  # This should be set in a record
         if not self._supports_simple_sequencing:
             raise AttributeError('This Assessment Part does not support simple child sequencing')
         self._my_map['childrenSequential'] = sequential

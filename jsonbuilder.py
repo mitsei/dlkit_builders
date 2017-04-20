@@ -217,7 +217,7 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
                               self.package['title'] + '\n' +
                               self.package['name'] + ' version ' +
                               self.package['version'] + '\n\n' +
-                              self.package['summary'] + '\n\n\"\"\"').encode('utf-8') +
+                              self._wrap(self.package['summary']) + '\n\n\"\"\"').encode('utf-8') +
                              '\n')
 
     def write_profile_file(self):
