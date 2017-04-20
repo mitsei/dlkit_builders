@@ -140,7 +140,7 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
 
         profile['VERSIONCOMPONENTS'][2] += 1
         profile['RELEASEDATE'] = str(datetime.date.today())
-        profile['SUPPORTS'].extend(['# Remove the # when implementations exist:',
+        profile['SUPPORTS'].extend(["# Remove the # when implementations exist:",
                                     "#supports_journal_rollback",
                                     "#supports_journal_branching"])
 
@@ -209,7 +209,7 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
                 '# pylint: disable=protected-access\n' +
                 '#     Access to protected methods allowed in package json package scope\n' +
                 '# pylint: disable=too-many-ancestors\n' +
-                '#     Inheritance defined in specification\n')
+                '#     Inheritance defined in specification')
 
     def write_license_file(self):
         with open(self._abc_module('summary_doc', abc=False), 'w') as write_file:
@@ -232,6 +232,7 @@ def serialize(var_dict):
     purely string based..."""
     return_dict = {}
     ppr = pprint.PrettyPrinter(indent=4)
+    ppr_list = pprint.PrettyPrinter(indent=5)
 
     for k, v in var_dict.iteritems():
         if isinstance(v, basestring):
@@ -239,6 +240,9 @@ def serialize(var_dict):
         elif isinstance(v, list) and len(v) <= 3:  # this is stupid and horrible, I know
             return_dict[k] = k + ' = ' + str(v)
         elif isinstance(v, list) or isinstance(v, dict):
+            if isinstance(v, list):
+                return_dict[k] = k + ' = \\\n    ' + ppr_list.pformat(v)
+                continue
             return_dict[k] = k + ' = ' + ppr.pformat(v)
 
     return return_dict

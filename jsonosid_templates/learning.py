@@ -252,7 +252,9 @@ class Activity:
         mgr = self._get_provider_manager('${return_pkg_caps}')
         if not mgr.supports_${return_type_list_object_under}_lookup():
             raise errors.OperationFailed('${return_pkg_title} does not support ${return_type_list_object} lookup')
-        lookup_session = mgr.get_${return_type_list_object_under}_lookup_session(proxy=getattr(self, "_proxy", None)) # What about the Proxy?
+
+        # What about the Proxy?
+        lookup_session = mgr.get_${return_type_list_object_under}_lookup_session(proxy=getattr(self, "_proxy", None))
         lookup_session.use_federated_${return_cat_name_under}_view()
         return lookup_session.get_${return_type_list_object_plural_under}_by_ids(self.get_${var_name_singular}_ids())"""
 

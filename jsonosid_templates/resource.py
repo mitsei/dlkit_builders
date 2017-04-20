@@ -1627,8 +1627,6 @@ class Resource:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
-        '#from ..id.objects import IdList',
-        '#import importlib',
         'from ..utilities import get_registry',
     ]
 
@@ -1800,7 +1798,8 @@ class ResourceForm:
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
 ${metadata_super_initers}        ${init_object}._init_metadata(self, **kwargs)
-${metadata_initers}    def _init_map(self, record_types=None, **kwargs):
+        ${metadata_initers}
+    def _init_map(self, record_types=None, **kwargs):
         \"\"\"Initialize form map\"\"\"
 ${map_super_initers}        ${init_object}._init_map(self, record_types=record_types)
 ${persisted_initers}"""

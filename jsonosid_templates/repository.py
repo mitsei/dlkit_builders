@@ -1027,9 +1027,10 @@ class Asset:
 
     get_asset_contents_template = """
         # Implemented from template for osid.repository.Asset.get_asset_contents_template
-        return ${aggregated_object_name}List(self._my_map['${var_name_plural_mixed}'],
-                                             runtime=self._runtime,
-                                             proxy=self._proxy)
+        return ${aggregated_object_name}List(
+            self._my_map['${var_name_plural_mixed}'],
+            runtime=self._runtime,
+            proxy=self._proxy)
 
     def _delete(self):
         for ${aggregated_object_name_under} in self.get_${aggregated_objects_name_under}():

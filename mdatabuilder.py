@@ -237,4 +237,4 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                 'DEFAULT_LANGUAGE_TYPE = Type(**types.Language().get_type_data("DEFAULT"))\n' +
                 'DEFAULT_SCRIPT_TYPE = Type(**types.Script().get_type_data("DEFAULT"))\n' +
                 'DEFAULT_FORMAT_TYPE = Type(**types.Format().get_type_data("DEFAULT"))\n' +
-                'DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data("DEFAULT"))\n')
+                'DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data("DEFAULT"))')

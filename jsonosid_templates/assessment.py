@@ -1034,7 +1034,6 @@ class Item:
                         proxy=self._proxy)"""
 
     additional_methods = """
-
     def get_configuration(self):
         config = dict()
         try:
@@ -1083,7 +1082,7 @@ class Item:
 
         \"\"\"
         if self.is_feedback_available():
-            pass # what is feedback anyway? Just a DisplayText or something more?
+            pass  # what is feedback anyway? Just a DisplayText or something more?
         raise errors.IllegalState()
 
     def is_solution_available(self):
@@ -1337,13 +1336,13 @@ class AssessmentOffered:
 
     def are_sections_sequential(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
-        if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
+        if not self.get_assessment().uses_simple_section_sequencing():  # Records should check this
             return True
         return True
 
     def are_sections_shuffled(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
-        if not self.get_assessment().uses_simple_section_sequencing(): # Records should check this
+        if not self.get_assessment().uses_simple_section_sequencing():  # Records should check this
             return False
         return False"""
 
@@ -1402,8 +1401,9 @@ class AssessmentOfferedForm:
         # Implemented from template for osid.assessment.AssessmentOfferedForm.set_duration_template
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
-        if not self._is_valid_${arg0_type_under}(${arg0_name},
-                                self.get_${arg0_name}_metadata()):
+        if not self._is_valid_${arg0_type_under}(
+                ${arg0_name},
+                self.get_${arg0_name}_metadata()):
             raise errors.InvalidArgument()
         map = dict()
         map['days'] = ${arg0_name}.days
@@ -1803,11 +1803,11 @@ class AssessmentSection:
             return None
 
         def reorder_choices(choices, magic_id):
-            ## We may want to do this with the magic lookup session instead
+            # We may want to do this with the magic lookup session instead
             # reorder the choices list according to the order in the magic_id
             identifier = unquote(Id(magic_id).identifier)
             if '?' in identifier:
-                #it is a magic ID, by our convention
+                # it is a magic ID, by our convention
                 magic_params = json.loads(identifier.split('?')[1])
                 choice_ids = [c['id'] for c in choices]
                 if (isinstance(magic_params, list) and

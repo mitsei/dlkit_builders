@@ -253,6 +253,8 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                         self.patterns[interface_name[:-4] + '.persisted_data'],
                         self.patterns[interface_name[:-4] + '.initialized_data'],
                         self.patterns[interface_name[:-4] + '.return_types'])
+                    if metadata_initers != '':
+                        metadata_initers += '\n'
                 except KeyError:
                     pass
         elif init_pattern == 'resource.ResourceQuery':
@@ -494,12 +496,7 @@ def make_metadata_initers(interface_name, persisted_data, initialized_data, retu
 
             # initer += template.substitute({'data_name': data_name,
             #                               'data_name_upper': data_name_upper})
-    # if initer:
-    #    initer += '\n'
-    if default:
-        default += '\n'
-    # return imports + initer + default
-    return imports + default
+    return (imports + default).strip()
 
 
 # Assemble the initializers for persistance data managed by Osid Object Forms
