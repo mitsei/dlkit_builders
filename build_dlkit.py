@@ -3,11 +3,13 @@ executable from the command line, not necessarily a Python shell.
 
 Packages to build is read-in from config.py
 """
+import datetime
 import os
 import sys
 import json
 import glob
 import string
+import subprocess
 
 from collections import OrderedDict
 from importlib import import_module
@@ -843,16 +845,30 @@ class Builder(Utilities):
     def tests(self, create_parent_dir=False):
         from testbuilder import TestBuilder
         if create_parent_dir:
-            TestBuilder(build_dir=self.build_dir + './tests').make()
+            TestBuilder(build_dir=self.build_dir + '/../tests').make()
         else:
             TestBuilder(build_dir=self.build_dir).make()
+
+    def update_hash_file(self):
+        """Create / update a simple file that keeps track of what
+         builder commit was used to generate the files"""
+        build_commit_file = os.path.join(ABS_PATH, self.build_dir, '..', 'build_data.json')
+        with open(build_commit_file, 'wb+') as build_file_handle:
+            build_file = {
+                'commit': subprocess.check_output(['git', 'describe', '--always']).strip(),
+                'command': ' '.join(sys.argv),
+                'date': str(datetime.datetime.utcnow()),
+                'user': subprocess.check_output(['git', 'config', 'user.name']).strip()
+            }
+            json.dump(build_file, build_file_handle)
 
 if __name__ == '__main__':
 
     def usage():
-        print("Usage: python build_controller.py [commands]")
+        print("Usage: python build_dlkit.py [commands]")
         print("where:")
-        print("  [commands] is any set of supported commands")
+        print("  - [commands] is any set of supported commands")
+        print("  - If no commands are provided, then all packages are built")
         print("")
         print("Supported commands:")
         print("  map: map the xosid files into pattern_maps/ and package_maps/")
@@ -877,10 +893,11 @@ if __name__ == '__main__':
         print("This will build the files to the directory specified, default of ./dlkit/.")
         print("")
         print("examples:")
-        print("  python build_controller.py map patterns abc mdata json")
-        print("  python build_controller.py --all")
+        print("  python build_dlkit.py --buildto dlkit-dev")
+        print("  python build_dlkit.py map patterns abc mdata json")
+        print("  python build_dlkit.py --all")
 
-    if len(sys.argv) == 1:
+    if '?' in sys.argv or 'help' in sys.argv:
         usage()
     else:
         builder = Builder()
@@ -895,7 +912,9 @@ if __name__ == '__main__':
                     'authz',
                     'services',
                     'manager',
-                    'tests']
+                    'tests',
+                    'help',
+                    '?']
         if not any(c in sys.argv for c in commands):
             usage()
             sys.exit(1)
@@ -915,8 +934,9 @@ if __name__ == '__main__':
                     usage()
                     sys.exit(1)
                 builder.build_dir = target_dir
-
-        if '--all' in sys.argv:
+        if ('--all' in sys.argv or
+                (len(sys.argv) == 3 and
+                 sys.argv[1] == '--buildto')):
             # ignore the other commands
             builder.map()
             builder.patterns()
@@ -927,7 +947,9 @@ if __name__ == '__main__':
             builder.authz()
             builder.manager()
             builder.tests(True)
-            builder.docs()
+            # builder.docs()
+            # Create a build-hash file so we know what commit built dlkit
+            builder.update_hash_file()
         else:
             # need to do these in a specific order, regardless of how
             # they are passed in.

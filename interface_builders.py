@@ -7,7 +7,7 @@ import string
 from binder_helpers import under_to_mixed, under_to_caps, camel_to_mixed,\
     remove_plural, camel_to_under, make_plural, camel_to_caps_under,\
     fix_reserved_word
-from build_controller import Utilities, BaseBuilder, Templates
+from build_dlkit import Utilities, BaseBuilder, Templates
 from config import managers_to_implement, packages_to_test
 from method_builders import MethodBuilder
 from mappers import Mapper

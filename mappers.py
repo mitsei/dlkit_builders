@@ -5,7 +5,7 @@ import os
 from xosid_mapper import XOsidMapper
 from collections import OrderedDict
 
-from build_controller import BaseBuilder
+from build_dlkit import BaseBuilder
 
 
 class Mapper(XOsidMapper, BaseBuilder):

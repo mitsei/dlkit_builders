@@ -19,9 +19,10 @@ and `mdata`. After that, depending on what you change, you could build just
 `json`, `authz`, or `services`. 
 
 ```
-    Usage: python build_controller.py [commands]
+    Usage: python build_dlkit.py [commands]
     where:
-      [commands] is any set of supported commands
+      - [commands] is any set of supported commands
+      - By default, python build_dlkit.py will build all packages
     
     Supported commands:
       map: map the xosid files into pattern_maps/ and package_maps/
@@ -41,8 +42,9 @@ and `mdata`. After that, depending on what you change, you could build just
 This will build the files to the directory specified, default of `../dlkit/`.
 
 Examples:
-  - `python build_controller.py map patterns abc mdata json`
-  - `python build_controller.py --all`
-  - `python build_controller.py json --buildto dlkit_testing`
+  - `python build_dlkit --buildto dlkit-dev`
+  - `python build_dlkit.py map patterns abc mdata json`
+  - `python build_dlkit.py --all`
+  - `python build_dlkit.py json --buildto dlkit_testing`
 
 NOTE: there are no builder tests, so the Travis CI build just does a PEP8 check.

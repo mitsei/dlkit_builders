@@ -1,7 +1,7 @@
 from config import managers_to_implement, sessions_to_implement
 
 from binder_helpers import camel_to_list, SkipMethod
-from build_controller import BaseBuilder
+from build_dlkit import BaseBuilder
 from interface_builders import InterfaceBuilder
 from method_builders import argless_clear, argless_get,\
     simple_property, set_and_del_property, one_arg_set

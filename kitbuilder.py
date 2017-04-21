@@ -3,7 +3,7 @@ import json
 
 import inflection
 
-from build_controller import BaseBuilder
+from build_dlkit import BaseBuilder
 from binder_helpers import SkipMethod, fix_reserved_word
 from interface_builders import InterfaceBuilder
 

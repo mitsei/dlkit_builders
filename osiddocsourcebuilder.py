@@ -3,7 +3,7 @@ import re
 from config import managers_to_implement
 
 from binder_helpers import camel_to_list, fix_reserved_word
-from build_controller import BaseBuilder
+from build_dlkit import BaseBuilder
 from interface_builders import InterfaceBuilder
 from method_builders import argless_get, argless_clear, one_arg_set, strip_prefixes
 

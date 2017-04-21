@@ -5,7 +5,7 @@ import datetime
 
 from importlib import import_module
 
-from build_controller import BaseBuilder
+from build_dlkit import BaseBuilder
 from interface_builders import InterfaceBuilder
 
 

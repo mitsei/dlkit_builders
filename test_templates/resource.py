@@ -4,9 +4,9 @@
 class ResourceProfile:
 
     import_statements_pattern = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)',
@@ -49,7 +49,7 @@ class ResourceManager:
         create_form.description = 'Test ${cat_name} for ${pkg_name} manager tests'
         catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.catalog_id = catalog.get_id()
-        # cls.mgr = Runtime().get_manager('${pkg_name_upper}', 'TEST_MONGO_1', (3, 0, 0))
+        # cls.mgr = Runtime().get_manager('${pkg_name_upper}', 'TEST_JSON_1', (3, 0, 0))
 
     @classmethod
     def tearDownClass(cls):
@@ -85,7 +85,7 @@ class ResourceProxyManager:
         create_form.description = 'Test ${cat_name} for ${pkg_name} proxy manager tests'
         catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.catalog_id = catalog.get_id()
-        # cls.mgr = Runtime().get_proxy_manager('${pkg_name_upper}', 'TEST_MONGO_1', (3, 0, 0))
+        # cls.mgr = Runtime().get_proxy_manager('${pkg_name_upper}', 'TEST_JSON_1', (3, 0, 0))
 
     @classmethod
     def tearDownClass(cls):
@@ -111,9 +111,9 @@ class ResourceProxyManager:
 class ResourceLookupSession:
 
     import_statements_pattern = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
@@ -228,9 +228,9 @@ class ResourceLookupSession:
 class ResourceQuerySession:
 
     import_statements_pattern = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
@@ -284,9 +284,9 @@ class ResourceQuerySession:
 class ResourceAdminSession:
 
     import_statements_pattern = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
@@ -342,9 +342,9 @@ class ResourceNotificationSession:
 class ResourceBinSession:
 
     import_statements_pattern = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
@@ -409,9 +409,9 @@ class ResourceBinSession:
 class ResourceAgentSession:
 
     import_statements = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
@@ -506,9 +506,9 @@ class ResourceAgentAssignmentSession:
 class BinLookupSession:
 
     import_statements_pattern = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
@@ -568,9 +568,9 @@ class BinLookupSession:
 class BinAdminSession:
 
     import_statements_pattern = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',

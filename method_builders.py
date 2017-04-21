@@ -3,7 +3,7 @@ from importlib import import_module
 
 from binder_helpers import fix_reserved_word, under_to_caps, get_pkg_name, camel_to_under, \
     camel_to_mixed, under_to_mixed, make_plural, remove_plural, SkipMethod
-from build_controller import Utilities, BaseBuilder, Templates
+from build_dlkit import Utilities, BaseBuilder, Templates
 from config import sessions_to_implement
 from syntax_helpers import syntax_to_under
 

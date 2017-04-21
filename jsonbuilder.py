@@ -6,7 +6,7 @@ import datetime
 from importlib import import_module
 
 from binder_helpers import under_to_caps
-from build_controller import BaseBuilder
+from build_dlkit import BaseBuilder
 from config import sessions_to_implement
 from interface_builders import InterfaceBuilder
 

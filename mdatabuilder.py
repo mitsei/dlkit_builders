@@ -3,7 +3,7 @@ import os
 import string
 
 from binder_helpers import camel_to_under, camel_to_caps_under
-from build_controller import BaseBuilder
+from build_dlkit import BaseBuilder
 from config import managers_to_implement, packages_to_test
 from interface_builders import InterfaceBuilder
 

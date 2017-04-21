@@ -1,7 +1,7 @@
 import json
 import glob
 
-from build_controller import BaseBuilder
+from build_dlkit import BaseBuilder
 from config import managers_to_implement
 from interface_builders import InterfaceBuilder
 

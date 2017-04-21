@@ -18,13 +18,13 @@ class GradeSystemAdminSession:
 class GradebookColumnLookupSession:
     # Until we figure out how to do Relationship init patterns properly:
     import_statements = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
-        'from dlkit.mongo.grading.objects import GradebookColumnSummary',
+        'from dlkit.json_.grading.objects import GradebookColumnSummary',
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.primordium.id.primitives import Id',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
@@ -88,9 +88,9 @@ class GradebookColumnLookupSession:
 class GradeEntryLookupSession:
     # Until we figure out how to do Relationship init patterns properly:
     import_statements = [
-        'from dlkit_runtime import PROXY_SESSION, proxy_example',
-        'from dlkit_runtime.managers import Runtime',
-        'REQUEST = proxy_example.TestRequest()',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
