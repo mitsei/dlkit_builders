@@ -6,17 +6,13 @@ class GradeSystemAdminSession:
 
     # override this until we create a more rigorous test that can send the gradesystem id arg
 
-    can_create_grades = """
-        pass"""
+    can_create_grades = """"""
 
-    can_create_grade_with_record_types = """
-        pass"""
+    can_create_grade_with_record_types = """"""
 
-    can_update_grades = """
-        pass"""
+    can_update_grades = """"""
 
-    can_delete_grades = """
-        pass"""
+    can_delete_grades = """"""
 
 
 class GradebookColumnLookupSession:
@@ -31,8 +27,8 @@ class GradebookColumnLookupSession:
         'from dlkit.mongo.grading.objects import GradebookColumnSummary',
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.primordium.id.primitives import Id',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
-        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
     ]
 
     # Until we figure out how to do Relationship init patterns properly:
@@ -82,8 +78,7 @@ class GradebookColumnLookupSession:
                 catalog.delete_gradebook_column(obj.ident)
             for obj in catalog.get_grade_systems():
                 catalog.delete_grade_system(obj.ident)
-            cls.svc_mgr.delete_gradebook(catalog.ident)
-    """
+            cls.svc_mgr.delete_gradebook(catalog.ident)"""
     # skip this one until gradebook column summary is supported
     get_gradebook_column_summary = """
         self.assertTrue(isinstance(self.catalog.get_gradebook_column_summary(self.gradebook_column_ids[0]),
@@ -101,8 +96,8 @@ class GradeEntryLookupSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.primordium.id.primitives import Id',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
-        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
     ]
 
     # Until we figure out how to do Relationship init patterns properly:
@@ -144,10 +139,6 @@ class GradeEntryLookupSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_grade_entries():
-        #    cls.catalog.delete_grade_entry(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_gradebook(catalog.ident)
         for catalog in cls.svc_mgr.get_gradebooks():
             for obj in catalog.get_grade_entries():
                 catalog.delete_grade_entry(obj.ident)
@@ -155,8 +146,7 @@ class GradeEntryLookupSession:
                 catalog.delete_gradebook_column(obj.ident)
             for obj in catalog.get_grade_systems():
                 catalog.delete_grade_system(obj.ident)
-            cls.svc_mgr.delete_gradebook(catalog.ident)
-"""
+            cls.svc_mgr.delete_gradebook(catalog.ident)"""
 
 
 class GradeEntryQuerySession:

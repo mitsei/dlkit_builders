@@ -10,16 +10,16 @@ class AuthorizationSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.id.primitives import Id',
         'from dlkit.primordium.type.primitives import Type',
-        'LOOKUP_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'lookup\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
-        'SEARCH_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'search\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
-        'CREATE_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'create\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
-        'DELETE_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'delete\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',})',
-        'ASSIGN_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'assign\', \'namespace\': \'resource.ResourceBin\', \'authority\': \'ODL.MIT.EDU\',})',
-        'CREATE_BIN_FUNCTION_ID = Id(**{\'identifier\': \'create\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
-        'DELETE_BIN_FUNCTION_ID = Id(**{\'identifier\': \'delete\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
-        'LOOKUP_BIN_FUNCTION_ID = Id(**{\'identifier\': \'lookup\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
-        'ACCESS_BIN_HIERARCHY_FUNCTION_ID = Id(**{\'identifier\': \'access\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
-        'MODIFY_BIN_HIERARCHY_FUNCTION_ID = Id(**{\'identifier\': \'modify\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\',})',
+        'LOOKUP_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'lookup\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'))',
+        'SEARCH_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'search\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'))',
+        'CREATE_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'create\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'))',
+        'DELETE_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'delete\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'))',
+        'ASSIGN_RESOURCE_FUNCTION_ID = Id(**{\'identifier\': \'assign\', \'namespace\': \'resource.ResourceBin\', \'authority\': \'ODL.MIT.EDU\'))',
+        'CREATE_BIN_FUNCTION_ID = Id(**{\'identifier\': \'create\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\'))',
+        'DELETE_BIN_FUNCTION_ID = Id(**{\'identifier\': \'delete\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\'))',
+        'LOOKUP_BIN_FUNCTION_ID = Id(**{\'identifier\': \'lookup\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\'))',
+        'ACCESS_BIN_HIERARCHY_FUNCTION_ID = Id(**{\'identifier\': \'access\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\'))',
+        'MODIFY_BIN_HIERARCHY_FUNCTION_ID = Id(**{\'identifier\': \'modify\', \'namespace\': \'resource.Bin\', \'authority\': \'ODL.MIT.EDU\'))',
         'ROOT_QUALIFIER_ID = Id(\'resource.Bin%3AROOT%40ODL.MIT.EDU\')',
         'BOOTSTRAP_VAULT_TYPE = Type(authority=\'ODL.MIT.EDU\', namespace=\'authorization.Vault\', identifier=\'bootstrap_vault\')',
         'OVERRIDE_VAULT_TYPE = Type(authority=\'ODL.MIT.EDU\', namespace=\'authorization.Vault\', identifier=\'override_vault\')',
@@ -245,8 +245,7 @@ class AuthorizationSession:
         #           |             |
         #        _ 1(t) _         2     not in hierarchy
         #       |        |        |
-        #       3        4       5(t)      6     7(t)   (the 'blue' resource in bin 2 is also assigned to bin 7)
-"""
+        #       3        4       5(t)      6     7(t)   (the 'blue' resource in bin 2 is also assigned to bin 7)"""
 
     is_authorized = """
         self.assertFalse(self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[0]))
@@ -297,7 +296,7 @@ class AuthorizationLookupSession:
             create_form = cls.catalog.get_authorization_form_for_create_for_agent(
                 AGENT_ID,
                 LOOKUP_RESOURCE_FUNCTION_ID,
-                Id(**{\'identifier\': str(num), \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',}),
+                Id(**{\'identifier\': str(num), \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\')),
                 [])
             create_form.display_name = 'Test Authorization ' + str(num)
             create_form.description = 'Test Authorization for AuthorizationLookupSession tests'
@@ -307,15 +306,10 @@ class AuthorizationLookupSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_authorizations():
-        #    cls.catalog.delete_authorization(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_vault(catalog.ident)
         for catalog in cls.svc_mgr.get_vaults():
             for obj in catalog.get_authorizations():
                 catalog.delete_authorization(obj.ident)
-            cls.svc_mgr.delete_vault(catalog.ident)
-"""
+            cls.svc_mgr.delete_vault(catalog.ident)"""
 
 
 class Authorization:
@@ -338,7 +332,7 @@ class AuthorizationQuerySession:
             create_form = cls.catalog.get_authorization_form_for_create_for_agent(
                 AGENT_ID,
                 LOOKUP_RESOURCE_FUNCTION_ID,
-                Id(**{\'identifier\': str(color), \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\',}),
+                Id(**{\'identifier\': str(color), \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\')),
                 [])
             create_form.display_name = 'Test Authorization ' + color
             create_form.description = (
@@ -349,12 +343,7 @@ class AuthorizationQuerySession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_authorizations():
-        #    cls.catalog.delete_authorization(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_vault(catalog.ident)
         for catalog in cls.svc_mgr.get_vaults():
             for obj in catalog.get_authorizations():
                 catalog.delete_authorization(obj.ident)
-            cls.svc_mgr.delete_vault(catalog.ident)
-"""
+            cls.svc_mgr.delete_vault(catalog.ident)"""

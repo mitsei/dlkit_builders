@@ -56,24 +56,16 @@ class ResourceManager:
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)"""
 
     get_resource_lookup_session_template = """
-        # if self.mgr.supports_${support_check}():
-        #     self.mgr.${method_name}()
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}()"""
 
     get_resource_lookup_session_for_bin_template = """
-        # if self.mgr.supports_${support_check}():
-        #     self.mgr.${method_name}(self.catalog_id)
-        # with self.assertRaises(errors.NullArgument):
-        #     self.mgr.${method_name}()
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.catalog_id)
         with self.assertRaises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_batch_manager_template = """
-        # if self.mgr.supports_${support_check}():
-        #     self.mgr.${method_name}()
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}()"""
 
@@ -100,28 +92,18 @@ class ResourceProxyManager:
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)"""
 
     get_resource_lookup_session_template = """
-        # if self.mgr.supports_${support_check}():
-        #     self.mgr.${method_name}(PROXY)
-        # with self.assertRaises(errors.NullArgument):
-        #     self.mgr.${method_name}()
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(PROXY)
         with self.assertRaises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_lookup_session_for_bin_template = """
-        # if self.mgr.supports_${support_check}():
-        #     self.mgr.${method_name}(self.catalog_id, PROXY)
-        # with self.assertRaises(errors.NullArgument):
-        #     self.mgr.${method_name}()
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.catalog_id, PROXY)
         with self.assertRaises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_batch_proxy_manager_template = """
-        # if self.mgr.supports_${support_check}():
-        #     self.mgr.${method_name}()
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}()"""
 
@@ -136,9 +118,9 @@ class ResourceLookupSession:
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
         'from dlkit.primordium.id.primitives import Id',
-        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\',})\n',
+        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
 
     init_template = """
@@ -163,21 +145,15 @@ class ResourceLookupSession:
     @classmethod
     def tearDownClass(cls):
         # Implemented from init template for ResourceLookupSession
-        #for obj in cls.catalog.get_${object_name_under_plural}():
-        #    cls.catalog.delete_${object_name_under}(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             for obj in catalog.get_${object_name_under_plural}():
                 catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
     get_bin_id_template = """
         self.assertEqual(self.catalog.${method_name}(), self.catalog.ident)"""
 
-    get_bin_template = """
-        pass"""
+    get_bin_template = """"""
 
     can_lookup_resources_template = """
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
@@ -259,7 +235,7 @@ class ResourceQuerySession:
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
     ]
 
     init_template = """
@@ -283,15 +259,10 @@ class ResourceQuerySession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_${object_name_under_plural}():
-        #    cls.catalog.delete_${object_name_under}(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             for obj in catalog.get_${object_name_under_plural}():
                 catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
     can_query_resources_template = """
         self.assertTrue(isinstance(self.catalog.${method_name}(), bool))"""
@@ -320,9 +291,9 @@ class ResourceAdminSession:
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
         'from dlkit.primordium.id.primitives import Id',
-        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\',})\n',
+        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
 
     init_template = """
@@ -338,8 +309,7 @@ class ResourceAdminSession:
     def tearDownClass(cls):
         for obj in cls.catalog.get_${object_name_under_plural}():
             cls.catalog.delete_${object_name_under}(obj.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)
-"""
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     can_create_resources_template = """
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
@@ -347,23 +317,17 @@ class ResourceAdminSession:
     can_create_resource_with_record_types_template = """
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(DEFAULT_TYPE), bool))"""
 
-    get_resource_form_for_create_template = """
-        pass"""
+    get_resource_form_for_create_template = """"""
 
-    create_resource_template = """
-        pass"""
+    create_resource_template = """"""
 
-    get_resource_form_for_update_template = """
-        pass"""
+    get_resource_form_for_update_template = """"""
 
-    update_resource_template = """
-        pass"""
+    update_resource_template = """"""
 
-    delete_resource_template = """
-        pass"""
+    delete_resource_template = """"""
 
-    alias_resource_template = """
-        pass"""
+    alias_resource_template = """"""
 
 
 class ResourceNotificationSession:
@@ -385,7 +349,7 @@ class ResourceBinSession:
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
     ]
 
     init_template = """
@@ -416,10 +380,6 @@ class ResourceBinSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_${object_name_under_plural}():
-        #    cls.catalog.delete_${object_name_under}(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
         cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
             cls.${object_name_under}_ids[1], cls.assigned_catalog.ident)
         cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
@@ -427,8 +387,7 @@ class ResourceBinSession:
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             for obj in catalog.get_${object_name_under_plural}():
                 catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
     get_resource_ids_by_bin_template = """
         objects = self.svc_mgr.get_${object_name_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
@@ -458,9 +417,9 @@ class ResourceAgentSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.primordium.id.primitives import Id',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
-        'AGENT_ID_0 = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\',})\n',
-        'AGENT_ID_1 = Id(**{\'identifier\': \'john_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'AGENT_ID_0 = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
+        'AGENT_ID_1 = Id(**{\'identifier\': \'john_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
     ]
 
     init = """
@@ -485,15 +444,10 @@ class ResourceAgentSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_resources():
-        #    cls.catalog.delete_resource(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_bin(catalog.ident)
         for catalog in cls.svc_mgr.get_bins():
             for obj in catalog.get_resources():
                 catalog.delete_resource(obj.ident)
-            cls.svc_mgr.delete_bin(catalog.ident)
-"""
+            cls.svc_mgr.delete_bin(catalog.ident)"""
 
     get_resource_id_by_agent = """
         resource_id = self.catalog.get_resource_id_by_agent(AGENT_ID_0)"""
@@ -506,8 +460,7 @@ class ResourceAgentSession:
         id_list = self.catalog.get_agent_ids_by_resource(self.resource_ids[0])
         self.assertEqual(id_list.next(), AGENT_ID_0)"""
 
-    get_agents_by_resource = """
-        """
+    get_agents_by_resource = """"""
 
 
 class ResourceAgentAssignmentSession:
@@ -532,15 +485,10 @@ class ResourceAgentAssignmentSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_resources():
-        #    cls.catalog.delete_resource(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_bin(catalog.ident)
         for catalog in cls.svc_mgr.get_bins():
             for obj in catalog.get_resources():
                 catalog.delete_resource(obj.ident)
-            cls.svc_mgr.delete_bin(catalog.ident)
-"""
+            cls.svc_mgr.delete_bin(catalog.ident)"""
 
     assign_agent_to_resource = """
         self.catalog.assign_agent_to_resource(AGENT_ID_0, self.resource_ids[0])
@@ -565,7 +513,7 @@ class BinLookupSession:
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
     ]
 
     init_template = """
@@ -584,11 +532,8 @@ class BinLookupSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
     use_comparative_bin_view_template = """
         self.svc_mgr.${method_name}()"""
@@ -630,7 +575,7 @@ class BinAdminSession:
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
         'from dlkit.abstract_osid.osid import errors',
     ]
 
@@ -651,11 +596,8 @@ class BinAdminSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
     can_create_bins_template = """
         # From test_templates/resource.py BinAdminSession.can_create_bins_template
@@ -701,8 +643,7 @@ class BinAdminSession:
         with self.assertRaises(errors.NotFound):
             self.svc_mgr.get_${cat_name_under}(cat_id)"""
 
-    alias_bin_template = """
-        pass"""
+    alias_bin_template = """"""
 
 
 class BinHierarchySession:
@@ -724,13 +665,13 @@ class BinHierarchySession:
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+
     @classmethod
     def tearDownClass(cls):
         cls.svc_mgr.remove_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
         cls.svc_mgr.remove_child_${cat_name_under_plural}(cls.catalogs['Root'].ident)
         for cat_name in cls.catalogs:
-            cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)"""
 
     can_access_objective_bank_hierarchy_template = """
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
@@ -773,8 +714,7 @@ class BinHierarchySession:
         self.assertEqual(catalog_list.available(), 1)
         self.assertEqual(catalog_list.next().display_name.text, 'Root')"""
 
-    is_ancestor_of_bin_template = """
-        pass"""
+    is_ancestor_of_bin_template = """"""
 
     has_child_bins_template = """
         self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool))
@@ -802,8 +742,7 @@ class BinHierarchySession:
         self.assertEqual(catalog_list.available(), 1)
         self.assertEqual(catalog_list.next().display_name.text, 'Grandchild 1')"""
 
-    is_descendant_of_bin_template = """
-        pass"""
+    is_descendant_of_bin_template = """"""
 
     get_bin_node_ids_template = """
         node_ids = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
@@ -833,31 +772,25 @@ class BinHierarchyDesignSession:
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+
     @classmethod
     def tearDownClass(cls):
         cls.svc_mgr.remove_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
         cls.svc_mgr.remove_child_${cat_name_under_plural}(cls.catalogs['Root'].ident)
         for cat_name in cls.catalogs:
-            cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)"""
 
-    can_modify_bin_hierarchy_template = """
-        pass"""
+    can_modify_bin_hierarchy_template = """"""
 
-    add_root_bin_template = """
-        pass"""
+    add_root_bin_template = """"""
 
-    remove_root_bin_template = """
-        pass"""
+    remove_root_bin_template = """"""
 
-    add_child_bin_template = """
-        pass"""
+    add_child_bin_template = """"""
 
-    remove_child_bin_template = """
-        pass"""
+    remove_child_bin_template = """"""
 
-    remove_child_bins_template = """
-        pass"""
+    remove_child_bins_template = """"""
 
 
 class Resource:
@@ -868,23 +801,17 @@ class Resource:
     init_template = """
 """
 
-    is_group_template = """
-        pass"""
+    is_group_template = """"""
 
-    is_demographic = """
-        pass"""
+    is_demographic = """"""
 
-    has_avatar_template = """
-        pass"""
+    has_avatar_template = """"""
 
-    get_avatar_id_template = """
-        pass"""
+    get_avatar_id_template = """"""
 
-    get_avatar_template = """
-        pass"""
+    get_avatar_template = """"""
 
-    get_resource_record_template = """
-        pass"""
+    get_resource_record_template = """"""
 
 
 class ResourceQuery:
@@ -895,8 +822,7 @@ class ResourceQuery:
     init_template = """
 """
 
-    clear_group_terms_template = """
-        pass"""
+    clear_group_terms_template = """"""
 
 
 class ResourceForm:
@@ -907,26 +833,19 @@ class ResourceForm:
     init_template = """
 """
 
-    get_group_metadata_template = """
-        pass"""
+    get_group_metadata_template = """"""
 
-    get_avatar_metadata_template = """
-        pass"""
+    get_avatar_metadata_template = """"""
 
-    set_group_template = """
-        pass"""
+    set_group_template = """"""
 
-    clear_group_template = """
-        pass"""
+    clear_group_template = """"""
 
-    set_avatar_template = """
-        pass"""
+    set_avatar_template = """"""
 
-    clear_avatar_template = """
-        pass"""
+    clear_avatar_template = """"""
 
-    get_resource_form_record_template = """
-        pass"""
+    get_resource_form_record_template = """"""
 
 
 class ResourceList:
@@ -934,11 +853,9 @@ class ResourceList:
     import_statements_pattern = [
     ]
 
-    get_next_resource_template = """
-        pass"""
+    get_next_resource_template = """"""
 
-    get_next_resources_template = """
-        pass"""
+    get_next_resources_template = """"""
 
 
 class Bin:

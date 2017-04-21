@@ -15,17 +15,13 @@ class AssetAdminSession:
     import_statements_pattern = [
     ]
 
-    create_asset_content_template = """
-        pass"""
+    create_asset_content_template = """"""
 
-    get_asset_content_form_for_update_template = """
-        pass"""
+    get_asset_content_form_for_update_template = """"""
 
-    update_asset_content_template = """
-        pass"""
+    update_asset_content_template = """"""
 
-    delete_asset_content_template = """
-        pass"""
+    delete_asset_content_template = """"""
 
 
 class CompositionLookupSession:
@@ -54,16 +50,11 @@ class CompositionLookupSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_${object_name_under_plural}():
-        #    cls.catalog.delete_${object_name_under}(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             catalog.use_unsequestered_${object_name_under}_view()
             for obj in catalog.get_${object_name_under_plural}():
                 catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
     use_active_composition_view = """
         self.catalog.use_active_composition_view()"""
@@ -142,8 +133,7 @@ class CompositionAdminSession:
         composition = self.catalog.get_composition(composition_ids[0])
         self.assertEqual(composition.get_children_ids().available(), 3)
         self.assertEqual(composition.get_child_ids().available(), 3)
-        self.assertEqual(composition.get_children().available(), 3)
-"""
+        self.assertEqual(composition.get_children().available(), 3)"""
 
 
 class AssetCompositionSession:
@@ -178,8 +168,7 @@ class AssetCompositionSession:
                 catalog.delete_asset(obj.ident)
             for obj in catalog.get_compositions():
                 catalog.delete_composition(obj.ident)
-            cls.svc_mgr.delete_repository(catalog.ident)
-"""
+            cls.svc_mgr.delete_repository(catalog.ident)"""
 
     get_composition_assets_template = """
         self.assertEqual(self.catalog.get_${containable_object_name_under}_${object_name_plural_under}(self.${containable_object_name_under}.ident).available(), 4)"""
@@ -225,8 +214,7 @@ class AssetCompositionDesignSession:
                 catalog.delete_composition(obj.ident)
             for obj in catalog.get_assets():
                 catalog.delete_asset(obj.ident)
-            cls.svc_mgr.delete_repository(catalog.ident)
-"""
+            cls.svc_mgr.delete_repository(catalog.ident)"""
 
     add_asset = """
         for asset_id in self.asset_ids:
@@ -269,26 +257,20 @@ class Asset:
     import_statements = [
     ]
 
-    get_title_template = """
-        pass"""
+    get_title_template = """"""
 
-    can_distribute_verbatim_template = """
-        pass"""
+    can_distribute_verbatim_template = """"""
 
-    get_asset_content_ids_template = """
-        pass"""
+    get_asset_content_ids_template = """"""
 
-    get_asset_contents_template = """
-        pass"""
+    get_asset_contents_template = """"""
 
 
 class AssetForm:
 
-    set_title_template = """
-        pass"""
+    set_title_template = """"""
 
-    clear_title_template = """
-        pass"""
+    clear_title_template = """"""
 
 
 class AssetContent:
@@ -296,14 +278,11 @@ class AssetContent:
     import_statements = [
     ]
 
-    has_url_template = """
-        pass"""
+    has_url_template = """"""
 
-    get_url_template = """
-        pass"""
+    get_url_template = """"""
 
-    get_data = """
-        pass"""
+    get_data = """"""
 
 
 class AssetContentForm:
@@ -311,11 +290,8 @@ class AssetContentForm:
     import_statements = [
     ]
 
-    set_url_template = """
-        pass"""
+    set_url_template = """"""
 
-    set_data = """
-        pass"""
+    set_data = """"""
 
-    clear_data = """
-        pass"""
+    clear_data = """"""

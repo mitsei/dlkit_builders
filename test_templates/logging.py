@@ -21,11 +21,8 @@ class LoggingSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_log(catalog.ident)
         for catalog in cls.svc_mgr.get_logs():
-            cls.svc_mgr.delete_log(catalog.ident)
-"""
+            cls.svc_mgr.delete_log(catalog.ident)"""
 
     can_log = """
         pass"""

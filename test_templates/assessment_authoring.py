@@ -14,8 +14,7 @@ class AssessmentAuthoringManager:
 
     @classmethod
     def tearDownClass(cls):
-        cls.svc_mgr.delete_bank(cls.catalog_id)
-"""
+        cls.svc_mgr.delete_bank(cls.catalog_id)"""
 
 
 class AssessmentAuthoringProxyManager:
@@ -33,8 +32,7 @@ class AssessmentAuthoringProxyManager:
 
     @classmethod
     def tearDownClass(cls):
-        cls.svc_mgr.delete_bank(cls.catalog_id)
-"""
+        cls.svc_mgr.delete_bank(cls.catalog_id)"""
 
 
 class AssessmentPartLookupSession:
@@ -96,8 +94,7 @@ class AssessmentPartLookupSession:
                     check_equal(value, dict2[key])
 
         check_dict_equal(self.assessment_part_list[0].get_assessment().object_map,
-                         self.assessment.object_map)
-"""
+                         self.assessment.object_map)"""
 
     get_bank_id = """
         # this should not be here...
@@ -233,5 +230,4 @@ class SequenceRuleLookupSession:
                 catalog.delete_assessment_part(obj.ident)
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""

@@ -21,8 +21,7 @@ class AssessmentSession:
         for catalog in cls.svc_mgr.get_banks():
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
     can_take_assessments = """
         pass"""
@@ -182,8 +181,7 @@ class AssessmentResultsSession:
         for catalog in cls.svc_mgr.get_banks():
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
 
 class ItemAdminSession:
@@ -246,17 +244,12 @@ class AssessmentOfferedLookupSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_assessments_offered():
-        #    cls.catalog.delete_assessment_offered(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_bank(catalog.ident)
         for catalog in cls.svc_mgr.get_banks():
             for obj in catalog.get_assessments_offered():
                 catalog.delete_assessment_offered(obj.ident)
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
 
 class AssessmentTakenLookupSession:
@@ -289,10 +282,6 @@ class AssessmentTakenLookupSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_assessments_taken():
-        #    cls.catalog.delete_assessment_taken(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_bank(catalog.ident)
         for catalog in cls.svc_mgr.get_banks():
             for obj in catalog.get_assessments_taken():
                 catalog.delete_assessment_taken(obj.ident)
@@ -300,9 +289,7 @@ class AssessmentTakenLookupSession:
                 catalog.delete_assessment_offered(obj.ident)
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
     # This is hand built, but there may be a pattern to try to map, specifically
     # getting objects for another package object and a persisted id thingy
@@ -360,10 +347,6 @@ class AssessmentOfferedBankSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_assessments_offered():
-        #    cls.catalog.delete_assessment_offered(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_bank(catalog.ident)
         cls.svc_mgr.unassign_assessment_offered_from_bank(
             cls.assessment_offered_ids[1], cls.assigned_catalog.ident)
         cls.svc_mgr.unassign_assessment_offered_from_bank(
@@ -373,8 +356,7 @@ class AssessmentOfferedBankSession:
                 catalog.delete_assessment_offered(obj.ident)
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
 
 class AssessmentTakenBankSession:
@@ -415,10 +397,6 @@ class AssessmentTakenBankSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_assessments_taken():
-        #    cls.catalog.delete_assessment_taken(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_bank(catalog.ident)
         cls.svc_mgr.unassign_assessment_taken_from_bank(
             cls.assessment_taken_ids[1], cls.assigned_catalog.ident)
         cls.svc_mgr.unassign_assessment_taken_from_bank(
@@ -430,9 +408,7 @@ class AssessmentTakenBankSession:
                 catalog.delete_assessment_offered(obj.ident)
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
 
 class AssessmentBasicAuthoringSession:
@@ -474,8 +450,7 @@ class AssessmentBasicAuthoringSession:
                 catalog.delete_assessment(obj.ident)
             for obj in catalog.get_items():
                 catalog.delete_item(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
     can_author_assessments = """
         pass"""
@@ -491,8 +466,7 @@ class AssessmentBasicAuthoringSession:
         additional_item = self.catalog.create_item(ifc)
         self.catalog.add_item(self.assessment.ident, additional_item.ident)
         self.assertEqual(self.catalog.get_assessment_items(self.assessment.ident).available(), 5)
-        self.catalog.remove_item(self.assessment.ident, additional_item.ident)
-        """
+        self.catalog.remove_item(self.assessment.ident, additional_item.ident)"""
 
     remove_item = """
         self._reorder_items()
@@ -537,8 +511,6 @@ class Question:
     import_statements = [
     ]
 
-    additional_methods = """
-"""
 
 
 class Item:
@@ -584,7 +556,7 @@ class AssessmentOfferedForm:
         pass"""
 
     set_duration_template = """
-       """
+        pass"""
 
 
 class AssessmentOfferedQuery:
@@ -623,17 +595,12 @@ class AssessmentOfferedQuerySession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_assessments_offered():
-        #    cls.catalog.delete_assessment_offered(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_bank(catalog.ident)
         for catalog in cls.svc_mgr.get_banks():
             for obj in catalog.get_assessments_offered():
                 catalog.delete_assessment_offered(obj.ident)
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
 
 class AssessmentTakenQuerySession:
@@ -667,10 +634,6 @@ class AssessmentTakenQuerySession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_assessments_taken():
-        #    cls.catalog.delete_assessment_taken(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_bank(catalog.ident)
         for catalog in cls.svc_mgr.get_banks():
             for obj in catalog.get_assessments_taken():
                 catalog.delete_assessment_taken(obj.ident)
@@ -678,18 +641,13 @@ class AssessmentTakenQuerySession:
                 catalog.delete_assessment_offered(obj.ident)
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)
-
-"""
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
 
 class AssessmentTaken:
 
     import_statements = [
     ]
-
-    additional_methods = """
-"""
 
     get_taker_id = """
         pass"""
@@ -758,7 +716,7 @@ class Response:
         pass"""
 
     get_item = """
-       """
+        pass"""
 
     get_response_record = """
         pass"""

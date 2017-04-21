@@ -34,8 +34,7 @@ class ObjectiveRequisiteSession:
                 catalog.delete_objective(obj_id)
             for obj in catalog.get_objectives():
                 catalog.delete_objective(obj.ident)
-            cls.svc_mgr.delete_objective_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
     get_requisite_objectives_template = """
         requisites = self.catalog.get_requisite_objectives(self.objective.ident)
@@ -47,8 +46,7 @@ class ObjectiveRequisiteSession:
             self.assertIn(
                 req.ident,
                 self.requisite_ids
-            )
-    """
+            )"""
 
     get_dependent_objectives_template = """
         dependents = self.catalog.get_dependent_objectives(self.objective.ident)
@@ -64,8 +62,7 @@ class ObjectiveRequisiteSession:
         self.assertEqual(
             dependents.next().ident,
             self.objective.ident
-        )
-    """
+        )"""
 
 
 class ObjectiveRequisiteAssignmentSession:
@@ -102,12 +99,10 @@ class ObjectiveRequisiteAssignmentSession:
                 catalog.delete_objective(obj_id)
             for obj in catalog.get_objectives():
                 catalog.delete_objective(obj.ident)
-            cls.svc_mgr.delete_objective_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
     assign_objective_requisite_template = """
-        self.catalog.assign_objective_requisite(self.objective.ident, self.requisite_ids[0])
-    """
+        self.catalog.assign_objective_requisite(self.objective.ident, self.requisite_ids[0])"""
 
 
 class ObjectiveHierarchyDesignSession:
@@ -138,39 +133,32 @@ class ObjectiveHierarchyDesignSession:
                 catalog.delete_objective(obj_id)
             for obj in catalog.get_objectives():
                 catalog.delete_objective(obj.ident)
-            cls.svc_mgr.delete_objective_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
     add_child_objective = """
         self.catalog.add_root_objective(self.objective.ident)
-        self.catalog.add_child_objective(self.objective.ident, self.child_ids[0])
-    """
+        self.catalog.add_child_objective(self.objective.ident, self.child_ids[0])"""
 
     add_root_objective = """
-        self.catalog.add_root_objective(self.objective.ident)
-    """
+        self.catalog.add_root_objective(self.objective.ident)"""
 
     can_modify_objective_hierarchy = """
-        self.assertTrue(self.catalog.can_modify_objective_hierarchy())
-    """
+        self.assertTrue(self.catalog.can_modify_objective_hierarchy())"""
 
     remove_child_objective = """
         self.catalog.add_root_objective(self.objective.ident)
         self.catalog.add_child_objective(self.objective.ident, self.child_ids[0])
-        self.catalog.remove_child_objective(self.objective.ident, self.child_ids[0])
-    """
+        self.catalog.remove_child_objective(self.objective.ident, self.child_ids[0])"""
 
     remove_child_objectives = """
         self.catalog.add_root_objective(self.objective.ident)
         self.catalog.add_child_objective(self.objective.ident, self.child_ids[0])
         self.catalog.add_child_objective(self.objective.ident, self.child_ids[1])
-        self.catalog.remove_child_objectives(self.objective.ident)
-    """
+        self.catalog.remove_child_objectives(self.objective.ident)"""
 
     remove_root_objective = """
         self.catalog.add_root_objective(self.objective.ident)
-        self.catalog.remove_root_objective(self.objective.ident)
-    """
+        self.catalog.remove_root_objective(self.objective.ident)"""
 
 
 class ObjectiveHierarchySession:
@@ -203,46 +191,29 @@ class ObjectiveHierarchySession:
                 catalog.delete_objective(obj_id)
             for obj in catalog.get_objectives():
                 catalog.delete_objective(obj.ident)
-            cls.svc_mgr.delete_objective_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
-    get_root_objective_ids = """
-    """
+    get_root_objective_ids = """"""
 
-    get_root_objectives = """
-    """
+    get_root_objectives = """"""
 
-    has_parent_objectives = """
-    """
+    has_parent_objectives = """"""
 
-    is_parent_of_objective = """
-    """
+    is_parent_of_objective = """"""
 
-    get_parent_objective_ids = """
+    get_parent_objective_ids = """"""
 
-    """
+    get_parent_objectives = """"""
 
-    get_parent_objectives = """
+    has_child_objectives = """"""
 
-    """
+    is_child_of_objective = """"""
 
-    has_child_objectives = """
+    get_child_objective_ids = """"""
 
-    """
+    get_child_objectives = """"""
 
-    is_child_of_objective = """
-
-    """
-
-    get_child_objective_ids = """
-
-    """
-
-    get_child_objectives = """
-    """
-
-    is_descendant_of_objective = """
-    """
+    is_descendant_of_objective = """"""
 
 
 class ObjectiveAdminSession:
@@ -250,8 +221,7 @@ class ObjectiveAdminSession:
     import_statements_pattern = [
     ]
 
-    delete_objective_template = """
-        pass"""
+    delete_objective_template = """"""
 
 
 class ObjectiveSequencingSession:
@@ -285,20 +255,14 @@ class ActivityLookupSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_activities():
-        #    cls.catalog.delete_activity(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_objective_bank(catalog.ident)
         for catalog in cls.svc_mgr.get_objective_banks():
             for obj in catalog.get_activities():
                 catalog.delete_activity(obj.ident)
             for obj in catalog.get_objectives():
                 catalog.delete_objective(obj.ident)
-            cls.svc_mgr.delete_objective_bank(catalog.ident)
-"""
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
-    get_activities_for_objective_template = """
-        pass"""
+    get_activities_for_objective_template = """"""
 
 
 class ActivityObjectiveBankSession:
@@ -345,8 +309,7 @@ class ActivityObjectiveBankSession:
                 catalog.delete_activity(obj.ident)
             for obj in catalog.get_objectives():
                 catalog.delete_objective(obj.ident)
-            cls.svc_mgr.delete_objective_bank(catalog.ident)
-    """
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
 
 class ActivityAdminSession:
@@ -354,8 +317,7 @@ class ActivityAdminSession:
     import_statements_pattern = [
     ]
 
-    get_activity_form_for_create_template = """
-        pass"""
+    get_activity_form_for_create_template = """"""
 
 
 class Activity:
@@ -366,32 +328,24 @@ class Activity:
     import_statements = [
     ]
 
-    get_objective_id_template = """
-        pass"""
+    get_objective_id_template = """"""
 
-    get_objective_template = """
-        pass"""
+    get_objective_template = """"""
 
-    is_asset_based_activity_template = """
-        pass"""
+    is_asset_based_activity_template = """"""
 
-    get_asset_ids_template = """
-        pass"""
+    get_asset_ids_template = """"""
 
-    get_assets_template = """
-        pass"""
+    get_assets_template = """"""
 
 
 class ActivityForm:
 
-    get_assets_metadata_template = """
-        pass"""
+    get_assets_metadata_template = """"""
 
-    set_assets_template = """
-        pass"""
+    set_assets_template = """"""
 
-    clear_assets_template = """
-        pass"""
+    clear_assets_template = """"""
 
 
 class ProficiencyQuerySession:

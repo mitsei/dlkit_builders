@@ -10,8 +10,8 @@ class CommentLookupSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.primordium.id.primitives import Id',
-        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\',})\n',
-        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\',})\n',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
     ]
 
     init_template = """
@@ -34,15 +34,10 @@ class CommentLookupSession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_${object_name_under_plural}():
-        #    cls.catalog.delete_${object_name_under}(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             for obj in catalog.get_${object_name_under_plural}():
                 catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
 
 class CommentQuerySession:
@@ -70,21 +65,15 @@ class CommentQuerySession:
 
     @classmethod
     def tearDownClass(cls):
-        #for obj in cls.catalog.get_${object_name_under_plural}():
-        #    cls.catalog.delete_${object_name_under}(obj.ident)
-        #for catalog in cls.catalogs:
-        #    cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             for obj in catalog.get_${object_name_under_plural}():
                 catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
-"""
+            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
 
 class CommentAdminSession:
 
-    get_comment_form_for_create_template = """
-        pass"""
+    get_comment_form_for_create_template = """"""
 
 
 class Comment:
@@ -92,11 +81,9 @@ class Comment:
     import_statements = [
     ]
 
-    get_commenting_agent_id = """
-        pass"""
+    get_commenting_agent_id = """"""
 
-    get_commenting_agent = """
-        pass"""
+    get_commenting_agent = """"""
 
 
 class CommentQuery:
