@@ -14,6 +14,7 @@ class RepositoryProfile:
         return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
 
     additional_methods = """
+
     def get_asset_content_lookup_session(self, *args, **kwargs):
         \"\"\"Pass through to provider \"\"\"
         return self._provider_manager.get_asset_content_lookup_session(*args, **kwargs)
