@@ -13,6 +13,17 @@ class RepositoryProfile:
         # osid.repository.RepositoryProfile.supports_coordinate_type
         return self._provider_manager.${method_name}(${args_kwargs_or_nothing})"""
 
+    additional_methods = """
+    def get_asset_content_lookup_session(self, *args, **kwargs):
+        \"\"\"Pass through to provider \"\"\"
+        return self._provider_manager.get_asset_content_lookup_session(*args, **kwargs)
+
+    asset_content_lookup_session = property(fget=get_asset_content_lookup_session)
+
+    def get_asset_content_lookup_session_for_repository(self, *args, **kwargs):
+        \"\"\"Pass through to provider \"\"\"
+        return self._provider_manager.get_asset_content_lookup_session_for_repository(args, kwargs)"""
+
 
 class AssetAdminSession:
 
