@@ -46,14 +46,6 @@ class ResourceManager:
         osid.OsidSession.__init__(self, proxy)
         self._sub_package_provider_managers = dict()
 
-    # def _get_view(self, view):
-    #     \"\"\"Gets the currently set view\"\"\"
-    #     if view in self._views:
-    #         return self._views[view]
-    #     else:
-    #         self._views[view] = DEFAULT
-    #         return DEFAULT
-
     def _set_${cat_name_under}_view(self, session):
         \"\"\"Sets the underlying ${cat_name_under} view to match current view\"\"\"
         if self._${cat_name_under}_view == COMPARATIVE:
