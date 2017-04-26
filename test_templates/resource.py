@@ -41,6 +41,9 @@ class ResourceManager:
 
     init_template = """
     # Implemented from resource.ResourceManager
+    class NotificationReceiver(object):
+        pass
+
     @classmethod
     def setUpClass(cls):
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', implementation='TEST_SERVICE')
@@ -50,22 +53,50 @@ class ResourceManager:
         catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.catalog_id = catalog.get_id()
         # cls.mgr = Runtime().get_manager('${pkg_name_upper}', 'TEST_JSON_1', (3, 0, 0))
+        cls.receiver = cls.NotificationReceiver()
 
     @classmethod
     def tearDownClass(cls):
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)"""
 
     get_resource_lookup_session_template = """
+        # From tests_templates/resource.py::ResourceManager::get_resource_lookup_session_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}()"""
 
     get_resource_lookup_session_for_bin_template = """
+        # From tests_templates/resource.py::ResourceManager::get_resource_lookup_session_for_bin_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.catalog_id)
         with self.assertRaises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
+    get_resource_admin_session_template = """
+        # From tests_templates/resource.py::ResourceManager::get_resource_admin_session_template
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}()"""
+
+    get_resource_admin_session_for_bin_template = """
+        # From tests_templates/resource.py::ResourceManager::get_resource_admin_session_for_bin_template
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.catalog_id)
+        with self.assertRaises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+
+    get_resource_notification_session_template = """
+        # From tests_templates/resource.py::ResourceManager::get_resource_notification_session_template
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.receiver)"""
+
+    get_resource_notification_session_for_bin_template = """
+        # From tests_templates/resource.py::ResourceManager::get_resource_notification_session_for_bin_template
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.receiver, self.catalog_id)
+        with self.assertRaises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+
     get_resource_batch_manager_template = """
+        # From tests_templates/resource.py::ResourceManager::get_resource_batch_manager_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}()"""
 
@@ -77,6 +108,10 @@ class ResourceProxyManager:
     ]
 
     init_template = """
+    # Implemented from resource.ResourceProxyManager
+    class NotificationReceiver(object):
+        pass
+
     @classmethod
     def setUpClass(cls):
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
@@ -86,26 +121,62 @@ class ResourceProxyManager:
         catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.catalog_id = catalog.get_id()
         # cls.mgr = Runtime().get_proxy_manager('${pkg_name_upper}', 'TEST_JSON_1', (3, 0, 0))
+        cls.receiver = cls.NotificationReceiver()
 
     @classmethod
     def tearDownClass(cls):
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)"""
 
     get_resource_lookup_session_template = """
+        # From tests_templates/resource.py::ResourceProxyManager::get_resource_lookup_session_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(PROXY)
         with self.assertRaises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_lookup_session_for_bin_template = """
+        # From tests_templates/resource.py::ResourceProxyManager::get_resource_lookup_session_for_bin_template
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.catalog_id, PROXY)
+        with self.assertRaises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+
+    get_resource_admin_session_template = """
+        # From tests_templates/resource.py::ResourceProxyManager::get_resource_admin_session_template
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(PROXY)
+        with self.assertRaises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+
+    get_resource_admin_session_for_bin_template = """
+        # From tests_templates/resource.py::ResourceProxyManager::get_resource_admin_session_for_bin_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.catalog_id, PROXY)
         with self.assertRaises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_batch_proxy_manager_template = """
+        # From tests_templates/resource.py::ResourceProxyManager::get_resource_batch_proxy_manager_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}()"""
+
+    get_resource_notification_session_template = """
+        # From tests_templates/resource.py::ResourceProxyManager::get_resource_notification_session_template
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.receiver, proxy=PROXY)"""
+
+    get_resource_notification_session_for_bin_template = """
+        # From tests_templates/resource.py::ResourceProxyManager::get_resource_notification_session_for_bin_template
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.receiver, self.catalog_id, proxy=PROXY)
+        with self.assertRaises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+
+    get_group_hierarchy_session = """
+        if self.svc_mgr.supports_group_hierarchy():
+            self.svc_mgr.get_group_hierarchy_session(PROXY)
+        with self.assertRaises(errors.Unimplemented):
+            self.svc_mgr.get_group_hierarchy_session()"""
 
 
 class ResourceLookupSession:
