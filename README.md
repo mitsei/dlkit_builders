@@ -6,7 +6,7 @@ directory to this, like:
 
 ```
 dlkit_builders
- |- build_controller.py
+ |- build_dlkit.py
 xosid
  |- assessment.xml
 ```
@@ -42,7 +42,7 @@ and `mdata`. After that, depending on what you change, you could build just
 This will build the files to the directory specified, default of `../dlkit/`.
 
 Examples:
-  - `python build_dlkit --buildto dlkit-dev`
+  - `python build_dlkit --buildto dlkit-dev/dlkit`
   - `python build_dlkit.py map patterns abc mdata json`
   - `python build_dlkit.py --all`
   - `python build_dlkit.py json --buildto dlkit_testing`
