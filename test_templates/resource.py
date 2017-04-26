@@ -649,6 +649,9 @@ class BinAdminSession:
 class BinHierarchySession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.id.objects import IdList',
+        'from dlkit.abstract_osid.hierarchy.objects import Hierarchy',
+        'from dlkit.primordium.id.primitives import Id'
     ]
 
     init_template = """
@@ -670,25 +673,39 @@ class BinHierarchySession:
     def tearDownClass(cls):
         cls.svc_mgr.remove_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
         cls.svc_mgr.remove_child_${cat_name_under_plural}(cls.catalogs['Root'].ident)
+        cls.svc_mgr.remove_root_${cat_name_under}(cls.catalogs['Root'].ident)
         for cat_name in cls.catalogs:
             cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)"""
 
     can_access_objective_bank_hierarchy_template = """
+        # From test_templates/resource.py::BinHierarchySession::can_access_objective_bank_hierarchy_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
 
     get_bin_hierarchy_id_template = """
-        hierarchy_id = self.svc_mgr.${method_name}()"""
+        # From test_templates/resource.py::BinHierarchySession::get_bin_hierarchy_id_template
+        hierarchy_id = self.svc_mgr.${method_name}()
+        self.assertTrue(isinstance(hierarchy_id, Id))"""
 
     get_bin_hierarchy_template = """
-        hierarchy = self.svc_mgr.${method_name}()"""
+        # From test_templates/resource.py::BinHierarchySession::get_bin_hierarchy_template
+        hierarchy = self.svc_mgr.${method_name}()
+        self.assertTrue(isinstance(hierarchy, Hierarchy))"""
 
     get_root_bin_ids_template = """
-        root_ids = self.svc_mgr.${method_name}()"""
+        # From test_templates/resource.py::BinHierarchySession::get_root_bin_ids_template
+        root_ids = self.svc_mgr.${method_name}()
+        self.assertTrue(isinstance(root_ids, IdList))
+        self.assertTrue(root_ids.available() == 1)"""
 
     get_root_bins_template = """
-        roots = self.svc_mgr.${method_name}()"""
+        # From test_templates/resource.py::BinHierarchySession::get_root_bins_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}List
+        roots = self.svc_mgr.${method_name}()
+        self.assertTrue(isinstance(roots, ${cat_name}List))
+        self.assertTrue(roots.available() == 1)"""
 
     has_parent_bins_template = """
+        # From test_templates/resource.py::BinHierarchySession::has_parent_bins_template
         self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool))
         self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident))
         self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 2'].ident))
@@ -696,25 +713,46 @@ class BinHierarchySession:
         self.assertFalse(self.svc_mgr.${method_name}(self.catalogs['Root'].ident))"""
 
     is_parent_of_bin_template = """
+        # From test_templates/resource.py::BinHierarchySession::is_parent_of_bin_template
         self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident), bool))
         self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Root'].ident, self.catalogs['Child 1'].ident))
         self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Grandchild 1'].ident))
         self.assertFalse(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident))"""
 
     get_parent_bin_ids_template = """
+        # From test_templates/resource.py::BinHierarchySession::get_parent_bin_ids_template
         from dlkit.abstract_osid.id.objects import ${return_type}
         catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
         self.assertTrue(isinstance(catalog_list, ${return_type}))
         self.assertEqual(catalog_list.available(), 1)"""
 
     get_parent_bins_template = """
+        # From test_templates/resource.py::BinHierarchySession::get_parent_bins_template
         from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
         catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
         self.assertTrue(isinstance(catalog_list, ${return_type}))
         self.assertEqual(catalog_list.available(), 1)
         self.assertEqual(catalog_list.next().display_name.text, 'Root')"""
 
-    is_ancestor_of_bin_template = """"""
+    is_ancestor_of_bin_template = """
+        # From test_templates/resource.py::BinHierarchySession::is_ancestor_of_bin_template
+        self.assertRaises(errors.Unimplemented,
+                          self.svc_mgr.${method_name},
+                          self.catalogs['Root'].ident,
+                          self.catalogs['Child 1'].ident)
+        # self.assertTrue(isinstance(self.svc_mgr.${method_name}(
+        #     self.catalogs['Root'].ident,
+        #     self.catalogs['Child 1'].ident),
+        #     bool))
+        # self.assertTrue(self.svc_mgr.${method_name}(
+        #     self.catalogs['Root'].ident,
+        #     self.catalogs['Child 1'].ident))
+        # self.assertTrue(self.svc_mgr.${method_name}(
+        #     self.catalogs['Root'].ident,
+        #     self.catalogs['Grandchild 1'].ident))
+        # self.assertFalse(self.svc_mgr.${method_name}(
+        #     self.catalogs['Child 1'].ident,
+        #     self.catalogs['Root'].ident))"""
 
     has_child_bins_template = """
         self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool))
@@ -742,7 +780,25 @@ class BinHierarchySession:
         self.assertEqual(catalog_list.available(), 1)
         self.assertEqual(catalog_list.next().display_name.text, 'Grandchild 1')"""
 
-    is_descendant_of_bin_template = """"""
+    is_descendant_of_bin_template = """
+        # From test_templates/resource.py::BinHierarchySession::is_descendant_of_bin_template
+        self.assertRaises(errors.Unimplemented,
+                          self.svc_mgr.${method_name},
+                          self.catalogs['Child 1'].ident,
+                          self.catalogs['Root'].ident)
+        # self.assertTrue(isinstance(self.svc_mgr.${method_name}(
+        #     self.catalogs['Root'].ident,
+        #     self.catalogs['Child 1'].ident),
+        #     bool))
+        # self.assertTrue(self.svc_mgr.${method_name}(
+        #     self.catalogs['Child 1'].ident,
+        #     self.catalogs['Root'].ident))
+        # self.assertTrue(self.svc_mgr.${method_name}(
+        #     self.catalogs['Grandchild 1'].ident,
+        #     self.catalogs['Root'].ident))
+        # self.assertFalse(self.svc_mgr.${method_name}(
+        #     self.catalogs['Root'].ident,
+        #     self.catalogs['Child 1'].ident))"""
 
     get_bin_node_ids_template = """
         node_ids = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
@@ -780,17 +836,29 @@ class BinHierarchyDesignSession:
         for cat_name in cls.catalogs:
             cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)"""
 
-    can_modify_bin_hierarchy_template = """"""
+    can_modify_bin_hierarchy_template = """
+        # this is tested in the setUpClass
+        self.assertTrue(True)"""
 
-    add_root_bin_template = """"""
+    add_root_bin_template = """
+        # this is tested in the setUpClass
+        self.assertTrue(True)"""
 
-    remove_root_bin_template = """"""
+    remove_root_bin_template = """
+        # this is tested in the tearDownClass
+        self.assertTrue(True)"""
 
-    add_child_bin_template = """"""
+    add_child_bin_template = """
+        # this is tested in the setUpClass
+        self.assertTrue(True)"""
 
-    remove_child_bin_template = """"""
+    remove_child_bin_template = """
+        # this is tested in the tearDownClass
+        self.assertTrue(True)"""
 
-    remove_child_bins_template = """"""
+    remove_child_bins_template = """
+        # this is tested in the tearDownClass
+        self.assertTrue(True)"""
 
 
 class Resource:
