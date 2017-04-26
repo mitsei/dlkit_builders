@@ -810,10 +810,20 @@ class BinHierarchySession:
         #     self.catalogs['Child 1'].ident))"""
 
     get_bin_node_ids_template = """
-        node_ids = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
-        # add some tests on the returned node"""
+        # From test_templates/resource.py::BinHierarchySession::get_bin_node_ids_template
+        # Per the spec, perhaps counterintuitively this method returns a
+        #  node, **not** a IdList...
+        node = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
+        self.assertTrue(isinstance(node, OsidNode))
+        self.assertFalse(node.is_root())
+        self.assertFalse(node.is_leaf())
+        self.assertTrue(node.get_child_ids().available(), 1)
+        self.assertTrue(isinstance(node.get_child_ids(), IdList))
+        self.assertTrue(node.get_parent_ids().available(), 1)
+        self.assertTrue(isinstance(node.get_parent_ids(), IdList))"""
 
     get_bin_nodes_template = """
+        # From test_templates/resource.py::BinHierarchySession::get_bin_nodes_template
         node = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
         self.assertTrue(isinstance(node, OsidNode))
         self.assertFalse(node.is_root())
