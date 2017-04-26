@@ -889,20 +889,57 @@ class BinHierarchyDesignSession:
 class Resource:
 
     import_statements_pattern = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
     init_template = """
-"""
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    is_group_template = """"""
+        form = cls.catalog.get_${object_name_under}_form_for_create([])
+        form.display_name = 'Test object'
+        cls.object = cls.catalog.create_${object_name_under}(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_${object_name_under_plural}():
+            cls.catalog.delete_${object_name_under}(obj.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+    is_group_template = """
+        # From test_templates/resources.py::Resource::is_group_template
+        self.assertTrue(isinstance(self.object.${method_name}(), bool))
+        self.assertFalse(self.object.${method_name}())"""
 
     is_demographic = """"""
 
-    has_avatar_template = """"""
+    has_avatar_template = """
+        # From test_templates/resources.py::Resource::has_avatar_template
+        self.assertTrue(isinstance(self.object.${method_name}(), bool))
+        self.assertFalse(self.object.${method_name}())"""
 
-    get_avatar_id_template = """"""
+    get_avatar_id_template = """
+        # From test_templates/resources.py::Resource::get_avatar_id_template
+        self.assertRaises(errors.IllegalState,
+                          self.object.${method_name})"""
 
-    get_avatar_template = """"""
+    get_avatar_template = """
+        # From test_templates/resources.py::Resource::get_avatar_template
+        self.assertRaises(errors.IllegalState,
+                          self.object.${method_name})"""
 
     get_resource_record_template = """"""
 

@@ -511,6 +511,54 @@ class Question:
     import_statements = [
     ]
 
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        item_form = cls.catalog.get_item_form_for_create([])
+        item_form.display_name = 'Item'
+        cls.item = cls.catalog.create_item(item_form)
+
+        form = cls.catalog.get_question_form_for_create(item.ident, [])
+        form.display_name = 'Test question'
+        cls.question = cls.catalog.create_question(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.svc_mgr.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
+class Answer:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        item_form = cls.catalog.get_item_form_for_create([])
+        item_form.display_name = 'Item'
+        cls.item = cls.catalog.create_item(item_form)
+
+        form = cls.catalog.get_answer_form_for_create(item.ident, [])
+        form.display_name = 'Test answer'
+        cls.answer = cls.catalog.create_answer(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.svc_mgr.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
 
 class Item:
 

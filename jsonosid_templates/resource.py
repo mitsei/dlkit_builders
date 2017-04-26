@@ -1643,7 +1643,7 @@ ${instance_initers}"""
 
     is_group_template = """
         # Implemented from template for osid.resource.Resource.is_group_template
-        return self._my_map['${var_name_mixed}']"""
+        return bool(self._my_map['${var_name_mixed}'])"""
 
     is_demographic = """
         return self._demographic"""
