@@ -79,11 +79,41 @@ class CommentAdminSession:
 class Comment:
 
     import_statements = [
+        'from dlkit.primordium.id.primitives import Id'
     ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('COMMENTING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_book_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_book(create_form)
+
+        form = cls.catalog.get_comment_form_for_create(
+            Id('resource.Resource%3A1%40ODL.MIT.EDU'),
+            [])
+        form.display_name = 'Test object'
+        cls.object = cls.catalog.create_comment(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_comments():
+            cls.catalog.delete_comment(obj.ident)
+        cls.svc_mgr.delete_book(cls.catalog.ident)"""
 
     get_commenting_agent_id = """"""
 
     get_commenting_agent = """"""
+
+    get_comment_record = """"""
+
+    get_rating = """"""
+
+    get_rating_id = """"""
+
+    has_rating = """"""
 
 
 class CommentQuery:

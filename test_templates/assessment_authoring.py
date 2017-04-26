@@ -231,3 +231,15 @@ class SequenceRuleLookupSession:
             for obj in catalog.get_assessments():
                 catalog.delete_assessment(obj.ident)
             cls.svc_mgr.delete_bank(catalog.ident)"""
+
+
+class AssessmentPart:
+    init = """"""
+
+    is_section = """"""
+
+
+class SequenceRule:
+    init = """"""
+
+    is_cumulative = """"""

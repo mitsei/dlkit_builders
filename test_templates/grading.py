@@ -189,3 +189,93 @@ class GradeEntryQuerySession:
             for obj in catalog.get_grade_systems():
                 catalog.delete_grade_system(obj.ident)
             cls.svc_mgr.delete_gradebook(catalog.ident)"""
+
+
+class Grade:
+    import_statements = [
+        'from dlkit.primordium.id.primitives import Id'
+    ]
+
+    init = """
+    # This really shouldn't be generated...should be GradeBook??
+    @classmethod
+    def setUpClass(cls):
+        cls.object = None
+
+    @classmethod
+    def tearDownClass(cls):
+        pass"""
+
+
+class GradeEntry:
+    import_statements = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+
+        form = cls.catalog.get_grade_system_form_for_create([])
+        form.display_name = 'Grade system'
+        cls.grade_system = cls.catalog.create_grade_system(form)
+
+        form = cls.catalog.get_gradebook_column_form_for_create([])
+        form.display_name = 'Gradebook Column'
+        form.set_grade_system(cls.grade_system.ident)
+        cls.column = cls.catalog.create_gradebook_column(form)
+
+        form = cls.catalog.get_grade_entry_form_for_create(
+            cls.column.ident,
+            AGENT_ID,
+            [])
+        form.display_name = 'Test object'
+        cls.object = cls.catalog.create_grade_entry(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_grade_entries():
+            cls.catalog.delete_grade_entry(obj.ident)
+        for obj in cls.catalog.get_gradebook_columns():
+            cls.catalog.delete_gradebook_column(obj.ident)
+        cls.catalog.delete_grade_system(cls.grade_system.ident)
+        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+
+    get_grading_agent = """"""
+
+    get_grading_agent_id = """"""
+
+    get_key_resource_id = """"""
+
+    get_key_resource = """"""
+
+    get_overridden_calculated_entry_id = """"""
+
+    get_overridden_calculated_entry = """"""
+
+
+class GradebookColumnSummary:
+    import_statements = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
+    ]
+
+    init = """"""

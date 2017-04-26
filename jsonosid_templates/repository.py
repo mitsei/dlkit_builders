@@ -1037,6 +1037,9 @@ class Asset:
     is_composition = """
         return bool(self._my_map['compositionId'])"""
 
+    is_copyright_status_known = """
+        return bool(self._my_map['copyright']['text'])"""
+
     additional_methods = """
     def get_object_map(self):
         obj_map = dict(self._my_map)

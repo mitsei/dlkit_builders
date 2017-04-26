@@ -97,6 +97,8 @@ sessions_to_implement = [
     'AssessmentPartItemDesignSession',
     'SequenceRuleLookupSession',
     'SequenceRuleAdminSession',
+    # authentication service:
+    'AgentLookupSession',
     # authorization service:
     'AuthorizationSession',
     'AuthorizationLookupSession',

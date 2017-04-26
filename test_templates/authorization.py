@@ -313,7 +313,65 @@ class AuthorizationLookupSession:
 
 
 class Authorization:
-    pass
+    import_statements = [
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)',
+        "LOOKUP_RESOURCE_FUNCTION_ID = Id(**{'identifier': 'lookup', 'namespace': 'resource.Resource', 'authority': 'ODL.MIT.EDU'})",
+        "AGENT_ID = Id(**{'identifier': 'jane_doe', 'namespace': 'osid.agent.Agent', 'authority': 'MIT-ODL'})"
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.authorization_list = list()
+        cls.authorization_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('AUTHORIZATION', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_vault_form_for_create([])
+        create_form.display_name = 'Test Vault'
+        create_form.description = 'Test Vault for AuthorizationQuerySession tests'
+        cls.catalog = cls.svc_mgr.create_vault(create_form)
+        create_form = cls.catalog.get_authorization_form_for_create_for_agent(
+            AGENT_ID,
+            LOOKUP_RESOURCE_FUNCTION_ID,
+            Id(**{\'identifier\': str('foo'), \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'}),
+            [])
+        create_form.display_name = 'Test Authorization'
+        create_form.description = (
+            'Test Authorization for Authorization tests')
+        obj = cls.catalog.create_authorization(create_form)
+        cls.object = obj
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_vaults():
+            for obj in catalog.get_authorizations():
+                catalog.delete_authorization(obj.ident)
+            cls.svc_mgr.delete_vault(catalog.ident)"""
+
+    get_agent = """"""
+
+    get_agent_id = """"""
+
+    has_agent = """"""
+
+    get_trust = """"""
+
+    get_trust_id = """"""
+
+    has_trust = """"""
+
+    get_resource = """"""
+
+    get_resource_id = """"""
+
+    has_resource = """"""
+
+    is_implicit = """"""
 
 
 class AuthorizationQuerySession:

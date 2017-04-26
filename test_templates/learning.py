@@ -325,8 +325,30 @@ class Activity:
     import_statements_pattern = [
     ]
 
-    import_statements = [
-    ]
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+
+        form = cls.catalog.get_objective_form_for_create([])
+        form.display_name = 'Objective'
+        cls.objective = cls.catalog.create_objective(form)
+
+        form = cls.catalog.get_activity_form_for_create(cls.objective.ident,
+                                                        [])
+        form.display_name = 'Test activity'
+        cls.object = cls.catalog.create_activity(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_activities():
+            cls.catalog.delete_activity(obj.ident)
+        cls.catalog.delete_objective(cls.objective.ident)
+        cls.svc_mgr.delete_objective_bank(cls.catalog.ident)"""
 
     get_objective_id_template = """"""
 
@@ -337,6 +359,12 @@ class Activity:
     get_asset_ids_template = """"""
 
     get_assets_template = """"""
+
+    is_assessment_based_activity = """"""
+
+    is_asset_based_activity = """"""
+
+    is_course_based_activity = """"""
 
 
 class ActivityForm:
@@ -416,3 +444,44 @@ class ProficiencyLookupSession:
             for obj in catalog.get_objectives():
                 catalog.delete_objective(obj.ident)
             cls.svc_mgr.delete_objective_bank(catalog.ident)"""
+
+
+class Proficiency:
+    import_statements = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.primordium.id.primitives import Id',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+
+        form = cls.catalog.get_objective_form_for_create([])
+        form.display_name = 'Objective'
+        cls.objective = cls.catalog.create_objective(form)
+
+        form = cls.catalog.get_proficiency_form_for_create(cls.objective.ident,
+                                                           AGENT_ID,
+                                                           [])
+        form.display_name = 'Test proficiency'
+        cls.object = cls.catalog.create_proficiency(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_proficiencies():
+            cls.catalog.delete_proficiency(obj.ident)
+        cls.catalog.delete_objective(cls.objective.ident)
+        cls.svc_mgr.delete_objective_bank(cls.catalog.ident)"""

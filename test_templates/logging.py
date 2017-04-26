@@ -42,6 +42,14 @@ class LogEntry:
     get_priority_template = """
         pass"""
 
+    get_agent = """"""
+
+    get_agent_id = """"""
+
+    get_resource = """"""
+
+    get_resource_id = """"""
+
 
 class LogEntryForm:
 

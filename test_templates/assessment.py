@@ -18,10 +18,9 @@ class AssessmentSession:
 
     @classmethod
     def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_assessments():
-                catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)"""
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
     can_take_assessments = """
         pass"""
@@ -178,10 +177,9 @@ class AssessmentResultsSession:
 
     @classmethod
     def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_assessments():
-                catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)"""
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
 class ItemAdminSession:
@@ -577,6 +575,31 @@ class AssessmentOffered:
     import_statements = [
     ]
 
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        form = cls.catalog.get_assessment_form_for_create([])
+        form.display_name = 'Assessment'
+        cls.assessment = cls.catalog.create_assessment(form)
+
+        form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        form.display_name = 'Test assessment offered'
+        cls.object = cls.catalog.create_assessment_offered(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                cls.catalog.delete_assessment_offered(offered.ident)
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
     additional_methods = """
         pass"""
 
@@ -591,6 +614,36 @@ class AssessmentOffered:
 
     get_duration_template = """
         pass"""
+
+    has_rubric = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set rubricId?
+        self.assertRaises(KeyError,
+                          self.object.has_rubric)"""
+
+    get_rubric = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set rubricId?
+        self.assertRaises(KeyError,
+                          self.object.get_rubric)"""
+
+    get_rubric_id = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set rubricId?
+        self.assertRaises(KeyError,
+                          self.object.get_rubric_id)"""
+
+    is_graded = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set graded?
+        self.assertRaises(KeyError,
+                          self.object.is_graded)"""
+
+    is_scored = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set scored?
+        self.assertRaises(KeyError,
+                          self.object.is_scored)"""
 
 
 class AssessmentOfferedForm:
@@ -696,6 +749,37 @@ class AssessmentTaken:
     import_statements = [
     ]
 
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        form = cls.catalog.get_assessment_form_for_create([])
+        form.display_name = 'Assessment'
+        cls.assessment = cls.catalog.create_assessment(form)
+
+        form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        form.display_name = 'Test assessment offered'
+        cls.offered = cls.catalog.create_assessment_offered(form)
+
+        form = cls.catalog.get_assessment_taken_form_for_create(cls.offered.ident,
+                                                                [])
+        cls.object = cls.catalog.create_assessment_taken(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
     get_taker_id = """
         pass"""
 
@@ -729,6 +813,48 @@ class AssessmentTaken:
     get_score_template = """
         pass"""
 
+    has_rubric = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set rubricId?
+        self.assertRaises(KeyError,
+                          self.object.has_rubric)"""
+
+    get_rubric = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set rubricId?
+        self.assertRaises(KeyError,
+                          self.object.get_rubric)"""
+
+    get_rubric_id = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set rubricId?
+        self.assertRaises(KeyError,
+                          self.object.get_rubric_id)"""
+
+    is_graded = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set graded?
+        self.assertRaises(KeyError,
+                          self.object.is_graded)"""
+
+    is_scored = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set scored?
+        self.assertRaises(KeyError,
+                          self.object.is_scored)"""
+
+    get_score_system = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set scoreSystemId?
+        self.assertRaises(KeyError,
+                          self.object.get_score_system)"""
+
+    get_score_system_id = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set scoreSystemId?
+        self.assertRaises(KeyError,
+                          self.object.get_score_system_id)"""
+
 
 class AssessmentTakenForm:
 
@@ -737,6 +863,7 @@ class AssessmentTakenForm:
 
 
 class AssessmentSection:
+    init = """"""
 
     has_allocated_time = """
         pass"""
