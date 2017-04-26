@@ -193,28 +193,6 @@ class ObjectiveHierarchySession:
                 catalog.delete_objective(obj.ident)
             cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
-    get_root_objective_ids = """"""
-
-    get_root_objectives = """"""
-
-    has_parent_objectives = """"""
-
-    is_parent_of_objective = """"""
-
-    get_parent_objective_ids = """"""
-
-    get_parent_objectives = """"""
-
-    has_child_objectives = """"""
-
-    is_child_of_objective = """"""
-
-    get_child_objective_ids = """"""
-
-    get_child_objectives = """"""
-
-    is_descendant_of_objective = """"""
-
 
 class ObjectiveAdminSession:
 
