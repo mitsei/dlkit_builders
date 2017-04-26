@@ -524,13 +524,13 @@ class Question:
         item_form.display_name = 'Item'
         cls.item = cls.catalog.create_item(item_form)
 
-        form = cls.catalog.get_question_form_for_create(item.ident, [])
+        form = cls.catalog.get_question_form_for_create(cls.item.ident, [])
         form.display_name = 'Test question'
         cls.question = cls.catalog.create_question(form)
 
     @classmethod
     def tearDownClass(cls):
-        for obj in cls.svc_mgr.get_items():
+        for obj in cls.catalog.get_items():
             cls.catalog.delete_item(obj.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
@@ -549,13 +549,13 @@ class Answer:
         item_form.display_name = 'Item'
         cls.item = cls.catalog.create_item(item_form)
 
-        form = cls.catalog.get_answer_form_for_create(item.ident, [])
+        form = cls.catalog.get_answer_form_for_create(cls.item.ident, [])
         form.display_name = 'Test answer'
         cls.answer = cls.catalog.create_answer(form)
 
     @classmethod
     def tearDownClass(cls):
-        for obj in cls.svc_mgr.get_items():
+        for obj in cls.catalog.get_items():
             cls.catalog.delete_item(obj.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
