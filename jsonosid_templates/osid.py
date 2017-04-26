@@ -2021,7 +2021,7 @@ class OsidNode:
         id_list = []
         from ..id.objects import IdList
         for parent_node in self._my_map['parentNodes']:
-            id_list.append(parent_node['id'])
+            id_list.append(str(parent_node.ident))
         return IdList(id_list)"""
 
     is_leaf = """
@@ -2034,7 +2034,7 @@ class OsidNode:
         id_list = []
         from ..id.objects import IdList
         for child_node in self._my_map['childNodes']:
-            id_list.append(child_node['id'])
+            id_list.append(str(child_node.ident))
         return IdList(id_list)"""
 
     additional_methods = """

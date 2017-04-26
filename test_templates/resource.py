@@ -570,6 +570,7 @@ class BinAdminSession:
     import_statements_pattern = [
         'from dlkit.runtime import PROXY_SESSION, proxy_example',
         'from dlkit.runtime.managers import Runtime',
+        'from dlkit.primordium.id.primitives import Id',
         'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
@@ -643,7 +644,12 @@ class BinAdminSession:
         with self.assertRaises(errors.NotFound):
             self.svc_mgr.get_${cat_name_under}(cat_id)"""
 
-    alias_bin_template = """"""
+    alias_bin_template = """
+        # From test_templates/resource.py BinAdminSession.alias_bin_template
+        alias_id = Id('${package_name_replace_reserved}.${cat_name}%3Amy-alias%40ODL.MIT.EDU')
+        self.svc_mgr.${method_name}(self.catalog_to_delete.ident, alias_id)
+        aliased_catalog = self.svc_mgr.get_${cat_name_under}(alias_id)
+        self.assertEqual(self.catalog_to_delete.ident, aliased_catalog.ident)"""
 
 
 class BinHierarchySession:
@@ -651,6 +657,7 @@ class BinHierarchySession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.id.objects import IdList',
         'from dlkit.abstract_osid.hierarchy.objects import Hierarchy',
+        'from dlkit.abstract_osid.osid.objects import OsidNode',
         'from dlkit.primordium.id.primitives import Id'
     ]
 
@@ -805,8 +812,14 @@ class BinHierarchySession:
         # add some tests on the returned node"""
 
     get_bin_nodes_template = """
-        nodes = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
-        # add some tests on the returned node"""
+        node = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
+        self.assertTrue(isinstance(node, OsidNode))
+        self.assertFalse(node.is_root())
+        self.assertFalse(node.is_leaf())
+        self.assertTrue(node.get_child_ids().available(), 1)
+        self.assertTrue(isinstance(node.get_child_ids(), IdList))
+        self.assertTrue(node.get_parent_ids().available(), 1)
+        self.assertTrue(isinstance(node.get_parent_ids(), IdList))"""
 
 
 class BinHierarchyDesignSession:
