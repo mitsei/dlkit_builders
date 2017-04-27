@@ -340,7 +340,6 @@ class GradeEntryAdminSession:
                 catalog.delete_grade_system(obj.ident)
             cls.svc_mgr.delete_gradebook(catalog.ident)"""
 
-
     get_grade_entry_form_for_create = """
         form = self.catalog.get_grade_entry_form_for_create(self.gradebook_column_ids[0], AGENT_ID, [])
         self.assertTrue(isinstance(form, OsidForm))
