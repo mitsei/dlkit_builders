@@ -38,6 +38,22 @@ class AssessmentAuthoringManager:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_lookup_session_for_bank(*args, **kwargs)"""
 
+    get_assessment_part_admin_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_admin_session(*args, **kwargs)"""
+
+    get_assessment_part_admin_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_admin_session_for_bank(*args, **kwargs)"""
+
+    get_sequence_rule_admin_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_admin_session(*args, **kwargs)"""
+
+    get_sequence_rule_admin_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_admin_session_for_bank(*args, **kwargs)"""
+
 
 class AssessmentAuthoringProxyManager:
     get_sequence_rule_lookup_session = """
@@ -55,6 +71,22 @@ class AssessmentAuthoringProxyManager:
     get_assessment_part_lookup_session_for_bank = """
         \"\"\"Pass through to provider method\"\"\"
         return AssessmentManager.get_assessment_part_lookup_session_for_bank(*args, **kwargs)"""
+
+    get_assessment_part_admin_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_admin_session(*args, **kwargs)"""
+
+    get_assessment_part_admin_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_admin_session_for_bank(*args, **kwargs)"""
+
+    get_sequence_rule_admin_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_sequence_rule_admin_session(*args, **kwargs)"""
+
+    get_sequence_rule_admin_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_sequence_rule_admin_session_for_bank(*args, **kwargs)"""
 
 
 class AssessmentAuthoringProfile:
