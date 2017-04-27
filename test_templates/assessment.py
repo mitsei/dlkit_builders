@@ -311,6 +311,7 @@ class AssessmentTakenAdminSession:
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.abstract_osid.assessment.objects import AssessmentTaken',
         'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE 2\', \'authority\': \'YOURS 2\'})'
     ]
 
     init = """
@@ -330,6 +331,11 @@ class AssessmentTakenAdminSession:
         create_form.description = 'Test AssessmentOffered for AssessmentTakenAdminSession tests'
         obj = cls.catalog.create_assessment_offered(create_form)
         cls.assessment_offered = obj
+        form = cls.catalog.get_assessment_taken_form_for_create(cls.assessment_offered.ident, [])
+        form.display_name = 'new AssessmentTaken'
+        form.description = 'description of AssessmentTaken'
+        form.set_genus_type(NEW_TYPE)
+        cls.osid_object = cls.catalog.create_assessment_taken(form)
 
     @classmethod
     def tearDownClass(cls):
@@ -343,13 +349,19 @@ class AssessmentTakenAdminSession:
             cls.catalog.delete_item(obj.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
-    create_assessment_taken = """
+    get_assessment_taken_form_for_create = """
+        form = self.catalog.get_assessment_taken_form_for_create(self.assessment_offered.ident, [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
+
+    delete_assessment_taken = """
         form = self.catalog.get_assessment_taken_form_for_create(self.assessment_offered.ident, [])
         form.display_name = 'new Assessment Taken'
         form.set_genus_type(NEW_TYPE)
         osid_object = self.catalog.create_assessment_taken(form)
-        self.assertTrue(isinstance(osid_object, AssessmentTaken))
-        self.assertEqual(osid_object.genus_type, NEW_TYPE)"""
+        self.catalog.delete_assessment_taken(osid_object.ident)
+        with self.assertRaises(errors.NotFound):
+            self.catalog.get_assessment_taken(osid_object.ident)"""
 
     ##
     # This impl may differ from the usual create_osid_object method in that it
@@ -699,6 +711,7 @@ class AssessmentOfferedAdminSession:
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.abstract_osid.assessment.objects import AssessmentOffered',
         'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})'
     ]
 
     init = """
@@ -722,6 +735,11 @@ class AssessmentOfferedAdminSession:
             obj = cls.catalog.create_assessment_offered(create_form)
             cls.assessment_offered_list.append(obj)
             cls.assessment_offered_ids.append(obj.ident)
+        create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        create_form.display_name = 'new AssessmentOffered'
+        create_form.description = 'description of AssessmentOffered'
+        create_form.genus_type = NEW_TYPE
+        cls.osid_object = cls.catalog.create_assessment_offered(create_form)
 
     @classmethod
     def tearDownClass(cls):
@@ -735,13 +753,19 @@ class AssessmentOfferedAdminSession:
             cls.catalog.delete_item(obj.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
-    create_assessment_offered = """
+    get_assessment_offered_form_for_create = """
+        form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
+
+    delete_assessment_offered = """
         form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
         form.display_name = 'new Assessment Offered'
         form.set_genus_type(NEW_TYPE)
         osid_object = self.catalog.create_assessment_offered(form)
-        self.assertTrue(isinstance(osid_object, AssessmentOffered))
-        self.assertEqual(osid_object.genus_type, NEW_TYPE)"""
+        self.catalog.delete_assessment_offered(osid_object.ident)
+        with self.assertRaises(errors.NotFound):
+            self.catalog.get_assessment_offered(osid_object.ident)"""
 
 
 class AssessmentOfferedForm:

@@ -637,7 +637,7 @@ class ResourceAdminSession:
         objects.${object_name}(osid_object_map=${object_name_under}_map, runtime=self._runtime, proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
-    can_manage_asset_aliases_template = """
+    can_manage_resource_aliases_template = """
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""

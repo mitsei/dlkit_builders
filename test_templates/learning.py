@@ -293,11 +293,61 @@ class ActivityObjectiveBankSession:
 class ActivityAdminSession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.osid.objects import OsidForm',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})'
     ]
 
-    get_activity_form_for_create_template = """"""
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.activity_list = list()
+        cls.activity_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ActivityLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+        create_form = cls.catalog.get_objective_form_for_create([])
+        create_form.display_name = 'Test Objective for Activity Lookup'
+        create_form.description = 'Test Objective for ActivityLookupSession tests'
+        cls.objective = cls.catalog.create_objective(create_form)
+        for num in [0, 1]:
+            create_form = cls.catalog.get_activity_form_for_create(cls.objective.ident, [])
+            create_form.display_name = 'Test Activity ' + str(num)
+            create_form.description = 'Test Activity for ActivityLookupSession tests'
+            obj = cls.catalog.create_activity(create_form)
+            cls.activity_list.append(obj)
+            cls.activity_ids.append(obj.ident)
 
-    create_activity = """"""
+        create_form = cls.catalog.get_activity_form_for_create(cls.objective.ident, [])
+        create_form.display_name = 'new Activity'
+        create_form.description = 'description of Activity'
+        create_form.genus_type = NEW_TYPE
+        cls.osid_object = cls.catalog.create_activity(create_form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_objective_banks():
+            for obj in catalog.get_activities():
+                catalog.delete_activity(obj.ident)
+            for obj in catalog.get_objectives():
+                catalog.delete_objective(obj.ident)
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
+
+    get_activity_form_for_create = """
+        form = self.catalog.get_activity_form_for_create(self.objective.ident, [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
+
+    delete_activity = """
+        form = self.catalog.get_activity_form_for_create(self.objective.ident, [])
+        form.display_name = 'new Activity'
+        form.description = 'description of Activity'
+        form.set_genus_type(NEW_TYPE)
+        osid_object = self.catalog.create_activity(form)
+        self.catalog.delete_activity(osid_object.ident)
+        with self.assertRaises(errors.NotFound):
+            self.catalog.get_activity(osid_object.ident)"""
 
 
 class Activity:
@@ -468,4 +518,61 @@ class Proficiency:
 
 
 class ProficiencyAdminSession:
-    create_proficiency = """"""
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid.objects import OsidForm',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})'
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.proficiency_list = list()
+        cls.proficiency_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ProficiencyLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+
+        form = cls.catalog.get_objective_form_for_create([])
+        form.display_name = "Test LO"
+        cls.objective = cls.catalog.create_objective(form)
+
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
+            create_form = cls.catalog.get_proficiency_form_for_create(cls.objective.ident, AGENT_ID, [])
+            create_form.display_name = 'Test Proficiency ' + color
+            create_form.description = (
+                'Test Proficiency for ProficiencyLookupSession tests, did I mention green')
+            obj = cls.catalog.create_proficiency(create_form)
+            cls.proficiency_list.append(obj)
+            cls.proficiency_ids.append(obj.ident)
+
+        create_form = cls.catalog.get_proficiency_form_for_create(cls.objective.ident, AGENT_ID, [])
+        create_form.display_name = 'new Proficiency'
+        create_form.description = 'description of Proficiency'
+        create_form.genus_type = NEW_TYPE
+        cls.osid_object = cls.catalog.create_proficiency(create_form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_objective_banks():
+            for obj in catalog.get_proficiencies():
+                catalog.delete_proficiency(obj.ident)
+            for obj in catalog.get_objectives():
+                catalog.delete_objective(obj.ident)
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
+
+    get_proficiency_form_for_create = """
+        form = self.catalog.get_proficiency_form_for_create(self.objective.ident, AGENT_ID, [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
+
+    delete_proficiency = """
+        create_form = self.catalog.get_proficiency_form_for_create(self.objective.ident, AGENT_ID, [])
+        create_form.display_name = 'new Proficiency'
+        create_form.description = 'description of Proficiency'
+        create_form.genus_type = NEW_TYPE
+        osid_object = self.catalog.create_proficiency(create_form)
+        self.catalog.delete_proficiency(osid_object.ident)
+        with self.assertRaises(errors.NotFound):
+            self.catalog.get_proficiency(osid_object.ident)"""

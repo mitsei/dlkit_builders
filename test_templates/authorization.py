@@ -408,4 +408,84 @@ class AuthorizationQuerySession:
 
 
 class AuthorizationAdminSession:
-    create_authorization = """"""
+    import_statements = [
+        'from dlkit.abstract_osid.osid.objects import OsidForm',
+        'from dlkit.abstract_osid.osid import errors',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})'
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.authorization_list = list()
+        cls.authorization_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('AUTHORIZATION', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_vault_form_for_create([])
+        create_form.display_name = 'Test Vault'
+        create_form.description = 'Test Vault for AuthorizationAdminSession tests'
+        cls.catalog = cls.svc_mgr.create_vault(create_form)
+        for num in [0, 1]:
+            create_form = cls.catalog.get_authorization_form_for_create_for_agent(
+                AGENT_ID,
+                LOOKUP_RESOURCE_FUNCTION_ID,
+                Id(**{\'identifier\': str(num), \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'}),
+                [])
+            create_form.display_name = 'Test Authorization ' + str(num)
+            create_form.description = 'Test Authorization for AuthorizationLookupSession tests'
+            object = cls.catalog.create_authorization(create_form)
+            cls.authorization_list.append(object)
+            cls.authorization_ids.append(object.ident)
+
+        form = cls.catalog.get_authorization_form_for_create_for_agent(
+            AGENT_ID,
+            LOOKUP_RESOURCE_FUNCTION_ID,
+            Id(**{\'identifier\': \'foo\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'}),
+            [])
+        form.display_name = 'new Authorization'
+        form.description = 'description of Authorization'
+        form.genus_type = NEW_TYPE
+        cls.osid_object = cls.catalog.create_authorization(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_vaults():
+            for obj in catalog.get_authorizations():
+                catalog.delete_authorization(obj.ident)
+            cls.svc_mgr.delete_vault(catalog.ident)"""
+
+    get_authorization_form_for_create = """
+        form = self.catalog.get_authorization_form_for_create_for_agent(
+            AGENT_ID,
+            LOOKUP_RESOURCE_FUNCTION_ID,
+            Id(**{\'identifier\': str(num), \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'}),
+            [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
+
+    update_authorization = """
+        from dlkit.abstract_osid.authorization.objects import Authorization
+        form = self.catalog.get_authorization_form_for_update(self.osid_object.ident)
+        form.display_name = 'new name'
+        form.description = 'new description'
+        form.set_genus_type(NEW_TYPE_2)
+        updated_object = self.catalog.update_authorization(form)
+        self.assertTrue(isinstance(updated_object, Authorization))
+        self.assertEqual(updated_object.ident, self.osid_object.ident)
+        self.assertEqual(updated_object.display_name.text, 'new name')
+        self.assertEqual(updated_object.description.text, 'new description')
+        self.assertEqual(updated_object.genus_type, NEW_TYPE_2)"""
+
+    delete_authorization = """
+        form = self.catalog.get_authorization_form_for_create_for_agent(
+            AGENT_ID,
+            LOOKUP_RESOURCE_FUNCTION_ID,
+            Id(**{\'identifier\': \'foo2\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'}),
+            [])
+        form.display_name = 'new Authorization'
+        form.description = 'description of Authorization'
+        form.genus_type = NEW_TYPE
+        osid_object = self.catalog.create_authorization(form)
+        self.catalog.delete_authorization(osid_object.ident)
+        with self.assertRaises(errors.NotFound):
+            self.catalog.get_authorization(osid_object.ident)"""

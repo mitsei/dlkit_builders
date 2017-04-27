@@ -282,4 +282,76 @@ class GradebookColumnSummary:
 
 
 class GradeEntryAdminSession:
-    create_grade_entry = """"""
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid.objects import OsidForm',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})'
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.grade_entry_list = list()
+        cls.grade_entry_ids = list()
+        cls.gradebook_column_list = list()
+        cls.gradebook_column_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+        create_form.display_name = 'Test Gradebook'
+        create_form.description = 'Test Gradebook for GradeEntryLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        create_form = cls.catalog.get_grade_system_form_for_create([])
+        create_form.display_name = 'Test Grade System'
+        create_form.description = 'Test Grade System for GradeEntryLookupSession tests'
+        create_form.based_on_grades = False
+        create_form.lowest_numeric_score = 0
+        create_form.highest_numeric_score = 5
+        create_form.numeric_score_increment = 0.25
+        cls.grade_system = cls.catalog.create_grade_system(create_form)
+        for num in [0, 1]:
+            create_form = cls.catalog.get_gradebook_column_form_for_create([])
+            create_form.display_name = 'Test GradebookColumn ' + str(num)
+            create_form.description = 'Test GradebookColumn for GradeEntryLookupSession tests'
+            create_form.grade_system = cls.grade_system.ident
+            obj = cls.catalog.create_gradebook_column(create_form)
+            cls.gradebook_column_list.append(obj)
+            cls.gradebook_column_ids.append(obj.ident)
+        for num in [0, 1]:
+            create_form = cls.catalog.get_grade_entry_form_for_create(cls.gradebook_column_ids[num], AGENT_ID, [])
+            create_form.display_name = 'Test GradeEntry ' + str(num)
+            create_form.description = 'Test GradeEntry for GradeEntryLookupSession tests'
+            object = cls.catalog.create_grade_entry(create_form)
+            cls.grade_entry_list.append(object)
+            cls.grade_entry_ids.append(object.ident)
+
+        create_form = cls.catalog.get_grade_entry_form_for_create(cls.gradebook_column_ids[0], AGENT_ID, [])
+        create_form.display_name = 'new GradeEntry'
+        create_form.description = 'description of GradeEntry'
+        create_form.genus_type = NEW_TYPE
+        cls.osid_object = cls.catalog.create_grade_entry(create_form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_gradebooks():
+            for obj in catalog.get_grade_entries():
+                catalog.delete_grade_entry(obj.ident)
+            for obj in catalog.get_gradebook_columns():
+                catalog.delete_gradebook_column(obj.ident)
+            for obj in catalog.get_grade_systems():
+                catalog.delete_grade_system(obj.ident)
+            cls.svc_mgr.delete_gradebook(catalog.ident)"""
+
+
+    get_grade_entry_form_for_create = """
+        form = self.catalog.get_grade_entry_form_for_create(self.gradebook_column_ids[0], AGENT_ID, [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
+
+    delete_grade_entry = """
+        create_form = self.catalog.get_grade_entry_form_for_create(self.gradebook_column_ids[0], AGENT_ID, [])
+        create_form.display_name = 'new GradeEntry'
+        create_form.description = 'description of GradeEntry'
+        create_form.genus_type = NEW_TYPE
+        osid_object = self.catalog.create_grade_entry(create_form)
+        self.catalog.delete_grade_entry(osid_object.ident)
+        with self.assertRaises(errors.NotFound):
+            self.catalog.get_grade_entry(osid_object.ident)"""

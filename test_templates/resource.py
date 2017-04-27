@@ -366,6 +366,7 @@ class ResourceAdminSession:
         'from dlkit.primordium.type.primitives import Type',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
         'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
         'from dlkit.primordium.id.primitives import Id',
         'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
@@ -380,6 +381,12 @@ class ResourceAdminSession:
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
 
+        form = cls.catalog.get_${object_name_under}_form_for_create([])
+        form.display_name = 'new ${object_name}'
+        form.description = 'description of ${object_name}'
+        form.set_genus_type(NEW_TYPE)
+        cls.osid_object = cls.catalog.create_${object_name_under}(form)
+
     @classmethod
     def tearDownClass(cls):
         for obj in cls.catalog.get_${object_name_under_plural}():
@@ -390,6 +397,18 @@ class ResourceAdminSession:
         # From test_templates/resource.py::ResourceAdminSession::can_create_resources_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
 
+    can_update_resources_template = """
+        # From test_templates/resource.py::ResourceAdminSession::can_update_resources_template
+        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+
+    can_delete_resources_template = """
+        # From test_templates/resource.py::ResourceAdminSession::can_delete_resources_template
+        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+
+    can_manage_resource_aliases_template = """
+        # From test_templates/resource.py::ResourceAdminSession::can_manage_resource_aliases_template
+        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+
     can_create_resource_with_record_types_template = """
         # From test_templates/resource.py::ResourceAdminSession::can_create_resource_with_record_types_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(DEFAULT_TYPE), bool))"""
@@ -397,25 +416,54 @@ class ResourceAdminSession:
     get_resource_form_for_create_template = """
         # From test_templates/resource.py::ResourceAdminSession::get_resource_form_for_create_template
         form = self.catalog.${method_name}([])
-        self.assertTrue(isinstance(form, OsidForm))"""
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
 
     create_resource_template = """
         # From test_templates/resource.py::ResourceAdminSession::create_resource_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${object_name}
+        self.assertTrue(isinstance(self.osid_object, ${object_name}))
+        self.assertEqual(self.osid_object.display_name.text, 'new ${object_name}')
+        self.assertEqual(self.osid_object.description.text, 'description of ${object_name}')
+        self.assertEqual(self.osid_object.genus_type, NEW_TYPE)"""
+
+    get_resource_form_for_update_template = """
+        # From test_templates/resource.py::ResourceAdminSession::get_resource_form_for_update_template
+        form = self.catalog.${method_name}(self.osid_object.ident)
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertTrue(form.is_for_update())"""
+
+    update_resource_template = """
+        # From test_templates/resource.py::ResourceAdminSession::update_resource_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${object_name}
+        form = self.catalog.get_${object_name_under}_form_for_update(self.osid_object.ident)
+        form.display_name = 'new name'
+        form.description = 'new description'
+        form.set_genus_type(NEW_TYPE_2)
+        updated_object = self.catalog.${method_name}(form)
+        self.assertTrue(isinstance(updated_object, ${object_name}))
+        self.assertEqual(updated_object.ident, self.osid_object.ident)
+        self.assertEqual(updated_object.display_name.text, 'new name')
+        self.assertEqual(updated_object.description.text, 'new description')
+        self.assertEqual(updated_object.genus_type, NEW_TYPE_2)"""
+
+    delete_resource_template = """
+        # From test_templates/resource.py::ResourceAdminSession::delete_resource_template
         form = self.catalog.get_${object_name_under}_form_for_create([])
         form.display_name = 'new ${object_name}'
+        form.description = 'description of ${object_name}'
         form.set_genus_type(NEW_TYPE)
-        osid_object = self.catalog.${method_name}(form)
-        self.assertTrue(isinstance(osid_object, ${object_name}))
-        self.assertEqual(osid_object.genus_type, NEW_TYPE)"""
+        osid_object = self.catalog.create_${object_name_under}(form)
+        self.catalog.${method_name}(osid_object.ident)
+        with self.assertRaises(errors.NotFound):
+            self.catalog.get_${object_name_under}(osid_object.ident)"""
 
-    get_resource_form_for_update_template = """"""
-
-    update_resource_template = """"""
-
-    delete_resource_template = """"""
-
-    alias_resource_template = """"""
+    alias_resource_template = """
+        # From test_templates/resource.py::ResourceAdminSession::alias_resource_template
+        alias_id = Id(self.catalog.ident.namespace + '%3Amy-alias%40ODL.MIT.EDU')
+        self.catalog.${method_name}(self.osid_object.ident, alias_id)
+        aliased_object = self.catalog.get_${object_name_under}(alias_id)
+        self.assertEqual(aliased_object.ident, self.osid_object.ident)"""
 
 
 class ResourceNotificationSession:

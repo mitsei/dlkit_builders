@@ -72,10 +72,56 @@ class CommentQuerySession:
 
 
 class CommentAdminSession:
+    import_statements = [
+        'from dlkit.abstract_osid.osid.objects import OsidForm',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})'
+    ]
 
-    get_comment_form_for_create_template = """"""
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.comment_list = list()
+        cls.comment_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('COMMENTING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_book_form_for_create([])
+        create_form.display_name = 'Test Book'
+        create_form.description = 'Test Book for CommentAdminSession tests'
+        cls.catalog = cls.svc_mgr.create_book(create_form)
+        for num in [0, 1]:
+            create_form = cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+            create_form.display_name = 'Test Comment ' + str(num)
+            create_form.description = 'Test Comment for CommentAdminSession tests'
+            object = cls.catalog.create_comment(create_form)
+            cls.comment_list.append(object)
+            cls.comment_ids.append(object.ident)
+        create_form = cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+        create_form.display_name = 'new Comment'
+        create_form.description = 'description of Comment'
+        create_form.genus_type = NEW_TYPE
+        cls.osid_object = cls.catalog.create_comment(create_form)
 
-    create_comment = """"""
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_books():
+            for obj in catalog.get_comments():
+                catalog.delete_comment(obj.ident)
+            cls.svc_mgr.delete_book(catalog.ident)"""
+
+    get_comment_form_for_create = """
+        form = self.catalog.get_comment_form_for_create(AGENT_ID, [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
+
+    delete_comment = """
+        form = self.catalog.get_comment_form_for_create(AGENT_ID, [])
+        form.display_name = 'new Comment'
+        form.description = 'description of Comment'
+        form.set_genus_type(NEW_TYPE)
+        osid_object = self.catalog.create_comment(form)
+        self.catalog.delete_comment(osid_object.ident)
+        with self.assertRaises(errors.NotFound):
+            self.catalog.get_comment(osid_object.ident)"""
 
 
 class Comment:
