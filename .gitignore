@@ -41,3 +41,5 @@ pattern_maps
 
 htmlcov/
 .cache/
+
+config.py
