@@ -75,6 +75,8 @@ class CommentAdminSession:
 
     get_comment_form_for_create_template = """"""
 
+    create_comment = """"""
+
 
 class Comment:
 

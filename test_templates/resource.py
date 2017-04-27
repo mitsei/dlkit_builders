@@ -216,15 +216,17 @@ class ResourceLookupSession:
     @classmethod
     def tearDownClass(cls):
         # Implemented from init template for ResourceLookupSession
-        for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
-            for obj in catalog.get_${object_name_under_plural}():
-                catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
+        for obj in cls.catalog.get_${object_name_under_plural}():
+            cls.catalog.delete_${object_name_under}(obj.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     get_bin_id_template = """
         self.assertEqual(self.catalog.${method_name}(), self.catalog.ident)"""
 
-    get_bin_template = """"""
+    get_bin_template = """
+        # is this test really needed?
+        # From test_templates/resource.py::ResourceLookupSession::get_bin_template
+        self.assertIsNotNone(self.catalog)"""
 
     can_lookup_resources_template = """
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
@@ -330,10 +332,9 @@ class ResourceQuerySession:
 
     @classmethod
     def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
-            for obj in catalog.get_${object_name_under_plural}():
-                catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
+        for obj in cls.catalog.get_${object_name_under_plural}():
+            cls.catalog.delete_${object_name_under}(obj.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     can_query_resources_template = """
         self.assertTrue(isinstance(self.catalog.${method_name}(), bool))"""
@@ -355,6 +356,7 @@ class ResourceQuerySession:
 class ResourceAdminSession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.osid.objects import OsidForm',
         'from dlkit.runtime import PROXY_SESSION, proxy_example',
         'from dlkit.runtime.managers import Runtime',
         'REQUEST = proxy_example.SimpleRequest()',
@@ -363,11 +365,13 @@ class ResourceAdminSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
         'from dlkit.primordium.id.primitives import Id',
         'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
 
     init_template = """
+    # From test_templates/resource.py::ResourceAdminSession::init_template
     @classmethod
     def setUpClass(cls):
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
@@ -383,14 +387,27 @@ class ResourceAdminSession:
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     can_create_resources_template = """
+        # From test_templates/resource.py::ResourceAdminSession::can_create_resources_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
 
     can_create_resource_with_record_types_template = """
+        # From test_templates/resource.py::ResourceAdminSession::can_create_resource_with_record_types_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(DEFAULT_TYPE), bool))"""
 
-    get_resource_form_for_create_template = """"""
+    get_resource_form_for_create_template = """
+        # From test_templates/resource.py::ResourceAdminSession::get_resource_form_for_create_template
+        form = self.catalog.${method_name}([])
+        self.assertTrue(isinstance(form, OsidForm))"""
 
-    create_resource_template = """"""
+    create_resource_template = """
+        # From test_templates/resource.py::ResourceAdminSession::create_resource_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${object_name}
+        form = self.catalog.get_${object_name_under}_form_for_create([])
+        form.display_name = 'new ${object_name}'
+        form.set_genus_type(NEW_TYPE)
+        osid_object = self.catalog.${method_name}(form)
+        self.assertTrue(isinstance(osid_object, ${object_name}))
+        self.assertEqual(osid_object.genus_type, NEW_TYPE)"""
 
     get_resource_form_for_update_template = """"""
 
@@ -455,10 +472,10 @@ class ResourceBinSession:
             cls.${object_name_under}_ids[1], cls.assigned_catalog.ident)
         cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
             cls.${object_name_under}_ids[2], cls.assigned_catalog.ident)
-        for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
-            for obj in catalog.get_${object_name_under_plural}():
-                catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
+        for obj in cls.catalog.get_${object_name_under_plural}():
+            cls.catalog.delete_${object_name_under}(obj.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.assigned_catalog.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     get_resource_ids_by_bin_template = """
         objects = self.svc_mgr.get_${object_name_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)

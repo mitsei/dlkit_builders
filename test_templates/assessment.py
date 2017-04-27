@@ -1,5 +1,8 @@
 
 class AssessmentSession:
+    import_statements = [
+        'from dlkit.abstract_osid.assessment.objects import Bank'
+    ]
 
     init = """
     @classmethod
@@ -21,6 +24,10 @@ class AssessmentSession:
         for obj in cls.catalog.get_assessments():
             cls.catalog.delete_assessment(obj.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    get_bank = """
+        # this test should not be needed....
+        self.assertTrue(isinstance(self.catalog, Bank))"""
 
     can_take_assessments = """
         pass"""
@@ -301,7 +308,48 @@ class AssessmentTakenLookupSession:
 class AssessmentTakenAdminSession:
 
     import_statements = [
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.abstract_osid.assessment.objects import AssessmentTaken',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
     ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentOfferedLookupSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        create_form.display_name = 'Test AssessmentOffered'
+        create_form.description = 'Test AssessmentOffered for AssessmentTakenAdminSession tests'
+        obj = cls.catalog.create_assessment_offered(create_form)
+        cls.assessment_offered = obj
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments_taken():
+            cls.catalog.delete_assessment_taken(obj.ident)
+        for obj in cls.catalog.get_assessments_offered():
+            cls.catalog.delete_assessment_offered(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    create_assessment_taken = """
+        form = self.catalog.get_assessment_taken_form_for_create(self.assessment_offered.ident, [])
+        form.display_name = 'new Assessment Taken'
+        form.set_genus_type(NEW_TYPE)
+        osid_object = self.catalog.create_assessment_taken(form)
+        self.assertTrue(isinstance(osid_object, AssessmentTaken))
+        self.assertEqual(osid_object.genus_type, NEW_TYPE)"""
 
     ##
     # This impl may differ from the usual create_osid_object method in that it
@@ -644,6 +692,56 @@ class AssessmentOffered:
         # since there are no form methods to set scored?
         self.assertRaises(KeyError,
                           self.object.is_scored)"""
+
+
+class AssessmentOfferedAdminSession:
+    import_statements = [
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.abstract_osid.assessment.objects import AssessmentOffered',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.assessment_offered_list = list()
+        cls.assessment_offered_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentOfferedLookupSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        for num in [0, 1]:
+            create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+            create_form.display_name = 'Test AssessmentOffered ' + str(num)
+            create_form.description = 'Test AssessmentOffered for AssessmentOfferedAdminSession tests'
+            obj = cls.catalog.create_assessment_offered(create_form)
+            cls.assessment_offered_list.append(obj)
+            cls.assessment_offered_ids.append(obj.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments_taken():
+            cls.catalog.delete_assessment_taken(obj.ident)
+        for obj in cls.catalog.get_assessments_offered():
+            cls.catalog.delete_assessment_offered(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    create_assessment_offered = """
+        form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+        form.display_name = 'new Assessment Offered'
+        form.set_genus_type(NEW_TYPE)
+        osid_object = self.catalog.create_assessment_offered(form)
+        self.assertTrue(isinstance(osid_object, AssessmentOffered))
+        self.assertEqual(osid_object.genus_type, NEW_TYPE)"""
 
 
 class AssessmentOfferedForm:

@@ -233,10 +233,22 @@ class SequenceRuleLookupSession:
             cls.svc_mgr.delete_bank(catalog.ident)"""
 
 
+class SequenceRuleAdminSession:
+    get_sequence_rule_form_for_create = """"""
+
+    create_sequence_rule = """"""
+
+
 class AssessmentPart:
     init = """"""
 
     is_section = """"""
+
+
+class AssessmentPartAdminSession:
+    create_assessment_part_for_assessment = """"""
+
+    create_assessment_part_for_assessment_part = """"""
 
 
 class SequenceRule:

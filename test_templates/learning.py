@@ -297,6 +297,8 @@ class ActivityAdminSession:
 
     get_activity_form_for_create_template = """"""
 
+    create_activity = """"""
+
 
 class Activity:
 
@@ -463,3 +465,7 @@ class Proficiency:
             cls.catalog.delete_proficiency(obj.ident)
         cls.catalog.delete_objective(cls.objective.ident)
         cls.svc_mgr.delete_objective_bank(cls.catalog.ident)"""
+
+
+class ProficiencyAdminSession:
+    create_proficiency = """"""

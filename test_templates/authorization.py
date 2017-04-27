@@ -405,3 +405,7 @@ class AuthorizationQuerySession:
             for obj in catalog.get_authorizations():
                 catalog.delete_authorization(obj.ident)
             cls.svc_mgr.delete_vault(catalog.ident)"""
+
+
+class AuthorizationAdminSession:
+    create_authorization = """"""

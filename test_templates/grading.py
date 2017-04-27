@@ -279,3 +279,7 @@ class GradebookColumnSummary:
     ]
 
     init = """"""
+
+
+class GradeEntryAdminSession:
+    create_grade_entry = """"""
