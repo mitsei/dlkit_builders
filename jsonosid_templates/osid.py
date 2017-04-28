@@ -203,6 +203,12 @@ class Extensible:
     ]
 
     init = """
+    def __new__(cls, osid_object_map, **kwargs):
+        base_cls = cls
+        if osid_object_map['recordTypeIds']:
+            cls = type(cls, (cls,) + get_records(osid_object_map['recordTypeIds']), {})
+        return super(base_cls, cls).__new__(cls)
+
     def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
         self._records = OrderedDict()
         self._supported_record_type_ids = []

@@ -1635,7 +1635,6 @@ class Resource:
     # ${cat_name}Id element and may be removed someday
     init_template = """
     _namespace = '${implpkg_name}.${interface_name}'
-
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='${object_name_upper}', **kwargs)
         self._catalog_name = '${cat_name}'
