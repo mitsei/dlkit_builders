@@ -910,7 +910,6 @@ def camel_to_under(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-
 def convert_catalog_id_to_object_id_string(catalog_id):
     """When doing hierarchies, need to convert a catalogId into an
     ObjectId, so convert to a string, then into a hex format.
@@ -936,3 +935,14 @@ def convert_catalog_id_to_object_id_string(catalog_id):
         # python 2
         seed_str = str(seed_str)
     return seed_str
+
+def get_object_records(record_type_ids, record_type_data):
+    records = []
+    for record_type_id in record_type_ids:
+
+        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        module = import_module(record_type_data['module_path'])
+        record = getattr(module, record_type_data['object_record_class_name'], None)
+
+
+    return tuple(reccords)
