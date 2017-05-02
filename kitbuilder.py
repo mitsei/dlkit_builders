@@ -15,7 +15,7 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/services'
-        self._template_dir = self._abs_path + '/builders/kitosid_templates'
+        self._template_dir = self._abs_path + '/kitosid_templates'
 
         self._class = 'services'
 

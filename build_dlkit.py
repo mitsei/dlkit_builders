@@ -98,7 +98,7 @@ class BaseBuilder(Utilities):
         self._pattern_maps_dir = None
         self._interface_maps_dir = None
         self._map_ext = '.json'
-        self._abs_path = ABS_PATH
+        self._abs_path = PROJECT_PATH
         self.package = None
 
         self._app_prefix = ''
