@@ -15,7 +15,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/json_'
-        self._template_dir = self._abs_path + '/builders/mdata_templates'
+        self._template_dir = self._abs_path + '/mdata_templates'
 
         self._class = 'mdata'
 
@@ -100,7 +100,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
             write_file.write((import_str + mdata_definitions).encode('utf-8'))
 
     def _make_mdata_maps(self, interface):
-        from builders.jsonosid_templates import options
+        from jsonosid_templates import options
         pd = interface['shortname'] + '.persisted_data'
         rt = interface['shortname'] + '.return_types'
         mdata = ('def get_' + camel_to_under(interface['shortname']) +

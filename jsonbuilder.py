@@ -1,3 +1,4 @@
+import os
 import sys
 import pprint
 import string
@@ -18,7 +19,7 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/json_'
-        self._template_dir = self._abs_path + '/builders/jsonosid_templates'
+        self._template_dir = self._abs_path + '/jsonosid_templates'
 
         self._class = 'json'
 
@@ -125,7 +126,8 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
         try:
             # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
             if self._root_dir not in sys.path:
-                sys.path.insert(0, self._abs_path)
+                parent_path = os.path.abspath(os.path.join(self._abs_path, os.pardir))
+                sys.path.insert(0, parent_path)
             profile_module = '{}.{}.profile'.format(self._import_path(self._root_dir, limited=False),
                                                     self._abc_pkg_name(abc=False))
             old_profile = import_module(profile_module)
