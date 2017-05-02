@@ -70,3 +70,6 @@ Examples:
 
 
 NOTE: there are no builder tests, so the Travis CI build just does a PEP8 check.
+
+# Detailed documentation
+More information about how the templates are structured, patterning, and the build process are available in the [wiki](https://github.com/mitsei/dlkit_builders/wiki).
