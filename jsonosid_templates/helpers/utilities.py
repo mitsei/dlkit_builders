@@ -817,6 +817,21 @@ def get_registry(entry, runtime):
     except (ImportError, AttributeError, KeyError, NotFound):
         return {}
 
+def get_record(data_sets, record_type, data_key):
+    """Returns a record class"""
+    record_type_data = data_sets[record_type.get_identifier()]
+    module = import_module(record_type_data['module_path'])
+    return getattr(module, record_type_data[data_key], None)
+
+def get_records(object_name, record_types, data_key, runtime):
+    """Returns a tuple of record classes"""
+    records = []
+    data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
+    for record_type in record_types:
+        record = get_record(data_sets, record_types, data_key)
+        if record is not None:
+            records.append(record)
+    return tuple(records)
 
 def is_authenticated_with_proxy(proxy):
     """Given a Proxy, checks whether a user is authenticated"""
@@ -936,13 +951,11 @@ def convert_catalog_id_to_object_id_string(catalog_id):
         seed_str = str(seed_str)
     return seed_str
 
-def get_object_records(record_type_ids, record_type_data):
+def get_object_records(object_name, record_type_ids):
     records = []
+    record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
     for record_type_id in record_type_ids:
-
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+        record_type_data = record_type_data_sets[Id(record_type_idstr).get_identifier()]
         module = import_module(record_type_data['module_path'])
         record = getattr(module, record_type_data['object_record_class_name'], None)
-
-
-    return tuple(reccords)
+    return tuple(records)

@@ -203,16 +203,18 @@ class Extensible:
     ]
 
     init = """
-    def __new__(cls, osid_object_map, **kwargs):
+    def __new__(cls, object_name, osid_object_map, **kwargs):
         base_cls = cls
         if osid_object_map['recordTypeIds']:
-            cls = type(cls, (cls,) + get_records(osid_object_map['recordTypeIds']), {})
+            record_types = [Type(rtype_id) for rtype_id in osid_object_map['recordTypeIds']]
+            cls = type(cls, (cls,) + get_object_records(
+                object_name, record_types, 'object_record_class_name'), {})
         return super(base_cls, cls).__new__(cls)
 
     def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
-        self._records = OrderedDict()
+        # self._records = {}
         self._supported_record_type_ids = []
-        self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
+        # self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
         self._runtime = runtime
         self._proxy = proxy
 
@@ -224,71 +226,86 @@ class Extensible:
     def __getitem__(self, item):
         return getattr(self, item)
 
+    # def __getattribute__(self, name):
+    #     if not name.startswith('_'):
+    #         if '_records' in self.__dict__:
+    #             for record in self._records:
+    #                 try:
+    #                     return self._records[record][name]
+    #                 except AttributeError:
+    #                     pass
+    #     return object.__getattribute__(self, name)
+
     def __getattribute__(self, name):
         if not name.startswith('_'):
-            if '_records' in self.__dict__:
-                for record in reversed(self._records):
+            if len(self.__class__.__bases__) > 1:
+                # Records override base class and each other in reverse order:
+                for record_class in reversed(self.__class__.__bases__[1:]):
                     try:
-                        return self._records[record][name]
+                        return record_class[name] # Need self somehow?
                     except AttributeError:
                         pass
         return object.__getattribute__(self, name)
 
-    def __getattr__(self, name):
-        if '_records' in self.__dict__:
-            for record in reversed(self._records):
-                try:
-                    return self._records[record][name]
-                except AttributeError:
-                    pass
-        raise AttributeError()
+    # def __getattr__(self, name):
+    #     if '_records' in self.__dict__:
+    #         for record in self._records:
+    #             try:
+    #                 return self._records[record][name]
+    #             except AttributeError:
+    #                 pass
+    #     raise AttributeError()
 
     def _get_record(self, record_type):
-        \"\"\"Get the record string type value given the record_type.\"\"\"
+        \"\"\"Get the record for the given record_type. Really just self\"\"\"
         if not self.has_record_type(record_type):
             raise errors.Unsupported()
-        if str(record_type) not in self._records:
-            raise errors.Unimplemented()
-        return self._records[str(record_type)]
+        return self
 
-    def _load_records(self, record_type_idstrs):
-        \"\"\"Load all records from given record_type_idstrs.\"\"\"
-        for record_type_idstr in record_type_idstrs:
-            self._init_record(record_type_idstr)
-
-    def _init_records(self, record_types):
-        \"\"\"Initalize all records for this form.\"\"\"
-        for record_type in record_types:
-            # This conditional was inserted on 7/11/14. It may prove problematic:
-            if str(record_type) not in self._my_map['recordTypeIds']:
-                record_initialized = self._init_record(str(record_type))
-                if record_initialized:
-                    self._my_map['recordTypeIds'].append(str(record_type))
-
-    def _init_record(self, record_type_idstr):
-        \"\"\"Initialize the record identified by the record_type_idstr.\"\"\"
-        import importlib
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['object_record_class_name'], None)
-        # only add recognized records ... so apps don't break
-        # if new records are injected by another app
-        if record is not None:
-            self._records[record_type_idstr] = record(self)
-            return True
-        else:
-            return False
+    # def _load_records(self, record_type_idstrs):
+    #     \"\"\"Load all records from given record_type_idstrs.\"\"\"
+    #     for record_type_idstr in record_type_idstrs:
+    #         self._init_record(record_type_idstr)
+    #
+    # def _init_records(self, record_types):
+    #     \"\"\"Initalize all records for this form.\"\"\"
+    #     for record_type in record_types:
+    #         # This conditional was inserted on 7/11/14. It may prove problematic:
+    #         if str(record_type) not in self._my_map['recordTypeIds']:
+    #             record_initialized = self._init_record(str(record_type))
+    #             if record_initialized:
+    #                 self._my_map['recordTypeIds'].append(str(record_type))
+    #
+    # def _init_record(self, record_type_idstr):
+    #     \"\"\"Initialize the record identified by the record_type_idstr.\"\"\"
+    #     import importlib
+    #     record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+    #     module = importlib.import_module(record_type_data['module_path'])
+    #     record = getattr(module, record_type_data['object_record_class_name'], None)
+    #     # only add recognized records ... so apps don't break
+    #     # if new records are injected by another app
+    #     if record is not None:
+    #         self._records[record_type_idstr] = record(self)
+    #         return True
+    #     else:
+    #         return False
 
     def _delete(self):
         \"\"\"Override this method in inheriting objects to perform special clearing operations.\"\"\"
-        try:
-            for record in self._records:
-                try:
-                    self._records[record]._delete()
-                except AttributeError:
-                    pass
-        except AttributeError:
-            pass
+        # try:
+        #     for record in self._records:
+        #         try:
+        #             self._records[record]._delete()
+        #         except AttributeError:
+        #             pass
+        # except AttributeError:
+        #     pass
+        for record_class in self.__class__.__bases__[1:]:
+            try:
+                record_class._delete(self)
+            except AttributeError:
+                pass
+
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
@@ -803,7 +820,7 @@ class OsidObject:
         osid_markers.Identifiable.__init__(self, runtime=runtime)
         osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
         self._my_map = osid_object_map
-        self._load_records(osid_object_map['recordTypeIds'])
+        # self._load_records(osid_object_map['recordTypeIds'])
 
     def get_object_map(self, obj_map=None):
         if obj_map is None:
@@ -824,14 +841,19 @@ class OsidObject:
             # catalogs do not have this attribute
             pass
 
-        try:  # Need to implement records for catalogs one of these days
-            for record in self._records:
-                try:
-                    self._records[record]._update_object_map(obj_map)
-                except AttributeError:
-                    pass
-        except AttributeError:
-            pass
+        # try:  # Need to implement records for catalogs one of these days
+        #     for record in self._records:
+        #         try:
+        #             self._records[record]._update_object_map(obj_map)
+        #         except AttributeError:
+        #             pass
+        # except AttributeError:
+        #     pass
+        for record_class in self.__class__.__bases__[1:]:
+            try:
+                record_class._update_object_map(self, obj_map)
+            except AttributeError:
+                pass
 
         obj_map.update(
             {'type': self._namespace.split('.')[-1],
@@ -1199,6 +1221,15 @@ class OsidExtensibleForm:
     ]
 
     init = """
+    def __new__(cls, object_name, osid_object_map=None, record_types=None, runtime=None **kwargs):
+        base_cls = cls
+        if osid_object_map is not None:
+            record_types = [Type(rtype_id) for rtype_id in osid_object_map['recordTypeIds']]
+        if record_types:
+            cls = type(cls, (cls,) + get_records(
+                object_name, record_types, 'form_record_class_name', runtime), {})
+        return super(base_cls, cls).__new__(cls)
+
     def __init__(self, **kwargs):
         osid_markers.Extensible.__init__(self, **kwargs)
 
@@ -1214,14 +1245,33 @@ class OsidExtensibleForm:
         Perhaps we should leverage it somehow?
 
         \"\"\"
-        if (not self.has_record_type(record_type) and
-                record_type.get_identifier() not in self._record_type_data_sets):
-            raise errors.Unsupported()
-        if str(record_type) not in self._records:
-            record_initialized = self._init_record(str(record_type))
-            if record_initialized and str(record_type) not in self._my_map['recordTypeIds']:
-                self._my_map['recordTypeIds'].append(str(record_type))
-        return self._records[str(record_type)]
+        # if (not self.has_record_type(record_type) and
+        #         record_type.get_identifier() not in self._record_type_data_sets):
+        #     raise errors.Unsupported()
+        # if str(record_type) not in self._records:
+        #     record_initialized = self._init_record(str(record_type))
+        #     if record_initialized and str(record_type) not in self._my_map['recordTypeIds']:
+        #         self._my_map['recordTypeIds'].append(str(record_type))
+        try:
+            return Extensible._get_record(self, record_type)
+        except errors.Unsupported:
+            self.add_form_record(record_type)
+        return self
+
+    def add_form_record(self, record_type):
+        \"\"\"Adds a record to this object. Should to be associated with a morphable record type\"\"\"
+        object_name = self._namespace.split('.')[-1].upper()
+        data_sets = get_registry(object_name + '_RECORD_TYPES', self._runtime)
+        record_class = get_record(self._all_supported_record_type_data_sets,
+                                  record_type,
+                                  'form_record_class_name')
+        if record_class is None:
+            raise errors.Unsupported
+        self.__class__.__bases__ = self.__class__.__bases__ + (record_class,)
+        record_class.__init__(self)
+        record_class._init_metadata(self)
+        record_class._init_map(self)
+        
 
     def _init_record(self, record_type_idstr):
         \"\"\"Override this from osid.Extensible because Forms use a different
