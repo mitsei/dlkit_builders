@@ -1221,7 +1221,7 @@ class OsidExtensibleForm:
     ]
 
     init = """
-    def __new__(cls, object_name, osid_object_map=None, record_types=None, runtime=None **kwargs):
+    def __new__(cls, object_name, osid_object_map=None, record_types=None, runtime=None, **kwargs):
         base_cls = cls
         if osid_object_map is not None:
             record_types = [Type(rtype_id) for rtype_id in osid_object_map['recordTypeIds']]
@@ -1236,7 +1236,7 @@ class OsidExtensibleForm:
     def _init_map(self, record_types):
         self._my_map['recordTypeIds'] = []
         if record_types is not None:
-            self._init_records(record_types)
+            self._my_map['recordTypeIds'] = [str(rtype) for rtype in record_types]
         self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _get_record(self, record_type):
@@ -1271,19 +1271,19 @@ class OsidExtensibleForm:
         record_class.__init__(self)
         record_class._init_metadata(self)
         record_class._init_map(self)
-        
+        self._my_map['recordTypeIds'].append(str(record_type))
 
-    def _init_record(self, record_type_idstr):
-        \"\"\"Override this from osid.Extensible because Forms use a different
-        attribute in record_type_data.\"\"\"
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['form_record_class_name'])
-        if record is not None:
-            self._records[record_type_idstr] = record(self)
-            return True
-        else:
-            return False"""
+    # def _init_record(self, record_type_idstr):
+    #     \"\"\"Override this from osid.Extensible because Forms use a different
+    #     attribute in record_type_data.\"\"\"
+    #     record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+    #     module = importlib.import_module(record_type_data['module_path'])
+    #     record = getattr(module, record_type_data['form_record_class_name'])
+    #     if record is not None:
+    #         self._records[record_type_idstr] = record(self)
+    #         return True
+    #     else:
+    #         return False"""
 
 
 class OsidTemporalForm:
@@ -1542,7 +1542,7 @@ class OsidObjectForm:
         if osid_object_map is not None:
             self._for_update = True
             self._my_map = osid_object_map
-            self._load_records(osid_object_map['recordTypeIds'])
+            # self._load_records(osid_object_map['recordTypeIds'])
         else:
             self._for_update = False
             self._my_map = {}
