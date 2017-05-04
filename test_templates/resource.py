@@ -682,28 +682,23 @@ class BinLookupSession:
         self.assertEqual(catalog.ident, self.catalogs[0].ident)"""
 
     get_bins_by_ids_template = """
-        catalogs = self.svc_mgr.${method_name}(self.catalog_ids)
-        self.assertTrue(catalogs.available() > 0)"""
+        catalogs = self.svc_mgr.${method_name}(self.catalog_ids)"""
 
-    get_bins_by_genus_type_template = """
-        catalogs = self.svc_mgr.${method_name}(DEFAULT_TYPE)
-        self.assertTrue(catalogs.available() > 0)"""
+    test_get_bins_by_genus_type_template = """
+        catalogs = self.svc_mgr.${method_name}(DEFAULT_TYPE)"""
 
-    get_bins_by_parent_genus_type_template = """
-        catalogs = self.svc_mgr.${method_name}(DEFAULT_TYPE)
-        self.assertTrue(catalogs.available() > 0)"""
+    test_get_bins_by_parent_genus_type_template = """
+        catalogs = self.svc_mgr.${method_name}(DEFAULT_TYPE)"""
 
-    get_bins_by_record_type_template = """
-        catalogs = self.svc_mgr.${method_name}(DEFAULT_TYPE)
-        self.assertTrue(catalogs.available() > 0)"""
+    test_get_bins_by_record_type_template = """
+        catalogs = self.svc_mgr.${method_name}(DEFAULT_TYPE)"""
 
-    get_bins_by_provider_template = """
+    test_get_bins_by_provider_template = """
         # PASSES RESOURCE_ID!!!!
         catalogs = self.svc_mgr.${method_name}()"""
 
     get_bins_template = """
-        catalogs = self.svc_mgr.${method_name}()
-        self.assertTrue(catalogs.available() > 0)"""
+        catalogs = self.svc_mgr.${method_name}()"""
 
 
 class BinAdminSession:
