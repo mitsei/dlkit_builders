@@ -51,7 +51,9 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
 
         print("Building {0} for {1}".format(self._class,
                                             self.package['name']))
-
+        if self.package['name'] == 'osid':
+            import pdb
+            pdb.set_trace()
         self.patterns = self._patterns()
 
         import_str = self.module_header('')
@@ -101,6 +103,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
 
     def _make_mdata_maps(self, interface):
         from jsonosid_templates import options
+
         pd = interface['shortname'] + '.persisted_data'
         rt = interface['shortname'] + '.return_types'
         mdata = ('def get_' + camel_to_under(interface['shortname']) +
