@@ -1637,7 +1637,7 @@ class Resource:
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, object_name='${object_name_upper}', **kwargs)
+        osid_objects.OsidObject.__init__(self, **kwargs)
         self._catalog_name = '${cat_name}'
 ${instance_initers}"""
 
@@ -1795,7 +1795,7 @@ class ResourceForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, **kwargs):
-        ${init_object}.__init__(self, object_name='${object_name_upper}', **kwargs)
+        ${init_object}.__init__(self, **kwargs)
         self._mdata = default_mdata.get_${object_name_under}_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
@@ -1888,7 +1888,7 @@ class Bin:
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidCatalog.__init__(self, object_name='${object_name_upper}', **kwargs)"""
+        osid_objects.OsidCatalog.__init__(self, **kwargs)"""
 
 # Someday we need to support templating for additional_methods_pattern:
 #     additional_methods_pattern = """
@@ -1908,7 +1908,7 @@ class BinForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidCatalogForm.__init__(self, object_name='${object_name_upper}', **kwargs)
+        osid_objects.OsidCatalogForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_${object_name_under}_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():

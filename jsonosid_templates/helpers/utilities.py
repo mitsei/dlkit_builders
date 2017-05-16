@@ -824,10 +824,10 @@ def get_record(data_sets, record_type, data_key):
     return getattr(module, record_type_data[data_key], None)
 
 def get_records(object_name, record_types, data_key, runtime):
-    """Returns a tuple of record classes"""
+    """Returns a tuple of record classes, in reverse order to force MRO"""
     records = []
     data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
-    for record_type in record_types:
+    for record_type in reversed(record_types):
         record = get_record(data_sets, record_types, data_key)
         if record is not None:
             records.append(record)

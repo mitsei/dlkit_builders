@@ -1039,7 +1039,7 @@ class Asset:
     _namespace = 'repository.Asset'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
+        osid_objects.OsidObject.__init__(self, **kwargs)
         self._catalog_name = 'Repository'
         if self.is_composition():
             self._composition = self.get_composition()

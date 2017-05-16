@@ -347,7 +347,7 @@ class AuthorizationForm:
     _namespace = 'authorization.Authorization'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidRelationshipForm.__init__(self, object_name='AUTHORIZATION', **kwargs)
+        osid_objects.OsidRelationshipForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_authorization_mdata()  # Don't know if we need default mdata for this
         self._init_metadata(**kwargs)
 

@@ -194,24 +194,29 @@ class Identifiable:
 class Extensible:
 
     import_statements = [
+        'import inflection',
         'from ..primitives import Id',
         'from ..primitives import Type',
         'from importlib import import_module',
         'from ..utilities import get_provider_manager',
-        'from ..utilities import get_registry',
-        'from collections import OrderedDict'
+        # 'from ..utilities import get_registry',
+        'from ..utilities import get_records',
     ]
 
     init = """
-    def __new__(cls, object_name, osid_object_map, **kwargs):
-        base_cls = cls
-        if osid_object_map['recordTypeIds']:
-            record_types = [Type(rtype_id) for rtype_id in osid_object_map['recordTypeIds']]
-            cls = type(cls, (cls,) + get_object_records(
-                object_name, record_types, 'object_record_class_name'), {})
-        return super(base_cls, cls).__new__(cls)
+    def __new__(cls, object_name, object_type, record_types, runtime, **kwargs):
+        # NOTE: All classes that inherit from osid.Extensible must override __new__
+        # and invoke this osid.Extensible.__new__ with the proper arguments.
+        # See osid.OsidObject and osid.OsidObjectForm for examples.
+        if record_types is not None:
+            cls = type(object_name + object_type,
+                      get_records(inflection.underscore(object_name).upper(),
+                                           record_types,
+                                           'object_record_class_name',
+                                           runtime) + (cls,), {})
+        return super(Extensible, cls).__new__(cls)
 
-    def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
+    def __init__(self, runtime=None, proxy=None, **kwargs):
         # self._records = {}
         self._supported_record_type_ids = []
         # self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
@@ -235,18 +240,19 @@ class Extensible:
     #                 except AttributeError:
     #                     pass
     #     return object.__getattribute__(self, name)
-
-    def __getattribute__(self, name):
-        if not name.startswith('_'):
-            if len(self.__class__.__bases__) > 1:
-                # Records override base class and each other in reverse order:
-                for record_class in reversed(self.__class__.__bases__[1:]):
-                    try:
-                        return record_class[name] # Need self somehow?
-                    except AttributeError:
-                        pass
-        return object.__getattribute__(self, name)
-
+    #
+    # THIS DID NOT WORK:
+    # def __getattribute__(self, name):
+    #     if not name.startswith('_'):
+    #         if len(self.__class__.__bases__) > 1:
+    #             # Records override base class and each other in reverse order:
+    #             for record_class in reversed(self.__class__.__bases__[1:]):
+    #                 try:
+    #                     return record_class[name] # Need self somehow?
+    #                 except AttributeError:
+    #                     pass
+    #     return object.__getattribute__(self, name)
+    #
     # def __getattr__(self, name):
     #     if '_records' in self.__dict__:
     #         for record in self._records:
@@ -291,21 +297,12 @@ class Extensible:
     #         return False
 
     def _delete(self):
-        \"\"\"Override this method in inheriting objects to perform special clearing operations.\"\"\"
-        # try:
-        #     for record in self._records:
-        #         try:
-        #             self._records[record]._delete()
-        #         except AttributeError:
-        #             pass
-        # except AttributeError:
-        #     pass
-        for record_class in self.__class__.__bases__[1:]:
-            try:
-                record_class._delete(self)
-            except AttributeError:
-                pass
-
+        \"\"\"Override this method in inheriting objects to perform special clearing operations.
+        
+        And make sure to call super if you do
+        
+        \"\"\"
+        pass
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
@@ -816,6 +813,11 @@ class OsidObject:
     init = """
     _namespace = 'osid.OsidObject'
 
+    def __new__(cls, osid_object_map, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
+        record_types = [Type(rtype_id) for rtype_id in osid_object_map['recordTypeIds']]
+        return osid_markers.Extensible.__new__(cls, object_name, '', record_types, runtime)
+
     def __init__(self, osid_object_map, runtime=None, **kwargs):
         osid_markers.Identifiable.__init__(self, runtime=runtime)
         osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
@@ -1216,19 +1218,17 @@ class OsidForm:
 
 
 class OsidExtensibleForm:
+
     import_statements = [
         'import importlib',
     ]
 
     init = """
-    def __new__(cls, object_name, osid_object_map=None, record_types=None, runtime=None, **kwargs):
-        base_cls = cls
+    def __new__(cls, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
         if osid_object_map is not None:
             record_types = [Type(rtype_id) for rtype_id in osid_object_map['recordTypeIds']]
-        if record_types:
-            cls = type(cls, (cls,) + get_records(
-                object_name, record_types, 'form_record_class_name', runtime), {})
-        return super(base_cls, cls).__new__(cls)
+        return osid_markers.Extensible.__new__(cls, object_name, 'Form', record_types, runtime)
 
     def __init__(self, **kwargs):
         osid_markers.Extensible.__init__(self, **kwargs)
@@ -1267,7 +1267,7 @@ class OsidExtensibleForm:
                                   'form_record_class_name')
         if record_class is None:
             raise errors.Unsupported
-        self.__class__.__bases__ = self.__class__.__bases__ + (record_class,)
+        self.__class__.__bases__ = (record_class,) + self.__class__.__bases__
         record_class.__init__(self)
         record_class._init_metadata(self)
         record_class._init_map(self)

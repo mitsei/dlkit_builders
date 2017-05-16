@@ -1020,7 +1020,7 @@ class Question:
 
     init = """
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, object_name='QUESTION', **kwargs)
+        osid_objects.OsidObject.__init__(self, **kwargs)
         self._catalog_name = 'Bank'
         if 'item_id' in kwargs:
             self._item_id = kwargs['item_id']
@@ -1321,7 +1321,7 @@ class AssessmentForm:
     _namespace = 'assessment.Assessment'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT', **kwargs)
+        osid_objects.OsidObjectForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_assessment_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():
@@ -1526,7 +1526,7 @@ class AssessmentTaken:
     _namespace = 'assessment.AssessmentTaken'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, object_name='ASSESSMENT_TAKEN', **kwargs)
+        osid_objects.OsidObject.__init__(self, **kwargs)
         self._catalog_name = 'Bank'
         self._assessment_sections = dict()"""
 
@@ -1915,7 +1915,7 @@ class AssessmentSection:
     _namespace = 'assessment.AssessmentSection'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, object_name='AssessmentSection', **kwargs)
+        osid_objects.OsidObject.__init__(self, **kwargs)
         self._assessment_part_id = Id(self._my_map['assessmentPartId'])
         self._assessment_taken_id = Id(self._my_map['assessmentTakenId'])
 

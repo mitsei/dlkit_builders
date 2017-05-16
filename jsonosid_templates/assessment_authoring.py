@@ -549,7 +549,7 @@ class AssessmentPartForm:
     def __init__(self, **kwargs):
         osid_objects.OsidContainableForm.__init__(self)
         osid_objects.OsidOperableForm.__init__(self)
-        osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT_PART', **kwargs)
+        osid_objects.OsidObjectForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_assessment_part_mdata()
         self._init_metadata(**kwargs)
         if not self.is_for_update():

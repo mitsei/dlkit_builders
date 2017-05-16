@@ -199,7 +199,7 @@ class GradeEntryForm:
     _namespace = 'grading.GradeEntry'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidRelationshipForm.__init__(self, object_name='GRADE_ENTRY', **kwargs)
+        osid_objects.OsidRelationshipForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_grade_entry_mdata()
         self._effective_agent_id = kwargs['effective_agent_id']
 
@@ -447,7 +447,7 @@ class GradebookColumnSummary:
     _namespace = 'grading.GradebookColumnSummary'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, object_name='GRADEBOOK_COLUMN_SUMMARY', **kwargs)
+        osid_objects.OsidObject.__init__(self, **kwargs)
         self._catalog_name = 'gradebook'
 
         # Not set the entries to be included in the calculation
