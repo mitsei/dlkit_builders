@@ -565,6 +565,7 @@ class AssessmentPartForm:
         self._my_map['allocatedTime'] = self._allocated_time_default
         self._my_map['itemsSequential'] = self._items_sequential_default
         self._my_map['itemsShuffled'] = self._items_shuffled_default
+        self._my_map['weight'] = self._weight_default
         if self._supports_simple_sequencing():
             self._my_map['childIds'] = []"""
 
