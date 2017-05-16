@@ -142,6 +142,12 @@ class LogEntryForm:
             raise errors.InvalidArgument()
         self._my_map['${var_name_mixed}'] = str(${arg0_name})"""
 
+    get_priority_metadata_template = """
+        # Implemented from template for osid.logging.LogEntryForm.get_priority_metadata
+        metadata = dict(self._mdata['${var_name}'])
+        metadata.update({'existing_type_values': self._my_map['${var_name_mixed}Id']})
+        return Metadata(**metadata)"""
+
 
 class LogEntryQuery:
     match_agent_id = """

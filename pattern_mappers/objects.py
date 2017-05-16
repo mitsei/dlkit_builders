@@ -128,6 +128,21 @@ def map_object_form_patterns(interface, package, index):
                             return_type_full=method['return_type'],
                             syntax='ID'))
 
+        # ObjectForm methods that return a metadata object for a Type element
+        elif (method['name'].startswith('get_') and
+                method['name'].endswith('_metadata') and
+                var_name[:-9] in index[object_name + '.persisted_data'] and
+                index[object_name + '.persisted_data'][var_name[:-9]] == 'osid.type.Type'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='logging.LogEntryForm.get_priority_metadata',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name[:-9],
+                            return_type_full=method['return_type'],
+                            syntax='ID'))
+
         # ObjectForm methods that return a metadata object for a primitive element
         elif (method['name'].startswith('get_') and
                 method['name'].endswith('_metadata')):
