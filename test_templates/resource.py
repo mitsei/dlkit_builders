@@ -1086,24 +1086,59 @@ class ResourceQuery:
     ]
 
     init_template = """
-"""
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    clear_group_terms_template = """"""
+        cls.query = cls.catalog.get_${object_name_under}_query()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+    clear_group_terms_template = """
+        """
 
 
 class ResourceForm:
 
     import_statements_pattern = [
+        'from dlkit.json_.osid.metadata import Metadata',
+        'from dlkit.primordium.type.primitives import Type'
     ]
 
     init_template = """
-"""
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    get_group_metadata_template = """"""
+        cls.form = cls.catalog.get_${object_name_under}_form_for_create([])
 
-    get_avatar_metadata_template = """"""
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
-    set_group_template = """"""
+    get_group_metadata_template = """
+        # From test_templates/resource.py::ResourceForm::get_group_metadata_template
+        self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
+
+    get_avatar_metadata_template = """
+        # From test_templates/resource.py::ResourceForm::get_avatar_metadata_template
+        self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
+
+    set_group_template = """
+        # From test_templates/resource.py::ResourceForm::set_group_template
+        form = self.catalog.get_${interface_name_under}_for_create([])
+        form.${method_name}(True)
+        self.assertTrue(form._my_map['${var_name_mixed}'])"""
 
     clear_group_template = """"""
 
@@ -1111,7 +1146,10 @@ class ResourceForm:
 
     clear_avatar_template = """"""
 
-    get_resource_form_record_template = """"""
+    get_resource_form_record_template = """
+        with self.assertRaises(errors.Unsupported):
+            self.form.${method_name}(Type('osid.Osid%3Afake-record%40ODL.MIT.EDU'))
+        # Here check for a real record?"""
 
 
 class ResourceList:

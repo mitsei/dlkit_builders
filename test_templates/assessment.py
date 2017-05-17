@@ -593,6 +593,33 @@ class Question:
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
+class QuestionForm:
+
+    import_statements = [
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        item_form = cls.catalog.get_item_form_for_create([])
+        item_form.display_name = 'Item'
+        cls.item = cls.catalog.create_item(item_form)
+
+        cls.form = cls.catalog.get_question_form_for_create(cls.item.ident, [])
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
 class Answer:
     init = """
     @classmethod
@@ -610,6 +637,29 @@ class Answer:
         form = cls.catalog.get_answer_form_for_create(cls.item.ident, [])
         form.display_name = 'Test answer'
         cls.answer = cls.catalog.create_answer(form)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
+class AnswerForm:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        item_form = cls.catalog.get_item_form_for_create([])
+        item_form.display_name = 'Item'
+        cls.item = cls.catalog.create_item(item_form)
+
+        cls.form = cls.catalog.get_answer_form_for_create(cls.item.ident, [])
 
     @classmethod
     def tearDownClass(cls):
@@ -770,6 +820,29 @@ class AssessmentOfferedAdminSession:
 
 class AssessmentOfferedForm:
 
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentOfferedLookupSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+
+        cls.form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident,
+                                                                      [])
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_banks():
+            for obj in catalog.get_assessments():
+                catalog.delete_assessment(obj.ident)
+            cls.svc_mgr.delete_bank(catalog.ident)"""
+
     set_start_time_template = """
 """
 
@@ -779,6 +852,18 @@ class AssessmentOfferedForm:
 
     set_duration_template = """
         pass"""
+
+    set_items_sequential = """
+        form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident,
+                                                                   [])
+        form.set_items_sequential(True)
+        self.assertTrue(form._my_map['itemsSequential'])"""
+
+    set_items_shuffled = """
+        form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident,
+                                                                   [])
+        form.set_items_shuffled(True)
+        self.assertTrue(form._my_map['itemsShuffled'])"""
 
 
 class AssessmentOfferedQuery:
@@ -982,6 +1067,34 @@ class AssessmentTakenForm:
 
     import_statements = [
     ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentTakenLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentOfferedLookupSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        create_form.display_name = 'Test AssessmentOffered'
+        create_form.description = 'Test AssessmentOffered for AssessmentOfferedLookupSession tests'
+        cls.assessment_offered = cls.catalog.create_assessment_offered(create_form)
+
+        cls.form = cls.catalog.get_assessment_taken_form_for_create(cls.assessment_offered.ident, [])
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_banks():
+            for obj in catalog.get_assessments_offered():
+                catalog.delete_assessment_offered(obj.ident)
+            for obj in catalog.get_assessments():
+                catalog.delete_assessment(obj.ident)
+            cls.svc_mgr.delete_bank(catalog.ident)"""
 
 
 class AssessmentSection:

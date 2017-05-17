@@ -40,6 +40,35 @@ class CommentLookupSession:
             cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
 
+class CommentForm:
+    import_statements = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.primordium.id.primitives import Id',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('COMMENTING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_book_form_for_create([])
+        create_form.display_name = 'Test Book'
+        create_form.description = 'Test Book for CommentForm tests'
+        cls.catalog = cls.svc_mgr.create_book(create_form)
+        cls.form = cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_books():
+            cls.svc_mgr.delete_book(catalog.ident)"""
+
+
 class CommentQuerySession:
 
     import_statements_pattern = CommentLookupSession.import_statements_pattern

@@ -233,6 +233,56 @@ class SequenceRuleLookupSession:
             cls.svc_mgr.delete_bank(catalog.ident)"""
 
 
+class SequenceRuleForm:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.sequence_rule_list = list()
+        cls.sequence_rule_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for SequenceRuleLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for SequenceRuleLookupSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        create_form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident, [])
+        create_form.display_name = 'Test Assessment Part 1'
+        create_form.description = 'Test Assessment Part for SequenceRuleLookupSession tests'
+        cls.assessment_part_1 = cls.catalog.create_assessment_part_for_assessment(create_form)
+
+        create_form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident, [])
+        create_form.display_name = 'Test Assessment Part 2'
+        create_form.description = 'Test Assessment Part for SequenceRuleLookupSession tests'
+        cls.assessment_part_2 = cls.catalog.create_assessment_part_for_assessment(create_form)
+
+        cls.form = cls.catalog.get_sequence_rule_form_for_create(cls.assessment_part_1.ident,
+                                                                 cls.assessment_part_2.ident,
+                                                                 [])
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_banks():
+            for obj in catalog.get_assessment_parts():
+                catalog.delete_assessment_part(obj.ident)
+            for obj in catalog.get_assessments():
+                catalog.delete_assessment(obj.ident)
+            cls.svc_mgr.delete_bank(catalog.ident)"""
+
+    set_cumulative = """
+        create_form = self.catalog.get_sequence_rule_form_for_create(self.assessment_part_1.ident,
+                                                                     self.assessment_part_2.ident,
+                                                                     [])
+        create_form.set_cumulative(True)
+        self.assertTrue(create_form._my_map['cumulative'])"""
+
+
+    get_applied_assessment_parts_metadata = """"""
+
+
 class SequenceRuleAdminSession:
     import_statements = [
         'from dlkit.abstract_osid.osid.objects import OsidForm',
@@ -319,6 +369,35 @@ class AssessmentPart:
     init = """"""
 
     is_section = """"""
+
+
+class AssessmentPartForm:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.assessment_part_list = list()
+        cls.assessment_part_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentPartLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        assessment_form = cls.catalog.get_assessment_form_for_create([])
+        assessment_form.display_name = 'Test Assessment'
+        assessment_form.description = 'Test Assessment for AssessmentPartLookupSession tests'
+        cls.assessment = cls.catalog.create_assessment(assessment_form)
+
+        cls.form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident,
+                                                                                  [])
+
+        cls.assessment = cls.catalog.get_assessment(cls.assessment.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.catalog.use_unsequestered_assessment_part_view()
+        cls.catalog.delete_assessment(cls.assessment.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
 class AssessmentPartAdminSession:

@@ -54,7 +54,27 @@ class LogEntry:
 class LogEntryForm:
 
     import_statements_pattern = [
+        'from dlkit.json_.osid.metadata import Metadata'
     ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+
+        cls.form = cls.catalog.get_${object_name_under}_form_for_create([])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     set_priority_template = """
         pass"""
+
+    get_priority_metadata_template = """
+        # From test_templates/logging.py::LogEntryForm::get_priority_metadata_template
+        self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""

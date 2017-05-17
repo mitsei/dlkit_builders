@@ -312,6 +312,28 @@ class AuthorizationLookupSession:
             cls.svc_mgr.delete_vault(catalog.ident)"""
 
 
+class AuthorizationForm:
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('AUTHORIZATION', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_vault_form_for_create([])
+        create_form.display_name = 'Test Vault'
+        create_form.description = 'Test Vault for AuthorizationLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_vault(create_form)
+        cls.form = cls.catalog.get_authorization_form_for_create_for_agent(
+            AGENT_ID,
+            LOOKUP_RESOURCE_FUNCTION_ID,
+            Id(**{\'identifier\': '1', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'}),
+            [])
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_vaults():
+            cls.svc_mgr.delete_vault(catalog.ident)"""
+
+
 class Authorization:
     import_statements = [
         'from dlkit.primordium.id.primitives import Id',

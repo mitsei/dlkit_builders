@@ -314,6 +314,28 @@ class AssetContentForm:
     import_statements = [
     ]
 
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_repository_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_repository(create_form)
+
+        form = cls.catalog.get_asset_form_for_create([])
+        form.display_name = 'Asset'
+        cls.asset = cls.catalog.create_asset(form)
+
+        cls.form = cls.catalog.get_asset_content_form_for_create(cls.asset.ident,
+                                                                 [])
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assets():
+            cls.catalog.delete_asset(obj.ident)
+        cls.svc_mgr.delete_repository(cls.catalog.ident)"""
+
     set_url_template = """"""
 
     set_data = """"""
