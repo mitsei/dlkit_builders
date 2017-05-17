@@ -400,6 +400,32 @@ class AssessmentPartForm:
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
+class AssessmentPartQuery:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.assessment_part_list = list()
+        cls.assessment_part_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentPartLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        assessment_form = cls.catalog.get_assessment_form_for_create([])
+        assessment_form.display_name = 'Test Assessment'
+        assessment_form.description = 'Test Assessment for AssessmentPartLookupSession tests'
+        cls.assessment = cls.catalog.create_assessment(assessment_form)
+
+        # cls.query = cls.catalog.get_assessment_part_query()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.catalog.use_unsequestered_assessment_part_view()
+        cls.catalog.delete_assessment(cls.assessment.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
 class AssessmentPartAdminSession:
     init = """
     @classmethod

@@ -1083,6 +1083,15 @@ class Resource:
 class ResourceQuery:
 
     import_statements_pattern = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
     init_template = """
@@ -1100,8 +1109,7 @@ class ResourceQuery:
     def tearDownClass(cls):
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
-    clear_group_terms_template = """
-        """
+    clear_group_terms_template = """"""
 
 
 class ResourceForm:

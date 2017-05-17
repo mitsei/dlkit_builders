@@ -429,6 +429,34 @@ class ActivityForm:
     clear_assets_template = """"""
 
 
+class ActivityQuery:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ActivityLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+        create_form = cls.catalog.get_objective_form_for_create([])
+        create_form.display_name = 'Test Objective for Activity Lookup'
+        create_form.description = 'Test Objective for ActivityLookupSession tests'
+        cls.objective = cls.catalog.create_objective(create_form)
+
+        objective_query = cls.catalog.get_objective_query()
+        # cls.query = objective_query.get_activity_query()
+        # Raises Unimplemented()
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_objective_banks():
+            for obj in catalog.get_activities():
+                catalog.delete_activity(obj.ident)
+            for obj in catalog.get_objectives():
+                catalog.delete_objective(obj.ident)
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
+
+
 class ProficiencyQuerySession:
     init = """
     @classmethod

@@ -231,6 +231,22 @@ class GradeForm:
     get_output_score_metadata = """"""
 
 
+class GradeQuery:
+    import_statements = [
+        'from dlkit.primordium.id.primitives import Id'
+    ]
+
+    init = """
+    # This really shouldn't be generated...should be GradeEntryQuery??
+    @classmethod
+    def setUpClass(cls):
+        cls.object = None
+
+    @classmethod
+    def tearDownClass(cls):
+        pass"""
+
+
 class GradeEntry:
     import_statements = [
         'from dlkit.runtime import PROXY_SESSION, proxy_example',

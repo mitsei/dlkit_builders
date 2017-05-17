@@ -620,6 +620,31 @@ class QuestionForm:
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
+class QuestionQuery:
+
+    import_statements = [
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        item_query = cls.catalog.get_item_query()
+        # cls.query = item_query.get_question_query()
+        # Currently raises Unsupported()
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
 class Answer:
     init = """
     @classmethod
@@ -660,6 +685,31 @@ class AnswerForm:
         cls.item = cls.catalog.create_item(item_form)
 
         cls.form = cls.catalog.get_answer_form_for_create(cls.item.ident, [])
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
+class AnswerQuery:
+
+    import_statements = [
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        item_query = cls.catalog.get_item_query()
+        # cls.query = item_query.get_answer_query()
+        # Currently raises Unsupported()
 
     @classmethod
     def tearDownClass(cls):
