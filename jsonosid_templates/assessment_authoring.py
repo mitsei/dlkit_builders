@@ -651,6 +651,34 @@ class AssessmentPartForm:
         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])"""
 
 
+class SequenceRuleForm:
+
+    init = """
+    def __init__(self, **kwargs):
+        osid_objects.OsidObjectForm.__init__(self, object_name='SEQUENCE_RULE', **kwargs)
+        self._mdata = default_mdata.get_sequence_rule_mdata()
+        self._init_metadata(**kwargs)
+        if not self.is_for_update():
+            self._init_map(**kwargs)
+
+    def _init_metadata(self, **kwargs):
+        \"\"\"Initialize form metadata\"\"\"
+        osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
+        self._cumulative_default = self._mdata['cumulative']['default_boolean_values'][0]
+        self._minimum_score_default = self._mdata['minimum_score']['default_integer_values'][0]
+        self._maximum_score_default = self._mdata['maximum_score']['default_integer_values'][0]
+
+    def _init_map(self, record_types=None, **kwargs):
+        \"\"\"Initialize form map\"\"\"
+        osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
+        self._my_map['nextAssessmentPartId'] = str(kwargs['next_assessment_part_id'])
+        self._my_map['cumulative'] = self._cumulative_default
+        self._my_map['minimumScore'] = self._minimum_score_default
+        self._my_map['maximumScore'] = self._maximum_score_default
+        self._my_map['assessmentPartId'] = str(kwargs['assessment_part_id'])
+        self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]"""
+
+
 class SequenceRuleAdminSession:
     get_sequence_rule_form_for_create = """
         for arg in sequence_rule_record_types:
