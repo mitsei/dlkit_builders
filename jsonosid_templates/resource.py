@@ -1867,7 +1867,7 @@ class ResourceList:
 
     get_next_resources_template = """
         # Implemented from template for osid.resource.ResourceList.get_next_resources
-        return self._get_next_n(${arg0_name})"""
+        return self._get_next_n(${return_type}List, number=${arg0_name})"""
 
 
 class Bin:
