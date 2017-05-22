@@ -559,3 +559,13 @@ class VaultNodeList:
     get_next_vault_node = """"""
 
     get_next_vault_nodes = """"""
+
+
+class VaultNode:
+    init = """"""
+
+    get_vault = """"""
+
+    get_parent_vault_nodes = """"""
+
+    get_child_vault_nodes = """"""

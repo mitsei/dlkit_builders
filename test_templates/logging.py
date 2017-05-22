@@ -86,3 +86,13 @@ class LogNodeList:
     get_next_log_node = """"""
 
     get_next_log_nodes = """"""
+
+
+class LogNode:
+    init = """"""
+
+    get_log = """"""
+
+    get_parent_log_nodes = """"""
+
+    get_child_log_nodes = """"""

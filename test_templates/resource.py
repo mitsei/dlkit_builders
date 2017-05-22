@@ -1332,3 +1332,82 @@ class BinNodeList:
         for obj in cls.${object_name_under}_ids:
             cls.svc_mgr.delete_${cat_name_under}(obj)
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+
+class BinNode:
+
+    import_statements_pattern = [
+    ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        # Implemented from init template for BinNode
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        cls.${object_name_under}_ids = list()
+
+    def setUp(self):
+        # Implemented from init template for BinNode
+        from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
+        self.${object_name_under}_list = list()
+        for num in [0, 1]:
+            create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + str(num)
+            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            obj = self.svc_mgr.create_${cat_name_under}(create_form)
+            self.${object_name_under}_list.append(${interface_name}(
+                obj.object_map,
+                runtime=self.svc_mgr._runtime,
+                proxy=self.svc_mgr._proxy))
+            self.${object_name_under}_ids.append(obj.ident)
+        # Not put the catalogs in a hierarchy
+        self.svc_mgr.add_root_${cat_name_under}(self.${object_name_under}_list[0].ident)
+        self.svc_mgr.add_child_${cat_name_under}(
+            self.${object_name_under}_list[0].ident,
+            self.${object_name_under}_list[1].ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        # Implemented from init template for BinNode
+        for obj in cls.${object_name_under}_ids:
+            cls.svc_mgr.delete_${cat_name_under}(obj)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+    get_bin_template = """
+        # from test_templates/resource.py::BinNode::get_bin_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}
+        self.assertTrue(isinstance(self.${cat_name_under}_list[0].${method_name}(), ${cat_name}))
+        self.assertEqual(str(self.${cat_name_under}_list[0].${method_name}().ident),
+                         str(self.${cat_name_under}_list[0].ident))"""
+
+    get_parent_bin_nodes_template = """
+        # from test_templates/resource.py::BinNode::get_parent_bin_nodes
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}NodeList
+        node = self.svc_mgr.get_${cat_name_under}_nodes(
+            self.${cat_name_under}_list[1].ident,
+            1,
+            0,
+            False)
+        self.assertTrue(isinstance(node.${method_name}(), ${cat_name}NodeList))
+        self.assertEqual(node.${method_name}().available(),
+                         1)
+        self.assertEqual(str(node.${method_name}().next().ident),
+                         str(self.${cat_name_under}_list[0].ident))"""
+
+    get_child_bin_nodes_template = """
+        # from test_templates/resource.py::BinNode::get_child_bin_nodes_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}NodeList
+        node = self.svc_mgr.get_${cat_name_under}_nodes(
+            self.${cat_name_under}_list[0].ident,
+            0,
+            1,
+            False)
+        self.assertTrue(isinstance(node.${method_name}(), ${cat_name}NodeList))
+        self.assertEqual(node.${method_name}().available(),
+                         1)
+        self.assertEqual(str(node.${method_name}().next().ident),
+                         str(self.${cat_name_under}_list[1].ident))"""

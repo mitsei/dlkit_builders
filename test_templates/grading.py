@@ -547,3 +547,13 @@ class GradebookNodeList:
     get_next_gradebook_node = """"""
 
     get_next_gradebook_nodes = """"""
+
+
+class GradebookNode:
+    init = """"""
+
+    get_gradebook = """"""
+
+    get_parent_gradebook_nodes = """"""
+
+    get_child_gradebook_nodes = """"""
