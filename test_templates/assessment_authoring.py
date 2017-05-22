@@ -242,21 +242,21 @@ class SequenceRuleForm:
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
-        create_form.description = 'Test Bank for SequenceRuleLookupSession tests'
+        create_form.description = 'Test Bank for SequenceRuleForm tests'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
 
         create_form = cls.catalog.get_assessment_form_for_create([])
         create_form.display_name = 'Test Assessment'
-        create_form.description = 'Test Assessment for SequenceRuleLookupSession tests'
+        create_form.description = 'Test Assessment for SequenceRuleForm tests'
         cls.assessment = cls.catalog.create_assessment(create_form)
         create_form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident, [])
         create_form.display_name = 'Test Assessment Part 1'
-        create_form.description = 'Test Assessment Part for SequenceRuleLookupSession tests'
+        create_form.description = 'Test Assessment Part for SequenceRuleForm tests'
         cls.assessment_part_1 = cls.catalog.create_assessment_part_for_assessment(create_form)
 
         create_form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident, [])
         create_form.display_name = 'Test Assessment Part 2'
-        create_form.description = 'Test Assessment Part for SequenceRuleLookupSession tests'
+        create_form.description = 'Test Assessment Part for SequenceRuleForm tests'
         cls.assessment_part_2 = cls.catalog.create_assessment_part_for_assessment(create_form)
 
         cls.form = cls.catalog.get_sequence_rule_form_for_create(cls.assessment_part_1.ident,
@@ -265,12 +265,11 @@ class SequenceRuleForm:
 
     @classmethod
     def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_assessment_parts():
-                catalog.delete_assessment_part(obj.ident)
-            for obj in catalog.get_assessments():
-                catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)"""
+        for obj in cls.catalog.get_assessment_parts():
+            cls.catalog.delete_assessment_part(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
     set_cumulative = """
         create_form = self.catalog.get_sequence_rule_form_for_create(self.assessment_part_1.ident,
@@ -281,6 +280,60 @@ class SequenceRuleForm:
 
 
     get_applied_assessment_parts_metadata = """"""
+
+
+class SequenceRuleList:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.sequence_rule_list = list()
+        cls.sequence_rule_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for SequenceRuleList tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for SequenceRuleList tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        create_form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident, [])
+        create_form.display_name = 'Test Assessment Part 1'
+        create_form.description = 'Test Assessment Part for SequenceRuleList tests'
+        cls.assessment_part_1 = cls.catalog.create_assessment_part_for_assessment(create_form)
+
+        create_form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident, [])
+        create_form.display_name = 'Test Assessment Part 2'
+        create_form.description = 'Test Assessment Part for SequenceRuleList tests'
+        cls.assessment_part_2 = cls.catalog.create_assessment_part_for_assessment(create_form)
+
+        cls.form = cls.catalog.get_sequence_rule_form_for_create(cls.assessment_part_1.ident,
+                                                                 cls.assessment_part_2.ident,
+                                                                 [])
+
+    def setUp(self):
+        from dlkit.json_.assessment_authoring.objects import SequenceRuleList
+        self.sequence_rule_list = list()
+        self.sequence_rule_ids = list()
+
+        for num in [0, 1]:
+            form = self.catalog.get_sequence_rule_form_for_create(self.assessment_part_1.ident,
+                                                                  self.assessment_part_2.ident,
+                                                                  [])
+            obj = self.catalog.create_sequence_rule(form)
+
+            self.sequence_rule_list.append(obj)
+            self.sequence_rule_ids.append(obj.ident)
+        self.sequence_rule_list = SequenceRuleList(self.sequence_rule_list)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_sequence_rules():
+            cls.catalog.delete_sequence_rule(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
 class SequenceRuleAdminSession:
@@ -380,18 +433,59 @@ class AssessmentPartForm:
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
-        create_form.description = 'Test Bank for AssessmentPartLookupSession tests'
+        create_form.description = 'Test Bank for AssessmentPartForm tests'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
 
         assessment_form = cls.catalog.get_assessment_form_for_create([])
         assessment_form.display_name = 'Test Assessment'
-        assessment_form.description = 'Test Assessment for AssessmentPartLookupSession tests'
+        assessment_form.description = 'Test Assessment for AssessmentPartForm tests'
         cls.assessment = cls.catalog.create_assessment(assessment_form)
 
         cls.form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident,
                                                                                   [])
 
         cls.assessment = cls.catalog.get_assessment(cls.assessment.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.catalog.use_unsequestered_assessment_part_view()
+        cls.catalog.delete_assessment(cls.assessment.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
+class AssessmentPartList:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.assessment_part_list = list()
+        cls.assessment_part_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentPartList tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        assessment_form = cls.catalog.get_assessment_form_for_create([])
+        assessment_form.display_name = 'Test Assessment'
+        assessment_form.description = 'Test Assessment for AssessmentPartList tests'
+        cls.assessment = cls.catalog.create_assessment(assessment_form)
+
+        cls.form = cls.catalog.get_assessment_part_form_for_create_for_assessment(cls.assessment.ident,
+                                                                                  [])
+
+    def setUp(self):
+        from dlkit.json_.assessment_authoring.objects import AssessmentPartList
+        self.assessment_part_list = list()
+        self.assessment_part_ids = list()
+
+        for num in [0, 1]:
+            form = self.catalog.get_assessment_part_form_for_create_for_assessment(self.assessment.ident, [])
+
+            obj = self.catalog.create_assessment_part_for_assessment(form)
+
+            self.assessment_part_list.append(obj)
+            self.assessment_part_ids.append(obj.ident)
+        self.assessment_part_list = AssessmentPartList(self.assessment_part_list)
 
     @classmethod
     def tearDownClass(cls):

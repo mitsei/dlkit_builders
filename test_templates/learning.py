@@ -207,6 +207,43 @@ class ObjectiveSequencingSession:
     ]
 
 
+class ObjectiveNodeList:
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ObjectiveNodeList tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+
+        cls.objective_node_ids = list()
+
+    def setUp(self):
+        from dlkit.json_.learning.objects import ObjectiveNodeList, ObjectiveNode
+        self.objective_node_list = list()
+        for num in [0, 1]:
+            create_form = self.catalog.get_objective_form_for_create([])
+            create_form.display_name = 'Test Objective ' + str(num)
+            create_form.description = 'Test Objective for ObjectiveNodeList tests'
+            obj = self.catalog.create_objective(create_form)
+            self.objective_node_list.append(ObjectiveNode(obj.object_map))
+            self.objective_node_ids.append(obj.ident)
+        # Not put the objectives in a hierarchy
+        self.catalog.add_root_objective(self.objective_node_list[0].ident)
+        self.catalog.add_child_objective(
+            self.objective_node_list[0].ident,
+            self.objective_node_list[1].ident)
+        self.objective_node_list = ObjectiveNodeList(self.objective_node_list)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_objectives():
+            cls.catalog.delete_objective(obj.ident)
+        cls.svc_mgr.delete_objective_bank(cls.catalog.ident)"""
+
+
 class ActivityLookupSession:
 
     init = """
@@ -404,11 +441,11 @@ class ActivityForm:
         cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
-        create_form.description = 'Test ObjectiveBank for ActivityLookupSession tests'
+        create_form.description = 'Test ObjectiveBank for ActivityForm tests'
         cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
         create_form = cls.catalog.get_objective_form_for_create([])
         create_form.display_name = 'Test Objective for Activity Lookup'
-        create_form.description = 'Test Objective for ActivityLookupSession tests'
+        create_form.description = 'Test Objective for ActivityForm tests'
         cls.objective = cls.catalog.create_objective(create_form)
 
         cls.form = cls.catalog.get_activity_form_for_create(cls.objective.ident, [])
@@ -427,6 +464,46 @@ class ActivityForm:
     set_assets_template = """"""
 
     clear_assets_template = """"""
+
+
+class ActivityList:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ActivityList tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+        create_form = cls.catalog.get_objective_form_for_create([])
+        create_form.display_name = 'Test Objective for Activity Lookup'
+        create_form.description = 'Test Objective for ActivityList tests'
+        cls.objective = cls.catalog.create_objective(create_form)
+
+        cls.form = cls.catalog.get_activity_form_for_create(cls.objective.ident, [])
+
+    def setUp(self):
+        from dlkit.json_.learning.objects import ActivityList
+        self.activity_list = list()
+        self.activity_ids = list()
+        for num in [0, 1]:
+            form = self.catalog.get_activity_form_for_create(self.objective.ident, [])
+            form.display_name = 'Test Activity ' + str(num)
+            form.description = 'Test Activity for ActivityList tests'
+            obj = self.catalog.create_activity(form)
+
+            self.activity_list.append(obj)
+            self.activity_ids.append(obj.ident)
+        self.activity_list = ActivityList(self.activity_list)
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_objective_banks():
+            for obj in catalog.get_activities():
+                catalog.delete_activity(obj.ident)
+            for obj in catalog.get_objectives():
+                catalog.delete_objective(obj.ident)
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
 
 class ActivityQuery:
@@ -534,7 +611,7 @@ class ProficiencyForm:
         cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
-        create_form.description = 'Test ObjectiveBank for ProficiencyLookupSession tests'
+        create_form.description = 'Test ObjectiveBank for ProficiencyForm tests'
         cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
 
         form = cls.catalog.get_objective_form_for_create([])
@@ -542,6 +619,46 @@ class ProficiencyForm:
         objective = cls.catalog.create_objective(form)
 
         cls.form = cls.catalog.get_proficiency_form_for_create(objective.ident, AGENT_ID, [])
+
+    @classmethod
+    def tearDownClass(cls):
+        for catalog in cls.svc_mgr.get_objective_banks():
+            for obj in catalog.get_proficiencies():
+                catalog.delete_proficiency(obj.ident)
+            for obj in catalog.get_objectives():
+                catalog.delete_objective(obj.ident)
+            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
+
+
+class ProficiencyList:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ProficiencyList tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+
+        form = cls.catalog.get_objective_form_for_create([])
+        form.display_name = "Test LO"
+        cls.objective = cls.catalog.create_objective(form)
+
+        cls.form = cls.catalog.get_proficiency_form_for_create(cls.objective.ident, AGENT_ID, [])
+
+    def setUp(self):
+        from dlkit.json_.learning.objects import ProficiencyList
+        self.proficiency_list = list()
+        self.proficiency_ids = list()
+        for num in [0, 1]:
+            form = self.catalog.get_proficiency_form_for_create(self.objective.ident, AGENT_ID, [])
+            form.display_name = 'Test Proficiency ' + str(num)
+            form.description = 'Test Proficiency for ProficiencyList tests'
+            obj = self.catalog.create_proficiency(form)
+
+            self.proficiency_list.append(obj)
+            self.proficiency_ids.append(obj.ident)
+        self.proficiency_list = ProficiencyList(self.proficiency_list)
 
     @classmethod
     def tearDownClass(cls):

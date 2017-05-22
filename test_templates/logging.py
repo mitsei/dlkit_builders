@@ -78,3 +78,11 @@ class LogEntryForm:
     get_priority_metadata_template = """
         # From test_templates/logging.py::LogEntryForm::get_priority_metadata_template
         self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
+
+
+class LogNodeList:
+    init = """"""
+
+    get_next_log_node = """"""
+
+    get_next_log_nodes = """"""

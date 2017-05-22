@@ -1060,7 +1060,9 @@ class Resource:
         self.assertTrue(isinstance(self.object.${method_name}(), bool))
         self.assertFalse(self.object.${method_name}())"""
 
-    is_demographic = """"""
+    is_demographic = """
+        with self.assertRaises(AttributeError):
+            self.object.is_demographic()"""
 
     has_avatar_template = """
         # From test_templates/resources.py::Resource::has_avatar_template
@@ -1116,7 +1118,8 @@ class ResourceForm:
 
     import_statements_pattern = [
         'from dlkit.json_.osid.metadata import Metadata',
-        'from dlkit.primordium.type.primitives import Type'
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.primordium.id.primitives import Id'
     ]
 
     init_template = """
@@ -1128,7 +1131,8 @@ class ResourceForm:
         create_form.description = 'Test catalog description'
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
 
-        cls.form = cls.catalog.get_${object_name_under}_form_for_create([])
+    def setUp(self):
+        self.form = self.catalog.get_${object_name_under}_form_for_create([])
 
     @classmethod
     def tearDownClass(cls):
@@ -1144,15 +1148,30 @@ class ResourceForm:
 
     set_group_template = """
         # From test_templates/resource.py::ResourceForm::set_group_template
-        form = self.catalog.get_${interface_name_under}_for_create([])
-        form.${method_name}(True)
-        self.assertTrue(form._my_map['${var_name_mixed}'])"""
+        self.form.${method_name}(True)
+        self.assertTrue(self.form._my_map['${var_name_mixed}'])"""
 
-    clear_group_template = """"""
+    clear_group_template = """
+        # From test_templates/resource.py::ResourceForm::clear_group_template
+        self.form.set_${var_name}(True)
+        self.assertTrue(self.form._my_map['${var_name_mixed}'])
+        self.form.${method_name}()
+        self.assertIsNone(self.form._my_map['${var_name_mixed}'])"""
 
-    set_avatar_template = """"""
+    set_avatar_template = """
+        # From test_templates/resource.py::ResourceForm::set_avatar_template
+        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], '')
+        self.form.set_${var_name}(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))
+        self.assertEqual(self.form._my_map['${var_name_mixed}Id'],
+                         'repository.Asset%3Afake-id%40ODL.MIT.EDU')"""
 
-    clear_avatar_template = """"""
+    clear_avatar_template = """
+        # From test_templates/resource.py::ResourceForm::clear_avatar_template
+        self.form.set_${var_name}(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))
+        self.assertEqual(self.form._my_map['${var_name_mixed}Id'],
+                         'repository.Asset%3Afake-id%40ODL.MIT.EDU')
+        self.form.${method_name}()
+        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], '')"""
 
     get_resource_form_record_template = """
         with self.assertRaises(errors.Unsupported):
@@ -1165,9 +1184,57 @@ class ResourceList:
     import_statements_pattern = [
     ]
 
-    get_next_resource_template = """"""
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        # Implemented from init template for ResourceList
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    get_next_resources_template = """"""
+    def setUp(self):
+        # Implemented from init template for ResourceList
+        from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
+        self.${object_name_under}_list = list()
+        self.${object_name_under}_ids = list()
+        for num in [0, 1]:
+            create_form = self.catalog.get_${object_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + str(num)
+            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            obj = self.catalog.create_${object_name_under}(create_form)
+            self.${object_name_under}_list.append(obj)
+            self.${object_name_under}_ids.append(obj.ident)
+        self.${object_name_under}_list = ${interface_name}(self.${object_name_under}_list)
+
+    @classmethod
+    def tearDownClass(cls):
+        # Implemented from init template for ResourceList
+        for obj in cls.catalog.get_${object_name_under_plural}():
+            cls.catalog.delete_${object_name_under}(obj.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+    get_next_resource_template = """
+        # From test_templates/resource.py::ResourceList::get_next_resource_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
+        self.assertTrue(isinstance(self.${return_type_under}_list.${method_name}(), ${return_type}))"""
+
+    get_next_resources_template = """
+        # From test_templates/resource.py::ResourceList::get_next_resources_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}List, ${return_type}
+        new_list = self.${return_type_under}_list.${method_name}(2)
+        self.assertTrue(isinstance(new_list, ${return_type}List))
+        for item in new_list:
+            self.assertTrue(isinstance(item, ${return_type}))"""
+
+
+class ResourceNodeList:
+    init = """"""
+
+    get_next_resource_node = """"""
+
+    get_next_resource_nodes = """"""
 
 
 class Bin:
@@ -1186,3 +1253,82 @@ class BinForm:
 
     init_template = """
 """
+
+
+class BinList:
+
+    import_statements_pattern = [
+    ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        # Implemented from init template for BinList
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        cls.${object_name_under}_ids = list()
+
+    def setUp(self):
+        # Implemented from init template for BinList
+        from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
+        self.${object_name_under}_list = list()
+        for num in [0, 1]:
+            create_form = self.svc_mgr.get_${object_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + str(num)
+            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            obj = self.svc_mgr.create_${object_name_under}(create_form)
+            self.${object_name_under}_list.append(obj)
+            self.${object_name_under}_ids.append(obj.ident)
+        self.${object_name_under}_list = ${interface_name}(self.${object_name_under}_list)
+
+    @classmethod
+    def tearDownClass(cls):
+        # Implemented from init template for BinList
+        for obj in cls.${object_name_under}_ids:
+            cls.svc_mgr.delete_${cat_name_under}(obj)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+
+class BinNodeList:
+
+    import_statements_pattern = [
+    ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        # Implemented from init template for BinNodeList
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        cls.${object_name_under}_ids = list()
+
+    def setUp(self):
+        # Implemented from init template for BinNodeList
+        from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}, ${object_name}
+        self.${object_name_under}_list = list()
+        for num in [0, 1]:
+            create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + str(num)
+            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            obj = self.svc_mgr.create_${cat_name_under}(create_form)
+            self.${object_name_under}_list.append(${object_name}(obj.object_map))
+            self.${object_name_under}_ids.append(obj.ident)
+        # Not put the catalogs in a hierarchy
+        self.svc_mgr.add_root_${cat_name_under}(self.${object_name_under}_list[0].ident)
+        self.svc_mgr.add_child_${cat_name_under}(
+            self.${object_name_under}_list[0].ident,
+            self.${object_name_under}_list[1].ident)
+        self.${object_name_under}_list = ${interface_name}(self.${object_name_under}_list)
+
+    @classmethod
+    def tearDownClass(cls):
+        # Implemented from init template for BinNodeList
+        for obj in cls.${object_name_under}_ids:
+            cls.svc_mgr.delete_${cat_name_under}(obj)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
