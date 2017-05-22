@@ -1,4 +1,5 @@
-from binder_helpers import make_plural, remove_plural, get_cat_name_for_pkg
+from binder_helpers import make_plural, remove_plural, get_cat_name_for_pkg,\
+    camel_to_under
 from osid_meta import OSID_Language_Primitives
 from syntax_helpers import get_syntax_for_arg_type
 OSID_Calendaring_Primitives = ['osid.calendaring.Time', 'osid.calendaring.DateTime', 'osid.calendaring.Duration']
@@ -1195,9 +1196,24 @@ def map_object_patterns(interface, package, index):
     return index
 
 
-def map_list_patterns(interface, package, index):
+def is_catalog(index, object_name):
+    return index['package_catalog_under'] == camel_to_under(object_name)
 
+
+def is_catalog_node(index, object_name):
+    return index['package_catalog_under'] + '_node' == camel_to_under(object_name)
+
+
+def map_list_patterns(interface, package, index):
     object_name = interface['shortname'][:-4]
+    if is_catalog(index, object_name):
+        # then this is a catalog, not an object!
+        index[interface['shortname'] + '.init_pattern'] = 'resource.BinList'
+    elif is_catalog_node(index, object_name):
+        # then this is a catalog node, so part of a hierarchy
+        index[interface['shortname'] + '.init_pattern'] = 'resource.BinNodeList'
+    else:
+        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceList'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 2)[-1]

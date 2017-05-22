@@ -198,6 +198,10 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             object_name = interface_name[:-4]
         elif init_pattern == 'resource.BinNode':
             object_name = interface_name[:-4]
+        elif init_pattern == 'resource.BinList':
+            object_name = interface_name[:-4]
+        elif init_pattern == 'resource.BinNodeList':
+            object_name = interface_name[:-4]
         elif init_pattern == 'resource.ResourceLookupSession':
             object_name = interface_name[:-13]
         elif init_pattern == 'resource.ResourceQuerySession':
@@ -257,6 +261,8 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                         metadata_initers += '\n'
                 except KeyError:
                     pass
+        elif init_pattern == 'resource.ResourceList':
+            object_name = interface_name[:-4]
         elif init_pattern == 'resource.ResourceQuery':
             object_name = interface_name[:-5]
 
@@ -267,12 +273,15 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         else:
             svc_mgr_or_catalog = 'catalog'
 
+        fixed_package_name = fix_reserved_word(self.package['name'], is_module=True)
+
         return {'app_name': self._app_name(),
                 'implpkg_name': self._abc_pkg_name(abc=False, reserved_word=False),
                 'kitpkg_name': self._abc_pkg_name(abc=False),
                 'pkg_name': self.package['name'],
                 'pkg_name_caps': self.first(self.package['name']).title(),
                 'pkg_name_replaced': self.replace(self.package['name']),
+                'pkg_name_replaced_reserved': self.replace(fixed_package_name),
                 'pkg_name_replaced_caps': self.replace(self.package['name'].title(), desired=''),
                 'pkg_name_replaced_upper': self.replace(self.package['name']).upper(),
                 'pkg_name_upper': self.first(self.package['name']).upper(),
@@ -353,6 +362,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             if hasattr(template_class, 'init_template'):
                 context = self._get_init_context(init_pattern, interface)
                 template = string.Template(getattr(template_class, 'init_template'))
+
                 return template.substitute(context) + '\n'
 
         return ''
