@@ -278,7 +278,6 @@ class SequenceRuleForm:
         create_form.set_cumulative(True)
         self.assertTrue(create_form._my_map['cumulative'])"""
 
-
     get_applied_assessment_parts_metadata = """"""
 
 
