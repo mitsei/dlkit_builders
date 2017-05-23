@@ -440,7 +440,21 @@ class BaseBuilder(Utilities):
         local_imports.sort()
         partial_third_party_imports.sort()
 
-        import_lists = [docstrings, full_imports, partial_third_party_imports, local_imports, constants]
+        python_2_3_third_party_imports = []
+
+        # fix urllib unquote import for python 2/3 compatibility
+        for third_party_import in partial_third_party_imports:
+            if ('urllib' in third_party_import and
+                    any([i in third_party_import for i in ['quote', 'unquote']])):
+                python_2_3_third_party_imports.append("""
+try:
+    from urllib import unquote
+except ImportError:
+    from urllib.parse import unquote""")
+                continue
+            python_2_3_third_party_imports.append(third_party_import)
+
+        import_lists = [docstrings, full_imports, python_2_3_third_party_imports, local_imports, constants]
 
         results = []
         for import_list in import_lists:
