@@ -1390,6 +1390,7 @@ class AssessmentOfferedForm:
 
     # This looks just like the generic one. Need to find in the pattern?
     clear_start_time_template = """
+        # Implemented from template for osid.assessment.AssessmentOfferedForm.clear_start_time_template
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess()
@@ -1408,6 +1409,13 @@ class AssessmentOfferedForm:
         map['seconds'] = ${arg0_name}.seconds
         map['microseconds'] = ${arg0_name}.microseconds
         self._my_map['${var_name_mixed}'] = map"""
+
+    clear_duration_template = """
+        # Implemented from template for osid.assessment.AssessmentOfferedForm.clear_duration_template
+        if (self.get_${var_name}_metadata().is_read_only() or
+                self.get_${var_name}_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
 
 
 class AssessmentOfferedQuery:
