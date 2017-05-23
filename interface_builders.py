@@ -565,7 +565,8 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
 
     initialize_to_none = ['boolean', 'osid.calendaring.DateTime', 'timestamp',
                           'osid.calendaring.Duration']
-    initialize_to_empty_string = ['decimal', 'cardinal', 'string']
+    initialize_to_empty_string = ['cardinal', 'string']
+    initialize_to_zero = ['decimal']
 
     for data_name in initialized_data:
         mixed_name = under_to_mixed(data_name)
@@ -576,6 +577,8 @@ def make_persistance_initers(persisted_data, initialized_data, aggregate_data):
             initers += '        self._my_map[\'{}\'] = None\n'.format(mixed_name)
         elif initialized_data[data_name] in initialize_to_empty_string:
             initers += '        self._my_map[\'{}\'] = \'\'\n'.format(mixed_name)
+        elif initialized_data[data_name] in initialize_to_zero:
+            initers += '        self._my_map[\'{}\'] = 0.0\n'.format(mixed_name)
         elif initialized_data[data_name] == 'osid.locale.DisplayText':
             initers += (
                 '        self._my_map[\'{}\'] = {\n' +
