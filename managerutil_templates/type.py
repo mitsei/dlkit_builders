@@ -47,7 +47,7 @@ class TypeList:
 
     get_next_type = """
         try:
-            next_item = self.next()
+            next_item = next(self)
         except StopIteration:
             raise IllegalState('no more elements available in this list')
         except:  # Need to specify exceptions here
@@ -55,7 +55,7 @@ class TypeList:
         else:
             return next_item
 
-    def next(self):
+    def __next__(self):
         try:
             next_item = OsidList.next(self)
         except:
@@ -75,7 +75,7 @@ class TypeList:
             i = 0
             while i < n:
                 try:
-                    next_list.append(self.next())
+                    next_list.append(next(self))
                 except:  # Need to specify exceptions here
                     raise OperationFailed()
                 i += 1

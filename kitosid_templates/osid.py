@@ -250,9 +250,6 @@ class OsidList:
     def __iter__(self):
         return self
 
-    def next(self):
-        return next(self)
-
     def __next__(self):
         next_object = next(self._iter_object)
         if self._count is not None:

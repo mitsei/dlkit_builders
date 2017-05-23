@@ -68,9 +68,6 @@ class MyIterator(object):
             else:
                 raise StopIteration
 
-    def next(self):
-        return next(self)
-
     def __next__(self):
         try:
             return next(self._data)

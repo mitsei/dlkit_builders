@@ -18,7 +18,7 @@ class Locale:
     ]
 
     init = """
-    ##
+    #
     # This constructor should probably be referencing a locale settings
     # module for default values?
     def __init__(self,
@@ -140,8 +140,8 @@ class LocaleList:
     ]
 
     get_next_locale = """
-        next_item = self.next()
+        next_item = next(self)
         return next_item
 
-    def next(self):
+    def __next__(self):
         return self._get_next_object(Locale)"""

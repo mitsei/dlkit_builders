@@ -39,9 +39,9 @@ class AssessmentTakenSectionList(abc_assessment_objects.AssessmentSectionList, o
         *compliance: mandatory -- This method must be implemented.*
 
         """
-        return self.next()
+        return next(self)
 
-    def next(self):
+    def __next__(self):
         if self._sections_sequential:
             next_object = self._get_next_object(AssessmentSection)
         elif self.has_next and self.available == 0:

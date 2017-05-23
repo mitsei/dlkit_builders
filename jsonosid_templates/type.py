@@ -335,9 +335,9 @@ class TypeList:
     ]
 
     get_next_type = """
-        return self.next()
+        return next(self)
 
-    def next(self):
+    def __next__(self):
         from .primitives import Type
         return self._get_next_object(Type)"""
 

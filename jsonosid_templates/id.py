@@ -25,8 +25,8 @@ class IdList:
     ]
 
     get_next_id = """
-        next_item = self.next()
+        next_item = next(self)
         return next_item
 
-    def next(self):
+    def __next__(self):
         return self._get_next_object(Id)"""

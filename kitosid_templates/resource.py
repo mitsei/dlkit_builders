@@ -1014,10 +1014,6 @@ class ResourceList:
         else:
             return next_item
 
-    def next(self):
-        # for Python 2 support
-        return next(self)
-
     def __next__(self):
         \"\"\"next method for enumerator\"\"\"
         # Implemented from kitosid template for -

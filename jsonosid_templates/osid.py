@@ -1616,7 +1616,7 @@ class OsidList:
             counter = 0
             while counter < number:
                 try:
-                    next_list.append(self.next())
+                    next_list.append(next(self))
                 except Exception:  # Need to specify exceptions here!
                     raise errors.OperationFailed()
                 counter += 1
@@ -1631,9 +1631,9 @@ class OsidList:
             next_object = Id(next_object)
         return next_object
 
-    def next(self):
+    def __next__(self):
         \"\"\"next method for iterator.\"\"\"
-        next_object = self._iter_object.next()
+        next_object = next(self._iter_object)
         if self._count is not None:
             self._count -= 1
         return next_object

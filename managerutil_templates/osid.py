@@ -46,10 +46,10 @@ class OsidList:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         \"\"\"Iterator 'next' method\"\"\"
         try:
-            next_object = self._iter_object.next()
+            next_object = next(self._iter_object)
         except:
             raise
         if self._count is not None:

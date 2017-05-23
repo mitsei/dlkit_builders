@@ -1860,9 +1860,9 @@ class ResourceList:
 
     get_next_resource_template = """
         # Implemented from template for osid.resource.ResourceList.get_next_resource
-        return self.next()
+        return next(self)
 
-    def next(self):
+    def __next__(self):
         return self._get_next_object(${return_type})"""
 
     get_next_resources_template = """
