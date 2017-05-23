@@ -594,7 +594,7 @@ class JSONClientValidated(object):
             write_target = '{}/{}.json'.format(self._cursor,
                                                doc['_id'])
             with open(write_target, 'wb') as write_file:
-                json.dump(doc, write_file)
+                json.dump(doc, write_file, ensure_ascii=False)
 
             self._validate_write(write_target)
             inserted_obj = Filler()
@@ -636,7 +636,7 @@ class JSONClientValidated(object):
                                                doc['_id'])
 
             with open(write_target, 'wb') as write_file:
-                json.dump(doc, write_file)
+                json.dump(doc, write_file, ensure_ascii=False)
             self._validate_write(write_target)
             inserted_obj = Filler()
             inserted_obj.inserted_id = doc['_id']
