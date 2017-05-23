@@ -1402,7 +1402,7 @@ class AssessmentOfferedForm:
             raise errors.NoAccess()
         if not self._is_valid_${arg0_type_under}(
                 ${arg0_name},
-                self.get_${arg0_name}_metadata()):
+                self.get_${var_name}_metadata()):
             raise errors.InvalidArgument()
         map = dict()
         map['days'] = ${arg0_name}.days
