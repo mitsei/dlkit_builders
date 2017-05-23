@@ -68,7 +68,7 @@ class MyIterator(object):
             else:
                 raise StopIteration
 
-    def __next__(self):
+    def next(self):
         try:
             return next(self._data)
         except AttributeError:
@@ -77,6 +77,8 @@ class MyIterator(object):
                 return self._data[self._i]
             else:
                 raise StopIteration
+
+    __next__ = next
 
 
 class ListFiller(object):

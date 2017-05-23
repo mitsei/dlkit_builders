@@ -143,5 +143,7 @@ class LocaleList:
         next_item = next(self)
         return next_item
 
-    def __next__(self):
-        return self._get_next_object(Locale)"""
+    def next(self):
+        return self._get_next_object(Locale)
+
+    __next__ = next"""

@@ -55,7 +55,7 @@ class TypeList:
         else:
             return next_item
 
-    def __next__(self):
+    def next(self):
         try:
             next_item = OsidList.next(self)
         except:
@@ -64,6 +64,7 @@ class TypeList:
             next_item = Type(next_item)
         return next_item
 
+    __next__ = next
     next_type = property(fget=get_next_type)"""
 
     get_next_types = """

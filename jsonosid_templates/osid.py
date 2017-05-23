@@ -1631,12 +1631,14 @@ class OsidList:
             next_object = Id(next_object)
         return next_object
 
-    def __next__(self):
+    def next(self):
         \"\"\"next method for iterator.\"\"\"
         next_object = next(self._iter_object)
         if self._count is not None:
             self._count -= 1
         return next_object
+
+    __next__ = next
 
     def len(self):
         \"\"\"Returns number of available elements\"\"\"

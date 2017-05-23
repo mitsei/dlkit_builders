@@ -28,5 +28,7 @@ class IdList:
         next_item = next(self)
         return next_item
 
-    def __next__(self):
-        return self._get_next_object(Id)"""
+    def next(self):
+        return self._get_next_object(Id)
+
+    __next__ = next"""

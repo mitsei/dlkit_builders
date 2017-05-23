@@ -337,9 +337,11 @@ class TypeList:
     get_next_type = """
         return next(self)
 
-    def __next__(self):
+    def next(self):
         from .primitives import Type
-        return self._get_next_object(Type)"""
+        return self._get_next_object(Type)
+
+    __next__ = next"""
 
     get_next_types = """
         return self._get_next_n(n)"""

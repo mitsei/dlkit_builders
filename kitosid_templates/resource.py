@@ -1014,12 +1014,14 @@ class ResourceList:
         else:
             return next_item
 
-    def __next__(self):
+    def next(self):
         \"\"\"next method for enumerator\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resource
         next_item = osid.OsidList.next(self)
-        return next_item"""
+        return next_item
+
+    __next__ = next"""
 
     get_next_resources_template = """
         \"\"\"gets next n objects from list\"\"\"

@@ -1862,8 +1862,10 @@ class ResourceList:
         # Implemented from template for osid.resource.ResourceList.get_next_resource
         return next(self)
 
-    def __next__(self):
-        return self._get_next_object(${return_type})"""
+    def next(self):
+        return self._get_next_object(${return_type})
+
+    __next__ = next"""
 
     get_next_resources_template = """
         # Implemented from template for osid.resource.ResourceList.get_next_resources
