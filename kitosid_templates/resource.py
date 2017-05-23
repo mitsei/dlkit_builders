@@ -1008,13 +1008,17 @@ class ResourceList:
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resource
         try:
-            next_item = self.next()
+            next_item = next(self)
         except StopIteration:
             raise IllegalState('no more elements available in this list')
         else:
             return next_item
 
     def next(self):
+        # for Python 2 support
+        return next(self)
+
+    def __next__(self):
         \"\"\"next method for enumerator\"\"\"
         # Implemented from kitosid template for -
         # osid.resource.ResourceList.get_next_resource
@@ -1033,7 +1037,7 @@ class ResourceList:
             i = 0
             while i < ${arg0_name}:
                 try:
-                    next_list.append(self.next())
+                    next_list.append(next(self))
                 except StopIteration:
                     break
                 i += 1
