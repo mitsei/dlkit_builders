@@ -1020,7 +1020,7 @@ class Asset:
         id_list = []
         for ${var_name} in self.get_${var_name_plural}():
             id_list.append(${var_name}.get_id())
-        return ${aggregated_object_name}List(id_list)"""
+        return IdList(id_list)"""
 
     get_asset_contents_template = """
         # Implemented from template for osid.repository.Asset.get_asset_contents_template
