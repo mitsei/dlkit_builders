@@ -1022,7 +1022,7 @@ class Answer:
 class Item:
 
     get_question_id = """
-        self.get_question().get_id()"""
+        return self.get_question().get_id()"""
 
     get_question = """
         question_map = dict(self._my_map['question'])
