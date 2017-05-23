@@ -1037,7 +1037,7 @@ class AssessmentOfferedAdminSession:
 
 
 class AssessmentOfferedForm:
-    import_statements = [
+    import_statements_pattern = [
         'from dlkit.primordium.calendaring.primitives import DateTime, Duration'
     ]
 
@@ -1250,7 +1250,8 @@ class AssessmentTakenQuerySession:
 
 class AssessmentTaken:
 
-    import_statements = [
+    import_statements_pattern = [
+        'from decimal import Decimal',
         'from dlkit.abstract_osid.osid import errors',
         'from dlkit.json_.assessment.objects import AssessmentOffered',
         'from dlkit.primordium.id.primitives import Id',
@@ -1398,8 +1399,8 @@ class AssessmentTaken:
 
     get_score_template = """
         # From test_templates/assessment.py::AssessmentTaken::get_score_template
-        self.assertTrue(isinstance(self.object.${method_name}(), float))
-        self.assertEqual(self.object.${method_name}(), 0.0)"""
+        self.assertTrue(isinstance(self.object.${method_name}(), Decimal))
+        self.assertEqual(self.object.${method_name}(), Decimal(0.0))"""
 
     has_rubric = """
         # This may be an error in the spec -- not in _my_map

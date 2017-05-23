@@ -79,6 +79,14 @@ class LogEntryForm:
         # From test_templates/logging.py::LogEntryForm::get_priority_metadata_template
         self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
 
+    set_timestamp = """
+        test_time = DateTime.utcnow()
+        # By default log entries have this set, so can't use the templated test
+        self.assertIsNotNone(self.form._my_map['timestamp'])
+        self.form.set_timestamp(test_time)
+        self.assertEqual(self.form._my_map['timestamp'],
+                         test_time)"""
+
 
 class LogNodeList:
     init = """"""

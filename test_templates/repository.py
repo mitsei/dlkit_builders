@@ -294,6 +294,7 @@ class AssetContent:
         form = cls.catalog.get_asset_content_form_for_create(cls.asset.ident,
                                                              [])
         form.display_name = 'Test asset content'
+        form.set_url('https://www.google.com')
         cls.object = cls.catalog.create_asset_content(form)
 
     @classmethod
