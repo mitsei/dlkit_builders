@@ -1431,6 +1431,7 @@ class AssessmentOfferedQuery:
 class AssessmentTaken:
 
     import_statements = [
+        'from decimal import Decimal',
         'from ..primitives import Id',
         'from dlkit.abstract_osid.osid import errors',
         'from ..osid.objects import OsidObject',
@@ -1680,7 +1681,7 @@ class AssessmentTaken:
 
     get_score_template = """
         # Implemented from template for osid.assessment.AssessmentTaken.get_score_template
-        return float(self._my_map['${var_name_mixed}'])"""
+        return Decimal(self._my_map['${var_name_mixed}'])"""
 
 
 class AssessmentTakenForm:
