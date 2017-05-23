@@ -1438,6 +1438,7 @@ class AssessmentTaken:
         'from .assessment_utilities import get_first_part_id_for_assessment',
         'from .assessment_utilities import get_next_part_id',
         'from .assessment_utilities import get_assessment_section',
+        'from dlkit.primordium.calendaring.primitives import DateTime, Duration',
         'from dlkit.primordium.id.primitives import Id',
         'from bson.objectid import ObjectId',
         'from ..primitives import DateTime, DisplayText',
@@ -1621,7 +1622,14 @@ class AssessmentTaken:
         if self._my_map['actualStartTime'] is None:
             raise errors.IllegalState('this assessment has not yet been started by the taker')
         else:
-            return self._my_map['actualStartTime']"""
+            start_time = self._my_map['actualStartTime']
+            return DateTime(year=start_time.year,
+                            month=start_time.month,
+                            day=start_time.day,
+                            hour=start_time.hour,
+                            minute=start_time.minute,
+                            second=start_time.second,
+                            microsecond=start_time.microsecond)"""
 
     has_ended = """
         assessment_offered = self.get_assessment_offered()
@@ -1647,7 +1655,14 @@ class AssessmentTaken:
             raise errors.IllegalState('this assessment has not yet ended')
         if not self._my_map['completionTime']:
             raise errors.OperationFailed('someone forgot to set the completion time')
-        return self._my_map['completionTime']"""
+        completion_time = self._my_map['completionTime']
+        return DateTime(year=completion_time.year,
+                        month=completion_time.month,
+                        day=completion_time.day,
+                        hour=completion_time.hour,
+                        minute=completion_time.minute,
+                        second=completion_time.second,
+                        microsecond=completion_time.microsecond)"""
 
     get_time_spent = """
         # Take another look at this. Not sure it's correct:
