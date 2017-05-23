@@ -435,9 +435,15 @@ class Activity:
 
 
 class ActivityForm:
+    import_statements_pattern = [
+        'from dlkit.json_.osid.metadata import Metadata',
+        'from dlkit.primordium.id.primitives import Id'
+    ]
+
     init = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/learning.py::ActivityForm::init_template
         cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -452,6 +458,7 @@ class ActivityForm:
 
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/learning.py::ActivityForm::init_template
         for catalog in cls.svc_mgr.get_objective_banks():
             for obj in catalog.get_activities():
                 catalog.delete_activity(obj.ident)
@@ -459,11 +466,29 @@ class ActivityForm:
                 catalog.delete_objective(obj.ident)
             cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
-    get_assets_metadata_template = """"""
+    get_assets_metadata_template = """
+        # From test_templates/learning.py::ActivityForm::get_assets_metadata_template
+        self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
 
-    set_assets_template = """"""
+    set_assets_template = """
+        # From test_templates/learning.py::ActivityForm::set_assets_template
+        test_id = Id('osid.Osid%3A1%40ODL.MIT.EDU')
+        self.form.${method_name}([test_id])
+        self.assertTrue(len(self.form._my_map['${var_name_singular_mixed}Ids']), 1)
+        self.assertEqual(self.form._my_map['${var_name_singular_mixed}Ids'][0],
+                         str(test_id))
+        # reset this for other tests
+        self.form._my_map['${var_name_singular_mixed}Ids'] = list()"""
 
-    clear_assets_template = """"""
+    clear_assets_template = """
+        # From test_templates/learning.py::ActivityForm::clear_assets_template
+        test_id = Id('osid.Osid%3A1%40ODL.MIT.EDU')
+        self.form.set_${var_name}([test_id])
+        self.assertTrue(len(self.form._my_map['${var_name_singular_mixed}Ids']), 1)
+        self.assertEqual(self.form._my_map['${var_name_singular_mixed}Ids'][0],
+                         str(test_id))
+        self.form.${method_name}()
+        self.assertEqual(self.form._my_map['${var_name_singular_mixed}Ids'], [])"""
 
 
 class ActivityList:

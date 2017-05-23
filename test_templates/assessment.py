@@ -789,20 +789,105 @@ class AnswerList:
 
 
 class Item:
+    import_statements = [
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.json_.assessment.objects import Question, AnswerList',
+        'from dlkit.json_.id.objects import IdList',
+        'from dlkit.json_.learning.objects import ObjectiveList'
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        cls.lsvc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.lsvc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test objective bank'
+        create_form.description = 'Test objective bank description'
+        cls.objective_bank = cls.lsvc_mgr.create_objective_bank(create_form)
+        cls.objectives = list()
+        for _ in range(2):
+            form = cls.objective_bank.get_objective_form_for_create([])
+            objective = cls.objective_bank.create_objective(form)
+            cls.objectives.append(objective)
+
+    def setUp(self):
+        form = self.catalog.get_item_form_for_create([])
+        form.display_name = 'Test object'
+        form.set_learning_objectives([self.objectives[0].ident,
+                                      self.objectives[1].ident])
+        self.item = self.catalog.create_item(form)
+
+        form = self.catalog.get_question_form_for_create(self.item.ident, [])
+        self.catalog.create_question(form)
+
+        form = self.catalog.get_answer_form_for_create(self.item.ident, [])
+        form.set_genus_type(Type('answer-genus%3Aright-answer%40ODL.MIT.EDU'))
+        self.catalog.create_answer(form)
+
+        self.item = self.catalog.get_item(self.item.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)
+
+        for obj in cls.objective_bank.get_objectives():
+            cls.objective_bank.delete_objective(obj.ident)
+        cls.lsvc_mgr.delete_objective_bank(cls.objective_bank.ident)"""
+
+    get_learning_objective_ids = """
+        lo_ids = self.item.get_learning_objective_ids()
+        self.assertTrue(isinstance(lo_ids, IdList))
+        self.assertEqual(lo_ids.available(), 2)
+        self.assertEqual(str(lo_ids.next()), str(self.objectives[0].ident))
+        self.assertEqual(str(lo_ids.next()), str(self.objectives[1].ident))"""
+
+    get_learning_objectives = """
+        los = self.item.get_learning_objectives()
+        self.assertTrue(isinstance(los, ObjectiveList))
+        self.assertEqual(los.available(), 2)
+        self.assertEqual(str(los.next().ident), str(self.objectives[0].ident))
+        self.assertEqual(str(los.next().ident), str(self.objectives[1].ident))"""
+
+    get_answer_ids = """
+        answer_ids = self.item.get_answer_ids()
+        self.assertTrue(isinstance(answer_ids, IdList))
+        self.assertEqual(answer_ids.available(), 1)"""
+
+    get_answers = """
+        answers = self.item.get_answers()
+        self.assertTrue(isinstance(answers, AnswerList))
+        self.assertEqual(answers.available(), 1)
+        self.assertEqual(str(answers.next().genus_type),
+                         'answer-genus%3Aright-answer%40ODL.MIT.EDU')"""
 
     get_question_id = """
-        pass"""
+        question_id = self.item.get_question_id()
+        self.assertTrue(isinstance(question_id, Id))
+        self.assertEqual(str(question_id), str(self.item.ident))"""
 
     get_question = """
-        pass"""
-
-    additional_methods = """
-        pass"""
+        question = self.item.get_question()
+        self.assertTrue(isinstance(question, Question))
+        self.assertEqual(str(question.ident),
+                         str(self.item.ident))"""
 
 
 class AssessmentOffered:
 
     import_statements = [
+        'import datetime',
+        'from dlkit.primordium.calendaring.primitives import DateTime, Duration',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.json_.assessment.objects import Assessment'
     ]
 
     init = """
@@ -820,6 +905,16 @@ class AssessmentOffered:
 
         form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
         form.display_name = 'Test assessment offered'
+        form.set_start_time(DateTime.utcnow())
+        form.set_duration(Duration(hours=1))
+        deadline = DateTime.utcnow() + datetime.timedelta(days=4)
+        form.set_deadline(DateTime(year=deadline.year,
+                                   month=deadline.month,
+                                   day=deadline.day,
+                                   hour=deadline.hour,
+                                   minute=deadline.minute,
+                                   second=deadline.second,
+                                   microsecond=deadline.microsecond))
         cls.object = cls.catalog.create_assessment_offered(form)
 
     @classmethod
@@ -830,20 +925,23 @@ class AssessmentOffered:
             cls.catalog.delete_assessment(obj.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
-    additional_methods = """
-        pass"""
+    get_assessment_id = """
+        self.assertTrue(isinstance(self.object.get_assessment_id(), Id))
+        self.assertEqual(str(self.object.get_assessment_id()),
+                         str(self.assessment.ident))"""
 
-    has_start_time_template = """
-        pass"""
+    get_assessment = """
+        self.assertTrue(isinstance(self.object.get_assessment(), Assessment))
+        self.assertEqual(str(self.object.get_assessment().ident),
+                         str(self.assessment.ident))"""
 
     get_start_time_template = """
-        pass"""
-
-    has_duration_template = """
-        pass"""
+        # From test_templates/assessment.py::AssessmentOffered::get_start_time_template
+        self.assertTrue(isinstance(self.object.get_start_time(), DateTime))"""
 
     get_duration_template = """
-        pass"""
+        # From test_templates/assessment.py::AssessmentOffered::get_duration_template
+        self.assertTrue(isinstance(self.object.get_duration(), Duration))"""
 
     has_rubric = """
         # This may be an error in the spec -- not in _my_map
@@ -939,6 +1037,9 @@ class AssessmentOfferedAdminSession:
 
 
 class AssessmentOfferedForm:
+    import_statements = [
+        'from dlkit.primordium.calendaring.primitives import DateTime, Duration'
+    ]
 
     init = """
     @classmethod
@@ -968,14 +1069,48 @@ class AssessmentOfferedForm:
             cls.catalog.delete_assessment(obj.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
-    set_start_time_template = """"""
+    set_start_time_template = """
+        # From test_templates/assessment.py::AssessmentOfferedForm::set_start_time_template
+        test_time = DateTime.utcnow()
+        self.assertIsNone(self.form._my_map['${var_name_mixed}'])
+        self.form.${method_name}(test_time)
+        self.assertEqual(self.form._my_map['${var_name_mixed}'],
+                         test_time)
+        # reset this for other tests
+        self.form._my_map['${var_name_mixed}'] = None"""
 
     # This looks just like the generic one. Need to find in the pattern?
     clear_start_time_template = """
-        pass"""
+        # From test_templates/assessment.py::AssessmentOfferedForm::clear_start_time_template
+        test_time = DateTime.utcnow()
+        self.assertIsNone(self.form._my_map['${var_name_mixed}'])
+        self.form.set_${var_name}(test_time)
+        self.assertEqual(self.form._my_map['${var_name_mixed}'],
+                         test_time)
+        self.form.${method_name}()
+        self.assertIsNone(self.form._my_map['${var_name_mixed}'])"""
 
     set_duration_template = """
-        pass"""
+        # From test_templates/assessment.py::AssessmentOfferedForm::set_duration_template
+        test_duration = Duration(hours=1)
+        self.assertIsNone(self.form._my_map['${var_name_mixed}'])
+        self.form.${method_name}(test_duration)
+        self.assertEqual(self.form._my_map['${var_name_mixed}']['seconds'], 3600)
+        self.assertEqual(self.form._my_map['${var_name_mixed}']['days'], 0)
+        self.assertEqual(self.form._my_map['${var_name_mixed}']['microseconds'], 0)
+        # reset this for other tests
+        self.form._my_map['${var_name_mixed}'] = None"""
+
+    clear_duration_template = """
+        # From test_templates/assessment.py::AssessmentOfferedForm::clear_duration_template
+        test_duration = Duration(hours=1)
+        self.assertIsNone(self.form._my_map['${var_name_mixed}'])
+        self.form.set_${var_name}(test_duration)
+        self.assertEqual(self.form._my_map['${var_name_mixed}']['seconds'], 3600)
+        self.assertEqual(self.form._my_map['${var_name_mixed}']['days'], 0)
+        self.assertEqual(self.form._my_map['${var_name_mixed}']['microseconds'], 0)
+        self.form.${method_name}()
+        self.assertIsNone(self.form._my_map['${var_name_mixed}'])"""
 
 
 class AssessmentOfferedList:
@@ -1116,6 +1251,12 @@ class AssessmentTakenQuerySession:
 class AssessmentTaken:
 
     import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.json_.assessment.objects import AssessmentOffered',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.records import registry',
+        'SEQUENCE_ASSESSMENT = Type(**registry.ASSESSMENT_RECORD_TYPES["simple-child-sequencing"])'
     ]
 
     init = """
@@ -1127,17 +1268,32 @@ class AssessmentTaken:
         create_form.description = 'Test catalog description'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
 
-        form = cls.catalog.get_assessment_form_for_create([])
+        form = cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
         form.display_name = 'Assessment'
         cls.assessment = cls.catalog.create_assessment(form)
+
+        form = cls.catalog.get_item_form_for_create([])
+        form.display_name = 'Test item'
+        cls.item = cls.catalog.create_item(form)
+
+        form = cls.catalog.get_question_form_for_create(cls.item.ident, [])
+        cls.catalog.create_question(form)
+        cls.item = cls.catalog.get_item(cls.item.ident)
+
+        cls.catalog.add_item(cls.assessment.ident, cls.item.ident)
+        cls.assessment = cls.catalog.get_assessment(cls.assessment.ident)
 
         form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
         form.display_name = 'Test assessment offered'
         cls.offered = cls.catalog.create_assessment_offered(form)
 
-        form = cls.catalog.get_assessment_taken_form_for_create(cls.offered.ident,
-                                                                [])
-        cls.object = cls.catalog.create_assessment_taken(form)
+    def setUp(self):
+        form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
+                                                                 [])
+        self.object = self.catalog.create_assessment_taken(form)
+
+    def tearDown(self):
+        self.catalog.delete_assessment_taken(self.object.ident)
 
     @classmethod
     def tearDownClass(cls):
@@ -1147,40 +1303,103 @@ class AssessmentTaken:
                     cls.catalog.delete_assessment_taken(taken.ident)
                 cls.catalog.delete_assessment_offered(offered.ident)
             cls.catalog.delete_assessment(obj.ident)
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
+    get_assessment_offered_id = """
+        self.assertTrue(isinstance(self.object.get_assessment_offered_id(), Id))
+        self.assertEqual(str(self.object.get_assessment_offered_id()),
+                         str(self.offered.ident))"""
+
+    get_assessment_offered = """
+        self.assertTrue(isinstance(self.object.get_assessment_offered(), AssessmentOffered))
+        self.assertEqual(str(self.object.get_assessment_offered().ident),
+                         str(self.offered.ident))"""
+
     get_taker_id = """
-        pass"""
+        self.assertTrue(isinstance(self.object.get_taker_id(), Id))
+        self.assertEqual(str(self.object.get_taker_id()),
+                         str(self.catalog._proxy.get_effective_agent_id()))"""
 
     get_taker = """
-        pass"""
+        with self.assertRaises(errors.Unimplemented):
+            self.object.get_taker()"""
 
     get_taking_agent_id = """
-        pass"""
+        self.assertTrue(isinstance(self.object.get_taking_agent_id(), Id))
+        self.assertEqual(str(self.object.get_taking_agent_id()),
+                         str(self.catalog._proxy.get_effective_agent_id()))"""
 
     get_taking_agent = """
-        pass"""
+        with self.assertRaises(errors.Unimplemented):
+            self.object.get_taking_agent()"""
 
     has_started = """
-        pass"""
+        # tests if the assessment has begun
+        self.assertTrue(self.object.has_started())"""
 
     get_actual_start_time = """
-        pass"""
+        # tests if the taker has started the assessment
+        with self.assertRaises(errors.IllegalState):
+            self.object.actual_start_time
+        # Also test the other branches of this method
+        form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
+                                                                 [])
+        taken = self.catalog.create_assessment_taken(form)
+        section = self.catalog.get_first_assessment_section(taken.ident)
+        section.get_questions()
+        taken = self.catalog.get_assessment_taken(taken.ident)
+        self.assertTrue(isinstance(taken.actual_start_time, DateTime))
+        self.catalog.delete_assessment_taken(taken.ident)"""
 
     has_ended = """
-        pass"""
+        # tests if the assessment is over
+        self.assertFalse(self.object.has_ended())"""
 
     get_completion_time = """
-        pass"""
+        # tests if the taker has "finished" the assessment
+        with self.assertRaises(errors.IllegalState):
+            self.object.completion_time
+        # Also test the other branches of this method
+        form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
+                                                                 [])
+        taken = self.catalog.create_assessment_taken(form)
+        section = self.catalog.get_first_assessment_section(taken.ident)
+        section.get_questions()
+
+        self.catalog.finish_assessment(taken.ident)
+
+        taken = self.catalog.get_assessment_taken(taken.ident)
+        self.assertTrue(isinstance(taken.completion_time, DateTime))
+        self.catalog.delete_assessment_taken(taken.ident)"""
 
     get_time_spent = """
-        pass"""
+        with self.assertRaises(errors.IllegalState):
+            self.object.time_spent
+        # Also test the other branches of this method
+        form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
+                                                                 [])
+        taken = self.catalog.create_assessment_taken(form)
+        section = self.catalog.get_first_assessment_section(taken.ident)
+        section.get_questions()
+
+        self.catalog.finish_assessment(taken.ident)
+        taken = self.catalog.get_assessment_taken(taken.ident)
+        self.assertTrue(isinstance(taken.time_spent, datetime.timedelta))
+        self.catalog.delete_assessment_taken(taken.ident)"""
 
     get_completion_template = """
-        pass"""
+        # From test_templates/assessment.py::AssessmentTaken::get_completion_template
+        # Our implementation is probably wrong -- there is no "completion" setter
+        # in the form / spec...so unclear how the value gets here.
+        self.assertRaises(KeyError,
+                          self.object.${method_name})"""
 
     get_score_template = """
-        pass"""
+        # From test_templates/assessment.py::AssessmentTaken::get_score_template
+        self.assertTrue(isinstance(self.object.${method_name}(), float))
+        self.assertEqual(self.object.${method_name}(), 0.0)"""
 
     has_rubric = """
         # This may be an error in the spec -- not in _my_map
@@ -1223,6 +1442,12 @@ class AssessmentTaken:
         # since there are no form methods to set scoreSystemId?
         self.assertRaises(KeyError,
                           self.object.get_score_system_id)"""
+
+    get_feedback = """
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set feedback?
+        self.assertRaises(KeyError,
+                          self.object.get_feedback)"""
 
 
 class AssessmentTakenForm:
@@ -1309,19 +1534,89 @@ class AssessmentTakenList:
 
 
 class AssessmentSection:
-    init = """"""
+    import_statements = [
+        'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.json_.assessment.objects import AssessmentTaken',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.records import registry',
+        'SEQUENCE_ASSESSMENT = Type(**registry.ASSESSMENT_RECORD_TYPES["simple-child-sequencing"])'
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        form = cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
+        form.display_name = 'Assessment'
+        cls.assessment = cls.catalog.create_assessment(form)
+
+        form = cls.catalog.get_item_form_for_create([])
+        form.display_name = 'Test item'
+        cls.item = cls.catalog.create_item(form)
+
+        form = cls.catalog.get_question_form_for_create(cls.item.ident, [])
+        cls.catalog.create_question(form)
+        cls.item = cls.catalog.get_item(cls.item.ident)
+
+        cls.catalog.add_item(cls.assessment.ident, cls.item.ident)
+        cls.assessment = cls.catalog.get_assessment(cls.assessment.ident)
+
+        form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        form.display_name = 'Test assessment offered'
+        cls.offered = cls.catalog.create_assessment_offered(form)
+
+    def setUp(self):
+        form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
+                                                                 [])
+        self.taken = self.catalog.create_assessment_taken(form)
+        self.section = self.catalog.get_first_assessment_section(self.taken.ident)
+
+    def tearDown(self):
+        self.catalog.delete_assessment_taken(self.taken.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
+            cls.catalog.delete_assessment(obj.ident)
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    get_assessment_taken_id = """
+        self.assertTrue(isinstance(self.section.get_assessment_taken_id(), Id))
+        self.assertEqual(str(self.section.get_assessment_taken_id()),
+                         str(self.taken.ident))"""
+
+    get_assessment_taken = """
+        self.assertTrue(isinstance(self.section.get_assessment_taken(), AssessmentTaken))
+        self.assertEqual(str(self.section.get_assessment_taken().ident),
+                         str(self.taken.ident))"""
 
     has_allocated_time = """
-        pass"""
+        with self.assertRaises(errors.Unimplemented):
+            self.section.has_allocated_time()"""
 
     get_allocated_time = """
-        pass"""
+        with self.assertRaises(errors.Unimplemented):
+            self.section.get_allocated_time()"""
 
     are_items_sequential = """
-        pass"""
+        # This does not throw an exception because of the SIMPLE_SEQUENCE record
+        self.assertFalse(self.section.are_items_sequential())"""
 
     are_items_shuffled = """
-        pass"""
+        # This does not throw an exception because of the SIMPLE_SEQUENCE record
+        self.assertFalse(self.section.are_items_shuffled())"""
 
 
 class AssessmentSectionList:

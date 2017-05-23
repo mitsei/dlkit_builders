@@ -302,7 +302,9 @@ class AssetContent:
             cls.catalog.delete_asset(obj.ident)
         cls.svc_mgr.delete_repository(cls.catalog.ident)"""
 
-    has_url_template = """"""
+    has_url_template = """
+        # From test_templates/repository.py::AssetContent::has_url_template
+        self.assertTrue(self.object.${method_name}())"""
 
     get_url_template = """"""
 

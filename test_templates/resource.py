@@ -1125,6 +1125,7 @@ class ResourceForm:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::ResourceForm::init_template
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
@@ -1132,10 +1133,12 @@ class ResourceForm:
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
 
     def setUp(self):
+        # From test_templates/resource.py::ResourceForm::init_template
         self.form = self.catalog.get_${object_name_under}_form_for_create([])
 
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::ResourceForm::init_template
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     get_group_metadata_template = """
