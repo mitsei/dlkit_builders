@@ -1001,8 +1001,12 @@ class OsidForm:
 
     def _is_valid_string(self, inpt, metadata):
         \"\"\"Checks if input is a valid string\"\"\"
-        if not isinstance(inpt, basestring):
-            return False
+        try:
+            if not isinstance(inpt, basestring):
+                return False
+        except NameError:
+            if not isinstance(inpt, str):
+                return False
         if metadata.get_minimum_string_length() and len(inpt) < metadata.get_minimum_string_length():
             return False
         elif metadata.get_maximum_string_length() and len(inpt) > metadata.get_maximum_string_length():

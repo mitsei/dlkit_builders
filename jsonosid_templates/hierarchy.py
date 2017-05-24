@@ -7,6 +7,7 @@ class HierarchyTraversalSession:
         'from ..osid.sessions import OsidSession',
         'from . import objects',
         'from ..id.objects import IdList',
+        'from ..utilities import convert_catalog_id_to_object_id_string'
     ]
 
     init = """
@@ -38,15 +39,15 @@ class HierarchyTraversalSession:
 
     def _get_catalog_hierarchy_id(self, catalog_id, proxy, runtime):
         \"\"\"Gets the catalog hierarchy\"\"\"
-        seed_str = str(catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000')
+        seed_str = convert_catalog_id_to_object_id_string(catalog_id)
         ident = Id(authority=self._authority,
                    namespace='hierarchy.Hierarchy',
-                   identifier=str(ObjectId(seed_str[:12])))
+                   identifier=seed_str)
         return HierarchyLookupSession(proxy, runtime).get_hierarchy(ident).get_id()  # Return the actual Id
 
     def _create_catalog_hierarchy(self, catalog_id, proxy, runtime):
         \"\"\"Creates a catalog hierarchy\"\"\"
-        seed_str = catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000'
+        seed_str = convert_catalog_id_to_object_id_string(catalog_id)
         has = HierarchyAdminSession(proxy, runtime)
         hfc = has.get_hierarchy_form_for_create([])
         hfc.set_display_name(catalog_id.get_identifier().title() + ' Hierarchy')
@@ -57,7 +58,7 @@ class HierarchyTraversalSession:
                                 namespace='hierarchy.Hierarchy',
                                 identifier=catalog_id.get_identifier().lower()))
         # This next tricks require serious inside knowledge:
-        hfc._my_map['_id'] = ObjectId(seed_str[:12])
+        hfc._my_map['_id'] = ObjectId(seed_str)
         hierarchy = has.create_hierarchy(hfc)
         return hierarchy.get_id()  # Return the Id of newly created catalog hierarchy
 
@@ -163,7 +164,8 @@ class HierarchyDesignSession:
         'from ..primitives import Type',
         'from dlkit.abstract_osid.osid import errors',
         'from ..osid.sessions import OsidSession',
-        'from ..id.objects import IdList'
+        'from ..id.objects import IdList',
+        'from ..utilities import convert_catalog_id_to_object_id_string'
     ]
 
     init = """
@@ -195,15 +197,15 @@ class HierarchyDesignSession:
 
     def _get_catalog_hierarchy_id(self, catalog_id, proxy, runtime):
         \"\"\"Gets the catalog hierarchy\"\"\"
-        seed_str = catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000'
+        seed_str = convert_catalog_id_to_object_id_string(catalog_id)
         ident = Id(authority=self._authority,
                    namespace='hierarchy.Hierarchy',
-                   identifier=str(ObjectId(seed_str[:12])))
+                   identifier=seed_str)
         return HierarchyLookupSession(proxy, runtime).get_hierarchy(ident).get_id()  # Return the actual Id
 
     def _create_catalog_hierarchy(self, catalog_id, proxy, runtime):
         \"\"\"Creates a catalog hierarchy\"\"\"
-        seed_str = catalog_id.get_identifier() + catalog_id.get_authority() + '000000000000'
+        seed_str = convert_catalog_id_to_object_id_string(catalog_id)
         has = HierarchyAdminSession(proxy, runtime)
         hfc = has.get_hierarchy_form_for_create([])
         hfc.set_display_name(catalog_id.get_authority() + ' ' + catalog_id.get_identifier() + ' Hierarchy')
@@ -212,7 +214,7 @@ class HierarchyDesignSession:
                                 namespace='hierarchy.Hierarchy',
                                 identifier=catalog_id.get_identifier()))
         # This next tricks require serious inside knowledge:
-        hfc._my_map['_id'] = ObjectId(seed_str[:12])
+        hfc._my_map['_id'] = ObjectId(seed_str)
         hierarchy = has.create_hierarchy(hfc)
         return hierarchy.get_id()  # Return the Id of newly created catalog hierarchy
 
