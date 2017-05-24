@@ -2085,11 +2085,12 @@ class OsidSearch:
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from dlkit.primordium.id.primitives import Id',
+        'from collections import OrderedDict'
     ]
 
     init = """
     def __init__(self, runtime):
-        self._records = dict()
+        self._records = OrderedDict()
         # _load_records is in OsidExtensibleQuery:
         # _all_supported_record_type_ids comes from inheriting query object
         # THIS SHOULD BE RE-DONE:
