@@ -347,7 +347,7 @@ class AssessmentSessionSection(object):
                                  if p['level'] == 1]
             my_display_elements.append(all_level_1_parts.index(level_1_part) + 1)
 
-            for level, waypoints in parts_in_same_route.iteritems():
+            for level, waypoints in parts_in_same_route.items():
                 # for each part in the route at a given level, sum up the number of questions
                 # that have appeared in that part
                 # start the last level at 1, because the "current" question being injected
