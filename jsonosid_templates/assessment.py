@@ -1940,6 +1940,7 @@ class Response:
         'from dlkit.abstract_osid.osid import errors',
         'from ..utilities import get_registry',
         'from .assessment_utilities import get_item_lookup_session',
+        'from collections import OrderedDict',
         'UNANSWERED = 0',
         'NULL_SUBMISSION = 1',
     ]
@@ -1968,7 +1969,7 @@ class Response:
         self._is_correct = None
         if 'isCorrect' in osid_object_map:
             self._is_correct = osid_object_map['isCorrect']
-        self._records = dict()
+        self._records = OrderedDict()
 
         # Consider that responses may want to have their own records separate
         # from the enclosed Answer records:

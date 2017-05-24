@@ -199,11 +199,12 @@ class Extensible:
         'from importlib import import_module',
         'from ..utilities import get_provider_manager',
         'from ..utilities import get_registry',
+        'from collections import OrderedDict'
     ]
 
     init = """
     def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
-        self._records = {}
+        self._records = OrderedDict()
         self._supported_record_type_ids = []
         self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
         self._runtime = runtime
@@ -220,7 +221,7 @@ class Extensible:
     def __getattribute__(self, name):
         if not name.startswith('_'):
             if '_records' in self.__dict__:
-                for record in self._records:
+                for record in reversed(self._records):
                     try:
                         return self._records[record][name]
                     except AttributeError:
@@ -229,7 +230,7 @@ class Extensible:
 
     def __getattr__(self, name):
         if '_records' in self.__dict__:
-            for record in self._records:
+            for record in reversed(self._records):
                 try:
                     return self._records[record][name]
                 except AttributeError:
@@ -1678,11 +1679,12 @@ class OsidQuery:
         'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
         'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))',
         'from .. import utilities',
+        'from collections import OrderedDict'
     ]
 
     init = """
     def __init__(self, runtime):
-        self._records = dict()
+        self._records = OrderedDict()
         # _load_records is in OsidExtensibleQuery:
         # _all_supported_record_type_ids comes from inheriting query object
         # THIS SHOULD BE RE-DONE:
