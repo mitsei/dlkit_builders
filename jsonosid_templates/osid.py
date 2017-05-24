@@ -862,6 +862,7 @@ class OsidForm:
         'from .metadata import Metadata',
         'from ..utilities import get_locale_with_proxy',
         'from ..utilities import update_display_text_defaults',
+        'from ..utilities import is_string',
         'import uuid',
         'from decimal import Decimal',
     ]
@@ -1001,12 +1002,8 @@ class OsidForm:
 
     def _is_valid_string(self, inpt, metadata):
         \"\"\"Checks if input is a valid string\"\"\"
-        try:
-            if not isinstance(inpt, basestring):
-                return False
-        except NameError:
-            if not isinstance(inpt, str):
-                return False
+        if not is_string(inpt):
+            return False
         if metadata.get_minimum_string_length() and len(inpt) < metadata.get_minimum_string_length():
             return False
         elif metadata.get_maximum_string_length() and len(inpt) > metadata.get_maximum_string_length():
@@ -1569,7 +1566,7 @@ class OsidCatalogForm:
 class OsidList:
     import_statements = [
         'from pymongo.cursor import Cursor',
-        'from ..utilities import OsidListList',
+        'from ..utilities import OsidListList, is_string',
         'import itertools'
     ]
 
@@ -1631,7 +1628,7 @@ class OsidList:
         next_object = OsidList.next(self)
         if isinstance(next_object, dict):
             next_object = object_class(osid_object_map=next_object, runtime=self._runtime, proxy=self._proxy)
-        elif isinstance(next_object, basestring) and object_class == Id:
+        elif is_string(next_object) and object_class == Id:
             next_object = Id(next_object)
         return next_object
 
