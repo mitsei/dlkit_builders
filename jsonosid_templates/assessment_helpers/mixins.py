@@ -351,8 +351,6 @@ class AssessmentSessionSection(object):
 
             # With Python 3, need to sort parts_in_same_route so that
             # the lowest level is first
-            import pdb
-            pdb.set_trace()
             parts_in_same_route = OrderedDict(sorted(parts_in_same_route.items(), key=lambda k: k[0]))
             for level, waypoints in parts_in_same_route.items():
                 # for each part in the route at a given level, sum up the number of questions
