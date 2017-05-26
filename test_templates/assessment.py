@@ -503,12 +503,11 @@ class AssessmentBasicAuthoringSession:
 
     @classmethod
     def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_assessments():
-                catalog.delete_assessment(obj.ident)
-            for obj in catalog.get_items():
-                catalog.delete_item(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)"""
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
     can_author_assessments = """
         pass"""
