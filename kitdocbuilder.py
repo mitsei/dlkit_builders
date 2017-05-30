@@ -25,12 +25,13 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
         # required and append to the appropriate module's import list.
         inherit_category = 'UNKNOWN_MODULE'
         for i in interface['inheritance']:
-            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+            pkg_name = self._abc_pkg_name(package_name=i['pkg_name'], abc=self._is('abc'))
+            inherit_category = self.get_interface_module(pkg_name, i['name'], True)
             if (i['pkg_name'] == self.package['name'] and
                     inherit_category == interface['category']):
                 pass
             else:
-                import_str = 'from ..{0} import {1} as {0}_{1}'.format(self._abc_pkg_name(package_name=i['pkg_name'],
+                import_str = 'from ..{0} import {1} as {0}_{1}'.format(self._abc_pkg_name(package_name=pkg_name,
                                                                                           abc=False),
                                                                        inherit_category)
 
@@ -79,7 +80,8 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
         # list for this interface. Also, check if an import statement is
         # required and append to the appropriate module's import list.
         for i in interface['inheritance']:
-            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+            pkg_name = self._abc_pkg_name(package_name=i['pkg_name'], abc=self._is('abc'))
+            inherit_category = self.get_interface_module(pkg_name, i['name'], True)
 
             if i['pkg_name'] == self.package['name'] and inherit_category == interface['category']:
                 inheritance.append(i['name'])
