@@ -1705,8 +1705,12 @@ class AssessmentTakenQuery:
 
 
 class AssessmentQuery:
+    # TODO: These all seem wrong, now that we have AssessmentParts??
     match_item_id = """
         self._add_match('itemIds', str(item_id), match)"""
+
+    clear_item_id_terms = """
+        self._clear_terms('itemIds')"""
 
     match_assessment_offered_id = """
         self._add_match('assessmentOfferedId', str(assessment_offered_id), match)"""
