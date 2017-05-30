@@ -510,7 +510,8 @@ class AssessmentPartQuery:
         assessment_form.description = 'Test Assessment for AssessmentPartLookupSession tests'
         cls.assessment = cls.catalog.create_assessment(assessment_form)
 
-        # cls.query = cls.catalog.get_assessment_part_query()
+    def setUp(self):
+        self.query = self.catalog.get_assessment_part_query()
 
     @classmethod
     def tearDownClass(cls):

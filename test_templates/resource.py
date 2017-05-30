@@ -1130,9 +1130,9 @@ class ResourceQuery:
 
     clear_group_terms_template = """
         # From test_templates/resource.py::ResourceQuery::clear_group_terms_template
-        self.query._query_terms['${var_name}'] = 'foo'
+        self.query._query_terms['${var_name_mixed}'] = 'foo'
         self.query.${method_name}()
-        self.assertNotIn('${var_name}',
+        self.assertNotIn('${var_name_mixed}',
                          self.query._query_terms)"""
 
     match_avatar_id_template = """
