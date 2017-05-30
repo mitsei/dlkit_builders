@@ -1718,7 +1718,7 @@ class ResourceQuery:
 
     match_avatar_id_template = """
         # Implemented from template for osid.resource.ResourceQuery.match_avatar_id
-        self._add_match('${var_name_mixed}', str(${arg0_name}, ${arg1_name}))"""
+        self._add_match('${var_name_mixed}', str(${arg0_name}), ${arg1_name})"""
 
     clear_avatar_id_terms_template = """
         # Implemented from template for osid.resource.ResourceQuery.clear_avatar_id
