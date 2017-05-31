@@ -1,6 +1,6 @@
 from config import managers_to_implement, sessions_to_implement
 
-from binder_helpers import camel_to_list, SkipMethod, under_to_caps
+from binder_helpers import camel_to_list, SkipMethod, under_to_caps, fix_reserved_word
 from build_dlkit import BaseBuilder
 from interface_builders import InterfaceBuilder
 from method_builders import argless_clear, argless_get,\
@@ -14,7 +14,7 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/dlkit'
-        self._template_dir = self._abs_path + '/builders/kitosid_templates'
+        self._template_dir = self._abs_path + '/kitosid_templates'
 
         self._excluded_packages = ['proxy', 'type']
 
@@ -25,12 +25,13 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
         # required and append to the appropriate module's import list.
         inherit_category = 'UNKNOWN_MODULE'
         for i in interface['inheritance']:
-            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+            pkg_name = self._abc_pkg_name(package_name=i['pkg_name'], abc=self._is('abc'))
+            inherit_category = self.get_interface_module(pkg_name, i['name'], True)
             if (i['pkg_name'] == self.package['name'] and
                     inherit_category == interface['category']):
                 pass
             else:
-                import_str = 'from ..{0} import {1} as {0}_{1}'.format(self._abc_pkg_name(package_name=i['pkg_name'],
+                import_str = 'from ..{0} import {1} as {0}_{1}'.format(self._abc_pkg_name(package_name=pkg_name,
                                                                                           abc=False),
                                                                        inherit_category)
 
@@ -79,7 +80,8 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
         # list for this interface. Also, check if an import statement is
         # required and append to the appropriate module's import list.
         for i in interface['inheritance']:
-            inherit_category = self.get_interface_module(i['pkg_name'], i['name'], True)
+            pkg_name = self._abc_pkg_name(package_name=i['pkg_name'], abc=self._is('abc'))
+            inherit_category = self.get_interface_module(pkg_name, i['name'], True)
 
             if i['pkg_name'] == self.package['name'] and inherit_category == interface['category']:
                 inheritance.append(i['name'])
@@ -328,7 +330,8 @@ class KitDocDLKitBuilder(InterfaceBuilder, BaseBuilder):
                     write_file.write('{0}\n\n\n{1}'.format('\n'.join(modules[module]['imports']),
                                                            modules[module]['body']).decode('utf-8').encode('utf-8'))
                 with open('{0}/services/{1}.py'.format(self._app_name(),
-                                                       self.package['name']), 'w') as write_file:
+                                                       self.replace(fix_reserved_word(self.package['name'],
+                                                                                      is_module=True))), 'w') as write_file:
                     write_file.write('{0}{1}\n\n\n{2}'.format(summary,
                                                               '\n'.join(modules[self.package['name']]['imports']),
                                                               modules[self.package['name']]['body']).decode('utf-8').encode('utf-8'))

@@ -38,6 +38,14 @@ class AssessmentAuthoringManager:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_lookup_session_for_bank(*args, **kwargs)"""
 
+    get_assessment_part_query_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_query_session(*args, **kwargs)"""
+
+    get_assessment_part_query_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_query_session_for_bank(*args, **kwargs)"""
+
     get_assessment_part_admin_session = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_admin_session(*args, **kwargs)"""
@@ -71,6 +79,14 @@ class AssessmentAuthoringProxyManager:
     get_assessment_part_lookup_session_for_bank = """
         \"\"\"Pass through to provider method\"\"\"
         return AssessmentManager.get_assessment_part_lookup_session_for_bank(*args, **kwargs)"""
+
+    get_assessment_part_query_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_query_session(*args, **kwargs)"""
+
+    get_assessment_part_query_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_query_session_for_bank(*args, **kwargs)"""
 
     get_assessment_part_admin_session = """
         \"\"\"Pass through to provider method\"\"\"
