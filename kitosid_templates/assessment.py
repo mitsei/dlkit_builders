@@ -547,6 +547,13 @@ class AssessmentPartLookupSession:
                     pass"""
 
 
+class AssessmentPartQuerySession:
+    get_assessment_part_query = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_query_session').get_assessment_part_query()"""
+
+
 class SequenceRuleAdminSession:
     can_create_sequence_rule = """
         \"\"\"Pass through to provider method\"\"\"
