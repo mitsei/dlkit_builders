@@ -15,7 +15,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/source'
-        self._template_dir = self._abs_path + '/builders/kitosid_templates'
+        self._template_dir = self._abs_path + '/kitosid_templates'
 
         self._excluded_packages = ['proxy', 'type']
 
@@ -160,7 +160,7 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
         return patterns
 
     def _update_module_imports(self, modules, interface):
-        package = self.package['name']
+        package = self.replace(fix_reserved_word(self.package['name'], is_module=True))
         if any(sn in interface['inherit_shortnames']
                for sn in ['OsidManager', 'OsidProxyManager', 'OsidProfile']):
             module_name = 'service_managers'
@@ -379,11 +379,13 @@ class KitSourceBuilder(InterfaceBuilder, BaseBuilder):
 
     def write_license_file(self):
         with open(self._abc_module('summary', extension='rst'), 'w') as write_file:
+            pkg_name = self.replace(fix_reserved_word(self.package['name'],
+                                                      is_module=True))
             write_file.write(('Summary\n=======\n\n' +
                               '.. currentmodule:: dlkit.services.' +
-                              self.package['name'] + '\n' +
+                              pkg_name + '\n' +
                               '.. automodule:: dlkit.services.' +
-                              self.package['name'] + '\n').encode('utf-8'))
+                              pkg_name + '\n').encode('utf-8'))
 
     def write_modules(self, modules):
         # first, write the Table of Contents
