@@ -1295,6 +1295,9 @@ class CompositionQuery:
     match_contained_composition_id = """
         self._add_match('childIds', str(composition_id), match)"""
 
+    clear_contained_composition_id_terms = """
+        self._clear_terms('childIds')"""
+
     match_asset_id = """
         self._add_match('assetIds', str(asset_id), match)"""
 
