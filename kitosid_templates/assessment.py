@@ -154,6 +154,10 @@ class AssessmentAuthoringProfile:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').supports_sequence_rule_lookup()"""
 
+    supports_assessment_part_query = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_query()"""
+
 
 class MyAssessmentTakenSession:
 
