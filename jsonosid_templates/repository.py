@@ -1298,6 +1298,9 @@ class CompositionQuery:
     match_asset_id = """
         self._add_match('assetIds', str(asset_id), match)"""
 
+    clear_asset_id_terms = """
+        self._clear_terms('assetIds')"""
+
 
 class CompositionSearch:
 
