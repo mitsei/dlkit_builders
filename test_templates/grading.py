@@ -267,6 +267,28 @@ class GradeQuery:
     def tearDownClass(cls):
         pass"""
 
+    match_grade_system_id = """"""
+
+    clear_grade_system_id_terms = """"""
+
+    clear_grade_system_terms = """"""
+
+    clear_input_score_start_range_terms = """"""
+
+    clear_input_score_end_range_terms = """"""
+
+    clear_output_score_terms = """"""
+
+    match_grade_entry_id = """"""
+
+    clear_grade_entry_id_terms = """"""
+
+    match_gradebook_id = """"""
+
+    clear_gradebook_id_terms = """"""
+
+    clear_gradebook_terms = """"""
+
 
 class GradeEntry:
     import_statements = [
