@@ -111,6 +111,56 @@ class CompositionQuerySession:
         self.catalog.update_composition(cfu)"""
 
 
+class CompositionQuery:
+    match_asset_id = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_asset_id(test_id, match=True)
+        self.assertEqual(self.query._query_terms['assetIds'], {
+            '$in': [str(test_id)]
+        })"""
+
+    clear_asset_id_terms = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_asset_id(test_id, match=True)
+        self.assertIn('assetIds',
+                      self.query._query_terms)
+        self.query.clear_asset_id_terms()
+        self.assertNotIn('assetIds',
+                         self.query._query_terms)"""
+
+    match_contained_composition_id = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_contained_composition_id(test_id, match=True)
+        self.assertEqual(self.query._query_terms['childIds'], {
+            '$in': [str(test_id)]
+        })"""
+
+    clear_contained_composition_id_terms = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_contained_composition_id(test_id, match=True)
+        self.assertIn('childIds',
+                      self.query._query_terms)
+        self.query.clear_contained_composition_id_terms()
+        self.assertNotIn('childIds',
+                         self.query._query_terms)"""
+
+    match_containing_composition_id = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_containing_composition_id(test_id, match=True)
+        self.assertEqual(self.query._query_terms['_id'], {
+            '$in': [test_id.identifier]
+        })"""
+
+    clear_containing_composition_id_terms = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_containing_composition_id(test_id, match=True)
+        self.assertIn('_id',
+                      self.query._query_terms)
+        self.query.clear_containing_composition_id_terms()
+        self.assertNotIn('_id',
+                         self.query._query_terms)"""
+
+
 class CompositionAdminSession:
 
     import_statements_pattern = [

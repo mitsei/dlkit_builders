@@ -1091,6 +1091,7 @@ class ResourceQuery:
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
         'CONDITION.set_http_request(REQUEST)',
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
         'from dlkit.primordium.type.primitives import Type',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
         'from dlkit.abstract_osid.osid import errors',
@@ -1099,19 +1100,144 @@ class ResourceQuery:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::ResourceQuery::init_template
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
 
-        cls.query = cls.catalog.get_${object_name_under}_query()
+    def setUp(self):
+        # From test_templates/resource.py::ResourceQuery::init_template
+        self.query = self.catalog.get_${object_name_under}_query()
 
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::ResourceQuery::init_template
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
-    clear_group_terms_template = """"""
+    match_group = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_group(match=True)"""
+
+    match_demographic = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_demographic(match=True)"""
+
+    clear_demographic_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_demographic_terms()"""
+
+    clear_group_terms_template = """
+        # From test_templates/resource.py::ResourceQuery::clear_group_terms_template
+        self.query._query_terms['${var_name_mixed}'] = 'foo'
+        self.query.${method_name}()
+        self.assertNotIn('${var_name_mixed}',
+                         self.query._query_terms)"""
+
+    match_avatar_id_template = """
+        # From test_templates/resource.py::ResourceQuery::match_avatar_id_template
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.${method_name}(test_id, match=True)
+        self.assertEqual(self.query._query_terms['${var_name_mixed}'], {
+            '$$in': [str(test_id)]
+        })"""
+
+    clear_avatar_id_terms_template = """
+        # From test_templates/resource.py::ResourceQuery::clear_avatar_id_terms_template
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_${var_name}(test_id, match=True)
+        self.assertIn('${var_name_mixed}',
+                      self.query._query_terms)
+        self.query.${method_name}()
+        self.assertNotIn('${var_name_mixed}',
+                         self.query._query_terms)"""
+
+    supports_containing_group_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_containing_group_query()"""
+
+    supports_avatar_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_avatar_query()"""
+
+    supports_agent_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_agent_query()"""
+
+    supports_resource_relationship_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_resource_relationship_query()"""
+
+    supports_bin_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_bin_query()"""
+
+    get_containing_group_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_containing_group_query()"""
+
+    get_avatar_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_avatar_query()"""
+
+    get_agent_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_agent_query()"""
+
+    get_resource_relationship_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_resource_relationship_query()"""
+
+    get_bin_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_bin_query()"""
+
+    match_any_containing_group = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_containing_group(match=True)"""
+
+    match_any_avatar = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_avatar(match=True)"""
+
+    match_any_agent = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_agent(match=True)"""
+
+    match_any_resource_relationship = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_resource_relationship(match=True)"""
+
+    clear_containing_group_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_containing_group_terms()"""
+
+    clear_agent_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_agent_terms()"""
+
+    clear_resource_relationship_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_resource_relationship_terms()"""
+
+    match_bin_id_template = """
+        # From test_templates/resource.py::ResourceQuery::match_bin_id_template
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.${method_name}(test_id, match=True)
+        self.assertEqual(self.query._query_terms['assigned${cat_name}Ids'], {
+            '$$in': [str(test_id)]
+        })"""
+
+    clear_bin_id_terms_template = """
+        # From test_templates/resource.py::ResourceQuery::clear_bin_id_terms_template
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_${var_name}(test_id, match=True)
+        self.assertIn('assigned${cat_name}Ids',
+                      self.query._query_terms)
+        self.query.${method_name}()
+        self.assertNotIn('assigned${cat_name}Ids',
+                         self.query._query_terms)"""
 
 
 class ResourceForm:

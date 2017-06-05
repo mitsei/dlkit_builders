@@ -154,6 +154,10 @@ class AssessmentAuthoringProfile:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').supports_sequence_rule_lookup()"""
 
+    supports_assessment_part_query = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_query()"""
+
 
 class MyAssessmentTakenSession:
 
@@ -545,6 +549,13 @@ class AssessmentPartLookupSession:
                     provider_session.use_unsequestered_assessment_part_view()
                 except AttributeError:
                     pass"""
+
+
+class AssessmentPartQuerySession:
+    get_assessment_part_query = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_query_session').get_assessment_part_query()"""
 
 
 class SequenceRuleAdminSession:

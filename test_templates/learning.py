@@ -558,6 +558,30 @@ class ActivityQuery:
                 catalog.delete_objective(obj.ident)
             cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
+    match_objective_id = """"""
+
+    clear_objective_id_terms = """"""
+
+    clear_objective_terms = """"""
+
+    match_asset_id = """"""
+
+    clear_asset_id_terms = """"""
+
+    match_course_id = """"""
+
+    clear_course_id_terms = """"""
+
+    match_assessment_id = """"""
+
+    clear_assessment_id_terms = """"""
+
+    match_objective_bank_id = """"""
+
+    clear_objective_bank_id_terms = """"""
+
+    clear_objective_bank_terms = """"""
+
 
 class ProficiencyQuerySession:
     init = """

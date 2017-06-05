@@ -880,6 +880,28 @@ class Item:
                          str(self.item.ident))"""
 
 
+class ItemQuery:
+    import_statement = [
+        'from dlkit.primordium.id.primitives import Id'
+    ]
+
+    match_learning_objective_id = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_learning_objective_id(test_id, match=True)
+        self.assertEqual(self.query._query_terms['learningObjectiveIds'], {
+            '$in': [str(test_id)]
+        })"""
+
+    clear_learning_objective_id_terms = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_learning_objective_id(test_id, match=True)
+        self.assertIn('learningObjectiveIds',
+                      self.query._query_terms)
+        self.query.clear_learning_objective_id_terms()
+        self.assertNotIn('learningObjectiveIds',
+                         self.query._query_terms)"""
+
+
 class AssessmentOffered:
 
     import_statements = [
@@ -1166,6 +1188,24 @@ class AssessmentOfferedQuery:
 
     match_start_time_template = """
         pass"""
+
+
+class AssessmentQuery:
+    match_item_id = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_item_id(test_id, match=True)
+        self.assertEqual(self.query._query_terms['itemIds'], {
+            '$in': [str(test_id)]
+        })"""
+
+    clear_item_id_terms = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_item_id(test_id, match=True)
+        self.assertIn('itemIds',
+                      self.query._query_terms)
+        self.query.clear_item_id_terms()
+        self.assertNotIn('itemIds',
+                         self.query._query_terms)"""
 
 
 class AssessmentOfferedQuerySession:

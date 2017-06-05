@@ -895,6 +895,7 @@ if __name__ == '__main__':
         print("  services: build the dlkit convenience service impls")
         print("  manager: build the manager_impls base classes")
         print("  tests: build the tests")
+        print("  docs: build the documentation in Sphinx format")
         print("  --all: build all of the above")
         print("  --buildto <directory>: the target build-to directory")
         print("")
@@ -927,6 +928,7 @@ if __name__ == '__main__':
                     'services',
                     'manager',
                     'tests',
+                    'docs',
                     'help',
                     '?']
         if not any(c in sys.argv for c in commands):

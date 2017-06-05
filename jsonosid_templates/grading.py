@@ -293,7 +293,7 @@ class GradeEntryForm:
 class GradeEntryQuery:
     match_gradebook_column_id = """
         self._add_match('gradebookColumnId',
-                        gradebook_column_id,
+                        str(gradebook_column_id),
                         match)
     """
 

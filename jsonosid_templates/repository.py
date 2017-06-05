@@ -1290,13 +1290,24 @@ class CompositionForm:
 
 class CompositionQuery:
     match_containing_composition_id = """
+        # I'm not sure this does what the spec says it should do...
+        #   I think it should look at a hierarchy of compositions.
         self._add_match('_id', composition_id.identifier, match)"""
+
+    clear_containing_composition_id_terms = """
+        self._clear_terms('_id')"""
 
     match_contained_composition_id = """
         self._add_match('childIds', str(composition_id), match)"""
 
+    clear_contained_composition_id_terms = """
+        self._clear_terms('childIds')"""
+
     match_asset_id = """
         self._add_match('assetIds', str(asset_id), match)"""
+
+    clear_asset_id_terms = """
+        self._clear_terms('assetIds')"""
 
 
 class CompositionSearch:
