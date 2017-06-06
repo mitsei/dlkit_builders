@@ -1245,7 +1245,9 @@ class ResourceForm:
     import_statements_pattern = [
         'from dlkit.json_.osid.metadata import Metadata',
         'from dlkit.primordium.type.primitives import Type',
-        'from dlkit.primordium.id.primitives import Id'
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.abstract_osid.id.primitives import Id as ABC_Id',
+        'from dlkit.abstract_osid.locale.primitives import DisplayText as ABC_DisplayText',
     ]
 
     init_template = """
@@ -1269,7 +1271,16 @@ class ResourceForm:
 
     get_group_metadata_template = """
         # From test_templates/resource.py::ResourceForm::get_group_metadata_template
-        self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
+        mdata = self.form.${method_name}()
+        self.assertTrue(isinstance(mdata, Metadata))
+        self.assertTrue(isinstance(mdata.get_element_id(), ABC_Id))
+        self.assertTrue(isinstance(mdata.get_element_label(), ABC_DisplayText))
+        self.assertTrue(isinstance(mdata.get_instructions(), ABC_DisplayText))
+        self.assertEquals(mdata.get_syntax(), 'BOOLEAN')
+        self.assertFalse(mdata.is_array())
+        self.assertTrue(isinstance(mdata.is_required(), boolean))
+        self.assertTrue(isinstance(mdata.is_read_only(), boolean))
+        self.assertTrue(isinstance(mdata.is_linked(), boolean))"""
 
     get_avatar_metadata_template = """
         # From test_templates/resource.py::ResourceForm::get_avatar_metadata_template
@@ -1278,7 +1289,9 @@ class ResourceForm:
     set_group_template = """
         # From test_templates/resource.py::ResourceForm::set_group_template
         self.form.${method_name}(True)
-        self.assertTrue(self.form._my_map['${var_name_mixed}'])"""
+        self.assertTrue(self.form._my_map['${var_name_mixed}'])
+        with self.assertRaises(errors.InvalidArgument):
+            self.form.${method_name}('false')"""
 
     clear_group_template = """
         # From test_templates/resource.py::ResourceForm::clear_group_template
