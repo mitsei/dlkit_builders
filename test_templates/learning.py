@@ -477,6 +477,8 @@ class ActivityForm:
         self.assertTrue(len(self.form._my_map['${var_name_singular_mixed}Ids']), 1)
         self.assertEqual(self.form._my_map['${var_name_singular_mixed}Ids'][0],
                          str(test_id))
+        with self.assertRaises(errors.InvalidArgument):
+            self.form.${method_name}('this is not a list')
         # reset this for other tests
         self.form._my_map['${var_name_singular_mixed}Ids'] = list()"""
 

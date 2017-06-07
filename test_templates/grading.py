@@ -397,7 +397,9 @@ class GradeEntryForm:
 
     set_ignored_for_calculations = """
         self.form.set_ignored_for_calculations(True)
-        self.assertTrue(self.form._my_map['ignoredForCalculations'])"""
+        self.assertTrue(self.form._my_map['ignoredForCalculations'])
+        with self.assertRaises(errors.InvalidArgument):
+            self.form.set_ignored_for_calculations('false')"""
 
     clear_grade = """
         # Normally this would follow ResourceForm.clear_avatar_template

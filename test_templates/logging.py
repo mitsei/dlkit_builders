@@ -73,11 +73,25 @@ class LogEntryForm:
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     set_priority_template = """
-        pass"""
+        # From test_templates/logging.py::LogEntryForm::set_priority_template
+        self.form.set_${var_name}(Type('type.Type%3Afake-tyep_id%40ODL.MIT.EDU'))
+        self.assertEqual(self.form._my_map['${var_name_mixed}'],
+                         'type.Type%3Afake-tyep_id%40ODL.MIT.EDU')
+        with self.assertRaises(errors.InvalidArgument):
+            self.form.${method_name}(True)"""
 
     get_priority_metadata_template = """
         # From test_templates/logging.py::LogEntryForm::get_priority_metadata_template
-        self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
+        mdata = self.form.${method_name}()
+        self.assertTrue(isinstance(mdata, Metadata))
+        self.assertTrue(isinstance(mdata.get_element_id(), ABC_Id))
+        self.assertTrue(isinstance(mdata.get_element_label(), ABC_DisplayText))
+        self.assertTrue(isinstance(mdata.get_instructions(), ABC_DisplayText))
+        self.assertEquals(mdata.get_syntax(), '${syntax}')
+        self.assertFalse(mdata.is_array())
+        self.assertTrue(isinstance(mdata.is_required(), bool))
+        self.assertTrue(isinstance(mdata.is_read_only(), bool))
+        self.assertTrue(isinstance(mdata.is_linked(), bool))"""
 
     set_timestamp = """
         test_time = DateTime.utcnow()
