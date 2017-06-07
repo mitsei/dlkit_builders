@@ -23,8 +23,18 @@ STRING_METADATA = """
                 'string_match_types': self.my_model.moptions['${data_name}']['match_types']"""
 
 COMMON_MDATA = """
-            'element_label': '${element_label}',
-            'instructions': '${instructions}',
+            'element_label': {
+                'text': '${element_label}',
+                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+            },
+            'instructions': {
+                'text': '${instructions}',
+                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+            },
             'required': False,
             'read_only': False,
             'linked': False,

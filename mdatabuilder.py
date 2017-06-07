@@ -103,7 +103,6 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
 
     def _make_mdata_maps(self, interface):
         from jsonosid_templates import options
-
         pd = interface['shortname'] + '.persisted_data'
         rt = interface['shortname'] + '.return_types'
         mdata = ('def get_' + camel_to_under(interface['shortname']) +

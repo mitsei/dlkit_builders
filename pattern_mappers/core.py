@@ -9,6 +9,17 @@ def map_osid_patterns(interface, package, index):
         var_name = method['name'].split('_', 1)[-1]
 
         if (interface['shortname'] == 'Metadata' and
+                method['name'] in ['get_element_label', 'get_instructions']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='osid.Metadata.get_element_label',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name,
+                            return_type_full=method['return_type']))
+
+        elif (interface['shortname'] == 'Metadata' and
                 'supports_' not in method['name'] and
                 len(method['errors']) == 0):
             index[interface['shortname'] + '.' + method['name']] = dict(

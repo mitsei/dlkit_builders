@@ -15,8 +15,18 @@ MIN_DATETIME = {
 }"""
 
     LOG_ENTRY_TIMESTAMP = """
-            'element_label': 'timestamp',
-            'instructions': 'enter a valid datetime object.',
+            'element_label': {
+                'text': 'timestamp',
+                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+            },
+            'instructions': {
+                'text': 'enter a valid datetime object.',
+                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+            },
             'required': False,
             'read_only': False,
             'linked': False,

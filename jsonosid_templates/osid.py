@@ -1972,6 +1972,7 @@ class Metadata:
 
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.primordium.locale.primitives import DisplayText'
     ]
 
     init = """
@@ -1981,6 +1982,10 @@ class Metadata:
     get_element_id_template = """
         # Implemented from template for osid.Metadata.get_element_id_template
         return self._kwargs['${var_name}']"""
+
+    get_element_label_template = """
+        # Implemented from template for osid.Metadata.get_element_id_template
+        return DisplayText(self._kwargs['${var_name}'])"""
 
     get_minimum_cardinal_template = """
         # Implemented from template for osid.Metadata.get_minimum_cardinal

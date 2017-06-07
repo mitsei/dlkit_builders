@@ -4,6 +4,7 @@ SYNTAX_MAP = {
     'boolean': 'BOOLEAN',
     'byte': 'BYTE',
     'cardinal': 'CARDINAL',
+    'timestamp': 'DATETIME',
     'osid.mapping.Coordinate': 'COORDINATE',
     'osid.financials.Currency': 'CURRENCY',
     'osid.calendaring.DateTime': 'DATETIME',
