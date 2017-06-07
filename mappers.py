@@ -9,7 +9,7 @@ from build_dlkit import BaseBuilder
 
 
 class Mapper(XOsidMapper, BaseBuilder):
-    def __init__(self, xosid_dir='xosid', xosid_ext='.xosid', *args, **kwargs):
+    def __init__(self, xosid_dir='../xosid', xosid_ext='.xosid', *args, **kwargs):
         super(Mapper, self).__init__(*args, **kwargs)
 
         self._xosid_dir = None
