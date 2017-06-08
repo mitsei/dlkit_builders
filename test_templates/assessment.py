@@ -1111,7 +1111,7 @@ class AssessmentOfferedForm:
         self.assertEqual(self.form._my_map['${var_name_mixed}'],
                          test_time)
         self.form.${method_name}()
-        self.assertIsNone(self.form._my_map['${var_name_mixed}'])"""
+        self.assertEqual(self.form._my_map['${var_name_mixed}'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
 
     set_duration_template = """
         # From test_templates/assessment.py::AssessmentOfferedForm::set_duration_template
@@ -1135,7 +1135,7 @@ class AssessmentOfferedForm:
         self.assertEqual(self.form._my_map['${var_name_mixed}']['days'], 0)
         self.assertEqual(self.form._my_map['${var_name_mixed}']['microseconds'], 0)
         self.form.${method_name}()
-        self.assertIsNone(self.form._my_map['${var_name_mixed}'])"""
+        self.assertEqual(self.form._my_map['${var_name_mixed}'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
 
 
 class AssessmentOfferedList:

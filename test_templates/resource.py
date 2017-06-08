@@ -1324,7 +1324,7 @@ class ResourceForm:
         self.assertEqual(self.form._my_map['${var_name_mixed}Id'],
                          'repository.Asset%3Afake-id%40ODL.MIT.EDU')
         self.form.${method_name}()
-        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], '')"""
+        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
 
     get_resource_form_record_template = """
         with self.assertRaises(errors.Unsupported):

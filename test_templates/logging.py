@@ -74,11 +74,19 @@ class LogEntryForm:
 
     set_priority_template = """
         # From test_templates/logging.py::LogEntryForm::set_priority_template
-        self.form.set_${var_name}(Type('type.Type%3Afake-tyep_id%40ODL.MIT.EDU'))
+        self.form.set_${var_name}(Type('type.Type%3Afake-type-id%40ODL.MIT.EDU'))
         self.assertEqual(self.form._my_map['${var_name_mixed}'],
-                         'type.Type%3Afake-tyep_id%40ODL.MIT.EDU')
+                         'type.Type%3Afake-type-id%40ODL.MIT.EDU')
         with self.assertRaises(errors.InvalidArgument):
             self.form.${method_name}(True)"""
+
+    clear_priority_template = """
+        # From test_templates/logging.py::LogEntryForm::clear_priority_template
+        self.form.set_${var_name}(Type('type.Type%3Afake-type-id%40ODL.MIT.EDU'))
+        self.assertEqual(self.form._my_map['${var_name_mixed}'],
+                         'type.Type%3Afake-type-id%40ODL.MIT.EDU')
+        self.form.${method_name}()
+        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
 
     get_priority_metadata_template = """
         # From test_templates/logging.py::LogEntryForm::get_priority_metadata_template
@@ -99,7 +107,9 @@ class LogEntryForm:
         self.assertIsNotNone(self.form._my_map['timestamp'])
         self.form.set_timestamp(test_time)
         self.assertEqual(self.form._my_map['timestamp'],
-                         test_time)"""
+                         test_time)
+        with self.assertRaises(errors.InvalidArgument):
+            self.form.set_timestamp(True)"""
 
 
 class LogNodeList:
