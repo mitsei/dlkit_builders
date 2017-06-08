@@ -137,10 +137,17 @@ class LogEntryForm:
         # Implemented from template for osid.logging.LogEntryForm.set_priority
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess()
-        if not self._is_valid_type(${arg0_name},
-                                   self.get_${var_name}_metadata()):
+        if not self._is_valid_type(${arg0_name}):
             raise errors.InvalidArgument()
         self._my_map['${var_name_mixed}'] = str(${arg0_name})"""
+
+    clear_priority_template = """
+        # Implemented from template for osid.logging.LogEntryForm.clear_priority_template
+        if (self.get_${var_name}_metadata().is_read_only() or
+                self.get_${var_name}_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
+
 
     get_priority_metadata_template = """
         # Implemented from template for osid.logging.LogEntryForm.get_priority_metadata

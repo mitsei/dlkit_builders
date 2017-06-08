@@ -1181,6 +1181,13 @@ class AssetContentForm:
             raise errors.InvalidArgument()
         self._my_map['${var_name_mixed}'] = ${arg0_name}"""
 
+    clear_url_template = """
+        # Implemented from template for osid.repository.AssetContentForm.clear_url_template
+        if (self.get_${var_name}_metadata().is_read_only() or
+                self.get_${var_name}_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
+
     set_data = """
         if data is None:
             raise errors.NullArgument()
