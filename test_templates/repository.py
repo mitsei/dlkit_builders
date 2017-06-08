@@ -417,7 +417,6 @@ class AssetContentForm:
         self.form.${method_name}()
         self.assertEqual(self.form._my_map['${var_name_mixed}'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
 
-
     set_data = """"""
 
     clear_data = """"""
