@@ -130,8 +130,7 @@ class LogEntryForm:
         self._my_map['priorityId'] = self._priority_default
         self._my_map['timestamp'] = self._timestamp_default
         self._my_map['assignedLogIds'] = [str(kwargs['log_id'])]
-        self._my_map['agentId'] = self._agent_default
-"""
+        self._my_map['agentId'] = self._agent_default"""
 
     set_priority_template = """
         # Implemented from template for osid.logging.LogEntryForm.set_priority
@@ -147,7 +146,6 @@ class LogEntryForm:
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
-
 
     get_priority_metadata_template = """
         # Implemented from template for osid.logging.LogEntryForm.get_priority_metadata

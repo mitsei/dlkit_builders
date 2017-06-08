@@ -8,6 +8,7 @@ DEFAULT_SCRIPT_TYPE = Type(**types.Script().get_type_data('DEFAULT'))
 DEFAULT_FORMAT_TYPE = Type(**types.Format().get_type_data('DEFAULT'))
 DEFAULT_GENUS_TYPE = Type(**types.Genus().get_type_data('DEFAULT'))
 
+
 def get_osid_form_mdata():
     """Return default mdata map for OsidForm"""
     return {
@@ -40,6 +41,7 @@ def get_osid_form_mdata():
             'string_set': []
         }
     }
+
 
 def get_osid_object_mdata():
     """Return default mdata map for OsidObject"""
@@ -124,6 +126,7 @@ def get_osid_object_mdata():
         }
     }
 
+
 def get_osid_temporal_mdata():
     """Return default mdata map for OsidTemporal"""
     return {
@@ -171,6 +174,7 @@ def get_osid_temporal_mdata():
         }
     }
 
+
 def get_osid_containable_mdata():
     """Return default mdata map for OsidContainable"""
     return {
@@ -195,6 +199,7 @@ def get_osid_containable_mdata():
             'syntax': 'BOOLEAN',
         }
     }
+
 
 def get_osid_sourceable_mdata():
     """Return default mdata map for OsidSourceable"""
