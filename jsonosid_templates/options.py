@@ -88,6 +88,13 @@ INTEGER_MDATA = """
             'maximum_integer': None,
             'integer_set': []"""
 
+CARDINAL_MDATA = """
+            'default_cardinal_values': [None],
+            'syntax': 'CARDINAL',
+            'minimum_cardinal': None,
+            'maximum_cardinal': None,
+            'cardinal_set': []"""
+
 TYPE_MDATA = """
             'default_${id_type}_values': ['NoneType%3ANONE%40dlkit.mit.edu'],
             'syntax': '${syntax}',
