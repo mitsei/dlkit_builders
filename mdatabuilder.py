@@ -157,7 +157,7 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                 'array': False
             })
             mdata = construct_data(options.INTEGER_MDATA, ctxt)
-        elif data_type  == 'cardinal':
+        elif data_type == 'cardinal':
             ctxt.update({
                 'instructions': 'enter a cardinal value',
                 'array': False
