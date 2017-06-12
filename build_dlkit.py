@@ -1003,4 +1003,6 @@ if __name__ == '__main__':
                 builder.tests(non_test_build)
             if 'docs' in sys.argv:
                 builder.docs()
+            # Create a build-hash file so we know what commit built dlkit
+            builder.update_hash_file()
     sys.exit(0)
