@@ -214,12 +214,12 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
                 '#     Inheritance defined in specification')
 
     def write_license_file(self):
-        with open(self._abc_module('summary_doc', abc=False), 'w') as write_file:
-            write_file.write((self._utf_code + '\"\"\"' +
+        with open(self._abc_module('summary_doc', abc=False, extension='txt'), 'w') as write_file:
+            write_file.write((self._utf_code +
                               self.package['title'] + '\n' +
                               self.package['name'] + ' version ' +
                               self.package['version'] + '\n\n' +
-                              self._wrap(self.package['summary']) + '\n\n\"\"\"').encode('utf-8') +
+                              self._wrap(self.package['summary'])).encode('utf-8') +
                              '\n')
 
     def write_profile_file(self):
