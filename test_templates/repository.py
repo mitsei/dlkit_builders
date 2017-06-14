@@ -335,6 +335,114 @@ class AssetForm:
         self.assertEqual(self.form._my_map['${var_name_mixed}'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
 
 
+class AssetQuery:
+    import_statements = [
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.primordium.calendaring.primitives import DateTime',
+        'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
+        'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data("WORDIGNORECASE"))'
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_repository_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_repository(create_form)
+
+    def setUp(self):
+        self.query = self.catalog.get_asset_query()
+        self.start_date = ''
+        self.end_date = ''
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_repository(cls.catalog.ident)"""
+
+    match_title = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_title('foo', DEFAULT_STRING_MATCH_TYPE, True)"""
+
+    match_any_title = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_title(True)"""
+
+    match_public_domain = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_public_domain(True)"""
+
+    match_any_public_domain = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_public_domain(True)"""
+
+    match_copyright = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_copyright('foo', DEFAULT_STRING_MATCH_TYPE, True)"""
+
+    match_any_copyright = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_copyright(True)"""
+
+    match_copyright_registration = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_copyright_registration('foo', DEFAULT_STRING_MATCH_TYPE, True)"""
+
+    match_any_copyright_registration = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_copyright_registration(True)"""
+
+    match_distribute_verbatim = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_distribute_verbatim(True)"""
+
+    match_distribute_alterations = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_distribute_alterations(True)"""
+
+    match_distribute_compositions = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_distribute_compositions(True)"""
+
+    support_source_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.support_source_query(True)"""
+
+    get_source_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_source_query(True)"""
+
+    match_any_source = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_source(True)"""
+
+    match_any_created_date = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_created_date(True)"""
+
+    match_created_date = """
+        """
+
+    match_published_date = """"""
+
+    match_published = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_published(True)"""
+
+    match_any_published_date = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_published_date(True)"""
+
+    match_principal_credit_string = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_principal_credit_string(True)"""
+
+    match_any_principal_credit_string = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_principal_credit_string(True)"""
+
+
 class AssetContent:
 
     import_statements = [

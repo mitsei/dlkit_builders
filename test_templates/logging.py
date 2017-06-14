@@ -128,3 +128,19 @@ class LogNode:
     get_parent_log_nodes = """"""
 
     get_child_log_nodes = """"""
+
+
+class LogQuery:
+    init = """"""
+
+    clear_log_entry_id_terms = """"""
+
+    clear_log_entry_terms = """"""
+
+    clear_ancestor_log_id_terms = """"""
+
+    clear_ancestor_log_terms = """"""
+
+    clear_descendant_log_id_terms = """"""
+
+    clear_descendant_log_terms = """"""

@@ -242,3 +242,19 @@ class CommentQuery:
 
     import_statements = [
     ]
+
+
+class BookQuery:
+    init = """"""
+
+    clear_comment_id_terms = """"""
+
+    clear_comment_terms = """"""
+
+    clear_ancestor_book_id_terms = """"""
+
+    clear_ancestor_book_terms = """"""
+
+    clear_descendant_book_id_terms = """"""
+
+    clear_descendant_book_terms = """"""

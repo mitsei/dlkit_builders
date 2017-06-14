@@ -661,3 +661,27 @@ class GradebookNode:
     get_parent_gradebook_nodes = """"""
 
     get_child_gradebook_nodes = """"""
+
+
+class GradebookQuery:
+    init = """"""
+
+    clear_grade_system_id_terms = """"""
+
+    clear_grade_system_terms = """"""
+
+    clear_grade_entry_id_terms = """"""
+
+    clear_grade_entry_terms = """"""
+
+    clear_gradebook_column_id_terms = """"""
+
+    clear_gradebook_column_terms = """"""
+
+    clear_ancestor_gradebook_id_terms = """"""
+
+    clear_ancestor_gradebook_terms = """"""
+
+    clear_descendant_gradebook_id_terms = """"""
+
+    clear_descendant_gradebook_terms = """"""

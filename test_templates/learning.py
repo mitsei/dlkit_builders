@@ -821,3 +821,23 @@ class ProficiencyAdminSession:
         self.catalog.delete_proficiency(osid_object.ident)
         with self.assertRaises(errors.NotFound):
             self.catalog.get_proficiency(osid_object.ident)"""
+
+
+class ObjectiveBankQuery:
+    init = """"""
+
+    clear_objective_id_terms = """"""
+
+    clear_objective_terms = """"""
+
+    clear_activity_id_terms = """"""
+
+    clear_activity_terms = """"""
+
+    clear_ancestor_objective_bank_id_terms = """"""
+
+    clear_ancestor_objective_bank_terms = """"""
+
+    clear_descendant_objective_bank_id_terms = """"""
+
+    clear_descendant_objective_bank_terms = """"""

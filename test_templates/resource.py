@@ -1564,3 +1564,94 @@ class BinNode:
                          1)
         self.assertEqual(str(node.${method_name}().next().ident),
                          str(self.${cat_name_under}_list[1].ident))"""
+
+
+class BinQuery:
+
+    import_statements_pattern = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        # From test_templates/resource.py::BinQuery::init_template
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
+
+    def setUp(self):
+        # From test_templates/resource.py::BinQuery::init_template
+        self.query = self.svc_mgr.get_${cat_name_under}_query()
+
+    @classmethod
+    def tearDownClass(cls):
+        # From test_templates/resource.py::BinQuery::init_template
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+    match_resource_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_resource_id(self.fake_id, True)"""
+
+    clear_group_terms_template = """
+        # From test_templates/resource.py::BinQuery::clear_group_terms_template
+        self.query._query_terms['${var_name_mixed}'] = 'foo'
+        self.query.${method_name}()
+        self.assertNotIn('${var_name_mixed}',
+                         self.query._query_terms)"""
+
+    supports_resource_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_resource_query()"""
+
+    supports_ancestor_bin_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_ancestor_bin_query()"""
+
+    supports_descendant_bin_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_descendant_bin_query()"""
+
+    get_resource_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_resource_query()"""
+
+    get_ancestor_bin_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_ancestor_bin_query()"""
+
+    get_descendant_bin_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_descendant_bin_query()"""
+
+    match_any_resource = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_resource(True)"""
+
+    match_any_ancestor_bin = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_ancestor_bin(True)"""
+
+    match_any_descendant_bin = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_descendant_bin(True)"""
+
+    match_ancestor_bin_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_ancestor_bin_id(self.fake_id, True)"""
+
+    match_descendant_bin_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_descendant_bin_id(self.fake_id, True)"""
