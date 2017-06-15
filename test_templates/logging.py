@@ -112,6 +112,66 @@ class LogEntryForm:
             self.form.set_timestamp(True)"""
 
 
+class LogEntryQuery:
+    import_statements = [
+        'from dlkit.primordium.calendaring.primitives import DateTime'
+    ]
+
+    match_priority = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_priority('foo', match=True)"""
+
+    match_minimum_priority = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_minimum_priority('foo', match=True)"""
+
+    match_timestamp = """
+        start_date = DateTime.utcnow()
+        end_date = DateTime.utcnow()
+        self.assertNotIn('timestamp', self.query._query_terms)
+        self.query.match_timestamp(start_date, end_date, True)
+        self.assertEqual(self.query._query_terms['timestamp'], {
+            '$gte': start_date,
+            '$lte': end_date
+        })"""
+
+    match_any_priority = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_priority(match=True)"""
+
+    clear_minimum_priority_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_minimum_priority_terms()"""
+
+    clear_resource_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_resource_terms()"""
+
+    supports_resource_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_resource_query()"""
+
+    supports_agent_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_agent_query()"""
+
+    supports_log_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_log_query()"""
+
+    get_resource_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_resource_query()"""
+
+    get_agent_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_agent_query()"""
+
+    get_log_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_log_query()"""
+
+
 class LogNodeList:
     init = """"""
 
@@ -131,16 +191,71 @@ class LogNode:
 
 
 class LogQuery:
-    init = """"""
+    import_statements = [
+        'from dlkit.json_.logging_.queries import LogQuery'
+    ]
 
-    clear_log_entry_id_terms = """"""
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('LOGGING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_log_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_log(create_form)
+        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
-    clear_log_entry_terms = """"""
+    def setUp(self):
+        self.query = LogQuery(runtime=self.catalog._runtime)
 
-    clear_ancestor_log_id_terms = """"""
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_log(cls.catalog.ident)"""
 
-    clear_ancestor_log_terms = """"""
+    match_log_entry_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_log_entry_id(self.fake_id, True)"""
 
-    clear_descendant_log_id_terms = """"""
+    match_ancestor_log_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_ancestor_log_id(self.fake_id, True)"""
 
-    clear_descendant_log_terms = """"""
+    match_descendant_log_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_descendant_log_id(self.fake_id, True)"""
+
+    match_any_log_entry = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_log_entry(True)"""
+
+    match_any_ancestor_log = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_ancestor_log(True)"""
+
+    match_any_descendant_log = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_descendant_log(True)"""
+
+    supports_log_entry_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_log_entry_query()"""
+
+    supports_ancestor_log_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_log_entry_query()"""
+
+    supports_descendant_log_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_descendant_log_query()"""
+
+    get_log_entry_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_log_entry_query()"""
+
+    get_ancestor_log_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_ancestor_log_query()"""
+
+    get_descendant_log_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_descendant_log_query()"""
