@@ -434,6 +434,7 @@ class AssessmentResultsSession:
     get_items = """
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
         taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
+        taken_lookup_session.use_federated_bank_view()
         taken = taken_lookup_session.get_assessment_taken(assessment_taken_id)
         ils = get_item_lookup_session(runtime=self._runtime, proxy=self._proxy)
         item_list = []
