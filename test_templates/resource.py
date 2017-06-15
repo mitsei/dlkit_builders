@@ -1138,6 +1138,7 @@ class ResourceQuery:
     match_avatar_id_template = """
         # From test_templates/resource.py::ResourceQuery::match_avatar_id_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.assertNotIn('${var_name_mixed}', self.query._query_terms)
         self.query.${method_name}(test_id, match=True)
         self.assertEqual(self.query._query_terms['${var_name_mixed}'], {
             '$$in': [str(test_id)]
