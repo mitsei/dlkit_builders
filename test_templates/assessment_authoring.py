@@ -10,7 +10,7 @@ class AssessmentAuthoringManager:
         create_form.description = 'Test Bank for assessment.authoring manager tests'
         catalog = cls.svc_mgr.create_bank(create_form)
         cls.catalog_id = catalog.get_id()
-        cls.mgr = Runtime().get_manager('ASSESSMENT_AUTHORING', 'TEST_JSON_1', (3, 0, 0))
+        # cls.mgr = Runtime().get_manager('ASSESSMENT_AUTHORING', 'TEST_JSON_1', (3, 0, 0))
 
     @classmethod
     def tearDownClass(cls):
@@ -28,7 +28,7 @@ class AssessmentAuthoringProxyManager:
         create_form.description = 'Test Bank for assessment.authoring manager tests'
         catalog = cls.svc_mgr.create_bank(create_form)
         cls.catalog_id = catalog.get_id()
-        cls.mgr = Runtime().get_manager('ASSESSMENT_AUTHORING', 'TEST_JSON_1', (3, 0, 0))
+        # cls.mgr = Runtime().get_manager('ASSESSMENT_AUTHORING', 'TEST_JSON_1', (3, 0, 0))
 
     @classmethod
     def tearDownClass(cls):
