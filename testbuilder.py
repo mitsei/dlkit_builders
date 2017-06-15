@@ -1,3 +1,4 @@
+from binder_helpers import remove_plural
 from build_dlkit import BaseBuilder
 from interface_builders import InterfaceBuilder
 
@@ -19,7 +20,20 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
 
     def _clean_up_impl(self, impl, interface, method):
         if impl == '':
-            impl = '{}pass'.format(self._dind)
+            test_object = remove_plural(interface['category'])
+            if len(method['args']) > 0:
+                impl = '{0}with self.assertRaises(errors.Unimplemented):\n{0}{1}self.{2}.{3}({4})'.format(self._dind,
+                                                                                                          self._ind,
+                                                                                                          test_object,
+                                                                                                          method['name'],
+                                                                                                          ', '.join((len(method['args']) * ['True'])))
+            elif method['name'].endswith('_record'):
+                impl = '{0}pass'.format(self._dind)
+            else:
+                impl = '{0}with self.assertRaises(errors.Unimplemented):\n{0}{1}self.{2}.{3}()'.format(self._dind,
+                                                                                                       self._ind,
+                                                                                                       test_object,
+                                                                                                       method['name'])
         else:
             context = self._get_method_context(method, interface)
             interface_sn = interface['shortname']
@@ -33,14 +47,14 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
 
     def _get_method_sig(self, method, interface):
         args = self._get_method_args(method, interface)
-        method_impl = self._make_method_impl(method, interface)
+        # method_impl = self._make_method_impl(method, interface)
         method_sig = '{}def test_{}({}):'.format(self._ind,
                                                  method['name'],
                                                  ', '.join(args))
 
-        if method_impl == '{}pass'.format(self._dind):
-            method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
-                                                                               method_sig)
+        # if method_impl == '{}pass'.format(self._dind):
+            # method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
+            #                                                                    method_sig)
 
         return method_sig
 

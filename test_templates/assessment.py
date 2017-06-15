@@ -622,6 +622,7 @@ class QuestionForm:
 class QuestionQuery:
 
     import_statements = [
+        'from dlkit.json_.assessment.queries import QuestionQuery'
     ]
 
     init = """
@@ -633,9 +634,9 @@ class QuestionQuery:
         create_form.description = 'Test catalog description'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
 
-        item_query = cls.catalog.get_item_query()
-        # cls.query = item_query.get_question_query()
-        # Currently raises Unsupported()
+    def setUp(self):
+        # Since the session isn't implemented, we just construct a QuestionQuery directly
+        self.query = QuestionQuery(runtime=self.catalog._runtime)
 
     @classmethod
     def tearDownClass(cls):
@@ -730,6 +731,7 @@ class AnswerForm:
 class AnswerQuery:
 
     import_statements = [
+        'from dlkit.json_.assessment.queries import AnswerQuery'
     ]
 
     init = """
@@ -741,9 +743,9 @@ class AnswerQuery:
         create_form.description = 'Test catalog description'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
 
-        item_query = cls.catalog.get_item_query()
-        # cls.query = item_query.get_answer_query()
-        # Currently raises Unsupported()
+    def setUp(self):
+        # Since the session isn't implemented, we just construct a AnswerQuery directly
+        self.query = AnswerQuery(runtime=self.catalog._runtime)
 
     @classmethod
     def tearDownClass(cls):
@@ -887,6 +889,7 @@ class ItemQuery:
 
     match_learning_objective_id = """
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.assertNotIn('learningObjectiveIds', self.query._query_terms)
         self.query.match_learning_objective_id(test_id, match=True)
         self.assertEqual(self.query._query_terms['learningObjectiveIds'], {
             '$in': [str(test_id)]
@@ -900,6 +903,24 @@ class ItemQuery:
         self.query.clear_learning_objective_id_terms()
         self.assertNotIn('learningObjectiveIds',
                          self.query._query_terms)"""
+
+    clear_learning_objective_terms = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_any_learning_objective(match=True)
+        self.assertIn('learningObjectiveIds',
+                      self.query._query_terms)
+        self.query.clear_learning_objective_terms()
+        self.assertNotIn('learningObjectiveIds',
+                         self.query._query_terms)"""
+
+    match_any_learning_objective = """
+        self.assertNotIn('learningObjectiveIds', self.query._query_terms)
+        self.query.match_any_learning_objective(match=True)
+        self.assertEqual(self.query._query_terms['learningObjectiveIds'], {
+            '$exists': 'true',
+            '$nin': [[], ['']]
+        })"""
+
 
 
 class AssessmentOffered:

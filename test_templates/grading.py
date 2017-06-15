@@ -15,6 +15,64 @@ class GradeSystemAdminSession:
     can_delete_grades = """"""
 
 
+class GradeSystemQuery:
+    match_lowest_numeric_score = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_lowest_numeric_score(1.0, 100.0, True)"""
+
+    match_numeric_score_increment = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_numeric_score_increment(1.0, 100.0, True)"""
+
+    match_highest_numeric_score = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_highest_numeric_score(1.0, 100.0, True)"""
+
+    match_based_on_grades = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_based_on_grades(True)"""
+
+    match_any_grade = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_grade(True)"""
+
+    match_any_gradebook_column = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_gradebook_column(True)"""
+
+    supports_grade_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_grade_query()"""
+
+    supports_gradebook_column_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_gradebook_column_query()"""
+
+    supports_gradebook_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_gradebook_query()"""
+
+    get_grade_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_grade_query()"""
+
+    get_gradebook_column_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_gradebook_column_query()"""
+
+    get_gradebook_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_gradebook_query()"""
+
+    clear_grade_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_grade_terms()"""
+
+    clear_gradebook_column_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_gradebook_column_terms()"""
+
+
 class GradebookColumnLookupSession:
     # Until we figure out how to do Relationship init patterns properly:
     import_statements = [
@@ -254,40 +312,78 @@ class GradeList:
 
 class GradeQuery:
     import_statements = [
-        'from dlkit.primordium.id.primitives import Id'
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.json_.grading.queries import GradeQuery'
     ]
 
     init = """
-    # This really shouldn't be generated...should be GradeEntryQuery??
     @classmethod
     def setUpClass(cls):
-        cls.object = None
+        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+
+    def setUp(self):
+        # Since the session isn't implemented, we just construct an ActivityQuery directly
+        self.query = GradeQuery(runtime=self.catalog._runtime)
 
     @classmethod
     def tearDownClass(cls):
-        pass"""
+        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
 
-    match_grade_system_id = """"""
+    supports_grade_system_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_grade_system_query()"""
 
-    clear_grade_system_id_terms = """"""
+    supports_grade_entry_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_grade_entry_query()"""
 
-    clear_grade_system_terms = """"""
+    supports_gradebook_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_gradebook_query()"""
 
-    clear_input_score_start_range_terms = """"""
+    get_grade_system_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_grade_system_query()"""
 
-    clear_input_score_end_range_terms = """"""
+    get_grade_entry_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_grade_entry_query()"""
 
-    clear_output_score_terms = """"""
+    get_gradebook_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_gradebook_query()"""
 
-    match_grade_entry_id = """"""
+    match_input_score_start_range = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_input_score_start_range(1.0, 100.0, True)"""
 
-    clear_grade_entry_id_terms = """"""
+    match_input_score_end_range = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_input_score_end_range(1.0, 100.0, True)"""
 
-    match_gradebook_id = """"""
+    match_input_score = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_input_score(1.0, 100.0, True)"""
 
-    clear_gradebook_id_terms = """"""
+    match_output_score = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_output_score(1.0, 100.0, True)"""
 
-    clear_gradebook_terms = """"""
+    match_any_grade_entry = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_grade_entry(True)"""
+
+    clear_input_score_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_input_score_terms()"""
+
+    clear_grade_entry_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_grade_entry_terms()"""
 
 
 class GradeEntry:
@@ -566,6 +662,40 @@ class GradebookColumnSummary:
         self.assertEqual(self.object.get_sum(), Decimal('4950'))"""
 
 
+class GradebookColumnSummaryQuery:
+    import_statements = [
+        'from dlkit.json_.grading.queries import GradebookColumnSummaryQuery'
+    ]
+
+    # Until we figure out how to do Relationship init patterns properly:
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.grade_entry_list = list()
+        cls.grade_entry_ids = list()
+        cls.gradebook_column_list = list()
+        cls.gradebook_column_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+        create_form.display_name = 'Test Gradebook'
+        create_form.description = 'Test Gradebook for GradebookColumnLookupSession tests'
+        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+
+    def setUp(self):
+        # Since the session isn't implemented, we just construct a GradebookColumnSummaryQuery directly
+        self.query = GradebookColumnSummaryQuery(runtime=self.catalog._runtime)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_grade_entries():
+            cls.catalog.delete_grade_entry(obj.ident)
+        for obj in cls.catalog.get_gradebook_columns():
+            cls.catalog.delete_gradebook_column(obj.ident)
+        for obj in cls.catalog.get_grade_systems():
+            cls.catalog.delete_grade_system(obj.ident)
+        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+
+
 class GradeEntryAdminSession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid.objects import OsidForm',
@@ -616,14 +746,13 @@ class GradeEntryAdminSession:
 
     @classmethod
     def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_gradebooks():
-            for obj in catalog.get_grade_entries():
-                catalog.delete_grade_entry(obj.ident)
-            for obj in catalog.get_gradebook_columns():
-                catalog.delete_gradebook_column(obj.ident)
-            for obj in catalog.get_grade_systems():
-                catalog.delete_grade_system(obj.ident)
-            cls.svc_mgr.delete_gradebook(catalog.ident)"""
+        for obj in cls.catalog.get_grade_entries():
+            cls.catalog.delete_grade_entry(obj.ident)
+        for obj in cls.catalog.get_gradebook_columns():
+            cls.catalog.delete_gradebook_column(obj.ident)
+        for obj in cls.catalog.get_grade_systems():
+            cls.catalog.delete_grade_system(obj.ident)
+        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
 
     get_grade_entry_form_for_create = """
         form = self.catalog.get_grade_entry_form_for_create(self.gradebook_column_ids[0], AGENT_ID, [])
@@ -664,24 +793,24 @@ class GradebookNode:
 
 
 class GradebookQuery:
-    init = """"""
+    import_statements = [
+        'from dlkit.json_.grading.queries import GradebookQuery'
+    ]
 
-    clear_grade_system_id_terms = """"""
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
-    clear_grade_system_terms = """"""
+    def setUp(self):
+        # Since the session isn't implemented, we just construct a GradebookQuery directly
+        self.query = GradebookQuery(runtime=self.catalog._runtime)
 
-    clear_grade_entry_id_terms = """"""
-
-    clear_grade_entry_terms = """"""
-
-    clear_gradebook_column_id_terms = """"""
-
-    clear_gradebook_column_terms = """"""
-
-    clear_ancestor_gradebook_id_terms = """"""
-
-    clear_ancestor_gradebook_terms = """"""
-
-    clear_descendant_gradebook_id_terms = """"""
-
-    clear_descendant_gradebook_terms = """"""
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
