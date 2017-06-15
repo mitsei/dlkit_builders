@@ -486,9 +486,9 @@ class GradebookColumnSummary:
 class GradebookColumnSummaryQuery:
     init = """
     def __init__(self, runtime):
-        self._namespace = 'grading.GradebookColumnSummary'
+        self._namespace = 'grading.GradebookColumnSummaryQuery'
         self._runtime = runtime
-        record_type_data_sets = get_registry('GRADEBOOK_COLUMN_SUMMARY_RECORD_TYPES', runtime)
+        record_type_data_sets = get_registry('GRADEBOOK_COLUMN_SUMMARY_QUERY_RECORD_TYPES', runtime)
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:

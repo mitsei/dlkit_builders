@@ -703,3 +703,16 @@ class SequenceRuleAdminSession:
                 assessment_part_id=assessment_part_id)
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
+
+
+class SequenceRuleQuery:
+    init = """
+    def __init__(self, runtime):
+        self._namespace = 'assessment_authoring.SequenceRuleQuery'
+        self._runtime = runtime
+        record_type_data_sets = get_registry('SEQUENCE_RULE_QUERY_RECORD_TYPES', runtime)
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidRuleQuery.__init__(self, runtime)"""

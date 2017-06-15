@@ -464,7 +464,7 @@ class AssessmentResultsSession:
 
     get_grade_entries = """
         # not implemented yet and are_results_available is False
-        raise IllegalState()"""
+        raise errors.IllegalState()"""
 
 
 class ItemAdminSession:
