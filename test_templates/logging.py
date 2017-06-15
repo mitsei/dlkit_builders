@@ -206,6 +206,7 @@ class LogQuery:
         cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
     def setUp(self):
+        # Since the session isn't implemented, we just construct a LogQuery directly
         self.query = LogQuery(runtime=self.catalog._runtime)
 
     @classmethod
