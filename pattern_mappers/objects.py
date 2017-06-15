@@ -24,7 +24,8 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='BOOLEAN'))
 
         # ObjectForm methods that clear a persisted boolean value.
         elif (method['name'].startswith('clear_') and
@@ -37,7 +38,8 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=var_name))
+                            var_name=var_name,
+                            syntax='BOOLEAN'))
 
         # ObjectForm methods that set a persisted osid.id.Id of another
         # osid object.
@@ -52,7 +54,8 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='ID'))
 
         ##
         # ObjectForm methods that clear a persisted osid.id.Id.
@@ -66,7 +69,8 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=var_name))
+                            var_name=var_name,
+                            syntax='ID'))
 
         # ObjectForm methods that set multiple persisted osid.id.Ids of
         # other osid objects.
@@ -82,7 +86,8 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='ID'))
 
         # ObjectForm methods that clear multiple persisted osid.id.Ids of
         # other osid objects.
@@ -97,7 +102,8 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=var_name))
+                            var_name=var_name,
+                            syntax='ID'))
 
         # ObjectForm methods that return a metadata object for an Id element
         elif (method['name'].startswith('get_') and
@@ -142,7 +148,7 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name[:-9],
                             return_type_full=method['return_type'],
-                            syntax='ID'))
+                            syntax='TYPE'))
 
         # ObjectForm methods that return a metadata object for a primitive element
         elif (method['name'].startswith('get_') and
@@ -179,7 +185,8 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='STRING'))
 
         # ObjectForm methods that set a persisted string.
         elif (method['name'].startswith('set_') and
@@ -193,7 +200,8 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='STRING'))
 
         # ObjectForm methods that set a persisted decimal value.
         elif (method['name'].startswith('set_') and
@@ -207,7 +215,8 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='DECIMAL'))
 
         # ObjectForm methods that clear a persisted decimal value.
         elif (method['name'].startswith('clear_') and
@@ -220,7 +229,8 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=var_name))
+                            var_name=var_name,
+                            syntax='DECIMAL'))
 
         # ObjectForm methods that set a persisted DateTime. Also looks for timestamps
         elif (method['name'].startswith('set_') and
@@ -235,7 +245,8 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='DATETIME'))
 
         # ObjectForm methods that set a persisted Durations.
         elif (method['name'].startswith('set_') and
@@ -250,12 +261,14 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='DURATION'))
 
-        # ObjectForm methods that clear a persisted string.
+        # ObjectForm methods that clear a persisted string for a DisplayText.
         elif (method['name'].startswith('clear_') and
                 var_name in index[object_name + '.persisted_data'] and
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
+                index[object_name + '.return_types'][var_name] == 'osid.locale.DisplayText' and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'string'):
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern='repository.AssetForm.clear_title',
@@ -263,7 +276,22 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=var_name))
+                            var_name=var_name,
+                            syntax='STRING'))
+
+        # ObjectForm methods that clear a persisted string.
+        elif (method['name'].startswith('clear_') and
+                var_name in index[object_name + '.persisted_data'] and
+                len(index[object_name + '.arg_detail'][var_name]) == 1 and
+                index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'string'):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='repository.AssetContentForm.clear_url',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name,
+                            syntax='STRING'))
 
         # ObjectForm methods that clear a persisted DateTime.
         elif (method['name'].startswith('clear_') and
@@ -276,7 +304,8 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=var_name))
+                            var_name=var_name,
+                            syntax='DATETIME'))
 
         # ObjectForm methods that clear a persisted Duration.
         elif (method['name'].startswith('clear_') and
@@ -289,7 +318,8 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=var_name))
+                            var_name=var_name,
+                            syntax='DURATION'))
 
         # ObjectForm methods that set a persisted DataInputStream.
         elif (method['name'].startswith('set_') and
@@ -303,7 +333,8 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='OBJECT'))
 
         # ObjectForm methods that clear a persisted DataInputStream.
         elif (method['name'].startswith('clear_') and
@@ -316,7 +347,8 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=var_name))
+                            var_name=var_name,
+                            syntax='OBJECT'))
 
         # ObjectForm methods that add a persisted Type.
         elif (method['name'].startswith('add_') and
@@ -329,7 +361,8 @@ def map_object_form_patterns(interface, package, index):
                             module_name=interface['category'],
                             method_name=method['name'],
                             var_name=var_name,
-                            arg0_name=method['args'][0]['var_name']))
+                            arg0_name=method['args'][0]['var_name'],
+                            syntax='TYPE'))
 
         # ObjectForm methods that remove a persisted Type.
         elif (method['name'].startswith('remove_') and
@@ -343,7 +376,8 @@ def map_object_form_patterns(interface, package, index):
                             module_name=interface['category'],
                             method_name=method['name'],
                             var_name=var_name,
-                            arg0_name=method['args'][0]['var_name']))
+                            arg0_name=method['args'][0]['var_name'],
+                            syntax='TYPE'))
 
         # ObjectForm methods that clear all of persisted Types. Note
         # that the AssetContentForm version of this uses the plural. and is
@@ -360,7 +394,8 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=remove_plural(var_name)))
+                            var_name=remove_plural(var_name),
+                            syntax='TYPE'))
 
         # ObjectForm methods that sets a persisted Type.
         elif (method['name'].startswith('set_') and
@@ -374,7 +409,8 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
-                            arg0_type_full=method['args'][0]['arg_type']))
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            syntax='TYPE'))
 
         # ObjectForm methods that clears a persisted Type.
         elif (method['name'].startswith('clear_') and
@@ -387,7 +423,8 @@ def map_object_form_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name'],
-                            var_name=var_name))
+                            var_name=var_name,
+                            syntax='TYPE'))
 
         # ObjectForm methods that get an extension record.
         elif (method['name'].startswith('get_') and

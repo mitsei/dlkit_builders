@@ -1245,7 +1245,9 @@ class ResourceForm:
     import_statements_pattern = [
         'from dlkit.json_.osid.metadata import Metadata',
         'from dlkit.primordium.type.primitives import Type',
-        'from dlkit.primordium.id.primitives import Id'
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.abstract_osid.id.primitives import Id as ABC_Id',
+        'from dlkit.abstract_osid.locale.primitives import DisplayText as ABC_DisplayText',
     ]
 
     init_template = """
@@ -1269,16 +1271,36 @@ class ResourceForm:
 
     get_group_metadata_template = """
         # From test_templates/resource.py::ResourceForm::get_group_metadata_template
-        self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
+        mdata = self.form.${method_name}()
+        self.assertTrue(isinstance(mdata, Metadata))
+        self.assertTrue(isinstance(mdata.get_element_id(), ABC_Id))
+        self.assertTrue(isinstance(mdata.get_element_label(), ABC_DisplayText))
+        self.assertTrue(isinstance(mdata.get_instructions(), ABC_DisplayText))
+        self.assertEquals(mdata.get_syntax(), '${syntax}')
+        self.assertFalse(mdata.is_array())
+        self.assertTrue(isinstance(mdata.is_required(), bool))
+        self.assertTrue(isinstance(mdata.is_read_only(), bool))
+        self.assertTrue(isinstance(mdata.is_linked(), bool))"""
 
     get_avatar_metadata_template = """
         # From test_templates/resource.py::ResourceForm::get_avatar_metadata_template
-        self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
+        mdata = self.form.${method_name}()
+        self.assertTrue(isinstance(mdata, Metadata))
+        self.assertTrue(isinstance(mdata.get_element_id(), ABC_Id))
+        self.assertTrue(isinstance(mdata.get_element_label(), ABC_DisplayText))
+        self.assertTrue(isinstance(mdata.get_instructions(), ABC_DisplayText))
+        self.assertEquals(mdata.get_syntax(), '${syntax}')
+        self.assertFalse(mdata.is_array())
+        self.assertTrue(isinstance(mdata.is_required(), bool))
+        self.assertTrue(isinstance(mdata.is_read_only(), bool))
+        self.assertTrue(isinstance(mdata.is_linked(), bool))"""
 
     set_group_template = """
         # From test_templates/resource.py::ResourceForm::set_group_template
         self.form.${method_name}(True)
-        self.assertTrue(self.form._my_map['${var_name_mixed}'])"""
+        self.assertTrue(self.form._my_map['${var_name_mixed}'])
+        with self.assertRaises(errors.InvalidArgument):
+            self.form.${method_name}('false')"""
 
     clear_group_template = """
         # From test_templates/resource.py::ResourceForm::clear_group_template
@@ -1292,7 +1314,9 @@ class ResourceForm:
         self.assertEqual(self.form._my_map['${var_name_mixed}Id'], '')
         self.form.set_${var_name}(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))
         self.assertEqual(self.form._my_map['${var_name_mixed}Id'],
-                         'repository.Asset%3Afake-id%40ODL.MIT.EDU')"""
+                         'repository.Asset%3Afake-id%40ODL.MIT.EDU')
+        with self.assertRaises(errors.InvalidArgument):
+            self.form.${method_name}(True)"""
 
     clear_avatar_template = """
         # From test_templates/resource.py::ResourceForm::clear_avatar_template
@@ -1300,7 +1324,7 @@ class ResourceForm:
         self.assertEqual(self.form._my_map['${var_name_mixed}Id'],
                          'repository.Asset%3Afake-id%40ODL.MIT.EDU')
         self.form.${method_name}()
-        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], '')"""
+        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
 
     get_resource_form_record_template = """
         with self.assertRaises(errors.Unsupported):

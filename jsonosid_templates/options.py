@@ -23,8 +23,18 @@ STRING_METADATA = """
                 'string_match_types': self.my_model.moptions['${data_name}']['match_types']"""
 
 COMMON_MDATA = """
-            'element_label': '${element_label}',
-            'instructions': '${instructions}',
+            'element_label': {
+                'text': '${element_label}',
+                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+            },
+            'instructions': {
+                'text': '${instructions}',
+                'languageTypeId': str(DEFAULT_LANGUAGE_TYPE),
+                'scriptTypeId': str(DEFAULT_SCRIPT_TYPE),
+                'formatTypeId': str(DEFAULT_FORMAT_TYPE),
+            },
             'required': False,
             'read_only': False,
             'linked': False,
@@ -77,6 +87,13 @@ INTEGER_MDATA = """
             'minimum_integer': None,
             'maximum_integer': None,
             'integer_set': []"""
+
+CARDINAL_MDATA = """
+            'default_cardinal_values': [None],
+            'syntax': 'CARDINAL',
+            'minimum_cardinal': None,
+            'maximum_cardinal': None,
+            'cardinal_set': []"""
 
 TYPE_MDATA = """
             'default_${id_type}_values': ['NoneType%3ANONE%40dlkit.mit.edu'],

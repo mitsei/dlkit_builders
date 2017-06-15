@@ -103,7 +103,6 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
 
     def _make_mdata_maps(self, interface):
         from jsonosid_templates import options
-
         pd = interface['shortname'] + '.persisted_data'
         rt = interface['shortname'] + '.return_types'
         mdata = ('def get_' + camel_to_under(interface['shortname']) +
@@ -152,12 +151,18 @@ class MDataBuilder(InterfaceBuilder, BaseBuilder):
                 'array': 'False'
             })
             mdata = construct_data(options.STRING_MDATA, ctxt)
-        elif data_type in ['cardinal', 'integer']:
+        elif data_type == 'integer':
             ctxt.update({
                 'instructions': 'enter an integer value',
                 'array': False
             })
             mdata = construct_data(options.INTEGER_MDATA, ctxt)
+        elif data_type == 'cardinal':
+            ctxt.update({
+                'instructions': 'enter a cardinal value',
+                'array': False
+            })
+            mdata = construct_data(options.CARDINAL_MDATA, ctxt)
         elif data_type == 'decimal':
             ctxt.update({
                 'instructions': 'enter a decimal value.',
