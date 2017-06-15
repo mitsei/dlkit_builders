@@ -534,6 +534,10 @@ class ActivityList:
 
 
 class ActivityQuery:
+    import_statements = [
+        'from dlkit.json_.learning.queries import ActivityQuery'
+    ]
+
     init = """
     @classmethod
     def setUpClass(cls):
@@ -547,9 +551,9 @@ class ActivityQuery:
         create_form.description = 'Test Objective for ActivityLookupSession tests'
         cls.objective = cls.catalog.create_objective(create_form)
 
-        objective_query = cls.catalog.get_objective_query()
-        # cls.query = objective_query.get_activity_query()
-        # Raises Unimplemented()
+    def setUp(self):
+        # Since the session isn't implemented, we just construct an ActivityQuery directly
+        self.query = ActivityQuery(runtime=self.catalog._runtime)
 
     @classmethod
     def tearDownClass(cls):
@@ -560,29 +564,211 @@ class ActivityQuery:
                 catalog.delete_objective(obj.ident)
             cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
-    match_objective_id = """"""
+    supports_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_objective_query()"""
 
-    clear_objective_id_terms = """"""
+    supports_asset_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_asset_query()"""
 
-    clear_objective_terms = """"""
+    supports_course_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_course_query()"""
 
-    match_asset_id = """"""
+    supports_assessment_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_assessment_query()"""
 
-    clear_asset_id_terms = """"""
+    supports_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_objective_bank_query()"""
 
-    match_course_id = """"""
+    get_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_objective_query()"""
 
-    clear_course_id_terms = """"""
+    get_asset_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_asset_query()"""
 
-    match_assessment_id = """"""
+    get_course_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_course_query()"""
 
-    clear_assessment_id_terms = """"""
+    get_assessment_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_assessment_query()"""
 
-    match_objective_bank_id = """"""
+    get_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_objective_bank_query()"""
 
-    clear_objective_bank_id_terms = """"""
+    match_any_asset = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_asset(True)"""
 
-    clear_objective_bank_terms = """"""
+    match_any_course = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_course(True)"""
+
+    match_any_assessment = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_assessment(True)"""
+
+    clear_asset_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_asset_terms()"""
+
+    clear_course_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_course_terms()"""
+
+    clear_assessment_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_assessment_terms()"""
+
+
+class ObjectiveQuery:
+    supports_assessment_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_assessment_query()"""
+
+    supports_knowledge_category_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_knowledge_category_query()"""
+
+    supports_cognitive_process_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_cognitive_process_query()"""
+
+    supports_activity_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_activity_query()"""
+
+    supports_requisite_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_requisite_objective_query()"""
+
+    supports_depndent_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_depndent_objective_query()"""
+
+    supports_equivalent_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_equivalent_objective_query()"""
+
+    supports_ancestor_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_ancestor_objective_query()"""
+
+    supports_descendant_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_descendant_objective_query()"""
+
+    supports_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_objective_bank_query()"""
+
+    get_assessment_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_assessment_query()"""
+
+    get_knowledge_category_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_knowledge_category_query()"""
+
+    get_cognitive_process_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_cognitive_process_query()"""
+
+    get_activity_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_activity_query()"""
+
+    get_requisite_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_requisite_objective_query()"""
+
+    get_dependent_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_dependent_objective_query()"""
+
+    get_equivalent_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_equivalent_objective_query()"""
+
+    get_ancestor_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_ancestor_objective_query()"""
+
+    get_descendant_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_descendant_objective_query()"""
+
+    get_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_objective_bank_query()"""
+
+    match_any_assessment = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_assessment(True)"""
+
+    match_any_knowledge_category = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_knowledge_category(True)"""
+
+    match_any_cognitive_process = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_cognitive_process(True)"""
+
+    match_any_activity = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_activity(True)"""
+
+    match_any_requisite_objective = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_requisite_objective(True)"""
+
+    match_any_dependent_objective = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_dependent_objective(True)"""
+
+    match_any_equivalent_objective = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_equivalent_objective(True)"""
+
+    match_any_ancestor_objective = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_ancestor_objective(True)"""
+
+    match_any_descendant_objective = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_descendant_objective(True)"""
+
+    clear_activity_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_activity_terms()"""
+
+    clear_requisite_objective_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_requisite_objective_terms()"""
+
+    clear_dependent_objective_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_dependent_objective_terms()"""
+
+    clear_equivalent_objective_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_equivalent_objective_terms()"""
+
+    clear_ancestor_objective_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_ancestor_objective_terms()"""
+
+    clear_descendant_objective_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_descendant_objective_terms()"""
 
 
 class ProficiencyQuerySession:
@@ -762,6 +948,66 @@ class Proficiency:
         cls.svc_mgr.delete_objective_bank(cls.catalog.ident)"""
 
 
+class ProficiencyQuery:
+    supports_resource_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_resource_query()"""
+
+    supports_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_objective_query()"""
+
+    supports_level_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_level_query()"""
+
+    supports_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_objective_bank_query()"""
+
+    get_resource_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_resource_query()"""
+
+    get_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_objective_query()"""
+
+    get_level_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_level_query()"""
+
+    get_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_objective_bank_query()"""
+
+    match_any_objective = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_objective(True)"""
+
+    match_any_level = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_level(True)"""
+
+    match_completion = """
+        start = float(0.0)
+        end = float(100.0)
+        self.assertNotIn('completion', self.query._query_terms)
+        self.query.match_completion(start, end, True)
+        self.assertEqual(self.query._query_terms['completion'], {
+            '$gte': start,
+            '$lte': end
+        })"""
+
+    match_minimum_completion = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_minimum_completion(float(50.0), True)"""
+
+    clear_minimum_completion_terms = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.clear_minimum_completion_terms()"""
+
+
 class ProficiencyAdminSession:
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid.objects import OsidForm',
@@ -824,20 +1070,88 @@ class ProficiencyAdminSession:
 
 
 class ObjectiveBankQuery:
-    init = """"""
+    import_statements = [
+        'from dlkit.json_.learning.queries import ObjectiveBankQuery'
+    ]
 
-    clear_objective_id_terms = """"""
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
-    clear_objective_terms = """"""
+    def setUp(self):
+        # Since the session isn't implemented, we just construct an ObjectiveBankQuery directly
+        self.query = ObjectiveBankQuery(runtime=self.catalog._runtime)
 
-    clear_activity_id_terms = """"""
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_objective_bank(cls.catalog.ident)"""
 
-    clear_activity_terms = """"""
+    match_objective_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_objective_id(self.fake_id, True)"""
 
-    clear_ancestor_objective_bank_id_terms = """"""
+    match_activity_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_activity_id(self.fake_id, True)"""
 
-    clear_ancestor_objective_bank_terms = """"""
+    match_ancestor_objective_bank_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_ancestor_objective_bank_id(self.fake_id, True)"""
 
-    clear_descendant_objective_bank_id_terms = """"""
+    match_descendant_objective_bank_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_descendant_objective_bank_id(self.fake_id, True)"""
 
-    clear_descendant_objective_bank_terms = """"""
+    match_any_objective = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_objective(True)"""
+
+    match_any_activity = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_activity(True)"""
+
+    match_any_ancestor_objective_bank = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_ancestor_objective_bank(True)"""
+
+    match_any_descendant_objective_bank = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.match_any_descendant_objective_bank(True)"""
+
+    supports_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_objective_query()"""
+
+    supports_activity_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_activity_query()"""
+
+    supports_ancestor_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_ancestor_objective_bank_query()"""
+
+    supports_descendant_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.supports_descendant_objective_bank_query()"""
+
+    get_objective_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_objective_query()"""
+
+    get_activity_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_activity_query()"""
+
+    get_ancestor_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_ancestor_objective_bank_query()"""
+
+    get_descendant_objective_bank_query = """
+        with self.assertRaises(errors.Unimplemented):
+            self.query.get_descendant_objective_bank_query()"""
