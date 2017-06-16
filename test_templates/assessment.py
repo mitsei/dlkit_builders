@@ -722,7 +722,144 @@ class AssessmentResultsSession:
 class ItemAdminSession:
 
     import_statements = [
+        'from dlkit.abstract_osid.assessment import objects',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'from dlkit.primordium.id.primitives import Id',
+        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ItemAdminSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+    def setUp(self):
+        create_form = self.catalog.get_item_form_for_create([])
+        create_form.display_name = 'new Item'
+        create_form.description = 'description of Item'
+        create_form.set_genus_type(NEW_TYPE)
+        self.osid_object = self.catalog.create_item(create_form)
+        self.session = self.catalog
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
+            cls.catalog.delete_assessment(obj.ident)
+        for item in cls.catalog.get_items():
+            cls.catalog.delete_item(item.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    create_answer = """
+        self.assertEqual(self.osid_object.get_answers().available(), 0)
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        self.session.create_answer(form)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertEqual(updated_item.get_answers().available(), 1)"""
+
+    create_question = """
+        with self.assertRaises(TypeError):
+            # question_map = dict(self._my_map['question'])
+            # TypeError: 'NoneType' object is not iterable
+            self.osid_object.get_question()
+
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        self.session.create_question(form)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertTrue(isinstance(updated_item.get_question(), Question))"""
+
+    delete_answer = """
+        self.assertEqual(self.osid_object.get_answers().available(), 0)
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        answer = self.session.create_answer(form)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertEqual(updated_item.get_answers().available(), 1)
+
+        with self.assertRaises(errors.NotFound):
+            self.session.delete_answer(Id('fake.Package%3A000000000000000000000000%40ODL.MIT.EDU'))
+
+        self.session.delete_answer(answer.ident)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertEqual(updated_item.get_answers().available(), 0)"""
+
+    delete_question = """
+        with self.assertRaises(TypeError):
+            # question_map = dict(self._my_map['question'])
+            # TypeError: 'NoneType' object is not iterable
+            self.osid_object.get_question()
+
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        question = self.session.create_question(form)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertTrue(isinstance(updated_item.get_question(), Question))
+
+        with self.assertRaises(errors.NotFound):
+            self.session.delete_question(Id('fake.Package%3A000000000000000000000000%40ODL.MIT.EDU'))
+
+        self.session.delete_question(question.ident)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+
+        with self.assertRaises(TypeError):
+            updated_item.get_question()"""
+
+    get_answer_form_for_create = """
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        self.assertTrue(isinstance(form, objects.AnswerForm))
+        self.assertFalse(form.is_for_update())"""
+
+    get_question_form_for_create = """
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        self.assertTrue(isinstance(form, objects.QuestionForm))
+        self.assertFalse(form.is_for_update())"""
+
+    get_answer_form_for_update = """
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        answer = self.session.create_answer(form)
+
+        form = self.session.get_answer_form_for_update(answer.ident)
+        self.assertTrue(isinstance(form, objects.AnswerForm))
+        self.assertTrue(form.is_for_update())"""
+
+    get_question_form_for_update = """
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        question = self.session.create_question(form)
+
+        form = self.session.get_question_form_for_update(question.ident)
+        self.assertTrue(isinstance(form, objects.QuestionForm))
+        self.assertTrue(form.is_for_update())"""
+
+    update_answer = """
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        form.display_name = 'first name'
+        answer = self.session.create_answer(form)
+        self.assertEqual(answer.display_name.text, 'first name')
+
+        form = self.session.get_answer_form_for_update(answer.ident)
+        form.display_name = 'second name'
+        answer = self.session.update_answer(form)
+        self.assertTrue(isinstance(answer, objects.Answer))
+        self.assertEqual(answer.display_name.text, 'second name')"""
+
+    update_question = """
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        question = self.session.create_question(form)
+        self.assertEqual(question.display_name.text, 'new Item')
+
+        form = self.session.get_question_form_for_update(question.ident)
+        form.display_name = 'second name'
+        question = self.session.update_question(form)
+        self.assertTrue(isinstance(question, objects.Question))
+        self.assertEqual(question.display_name.text, 'second name')"""
 
 
 class AssessmentAdminSession:
