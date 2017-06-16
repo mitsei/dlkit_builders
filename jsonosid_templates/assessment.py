@@ -440,12 +440,15 @@ class AssessmentResultsSession:
         taken_lookup_session.use_federated_bank_view()
         taken = taken_lookup_session.get_assessment_taken(assessment_taken_id)
         ils = get_item_lookup_session(runtime=self._runtime, proxy=self._proxy)
+        ils.use_federated_bank_view()
         item_list = []
         if 'sections' in taken._my_map:
             for section_id in taken._my_map['sections']:
-                section = get_assessment_section(Id(section_id))
+                section = get_assessment_section(Id(section_id),
+                                                 runtime=self._runtime,
+                                                 proxy=self._proxy)
                 for question in section._my_map['questions']:
-                    item_list.append(ils.get_item(question['questionId']))
+                    item_list.append(ils.get_item(Id(question['questionId'])))
         return ItemList(item_list)"""
 
     get_responses = """
