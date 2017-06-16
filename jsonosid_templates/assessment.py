@@ -1223,6 +1223,14 @@ class Assessment:
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return False
 
+    def uses_simple_section_sequencing(self):
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        return False
+
+    def uses_shuffled_section_sequencing(self):
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        return False
+
     def _supports_simple_sequencing(self):
         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])
 
@@ -1338,15 +1346,11 @@ class AssessmentOffered:
 
     def are_sections_sequential(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
-        if not self.get_assessment().uses_simple_section_sequencing():  # Records should check this
-            return True
-        return True
+        return self.get_assessment().uses_simple_section_sequencing()  # Records should check this
 
     def are_sections_shuffled(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
-        if not self.get_assessment().uses_simple_section_sequencing():  # Records should check this
-            return False
-        return False"""
+        return self.get_assessment().uses_shuffled_section_sequencing()  # Records should check this"""
 
     has_start_time_template = """
         # Implemented from template for osid.assessment.AssessmentOffered.has_start_time_template
