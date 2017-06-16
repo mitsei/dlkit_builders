@@ -548,6 +548,17 @@ class ItemAdminSession:
                                 runtime=self._runtime,
                                 proxy=self._proxy)"""
 
+    delete_question = """
+        collection = JSONClientValidated('assessment',
+                                         collection='Item',
+                                         runtime=self._runtime)
+        if not isinstance(question_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+        item = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
+
+        item['question'] = None
+        collection.save(item)"""
+
     get_question_form_for_update_import_templates = [
         'from dlkit.abstract_osid.id.primitives import Id as ABCId'
     ]
