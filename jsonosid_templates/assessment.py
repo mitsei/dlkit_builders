@@ -379,7 +379,10 @@ class AssessmentSession:
         # This makes the simple assumption that answers are available only when
         # a response has been submitted for an Item.
         try:
-            self.get_response(assessment_section_id, item_id)
+            response = self.get_response(assessment_section_id, item_id)
+            # need to invoke something like .object_map before
+            # a "null" response throws IllegalState
+            response.object_map
         except errors.IllegalState:
             return False
         else:
