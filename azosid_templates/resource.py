@@ -116,6 +116,30 @@ class ResourceManager:
         except AttributeError:
             raise OperationFailed()"""
 
+    get_resource_notification_session_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_template
+        try:
+            return getattr(sessions, '${return_type}')(
+                provider_session=self._provider_manager.${method_name}(${arg0_name}),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
+        except AttributeError:
+            raise OperationFailed()"""
+
+    get_resource_notification_session_for_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_for_bin_template
+        try:
+            return getattr(sessions, '${return_type}')(
+                provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
+        except AttributeError:
+            raise OperationFailed()"""
+
 
 class ResourceProxyManager:
     import_statements_pattern = [
@@ -196,6 +220,30 @@ class ResourceProxyManager:
                 override_lookup_session=self._get_override_lookup_session(),
                 provider_manager=self._provider_manager,
                 proxy=proxy)
+        except AttributeError:
+            raise OperationFailed()"""
+
+    get_resource_notification_session_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_template
+        try:
+            return getattr(sessions, '${return_type}')(
+                provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
+        except AttributeError:
+            raise OperationFailed()"""
+
+    get_resource_notification_session_for_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_for_bin_template
+        try:
+            return getattr(sessions, '${return_type}')(
+                provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}, ${arg2_name}),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
         except AttributeError:
             raise OperationFailed()"""
 
@@ -562,6 +610,12 @@ class ResourceAdminSession:
         if not self._can_for_${object_name_under}('delete', ${object_name_under}_id):
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name})"""
+
+    can_manage_resource_aliases_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceAdminSession.can_manage_resource_aliases
+        return (self._can('${func_name}') or
+                bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     alias_resource_template = """
         # Implemented from azosid template for -
