@@ -428,14 +428,13 @@ class SequenceRuleAdminSession:
 
     @classmethod
     def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_sequence_rules():
-                catalog.delete_sequence_rule(obj.ident)
-            for obj in catalog.get_assessment_parts():
-                catalog.delete_assessment_part(obj.ident)
-            for obj in catalog.get_assessments():
-                catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)"""
+        for obj in cls.catalog.get_sequence_rules():
+            cls.catalog.delete_sequence_rule(obj.ident)
+        for obj in cls.catalog.get_assessment_parts():
+            cls.catalog.delete_assessment_part(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
     get_sequence_rule_form_for_create = """
         form = self.catalog.get_sequence_rule_form_for_create(self.assessment_part_1.ident,
