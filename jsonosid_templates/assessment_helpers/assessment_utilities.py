@@ -228,7 +228,7 @@ def create_first_assessment_section(assessment_id, runtime, proxy, bank_id):
                                                                          part_id,
                                                                          [])
         rule_form.set_display_name('First Part Rule')
-        rule_admin_session.create_rule(rule_form)
+        rule_admin_session.create_sequence_rule(rule_form)
     return part_id
 
 
