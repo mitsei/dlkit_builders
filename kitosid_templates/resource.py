@@ -1126,6 +1126,7 @@ class Bin:
             return self._provider_sessions[agent_key][session_name]
         else:
             session_class = getattr(self._provider_manager, 'get_' + session_name + '_for_${cat_name_under}')
+            if self._proxy is None:
                 if 'notification_session' in session_name:
                     # Is there something else we should do about the receiver field?
                     session = session_class('fake receiver', self._catalog.get_id())
