@@ -375,6 +375,33 @@ class SequenceRuleList:
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
+class SequenceRuleQuery:
+    import_statements = [
+        'from dlkit.json_.assessment_authoring.queries import SequenceRuleQuery'
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for SequenceRuleQuery tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+    def setUp(self):
+        # Since the session isn't implemented, we just construct an SequenceRuleQuery directly
+        self.query = SequenceRuleQuery(runtime=self.catalog._runtime)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_sequence_rules():
+            cls.catalog.delete_sequence_rule(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
 class SequenceRuleAdminSession:
     import_statements = [
         'from dlkit.abstract_osid.osid.objects import OsidForm',

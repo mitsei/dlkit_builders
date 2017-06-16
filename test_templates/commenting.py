@@ -225,18 +225,6 @@ class Comment:
             cls.catalog.delete_comment(obj.ident)
         cls.svc_mgr.delete_book(cls.catalog.ident)"""
 
-    get_commenting_agent_id = """"""
-
-    get_commenting_agent = """"""
-
-    get_comment_record = """"""
-
-    get_rating = """"""
-
-    get_rating_id = """"""
-
-    has_rating = """"""
-
 
 class CommentQuery:
 
@@ -245,16 +233,24 @@ class CommentQuery:
 
 
 class BookQuery:
-    init = """"""
+    import_statements = [
+        'from dlkit.json_.commenting.queries import BookQuery'
+    ]
 
-    clear_comment_id_terms = """"""
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('COMMENTING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_book_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_book(create_form)
+        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
-    clear_comment_terms = """"""
+    def setUp(self):
+        # Since the session isn't implemented, we just construct an BookQuery directly
+        self.query = BookQuery(runtime=self.catalog._runtime)
 
-    clear_ancestor_book_id_terms = """"""
-
-    clear_ancestor_book_terms = """"""
-
-    clear_descendant_book_id_terms = """"""
-
-    clear_descendant_book_terms = """"""
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_book(cls.catalog.ident)"""
