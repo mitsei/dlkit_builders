@@ -3,8 +3,7 @@ class GradeEntryAdminSession:
 
     import_statements = [
         'from dlkit.abstract_osid.id.primitives import Id as ABCId',
-        'from dlkit.abstract_osid.type.primitives import Type as ABCType',
-        'from dlkit.primordium.calendaring.primitives import DateTime'
+        'from dlkit.abstract_osid.type.primitives import Type as ABCType'
     ]
 
     get_grade_entry_form_for_create = """
@@ -62,33 +61,6 @@ class GradeEntryAdminSession:
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
-
-    create_grade_entry = """
-        collection = JSONClientValidated('grading',
-                                         collection='GradeEntry',
-                                         runtime=self._runtime)
-        if not isinstance(grade_entry_form, ABCGradeEntryForm):
-            raise errors.InvalidArgument('argument type is not an GradeEntryForm')
-        if grade_entry_form.is_for_update():
-            raise errors.InvalidArgument('the GradeEntryForm is for update only, not create')
-        try:
-            if self._forms[grade_entry_form.get_id().get_identifier()] == CREATED:
-                raise errors.IllegalState('grade_entry_form already used in a create transaction')
-        except KeyError:
-            raise errors.Unsupported('grade_entry_form did not originate from this session')
-        if not grade_entry_form.is_valid():
-            raise errors.InvalidArgument('one or more of the form elements is invalid')
-
-        grade_entry_form._my_map['timeGraded'] = DateTime.utcnow()
-        insert_result = collection.insert_one(grade_entry_form._my_map)
-
-        self._forms[grade_entry_form.get_id().get_identifier()] = CREATED
-        result = objects.GradeEntry(
-            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime,
-            proxy=self._proxy)
-
-        return result"""
 
 
 class GradeSystem:
@@ -176,7 +148,7 @@ class GradeEntry:
         return Agent(self.get_key_resource_id())"""
 
     get_time_graded = """
-        if not self.is_graded or self.is_derived():
+        if not self.is_graded() or self.is_derived():
             raise errors.IllegalState()
         time_graded = self._my_map['timeGraded']
         return DateTime(
@@ -189,7 +161,7 @@ class GradeEntry:
             microsecond=time_graded.microsecond)"""
 
     is_graded = """
-        return bool(self._my_map['gradeId'] is not None or self._my_map['score'] is not None)"""
+        return bool(self._my_map['gradeId'] != '' or self._my_map['score'] is not None)"""
 
     get_grading_agent_id = """
         if not self.is_graded or self.is_derived():
@@ -261,9 +233,9 @@ class GradeEntryForm:
             self._mdata['score'].update(
                 {'minimum_decimal': self._grade_system.get_lowest_numeric_score(),
                  'maximum_decimal': self._grade_system.get_highest_numeric_score()})
-        self._grade_default = self._mdata['grade']['default_id_values'][0]
-        self._ignored_for_calculations_default = self._mdata['ignored_for_calculations']['default_boolean_values'][0]
-        self._score_default = self._mdata['score']['default_decimal_values'][0]
+        self._grade_default = list(self._mdata['grade']['default_id_values'])[0]
+        self._ignored_for_calculations_default = list(self._mdata['ignored_for_calculations']['default_boolean_values'])[0]
+        self._score_default = list(self._mdata['score']['default_decimal_values'])[0]
 
     def _init_map(self, record_types=None, **kwargs):
         osid_objects.OsidRelationshipForm._init_map(self, record_types=record_types)
@@ -291,7 +263,7 @@ class GradeEntryForm:
             raise errors.InvalidArgument('Grade ID not in the acceptable set.')
         self._my_map['gradeId'] = str(grade_id)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
-        self._my_map['timeGraded'] = now_map()"""
+        self._my_map['timeGraded'] = DateTime.utcnow()"""
 
     clear_grade = """
         if not self._grade_system.is_based_on_grades():
@@ -317,7 +289,7 @@ class GradeEntryForm:
             raise errors.InvalidArgument('score must be in increments of ' + str(self._score_increment))
         self._my_map['score'] = float(score)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
-        self._my_map['timeGraded'] = now_map()"""
+        self._my_map['timeGraded'] = DateTime.utcnow()"""
 
     clear_score = """
         if self._grade_system.is_based_on_grades():
