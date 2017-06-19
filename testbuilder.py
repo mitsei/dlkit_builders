@@ -19,16 +19,31 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
                                                  method['name'])
 
     def _clean_up_impl(self, impl, interface, method):
+        def is_catalog():
+            return 'OsidCatalog' in interface['inherit_shortnames']
+
+        def is_record_method():
+            return method['name'].endswith('_record')
+
         if impl == '':
             test_object = remove_plural(interface['category'])
-            if len(method['args']) > 0:
+            if (len(method['args']) > 0 and
+                    ((is_catalog() and
+                      is_record_method()) or
+                     (not is_catalog() and not is_record_method()))):
+                # i.e. AssessmentManager.get_bank_record() throws Unimplemented()
+                # i.e. Question.get_question_record() throws Unsupported()
                 impl = '{0}with self.assertRaises(errors.Unimplemented):\n{0}{1}self.{2}.{3}({4})'.format(self._dind,
                                                                                                           self._ind,
                                                                                                           test_object,
                                                                                                           method['name'],
                                                                                                           ', '.join((len(method['args']) * ['True'])))
             elif method['name'].endswith('_record'):
-                impl = '{0}pass'.format(self._dind)
+                impl = '{0}with self.assertRaises(errors.Unsupported):\n{0}{1}self.{2}.{3}({4})'.format(self._dind,
+                                                                                                        self._ind,
+                                                                                                        test_object,
+                                                                                                        method['name'],
+                                                                                                        ', '.join((len(method['args']) * ['True'])))
             else:
                 impl = '{0}with self.assertRaises(errors.Unimplemented):\n{0}{1}self.{2}.{3}()'.format(self._dind,
                                                                                                        self._ind,
