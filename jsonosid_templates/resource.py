@@ -862,10 +862,10 @@ class ResourceBinAssignmentSession:
         # This will likely be overridden by an authorization adapter
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
-        ${object_name_plural_under} = lookup_session.get_${cat_name_plural_under}()
+        ${cat_name_plural_under} = lookup_session.get_${cat_name_plural_under}()
         id_list = []
-        for ${object_name_under} in ${object_name_plural_under}:
-            id_list.append(${object_name_plural_under}.get_id())
+        for ${cat_name_under} in ${cat_name_plural_under}:
+            id_list.append(${cat_name_under}.get_id())
         return IdList(id_list)"""
 
     get_assignable_bin_ids_for_resource_template = """
