@@ -317,6 +317,7 @@ class ResourceQuerySession:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::ResourceQuerySession::init_template
         cls.${object_name_under}_list = list()
         cls.${object_name_under}_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
@@ -333,27 +334,38 @@ class ResourceQuerySession:
             cls.${object_name_under}_list.append(obj)
             cls.${object_name_under}_ids.append(obj.ident)
 
+    def setUp(self):
+        # From test_templates/resource.py::ResourceQuerySession::init_template
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::ResourceQuerySession::init_template
         for obj in cls.catalog.get_${object_name_under_plural}():
             cls.catalog.delete_${object_name_under}(obj.ident)
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     can_query_resources_template = """
-        self.assertTrue(isinstance(self.catalog.${method_name}(), bool))"""
+        # From test_templates/resource.py ResourceQuerySession::can_query_resources_template
+        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
+
+    can_search_resources_template = """
+        # From test_templates/resource.py ResourceQuerySession::can_search_resources_template
+        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
 
     get_resource_query_template = """
-        query = self.catalog.${method_name}()"""
+        # From test_templates/resource.py ResourceQuerySession::get_resource_query_template
+        query = self.session.${method_name}()"""
 
     get_resources_by_query_template = """
         # From test_templates/resource.py ResourceQuerySession::get_resources_by_query_template
         # Need to add some tests with string types
-        query = self.catalog.get_${object_name_under}_query()
+        query = self.session.get_${object_name_under}_query()
         query.match_display_name('orange')
         self.assertEqual(self.catalog.${method_name}(query).available(), 2)
         query.clear_display_name_terms()
         query.match_display_name('blue', match=False)
-        self.assertEqual(self.catalog.${method_name}(query).available(), 3)"""
+        self.assertEqual(self.session.${method_name}(query).available(), 3)"""
 
 
 class ResourceAdminSession:
@@ -375,9 +387,9 @@ class ResourceAdminSession:
     ]
 
     init_template = """
-    # From test_templates/resource.py::ResourceAdminSession::init_template
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::ResourceAdminSession::init_template
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
@@ -390,8 +402,13 @@ class ResourceAdminSession:
         form.set_genus_type(NEW_TYPE)
         cls.osid_object = cls.catalog.create_${object_name_under}(form)
 
+    def setUp(self):
+        # From test_templates/resource.py::ResourceAdminSession::init_template
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::ResourceAdminSession::init_template
         for obj in cls.catalog.get_${object_name_under_plural}():
             cls.catalog.delete_${object_name_under}(obj.ident)
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
@@ -521,6 +538,7 @@ class ResourceBinSession:
             cls.${object_name_under}_ids[2], cls.assigned_catalog.ident)
 
     def setUp(self):
+        # From test_templates/resource.py::ResourceBinSession::init_template
         self.session = self.svc_mgr
 
     @classmethod
@@ -535,6 +553,11 @@ class ResourceBinSession:
         cls.svc_mgr.delete_${cat_name_under}(cls.assigned_catalog.ident)
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
+    can_lookup_resource_bin_mappings_template = """
+        # From test_templates/resource.py::ResourceBinSession::can_lookup_resource_bin_mappings
+        result = self.session.${method_name}()
+        self.assertTrue(result)"""
+
     get_resource_ids_by_bin_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bin_template
         objects = self.svc_mgr.get_${object_name_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
@@ -542,7 +565,7 @@ class ResourceBinSession:
 
     get_resource_ids_by_bins_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bins_template
-        catalog_ids= [self.catalog.ident, self.assigned_catalog.ident]
+        catalog_ids = [self.catalog.ident, self.assigned_catalog.ident]
         object_ids = self.session.${method_name}(catalog_ids)
         self.assertTrue(isinstance(object_ids, IdList))
         # Currently our impl does not remove duplicate objectIds
@@ -556,7 +579,7 @@ class ResourceBinSession:
 
     get_resources_by_bins_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resources_by_bins_template
-        catalog_ids= [self.catalog.ident, self.assigned_catalog.ident]
+        catalog_ids = [self.catalog.ident, self.assigned_catalog.ident]
         results = self.session.${method_name}(catalog_ids)
         self.assertTrue(isinstance(results, ABCObjects.${object_name}List))
         # Currently our impl does not remove duplicate objects
@@ -576,6 +599,115 @@ class ResourceBinSession:
         # From test_templates/resource.py::ResourceBinSession::get_bins_by_resource_template
         cats = self.svc_mgr.get_${cat_name_plural_under}_by_${object_name_under}(self.${object_name_under}_ids[1])
         self.assertEqual(cats.available(), 2)"""
+
+
+class ResourceBinAssignmentSession:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import objects as ABCObjects',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.json_.id.objects import IdList',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+    ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+        cls.${object_name_under}_list = list()
+        cls.${object_name_under}_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name} for Assignment'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests assignment'
+        cls.assigned_catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        for num in [0, 1, 2]:
+            create_form = cls.catalog.get_${object_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + str(num)
+            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            obj = cls.catalog.create_${object_name_under}(create_form)
+            cls.${object_name_under}_list.append(obj)
+            cls.${object_name_under}_ids.append(obj.ident)
+
+    def setUp(self):
+        # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+        self.session = self.svc_mgr
+
+    @classmethod
+    def tearDownClass(cls):
+        # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+        for obj in cls.catalog.get_${object_name_under_plural}():
+            cls.catalog.delete_${object_name_under}(obj.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.assigned_catalog.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+    assign_resource_to_bin_template = """
+        # From test_templates/resource.py::ResourceBinAssignmentSession::assign_resource_to_bin_template
+        results = self.assigned_catalog.get_${object_name_plural_under}()
+        self.assertEqual(results.available(), 0)
+        self.session.${method_name}(self.${object_name_under}_ids[1], self.assigned_catalog.ident)
+        results = self.assigned_catalog.get_${object_name_plural_under}()
+        self.assertEqual(results.available(), 1)
+        self.session.unassign_${object_name_under}_from_${cat_name_lower}(
+            self.${object_name_under}_ids[1],
+            self.assigned_catalog.ident)"""
+
+    unassign_resource_from_bin_template = """
+        # From test_templates/resource.py::ResourceBinAssignmentSession::unassign_resource_from_bin_template
+        results = self.assigned_catalog.get_${object_name_plural_under}()
+        self.assertEqual(results.available(), 0)
+        self.session.assign_${object_name_under}_to_${cat_name_lower}(
+            self.${object_name_under}_ids[1],
+            self.assigned_catalog.ident)
+        results = self.assigned_catalog.get_${object_name_plural_under}()
+        self.assertEqual(results.available(), 1)
+        self.session.${method_name}(
+            self.${object_name_under}_ids[1],
+            self.assigned_catalog.ident)
+        results = self.assigned_catalog.get_${object_name_plural_under}()
+        self.assertEqual(results.available(), 0)"""
+
+    can_assign_resources_template = """
+        # From test_templates/resource.py::ResourceBinAssignmentSession::can_assign_resources_template
+        result = self.session.${method_name}()
+        self.assertTrue(isinstance(result, bool))"""
+
+    can_assign_resources_to_bin_template = """
+        # From test_templates/resource.py::ResourceBinAssignmentSession::can_assign_resources_to_bin_template
+        result = self.session.${method_name}(self.assigned_catalog.ident)
+        self.assertTrue(isinstance(result, bool))"""
+
+    get_assignable_bin_ids_template = """
+        # From test_templates/resource.py::ResourceBinAssignmentSession::get_assignable_bin_ids_template
+        # Note that our implementation just returns all catalogIds, which does not follow
+        #   the OSID spec (should return only the catalogIds below the given one in the hierarchy.
+        results = self.session.${method_name}(self.catalog.ident)
+        self.assertTrue(isinstance(results, IdList))
+
+        # Because we're not deleting all banks from all tests, we might
+        #   have some crufty banks here...but there should be at least 2.
+        self.assertTrue(results.available() >= 2)"""
+
+    get_assignable_bin_ids_for_resource_template = """
+        # From test_templates/resource.py::ResourceBinAssignmentSession::get_assignable_bin_ids_for_item_template
+        # Note that our implementation just returns all catalogIds, which does not follow
+        #   the OSID spec (should return only the catalogIds below the given one in the hierarchy.
+        results = self.session.${method_name}(self.catalog.ident, self.${object_name_under}_ids[0])
+        self.assertTrue(isinstance(results, IdList))
+
+        # Because we're not deleting all banks from all tests, we might
+        #   have some crufty banks here...but there should be at least 2.
+        self.assertTrue(results.available() >= 2)"""
 
 
 class ResourceAgentSession:
@@ -686,11 +818,14 @@ class BinLookupSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'DEFAULT_GENUS_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'GenusType\', \'authority\': \'DLKIT.MIT.EDU\'})',
+        'AGENT_ID = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
     ]
 
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::BinLookupSession::init_template
         cls.catalogs = list()
         cls.catalog_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
@@ -702,39 +837,55 @@ class BinLookupSession:
             cls.catalogs.append(catalog)
             cls.catalog_ids.append(catalog.ident)
 
+    def setUp(self):
+        # From test_templates/resource.py::BinLookupSession::init_template
+        self.session = self.svc_mgr
+
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::BinLookupSession::init_template
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
     use_comparative_bin_view_template = """
+        # From test_templates/resource.py::BinLookupSession::use_comparative_bin_view_template
         self.svc_mgr.${method_name}()"""
 
     use_plenary_bin_view_template = """
+        # From test_templates/resource.py::BinLookupSession::use_plenary_bin_view_template
         self.svc_mgr.${method_name}()"""
 
     get_bin_template = """
+        # From test_templates/resource.py::BinLookupSession::get_bin_template
         catalog = self.svc_mgr.${method_name}(self.catalogs[0].ident)
         self.assertEqual(catalog.ident, self.catalogs[0].ident)"""
 
     get_bins_by_ids_template = """
-        catalogs = self.svc_mgr.${method_name}(self.catalog_ids)"""
+        # From test_templates/resource.py::BinLookupSession::get_bins_by_ids_template
+        catalogs = self.svc_mgr.${method_name}(self.catalog_ids)
+        self.assertTrue(catalogs.available() == 2)
+        self.assertTrue(isinstance(catalogs, ABCObjects.${cat_name}List))
+        reversed_catalog_ids = [str(cat_id) for cat_id in self.catalog_ids][::-1]
+        for index, catalog in enumerate(catalogs):
+            self.assertEqual(str(catalog.ident),
+                             reversed_catalog_ids[index])"""
 
-    test_get_bins_by_genus_type_template = """
-        catalogs = self.svc_mgr.${method_name}(DEFAULT_TYPE)"""
-
-    test_get_bins_by_parent_genus_type_template = """
-        catalogs = self.svc_mgr.${method_name}(DEFAULT_TYPE)"""
-
-    test_get_bins_by_record_type_template = """
-        catalogs = self.svc_mgr.${method_name}(DEFAULT_TYPE)"""
-
-    test_get_bins_by_provider_template = """
-        # PASSES RESOURCE_ID!!!!
-        catalogs = self.svc_mgr.${method_name}()"""
+    get_bins_by_genus_type_template = """
+        # From test_templates/resource.py::BinLookupSession::get_bins_by_genus_type_template
+        catalogs = self.svc_mgr.${method_name}(DEFAULT_GENUS_TYPE)
+        self.assertTrue(catalogs.available() > 0)
+        self.assertTrue(isinstance(catalogs, ABCObjects.${cat_name}List))"""
 
     get_bins_template = """
-        catalogs = self.svc_mgr.${method_name}()"""
+        # From test_templates/resource.py::BinLookupSession::get_bins_template
+        catalogs = self.svc_mgr.${method_name}()
+        self.assertTrue(catalogs.available() > 0)
+        self.assertTrue(isinstance(catalogs, ABCObjects.${cat_name}List))"""
+
+    can_lookup_bins_template = """
+        # From test_templates/resource.py::BinLookupSession::can_lookup_bins_template
+        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
+
 
 
 class BinAdminSession:
@@ -755,6 +906,7 @@ class BinAdminSession:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::BinAdminSession::init_template
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
         # Initialize test catalog:
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
@@ -767,13 +919,26 @@ class BinAdminSession:
         create_form.description = 'Test ${cat_name} for ${interface_name} deletion test'
         cls.catalog_to_delete = cls.svc_mgr.create_${cat_name_under}(create_form)
 
+    def setUp(self):
+        # From test_templates/resource.py::BinAdminSession::init_template
+        self.session = self.svc_mgr
+
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::BinAdminSession::init_template
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
     can_create_bins_template = """
         # From test_templates/resource.py BinAdminSession.can_create_bins_template
+        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+
+    can_delete_bins_template = """
+        # From test_templates/resource.py BinAdminSession.can_delete_bins_template
+        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+
+    can_update_bins_template = """
+        # From test_templates/resource.py BinAdminSession.can_update_bins_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
 
     can_create_bin_with_record_types_template = """
@@ -836,6 +1001,7 @@ class BinHierarchySession:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::BinHierarchySession::init_template
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
         cls.catalogs = dict()
         for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
@@ -848,15 +1014,20 @@ class BinHierarchySession:
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
 
+    def setUp(self):
+        # From test_templates/resource.py::BinHierarchySession::init_template
+        self.session = self.svc_mgr
+
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::BinHierarchySession::init_template
         cls.svc_mgr.remove_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
         cls.svc_mgr.remove_child_${cat_name_under_plural}(cls.catalogs['Root'].ident)
         cls.svc_mgr.remove_root_${cat_name_under}(cls.catalogs['Root'].ident)
         for cat_name in cls.catalogs:
             cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)"""
 
-    can_access_objective_bank_hierarchy_template = """
+    can_access_bin_hierarchy_template = """
         # From test_templates/resource.py::BinHierarchySession::can_access_objective_bank_hierarchy_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
 
@@ -1014,6 +1185,7 @@ class BinHierarchyDesignSession:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::BinHierarchyDesignSession::init_template
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
         cls.catalogs = dict()
         for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
@@ -1026,36 +1198,98 @@ class BinHierarchyDesignSession:
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
         cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
 
+    def setUp(self):
+        # From test_templates/resource.py::BinHierarchyDesignSession::init_template
+        self.session = self.svc_mgr
+
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::BinHierarchyDesignSession::init_template
         cls.svc_mgr.remove_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
         cls.svc_mgr.remove_child_${cat_name_under_plural}(cls.catalogs['Root'].ident)
         for cat_name in cls.catalogs:
             cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)"""
 
     can_modify_bin_hierarchy_template = """
-        # this is tested in the setUpClass
-        self.assertTrue(True)"""
+        # From test_templates/resource.py::BinHierarchyDesignSession::can_modify_bin_hierarchy_template
+        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
 
     add_root_bin_template = """
+        # From test_templates/resource.py::BinHierarchyDesignSession::add_root_bin_template
         # this is tested in the setUpClass
-        self.assertTrue(True)"""
+        roots = self.session.get_root_${cat_name_plural_under}()
+        self.assertTrue(isinstance(roots, ABCObjects.${cat_name}List))
+        self.assertEqual(roots.available(), 1)"""
 
     remove_root_bin_template = """
-        # this is tested in the tearDownClass
-        self.assertTrue(True)"""
+        # From test_templates/resource.py::BinHierarchyDesignSession::remove_root_bin_template
+        roots = self.session.get_root_${cat_name_plural_under}()
+        self.assertEqual(roots.available(), 1)
+
+        create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'new root'
+        create_form.description = 'Test ${cat_name} root'
+        new_${cat_name_under} = self.svc_mgr.create_${cat_name_under}(create_form)
+        self.svc_mgr.add_root_${cat_name_under}(new_${cat_name_under}.ident)
+
+        roots = self.session.get_root_${cat_name_plural_under}()
+        self.assertEqual(roots.available(), 2)
+
+        self.session.${method_name}(new_${cat_name_under}.ident)
+
+        roots = self.session.get_root_${cat_name_plural_under}()
+        self.assertEqual(roots.available(), 1)"""
 
     add_child_bin_template = """
+        # From test_templates/resource.py::BinHierarchyDesignSession::add_child_bin_template
         # this is tested in the setUpClass
-        self.assertTrue(True)"""
+        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
+        self.assertTrue(isinstance(children, ABCObjects.${cat_name}List))
+        self.assertEqual(children.available(), 2)"""
 
     remove_child_bin_template = """
-        # this is tested in the tearDownClass
-        self.assertTrue(True)"""
+        # From test_templates/resource.py::BinHierarchyDesignSession::remove_child_bin_template
+        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
+        self.assertEqual(children.available(), 2)
+
+        create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'test child'
+        create_form.description = 'Test ${cat_name} child'
+        new_${cat_name_under} = self.svc_mgr.create_${cat_name_under}(create_form)
+        self.svc_mgr.add_child_${cat_name_under}(
+            self.catalogs['Root'].ident,
+            new_${cat_name_under}.ident)
+
+        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
+        self.assertEqual(children.available(), 3)
+
+        self.session.${method_name}(
+            self.catalogs['Root'].ident,
+            new_${cat_name_under}.ident)
+
+        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
+        self.assertEqual(children.available(), 2)"""
 
     remove_child_bins_template = """
-        # this is tested in the tearDownClass
-        self.assertTrue(True)"""
+        # From test_templates/resource.py::BinHierarchyDesignSession::remove_child_bins_template
+        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Grandchild 1'].ident)
+        self.assertEqual(children.available(), 0)
+
+        create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'test great grandchild'
+        create_form.description = 'Test ${cat_name} child'
+        new_${cat_name_under} = self.svc_mgr.create_${cat_name_under}(create_form)
+        self.svc_mgr.add_child_${cat_name_under}(
+            self.catalogs['Grandchild 1'].ident,
+            new_${cat_name_under}.ident)
+
+        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Grandchild 1'].ident)
+        self.assertEqual(children.available(), 1)
+
+        self.session.${method_name}(self.catalogs['Grandchild 1'].ident)
+
+        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Grandchild 1'].ident)
+        self.assertEqual(children.available(), 0)"""
 
 
 class Resource:
@@ -1564,3 +1798,54 @@ class BinQuery:
         self.query.${method_name}()
         self.assertNotIn('${var_name_mixed}',
                          self.query._query_terms)"""
+
+
+class BinQuerySession:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import queries as ABCQueries',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        # From test_templates/resource.py::BinQuerySession::init_template
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
+
+    def setUp(self):
+        # From test_templates/resource.py::BinQuerySession::init_template
+        self.session = self.svc_mgr
+
+    @classmethod
+    def tearDownClass(cls):
+        # From test_templates/resource.py::BinQuerySession::init_template
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+    get_bin_query_template = """
+        # From test_templates/resource.py::BinQuerySession::get_bin_query_template
+        query = self.session.${method_name}()
+        self.assertTrue(isinstance(query, ABCQueries.${cat_name}Query))"""
+
+    get_bins_by_query_template = """
+        # From test_templates/resource.py::BinQuerySession::get_bins_by_query_template
+        query = self.session.get_${cat_name_under}_query()
+        query.match_display_name('Test catalog')
+        self.assertEqual(self.session.${method_name}(query).available(), 1)
+        query.clear_display_name_terms()
+        query.match_display_name('Test catalog', match=False)
+        self.assertEqual(self.session.${method_name}(query).available(), 0)"""

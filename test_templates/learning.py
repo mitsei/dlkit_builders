@@ -199,7 +199,25 @@ class ObjectiveAdminSession:
     import_statements_pattern = [
     ]
 
-    delete_objective_template = """"""
+    delete_objective_template = """
+        # From test_templates/learning.py::ObjectiveAdminSession::delete_objective_template
+        results = self.catalog.get_${object_name_under}s()
+        self.assertEqual(results.available(), 1)
+
+        form = self.catalog.get_${object_name_under}_form_for_create([])
+        form.display_name = 'new ${object_name}'
+        form.description = 'description of ${object_name}'
+        new_${object_name_under} = self.catalog.create_${object_name_under}(form)
+
+        results = self.catalog.get_${object_name_under}s()
+        self.assertEqual(results.available(), 2)
+
+        self.session.${method_name}(new_${object_name_under}.ident)
+
+        results = self.catalog.get_${object_name_under}s()
+        self.assertEqual(results.available(), 1)
+        self.assertNotEqual(str(results.next().ident),
+                            str(new_${object_name_under}.ident))"""
 
 
 class ObjectiveSequencingSession:
@@ -245,6 +263,8 @@ class ObjectiveNodeList:
 
 
 class ActivityLookupSession:
+    import_statements = [
+    ]
 
     init = """
     @classmethod
@@ -268,6 +288,9 @@ class ActivityLookupSession:
             cls.activity_list.append(obj)
             cls.activity_ids.append(obj.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_objective_banks():
@@ -277,7 +300,11 @@ class ActivityLookupSession:
                 catalog.delete_objective(obj.ident)
             cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
-    get_activities_for_objective_template = """"""
+    get_activities_for_objective_template = """
+        # From test_templates/learning.py::ActivityLookupSession::get_activities_for_objective_template
+        results = self.session.${method_name}(self.${arg0_object_under}.ident)
+        self.assertEqual(results.available(), 2)
+        self.assertTrue(isinstance(results, ABCObjects.${return_type_list_object}List))"""
 
 
 class ActivityObjectiveBankSession:
