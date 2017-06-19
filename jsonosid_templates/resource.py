@@ -872,7 +872,7 @@ class ResourceBinAssignmentSession:
         # Implemented from template for
         # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource
         # This will likely be overridden by an authorization adapter
-        return self.get_assignable_bin_ids()"""
+        return self.get_assignable_${cat_name_under}_ids(${arg0_name})"""
 
     assign_resource_to_bin_template = """
         # Implemented from template for
