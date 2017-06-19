@@ -862,6 +862,62 @@ class ItemAdminSession:
         self.assertEqual(question.display_name.text, 'second name')"""
 
 
+class ItemBankSession:
+
+    import_statements = [
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'from dlkit.primordium.id.primitives import Id',
+        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.item_list = list()
+        cls.item_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ItemBankSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank for Assignment'
+        create_form.description = 'Test Bank for ItemBankSession tests assignment'
+        cls.assigned_catalog = cls.svc_mgr.create_bank(create_form)
+        for num in [0, 1, 2]:
+            create_form = cls.catalog.get_item_form_for_create([])
+            create_form.display_name = 'Test Item ' + str(num)
+            create_form.description = 'Test Item for ItemBankSession tests'
+            obj = cls.catalog.create_item(create_form)
+            cls.item_list.append(obj)
+            cls.item_ids.append(obj.ident)
+        cls.svc_mgr.assign_item_to_bank(
+            cls.item_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.assign_item_to_bank(
+            cls.item_ids[2], cls.assigned_catalog.ident)
+
+    def setUp(self):
+        self.session = self.svc_mgr
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.unassign_item_from_bank(
+            cls.item_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.unassign_item_from_bank(
+            cls.item_ids[2], cls.assigned_catalog.ident)
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.assigned_catalog.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    can_lookup_item_bank_mappings = """
+        result = self.session.can_lookup_item_bank_mappings()
+        self.assertTrue(result)"""
+
+
 class AssessmentAdminSession:
 
     import_statements = [

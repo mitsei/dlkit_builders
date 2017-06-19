@@ -481,7 +481,9 @@ class ResourceNotificationSession:
 class ResourceBinSession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import objects as ABCObjects',
         'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.json_.id.objects import IdList',
         'from dlkit.runtime.managers import Runtime',
         'REQUEST = proxy_example.SimpleRequest()',
         'CONDITION = PROXY_SESSION.get_proxy_condition()',
@@ -494,6 +496,7 @@ class ResourceBinSession:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::ResourceBinSession::init_template
         cls.${object_name_under}_list = list()
         cls.${object_name_under}_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
@@ -517,8 +520,12 @@ class ResourceBinSession:
         cls.svc_mgr.assign_${object_name_under}_to_${cat_name_under}(
             cls.${object_name_under}_ids[2], cls.assigned_catalog.ident)
 
+    def setUp(self):
+        self.session = self.svc_mgr
+
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::ResourceBinSession::init_template
         cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
             cls.${object_name_under}_ids[1], cls.assigned_catalog.ident)
         cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
@@ -529,18 +536,44 @@ class ResourceBinSession:
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     get_resource_ids_by_bin_template = """
+        # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bin_template
         objects = self.svc_mgr.get_${object_name_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
         self.assertEqual(objects.available(), 2)"""
 
+    get_resource_ids_by_bins_template = """
+        # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bins_template
+        catalog_ids= [self.catalog.ident, self.assigned_catalog.ident]
+        object_ids = self.session.${method_name}(catalog_ids)
+        self.assertTrue(isinstance(object_ids, IdList))
+        # Currently our impl does not remove duplicate objectIds
+        self.assertEqual(object_ids.available(), 5)"""
+
+    get_resources_by_bin_template = """
+        # From test_templates/resource.py::ResourceBinSession::get_resources_by_bin_template
+        results = self.session.${method_name}(self.assigned_catalog.ident)
+        self.assertTrue(isinstance(results, ABCObjects.${object_name}List))
+        self.assertEqual(results.available(), 2)"""
+
+    get_resources_by_bins_template = """
+        # From test_templates/resource.py::ResourceBinSession::get_resources_by_bins_template
+        catalog_ids= [self.catalog.ident, self.assigned_catalog.ident]
+        results = self.session.${method_name}(catalog_ids)
+        self.assertTrue(isinstance(results, ABCObjects.${object_name}List))
+        # Currently our impl does not remove duplicate objects
+        self.assertEqual(results.available(), 5)"""
+
     get_resource_by_bin_template = """
+        # From test_templates/resource.py::ResourceBinSession::get_resource_by_bin_template
         objects = self.svc_mgr.get_${object_name_plural_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
         self.assertEqual(objects.available(), 2)"""
 
     get_bin_ids_by_resource_template = """
+        # From test_templates/resource.py::ResourceBinSession::get_bin_ids_by_resource_template
         cats = self.svc_mgr.get_${cat_name_under}_ids_by_${object_name_under}(self.${object_name_under}_ids[1])
         self.assertEqual(cats.available(), 2)"""
 
     get_bins_by_resource_template = """
+        # From test_templates/resource.py::ResourceBinSession::get_bins_by_resource_template
         cats = self.svc_mgr.get_${cat_name_plural_under}_by_${object_name_under}(self.${object_name_under}_ids[1])
         self.assertEqual(cats.available(), 2)"""
 
