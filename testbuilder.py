@@ -53,8 +53,8 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
                                                  ', '.join(args))
 
         # if method_impl == '{}pass'.format(self._dind):
-            # method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
-            #                                                                    method_sig)
+        #     method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
+        #                                                                        method_sig)
 
         return method_sig
 
