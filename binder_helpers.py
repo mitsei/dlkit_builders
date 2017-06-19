@@ -135,7 +135,9 @@ _singular_to_plural = {
     'GradeEntry': 'GradeEntries',
     'grade_entry': 'grade_entries',
     'log_entry': 'log_entries',
-    'LogEntry': 'LogEntries'
+    'LogEntry': 'LogEntries',
+    'search': 'searches',
+    'Search': 'Searches'
 }
 
 _plural_to_singular = {v: k for k, v in _singular_to_plural.items()}
