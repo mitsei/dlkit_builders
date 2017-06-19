@@ -22,14 +22,26 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
         def is_catalog():
             return 'OsidCatalog' in interface['inherit_shortnames']
 
+        def is_query():
+            return any(query_term in interface['inherit_shortnames']
+                       for query_term in ['OsidObjectQuery', 'OsidCatalogQuery'])
+
         def is_record_method():
             return method['name'].endswith('_record')
 
+        def is_search():
+            return any(search_term in interface['inherit_shortnames']
+                       for search_term in ['OsidSearch', 'OsidSearchResults'])
+
         if impl == '':
             test_object = remove_plural(interface['category'])
-            if (len(method['args']) > 0 and
+            if is_search():
+                # We don't have any search stuff implemented yet
+                impl = '{0}pass'.format(self._dind)
+            elif (len(method['args']) > 0 and
                     ((is_catalog() and
                       is_record_method()) or
+                     (is_query() and is_record_method()) or
                      (not is_catalog() and not is_record_method()))):
                 # i.e. AssessmentManager.get_bank_record() throws Unimplemented()
                 # i.e. Question.get_question_record() throws Unsupported()
@@ -62,14 +74,14 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
 
     def _get_method_sig(self, method, interface):
         args = self._get_method_args(method, interface)
-        # method_impl = self._make_method_impl(method, interface)
+        method_impl = self._make_method_impl(method, interface)
         method_sig = '{}def test_{}({}):'.format(self._ind,
                                                  method['name'],
                                                  ', '.join(args))
 
-        # if method_impl == '{}pass'.format(self._dind):
-        #     method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
-        #                                                                        method_sig)
+        if method_impl == '{}pass'.format(self._dind):
+            method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
+                                                                               method_sig)
 
         return method_sig
 
