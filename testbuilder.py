@@ -20,11 +20,15 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
 
     def _clean_up_impl(self, impl, interface, method):
         def is_catalog():
-            return 'OsidCatalog' in interface['inherit_shortnames']
+            return any(cat_term in interface['inherit_shortnames']
+                       for cat_term in ['OsidCatalog', 'OsidCatalogForm'])
 
         def is_query():
             return any(query_term in interface['inherit_shortnames']
-                       for query_term in ['OsidObjectQuery', 'OsidCatalogQuery'])
+                       for query_term in ['OsidObjectQuery',
+                                          'OsidRelationshipQuery',
+                                          'OsidRuleQuery',
+                                          'OsidCatalogQuery'])
 
         def is_record_method():
             return method['name'].endswith('_record')

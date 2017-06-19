@@ -1433,6 +1433,41 @@ class ResourceQuery:
                          self.query._query_terms)"""
 
 
+class ResourceSearch:
+
+    import_statements_pattern = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        # From test_templates/resource.py::ResourceSearch::init_template
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+
+    def setUp(self):
+        # From test_templates/resource.py::ResourceSearch::init_template
+        self.search = self.catalog.get_${object_name_under}_search()
+
+    @classmethod
+    def tearDownClass(cls):
+        # From test_templates/resource.py::ResourceSearch::init_template
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+
 class ResourceForm:
 
     import_statements_pattern = [
@@ -1773,11 +1808,21 @@ class BinNode:
             self.${object_name_under}_list[0].ident,
             self.${object_name_under}_list[1].ident)
 
+        self.object = self.svc_mgr.get_${cat_name_under}_nodes(
+            self.${object_name_under}_list[0].ident, 0, 5, False)
+
+    def tearDown(self):
+        # Implemented from init template for BinNode
+        self.svc_mgr.remove_child_${cat_name_under}(
+            self.${object_name_under}_list[0].ident,
+            self.${object_name_under}_list[1].ident)
+        self.svc_mgr.remove_root_${cat_name_under}(self.${object_name_under}_list[0].ident)
+        for node in self.${object_name_under}_list:
+            self.svc_mgr.delete_${cat_name_under}(node.ident)
+
     @classmethod
     def tearDownClass(cls):
         # Implemented from init template for BinNode
-        for obj in cls.${object_name_under}_ids:
-            cls.svc_mgr.delete_${cat_name_under}(obj)
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     get_bin_template = """

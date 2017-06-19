@@ -1003,10 +1003,18 @@ class AssessmentTakenLookupSession:
     # This is hand built, but there may be a pattern to try to map, specifically
     # getting objects for another package object and a persisted id thingy
     get_assessments_taken_for_taker_and_assessment_offered = """
-        pass"""
+        from dlkit.abstract_osid.assessment.objects import AssessmentTakenList
+        takens = self.session.get_assessments_taken_for_taker_and_assessment_offered(
+            self.catalog._proxy.get_effective_agent_id(),
+            self.assessment_offered.ident)
+        self.assertTrue(isinstance(takens, AssessmentTakenList))
+        self.assertEqual(takens.available(), 2)"""
 
     get_assessments_taken_for_assessment = """
-        pass"""
+        from dlkit.abstract_osid.assessment.objects import AssessmentTakenList
+        takens = self.session.get_assessments_taken_for_assessment(self.assessment.ident)
+        self.assertTrue(isinstance(takens, AssessmentTakenList))
+        self.assertEqual(takens.available(), 2)"""
 
 
 class AssessmentTakenAdminSession:
@@ -1304,7 +1312,7 @@ class AssessmentBasicAuthoringSession:
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
     can_author_assessments = """
-        pass"""
+        self.assertTrue(isinstance(self.catalog.can_author_assessments(), bool))"""
 
     get_items = """
         self.assertEqual(self.catalog.get_assessment_items(self.assessment.ident).available(), 4)"""
@@ -1723,6 +1731,83 @@ class ItemQuery:
         })"""
 
 
+class ItemSearch:
+    import_statements = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+    def setUp(self):
+        self.search = self.catalog.get_item_search()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    search_among_items = """
+        # This is implementation dependent...find some other way?
+        self.assertIsNone(self.search._id_list)
+        fake_list = [self.catalog.ident]
+        self.search.search_among_items(fake_list)
+        self.assertEqual(self.search._id_list, fake_list)"""
+
+
+class ItemSearchResults:
+    import_statements = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+    def setUp(self):
+        self.query = self.catalog.get_item_query()
+        self.search_obj = self.catalog.get_item_search()
+        self.search = self.catalog.get_items_by_search(self.query, self.search_obj)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    get_items = """
+        from dlkit.abstract_osid.assessment.objects import ItemList
+        items = self.search.get_items()
+        self.assertTrue(isinstance(items, ItemList))
+        self.assertEqual(items.available(), 0)"""
+
+
 class ItemQuerySession:
     import_statements = [
     ]
@@ -1766,6 +1851,7 @@ class ItemSearchSession:
     import_statements = [
         'from dlkit.json_.assessment import searches',
         'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.abstract_osid.osid import errors',
         'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
         'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data("WORDIGNORECASE"))'
     ]
@@ -2102,12 +2188,22 @@ class AssessmentOfferedList:
 
 
 class AssessmentOfferedQuery:
+    import_statements = [
+        'from dlkit.primordium.calendaring.primitives import DateTime'
+    ]
 
     match_start_time_template = """
-        pass"""
+        start_time = DateTime.utcnow()
+        end_time = DateTime.utcnow()
+        self.query.${method_name}(start_time, end_time, match=True)
+        self.assertEqual(self.query._query_terms['${var_name_mixed}'], {
+            '$$gte': start_time,
+            '$$lte': end_time
+        })"""
 
 
 class AssessmentQuery:
+
     match_item_id = """
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.match_item_id(test_id, match=True)
