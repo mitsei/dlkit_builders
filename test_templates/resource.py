@@ -1309,6 +1309,7 @@ class Resource:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/resource.py::Resource::init_template
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
@@ -1321,6 +1322,7 @@ class Resource:
 
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/resource.py::Resource::init_template
         for obj in cls.catalog.get_${object_name_under_plural}():
             cls.catalog.delete_${object_name_under}(obj.ident)
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
@@ -1551,6 +1553,7 @@ class ResourceList:
             self.${object_name_under}_list.append(obj)
             self.${object_name_under}_ids.append(obj.ident)
         self.${object_name_under}_list = ${interface_name}(self.${object_name_under}_list)
+        self.object = self.${object_name_under}_list
 
     @classmethod
     def tearDownClass(cls):
@@ -1584,19 +1587,75 @@ class ResourceNodeList:
 class Bin:
 
     import_statements_pattern = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
     init_template = """
-"""
+    @classmethod
+    def setUpClass(cls):
+        # From test_templates/resource.py::Bin::init_template
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+
+    def setUp(self):
+        # From test_templates/resource.py::Bin::init_template
+        form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+        form.display_name = 'for testing'
+        self.object = self.svc_mgr.create_${cat_name_under}(form)
+
+    def tearDown(self):
+        # From test_templates/resource.py::Bin::init_template
+        self.svc_mgr.delete_${cat_name_under}(self.object.ident)
+
+    @classmethod
+    def tearDownClass(cls):
+        # From test_templates/resource.py::Bin::init_template
+        pass"""
 
 
 class BinForm:
 
     import_statements_pattern = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
     ]
 
     init_template = """
-"""
+    @classmethod
+    def setUpClass(cls):
+        # From test_templates/resource.py::BinForm::init_template
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+
+    def setUp(self):
+        # From test_templates/resource.py::BinForm::init_template
+        self.object = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+
+    def tearDown(self):
+        # From test_templates/resource.py::BinForm::init_template
+        pass
+
+    @classmethod
+    def tearDownClass(cls):
+        # From test_templates/resource.py::BinForm::init_template
+        pass"""
+
+    get_bin_form_record = """
+        with self.assertRaises(errors.Unsupported):
+            self.object.${method_name}(DEFAULT_TYPE)"""
 
 
 class BinList:

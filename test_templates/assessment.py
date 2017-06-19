@@ -1379,6 +1379,9 @@ class Question:
         form.display_name = 'Test question'
         cls.question = cls.catalog.create_question(form)
 
+    def setUp(self):
+        self.object = self.question
+
     @classmethod
     def tearDownClass(cls):
         for obj in cls.catalog.get_items():
@@ -1491,6 +1494,9 @@ class Answer:
         form = cls.catalog.get_answer_form_for_create(cls.item.ident, [])
         form.display_name = 'Test answer'
         cls.answer = cls.catalog.create_answer(form)
+
+    def setUp(self):
+        self.object = self.answer
 
     @classmethod
     def tearDownClass(cls):
@@ -1627,6 +1633,7 @@ class Item:
         self.catalog.create_answer(form)
 
         self.item = self.catalog.get_item(self.item.ident)
+        self.object = self.item
 
     @classmethod
     def tearDownClass(cls):
@@ -2531,6 +2538,7 @@ class AssessmentSection:
                                                                  [])
         self.taken = self.catalog.create_assessment_taken(form)
         self.section = self.catalog.get_first_assessment_section(self.taken.ident)
+        self.object = self.section
 
     def tearDown(self):
         self.catalog.delete_assessment_taken(self.taken.ident)
@@ -2649,12 +2657,74 @@ class ResponseList:
     ]
 
     init = """
-"""
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ResponseList tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
 
-    get_next_response = """"""
+        create_form = cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
 
-    get_next_responses = """"""
+        for number in ['One', 'Two', 'Three', 'Four']:
+            ifc = cls.catalog.get_item_form_for_create([])
+            ifc.set_display_name('Test Assessment Item ' + number)
+            ifc.set_description('This is a Test Item Called Number ' + number)
+            test_item = cls.catalog.create_item(ifc)
+            form = cls.catalog.get_question_form_for_create(test_item.ident, [])
+            cls.catalog.create_question(form)
 
+            if number == 'One':
+                form = cls.catalog.get_answer_form_for_create(test_item.ident, [])
+                cls.catalog.create_answer(form)
+
+            cls.catalog.add_item(cls.assessment.ident, test_item.ident)
+
+        form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        cls.assessment_offered = cls.catalog.create_assessment_offered(form)
+
+    def setUp(self):
+        form = self.catalog.get_assessment_taken_form_for_create(self.assessment_offered.ident, [])
+        self.taken = self.catalog.create_assessment_taken(form)
+
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        for num in [0, 1]:
+            create_form = self.catalog.get_response_form(section.ident, first_question.ident)
+            self.catalog.submit_response(section.ident, first_question.ident, create_form)
+
+        self.response_list = self.catalog.get_responses(section.ident)
+        self.object = self.response_list
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
+            cls.catalog.delete_assessment(obj.ident)
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    get_next_response = """
+        from dlkit.abstract_osid.assessment.rules import Response
+        self.assertTrue(isinstance(self.response_list.get_next_response(), Response))"""
+
+    get_next_responses = """
+        from dlkit.abstract_osid.assessment.objects import ResponseList
+        from dlkit.abstract_osid.assessment.rules import Response
+        new_list = self.response_list.get_next_responses(2)
+        self.assertTrue(isinstance(new_list, ResponseList))
+        for item in new_list:
+            self.assertTrue(isinstance(item, Response))"""
 
 class BankQuery:
     match_ancestor_bank_id = """
@@ -2663,3 +2733,9 @@ class BankQuery:
         self.assertEqual(self.query._query_terms['_id'], {
             '$in': []
         })"""
+
+
+class BankForm:
+    get_bank_form_record = """
+        with self.assertRaises(errors.Unsupported):
+            self.object.get_bank_form_record(DEFAULT_TYPE)"""
