@@ -175,6 +175,14 @@ class GradeEntry:
             raise errors.IllegalState()
         return self._my_map['overriddenCalculatedEntryId']"""
 
+    get_grade = """
+        grade_system = self.get_gradebook_column().get_grade_system()
+
+        for grade in grade_system.get_grades():
+            if str(grade.ident) == self._my_map['gradeId']:
+                return grade
+        raise errors.IllegalState('gradeId does not exist in this GradeSystem')"""
+
 
 class GradeEntryForm:
 
