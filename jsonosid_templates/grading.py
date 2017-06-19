@@ -4,6 +4,7 @@ class GradeEntryAdminSession:
     import_statements = [
         'from dlkit.abstract_osid.id.primitives import Id as ABCId',
         'from dlkit.abstract_osid.type.primitives import Type as ABCType',
+        'from dlkit.primordium.calendaring.primitives import DateTime'
     ]
 
     get_grade_entry_form_for_create = """
@@ -61,6 +62,33 @@ class GradeEntryAdminSession:
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
+
+    create_grade_entry = """
+        collection = JSONClientValidated('grading',
+                                         collection='GradeEntry',
+                                         runtime=self._runtime)
+        if not isinstance(grade_entry_form, ABCGradeEntryForm):
+            raise errors.InvalidArgument('argument type is not an GradeEntryForm')
+        if grade_entry_form.is_for_update():
+            raise errors.InvalidArgument('the GradeEntryForm is for update only, not create')
+        try:
+            if self._forms[grade_entry_form.get_id().get_identifier()] == CREATED:
+                raise errors.IllegalState('grade_entry_form already used in a create transaction')
+        except KeyError:
+            raise errors.Unsupported('grade_entry_form did not originate from this session')
+        if not grade_entry_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+
+        grade_entry_form._my_map['timeGraded'] = DateTime.utcnow()
+        insert_result = collection.insert_one(grade_entry_form._my_map)
+
+        self._forms[grade_entry_form.get_id().get_identifier()] = CREATED
+        result = objects.GradeEntry(
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
+
+        return result"""
 
 
 class GradeSystem:
@@ -137,24 +165,28 @@ class GradeSystemForm:
 class GradeEntry:
 
     import_statements = [
+        'from dlkit.primordium.id.primitives import Id',
         'from ..resource.simple_agent import Agent',
     ]
 
     get_key_resource_id = """
-        return self._my_map['resourceId']"""
+        return Id(self._my_map['resourceId'])"""
+
+    get_key_resource = """
+        return Agent(self.get_key_resource_id())"""
 
     get_time_graded = """
         if not self.is_graded or self.is_derived():
             raise errors.IllegalState()
         time_graded = self._my_map['timeGraded']
         return DateTime(
-            time_graded['year'],
-            time_graded['month'],
-            time_graded['day'],
-            time_graded['hour'],
-            time_graded['minute'],
-            time_graded['second'],
-            time_graded['microsecond'])"""
+            year=time_graded.year,
+            month=time_graded.month,
+            day=time_graded.day,
+            hour=time_graded.hour,
+            minute=time_graded.minute,
+            second=time_graded.second,
+            microsecond=time_graded.microsecond)"""
 
     is_graded = """
         return bool(self._my_map['gradeId'] is not None or self._my_map['score'] is not None)"""
@@ -168,7 +200,7 @@ class GradeEntry:
         return Agent(self.get_grading_agent_id())"""
 
     overrides_calculated_entry = """
-        return bool(self._my_map('overriddenCalculatedEntryId'))"""
+        return bool(self._my_map['overriddenCalculatedEntryId'])"""
 
     get_overridden_calculated_entry_id = """
         if not self.overrides_calculated_entry():
