@@ -168,6 +168,13 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 if (template_class and
                         hasattr(template_class, imports)):
                     template_imports += getattr(template_class, imports)
+
+            # also apply the context here
+            context = self._get_init_context(interface_name, interface)
+            for index, import_str in enumerate(template_imports):
+                import_template = string.Template(import_str)
+                template_imports[index] = import_template.substitute(context)
+
             return template_imports
         return default
 
