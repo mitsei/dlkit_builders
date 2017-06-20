@@ -2,6 +2,7 @@
 class CommentLookupSession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import objects as ABCObjects',
         'from dlkit.runtime import PROXY_SESSION, proxy_example',
         'from dlkit.runtime.managers import Runtime',
         'REQUEST = proxy_example.SimpleRequest()',
@@ -17,6 +18,7 @@ class CommentLookupSession:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/commenting.py::CommentLookupSession::init_template
         cls.${object_name_under}_list = list()
         cls.${object_name_under}_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
@@ -32,8 +34,13 @@ class CommentLookupSession:
             cls.${object_name_under}_list.append(object)
             cls.${object_name_under}_ids.append(object.ident)
 
+    def setUp(self):
+        # From test_templates/commenting.py::CommentLookupSession::init_template
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/commenting.py::CommentLookupSession::init_template
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             for obj in catalog.get_${object_name_under_plural}():
                 catalog.delete_${object_name_under}(obj.ident)
@@ -137,6 +144,9 @@ class CommentQuerySession:
             cls.${object_name_under}_list.append(obj)
             cls.${object_name_under}_ids.append(obj.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
@@ -201,7 +211,8 @@ class CommentAdminSession:
 class Comment:
 
     import_statements = [
-        'from dlkit.primordium.id.primitives import Id'
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.locale.primitives import DisplayText'
     ]
 
     init = """
@@ -224,6 +235,22 @@ class Comment:
         for obj in cls.catalog.get_comments():
             cls.catalog.delete_comment(obj.ident)
         cls.svc_mgr.delete_book(cls.catalog.ident)"""
+
+    get_commenting_agent = """
+        # because the resource doesn't actually exist
+        with self.assertRaises(errors.OperationFailed):
+            self.object.get_commenting_agent()"""
+
+    get_commenting_agent_id = """
+        result = self.object.get_commenting_agent_id()
+        self.assertTrue(isinstance(result, Id))
+        self.assertEqual(str(result),
+                         str(self.catalog._proxy.get_effective_agent_id()))"""
+
+    get_text = """
+        result = self.object.get_text()
+        self.assertTrue(isinstance(result, DisplayText))
+        self.assertEqual(result.text, '')"""
 
 
 class CommentQuery:

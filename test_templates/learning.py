@@ -127,6 +127,9 @@ class ObjectiveHierarchyDesignSession:
             cls.child_list.append(obj)
             cls.child_ids.append(obj.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     def tearDown(cls):
         for catalog in cls.svc_mgr.get_objective_banks():
             for obj_id in cls.child_ids:
@@ -183,6 +186,9 @@ class ObjectiveHierarchySession:
             obj = cls.catalog.create_objective(create_form)
             cls.child_list.append(obj)
             cls.child_ids.append(obj.ident)
+
+    def setUp(self):
+        self.session = self.catalog
 
     @classmethod
     def tearDownClass(cls):
@@ -254,6 +260,40 @@ class ObjectiveNodeList:
             self.objective_node_list[0].ident,
             self.objective_node_list[1].ident)
         self.objective_node_list = ObjectiveNodeList(self.objective_node_list)
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_objectives():
+            cls.catalog.delete_objective(obj.ident)
+        cls.svc_mgr.delete_objective_bank(cls.catalog.ident)"""
+
+
+class ObjectiveNode:
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ObjectiveNode tests'
+        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
+
+    def setUp(self):
+        from dlkit.json_.learning.objects import ObjectiveNode
+        self.objective_node_list = list()
+        for num in [0, 1]:
+            create_form = self.catalog.get_objective_form_for_create([])
+            create_form.display_name = 'Test Objective ' + str(num)
+            create_form.description = 'Test Objective for ObjectiveNodeList tests'
+            obj = self.catalog.create_objective(create_form)
+            self.objective_node_list.append(ObjectiveNode(obj.object_map))
+        # Now put the objectives in a hierarchy
+        self.catalog.add_root_objective(self.objective_node_list[0].ident)
+        self.catalog.add_child_objective(
+            self.objective_node_list[0].ident,
+            self.objective_node_list[1].ident)
+        self.object = ObjectiveNode(self.objective_node_list[0])
 
     @classmethod
     def tearDownClass(cls):
@@ -417,6 +457,11 @@ class ActivityAdminSession:
 class Activity:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.assessment.objects import AssessmentList',
+        'from dlkit.abstract_osid.learning.objects import Objective',
+        'from dlkit.abstract_osid.repository.objects import AssetList',
+        'from dlkit.json_.id.objects import IdList',
+        'from dlkit.primordium.id.primitives import Id'
     ]
 
     init = """
@@ -444,21 +489,47 @@ class Activity:
         cls.catalog.delete_objective(cls.objective.ident)
         cls.svc_mgr.delete_objective_bank(cls.catalog.ident)"""
 
-    get_objective_id_template = """"""
+    get_assessment_ids = """
+        result = self.object.get_assessment_ids()
+        self.assertTrue(isinstance(result, IdList))
+        self.assertEqual(result.available(), 0)"""
 
-    get_objective_template = """"""
+    get_assessments = """
+        result = self.object.get_assessments()
+        self.assertTrue(isinstance(result, AssessmentList))
+        self.assertEqual(result.available(), 0)"""
 
-    is_asset_based_activity_template = """"""
+    get_asset_ids = """
+        result = self.object.get_asset_ids()
+        self.assertTrue(isinstance(result, IdList))
+        self.assertEqual(result.available(), 0)"""
 
-    get_asset_ids_template = """"""
+    get_assets = """
+        result = self.object.get_assets()
+        self.assertTrue(isinstance(result, AssetList))
+        self.assertEqual(result.available(), 0)"""
 
-    get_assets_template = """"""
+    get_course_ids = """
+        result = self.object.get_course_ids()
+        self.assertTrue(isinstance(result, IdList))
+        self.assertEqual(result.available(), 0)"""
 
-    is_assessment_based_activity = """"""
+    get_courses = """
+        # We don't have the course service yet
+        with self.assertRaises(errors.OperationFailed):
+            self.object.get_courses()"""
 
-    is_asset_based_activity = """"""
+    get_objective = """
+        result = self.object.get_objective()
+        self.assertTrue(isinstance(result, Objective))
+        self.assertEqual(str(result.ident),
+                         str(self.objective.ident))"""
 
-    is_course_based_activity = """"""
+    get_objective_id = """
+        result = self.object.get_objective_id()
+        self.assertTrue(isinstance(result, Id))
+        self.assertEqual(str(result),
+                         str(self.objective.ident))"""
 
 
 class ActivityForm:
@@ -663,6 +734,10 @@ class ProficiencyLookupSession:
 
 
 class ProficiencyForm:
+    import_statements = [
+        'from dlkit.primordium.id.primitives import Id'
+    ]
+
     init = """
     @classmethod
     def setUpClass(cls):
@@ -674,9 +749,11 @@ class ProficiencyForm:
 
         form = cls.catalog.get_objective_form_for_create([])
         form.display_name = "Test LO"
-        objective = cls.catalog.create_objective(form)
+        cls.objective = cls.catalog.create_objective(form)
 
-        cls.form = cls.catalog.get_proficiency_form_for_create(objective.ident, AGENT_ID, [])
+    def setUp(self):
+        self.form = self.catalog.get_proficiency_form_for_create(self.objective.ident, AGENT_ID, [])
+        self.object = self.form
 
     @classmethod
     def tearDownClass(cls):
@@ -686,6 +763,29 @@ class ProficiencyForm:
             for obj in catalog.get_objectives():
                 catalog.delete_objective(obj.ident)
             cls.svc_mgr.delete_objective_bank(catalog.ident)"""
+
+    clear_completion = """
+        self.form.set_completion(50.0)
+        self.assertIsNotNone(self.form._my_map['completion'])
+        self.form.clear_completion()
+        self.assertIsNone(self.form._my_map['completion'])"""
+
+    set_completion = """
+        self.assertIsNone(self.form._my_map['completion'])
+        self.form.set_completion(50.0)
+        self.assertIsNotNone(self.form._my_map['completion'])"""
+
+    clear_level = """
+        self.form.set_level(Id('grading.Grade%3Afake%40ODL.MIT.EDU'))
+        self.assertIsNotNone(self.form._my_map['level'])
+        self.form.clear_level()
+        self.assertEqual(self.form._my_map['level'], '')"""
+
+    set_level = """
+        # This is a slightly hokey test, because the spec seems to have a typo
+        self.assertEqual(self.form._my_map['levelId'], '')
+        self.form.set_level(Id('grading.Grade%3Afake%40ODL.MIT.EDU'))
+        self.assertIsNotNone(self.form._my_map['level'])"""
 
 
 class ProficiencyList:
@@ -730,6 +830,7 @@ class ProficiencyList:
 
 class Proficiency:
     import_statements = [
+        'from dlkit.abstract_osid.learning.objects import Objective',
         'from dlkit.runtime import PROXY_SESSION, proxy_example',
         'from dlkit.runtime.managers import Runtime',
         'REQUEST = proxy_example.SimpleRequest()',
@@ -767,6 +868,25 @@ class Proficiency:
             cls.catalog.delete_proficiency(obj.ident)
         cls.catalog.delete_objective(cls.objective.ident)
         cls.svc_mgr.delete_objective_bank(cls.catalog.ident)"""
+
+    get_completion = """
+        score = self.object.get_completion()
+        self.assertIsNone(score)
+
+        # if this is set, should be a Decimal
+        form = self.catalog.get_proficiency_form_for_create(self.objective.ident,
+                                                            AGENT_ID,
+                                                            [])
+        form.set_completion(0.0)
+        new_proficiency = self.catalog.create_proficiency(form)
+
+        self.assertEqual(new_proficiency.get_completion(), 0.0)"""
+
+    get_objective = """
+        result = self.object.get_objective()
+        self.assertTrue(isinstance(result, Objective))
+        self.assertEqual(str(result.ident),
+                         str(self.objective.ident))"""
 
 
 class ProficiencyQuery:

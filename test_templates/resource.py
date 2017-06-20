@@ -190,6 +190,7 @@ class ResourceLookupSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'DEFAULT_GENUS_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'GenusType\', \'authority\': \'ODL.MIT.EDU\'})',
         'from dlkit.primordium.id.primitives import Id',
         'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
@@ -224,6 +225,7 @@ class ResourceLookupSession:
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
 
     get_bin_id_template = """
+        # From test_templates/resource.py ResourceLookupSession.get_bin_id_template
         self.assertEqual(self.catalog.${method_name}(), self.catalog.ident)"""
 
     get_bin_template = """
@@ -232,18 +234,23 @@ class ResourceLookupSession:
         self.assertIsNotNone(self.catalog)"""
 
     can_lookup_resources_template = """
+        # From test_templates/resource.py ResourceLookupSession.can_lookup_resources_template
         self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
 
     use_comparative_resource_view_template = """
+        # From test_templates/resource.py ResourceLookupSession.use_comparative_resource_view_template
         self.catalog.${method_name}()"""
 
     use_plenary_resource_view_template = """
+        # From test_templates/resource.py ResourceLookupSession.use_plenary_resource_view_template
         self.catalog.${method_name}()"""
 
     use_federated_bin_view_template = """
+        # From test_templates/resource.py ResourceLookupSession.use_federated_bin_view_template
         self.catalog.${method_name}()"""
 
     use_isolated_bin_view_template = """
+        # From test_templates/resource.py ResourceLookupSession.use_isolated_bin_view_template
         self.catalog.${method_name}()"""
 
     get_resource_template = """
@@ -261,23 +268,29 @@ class ResourceLookupSession:
         objects = self.catalog.${method_name}(self.${object_name_under}_ids)
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}(self.${object_name_under}_ids)"""
+        objects = self.catalog.${method_name}(self.${object_name_under}_ids)
+        self.assertTrue(objects.available() > 0)
+        self.assertTrue(isinstance(objects, ${return_type}))"""
 
     get_resources_by_genus_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_genus_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        objects = self.catalog.${method_name}(DEFAULT_TYPE)
+        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}(DEFAULT_TYPE)"""
+        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
+        self.assertTrue(objects.available() > 0)
+        self.assertTrue(isinstance(objects, ${return_type}))"""
 
     get_resources_by_parent_genus_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_parent_genus_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        objects = self.catalog.${method_name}(DEFAULT_TYPE)
+        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}(DEFAULT_TYPE)"""
+        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
+        self.assertTrue(objects.available() == 0)
+        self.assertTrue(isinstance(objects, ${return_type}))"""
 
     get_resources_by_record_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_record_type_template
@@ -285,7 +298,9 @@ class ResourceLookupSession:
         objects = self.catalog.${method_name}(DEFAULT_TYPE)
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}(DEFAULT_TYPE)"""
+        objects = self.catalog.${method_name}(DEFAULT_TYPE)
+        self.assertTrue(objects.available() == 0)
+        self.assertTrue(isinstance(objects, ${return_type}))"""
 
     get_resources_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_template
@@ -294,6 +309,8 @@ class ResourceLookupSession:
         self.assertTrue(isinstance(objects, ${return_type}))
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}()
+        self.assertTrue(objects.available() > 0)
+        self.assertTrue(isinstance(objects, ${return_type}))
 
     def test_get_${object_name_under}_with_alias(self):
         self.catalog.alias_${object_name_under}(self.${object_name_under}_ids[0], ALIAS_ID)
@@ -396,15 +413,18 @@ class ResourceAdminSession:
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
 
-        form = cls.catalog.get_${object_name_under}_form_for_create([])
+    def setUp(self):
+        # From test_templates/resource.py::ResourceAdminSession::init_template
+        form = self.catalog.get_${object_name_under}_form_for_create([])
         form.display_name = 'new ${object_name}'
         form.description = 'description of ${object_name}'
         form.set_genus_type(NEW_TYPE)
-        cls.osid_object = cls.catalog.create_${object_name_under}(form)
-
-    def setUp(self):
-        # From test_templates/resource.py::ResourceAdminSession::init_template
+        self.osid_object = self.catalog.create_${object_name_under}(form)
         self.session = self.catalog
+
+    def tearDown(self):
+        # From test_templates/resource.py::ResourceAdminSession::init_template
+        self.catalog.delete_${object_name_under}(self.osid_object.ident)
 
     @classmethod
     def tearDownClass(cls):

@@ -223,6 +223,9 @@ class GradebookColumnLookupSession:
             cls.grade_entry_list.append(object)
             cls.grade_entry_ids.append(object.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_gradebooks():
@@ -292,6 +295,9 @@ class GradeEntryLookupSession:
             cls.grade_entry_list.append(object)
             cls.grade_entry_ids.append(object.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_gradebooks():
@@ -302,6 +308,23 @@ class GradeEntryLookupSession:
             for obj in catalog.get_grade_systems():
                 catalog.delete_grade_system(obj.ident)
             cls.svc_mgr.delete_gradebook(catalog.ident)"""
+
+    get_grade_entries_for_gradebook_column_on_date = """
+        end_date = DateTime.utcnow() + datetime.timedelta(days=5)
+        end_date = DateTime(**{
+            'year': end_date.year,
+            'month': end_date.month,
+            'day': end_date.day,
+            'hour': end_date.hour,
+            'minute': end_date.minute,
+            'second': end_date.second,
+            'microsecond': end_date.microsecond
+        })
+        results = self.session.get_grade_entries_for_gradebook_column_on_date(self.gradebook_column_ids[0],
+                                                                              DateTime.utcnow(),
+                                                                              end_date)
+        self.assertTrue(isinstance(results, ABCObjects.GradeEntryList))
+        self.assertEqual(results.available(), 1)"""
 
 
 class GradeEntryQuerySession:
@@ -333,6 +356,9 @@ class GradeEntryQuerySession:
             obj = cls.catalog.create_grade_entry(create_form)
             cls.grade_entry_list.append(obj)
             cls.grade_entry_ids.append(obj.ident)
+
+    def setUp(self):
+        self.session = self.catalog
 
     @classmethod
     def tearDownClass(cls):
@@ -1020,6 +1046,9 @@ class GradeEntryAdminSession:
         create_form.genus_type = NEW_TYPE
         cls.osid_object = cls.catalog.create_grade_entry(create_form)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for obj in cls.catalog.get_grade_entries():
@@ -1068,3 +1097,152 @@ class GradebookQuery:
     @classmethod
     def tearDownClass(cls):
         cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+
+
+class GradebookHierarchySession:
+    init = """
+    # Override this because spec doesn't have a method ``remove_child_gradebooks``
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
+        cls.catalogs = dict()
+        for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
+            create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+            create_form.display_name = name
+            create_form.description = 'Test Gradebook ' + name
+            cls.catalogs[name] = cls.svc_mgr.create_gradebook(create_form)
+        cls.svc_mgr.add_root_gradebook(cls.catalogs['Root'].ident)
+        cls.svc_mgr.add_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
+        cls.svc_mgr.add_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
+        cls.svc_mgr.add_child_gradebook(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+
+    def setUp(self):
+        self.session = self.svc_mgr
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
+        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
+        cls.svc_mgr.remove_root_gradebook(cls.catalogs['Root'].ident)
+        for cat_name in cls.catalogs:
+            cls.svc_mgr.delete_gradebook(cls.catalogs[cat_name].ident)"""
+
+
+class GradebookHierarchyDesignSession:
+    init = """
+    # Override this because spec doesn't have a method ``remove_child_gradebooks``
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
+        cls.catalogs = dict()
+        for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
+            create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+            create_form.display_name = name
+            create_form.description = 'Test Gradebook ' + name
+            cls.catalogs[name] = cls.svc_mgr.create_gradebook(create_form)
+        cls.svc_mgr.add_root_gradebook(cls.catalogs['Root'].ident)
+        cls.svc_mgr.add_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
+        cls.svc_mgr.add_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
+        cls.svc_mgr.add_child_gradebook(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+
+    def setUp(self):
+        self.session = self.svc_mgr
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
+        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
+        cls.svc_mgr.remove_root_gradebook(cls.catalogs['Root'].ident)
+        for cat_name in cls.catalogs:
+            cls.svc_mgr.delete_gradebook(cls.catalogs[cat_name].ident)"""
+
+
+class GradeSystemAdminSession:
+    import_statements = [
+        'from dlkit.abstract_osid.grading.objects import Grade',
+        'from dlkit.abstract_osid.osid.objects import OsidForm'
+    ]
+
+    can_create_grade_with_record_types = """
+        self.assertTrue(
+            isinstance(self.session.can_create_grade_with_record_types(self.osid_object.ident,
+                                                                       DEFAULT_TYPE),
+                       bool))"""
+
+    can_create_grades = """
+        self.assertTrue(
+            isinstance(self.session.can_create_grades(self.osid_object.ident),
+                       bool))"""
+
+    can_delete_grades = """
+        self.assertTrue(
+            isinstance(self.session.can_delete_grades(self.osid_object.ident),
+                       bool))"""
+
+    create_grade = """
+        self.assertEqual(self.osid_object.get_grades().available(), 0)
+        form = self.session.get_grade_form_for_create(
+            self.osid_object.ident,
+            [])
+        form.display_name = 'Test object'
+        grade = self.session.create_grade(form)
+        self.assertTrue(isinstance(grade, Grade))
+        self.assertEqual(grade.display_name.text, 'Test object')
+
+        updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
+        self.assertEqual(updated_grade_system.get_grades().available(), 1)"""
+
+    delete_grade = """
+        form = self.session.get_grade_form_for_create(
+            self.osid_object.ident,
+            [])
+        form.display_name = 'Test object'
+        grade = self.session.create_grade(form)
+        self.assertTrue(isinstance(grade, Grade))
+        self.assertEqual(grade.display_name.text, 'Test object')
+
+        updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
+        self.assertEqual(updated_grade_system.get_grades().available(), 1)
+
+        self.session.delete_grade(grade.ident)
+
+        updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
+        self.assertEqual(updated_grade_system.get_grades().available(), 0)"""
+
+    get_grade_form_for_create = """
+        form = self.session.get_grade_form_for_create(
+            self.osid_object.ident,
+            [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
+
+    get_grade_form_for_update = """
+        form = self.session.get_grade_form_for_create(
+            self.osid_object.ident,
+            [])
+        grade = self.session.create_grade(form)
+        form = self.session.get_grade_form_for_update(grade.ident)
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertTrue(form.is_for_update())"""
+
+    update_grade = """
+        self.assertEqual(self.osid_object.get_grades().available(), 0)
+        form = self.session.get_grade_form_for_create(
+            self.osid_object.ident,
+            [])
+        form.display_name = 'Test object'
+        grade = self.session.create_grade(form)
+        self.assertTrue(isinstance(grade, Grade))
+        self.assertEqual(grade.display_name.text, 'Test object')
+
+        form = self.session.get_grade_form_for_update(grade.ident)
+        form.display_name = 'new name'
+        grade = self.session.update_grade(form)
+
+        self.assertTrue(isinstance(grade, Grade))
+        self.assertEqual(grade.display_name.text, 'new name')
+
+        updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
+        self.assertEqual(updated_grade_system.get_grades().available(), 1)"""
