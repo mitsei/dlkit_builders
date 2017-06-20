@@ -39,7 +39,7 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
 
         if impl == '':
             test_object = remove_plural(interface['category'])
-            if is_search():
+            if is_search() or 'VaultNode' in interface['shortname']:
                 # We don't have any search stuff implemented yet
                 impl = '{0}pass'.format(self._dind)
             elif (len(method['args']) > 0 and

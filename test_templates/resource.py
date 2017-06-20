@@ -810,6 +810,7 @@ class ResourceAgentAssignmentSession:
 class BinLookupSession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import objects as ABCObjects',
         'from dlkit.runtime import PROXY_SESSION, proxy_example',
         'from dlkit.runtime.managers import Runtime',
         'REQUEST = proxy_example.SimpleRequest()',
