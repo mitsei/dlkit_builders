@@ -486,13 +486,24 @@ class AssessmentPart:
         return session"""
 
     get_assessment_part = """
+        if not self.has_parent_part():
+            raise errors.IllegalState('no parent part')
         lookup_session = self._get_assessment_part_lookup_session()
         return lookup_session.get_assessment_part(self.get_assessment_part_id())"""
 
+    get_assessment_part_id = """
+        if not self.has_parent_part():
+            raise errors.IllegalState('no parent part')
+        return Id(self._my_map['assessmentPartId'])"""
+
     get_child_assessment_part_ids = """
+        if not self.has_children():
+            raise errors.IllegalState('no children assessment parts')
         return IdList(self._my_map['childIds'])"""
 
     get_child_assessment_parts = """
+        if not self.has_children():
+            raise errors.IllegalState('no children assessment parts')
         # only returned unsequestered children?
         lookup_session = self._get_assessment_part_lookup_session()
         lookup_session.use_sequestered_assessment_part_view()
