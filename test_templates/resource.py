@@ -1328,8 +1328,7 @@ class Resource:
 
     is_group_template = """
         # From test_templates/resources.py::Resource::is_group_template
-        self.assertTrue(isinstance(self.object.${method_name}(), bool))
-        self.assertFalse(self.object.${method_name}())"""
+        self.assertTrue(isinstance(self.object.${method_name}(), bool))"""
 
     is_demographic = """
         with self.assertRaises(AttributeError):
@@ -1337,8 +1336,7 @@ class Resource:
 
     has_avatar_template = """
         # From test_templates/resources.py::Resource::has_avatar_template
-        self.assertTrue(isinstance(self.object.${method_name}(), bool))
-        self.assertFalse(self.object.${method_name}())"""
+        self.assertTrue(isinstance(self.object.${method_name}(), bool))"""
 
     get_avatar_id_template = """
         # From test_templates/resources.py::Resource::get_avatar_id_template
@@ -1349,8 +1347,6 @@ class Resource:
         # From test_templates/resources.py::Resource::get_avatar_template
         self.assertRaises(errors.IllegalState,
                           self.object.${method_name})"""
-
-    get_resource_record_template = """"""
 
 
 class ResourceQuery:
@@ -1689,7 +1685,7 @@ class BinForm:
 
     get_bin_form_record = """
         with self.assertRaises(errors.Unsupported):
-            self.object.${method_name}(DEFAULT_TYPE)"""
+            self.object.get_bin_form_record(DEFAULT_TYPE)"""
 
 
 class BinList:

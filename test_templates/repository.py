@@ -56,17 +56,25 @@ class CompositionLookupSession:
                 catalog.delete_${object_name_under}(obj.ident)
             cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
 
-    use_active_composition_view = """
-        self.catalog.use_active_composition_view()"""
+    use_active_composition_view_template = """
+        # From test_templates/repository.py::CompositionLookupSession::use_active_composition_view_template
+        # Ideally also verify the value is set...
+        self.catalog.${method_name}()"""
 
-    use_any_status_composition_view = """
-        self.catalog.use_any_status_composition_view()"""
+    use_any_status_composition_view_template = """
+        # From test_templates/repository.py::CompositionLookupSession::use_any_status_composition_view_template
+        # Ideally also verify the value is set...
+        self.catalog.${method_name}()"""
 
-    use_sequestered_composition_view = """
-        self.catalog.use_sequestered_composition_view()"""
+    use_sequestered_composition_view_template = """
+        # From test_templates/repository.py::CompositionLookupSession::use_sequestered_composition_view
+        # Ideally also verify the value is set...
+        self.catalog.${method_name}()"""
 
-    use_unsequestered_composition_view = """
-        self.catalog.use_unsequestered_composition_view()"""
+    use_unsequestered_composition_view_template = """
+        # From test_templates/repository.py::CompositionLookupSession::use_unsequestered_composition_view
+        # Ideally also verify the value is set...
+        self.catalog.${method_name}()"""
 
     get_composition = """
         self.catalog.use_isolated_repository_view()
@@ -78,8 +86,7 @@ class CompositionLookupSession:
         self.catalog.use_sequestered_composition_view()
         obj = self.catalog.get_composition(self.composition_list[1].ident)
         with self.assertRaises(errors.NotFound):
-            obj = self.catalog.get_composition(self.composition_list[3].ident)
-"""
+            obj = self.catalog.get_composition(self.composition_list[3].ident)"""
 
     get_compositions = """
         from dlkit.abstract_osid.repository.objects import CompositionList
