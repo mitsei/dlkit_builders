@@ -887,7 +887,6 @@ class BinLookupSession:
         self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
 
 
-
 class BinAdminSession:
 
     import_statements_pattern = [
