@@ -330,50 +330,9 @@ class AssessmentPartAdminSession:
             apls.use_unsequestered_assessment_part_view()
             apls.use_federated_bank_view()
             part = apls.get_assessment_part(assessment_part_id)
-
-            # TODO: also remove this from the parent childIds list, if applicable
-
             part.delete()
         except AttributeError:
             collection.delete_one({'_id': ObjectId(assessment_part_id.get_identifier())})"""
-
-    create_assessment_part_for_assessment_part = """
-        # Override the template because we want to also update the parent's "childIds"
-        #   list...
-        collection = JSONClientValidated('assessment_authoring',
-                                         collection='AssessmentPart',
-                                         runtime=self._runtime)
-        if not isinstance(assessment_part_form, ABCAssessmentPartForm):
-            raise errors.InvalidArgument('argument type is not an AssessmentPartForm')
-        if assessment_part_form.is_for_update():
-            raise errors.InvalidArgument('the AssessmentPartForm is for update only, not create')
-        try:
-            if self._forms[assessment_part_form.get_id().get_identifier()] == CREATED:
-                raise errors.IllegalState('assessment_part_form already used in a create transaction')
-        except KeyError:
-            raise errors.Unsupported('assessment_part_form did not originate from this session')
-        if not assessment_part_form.is_valid():
-            raise errors.InvalidArgument('one or more of the form elements is invalid')
-        insert_result = collection.insert_one(assessment_part_form._my_map)
-
-        self._forms[assessment_part_form.get_id().get_identifier()] = CREATED
-        result = objects.AssessmentPart(
-            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime,
-            proxy=self._proxy)
-
-        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
-        lookup_session = mgr.get_assessment_part_lookup_session_for_bank(self._catalog_id, proxy=self._proxy)
-        parent_part = lookup_session.get_assessment_part(Id(result['assessmentPartId']))
-        current_child_ids = list(parent_part.get_child_ids())
-        current_child_ids.append(result.ident)
-
-        admin_session = mgr.get_assessment_part_admin_session(proxy=self._proxy)
-        parent_update_form = admin_session.get_assessment_part_form_for_update(parent_part.ident)
-        parent_update_form.set_children(current_child_ids)
-        admin_session.update_assessment_part(parent_update_form)
-
-        return result"""
 
 
 class AssessmentPartItemSession:
@@ -772,3 +731,40 @@ class SequenceRuleQuery:
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
         osid_queries.OsidRuleQuery.__init__(self, runtime)"""
+
+
+class SequenceRuleLookupSession:
+    get_sequence_rules_for_assessment = """
+        # First, recursively get all the partIds for the assessment
+        def get_all_children_part_ids(part):
+            child_ids = []
+            if part.has_children():
+                child_ids = list(part.get_child_assessment_part_ids())
+                for child in part.get_child_assessment_parts():
+                    child_ids += get_all_children_part_ids(child)
+            return child_ids
+
+        all_assessment_part_ids = []
+
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = mgr.get_assessment_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
+        assessment = lookup_session.get_assessment(assessment_id)
+
+        if assessment.has_children():
+            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+            lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+            lookup_session.use_federated_bank_view()
+            all_assessment_part_ids = list(assessment.get_child_ids())
+            for child_part_id in assessment.get_child_ids():
+                child_part = lookup_session.get_assessment_part(child_part_id)
+                all_assessment_part_ids += get_all_children_part_ids(child_part)
+
+        id_strs = [str(part_id) for part_id in all_assessment_part_ids]
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='SequenceRule',
+                                         runtime=self._runtime)
+        result = collection.find(
+            dict({'assessmentPartId': {'$in': id_strs}},
+                 **self._view_filter()))
+        return objects.SequenceRuleList(result, runtime=self._runtime)"""
