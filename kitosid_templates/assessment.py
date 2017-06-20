@@ -62,6 +62,14 @@ class AssessmentAuthoringManager:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_admin_session_for_bank(*args, **kwargs)"""
 
+    get_assessment_part_item_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session(*args, **kwargs)"""
+
+    get_assessment_part_item_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session_for_bank(*args, **kwargs)"""
+
 
 class AssessmentAuthoringProxyManager:
     get_sequence_rule_lookup_session = """
@@ -103,6 +111,14 @@ class AssessmentAuthoringProxyManager:
     get_sequence_rule_admin_session_for_bank = """
         \"\"\"Pass through to provider method\"\"\"
         return AssessmentManager.get_sequence_rule_admin_session_for_bank(*args, **kwargs)"""
+
+    get_assessment_part_item_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_item_session(*args, **kwargs)"""
+
+    get_assessment_part_item_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_item_session_for_bank(*args, **kwargs)"""
 
 
 class AssessmentAuthoringProfile:
@@ -474,6 +490,12 @@ class AssessmentPartItemSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_item_session').get_assessment_part_items(*args, **kwargs)"""
 
+    can_access_assessment_part_items = """
+        \"\"\"Pass through to provider method\"\"\"
+        # Note: this method is different from the underlying signature
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_item_session').can_access_assessment_part_items()"""
+
 
 class AssessmentPartItemDesignSession:
     import_statements = [
@@ -620,6 +642,11 @@ class SequenceRuleLookupSession:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'sequence_rule_lookup_session').get_sequence_rules()"""
+
+    get_sequence_rules_for_assessment = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_lookup_session').get_sequence_rules_for_assessment(*args, **kwargs)"""
 
 
 class Bank:
