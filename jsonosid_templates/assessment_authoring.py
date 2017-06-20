@@ -330,9 +330,50 @@ class AssessmentPartAdminSession:
             apls.use_unsequestered_assessment_part_view()
             apls.use_federated_bank_view()
             part = apls.get_assessment_part(assessment_part_id)
+
+            # TODO: also remove this from the parent childIds list, if applicable
+
             part.delete()
         except AttributeError:
             collection.delete_one({'_id': ObjectId(assessment_part_id.get_identifier())})"""
+
+    create_assessment_part_for_assessment_part = """
+        # Override the template because we want to also update the parent's "childIds"
+        #   list...
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='AssessmentPart',
+                                         runtime=self._runtime)
+        if not isinstance(assessment_part_form, ABCAssessmentPartForm):
+            raise errors.InvalidArgument('argument type is not an AssessmentPartForm')
+        if assessment_part_form.is_for_update():
+            raise errors.InvalidArgument('the AssessmentPartForm is for update only, not create')
+        try:
+            if self._forms[assessment_part_form.get_id().get_identifier()] == CREATED:
+                raise errors.IllegalState('assessment_part_form already used in a create transaction')
+        except KeyError:
+            raise errors.Unsupported('assessment_part_form did not originate from this session')
+        if not assessment_part_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        insert_result = collection.insert_one(assessment_part_form._my_map)
+
+        self._forms[assessment_part_form.get_id().get_identifier()] = CREATED
+        result = objects.AssessmentPart(
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
+
+        mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+        lookup_session = mgr.get_assessment_part_lookup_session_for_bank(self._catalog_id, proxy=self._proxy)
+        parent_part = lookup_session.get_assessment_part(Id(result['assessmentPartId']))
+        current_child_ids = list(parent_part.get_child_ids())
+        current_child_ids.append(result.ident)
+
+        admin_session = mgr.get_assessment_part_admin_session(proxy=self._proxy)
+        parent_update_form = admin_session.get_assessment_part_form_for_update(parent_part.ident)
+        parent_update_form.set_children(current_child_ids)
+        admin_session.update_assessment_part(parent_update_form)
+
+        return result"""
 
 
 class AssessmentPartItemSession:
@@ -687,7 +728,11 @@ class SequenceRuleForm:
         self._my_map['minimumScore'] = self._minimum_score_default
         self._my_map['maximumScore'] = self._maximum_score_default
         self._my_map['assessmentPartId'] = str(kwargs['assessment_part_id'])
-        self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]"""
+        self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]
+        self._my_map['appliedAssessmentPartIds'] = []"""
+
+    get_applied_assessment_parts_metadata = """
+        raise errors.Unimplemented()"""
 
 
 class SequenceRuleAdminSession:
