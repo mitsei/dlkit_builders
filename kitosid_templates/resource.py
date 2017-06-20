@@ -1154,14 +1154,6 @@ class Bin:
         \"\"\"Strange little method to assure conformance for inherited Sessions."\"\"
         return self
 
-    def get_objective_hierarchy_id(self):
-        \"\"\"WHAT am I doing here?\"\"\"
-        return self._catalog_id
-
-    def get_objective_hierarchy(self):
-        \"\"\"WHAT am I doing here?\"\"\"
-        return self
-
     def __getattr__(self, name):
         if '_catalog' in self.__dict__:
             try:

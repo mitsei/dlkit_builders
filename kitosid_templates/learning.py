@@ -121,3 +121,11 @@ class ObjectiveRequisiteAssignmentSession:
         # Implemented from kitosid template for -
         # osid.learning.ObjectiveRequisiteAssignmentSession.unassign_equivalent_objective
         return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+
+
+class ObjectiveHierarchySession:
+    get_objective_hierarchy = """
+        return self._get_provider_session('objective_hierarchy_session').get_objective_hierarchy()"""
+
+    get_objective_hierarchy_id = """
+        return self._get_provider_session('objective_hierarchy_session').get_objective_hierarchy_id()"""

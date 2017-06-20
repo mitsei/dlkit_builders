@@ -389,6 +389,13 @@ class ProficiencyForm:
             raise errors.InvalidArgument()
         self._my_map['levelId'] = str(grade_id)"""
 
+    clear_level = """
+        if (self.get_level_metadata().is_read_only() or
+                self.get_level_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['levelId'] = self._level_default
+        self._my_map['level'] = self._level_default"""
+
 
 class ProficiencyQuery:
     init = """
