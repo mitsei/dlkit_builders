@@ -64,7 +64,7 @@ class GradeEntryAdminSession:
 
 
 class GradeSystem:
-    import_statements = [
+    import_statements_pattern = [
         'from decimal import Decimal',
     ]
 
