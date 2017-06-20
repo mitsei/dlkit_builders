@@ -2822,6 +2822,7 @@ class ResponseList:
         for item in new_list:
             self.assertTrue(isinstance(item, Response))"""
 
+
 class BankQuery:
     match_ancestor_bank_id = """
         self.assertNotIn('_id', self.query._query_terms)
