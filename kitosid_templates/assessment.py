@@ -519,6 +519,11 @@ class AssessmentPartLookupSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_lookup_session').get_assessment_parts()"""
 
+    get_assessment_parts_for_assessment = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts_for_assessment(*args, **kwargs)"""
+
     can_lookup_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
