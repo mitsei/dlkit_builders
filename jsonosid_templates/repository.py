@@ -1140,6 +1140,8 @@ class AssetContent:
         return self._my_map['${var_name_mixed}']"""
 
     get_data = """
+        if not bool(self._my_map['data']):
+            raise errors.IllegalState('no data')
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
@@ -1190,7 +1192,9 @@ class AssetContentForm:
 
     set_data = """
         if data is None:
-            raise errors.NullArgument()
+            raise errors.NullArgument('data cannot be None')
+        if not isinstance(data, DataInputStream):
+            raise errors.InvalidArgument('data must be instance of DataInputStream')
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
@@ -1203,7 +1207,7 @@ class AssetContentForm:
                 self.get_data_metadata().is_required()):
             raise errors.NoAccess()
         if self._my_map['data'] == self._data_default:
-            pass
+            return
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
