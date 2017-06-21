@@ -190,7 +190,7 @@ class ResourceLookupSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
-        'DEFAULT_GENUS_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'GenusType\', \'authority\': \'ODL.MIT.EDU\'})',
+        'DEFAULT_GENUS_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'GenusType\', \'authority\': \'DLKIT.MIT.EDU\'})',
         'from dlkit.primordium.id.primitives import Id',
         'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
@@ -576,7 +576,7 @@ class ResourceBinSession:
     can_lookup_resource_bin_mappings_template = """
         # From test_templates/resource.py::ResourceBinSession::can_lookup_resource_bin_mappings
         result = self.session.${method_name}()
-        self.assertTrue(result)"""
+        self.assertTrue(isinstance(result, bool))"""
 
     get_resource_ids_by_bin_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bin_template
@@ -678,7 +678,7 @@ class ResourceBinAssignmentSession:
         self.session.${method_name}(self.${object_name_under}_ids[1], self.assigned_catalog.ident)
         results = self.assigned_catalog.get_${object_name_plural_under}()
         self.assertEqual(results.available(), 1)
-        self.session.unassign_${object_name_under}_from_${cat_name_lower}(
+        self.session.unassign_${object_name_under}_from_${cat_name_under}(
             self.${object_name_under}_ids[1],
             self.assigned_catalog.ident)"""
 
@@ -686,7 +686,7 @@ class ResourceBinAssignmentSession:
         # From test_templates/resource.py::ResourceBinAssignmentSession::unassign_resource_from_bin_template
         results = self.assigned_catalog.get_${object_name_plural_under}()
         self.assertEqual(results.available(), 0)
-        self.session.assign_${object_name_under}_to_${cat_name_lower}(
+        self.session.assign_${object_name_under}_to_${cat_name_under}(
             self.${object_name_under}_ids[1],
             self.assigned_catalog.ident)
         results = self.assigned_catalog.get_${object_name_plural_under}()
