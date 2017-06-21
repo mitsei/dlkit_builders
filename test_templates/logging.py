@@ -19,36 +19,45 @@ class LoggingSession:
         create_form.description = 'Test Log for LogAdminSession deletion test'
         cls.catalog_to_delete = cls.svc_mgr.create_log(create_form)
 
+    def setUp(self):
+        self.session = self.svc_mgr
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_logs():
             cls.svc_mgr.delete_log(catalog.ident)"""
 
     can_log = """
-        pass"""
-
-    log = """
-        pass"""
-
-    get_log_id = """
-        pass"""
+        self.assertTrue(isinstance(self.session.can_log(), bool))"""
 
 
 class LogEntry:
 
-    import_statements_pattern = [
+    import_statements = [
     ]
 
     get_priority_template = """
         pass"""
 
-    get_agent = """"""
+    get_agent = """
+        # because we don't have Agency implemented in authentication
+        with self.assertRaises(AttributeError):
+            self.object.get_agent()"""
 
-    get_agent_id = """"""
+    get_agent_id = """
+        result = self.object.get_agent_id()
+        self.assertTrue(isinstance(result, Id))
+        self.assertEqual(str(result),
+                         str(self.catalog._proxy.get_effective_agent_id()))"""
 
-    get_resource = """"""
+    get_resource = """
+        with self.assertRaises(errors.Unimplemented):
+            self.object.get_resource()"""
 
-    get_resource_id = """"""
+    get_resource_id = """
+        with self.assertRaises(errors.Unimplemented):
+            self.object.get_resource_id()"""
+
 
 
 class LogEntryForm:

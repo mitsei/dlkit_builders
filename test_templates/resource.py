@@ -1100,7 +1100,7 @@ class BinHierarchySession:
 
     get_parent_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::get_parent_bins_template
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
         self.assertTrue(isinstance(catalog_list, ${return_type}))
         self.assertEqual(catalog_list.available(), 1)
@@ -1127,6 +1127,7 @@ class BinHierarchySession:
         #     self.catalogs['Root'].ident))"""
 
     has_child_bins_template = """
+        # From test_templates/resource.py::BinHierarchySession::has_child_bins_template
         self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool))
         self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Root'].ident))
         self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident))
@@ -1134,19 +1135,22 @@ class BinHierarchySession:
         self.assertFalse(self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident))"""
 
     is_child_of_bin_template = """
+        # From test_templates/resource.py::BinHierarchySession::is_child_of_bin_template
         self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident), bool))
         self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident))
         self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident, self.catalogs['Child 1'].ident))
         self.assertFalse(self.svc_mgr.${method_name}(self.catalogs['Root'].ident, self.catalogs['Child 1'].ident))"""
 
     get_child_bin_ids_template = """
+        # From test_templates/resource.py::BinHierarchySession::get_child_bin_ids_template
         from dlkit.abstract_osid.id.objects import ${return_type}
         catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
         self.assertTrue(isinstance(catalog_list, ${return_type}))
         self.assertEqual(catalog_list.available(), 1)"""
 
     get_child_bins_template = """
-        from dlkit.abstract_osid.${package_name_replace}.objects import ${return_type}
+        # From test_templates/resource.py::BinHierarchySession::get_child_bins_template
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
         self.assertTrue(isinstance(catalog_list, ${return_type}))
         self.assertEqual(catalog_list.available(), 1)
