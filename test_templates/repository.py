@@ -13,15 +13,82 @@ class RepositoryProfile:
 class AssetAdminSession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import objects as ABCObjects',
     ]
 
-    create_asset_content_template = """"""
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_repository_form_for_create([])
+        create_form.display_name = 'Test Repository'
+        create_form.description = 'Test Repository for AssetAdminSession tests'
+        cls.catalog = cls.svc_mgr.create_repository(create_form)
 
-    get_asset_content_form_for_update_template = """"""
+    def setUp(self):
+        form = self.catalog.get_asset_form_for_create([])
+        form.display_name = 'new Asset'
+        form.description = 'description of Asset'
+        form.set_genus_type(NEW_TYPE)
+        self.osid_object = self.catalog.create_asset(form)
+        self.parent_object = self.osid_object
+        self.session = self.catalog
 
-    update_asset_content_template = """"""
+    def tearDown(self):
+        self.catalog.delete_asset(self.osid_object.ident)
 
-    delete_asset_content_template = """"""
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assets():
+            cls.catalog.delete_asset(obj.ident)
+        cls.svc_mgr.delete_repository(cls.catalog.ident)"""
+
+    create_asset_content_template = """
+        results = self.parent_object.get_${aggregated_objects_name_under}()
+        self.assertTrue(isinstance(results, ABCObjects.${aggregated_object_name}List))
+        self.assertEqual(results.available(), 0)
+
+        form = self.catalog.get_${aggregated_object_name_under}_form_for_create(self.parent_object.ident, [])
+        result = self.catalog.${method_name}(form)
+        self.assertTrue(isinstance(result, ABCObjects.${aggregated_object_name}))
+
+        updated_parent = self.catalog.get_${object_name_under}(self.parent_object.ident)
+        results = updated_parent.get_${aggregated_objects_name_under}()
+        self.assertEqual(results.available(), 1)"""
+
+    get_asset_content_form_for_update_template = """
+        form = self.catalog.get_${aggregated_object_name_under}_form_for_create(self.parent_object.ident, [])
+        new_aggregated_object = self.catalog.create_${aggregated_object_name_under}(form)
+
+        form = self.catalog.${method_name}(new_aggregated_object.ident)
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertTrue(form.is_for_update())"""
+
+    update_asset_content_template = """
+        form = self.catalog.get_${aggregated_object_name_under}_form_for_create(self.parent_object.ident, [])
+        form.display_name = 'old name'
+        new_aggregated_object = self.catalog.create_${aggregated_object_name_under}(form)
+
+        self.assertEqual(new_aggregated_object.display_name.text, 'old name')
+
+        form = self.catalog.get_${aggregated_object_name_under}_form_for_update(new_aggregated_object.ident)
+        form.display_name = 'new name'
+        result = self.catalog.${method_name}(form)
+        self.assertTrue(isinstance(result, ABCObjects.${aggregated_object_name}))
+        self.assertEqual(result.display_name.text, 'new name')"""
+
+    delete_asset_content_template = """
+        form = self.catalog.get_${aggregated_object_name_under}_form_for_create(self.parent_object.ident, [])
+        result = self.catalog.create_${aggregated_object_name_under}(form)
+
+        updated_parent = self.catalog.get_${object_name_under}(self.parent_object.ident)
+        results = updated_parent.get_${aggregated_objects_name_under}()
+        self.assertEqual(results.available(), 1)
+
+        self.catalog.${method_name}(result.ident)
+
+        results = self.parent_object.get_${aggregated_objects_name_under}()
+        self.assertEqual(results.available(), 0)"""
 
 
 class CompositionLookupSession:
@@ -31,6 +98,7 @@ class CompositionLookupSession:
     init_template = """
     @classmethod
     def setUpClass(cls):
+        # From test_templates/repository.py::CompositionLookupSession::init_template
         cls.${object_name_under}_list = list()
         cls.${object_name_under}_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
@@ -48,8 +116,13 @@ class CompositionLookupSession:
             cls.${object_name_under}_list.append(obj)
             cls.${object_name_under}_ids.append(obj.ident)
 
+    def setUp(self):
+        # From test_templates/repository.py::CompositionLookupSession::init_template
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
+        # From test_templates/repository.py::CompositionLookupSession::init_template
         for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
             catalog.use_unsequestered_${object_name_under}_view()
             for obj in catalog.get_${object_name_under_plural}():
@@ -116,6 +189,42 @@ class CompositionQuerySession:
         cfu = self.catalog.get_composition_form_for_update(self.composition_list[3].ident)
         cfu.set_sequestered(False)
         self.catalog.update_composition(cfu)"""
+
+
+class CompositionSearchSession:
+
+    import_statements = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_repository_form_for_create([])
+        create_form.display_name = 'Test Repository'
+        create_form.description = 'Test Repository for CompositionSearchSession tests'
+        cls.catalog = cls.svc_mgr.create_repository(create_form)
+
+    def setUp(self):
+        self.session = self.catalog
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_repository(cls.catalog.ident)"""
+
+
+class Composition:
+    get_children = """
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_children()"""
 
 
 class CompositionQuery:
@@ -218,6 +327,9 @@ class AssetCompositionSession:
             cls.asset_ids.append(obj.ident)
             cls.catalog.add_asset(obj.ident, cls.composition.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_repositories():
@@ -227,10 +339,16 @@ class AssetCompositionSession:
                 catalog.delete_composition(obj.ident)
             cls.svc_mgr.delete_repository(catalog.ident)"""
 
+    can_access_asset_compositions_template = """
+        # From test_templates/repository.py::AssetCompositionSession::can_access_asset_compositions_template
+        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
+
     get_composition_assets_template = """
+        # From test_templates/repository.py::AssetCompositionSession::get_composition_assets_template
         self.assertEqual(self.catalog.get_${containable_object_name_under}_${object_name_plural_under}(self.${containable_object_name_under}.ident).available(), 4)"""
 
     get_compositions_by_asset_template = """
+        # From test_templates/repository.py::AssetCompositionSession::get_compositions_by_asset_template
         self.assertEqual(self.catalog.get_${containable_object_name_plural_under}_by_${object_name_under}(self.${object_name_under}_ids[0]).available(), 1)
         self.assertEqual(self.catalog.get_${containable_object_name_plural_under}_by_${object_name_under}(self.${object_name_under}_ids[0]).next().ident, self.${containable_object_name_under}.ident)"""
 
@@ -263,6 +381,9 @@ class AssetCompositionDesignSession:
             composition = cls.catalog.create_composition(create_form)
             cls.composition_list.append(composition)
             cls.composition_ids.append(composition.ident)
+
+    def setUp(self):
+        self.session = self.catalog
 
     @classmethod
     def tearDownClass(cls):
@@ -308,19 +429,61 @@ class AssetCompositionDesignSession:
         self.catalog.remove_asset(self.asset_ids[1], self.composition_ids[4])
         self.assertEqual(self.catalog.get_composition_assets(self.composition_ids[4]).available(), 3)"""
 
+    can_compose_assets_template = """
+        # From test_templates/repository.py::AssetCompositionDesignSession::can_compose_assets_template
+        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
+
 
 class Asset:
 
-    import_statements = [
+    import_statements_pattern = [
+        'from dlkit.json_.id.objects import IdList',
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import objects as ABCObjects',
+        'from dlkit.primordium.locale.primitives import DisplayText'
     ]
 
-    get_title_template = """"""
+    can_distribute_alterations = """
+        with self.assertRaises(errors.IllegalState):
+            self.object.can_distribute_alterations()"""
 
-    can_distribute_verbatim_template = """"""
+    can_distribute_compositions = """
+        with self.assertRaises(errors.IllegalState):
+            self.object.can_distribute_compositions()"""
 
-    get_asset_content_ids_template = """"""
+    can_distribute_verbatim = """
+        with self.assertRaises(errors.IllegalState):
+            self.object.can_distribute_verbatim()"""
 
-    get_asset_contents_template = """"""
+    get_asset_content_ids_template = """
+        results = self.object.${method_name}()
+        self.assertTrue(isinstance(results, IdList))"""
+
+    get_asset_contents_template = """
+        results = self.object.${method_name}()
+        self.assertTrue(isinstance(results, ABCObjects.${return_type}))"""
+
+    get_composition = """
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_composition()"""
+
+    get_composition_id = """
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_composition_id()"""
+
+    get_title_template = """
+        # From test_templates/repository.py::Asset::get_title_template
+        result = self.object.${method_name}()
+        self.assertTrue(isinstance(result, DisplayText))
+        self.assertEqual(result.text, '')"""
+
+    is_composition = """
+        result = self.object.is_composition()
+        self.assertTrue(isinstance(result, bool))"""
+
+    get_provider_links = """
+        # Override because no providerLinkIds
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_provider_links()"""
 
 
 class AssetForm:
@@ -385,6 +548,48 @@ class AssetQuery:
         })"""
 
 
+class AssetSearchSession:
+    import_statements = [
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.abstract_osid.repository import searches',
+        'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
+        'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data("WORDIGNORECASE"))'
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('REPOSITORY', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_repository_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_repository(create_form)
+
+    def setUp(self):
+        self.session = self.catalog
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_repository(cls.catalog.ident)"""
+
+    get_asset_search = """
+        search = self.session.get_asset_search()
+        self.assertTrue(isinstance(search, searches.AssetSearch))"""
+
+    get_assets_by_search = """
+        query = self.session.get_asset_query()
+        query.match_display_name('zxy', DEFAULT_STRING_MATCH_TYPE, True)
+        search = self.session.get_asset_search()
+        results = self.session.get_assets_by_search(query, search)
+        self.assertTrue(isinstance(results, searches.AssetSearchResults))
+        self.assertEqual(results.get_result_size(), 0)"""
+
+
+class AssetNotificationSession:
+    register_for_new_assets_by_genus_type = """
+        self.session.register_for_new_assets_by_genus_type(Id('package.Catalog%3Afake%40DLKIT.MIT.EDU'))"""
+
+
 class AssetContent:
 
     import_statements = [
@@ -417,11 +622,20 @@ class AssetContent:
 
     has_url_template = """
         # From test_templates/repository.py::AssetContent::has_url_template
-        self.assertTrue(self.object.${method_name}())"""
+        self.assertTrue(isinstance(self.object.${method_name}(), bool))"""
 
-    get_url_template = """"""
+    get_url_template = """
+        # From test_templates/repository.py::AssetContent::get_url_template
+        with self.assertRaises(errors.IllegalState):
+            self.object.${method_name}()"""
 
-    get_data = """"""
+    get_url = """
+        result = self.object.get_url()
+        self.assertEqual(result, 'https://www.google.com')"""
+
+    get_data = """
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_data()"""
 
 
 class AssetContentForm:
@@ -442,8 +656,10 @@ class AssetContentForm:
         form.display_name = 'Asset'
         cls.asset = cls.catalog.create_asset(form)
 
-        cls.form = cls.catalog.get_asset_content_form_for_create(cls.asset.ident,
-                                                                 [])
+    def setUp(self):
+        self.form = self.catalog.get_asset_content_form_for_create(self.asset.ident,
+                                                                   [])
+        self.object = self.form
 
     @classmethod
     def tearDownClass(cls):
@@ -467,9 +683,13 @@ class AssetContentForm:
         self.form.${method_name}()
         self.assertEqual(self.form._my_map['${var_name_mixed}'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
 
-    set_data = """"""
+    set_data = """
+        with self.assertRaises(errors.InvalidArgument):
+            self.form.set_data('foo')
+        # TODO: should test setting actual data..."""
 
-    clear_data = """"""
+    clear_data = """
+        self.form.clear_data()"""
 
 
 class AssetContentList:

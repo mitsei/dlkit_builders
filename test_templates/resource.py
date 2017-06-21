@@ -514,6 +514,27 @@ class ResourceNotificationSession:
     # Placeholder: still need to write a real ResourceNotificationSession tess
     init_template = ResourceLookupSession.init_template
 
+    register_for_changed_resources_template = """
+        self.session.${method_name}()"""
+
+    register_for_deleted_resources_template = """
+        self.session.${method_name}()"""
+
+    register_for_changed_resource_template = """
+        self.session.${method_name}(Id('package.Catalog%3Afake%40DLKIT.MIT.EDU'))"""
+
+    register_for_deleted_resource_template = """
+        self.session.${method_name}(Id('package.Catalog%3Afake%40DLKIT.MIT.EDU'))"""
+
+    register_for_new_resources_template = """
+        self.session.${method_name}()"""
+
+    reliable_resource_notifications_template = """
+        self.session.${method_name}()"""
+
+    unreliable_resource_notifications_template = """
+        self.session.${method_name}()"""
+
 
 class ResourceBinSession:
 
@@ -1486,6 +1507,63 @@ class ResourceSearch:
     def tearDownClass(cls):
         # From test_templates/resource.py::ResourceSearch::init_template
         cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+
+class ResourceSearchSession:
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import searches as ABCSearches',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+    ]
+
+    init_template = """
+    @classmethod
+    def setUpClass(cls):
+        # From test_templates/resource.py::ResourceSearchSession::init_template
+        cls.${object_name_under}_list = list()
+        cls.${object_name_under}_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
+            create_form = cls.catalog.get_${object_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + color
+            create_form.description = (
+                'Test ${object_name} for ${interface_name} tests, did I mention green')
+            obj = cls.catalog.create_${object_name_under}(create_form)
+            cls.${object_name_under}_list.append(obj)
+            cls.${object_name_under}_ids.append(obj.ident)
+
+    def setUp(self):
+        # From test_templates/resource.py::ResourceSearchSession::init_template
+        self.session = self.catalog
+
+    @classmethod
+    def tearDownClass(cls):
+        # From test_templates/resource.py::ResourceSearchSession::init_template
+        for obj in cls.catalog.get_${object_name_under_plural}():
+            cls.catalog.delete_${object_name_under}(obj.ident)
+        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+    get_resource_search_template = """
+        # From test_templates/resource.py::ResourceSearchSession::get_resource_search_template
+        result = self.session.${method_name}()
+        self.assertTrue(isinstance(result, ABCSearches.${return_type}))"""
+
+    get_resources_by_search_template = """
+        # From test_templates/resource.py::ResourceSearchSession::get_resources_by_search_template
+        query = self.catalog.get_${object_name_under}_query()
+        search = self.session.get_${object_name_under}_search()
+        results = self.session.${method_name}(query, search)
+        self.assertTrue(isinstance(results, ABCSearches.${return_type}))"""
 
 
 class ResourceForm:
