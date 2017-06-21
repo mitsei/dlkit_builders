@@ -81,6 +81,12 @@ class LogEntry:
         else:
             return Id(self._my_map['${var_name_mixed}'])"""
 
+    get_resource_id = """
+        raise errors.Unimplemented()"""
+
+    get_resource = """
+        raise errors.Unimplemented()"""
+
     additional_methods = """
     def get_object_map(self):
         obj_map = dict(self._my_map)
