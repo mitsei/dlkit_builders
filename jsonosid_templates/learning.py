@@ -235,10 +235,20 @@ class Activity:
 
     get_objective_id_template = """
         # Implemented from template for osid.learning.Activity.get_objective_id
-        return Id(self._my_map['${var_name_mixed}Id'])"""
+        if not self.has_${var_name}():
+            raise errors.IllegalState('${var_name} empty')
+        return Id(self._my_map['${var_name_mixed}Id'])
+
+    def has_${var_name}(self):
+        \"\"\"not in spec, useful for other templated methods where it isn't guaranteed
+        that a parent objectId exists\"\"\"
+        # Implemented from template for osid.learning.Activity.get_objective_id
+        return bool(self._my_map['${var_name_mixed}Id'])"""
 
     get_objective_template = """
         # Implemented from template for osid.learning.Activity.get_objective
+        if not self.has_${var_name}():
+            raise errors.IllegalState('${var_name} empty')
         mgr = self._get_provider_manager('${return_pkg_replace_caps}')
         if not mgr.supports_${return_type_under}_lookup():
             raise errors.OperationFailed('${return_pkg_replace_title} does not support ${return_type} lookup')
@@ -268,6 +278,8 @@ class Activity:
 
     get_assets_template = """
         # Implemented from template for osid.learning.Activity.get_assets_template
+        if not bool(self._my_map['${var_name_singular_mixed}Ids']):
+            raise errors.IllegalState('no ${var_name_singular_mixed}Ids')
         mgr = self._get_provider_manager('${return_pkg_caps}')
         if not mgr.supports_${return_type_list_object_under}_lookup():
             raise errors.OperationFailed('${return_pkg_title} does not support ${return_type_list_object} lookup')
