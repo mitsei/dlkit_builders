@@ -93,14 +93,14 @@ class ObjectiveRequisiteAssignmentSession:
     ]
 
     assign_objective_requisite_template = """
-        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+        requisite_type = Type(**Relationship().get_type_data('${object_name_upper}.REQUISITE'))
 
         ras = self._get_provider_manager(
             'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_objective_bank_id(), proxy=self._proxy)
+            self.get_${cat_name_under}_id(), proxy=self._proxy)
         rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name}, [])
-        rfc.set_display_name('Objective Requisite')
-        rfc.set_description('An Objective Requisite created by the ObjectiveRequisiteAssignmentSession')
+        rfc.set_display_name('${object_name} Requisite')
+        rfc.set_description('An ${object_name} Requisite created by the ${object_name}RequisiteAssignmentSession')
         rfc.set_genus_type(requisite_type)
         ras.create_relationship(rfc)"""
 
@@ -110,13 +110,20 @@ class ObjectiveRequisiteAssignmentSession:
     ]
 
     unassign_objective_requisite_template = """
-        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+        requisite_type = Type(**Relationship().get_type_data('${object_name_upper}.REQUISITE'))
         rls = self._get_provider_manager(
-            'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_objective_bank_id(), proxy=self._proxy)
+            'RELATIONSHIP').get_relationship_lookup_session_for_family(
+            self.get_${cat_name_under}_id(), proxy=self._proxy)
         ras = self._get_provider_manager(
             'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_objective_bank_id(), proxy=self._proxy)"""
+            self.get_${cat_name_under}_id(), proxy=self._proxy)
+        rls.use_federated_family_view()
+        relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name}, requisite_type)
+        if relationships.available() == 0:
+            raise errors.IllegalState('no ${object_name} found')
+        for relationship in relationships:
+            if str(relationship.get_destination_id()) == str(${arg1_name}):
+                ras.delete_relationship(relationship.ident)"""
 
 
 class ObjectiveAdminSession:
@@ -306,6 +313,7 @@ class ActivityForm:
 class ObjectiveHierarchySession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Objective
         self._catalog_name = 'ObjectiveBank'
         OsidSession._init_object(
@@ -330,6 +338,7 @@ class ObjectiveHierarchySession:
 class ObjectiveHierarchyDesignSession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Objective
         self._catalog_name = 'ObjectiveBank'
         OsidSession._init_object(
