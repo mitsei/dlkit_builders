@@ -747,7 +747,7 @@ class ResourceNotificationSession:
         if not MONGO_LISTENER.receivers[self._ns][self._receiver]['d']:
             MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = []
         if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['d'], list):
-            self.MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())"""
+            MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())"""
 
 
 class ResourceBinSession:
@@ -1658,14 +1658,14 @@ ${instance_initers}"""
 
     get_avatar_id_template = """
         # Implemented from template for osid.resource.Resource.get_avatar_id_template
-        if not self._my_map['${var_name_mixed}Id']:
+        if not bool(self._my_map['${var_name_mixed}Id']):
             raise errors.IllegalState('this ${object_name} has no ${var_name}')
         else:
             return Id(self._my_map['${var_name_mixed}Id'])"""
 
     get_avatar_template = """
         # Implemented from template for osid.resource.Resource.get_avatar_template
-        if not self._my_map['${var_name_mixed}Id']:
+        if not bool(self._my_map['${var_name_mixed}Id']):
             raise errors.IllegalState('this ${object_name} has no ${var_name}')
         mgr = self._get_provider_manager('${return_pkg_caps}')
         if not mgr.supports_${return_type_under}_lookup():
