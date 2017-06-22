@@ -614,25 +614,25 @@ class ActivityAdminSession:
             cls.svc_mgr.delete_objective_bank(catalog.ident)"""
 
     get_activity_form_for_create_template = """
+        # From test_templates/learning.py::ActivityAdminSession::get_activity_form_for_create_template
         form = self.catalog.${method_name}(self.parent_object.ident, [])
         self.assertTrue(isinstance(form, OsidForm))
         self.assertFalse(form.is_for_update())"""
 
-    delete_activity_template = """
-        form = self.catalog.get_${object_name_under}_form_for_create(self.parent_object.ident, [])
-        form.display_name = 'new ${object_name}'
-        form.description = 'description of ${object_name}'
+    delete_activity = """
+        form = self.catalog.get_activity_form_for_create(self.parent_object.ident, [])
+        form.display_name = 'new Activity'
+        form.description = 'description of Activity'
         form.set_genus_type(NEW_TYPE)
-        osid_object = self.catalog.create_${object_name_under}(form)
-        self.catalog.${method_name}(osid_object.ident)
+        osid_object = self.catalog.create_activity(form)
+        self.catalog.delete_activity(osid_object.ident)
         with self.assertRaises(errors.NotFound):
-            self.catalog.get_${object_name_under}(osid_object.ident)"""
+            self.catalog.get_activity(osid_object.ident)"""
 
 
 class Activity:
 
     import_statements_pattern = [
-        'from dlkit.abstract_osid.assessment.objects import AssessmentList',
         'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import objects as ABCObjects',
         'from dlkit.json_.id.objects import IdList',
         'from dlkit.primordium.id.primitives import Id'
@@ -669,9 +669,8 @@ class Activity:
         self.assertEqual(result.available(), 0)"""
 
     get_assessments = """
-        result = self.object.get_assessments()
-        self.assertTrue(isinstance(result, AssessmentList))
-        self.assertEqual(result.available(), 0)"""
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_assessments()"""
 
     get_asset_ids_template = """
         # From test_templates/learning.py::Activity::get_asset_ids_template
@@ -681,10 +680,8 @@ class Activity:
 
     get_assets_template = """
         # From test_templates/learning.py::Activity::get_assets_template
-        from dlkit.abstract_osid.${return_pkg}.${return_module} import ${return_type}
-        result = self.object.${method_name}()
-        self.assertTrue(isinstance(result, ${return_type}))
-        self.assertEqual(result.available(), 0)"""
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_assets()"""
 
     get_course_ids = """
         result = self.object.get_course_ids()
@@ -693,7 +690,7 @@ class Activity:
 
     get_courses = """
         # We don't have the course service yet
-        with self.assertRaises(errors.OperationFailed):
+        with self.assertRaises(errors.IllegalState):
             self.object.get_courses()"""
 
     get_objective_template = """
