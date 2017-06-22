@@ -754,6 +754,8 @@ class ResourceBinAssignmentSession:
 class ResourceAgentSession:
 
     import_statements = [
+        'from dlkit.abstract_osid.authentication.objects import AgentList',
+        'from dlkit.abstract_osid.resource.objects import Resource',
         'from dlkit.runtime import PROXY_SESSION, proxy_example',
         'from dlkit.runtime.managers import Runtime',
         'REQUEST = proxy_example.SimpleRequest()',
@@ -762,6 +764,7 @@ class ResourceAgentSession:
         'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
         'from dlkit.primordium.type.primitives import Type',
         'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.json_.id.objects import IdList',
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
         'AGENT_ID_0 = Id(**{\'identifier\': \'jane_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
         'AGENT_ID_1 = Id(**{\'identifier\': \'john_doe\', \'namespace\': \'osid.agent.Agent\', \'authority\': \'MIT-ODL\'})',
@@ -787,6 +790,9 @@ class ResourceAgentSession:
         cls.catalog.assign_agent_to_resource(AGENT_ID_0, cls.resource_ids[0])
         cls.catalog.assign_agent_to_resource(AGENT_ID_1, cls.resource_ids[1])
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_bins():
@@ -795,17 +801,25 @@ class ResourceAgentSession:
             cls.svc_mgr.delete_bin(catalog.ident)"""
 
     get_resource_id_by_agent = """
-        resource_id = self.catalog.get_resource_id_by_agent(AGENT_ID_0)"""
+        resource_id = self.catalog.get_resource_id_by_agent(AGENT_ID_0)
+        self.assertTrue(isinstance(resource_id, Id))
+        self.assertEqual(resource_id, self.resource_ids[0])"""
 
     get_resource_by_agent = """
         resource = self.catalog.get_resource_by_agent(AGENT_ID_1)
+        self.assertTrue(isinstance(resource, Resource))
         self.assertEqual(resource.display_name.text, 'Test Resource 1')"""
 
     get_agent_ids_by_resource = """
         id_list = self.catalog.get_agent_ids_by_resource(self.resource_ids[0])
-        self.assertEqual(id_list.next(), AGENT_ID_0)"""
+        self.assertEqual(id_list.next(), AGENT_ID_0)
+        self.assertTrue(isinstance(id_list, IdList))"""
 
-    get_agents_by_resource = """"""
+    get_agents_by_resource = """
+        agents = self.catalog.get_agents_by_resource(self.resource_ids[0])
+        self.assertEqual(agents.available(), 1)
+        self.assertTrue(isinstance(agents, AgentList))
+        self.assertEqual(agents.next().ident, AGENT_ID_0)"""
 
 
 class ResourceAgentAssignmentSession:
@@ -827,6 +841,9 @@ class ResourceAgentAssignmentSession:
             obj = cls.catalog.create_resource(create_form)
             cls.resource_list.append(obj)
             cls.resource_ids.append(obj.ident)
+
+    def setUp(self):
+        self.session = self.catalog
 
     @classmethod
     def tearDownClass(cls):
@@ -1522,36 +1539,45 @@ class ResourceSearchSession:
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
     ]
 
-    init_template = """
+    import_statements = [
+        'from dlkit.abstract_osid.resource import searches as ABCSearches',
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+    ]
+
+    init = """
     @classmethod
     def setUpClass(cls):
-        # From test_templates/resource.py::ResourceSearchSession::init_template
-        cls.${object_name_under}_list = list()
-        cls.${object_name_under}_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
-        create_form.display_name = 'Test ${cat_name}'
-        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        cls.resource_list = list()
+        cls.resource_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('RESOURCE', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bin_form_for_create([])
+        create_form.display_name = 'Test Bin'
+        create_form.description = 'Test Bin for ResourceSearchSession tests'
+        cls.catalog = cls.svc_mgr.create_bin(create_form)
         for color in ['Orange', 'Blue', 'Green', 'orange']:
-            create_form = cls.catalog.get_${object_name_under}_form_for_create([])
-            create_form.display_name = 'Test ${object_name} ' + color
+            create_form = cls.catalog.get_resource_form_for_create([])
+            create_form.display_name = 'Test Resource ' + color
             create_form.description = (
-                'Test ${object_name} for ${interface_name} tests, did I mention green')
-            obj = cls.catalog.create_${object_name_under}(create_form)
-            cls.${object_name_under}_list.append(obj)
-            cls.${object_name_under}_ids.append(obj.ident)
+                'Test Resource for ResourceSearchSession tests, did I mention green')
+            obj = cls.catalog.create_resource(create_form)
+            cls.resource_list.append(obj)
+            cls.resource_ids.append(obj.ident)
 
     def setUp(self):
-        # From test_templates/resource.py::ResourceSearchSession::init_template
         self.session = self.catalog
 
     @classmethod
     def tearDownClass(cls):
-        # From test_templates/resource.py::ResourceSearchSession::init_template
-        for obj in cls.catalog.get_${object_name_under_plural}():
-            cls.catalog.delete_${object_name_under}(obj.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+        for obj in cls.catalog.get_resources():
+            cls.catalog.delete_resource(obj.ident)
+        cls.svc_mgr.delete_bin(cls.catalog.ident)"""
 
     get_resource_search_template = """
         # From test_templates/resource.py::ResourceSearchSession::get_resource_search_template
@@ -1785,10 +1811,6 @@ class BinForm:
     def tearDownClass(cls):
         # From test_templates/resource.py::BinForm::init_template
         pass"""
-
-    get_bin_form_record = """
-        with self.assertRaises(errors.Unsupported):
-            self.object.get_bin_form_record(DEFAULT_TYPE)"""
 
 
 class BinList:
