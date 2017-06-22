@@ -235,19 +235,13 @@ class Activity:
 
     get_objective_id_template = """
         # Implemented from template for osid.learning.Activity.get_objective_id
-        if not self.has_${var_name}():
+        if not bool(self._my_map['${var_name_mixed}Id']):
             raise errors.IllegalState('${var_name} empty')
-        return Id(self._my_map['${var_name_mixed}Id'])
-
-    def has_${var_name}(self):
-        \"\"\"not in spec, useful for other templated methods where it isn't guaranteed
-        that a parent objectId exists\"\"\"
-        # Implemented from template for osid.learning.Activity.get_objective_id
-        return bool(self._my_map['${var_name_mixed}Id'])"""
+        return Id(self._my_map['${var_name_mixed}Id'])"""
 
     get_objective_template = """
         # Implemented from template for osid.learning.Activity.get_objective
-        if not self.has_${var_name}():
+        if not bool(self._my_map['${var_name_mixed}Id']):
             raise errors.IllegalState('${var_name} empty')
         mgr = self._get_provider_manager('${return_pkg_replace_caps}')
         if not mgr.supports_${return_type_under}_lookup():
