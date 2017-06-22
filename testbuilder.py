@@ -37,13 +37,13 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
             return any(search_term in interface['inherit_shortnames']
                        for search_term in ['OsidSearch', 'OsidSearchResults'])
 
-        def is_unimplemented_catalog_node():
+        def is_unimplemented_node():
             return any(node in interface['shortname']
-                       for node in ['VaultNode', 'LogNode'])
+                       for node in ['VaultNode', 'LogNode', 'ResourceNode'])
 
         if impl == '':
             test_object = remove_plural(interface['category'])
-            if is_search() or is_unimplemented_catalog_node():
+            if is_search() or is_unimplemented_node():
                 # We don't have any search stuff implemented yet
                 impl = '{0}pass'.format(self._dind)
             elif (len(method['args']) > 0 and
