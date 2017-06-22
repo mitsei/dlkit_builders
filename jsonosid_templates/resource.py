@@ -905,7 +905,8 @@ class ResourceAgentSession:
 
     import_statements = [
         'from .simple_agent import Agent',
-        'from ..id.objects import IdList'
+        'from ..id.objects import IdList',
+        'from ..authentication.objects import AgentList'
     ]
 
     init = """
