@@ -46,9 +46,10 @@ class SubjectHierarchySession:
         result = collection.find(
             dict({'_id': {'$$in': [ObjectId(root_id.get_identifier()) for root_id in root_ids]}},
                  **self._view_filter()))
-        return objects.${return_type}(result,
-                                      runtime=self._runtime,
-                                      proxy=self._proxy)"""
+        return objects.${return_type}(
+            result,
+            runtime=self._runtime,
+            proxy=self._proxy)"""
 
     get_child_subjects_template = """
         # Implemented from template for
@@ -56,12 +57,13 @@ class SubjectHierarchySession:
         if self._hierarchy_session.has_children(${arg0_name}):
             child_ids = self._hierarchy_session.get_children(${arg0_name})
             collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
+                                             collection='${object_name}',
+                                             runtime=self._runtime)
             result = collection.find(
                 dict({'_id': {'$$in': [ObjectId(child_id.get_identifier()) for child_id in child_ids]}},
                      **self._view_filter()))
-            return objects.${return_type}(result,
-                                          runtime=self._runtime,
-                                          proxy=self._proxy)
+            return objects.${return_type}(
+                result,
+                runtime=self._runtime,
+                proxy=self._proxy)
         raise errors.IllegalState('no children')"""
