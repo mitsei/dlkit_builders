@@ -284,6 +284,7 @@ def fix_bad_name(name, optional_match_term=None):
         'osid.repository.CompositionQuerySession': 'osid.repository.CompositionQuerySession',
         'supports_authorizatin_batch': 'supports_authorization_batch',
         'supports_authorizatin_rules': 'supports_authorization_rules',
+        'get_compoitions_by_repositories': 'get_compositions_by_repositories'
     }
 
     if optional_match_term == 'get_composition_query_session':
