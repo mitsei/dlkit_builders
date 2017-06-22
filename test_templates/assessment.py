@@ -1,28 +1,63 @@
 
 class AssessmentSession:
     import_statements = [
-        'from dlkit.abstract_osid.assessment.objects import Bank'
+        'import datetime',
+        'from dlkit.abstract_osid.assessment.objects import Bank, Answer, AnswerList, AnswerForm',
+        'from dlkit.abstract_osid.assessment.objects import Question, QuestionList',
+        'from dlkit.abstract_osid.assessment.objects import ResponseList',
+        'from dlkit.abstract_osid.assessment.objects import AssessmentSection, AssessmentSectionList',
+        'from dlkit.abstract_osid.assessment.rules import Response',
+        'from dlkit.primordium.calendaring.primitives import DateTime',
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.records import registry',
+        'SEQUENCE_ASSESSMENT = Type(**registry.ASSESSMENT_RECORD_TYPES["simple-child-sequencing"])'
     ]
 
     init = """
     @classmethod
     def setUpClass(cls):
-        cls.assessment_offered_list = list()
-        cls.assessment_offered_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
-        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        create_form.description = 'Test Bank for AssessmentSession tests'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
-        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form = cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
         create_form.display_name = 'Test Assessment'
         create_form.description = 'Test Assessment for AssessmentSession tests'
         cls.assessment = cls.catalog.create_assessment(create_form)
 
+        for number in ['One', 'Two', 'Three', 'Four']:
+            ifc = cls.catalog.get_item_form_for_create([])
+            ifc.set_display_name('Test Assessment Item ' + number)
+            ifc.set_description('This is a Test Item Called Number ' + number)
+            test_item = cls.catalog.create_item(ifc)
+            form = cls.catalog.get_question_form_for_create(test_item.ident, [])
+            cls.catalog.create_question(form)
+
+            if number == 'One':
+                form = cls.catalog.get_answer_form_for_create(test_item.ident, [])
+                cls.catalog.create_answer(form)
+
+            cls.catalog.add_item(cls.assessment.ident, test_item.ident)
+
+        form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        cls.assessment_offered = cls.catalog.create_assessment_offered(form)
+
+    def setUp(self):
+        self.session = self.catalog
+        form = self.catalog.get_assessment_taken_form_for_create(self.assessment_offered.ident, [])
+        self.taken = self.catalog.create_assessment_taken(form)
+
     @classmethod
     def tearDownClass(cls):
         for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
             cls.catalog.delete_assessment(obj.ident)
+        for item in cls.catalog.get_items():
+            cls.catalog.delete_item(item.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
     get_bank = """
@@ -30,197 +65,859 @@ class AssessmentSession:
         self.assertTrue(isinstance(self.catalog, Bank))"""
 
     can_take_assessments = """
-        pass"""
-
-    has_assessment_begun = """
-        pass"""
-
-    is_assessment_over = """
-        pass"""
-
-    # This method has been deprecated:
-    finished_assessment = """
-        pass"""
-
-    requires_synchronous_sections = """
-        pass"""
-
-    get_first_assessment_section = """
-        pass"""
-
-    has_next_assessment_section = """
-        pass"""
-
-    get_next_assessment_section = """
-        pass"""
-
-    has_previous_assessment_section = """
-        pass"""
-
-    get_previous_assessment_section = """
-        pass"""
+        self.assertTrue(self.session.can_take_assessments())"""
 
     get_assessment_section = """
-        pass"""
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        test_section = self.session.get_assessment_section(section.ident)
+        self.assertTrue(isinstance(test_section, AssessmentSection))
+        self.assertEqual(str(test_section.ident),
+                         str(section.ident))"""
 
     get_assessment_sections = """
-        pass"""
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        test_sections = self.session.get_assessment_sections(self.taken.ident)
+        self.assertTrue(isinstance(test_sections, AssessmentSectionList))
+        self.assertEqual(test_sections.available(), 1)
+        first_section = test_sections.next()
+        self.assertTrue(isinstance(first_section, AssessmentSection))
+        self.assertEqual(str(first_section.ident),
+                         str(section.ident))"""
 
-    is_assessment_section_complete = """
-        pass"""
-
-    get_incomplete_assessment_sections = """
-        pass"""
-
-    has_assessment_section_begun = """
-        pass"""
-
-    is_assessment_section_over = """
-        pass"""
-
-    # This method has been deprecated:
-    finished_assessment_section = """
-        pass"""
-
-    requires_synchronous_responses = """
-        pass"""
-
-    get_first_question = """
-        pass"""
-
-    has_next_question = """
-        pass"""
-
-    get_next_question = """
-        pass"""
-
-    has_previous_question = """
-        pass"""
-
-    get_previous_question = """
-        pass"""
-
-    get_question = """
-        pass"""
-
-    get_questions = """
-        pass"""
-
-    get_response_form = """
-        pass"""
+    get_first_assessment_section = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        self.assertTrue(isinstance(section, AssessmentSection))"""
 
     submit_response = """
-        pass"""
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
 
-    skip_item = """
-        pass"""
+        self.assertIn('missingResponse',
+                      section._my_map['questions'][0]['responses'][0])
+        self.assertEqual(0, section._my_map['questions'][0]['responses'][0]['missingResponse'])
 
-    is_question_answered = """
-        pass"""
+        form = self.session.get_response_form(section.ident, first_question.ident)
+        self.session.submit_response(section.ident, first_question.ident, form)
+        section = self.catalog.get_assessment_section(section.ident)
 
-    get_unanswered_questions = """
-        pass"""
-
-    has_unanswered_questions = """
-        pass"""
-
-    get_first_unanswered_question = """
-        pass"""
-
-    has_next_unanswered_question = """
-        pass"""
-
-    get_next_unanswered_question = """
-        pass"""
-
-    has_previous_unanswered_question = """
-        pass"""
-
-    get_previous_unanswered_question = """
-        pass"""
-
-    get_response = """
-        pass"""
-
-    get_responses = """
-        pass"""
+        self.assertNotIn('missingResponse',
+                         section._my_map['questions'][0]['responses'][0])"""
 
     clear_response = """
-        pass"""
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
 
-    finish_assessment_section = """
-        pass"""
+        self.assertIn('missingResponse',
+                      section._my_map['questions'][0]['responses'][0])
+        self.assertEqual(0, section._my_map['questions'][0]['responses'][0]['missingResponse'])
 
-    # This is no longer needed?
-    finish = """
-        pass"""
+        form = self.session.get_response_form(section.ident, first_question.ident)
+        self.session.submit_response(section.ident, first_question.ident, form)
+        section = self.catalog.get_assessment_section(section.ident)
+
+        self.assertNotIn('missingResponse',
+                         section._my_map['questions'][0]['responses'][0])
+
+        self.session.clear_response(section.ident, first_question.ident)
+        section = self.catalog.get_assessment_section(section.ident)
+
+        self.assertIn('missingResponse',
+                      section._my_map['questions'][0]['responses'][0])
+        self.assertEqual(1, section._my_map['questions'][0]['responses'][0]['missingResponse'])"""
+
+    skip_item = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        self.assertIn('missingResponse',
+                      section._my_map['questions'][0]['responses'][0])
+        self.assertEqual(0, section._my_map['questions'][0]['responses'][0]['missingResponse'])
+
+        self.session.skip_item(section.ident, first_question.ident)
+        section = self.catalog.get_assessment_section(section.ident)
+
+        self.assertIn('missingResponse',
+                      section._my_map['questions'][0]['responses'][0])
+        self.assertEqual(1, section._my_map['questions'][0]['responses'][0]['missingResponse'])"""
 
     finish_assessment = """
-        pass"""
+        future_start = DateTime.utcnow() + datetime.timedelta(days=1)
+        form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+        form.set_start_time(DateTime(**{
+            'year': future_start.year,
+            'month': future_start.month,
+            'day': future_start.day,
+            'hour': future_start.hour,
+            'minute': future_start.minute,
+            'second': future_start.second
+        }))
+        future_offered = self.catalog.create_assessment_offered(form)
+        form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
+        future_taken = self.catalog.create_assessment_taken(form)
+        with self.assertRaises(errors.IllegalState):
+            self.session.finish_assessment(future_taken.ident)
 
-    is_answer_available = """
-        pass"""
+        self.assertIsNone(self.taken._my_map['completionTime'])
+        self.session.finish_assessment(self.taken.ident)
+        taken = self.catalog.get_assessment_taken(self.taken.ident)
+        self.assertIsNotNone(taken._my_map['completionTime'])"""
+
+    finish_assessment_section = """
+        future_start = DateTime.utcnow() + datetime.timedelta(days=1)
+        form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+        form.set_start_time(DateTime(**{
+            'year': future_start.year,
+            'month': future_start.month,
+            'day': future_start.day,
+            'hour': future_start.hour,
+            'minute': future_start.minute,
+            'second': future_start.second
+        }))
+        future_offered = self.catalog.create_assessment_offered(form)
+        form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
+        future_taken = self.catalog.create_assessment_taken(form)
+        with self.assertRaises(errors.IllegalState):
+            self.catalog.get_first_assessment_section(future_taken.ident)
+
+        first_section = self.catalog.get_first_assessment_section(self.taken.ident)
+        self.assertNotIn('completionTime', first_section._my_map)
+        self.session.finish_assessment_section(first_section.ident)
+
+        with self.assertRaises(errors.IllegalState):
+            # it is over, so can't GET the section now
+            self.catalog.get_assessment_section(first_section.ident)"""
+
+    has_assessment_begun = """
+        future_start = DateTime.utcnow() + datetime.timedelta(days=1)
+        form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+        form.set_start_time(DateTime(**{
+            'year': future_start.year,
+            'month': future_start.month,
+            'day': future_start.day,
+            'hour': future_start.hour,
+            'minute': future_start.minute,
+            'second': future_start.second
+        }))
+        future_offered = self.catalog.create_assessment_offered(form)
+        form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
+        future_taken = self.catalog.create_assessment_taken(form)
+        self.assertFalse(self.session.has_assessment_begun(future_taken.ident))
+
+        self.assertTrue(self.session.has_assessment_begun(self.taken.ident))"""
+
+    has_assessment_section_begun = """
+        future_start = DateTime.utcnow() + datetime.timedelta(days=1)
+        form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+        form.set_start_time(DateTime(**{
+            'year': future_start.year,
+            'month': future_start.month,
+            'day': future_start.day,
+            'hour': future_start.hour,
+            'minute': future_start.minute,
+            'second': future_start.second
+        }))
+        future_offered = self.catalog.create_assessment_offered(form)
+        form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
+        future_taken = self.catalog.create_assessment_taken(form)
+
+        with self.assertRaises(errors.IllegalState):
+            # cannot even get the sectionId to call the method
+            self.catalog.get_first_assessment_section(future_taken.ident)
+
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        self.assertTrue(self.session.has_assessment_section_begun(section.ident))"""
+
+    is_assessment_over = """
+        # There are also other conditions that flag "over", but are not
+        # tested here. Like if the offered goes past the deadline...so we
+        # would have to do a time.sleep(). TODO: add those tests in.
+
+        self.assertFalse(self.session.is_assessment_over(self.taken.ident))
+        self.session.finish_assessment(self.taken.ident)
+        self.assertTrue(self.session.is_assessment_over(self.taken.ident))"""
+
+    is_assessment_section_over = """
+        # There are also other conditions that flag "over", but are not
+        # tested here. Like if the offered goes past the deadline...so we
+        # would have to do a time.sleep(). TODO: add those tests in.
+
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+
+        self.assertFalse(self.session.is_assessment_section_over(section.ident))
+        self.session.finish_assessment_section(section.ident)
+        self.assertTrue(self.session.is_assessment_section_over(section.ident))"""
 
     get_answers = """
-        pass"""
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+
+        with self.assertRaises(errors.IllegalState):
+            self.session.get_answers(section.ident, second_question.ident)
+
+        form = self.session.get_response_form(section.ident, first_question.ident)
+        self.session.submit_response(section.ident, first_question.ident, form)
+
+        answers = self.session.get_answers(section.ident, first_question.ident)
+        self.assertTrue(isinstance(answers, AnswerList))
+        self.assertEqual(answers.available(), 1)
+        self.assertTrue(isinstance(answers.next(), Answer))"""
+
+    is_answer_available = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+
+        self.assertFalse(self.session.is_answer_available(section.ident,
+                                                          second_question.ident))
+
+        form = self.session.get_response_form(section.ident, first_question.ident)
+        self.session.submit_response(section.ident, first_question.ident, form)
+
+        answers = self.session.get_answers(section.ident, first_question.ident)
+        self.assertTrue(isinstance(answers, AnswerList))
+        self.assertTrue(self.session.is_answer_available(section.ident,
+                                                         first_question.ident))"""
+
+    get_first_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        test_question = self.session.get_first_question(section.ident)
+        self.assertTrue(isinstance(test_question, Question))
+        self.assertEqual(str(first_question.ident),
+                         str(test_question.ident))"""
+
+    get_first_unanswered_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+
+        unanswered_question = self.session.get_first_unanswered_question(section.ident)
+        self.assertTrue(isinstance(unanswered_question, Question))
+        self.assertEqual(str(unanswered_question.ident),
+                         str(first_question.ident))
+
+        form = self.session.get_response_form(section.ident, first_question.ident)
+        self.session.submit_response(section.ident, first_question.ident, form)
+
+        unanswered_question = self.session.get_first_unanswered_question(section.ident)
+        self.assertTrue(isinstance(unanswered_question, Question))
+        self.assertEqual(str(unanswered_question.ident),
+                         str(second_question.ident))"""
+
+    is_question_answered = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        self.assertFalse(self.session.is_question_answered(section.ident,
+                                                           first_question.ident))
+
+        form = self.session.get_response_form(section.ident, first_question.ident)
+        self.session.submit_response(section.ident, first_question.ident, form)
+
+        self.assertTrue(self.session.is_question_answered(section.ident,
+                                                          first_question.ident))"""
+
+    get_incomplete_assessment_sections = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+
+        test_sections = self.session.get_incomplete_assessment_sections(self.taken.ident)
+        self.assertTrue(isinstance(test_sections, AssessmentSectionList))
+        self.assertEqual(test_sections.available(), 1)
+        first_section = test_sections.next()
+        self.assertTrue(isinstance(first_section, AssessmentSection))
+        self.assertEqual(str(first_section.ident),
+                         str(section.ident))
+
+        for question in questions:
+            form = self.session.get_response_form(section.ident, question.ident)
+            self.session.submit_response(section.ident, question.ident, form)
+
+        self.session._provider_sessions = {}  # need to get rid of the cached taken
+        test_sections = self.session.get_incomplete_assessment_sections(self.taken.ident)
+        self.assertTrue(isinstance(test_sections, AssessmentSectionList))
+        self.assertEqual(test_sections.available(), 0)"""
+
+    is_assessment_section_complete = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        total_questions = questions.available()
+
+        self.assertFalse(self.session.is_assessment_section_complete(section.ident))
+
+        for index, question in enumerate(questions):
+            form = self.session.get_response_form(section.ident, question.ident)
+            self.session.submit_response(section.ident, question.ident, form)
+            if index < (total_questions - 1):
+                self.assertFalse(self.session.is_assessment_section_complete(section.ident))
+            else:
+                self.assertTrue(self.session.is_assessment_section_complete(section.ident))"""
+
+    get_next_assessment_section = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        with self.assertRaises(errors.IllegalState):
+            self.session.get_next_assessment_section(section.ident)"""
+
+    get_previous_assessment_section = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        with self.assertRaises(errors.IllegalState):
+            self.session.get_previous_assessment_section(section.ident)"""
+
+    has_next_assessment_section = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        self.assertFalse(self.session.has_next_assessment_section(section.ident))"""
+
+    has_previous_assessment_section = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        self.assertFalse(self.session.has_previous_assessment_section(section.ident))"""
+
+    get_next_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+        third_question = questions.next()
+        fourth_question = questions.next()
+
+        test_question = self.session.get_next_question(section.ident,
+                                                       first_question.ident)
+        self.assertTrue(isinstance(test_question, Question))
+        self.assertEqual(str(second_question.ident),
+                         str(test_question.ident))
+
+        with self.assertRaises(errors.IllegalState):
+            self.session.get_next_question(section.ident, fourth_question.ident)"""
+
+    has_next_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+        third_question = questions.next()
+        fourth_question = questions.next()
+
+        self.assertTrue(self.session.has_next_question(section.ident,
+                                                       first_question.ident))
+        self.assertFalse(self.session.has_next_question(section.ident,
+                                                        fourth_question.ident))"""
+
+    get_previous_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+        third_question = questions.next()
+        fourth_question = questions.next()
+
+        test_question = self.session.get_previous_question(section.ident,
+                                                           fourth_question.ident)
+        self.assertTrue(isinstance(test_question, Question))
+        self.assertEqual(str(third_question.ident),
+                         str(test_question.ident))
+
+        with self.assertRaises(errors.IllegalState):
+            self.session.get_previous_question(section.ident, first_question.ident)"""
+
+    has_previous_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+        third_question = questions.next()
+        fourth_question = questions.next()
+
+        self.assertTrue(self.session.has_previous_question(section.ident,
+                                                           fourth_question.ident))
+        self.assertFalse(self.session.has_previous_question(section.ident,
+                                                            first_question.ident))"""
+
+    get_next_unanswered_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+        third_question = questions.next()
+        fourth_question = questions.next()
+
+        test_question = self.session.get_next_unanswered_question(section.ident,
+                                                                  first_question.ident)
+        self.assertTrue(isinstance(test_question, Question))
+        self.assertEqual(str(second_question.ident),
+                         str(test_question.ident))
+
+        form = self.session.get_response_form(section.ident, second_question.ident)
+        self.session.submit_response(section.ident, second_question.ident, form)
+
+        test_question = self.session.get_next_unanswered_question(section.ident,
+                                                                  first_question.ident)
+        self.assertTrue(isinstance(test_question, Question))
+        self.assertEqual(str(third_question.ident),
+                         str(test_question.ident))
+
+        with self.assertRaises(errors.IllegalState):
+            self.session.get_next_unanswered_question(section.ident,
+                                                      fourth_question.ident)"""
+
+    has_next_unanswered_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+        third_question = questions.next()
+        fourth_question = questions.next()
+
+        self.assertTrue(self.session.has_next_unanswered_question(section.ident,
+                                                                  first_question.ident))
+
+        form = self.session.get_response_form(section.ident, second_question.ident)
+        self.session.submit_response(section.ident, second_question.ident, form)
+
+        self.assertTrue(self.session.has_next_unanswered_question(section.ident,
+                                                                  first_question.ident))
+        self.assertFalse(self.session.has_next_unanswered_question(section.ident,
+                                                                   fourth_question.ident))"""
+
+    get_previous_unanswered_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+        third_question = questions.next()
+        fourth_question = questions.next()
+
+        test_question = self.session.get_previous_unanswered_question(section.ident,
+                                                                      fourth_question.ident)
+        self.assertTrue(isinstance(test_question, Question))
+        self.assertEqual(str(third_question.ident),
+                         str(test_question.ident))
+
+        form = self.session.get_response_form(section.ident, third_question.ident)
+        self.session.submit_response(section.ident, third_question.ident, form)
+
+        test_question = self.session.get_previous_unanswered_question(section.ident,
+                                                                      fourth_question.ident)
+        self.assertTrue(isinstance(test_question, Question))
+        self.assertEqual(str(second_question.ident),
+                         str(test_question.ident))
+
+        with self.assertRaises(errors.IllegalState):
+            self.session.get_previous_unanswered_question(section.ident,
+                                                          first_question.ident)"""
+
+    has_previous_unanswered_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+        second_question = questions.next()
+        third_question = questions.next()
+        fourth_question = questions.next()
+
+        self.assertTrue(self.session.has_previous_unanswered_question(section.ident,
+                                                                      fourth_question.ident))
+
+        form = self.session.get_response_form(section.ident, third_question.ident)
+        self.session.submit_response(section.ident, third_question.ident, form)
+
+        self.assertTrue(self.session.has_previous_unanswered_question(section.ident,
+                                                                      fourth_question.ident))
+        self.assertFalse(self.session.has_previous_unanswered_question(section.ident,
+                                                                       first_question.ident))"""
+
+    get_question = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        test_question = self.session.get_question(section.ident, first_question.ident)
+        self.assertTrue(isinstance(test_question, Question))
+        self.assertEqual(str(test_question.ident),
+                         str(first_question.ident))"""
+
+    get_questions = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        test_questions = self.session.get_questions(section.ident)
+        self.assertTrue(isinstance(test_questions, QuestionList))
+        self.assertEqual(test_questions.available(), 4)
+        first_test_question = test_questions.next()
+        self.assertTrue(isinstance(first_test_question, Question)),
+        self.assertEqual(str(first_test_question.ident),
+                         str(first_question.ident))"""
+
+    get_unanswered_questions = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        question_ids = [q.ident for q in questions]
+
+        test_questions = self.session.get_unanswered_questions(section.ident)
+        self.assertTrue(isinstance(test_questions, QuestionList))
+        self.assertEqual(test_questions.available(), 4)
+        test_question_ids = [q.ident for q in test_questions]
+        self.assertEqual(question_ids, test_question_ids)
+
+        form = self.session.get_response_form(section.ident, question_ids[1])
+        self.session.submit_response(section.ident, question_ids[1], form)
+
+        test_questions = self.session.get_unanswered_questions(section.ident)
+        self.assertTrue(isinstance(test_questions, QuestionList))
+        self.assertEqual(test_questions.available(), 3)
+        test_question_ids = [q.ident for q in test_questions]
+        self.assertNotIn(question_ids[1], test_question_ids)"""
+
+    get_response = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        test_response = self.session.get_response(section.ident, first_question.ident)
+        self.assertTrue(isinstance(test_response, Response))
+
+        with self.assertRaises(errors.IllegalState):
+            test_response.object_map
+
+        form = self.session.get_response_form(section.ident, first_question.ident)
+        self.session.submit_response(section.ident, first_question.ident, form)
+
+        test_response = self.session.get_response(section.ident, first_question.ident)
+        self.assertTrue(isinstance(test_response, Response))
+
+        test_response.object_map"""
+
+    get_responses = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+
+        test_responses = self.session.get_responses(section.ident)
+        self.assertTrue(isinstance(test_responses, ResponseList))
+        self.assertEqual(test_responses.available(), 4)
+        first_response = test_responses.next()
+        self.assertTrue(isinstance(first_response, Response))
+
+        with self.assertRaises(errors.IllegalState):
+            first_response.object_map"""
+
+    get_response_form = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        form = self.session.get_response_form(section.ident, first_question.ident)
+        self.assertTrue(isinstance(form, AnswerForm))"""
+
+    has_unanswered_questions = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        total_questions = questions.available()
+
+        self.assertTrue(self.session.has_unanswered_questions(section.ident))
+
+        for index, question in enumerate(questions):
+            form = self.session.get_response_form(section.ident, question.ident)
+            self.session.submit_response(section.ident, question.ident, form)
+            if index < (total_questions - 1):
+                self.assertTrue(self.session.has_unanswered_questions(section.ident))
+            else:
+                self.assertFalse(self.session.has_unanswered_questions(section.ident))"""
+
+    requires_synchronous_responses = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        self.assertFalse(self.session.requires_synchronous_responses(section.ident))"""
+
+    requires_synchronous_sections = """
+        self.assertFalse(self.session.requires_synchronous_sections(self.taken.ident))"""
 
 
 class AssessmentResultsSession:
+    import_statements = [
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.records import registry',
+        'SEQUENCE_ASSESSMENT = Type(**registry.ASSESSMENT_RECORD_TYPES["simple-child-sequencing"])'
+    ]
 
     init = """
     @classmethod
     def setUpClass(cls):
-        cls.assessment_offered_list = list()
-        cls.assessment_offered_ids = list()
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
-        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        create_form.description = 'Test Bank for AssessmentResultsSession tests'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
-        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form = cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
         create_form.display_name = 'Test Assessment'
-        create_form.description = 'Test Assessment for AssessmentSession tests'
+        create_form.description = 'Test Assessment for AssessmentResultsSession tests'
         cls.assessment = cls.catalog.create_assessment(create_form)
+
+        for number in ['One', 'Two', 'Three', 'Four']:
+            ifc = cls.catalog.get_item_form_for_create([])
+            ifc.set_display_name('Test Assessment Item ' + number)
+            ifc.set_description('This is a Test Item Called Number ' + number)
+            test_item = cls.catalog.create_item(ifc)
+
+            form = cls.catalog.get_question_form_for_create(test_item.ident, [])
+            cls.catalog.create_question(form)
+
+            cls.catalog.add_item(cls.assessment.ident, test_item.ident)
+
+        form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        cls.assessment_offered = cls.catalog.create_assessment_offered(form)
+
+    def setUp(self):
+        self.session = self.svc_mgr.get_assessment_results_session(proxy=self.catalog._proxy)
+        form = self.catalog.get_assessment_taken_form_for_create(self.assessment_offered.ident, [])
+        self.taken = self.catalog.create_assessment_taken(form)
 
     @classmethod
     def tearDownClass(cls):
         for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
             cls.catalog.delete_assessment(obj.ident)
+        for item in cls.catalog.get_items():
+            cls.catalog.delete_item(item.ident)
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    are_results_available = """
+        self.assertFalse(self.session.are_results_available(self.assessment.ident))"""
+
+    can_access_assessment_results = """
+        self.assertTrue(self.session.can_access_assessment_results())"""
+
+    get_grade_entries = """
+        with self.assertRaises(errors.IllegalState):
+            self.session.get_grade_entries(self.assessment.ident)"""
+
+    get_items = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        section.get_questions()
+        self.assertEqual(self.session.get_items(self.taken.ident).available(), 4)"""
+
+    get_responses = """
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+
+        test_responses = self.session.get_responses(self.taken.ident)
+        self.assertTrue(isinstance(test_responses, ResponseList))
+        self.assertEqual(test_responses.available(), 4)
+        first_response = test_responses.next()
+        self.assertTrue(isinstance(first_response, Response))
+
+        with self.assertRaises(errors.IllegalState):
+            first_response.object_map"""
 
 
 class ItemAdminSession:
 
     import_statements = [
+        'from dlkit.abstract_osid.assessment import objects',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'from dlkit.primordium.id.primitives import Id',
+        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
 
-    # This method may need to be hand implemented to deal with error if the item
-    # is found to be associated with an assessment
-    proposed_delete_item = """
-"""
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ItemAdminSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
 
-    # These methods overwrite the canonical aggregate object admin methods to
-    # deal with authoring Questions whitch are special: ie. there is only one per
-    # Item.  Perhaps we will see this pattern again and can make templates.
+    def setUp(self):
+        create_form = self.catalog.get_item_form_for_create([])
+        create_form.display_name = 'new Item'
+        create_form.description = 'description of Item'
+        create_form.set_genus_type(NEW_TYPE)
+        self.osid_object = self.catalog.create_item(create_form)
+        self.session = self.catalog
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
+            cls.catalog.delete_assessment(obj.ident)
+        for item in cls.catalog.get_items():
+            cls.catalog.delete_item(item.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    create_answer = """
+        self.assertEqual(self.osid_object.get_answers().available(), 0)
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        self.session.create_answer(form)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertEqual(updated_item.get_answers().available(), 1)"""
+
     create_question = """
-        pass"""
+        with self.assertRaises(TypeError):
+            # question_map = dict(self._my_map['question'])
+            # TypeError: 'NoneType' object is not iterable
+            self.osid_object.get_question()
+
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        self.session.create_question(form)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertTrue(isinstance(updated_item.get_question(), Question))"""
+
+    delete_answer = """
+        self.assertEqual(self.osid_object.get_answers().available(), 0)
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        answer = self.session.create_answer(form)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertEqual(updated_item.get_answers().available(), 1)
+
+        with self.assertRaises(errors.NotFound):
+            self.session.delete_answer(Id('fake.Package%3A000000000000000000000000%40ODL.MIT.EDU'))
+
+        self.session.delete_answer(answer.ident)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertEqual(updated_item.get_answers().available(), 0)"""
+
+    delete_question = """
+        with self.assertRaises(TypeError):
+            # question_map = dict(self._my_map['question'])
+            # TypeError: 'NoneType' object is not iterable
+            self.osid_object.get_question()
+
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        question = self.session.create_question(form)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+        self.assertTrue(isinstance(updated_item.get_question(), Question))
+
+        with self.assertRaises(errors.NotFound):
+            self.session.delete_question(Id('fake.Package%3A000000000000000000000000%40ODL.MIT.EDU'))
+
+        self.session.delete_question(question.ident)
+        updated_item = self.catalog.get_item(self.osid_object.ident)
+
+        with self.assertRaises(TypeError):
+            updated_item.get_question()"""
+
+    get_answer_form_for_create = """
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        self.assertTrue(isinstance(form, objects.AnswerForm))
+        self.assertFalse(form.is_for_update())"""
+
+    get_question_form_for_create = """
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        self.assertTrue(isinstance(form, objects.QuestionForm))
+        self.assertFalse(form.is_for_update())"""
+
+    get_answer_form_for_update = """
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        answer = self.session.create_answer(form)
+
+        form = self.session.get_answer_form_for_update(answer.ident)
+        self.assertTrue(isinstance(form, objects.AnswerForm))
+        self.assertTrue(form.is_for_update())"""
 
     get_question_form_for_update = """
-        pass"""
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        question = self.session.create_question(form)
+
+        form = self.session.get_question_form_for_update(question.ident)
+        self.assertTrue(isinstance(form, objects.QuestionForm))
+        self.assertTrue(form.is_for_update())"""
+
+    update_answer = """
+        form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+        form.display_name = 'first name'
+        answer = self.session.create_answer(form)
+        self.assertEqual(answer.display_name.text, 'first name')
+
+        form = self.session.get_answer_form_for_update(answer.ident)
+        form.display_name = 'second name'
+        answer = self.session.update_answer(form)
+        self.assertTrue(isinstance(answer, objects.Answer))
+        self.assertEqual(answer.display_name.text, 'second name')"""
 
     update_question = """
-        pass"""
+        form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+        question = self.session.create_question(form)
+        self.assertEqual(question.display_name.text, 'new Item')
+
+        form = self.session.get_question_form_for_update(question.ident)
+        form.display_name = 'second name'
+        question = self.session.update_question(form)
+        self.assertTrue(isinstance(question, objects.Question))
+        self.assertEqual(question.display_name.text, 'second name')"""
+
+
+class ItemBankSession:
+
+    import_statements = [
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+        'from dlkit.primordium.id.primitives import Id',
+        'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.item_list = list()
+        cls.item_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ItemBankSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank for Assignment'
+        create_form.description = 'Test Bank for ItemBankSession tests assignment'
+        cls.assigned_catalog = cls.svc_mgr.create_bank(create_form)
+        for num in [0, 1, 2]:
+            create_form = cls.catalog.get_item_form_for_create([])
+            create_form.display_name = 'Test Item ' + str(num)
+            create_form.description = 'Test Item for ItemBankSession tests'
+            obj = cls.catalog.create_item(create_form)
+            cls.item_list.append(obj)
+            cls.item_ids.append(obj.ident)
+        cls.svc_mgr.assign_item_to_bank(
+            cls.item_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.assign_item_to_bank(
+            cls.item_ids[2], cls.assigned_catalog.ident)
+
+    def setUp(self):
+        self.session = self.svc_mgr
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.unassign_item_from_bank(
+            cls.item_ids[1], cls.assigned_catalog.ident)
+        cls.svc_mgr.unassign_item_from_bank(
+            cls.item_ids[2], cls.assigned_catalog.ident)
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.assigned_catalog.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
 class AssessmentAdminSession:
 
     import_statements = [
     ]
-
-    # This method may need to be hand implemented to deal with error if the assessment
-    # is found to be associated with an assessment offered
-    proposed_delete_assessment = """
-        pass"""
 
 
 class AssessmentOfferedLookupSession:
@@ -247,14 +944,16 @@ class AssessmentOfferedLookupSession:
             cls.assessment_offered_list.append(obj)
             cls.assessment_offered_ids.append(obj.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_assessments_offered():
-                catalog.delete_assessment_offered(obj.ident)
-            for obj in catalog.get_assessments():
-                catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)"""
+        for obj in cls.catalog.get_assessments_offered():
+            cls.catalog.delete_assessment_offered(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
 class AssessmentTakenLookupSession:
@@ -285,24 +984,37 @@ class AssessmentTakenLookupSession:
             cls.assessment_taken_list.append(obj)
             cls.assessment_taken_ids.append(obj.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_assessments_taken():
-                catalog.delete_assessment_taken(obj.ident)
-            for obj in catalog.get_assessments_offered():
-                catalog.delete_assessment_offered(obj.ident)
             for obj in catalog.get_assessments():
+                for offered in catalog.get_assessments_offered_for_assessment(obj.ident):
+                    for taken in catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                        catalog.delete_assessment_taken(taken.ident)
+                    catalog.delete_assessment_offered(offered.ident)
                 catalog.delete_assessment(obj.ident)
+            for obj in catalog.get_items():
+                catalog.delete_item(obj.ident)
             cls.svc_mgr.delete_bank(catalog.ident)"""
 
     # This is hand built, but there may be a pattern to try to map, specifically
     # getting objects for another package object and a persisted id thingy
     get_assessments_taken_for_taker_and_assessment_offered = """
-        pass"""
+        from dlkit.abstract_osid.assessment.objects import AssessmentTakenList
+        takens = self.session.get_assessments_taken_for_taker_and_assessment_offered(
+            self.catalog._proxy.get_effective_agent_id(),
+            self.assessment_offered.ident)
+        self.assertTrue(isinstance(takens, AssessmentTakenList))
+        self.assertEqual(takens.available(), 2)"""
 
     get_assessments_taken_for_assessment = """
-        pass"""
+        from dlkit.abstract_osid.assessment.objects import AssessmentTakenList
+        takens = self.session.get_assessments_taken_for_assessment(self.assessment.ident)
+        self.assertTrue(isinstance(takens, AssessmentTakenList))
+        self.assertEqual(takens.available(), 2)"""
 
 
 class AssessmentTakenAdminSession:
@@ -381,7 +1093,7 @@ class AssessmentOfferedBankSession:
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
-        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        create_form.description = 'Test Bank for AssessmentOfferedBankSession tests'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank Assigned'
@@ -403,18 +1115,60 @@ class AssessmentOfferedBankSession:
         cls.svc_mgr.assign_assessment_offered_to_bank(
             cls.assessment_offered_ids[2], cls.assigned_catalog.ident)
 
+    def setUp(self):
+        self.session = self.svc_mgr
+
     @classmethod
     def tearDownClass(cls):
         cls.svc_mgr.unassign_assessment_offered_from_bank(
             cls.assessment_offered_ids[1], cls.assigned_catalog.ident)
         cls.svc_mgr.unassign_assessment_offered_from_bank(
             cls.assessment_offered_ids[2], cls.assigned_catalog.ident)
-        for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_assessments_offered():
-                catalog.delete_assessment_offered(obj.ident)
-            for obj in catalog.get_assessments():
-                catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)"""
+        for obj in cls.catalog.get_assessments_offered():
+            cls.catalog.delete_assessment_offered(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
+class AssessmentOfferedBankAssignmentSession:
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.assessment_offered_list = list()
+        cls.assessment_offered_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentOfferedBankAssignmentSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank Assigned'
+        create_form.description = 'Test Bank for AssessmentOfferedBankAssignmentSession tests'
+        cls.assigned_catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentOfferedBankAssignmentSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        for num in [0, 1, 2]:
+            create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+            create_form.display_name = 'Test AssessmentOffered ' + str(num)
+            create_form.description = 'Test AssessmentOffered for AssessmentOfferedBankAssignmentSession tests'
+            obj = cls.catalog.create_assessment_offered(create_form)
+            cls.assessment_offered_list.append(obj)
+            cls.assessment_offered_ids.append(obj.ident)
+
+    def setUp(self):
+        self.session = self.svc_mgr
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments_offered():
+            cls.catalog.delete_assessment_offered(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
 class AssessmentTakenBankSession:
@@ -453,20 +1207,68 @@ class AssessmentTakenBankSession:
         cls.svc_mgr.assign_assessment_taken_to_bank(
             cls.assessment_taken_ids[2], cls.assigned_catalog.ident)
 
+    def setUp(self):
+        self.session = self.svc_mgr
+
     @classmethod
     def tearDownClass(cls):
         cls.svc_mgr.unassign_assessment_taken_from_bank(
             cls.assessment_taken_ids[1], cls.assigned_catalog.ident)
         cls.svc_mgr.unassign_assessment_taken_from_bank(
             cls.assessment_taken_ids[2], cls.assigned_catalog.ident)
-        for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_assessments_taken():
-                catalog.delete_assessment_taken(obj.ident)
-            for obj in catalog.get_assessments_offered():
-                catalog.delete_assessment_offered(obj.ident)
-            for obj in catalog.get_assessments():
-                catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)"""
+        for obj in cls.catalog.get_assessments_taken():
+            cls.catalog.delete_assessment_taken(obj.ident)
+        for obj in cls.catalog.get_assessments_offered():
+            cls.catalog.delete_assessment_offered(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+
+class AssessmentTakenBankAssignmentSession:
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.assessment_taken_list = list()
+        cls.assessment_taken_ids = list()
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentTakenBankAssignmentSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank Assigned'
+        create_form.description = 'Test Bank for AssessmentTakenBankAssignmentSession tests'
+        cls.assigned_catalog = cls.svc_mgr.create_bank(create_form)
+        create_form = cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentTakenBankAssignmentSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
+        create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        create_form.display_name = 'Test AssessmentOffered'
+        create_form.description = 'Test AssessmentOffered for AssessmentTakenBankAssignmentSession tests'
+        cls.assessment_offered = cls.catalog.create_assessment_offered(create_form)
+        for num in [0, 1, 2]:
+            create_form = cls.catalog.get_assessment_taken_form_for_create(cls.assessment_offered.ident, [])
+            create_form.display_name = 'Test AssessmentTaken ' + str(num)
+            create_form.description = 'Test AssessmentTaken for AssessmentTakenBankAssignmentSession tests'
+            obj = cls.catalog.create_assessment_taken(create_form)
+            cls.assessment_taken_list.append(obj)
+            cls.assessment_taken_ids.append(obj.ident)
+
+    def setUp(self):
+        self.session = self.svc_mgr
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments_taken():
+            cls.catalog.delete_assessment_taken(obj.ident)
+        for obj in cls.catalog.get_assessments_offered():
+            cls.catalog.delete_assessment_offered(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
 class AssessmentBasicAuthoringSession:
@@ -510,7 +1312,7 @@ class AssessmentBasicAuthoringSession:
         cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
     can_author_assessments = """
-        pass"""
+        self.assertTrue(isinstance(self.catalog.can_author_assessments(), bool))"""
 
     get_items = """
         self.assertEqual(self.catalog.get_assessment_items(self.assessment.ident).available(), 4)"""
@@ -585,6 +1387,9 @@ class Question:
         form.display_name = 'Test question'
         cls.question = cls.catalog.create_question(form)
 
+    def setUp(self):
+        self.object = self.question
+
     @classmethod
     def tearDownClass(cls):
         for obj in cls.catalog.get_items():
@@ -622,6 +1427,7 @@ class QuestionForm:
 class QuestionQuery:
 
     import_statements = [
+        'from dlkit.json_.assessment.queries import QuestionQuery'
     ]
 
     init = """
@@ -633,9 +1439,9 @@ class QuestionQuery:
         create_form.description = 'Test catalog description'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
 
-        item_query = cls.catalog.get_item_query()
-        # cls.query = item_query.get_question_query()
-        # Currently raises Unsupported()
+    def setUp(self):
+        # Since the session isn't implemented, we just construct a QuestionQuery directly
+        self.query = QuestionQuery(runtime=self.catalog._runtime)
 
     @classmethod
     def tearDownClass(cls):
@@ -697,6 +1503,9 @@ class Answer:
         form.display_name = 'Test answer'
         cls.answer = cls.catalog.create_answer(form)
 
+    def setUp(self):
+        self.object = self.answer
+
     @classmethod
     def tearDownClass(cls):
         for obj in cls.catalog.get_items():
@@ -730,6 +1539,7 @@ class AnswerForm:
 class AnswerQuery:
 
     import_statements = [
+        'from dlkit.json_.assessment.queries import AnswerQuery'
     ]
 
     init = """
@@ -741,9 +1551,9 @@ class AnswerQuery:
         create_form.description = 'Test catalog description'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
 
-        item_query = cls.catalog.get_item_query()
-        # cls.query = item_query.get_answer_query()
-        # Currently raises Unsupported()
+    def setUp(self):
+        # Since the session isn't implemented, we just construct a AnswerQuery directly
+        self.query = AnswerQuery(runtime=self.catalog._runtime)
 
     @classmethod
     def tearDownClass(cls):
@@ -831,6 +1641,7 @@ class Item:
         self.catalog.create_answer(form)
 
         self.item = self.catalog.get_item(self.item.ident)
+        self.object = self.item
 
     @classmethod
     def tearDownClass(cls):
@@ -887,6 +1698,7 @@ class ItemQuery:
 
     match_learning_objective_id = """
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.assertNotIn('learningObjectiveIds', self.query._query_terms)
         self.query.match_learning_objective_id(test_id, match=True)
         self.assertEqual(self.query._query_terms['learningObjectiveIds'], {
             '$in': [str(test_id)]
@@ -900,6 +1712,192 @@ class ItemQuery:
         self.query.clear_learning_objective_id_terms()
         self.assertNotIn('learningObjectiveIds',
                          self.query._query_terms)"""
+
+    clear_learning_objective_terms = """
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_any_learning_objective(match=True)
+        self.assertIn('learningObjectiveIds',
+                      self.query._query_terms)
+        self.query.clear_learning_objective_terms()
+        self.assertNotIn('learningObjectiveIds',
+                         self.query._query_terms)"""
+
+    match_any_learning_objective = """
+        self.assertNotIn('learningObjectiveIds', self.query._query_terms)
+        self.query.match_any_learning_objective(match=True)
+        self.assertEqual(self.query._query_terms['learningObjectiveIds'], {
+            '$exists': 'true',
+            '$nin': [[], ['']]
+        })"""
+
+
+class ItemSearch:
+    import_statements = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+    def setUp(self):
+        self.search = self.catalog.get_item_search()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    search_among_items = """
+        # This is implementation dependent...find some other way?
+        self.assertIsNone(self.search._id_list)
+        fake_list = [self.catalog.ident]
+        self.search.search_among_items(fake_list)
+        self.assertEqual(self.search._id_list, fake_list)"""
+
+
+class ItemSearchResults:
+    import_statements = [
+        'from dlkit.runtime import PROXY_SESSION, proxy_example',
+        'from dlkit.runtime.managers import Runtime',
+        'REQUEST = proxy_example.SimpleRequest()',
+        'CONDITION = PROXY_SESSION.get_proxy_condition()',
+        'CONDITION.set_http_request(REQUEST)',
+        'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+        'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.primordium.type.primitives import Type',
+        'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+    def setUp(self):
+        self.query = self.catalog.get_item_query()
+        self.search_obj = self.catalog.get_item_search()
+        self.search = self.catalog.get_items_by_search(self.query, self.search_obj)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    get_items = """
+        from dlkit.abstract_osid.assessment.objects import ItemList
+        items = self.search.get_items()
+        self.assertTrue(isinstance(items, ItemList))
+        self.assertEqual(items.available(), 0)"""
+
+
+class ItemQuerySession:
+    import_statements = [
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ItemQuerySession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
+            create_form = cls.catalog.get_item_form_for_create([])
+            create_form.display_name = 'Test Item ' + color
+            create_form.description = (
+                'Test Item for ItemQuerySession tests, did I mention green')
+            obj = cls.catalog.create_item(create_form)
+
+    def setUp(self):
+        self.session = self.catalog
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
+            cls.catalog.delete_assessment(obj.ident)
+        for item in cls.catalog.get_items():
+            cls.catalog.delete_item(item.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    can_search_items = """
+        self.assertTrue(self.session.can_search_items())"""
+
+
+class ItemSearchSession:
+    import_statements = [
+        'from dlkit.json_.assessment import searches',
+        'from dlkit.primordium.type.primitives import Type',
+        'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
+        'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data("WORDIGNORECASE"))'
+    ]
+
+    init = """
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ItemSearchSession tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
+
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
+            create_form = cls.catalog.get_item_form_for_create([])
+            create_form.display_name = 'Test Item ' + color
+            create_form.description = (
+                'Test Item for ItemSearchSession tests, did I mention green')
+            obj = cls.catalog.create_item(create_form)
+
+    def setUp(self):
+        self.session = self.catalog
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
+            cls.catalog.delete_assessment(obj.ident)
+        for item in cls.catalog.get_items():
+            cls.catalog.delete_item(item.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    get_item_search = """
+        search = self.session.get_item_search()
+        self.assertTrue(isinstance(search, searches.ItemSearch))"""
+
+    get_items_by_search = """
+        query = self.session.get_item_query()
+        query.match_display_name('zxy', DEFAULT_STRING_MATCH_TYPE, True)
+        search = self.session.get_item_search()
+        results = self.session.get_items_by_search(query, search)
+        self.assertTrue(isinstance(results, searches.ItemSearchResults))
+        self.assertEqual(results.get_result_size(), 0)"""
 
 
 class AssessmentOffered:
@@ -1190,12 +2188,22 @@ class AssessmentOfferedList:
 
 
 class AssessmentOfferedQuery:
+    import_statements = [
+        'from dlkit.primordium.calendaring.primitives import DateTime'
+    ]
 
     match_start_time_template = """
-        pass"""
+        start_time = DateTime.utcnow()
+        end_time = DateTime.utcnow()
+        self.query.${method_name}(start_time, end_time, match=True)
+        self.assertEqual(self.query._query_terms['${var_name_mixed}'], {
+            '$$gte': start_time,
+            '$$lte': end_time
+        })"""
 
 
 class AssessmentQuery:
+
     match_item_id = """
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.match_item_id(test_id, match=True)
@@ -1226,11 +2234,11 @@ class AssessmentOfferedQuerySession:
         cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
         create_form = cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
-        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        create_form.description = 'Test Bank for AssessmentOfferedQuerySession tests'
         cls.catalog = cls.svc_mgr.create_bank(create_form)
         create_form = cls.catalog.get_assessment_form_for_create([])
         create_form.display_name = 'Test Assessment'
-        create_form.description = 'Test Assessment for AssessmentOfferedLookupSession tests'
+        create_form.description = 'Test Assessment for AssessmentOfferedQuerySession tests'
         cls.assessment = cls.catalog.create_assessment(create_form)
         for color in ['Orange', 'Blue', 'Green', 'orange']:
             create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
@@ -1241,14 +2249,16 @@ class AssessmentOfferedQuerySession:
             cls.assessment_offered_list.append(obj)
             cls.assessment_offered_ids.append(obj.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_banks():
-            for obj in catalog.get_assessments_offered():
-                catalog.delete_assessment_offered(obj.ident)
-            for obj in catalog.get_assessments():
-                catalog.delete_assessment(obj.ident)
-            cls.svc_mgr.delete_bank(catalog.ident)"""
+        for obj in cls.catalog.get_assessments_offered():
+            cls.catalog.delete_assessment_offered(obj.ident)
+        for obj in cls.catalog.get_assessments():
+            cls.catalog.delete_assessment(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
 
 
 class AssessmentTakenQuerySession:
@@ -1265,11 +2275,11 @@ class AssessmentTakenQuerySession:
         cls.catalog = cls.svc_mgr.create_bank(create_form)
         create_form = cls.catalog.get_assessment_form_for_create([])
         create_form.display_name = 'Test Assessment'
-        create_form.description = 'Test Assessment for AssessmentOfferedLookupSession tests'
+        create_form.description = 'Test Assessment for AssessmentTakenLookupSession tests'
         cls.assessment = cls.catalog.create_assessment(create_form)
         create_form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
         create_form.display_name = 'Test AssessmentOffered'
-        create_form.description = 'Test AssessmentOffered for AssessmentOfferedLookupSession tests'
+        create_form.description = 'Test AssessmentOffered for AssessmentTakenLookupSession tests'
         cls.assessment_offered = cls.catalog.create_assessment_offered(create_form)
         for color in ['Orange', 'Blue', 'Green', 'orange']:
             create_form = cls.catalog.get_assessment_taken_form_for_create(cls.assessment_offered.ident, [])
@@ -1279,6 +2289,9 @@ class AssessmentTakenQuerySession:
             obj = cls.catalog.create_assessment_taken(create_form)
             cls.assessment_taken_list.append(obj)
             cls.assessment_taken_ids.append(obj.ident)
+
+    def setUp(self):
+        self.session = self.catalog
 
     @classmethod
     def tearDownClass(cls):
@@ -1621,6 +2634,7 @@ class AssessmentSection:
                                                                  [])
         self.taken = self.catalog.create_assessment_taken(form)
         self.section = self.catalog.get_first_assessment_section(self.taken.ident)
+        self.object = self.section
 
     def tearDown(self):
         self.catalog.delete_assessment_taken(self.taken.ident)
@@ -1739,8 +2753,86 @@ class ResponseList:
     ]
 
     init = """
-"""
+    @classmethod
+    def setUpClass(cls):
+        cls.svc_mgr = Runtime().get_service_manager('ASSESSMENT', proxy=PROXY, implementation='TEST_SERVICE')
+        create_form = cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ResponseList tests'
+        cls.catalog = cls.svc_mgr.create_bank(create_form)
 
-    get_next_response = """"""
+        create_form = cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentSession tests'
+        cls.assessment = cls.catalog.create_assessment(create_form)
 
-    get_next_responses = """"""
+        for number in ['One', 'Two', 'Three', 'Four']:
+            ifc = cls.catalog.get_item_form_for_create([])
+            ifc.set_display_name('Test Assessment Item ' + number)
+            ifc.set_description('This is a Test Item Called Number ' + number)
+            test_item = cls.catalog.create_item(ifc)
+            form = cls.catalog.get_question_form_for_create(test_item.ident, [])
+            cls.catalog.create_question(form)
+
+            if number == 'One':
+                form = cls.catalog.get_answer_form_for_create(test_item.ident, [])
+                cls.catalog.create_answer(form)
+
+            cls.catalog.add_item(cls.assessment.ident, test_item.ident)
+
+        form = cls.catalog.get_assessment_offered_form_for_create(cls.assessment.ident, [])
+        cls.assessment_offered = cls.catalog.create_assessment_offered(form)
+
+    def setUp(self):
+        form = self.catalog.get_assessment_taken_form_for_create(self.assessment_offered.ident, [])
+        self.taken = self.catalog.create_assessment_taken(form)
+
+        section = self.catalog.get_first_assessment_section(self.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        for num in [0, 1]:
+            create_form = self.catalog.get_response_form(section.ident, first_question.ident)
+            self.catalog.submit_response(section.ident, first_question.ident, create_form)
+
+        self.response_list = self.catalog.get_responses(section.ident)
+        self.object = self.response_list
+
+    @classmethod
+    def tearDownClass(cls):
+        for obj in cls.catalog.get_assessments():
+            for offered in cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                for taken in cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                    cls.catalog.delete_assessment_taken(taken.ident)
+                cls.catalog.delete_assessment_offered(offered.ident)
+            cls.catalog.delete_assessment(obj.ident)
+        for obj in cls.catalog.get_items():
+            cls.catalog.delete_item(obj.ident)
+        cls.svc_mgr.delete_bank(cls.catalog.ident)"""
+
+    get_next_response = """
+        from dlkit.abstract_osid.assessment.rules import Response
+        self.assertTrue(isinstance(self.response_list.get_next_response(), Response))"""
+
+    get_next_responses = """
+        from dlkit.abstract_osid.assessment.objects import ResponseList
+        from dlkit.abstract_osid.assessment.rules import Response
+        new_list = self.response_list.get_next_responses(2)
+        self.assertTrue(isinstance(new_list, ResponseList))
+        for item in new_list:
+            self.assertTrue(isinstance(item, Response))"""
+
+
+class BankQuery:
+    match_ancestor_bank_id = """
+        self.assertNotIn('_id', self.query._query_terms)
+        self.query.match_ancestor_bank_id(self.fake_id, True)
+        self.assertEqual(self.query._query_terms['_id'], {
+            '$in': []
+        })"""
+
+
+class BankForm:
+    get_bank_form_record = """
+        with self.assertRaises(errors.Unsupported):
+            self.object.get_bank_form_record(DEFAULT_TYPE)"""

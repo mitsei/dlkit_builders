@@ -135,7 +135,9 @@ _singular_to_plural = {
     'GradeEntry': 'GradeEntries',
     'grade_entry': 'grade_entries',
     'log_entry': 'log_entries',
-    'LogEntry': 'LogEntries'
+    'LogEntry': 'LogEntries',
+    'search': 'searches',
+    'Search': 'Searches'
 }
 
 _plural_to_singular = {v: k for k, v in _singular_to_plural.items()}
@@ -282,6 +284,8 @@ def fix_bad_name(name, optional_match_term=None):
         'osid.repository.CompositionQuerySession': 'osid.repository.CompositionQuerySession',
         'supports_authorizatin_batch': 'supports_authorization_batch',
         'supports_authorizatin_rules': 'supports_authorization_rules',
+        'get_compoitions_by_repositories': 'get_compositions_by_repositories',
+        'osid.assessment.AssessmentNotificationSession': 'osid.assessment.ItemNotificationSession'
     }
 
     if optional_match_term == 'get_composition_query_session':
@@ -289,6 +293,8 @@ def fix_bad_name(name, optional_match_term=None):
     elif optional_match_term in ['get_composition_search_session',
                                  'get_composition_search_session_for_repository']:
         name = 'osid.repository.CompositionSearchSession'
+    elif optional_match_term == 'get_item_notification_session_for_bank':
+        name = bad_names_map[name]
     else:
         if name in bad_names_map:
             name = bad_names_map[name]

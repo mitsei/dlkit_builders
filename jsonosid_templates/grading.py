@@ -3,7 +3,7 @@ class GradeEntryAdminSession:
 
     import_statements = [
         'from dlkit.abstract_osid.id.primitives import Id as ABCId',
-        'from dlkit.abstract_osid.type.primitives import Type as ABCType',
+        'from dlkit.abstract_osid.type.primitives import Type as ABCType'
     ]
 
     get_grade_entry_form_for_create = """
@@ -64,7 +64,7 @@ class GradeEntryAdminSession:
 
 
 class GradeSystem:
-    import_statements = [
+    import_statements_pattern = [
         'from decimal import Decimal',
     ]
 
@@ -137,27 +137,31 @@ class GradeSystemForm:
 class GradeEntry:
 
     import_statements = [
+        'from dlkit.primordium.id.primitives import Id',
         'from ..resource.simple_agent import Agent',
     ]
 
     get_key_resource_id = """
-        return self._my_map['resourceId']"""
+        return Id(self._my_map['resourceId'])"""
+
+    get_key_resource = """
+        return Agent(self.get_key_resource_id())"""
 
     get_time_graded = """
-        if not self.is_graded or self.is_derived():
+        if not self.is_graded() or self.is_derived():
             raise errors.IllegalState()
         time_graded = self._my_map['timeGraded']
         return DateTime(
-            time_graded['year'],
-            time_graded['month'],
-            time_graded['day'],
-            time_graded['hour'],
-            time_graded['minute'],
-            time_graded['second'],
-            time_graded['microsecond'])"""
+            year=time_graded.year,
+            month=time_graded.month,
+            day=time_graded.day,
+            hour=time_graded.hour,
+            minute=time_graded.minute,
+            second=time_graded.second,
+            microsecond=time_graded.microsecond)"""
 
     is_graded = """
-        return bool(self._my_map['gradeId'] is not None or self._my_map['score'] is not None)"""
+        return bool(self._my_map['gradeId'] != '' or self._my_map['score'] is not None)"""
 
     get_grading_agent_id = """
         if not self.is_graded or self.is_derived():
@@ -168,12 +172,20 @@ class GradeEntry:
         return Agent(self.get_grading_agent_id())"""
 
     overrides_calculated_entry = """
-        return bool(self._my_map('overriddenCalculatedEntryId'))"""
+        return bool(self._my_map['overriddenCalculatedEntryId'])"""
 
     get_overridden_calculated_entry_id = """
         if not self.overrides_calculated_entry():
             raise errors.IllegalState()
         return self._my_map['overriddenCalculatedEntryId']"""
+
+    get_grade = """
+        grade_system = self.get_gradebook_column().get_grade_system()
+
+        for grade in grade_system.get_grades():
+            if str(grade.ident) == self._my_map['gradeId']:
+                return grade
+        raise errors.IllegalState('gradeId does not exist in this GradeSystem')"""
 
 
 class GradeEntryForm:
@@ -221,9 +233,9 @@ class GradeEntryForm:
             self._mdata['score'].update(
                 {'minimum_decimal': self._grade_system.get_lowest_numeric_score(),
                  'maximum_decimal': self._grade_system.get_highest_numeric_score()})
-        self._grade_default = self._mdata['grade']['default_id_values'][0]
-        self._ignored_for_calculations_default = self._mdata['ignored_for_calculations']['default_boolean_values'][0]
-        self._score_default = self._mdata['score']['default_decimal_values'][0]
+        self._grade_default = list(self._mdata['grade']['default_id_values'])[0]
+        self._ignored_for_calculations_default = list(self._mdata['ignored_for_calculations']['default_boolean_values'])[0]
+        self._score_default = list(self._mdata['score']['default_decimal_values'])[0]
 
     def _init_map(self, record_types=None, **kwargs):
         osid_objects.OsidRelationshipForm._init_map(self, record_types=record_types)
@@ -251,7 +263,7 @@ class GradeEntryForm:
             raise errors.InvalidArgument('Grade ID not in the acceptable set.')
         self._my_map['gradeId'] = str(grade_id)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
-        self._my_map['timeGraded'] = now_map()"""
+        self._my_map['timeGraded'] = DateTime.utcnow()"""
 
     clear_grade = """
         if not self._grade_system.is_based_on_grades():
@@ -277,7 +289,7 @@ class GradeEntryForm:
             raise errors.InvalidArgument('score must be in increments of ' + str(self._score_increment))
         self._my_map['score'] = float(score)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
-        self._my_map['timeGraded'] = now_map()"""
+        self._my_map['timeGraded'] = DateTime.utcnow()"""
 
     clear_score = """
         if self._grade_system.is_based_on_grades():
@@ -481,3 +493,16 @@ class GradebookColumnSummary:
 
     get_sum = """
         return sum(self._entry_scores)"""
+
+
+class GradebookColumnSummaryQuery:
+    init = """
+    def __init__(self, runtime):
+        self._namespace = 'grading.GradebookColumnSummaryQuery'
+        self._runtime = runtime
+        record_type_data_sets = get_registry('GRADEBOOK_COLUMN_SUMMARY_QUERY_RECORD_TYPES', runtime)
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidRuleQuery.__init__(self, runtime)"""

@@ -1,3 +1,4 @@
+from binder_helpers import remove_plural
 from build_dlkit import BaseBuilder
 from interface_builders import InterfaceBuilder
 
@@ -18,8 +19,56 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
                                                  method['name'])
 
     def _clean_up_impl(self, impl, interface, method):
+        def is_catalog():
+            return any(cat_term in interface['inherit_shortnames']
+                       for cat_term in ['OsidCatalog', 'OsidCatalogForm'])
+
+        def is_query():
+            return any(query_term in interface['inherit_shortnames']
+                       for query_term in ['OsidObjectQuery',
+                                          'OsidRelationshipQuery',
+                                          'OsidRuleQuery',
+                                          'OsidCatalogQuery'])
+
+        def is_record_method():
+            return method['name'].endswith('_record')
+
+        def is_search():
+            return any(search_term in interface['inherit_shortnames']
+                       for search_term in ['OsidSearch', 'OsidSearchResults'])
+
+        def is_unimplemented_node():
+            return any(node in interface['shortname']
+                       for node in ['VaultNode', 'LogNode', 'ResourceNode'])
+
         if impl == '':
-            impl = '{}pass'.format(self._dind)
+            test_object = remove_plural(interface['category'])
+            if is_search() or is_unimplemented_node():
+                # We don't have any search stuff implemented yet
+                impl = '{0}pass'.format(self._dind)
+            elif (len(method['args']) > 0 and
+                    ((is_catalog() and
+                      is_record_method()) or
+                     (is_query() and is_record_method()) or
+                     (not is_catalog() and not is_record_method()))):
+                # i.e. AssessmentManager.get_bank_record() throws Unimplemented()
+                # i.e. Question.get_question_record() throws Unsupported()
+                impl = '{0}with self.assertRaises(errors.Unimplemented):\n{0}{1}self.{2}.{3}({4})'.format(self._dind,
+                                                                                                          self._ind,
+                                                                                                          test_object,
+                                                                                                          method['name'],
+                                                                                                          ', '.join((len(method['args']) * ['True'])))
+            elif method['name'].endswith('_record'):
+                impl = '{0}with self.assertRaises(errors.Unsupported):\n{0}{1}self.{2}.{3}({4})'.format(self._dind,
+                                                                                                        self._ind,
+                                                                                                        test_object,
+                                                                                                        method['name'],
+                                                                                                        ', '.join((len(method['args']) * ['True'])))
+            else:
+                impl = '{0}with self.assertRaises(errors.Unimplemented):\n{0}{1}self.{2}.{3}()'.format(self._dind,
+                                                                                                       self._ind,
+                                                                                                       test_object,
+                                                                                                       method['name'])
         else:
             context = self._get_method_context(method, interface)
             interface_sn = interface['shortname']

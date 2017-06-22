@@ -379,7 +379,10 @@ class AssessmentSession:
         # This makes the simple assumption that answers are available only when
         # a response has been submitted for an Item.
         try:
-            self.get_response(assessment_section_id, item_id)
+            response = self.get_response(assessment_section_id, item_id)
+            # need to invoke something like .object_map before
+            # a "null" response throws IllegalState
+            response.object_map
         except errors.IllegalState:
             return False
         else:
@@ -434,14 +437,18 @@ class AssessmentResultsSession:
     get_items = """
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
         taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
+        taken_lookup_session.use_federated_bank_view()
         taken = taken_lookup_session.get_assessment_taken(assessment_taken_id)
         ils = get_item_lookup_session(runtime=self._runtime, proxy=self._proxy)
+        ils.use_federated_bank_view()
         item_list = []
         if 'sections' in taken._my_map:
             for section_id in taken._my_map['sections']:
-                section = get_assessment_section(Id(section_id))
+                section = get_assessment_section(Id(section_id),
+                                                 runtime=self._runtime,
+                                                 proxy=self._proxy)
                 for question in section._my_map['questions']:
-                    item_list.append(ils.get_item(question['questionId']))
+                    item_list.append(ils.get_item(Id(question['questionId'])))
         return ItemList(item_list)"""
 
     get_responses = """
@@ -464,7 +471,7 @@ class AssessmentResultsSession:
 
     get_grade_entries = """
         # not implemented yet and are_results_available is False
-        raise IllegalState()"""
+        raise errors.IllegalState()"""
 
 
 class ItemAdminSession:
@@ -540,6 +547,17 @@ class ItemAdminSession:
         return objects.Question(osid_object_map=question_form._my_map,
                                 runtime=self._runtime,
                                 proxy=self._proxy)"""
+
+    delete_question = """
+        collection = JSONClientValidated('assessment',
+                                         collection='Item',
+                                         runtime=self._runtime)
+        if not isinstance(question_id, ABCId):
+            raise errors.InvalidArgument('the argument is not a valid OSID Id')
+        item = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
+
+        item['question'] = None
+        collection.save(item)"""
 
     get_question_form_for_update_import_templates = [
         'from dlkit.abstract_osid.id.primitives import Id as ABCId'
@@ -1219,6 +1237,14 @@ class Assessment:
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return False
 
+    def uses_simple_section_sequencing(self):
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        return False
+
+    def uses_shuffled_section_sequencing(self):
+        \"\"\"This method can be overwritten by a record extension.\"\"\"
+        return False
+
     def _supports_simple_sequencing(self):
         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])
 
@@ -1334,15 +1360,11 @@ class AssessmentOffered:
 
     def are_sections_sequential(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
-        if not self.get_assessment().uses_simple_section_sequencing():  # Records should check this
-            return True
-        return True
+        return self.get_assessment().uses_simple_section_sequencing()  # Records should check this
 
     def are_sections_shuffled(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
-        if not self.get_assessment().uses_simple_section_sequencing():  # Records should check this
-            return False
-        return False"""
+        return self.get_assessment().uses_shuffled_section_sequencing()  # Records should check this"""
 
     has_start_time_template = """
         # Implemented from template for osid.assessment.AssessmentOffered.has_start_time_template
@@ -1529,6 +1551,19 @@ class AssessmentTaken:
         else:
             return self._get_assessment_section(
                 Id(self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) + 1]))
+
+    def _get_previous_assessment_section(self, assessment_section_id):
+        \"\"\"Gets the previous section before section_id.
+
+        Assumes that section list exists in taken and section_id is in section list.
+        Assumes that Section parts only exist as children of Assessments
+
+        \"\"\"
+        if self._my_map['sections'][0] == str(assessment_section_id):
+            raise errors.IllegalState('already at the first section')
+        else:
+            return self._get_assessment_section(
+                Id(self._my_map['sections'][self._my_map['sections'].index(str(assessment_section_id)) - 1]))
 
     def _get_assessment_section(self, assessment_section_id):
         if assessment_section_id not in self._assessment_sections:

@@ -225,6 +225,9 @@ class AuthorizationSession:
             cls.authz_list.append(authz)
             cls.authz_id_list.append(authz.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.resource_mgr.get_bins():
@@ -281,6 +284,9 @@ class AuthorizationSession:
 
 
 class AuthorizationLookupSession:
+    import_statements = [
+        'from dlkit.abstract_osid.authorization.objects import AuthorizationList'
+    ]
 
     init = """
     @classmethod
@@ -304,12 +310,20 @@ class AuthorizationLookupSession:
             cls.authorization_list.append(object)
             cls.authorization_ids.append(object.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_vaults():
             for obj in catalog.get_authorizations():
                 catalog.delete_authorization(obj.ident)
             cls.svc_mgr.delete_vault(catalog.ident)"""
+
+    get_authorizations_for_function = """
+        results = self.session.get_authorizations_for_function(LOOKUP_RESOURCE_FUNCTION_ID)
+        self.assertEqual(results.available(), 2)
+        self.assertTrue(isinstance(results, AuthorizationList))"""
 
 
 class AuthorizationForm:
@@ -416,25 +430,70 @@ class Authorization:
                 catalog.delete_authorization(obj.ident)
             cls.svc_mgr.delete_vault(catalog.ident)"""
 
-    get_agent = """"""
+    get_agent = """
+        # because we don't have Agency implemented in authentication
+        with self.assertRaises(AttributeError):
+            self.object.get_agent()"""
 
-    get_agent_id = """"""
+    get_agent_id = """
+        result = self.object.get_agent_id()
+        self.assertTrue(isinstance(result, Id))
+        self.assertEqual(str(result),
+                         str(AGENT_ID))"""
 
-    has_agent = """"""
+    get_function = """
+        # not supported
+        with self.assertRaises(errors.OperationFailed):
+            self.object.get_function()"""
 
-    get_trust = """"""
+    get_function_id = """
+        result = self.object.get_function_id()
+        self.assertTrue(isinstance(result, Id))
+        self.assertEqual(str(result),
+                         str(LOOKUP_RESOURCE_FUNCTION_ID))"""
 
-    get_trust_id = """"""
+    get_qualifier = """
+        # not supported
+        with self.assertRaises(errors.OperationFailed):
+            self.object.get_qualifier()"""
 
-    has_trust = """"""
+    get_qualifier_id = """
+        result = self.object.get_qualifier_id()
+        self.assertTrue(isinstance(result, Id))
+        self.assertEqual(str(result),
+                         'resource.Resource%3Afoo%40ODL.MIT.EDU')"""
 
-    get_resource = """"""
+    has_agent = """
+        self.assertTrue(isinstance(self.object.has_agent(), bool))"""
 
-    get_resource_id = """"""
+    get_trust = """
+        # no trust, so throws IllegalState
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_trust()"""
 
-    has_resource = """"""
+    get_trust_id = """
+        # no trust, so throws IllegalState
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_trust_id()"""
 
-    is_implicit = """"""
+    has_trust = """
+        self.assertTrue(isinstance(self.object.has_trust(), bool))"""
+
+    get_resource = """
+        # no resource, so throws IllegalState
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_resource()"""
+
+    get_resource_id = """
+        # no resource, so throws IllegalState
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_resource_id()"""
+
+    has_resource = """
+        self.assertTrue(isinstance(self.object.has_resource(), bool))"""
+
+    is_implicit = """
+        self.assertTrue(isinstance(self.object.is_implicit(), bool))"""
 
 
 class AuthorizationQuerySession:
@@ -462,6 +521,9 @@ class AuthorizationQuerySession:
             cls.authorization_list.append(obj)
             cls.authorization_ids.append(obj.ident)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_vaults():
@@ -472,6 +534,7 @@ class AuthorizationQuerySession:
 
 class AuthorizationAdminSession:
     import_statements = [
+        'from dlkit.abstract_osid.authorization.objects import Authorization',
         'from dlkit.abstract_osid.osid.objects import OsidForm',
         'from dlkit.abstract_osid.osid import errors',
         'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
@@ -510,6 +573,9 @@ class AuthorizationAdminSession:
         form.genus_type = NEW_TYPE
         cls.osid_object = cls.catalog.create_authorization(form)
 
+    def setUp(self):
+        self.session = self.catalog
+
     @classmethod
     def tearDownClass(cls):
         for catalog in cls.svc_mgr.get_vaults():
@@ -527,7 +593,6 @@ class AuthorizationAdminSession:
         self.assertFalse(form.is_for_update())"""
 
     update_authorization = """
-        from dlkit.abstract_osid.authorization.objects import Authorization
         form = self.catalog.get_authorization_form_for_update(self.osid_object.ident)
         form.display_name = 'new name'
         form.description = 'new description'
@@ -552,6 +617,24 @@ class AuthorizationAdminSession:
         self.catalog.delete_authorization(osid_object.ident)
         with self.assertRaises(errors.NotFound):
             self.catalog.get_authorization(osid_object.ident)"""
+
+    get_authorization_form_for_create_for_agent = """
+        form = self.catalog.get_authorization_form_for_create_for_agent(
+            AGENT_ID,
+            LOOKUP_RESOURCE_FUNCTION_ID,
+            Id(**{\'identifier\': \'foo\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'}),
+            [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
+
+    get_authorization_form_for_create_for_resource = """
+        form = self.catalog.get_authorization_form_for_create_for_resource(
+            AGENT_ID,
+            LOOKUP_RESOURCE_FUNCTION_ID,
+            Id(**{\'identifier\': \'foo\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'}),
+            [])
+        self.assertTrue(isinstance(form, OsidForm))
+        self.assertFalse(form.is_for_update())"""
 
 
 class VaultNodeList:

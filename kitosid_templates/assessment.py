@@ -62,6 +62,14 @@ class AssessmentAuthoringManager:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_admin_session_for_bank(*args, **kwargs)"""
 
+    get_assessment_part_item_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session(*args, **kwargs)"""
+
+    get_assessment_part_item_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session_for_bank(*args, **kwargs)"""
+
 
 class AssessmentAuthoringProxyManager:
     get_sequence_rule_lookup_session = """
@@ -103,6 +111,14 @@ class AssessmentAuthoringProxyManager:
     get_sequence_rule_admin_session_for_bank = """
         \"\"\"Pass through to provider method\"\"\"
         return AssessmentManager.get_sequence_rule_admin_session_for_bank(*args, **kwargs)"""
+
+    get_assessment_part_item_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_item_session(*args, **kwargs)"""
+
+    get_assessment_part_item_session_for_bank = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_item_session_for_bank(*args, **kwargs)"""
 
 
 class AssessmentAuthoringProfile:
@@ -474,6 +490,12 @@ class AssessmentPartItemSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_item_session').get_assessment_part_items(*args, **kwargs)"""
 
+    can_access_assessment_part_items = """
+        \"\"\"Pass through to provider method\"\"\"
+        # Note: this method is different from the underlying signature
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_item_session').can_access_assessment_part_items()"""
+
 
 class AssessmentPartItemDesignSession:
     import_statements = [
@@ -519,6 +541,16 @@ class AssessmentPartLookupSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_lookup_session').get_assessment_parts()"""
 
+    get_assessment_parts_for_assessment = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts_for_assessment(*args, **kwargs)"""
+
+    get_assessment_parts_by_genus_type = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_lookup_session').get_assessment_parts_by_genus_type(*args, **kwargs)"""
+
     can_lookup_assessment_parts = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
@@ -556,6 +588,11 @@ class AssessmentPartQuerySession:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_query_session').get_assessment_part_query()"""
+
+    can_search_assessment_parts = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_query_session').can_search_assessment_parts()"""
 
 
 class SequenceRuleAdminSession:
@@ -610,6 +647,11 @@ class SequenceRuleLookupSession:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'sequence_rule_lookup_session').get_sequence_rules()"""
+
+    get_sequence_rules_for_assessment = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'sequence_rule_lookup_session').get_sequence_rules_for_assessment(*args, **kwargs)"""
 
 
 class Bank:
@@ -697,9 +739,17 @@ class Bank:
         else:
             session_class = getattr(self._provider_manager, 'get_' + session_name + '_for_bank')
             if self._proxy is None:
-                session = session_class(self._catalog.get_id())
+                if 'notification_session' in session_name:
+                    # Is there something else we should do about the receiver field?
+                    session = session_class('fake receiver', self._catalog.get_id())
+                else:
+                    session = session_class(self._catalog.get_id())
             else:
-                session = session_class(self._catalog.get_id(), self._proxy)
+                if 'notification_session' in session_name:
+                    # Is there something else we should do about the receiver field?
+                    session = session_class('fake receiver', self._catalog.get_id(), self._proxy)
+                else:
+                    session = session_class(self._catalog.get_id(), self._proxy)
             self._set_bank_view(session)
             self._set_object_view(session)
             self._set_operable_view(session)

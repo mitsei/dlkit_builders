@@ -93,14 +93,14 @@ class ObjectiveRequisiteAssignmentSession:
     ]
 
     assign_objective_requisite_template = """
-        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+        requisite_type = Type(**Relationship().get_type_data('${object_name_upper}.REQUISITE'))
 
         ras = self._get_provider_manager(
             'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_objective_bank_id(), proxy=self._proxy)
+            self.get_${cat_name_under}_id(), proxy=self._proxy)
         rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name}, [])
-        rfc.set_display_name('Objective Requisite')
-        rfc.set_description('An Objective Requisite created by the ObjectiveRequisiteAssignmentSession')
+        rfc.set_display_name('${object_name} Requisite')
+        rfc.set_description('An ${object_name} Requisite created by the ${object_name}RequisiteAssignmentSession')
         rfc.set_genus_type(requisite_type)
         ras.create_relationship(rfc)"""
 
@@ -110,13 +110,20 @@ class ObjectiveRequisiteAssignmentSession:
     ]
 
     unassign_objective_requisite_template = """
-        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+        requisite_type = Type(**Relationship().get_type_data('${object_name_upper}.REQUISITE'))
         rls = self._get_provider_manager(
-            'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_objective_bank_id(), proxy=self._proxy)
+            'RELATIONSHIP').get_relationship_lookup_session_for_family(
+            self.get_${cat_name_under}_id(), proxy=self._proxy)
         ras = self._get_provider_manager(
             'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_objective_bank_id(), proxy=self._proxy)"""
+            self.get_${cat_name_under}_id(), proxy=self._proxy)
+        rls.use_federated_family_view()
+        relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name}, requisite_type)
+        if relationships.available() == 0:
+            raise errors.IllegalState('no ${object_name} found')
+        for relationship in relationships:
+            if str(relationship.get_destination_id()) == str(${arg1_name}):
+                ras.delete_relationship(relationship.ident)"""
 
 
 class ObjectiveAdminSession:
@@ -228,10 +235,14 @@ class Activity:
 
     get_objective_id_template = """
         # Implemented from template for osid.learning.Activity.get_objective_id
+        if not bool(self._my_map['${var_name_mixed}Id']):
+            raise errors.IllegalState('${var_name} empty')
         return Id(self._my_map['${var_name_mixed}Id'])"""
 
     get_objective_template = """
         # Implemented from template for osid.learning.Activity.get_objective
+        if not bool(self._my_map['${var_name_mixed}Id']):
+            raise errors.IllegalState('${var_name} empty')
         mgr = self._get_provider_manager('${return_pkg_replace_caps}')
         if not mgr.supports_${return_type_under}_lookup():
             raise errors.OperationFailed('${return_pkg_replace_title} does not support ${return_type} lookup')
@@ -239,6 +250,18 @@ class Activity:
         lookup_session.use_federated_${return_cat_name_under}_view()
         return lookup_session.get_${return_type_under}(self.get_${var_name}_id())"""
 
+    is_course_based_activity = """
+        return bool(self._my_map['courseIds'])"""
+
+    is_assessment_based_activity = """
+        return bool(self._my_map['assessmentIds'])"""
+
+    is_asset_based_activity = """
+        return bool(self._my_map['assetIds'])"""
+
+    # This is actually used by Grading.GradeSystem.is_based_on_grades
+    # Something wrong with our patterns, if it isn't going to the source pattern of
+    # Resource.Resource.is_group_template...
     is_asset_based_activity_template = """
         # Implemented from template for osid.learning.Activity.is_asset_based_activity_template
         return self._my_map['${var_name_mixed}']"""
@@ -249,6 +272,8 @@ class Activity:
 
     get_assets_template = """
         # Implemented from template for osid.learning.Activity.get_assets_template
+        if not bool(self._my_map['${var_name_singular_mixed}Ids']):
+            raise errors.IllegalState('no ${var_name_singular_mixed}Ids')
         mgr = self._get_provider_manager('${return_pkg_caps}')
         if not mgr.supports_${return_type_list_object_under}_lookup():
             raise errors.OperationFailed('${return_pkg_title} does not support ${return_type_list_object} lookup')
@@ -294,6 +319,7 @@ class ActivityForm:
 class ObjectiveHierarchySession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Objective
         self._catalog_name = 'ObjectiveBank'
         OsidSession._init_object(
@@ -318,6 +344,7 @@ class ObjectiveHierarchySession:
 class ObjectiveHierarchyDesignSession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
+        OsidSession.__init__(self)
         self._catalog_class = objects.Objective
         self._catalog_name = 'ObjectiveBank'
         OsidSession._init_object(
@@ -376,6 +403,13 @@ class ProficiencyForm:
         if not self._is_valid_id(grade_id):
             raise errors.InvalidArgument()
         self._my_map['levelId'] = str(grade_id)"""
+
+    clear_level = """
+        if (self.get_level_metadata().is_read_only() or
+                self.get_level_metadata().is_required()):
+            raise errors.NoAccess()
+        self._my_map['levelId'] = self._level_default
+        self._my_map['level'] = self._level_default"""
 
 
 class ProficiencyQuery:
