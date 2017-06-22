@@ -59,7 +59,6 @@ class LogEntry:
             self.object.get_resource_id()"""
 
 
-
 class LogEntryForm:
 
     import_statements_pattern = [
