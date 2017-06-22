@@ -672,7 +672,8 @@ class GradeEntry:
             self.object.get_grade()"""
 
     get_grade_id = """
-        self.assertTrue(isinstance(self.object.get_grade_id(), Id))"""
+        with self.assertRaises(errors.IllegalState):
+            self.object.get_grade()"""
 
     get_gradebook_column = """
         self.assertTrue(isinstance(self.object.get_gradebook_column(), GradebookColumn))
