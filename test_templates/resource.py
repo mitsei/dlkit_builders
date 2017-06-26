@@ -16,21 +16,31 @@ class ResourceProfile:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        cls.mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')"""
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
 
     supports_visible_federation_template = """
-        self.assertTrue(isinstance(self.mgr.supports_visible_federation(), bool))"""
+        assert isinstance(self.mgr.supports_visible_federation(), bool)"""
 
     supports_resource_lookup_template = """
-        self.assertTrue(isinstance(self.mgr.${method_name}(), bool))"""
+        assert isinstance(self.mgr.${method_name}(), bool)"""
 
     get_resource_record_types_template = """
-        self.assertTrue(isinstance(self.mgr.${method_name}(), abc_type_list))"""
+        assert isinstance(self.mgr.${method_name}(), abc_type_list)"""
 
     supports_resource_record_type_template = """
-        self.assertTrue(isinstance(self.mgr.${method_name}(DEFAULT_TYPE), bool))"""
+        assert isinstance(self.mgr.${method_name}(DEFAULT_TYPE), bool)"""
 
 
 class ResourceManager:
@@ -40,24 +50,38 @@ class ResourceManager:
     ]
 
     init_template = """
+class NotificationReceiver(object):
     # Implemented from resource.ResourceManager
-    class NotificationReceiver(object):
-        pass
+    pass
 
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from resource.ResourceManager
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${pkg_name} manager tests'
-        catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        cls.catalog_id = catalog.get_id()
-        # cls.mgr = Runtime().get_manager('${pkg_name_upper}', 'TEST_JSON_1', (3, 0, 0))
-        cls.receiver = cls.NotificationReceiver()
+        catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog_id = catalog.get_id()
+        request.cls.receiver = NotificationReceiver()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)"""
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog_id)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Implemented from resource.ResourceManager
+    pass"""
 
     get_resource_lookup_session_template = """
         # From tests_templates/resource.py::ResourceManager::get_resource_lookup_session_template
@@ -68,7 +92,7 @@ class ResourceManager:
         # From tests_templates/resource.py::ResourceManager::get_resource_lookup_session_for_bin_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.catalog_id)
-        with self.assertRaises(errors.NullArgument):
+        with pytest.raises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_admin_session_template = """
@@ -80,7 +104,7 @@ class ResourceManager:
         # From tests_templates/resource.py::ResourceManager::get_resource_admin_session_for_bin_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.catalog_id)
-        with self.assertRaises(errors.NullArgument):
+        with pytest.raises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_notification_session_template = """
@@ -92,7 +116,7 @@ class ResourceManager:
         # From tests_templates/resource.py::ResourceManager::get_resource_notification_session_for_bin_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.receiver, self.catalog_id)
-        with self.assertRaises(errors.NullArgument):
+        with pytest.raises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_batch_manager_template = """
@@ -108,51 +132,66 @@ class ResourceProxyManager:
     ]
 
     init_template = """
+class NotificationReceiver(object):
     # Implemented from resource.ResourceProxyManager
-    class NotificationReceiver(object):
-        pass
+    pass
 
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from resource.ResourceProxyManager
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${pkg_name} proxy manager tests'
-        catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        cls.catalog_id = catalog.get_id()
-        # cls.mgr = Runtime().get_proxy_manager('${pkg_name_upper}', 'TEST_JSON_1', (3, 0, 0))
-        cls.receiver = cls.NotificationReceiver()
+        catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog_id = catalog.get_id()
+        request.cls.receiver = request.cls.NotificationReceiver()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog_id)"""
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog_id)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Implemented from resource.ResourceProxyManager
+    pass"""
 
     get_resource_lookup_session_template = """
         # From tests_templates/resource.py::ResourceProxyManager::get_resource_lookup_session_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(PROXY)
-        with self.assertRaises(errors.NullArgument):
+        with pytest.raises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_lookup_session_for_bin_template = """
         # From tests_templates/resource.py::ResourceProxyManager::get_resource_lookup_session_for_bin_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.catalog_id, PROXY)
-        with self.assertRaises(errors.NullArgument):
+        with pytest.raises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_admin_session_template = """
         # From tests_templates/resource.py::ResourceProxyManager::get_resource_admin_session_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(PROXY)
-        with self.assertRaises(errors.NullArgument):
+        with pytest.raises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_admin_session_for_bin_template = """
         # From tests_templates/resource.py::ResourceProxyManager::get_resource_admin_session_for_bin_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.catalog_id, PROXY)
-        with self.assertRaises(errors.NullArgument):
+        with pytest.raises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_resource_batch_proxy_manager_template = """
@@ -169,13 +208,13 @@ class ResourceProxyManager:
         # From tests_templates/resource.py::ResourceProxyManager::get_resource_notification_session_for_bin_template
         if self.svc_mgr.supports_${support_check}():
             self.svc_mgr.${method_name}(self.receiver, self.catalog_id, proxy=PROXY)
-        with self.assertRaises(errors.NullArgument):
+        with pytest.raises(errors.NullArgument):
             self.svc_mgr.${method_name}()"""
 
     get_group_hierarchy_session = """
         if self.svc_mgr.supports_group_hierarchy():
             self.svc_mgr.get_group_hierarchy_session(PROXY)
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.svc_mgr.get_group_hierarchy_session()"""
 
 
@@ -196,46 +235,56 @@ class ResourceLookupSession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # Implemented from init template for ResourceLookupSession
-        cls.${object_name_under}_list = list()
-        cls.${object_name_under}_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from init template for ResourceLookupSession
+    request.cls.service_config = request.param
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_${object_name_under}_form_for_create([])
+            create_form = request.cls.catalog.get_${object_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + str(num)
             create_form.description = 'Test ${object_name} for ${interface_name} tests'
-            obj = cls.catalog.create_${object_name_under}(create_form)
-            cls.${object_name_under}_list.append(obj)
-            cls.${object_name_under}_ids.append(obj.ident)
+            obj = request.cls.catalog.create_${object_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(obj)
+            request.cls.${object_name_under}_ids.append(obj.ident)
 
-    def setUp(self):
-        self.session = self.catalog
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_${object_name_under_plural}():
+                request.cls.catalog.delete_${object_name_under}(obj.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # Implemented from init template for ResourceLookupSession
-        for obj in cls.catalog.get_${object_name_under_plural}():
-            cls.catalog.delete_${object_name_under}(obj.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        request.cls.session = request.cls.catalog"""
 
     get_bin_id_template = """
         # From test_templates/resource.py ResourceLookupSession.get_bin_id_template
-        self.assertEqual(self.catalog.${method_name}(), self.catalog.ident)"""
+        assert self.catalog.${method_name}() == self.catalog.ident"""
 
     get_bin_template = """
         # is this test really needed?
         # From test_templates/resource.py::ResourceLookupSession::get_bin_template
-        self.assertIsNotNone(self.catalog)"""
+        assert self.catalog is not None"""
 
     can_lookup_resources_template = """
         # From test_templates/resource.py ResourceLookupSession.can_lookup_resources_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool)"""
 
     use_comparative_resource_view_template = """
         # From test_templates/resource.py ResourceLookupSession.use_comparative_resource_view_template
@@ -257,70 +306,71 @@ class ResourceLookupSession:
         # From test_templates/resource.py ResourceLookupSession.get_resource_template
         self.catalog.use_isolated_${cat_name_under}_view()
         obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
-        self.assertEqual(obj.ident, self.${object_name_under}_list[0].ident)
+        assert obj.ident == self.${object_name_under}_list[0].ident
         self.catalog.use_federated_${cat_name_under}_view()
         obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
-        self.assertEqual(obj.ident, self.${object_name_under}_list[0].ident)"""
+        assert obj.ident == self.${object_name_under}_list[0].ident"""
 
     get_resources_by_ids_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_ids_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}(self.${object_name_under}_ids)
-        self.assertTrue(isinstance(objects, ${return_type}))
+        assert isinstance(objects, ${return_type})
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}(self.${object_name_under}_ids)
-        self.assertTrue(objects.available() > 0)
-        self.assertTrue(isinstance(objects, ${return_type}))"""
+        assert objects.available() > 0
+        assert isinstance(objects, ${return_type})"""
 
     get_resources_by_genus_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_genus_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
-        self.assertTrue(isinstance(objects, ${return_type}))
+        assert isinstance(objects, ${return_type})
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
-        self.assertTrue(objects.available() > 0)
-        self.assertTrue(isinstance(objects, ${return_type}))"""
+        assert objects.available() > 0
+        assert isinstance(objects, ${return_type})"""
 
     get_resources_by_parent_genus_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_parent_genus_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
-        self.assertTrue(isinstance(objects, ${return_type}))
+        assert isinstance(objects, ${return_type})
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
-        self.assertTrue(objects.available() == 0)
-        self.assertTrue(isinstance(objects, ${return_type}))"""
+        assert objects.available() == 0
+        assert isinstance(objects, ${return_type})"""
 
     get_resources_by_record_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_record_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}(DEFAULT_TYPE)
-        self.assertTrue(isinstance(objects, ${return_type}))
+        assert isinstance(objects, ${return_type})
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}(DEFAULT_TYPE)
-        self.assertTrue(objects.available() == 0)
-        self.assertTrue(isinstance(objects, ${return_type}))"""
+        assert objects.available() == 0
+        assert isinstance(objects, ${return_type})"""
 
     get_resources_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         objects = self.catalog.${method_name}()
-        self.assertTrue(isinstance(objects, ${return_type}))
+        assert isinstance(objects, ${return_type})
         self.catalog.use_federated_${cat_name_under}_view()
         objects = self.catalog.${method_name}()
-        self.assertTrue(objects.available() > 0)
-        self.assertTrue(isinstance(objects, ${return_type}))
+        assert objects.available() > 0
+        assert isinstance(objects, ${return_type})
 
     def test_get_${object_name_under}_with_alias(self):
         self.catalog.alias_${object_name_under}(self.${object_name_under}_ids[0], ALIAS_ID)
         obj = self.catalog.get_${object_name_under}(ALIAS_ID)
-        self.assertEqual(obj.get_id(), self.${object_name_under}_ids[0])"""
+        assert obj.get_id() == self.${object_name_under}_ids[0]"""
 
 
 class ResourceQuerySession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import queries as ABCQueries',
         'from dlkit.runtime import PROXY_SESSION, proxy_example',
         'from dlkit.runtime.managers import Runtime',
         'REQUEST = proxy_example.SimpleRequest()',
@@ -332,57 +382,68 @@ class ResourceQuerySession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::ResourceQuerySession::init_template
-        cls.${object_name_under}_list = list()
-        cls.${object_name_under}_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::ResourceQuerySession::init_template
+    request.cls.service_config = request.param
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
         for color in ['Orange', 'Blue', 'Green', 'orange']:
-            create_form = cls.catalog.get_${object_name_under}_form_for_create([])
+            create_form = request.cls.catalog.get_${object_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + color
             create_form.description = (
                 'Test ${object_name} for ${interface_name} tests, did I mention green')
-            obj = cls.catalog.create_${object_name_under}(create_form)
-            cls.${object_name_under}_list.append(obj)
-            cls.${object_name_under}_ids.append(obj.ident)
+            obj = request.cls.catalog.create_${object_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(obj)
+            request.cls.${object_name_under}_ids.append(obj.ident)
 
-    def setUp(self):
-        # From test_templates/resource.py::ResourceQuerySession::init_template
-        self.session = self.catalog
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_${object_name_under_plural}():
+                request.cls.catalog.delete_${object_name_under}(obj.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::ResourceQuerySession::init_template
-        for obj in cls.catalog.get_${object_name_under_plural}():
-            cls.catalog.delete_${object_name_under}(obj.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceQuerySession::init_template
+    if not is_never_authz(request.cls.service_config):
+        request.cls.session = request.cls.catalog"""
 
     can_query_resources_template = """
         # From test_templates/resource.py ResourceQuerySession::can_query_resources_template
-        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
+        assert isinstance(self.session.${method_name}(), bool)"""
 
     can_search_resources_template = """
         # From test_templates/resource.py ResourceQuerySession::can_search_resources_template
-        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
+        assert isinstance(self.session.${method_name}(), bool)"""
 
     get_resource_query_template = """
         # From test_templates/resource.py ResourceQuerySession::get_resource_query_template
-        query = self.session.${method_name}()"""
+        query = self.session.${method_name}()
+        assert isinstance(query, ABCQueries.${return_type})"""
 
     get_resources_by_query_template = """
         # From test_templates/resource.py ResourceQuerySession::get_resources_by_query_template
         # Need to add some tests with string types
         query = self.session.get_${object_name_under}_query()
         query.match_display_name('orange')
-        self.assertEqual(self.catalog.${method_name}(query).available(), 2)
+        assert self.catalog.${method_name}(query).available() == 2
         query.clear_display_name_terms()
         query.match_display_name('blue', match=False)
-        self.assertEqual(self.session.${method_name}(query).available(), 3)"""
+        assert self.session.${method_name}(query).available() == 3"""
 
 
 class ResourceAdminSession:
@@ -404,74 +465,87 @@ class ResourceAdminSession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::ResourceAdminSession::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::ResourceAdminSession::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    def setUp(self):
-        # From test_templates/resource.py::ResourceAdminSession::init_template
-        form = self.catalog.get_${object_name_under}_form_for_create([])
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_${object_name_under_plural}():
+                request.cls.catalog.delete_${object_name_under}(obj.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceAdminSession::init_template
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_${object_name_under}_form_for_create([])
         form.display_name = 'new ${object_name}'
         form.description = 'description of ${object_name}'
         form.set_genus_type(NEW_TYPE)
-        self.osid_object = self.catalog.create_${object_name_under}(form)
-        self.session = self.catalog
+        request.cls.osid_object = request.cls.catalog.create_${object_name_under}(form)
+        request.cls.session = request.cls.catalog
 
-    def tearDown(self):
+    def test_tear_down():
         # From test_templates/resource.py::ResourceAdminSession::init_template
-        self.catalog.delete_${object_name_under}(self.osid_object.ident)
+        if not is_never_authz(request.cls.service_config):
+        request.cls.catalog.delete_${object_name_under}(request.cls.osid_object.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::ResourceAdminSession::init_template
-        for obj in cls.catalog.get_${object_name_under_plural}():
-            cls.catalog.delete_${object_name_under}(obj.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(test_tear_down)"""
 
     can_create_resources_template = """
         # From test_templates/resource.py::ResourceAdminSession::can_create_resources_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool)"""
 
     can_update_resources_template = """
         # From test_templates/resource.py::ResourceAdminSession::can_update_resources_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool)"""
 
     can_delete_resources_template = """
         # From test_templates/resource.py::ResourceAdminSession::can_delete_resources_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool)"""
 
     can_manage_resource_aliases_template = """
         # From test_templates/resource.py::ResourceAdminSession::can_manage_resource_aliases_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool)"""
 
     can_create_resource_with_record_types_template = """
         # From test_templates/resource.py::ResourceAdminSession::can_create_resource_with_record_types_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(DEFAULT_TYPE), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(DEFAULT_TYPE), bool)"""
 
     get_resource_form_for_create_template = """
         # From test_templates/resource.py::ResourceAdminSession::get_resource_form_for_create_template
         form = self.catalog.${method_name}([])
-        self.assertTrue(isinstance(form, OsidForm))
-        self.assertFalse(form.is_for_update())"""
+        assert isinstance(form, OsidForm)
+        assert not form.is_for_update()"""
 
     create_resource_template = """
         # From test_templates/resource.py::ResourceAdminSession::create_resource_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${object_name}
-        self.assertTrue(isinstance(self.osid_object, ${object_name}))
-        self.assertEqual(self.osid_object.display_name.text, 'new ${object_name}')
-        self.assertEqual(self.osid_object.description.text, 'description of ${object_name}')
-        self.assertEqual(self.osid_object.genus_type, NEW_TYPE)"""
+        assert isinstance(self.osid_object, ${object_name})
+        assert self.osid_object.display_name.text == 'new ${object_name}'
+        assert self.osid_object.description.text == 'description of ${object_name}'
+        assert self.osid_object.genus_type == NEW_TYPE"""
 
     get_resource_form_for_update_template = """
         # From test_templates/resource.py::ResourceAdminSession::get_resource_form_for_update_template
         form = self.catalog.${method_name}(self.osid_object.ident)
-        self.assertTrue(isinstance(form, OsidForm))
-        self.assertTrue(form.is_for_update())"""
+        assert isinstance(form, OsidForm)
+        assert form.is_for_update()"""
 
     update_resource_template = """
         # From test_templates/resource.py::ResourceAdminSession::update_resource_template
@@ -481,11 +555,11 @@ class ResourceAdminSession:
         form.description = 'new description'
         form.set_genus_type(NEW_TYPE_2)
         updated_object = self.catalog.${method_name}(form)
-        self.assertTrue(isinstance(updated_object, ${object_name}))
-        self.assertEqual(updated_object.ident, self.osid_object.ident)
-        self.assertEqual(updated_object.display_name.text, 'new name')
-        self.assertEqual(updated_object.description.text, 'new description')
-        self.assertEqual(updated_object.genus_type, NEW_TYPE_2)"""
+        assert isinstance(updated_object, ${object_name})
+        assert updated_object.ident == self.osid_object.ident
+        assert updated_object.display_name.text == 'new name'
+        assert updated_object.description.text == 'new description'
+        assert updated_object.genus_type == NEW_TYPE_2"""
 
     delete_resource_template = """
         # From test_templates/resource.py::ResourceAdminSession::delete_resource_template
@@ -495,7 +569,7 @@ class ResourceAdminSession:
         form.set_genus_type(NEW_TYPE)
         osid_object = self.catalog.create_${object_name_under}(form)
         self.catalog.${method_name}(osid_object.ident)
-        with self.assertRaises(errors.NotFound):
+        with pytest.raises(errors.NotFound):
             self.catalog.get_${object_name_under}(osid_object.ident)"""
 
     alias_resource_template = """
@@ -503,7 +577,7 @@ class ResourceAdminSession:
         alias_id = Id(self.catalog.ident.namespace + '%3Amy-alias%40ODL.MIT.EDU')
         self.catalog.${method_name}(self.osid_object.ident, alias_id)
         aliased_object = self.catalog.get_${object_name_under}(alias_id)
-        self.assertEqual(aliased_object.ident, self.osid_object.ident)"""
+        assert aliased_object.ident == self.osid_object.ident"""
 
 
 class ResourceNotificationSession:
@@ -552,94 +626,103 @@ class ResourceBinSession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::ResourceBinSession::init_template
-        cls.${object_name_under}_list = list()
-        cls.${object_name_under}_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::ResourceBinSession::init_template
+    request.cls.service_config = request.param
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name} for Assignment'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests assignment'
-        cls.assigned_catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.assigned_catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
         for num in [0, 1, 2]:
-            create_form = cls.catalog.get_${object_name_under}_form_for_create([])
+            create_form = request.cls.catalog.get_${object_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + str(num)
             create_form.description = 'Test ${object_name} for ${interface_name} tests'
-            obj = cls.catalog.create_${object_name_under}(create_form)
-            cls.${object_name_under}_list.append(obj)
-            cls.${object_name_under}_ids.append(obj.ident)
-        cls.svc_mgr.assign_${object_name_under}_to_${cat_name_under}(
-            cls.${object_name_under}_ids[1], cls.assigned_catalog.ident)
-        cls.svc_mgr.assign_${object_name_under}_to_${cat_name_under}(
-            cls.${object_name_under}_ids[2], cls.assigned_catalog.ident)
+            obj = request.cls.catalog.create_${object_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(obj)
+            request.cls.${object_name_under}_ids.append(obj.ident)
+        request.cls.svc_mgr.assign_${object_name_under}_to_${cat_name_under}(
+            request.cls.${object_name_under}_ids[1], request.cls.assigned_catalog.ident)
+        request.cls.svc_mgr.assign_${object_name_under}_to_${cat_name_under}(
+            request.cls.${object_name_under}_ids[2], request.cls.assigned_catalog.ident)
 
-    def setUp(self):
-        # From test_templates/resource.py::ResourceBinSession::init_template
-        self.session = self.svc_mgr
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
+                request.cls.${object_name_under}_ids[1], request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
+                request.cls.${object_name_under}_ids[2], request.cls.assigned_catalog.ident)
+            for obj in request.cls.catalog.get_${object_name_under_plural}():
+                request.cls.catalog.delete_${object_name_under}(obj.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::ResourceBinSession::init_template
-        cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
-            cls.${object_name_under}_ids[1], cls.assigned_catalog.ident)
-        cls.svc_mgr.unassign_${object_name_under}_from_${cat_name_under}(
-            cls.${object_name_under}_ids[2], cls.assigned_catalog.ident)
-        for obj in cls.catalog.get_${object_name_under_plural}():
-            cls.catalog.delete_${object_name_under}(obj.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.assigned_catalog.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceBinSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
 
     can_lookup_resource_bin_mappings_template = """
         # From test_templates/resource.py::ResourceBinSession::can_lookup_resource_bin_mappings
         result = self.session.${method_name}()
-        self.assertTrue(isinstance(result, bool))"""
+        assert isinstance(result, bool)"""
 
     get_resource_ids_by_bin_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bin_template
         objects = self.svc_mgr.get_${object_name_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
-        self.assertEqual(objects.available(), 2)"""
+        assert objects.available() == 2"""
 
     get_resource_ids_by_bins_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bins_template
         catalog_ids = [self.catalog.ident, self.assigned_catalog.ident]
         object_ids = self.session.${method_name}(catalog_ids)
-        self.assertTrue(isinstance(object_ids, IdList))
+        assert isinstance(object_ids, IdList)
         # Currently our impl does not remove duplicate objectIds
-        self.assertEqual(object_ids.available(), 5)"""
+        assert object_ids.available() == 5"""
 
     get_resources_by_bin_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resources_by_bin_template
         results = self.session.${method_name}(self.assigned_catalog.ident)
-        self.assertTrue(isinstance(results, ABCObjects.${object_name}List))
-        self.assertEqual(results.available(), 2)"""
+        assert isinstance(results, ABCObjects.${object_name}List)
+        assert results.available() == 2"""
 
     get_resources_by_bins_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resources_by_bins_template
         catalog_ids = [self.catalog.ident, self.assigned_catalog.ident]
         results = self.session.${method_name}(catalog_ids)
-        self.assertTrue(isinstance(results, ABCObjects.${object_name}List))
+        assert isinstance(results, ABCObjects.${object_name}List)
         # Currently our impl does not remove duplicate objects
-        self.assertEqual(results.available(), 5)"""
+        assert results.available() == 5"""
 
     get_resource_by_bin_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_by_bin_template
         objects = self.svc_mgr.get_${object_name_plural_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
-        self.assertEqual(objects.available(), 2)"""
+        assert objects.available() == 2"""
 
     get_bin_ids_by_resource_template = """
         # From test_templates/resource.py::ResourceBinSession::get_bin_ids_by_resource_template
         cats = self.svc_mgr.get_${cat_name_under}_ids_by_${object_name_under}(self.${object_name_under}_ids[1])
-        self.assertEqual(cats.available(), 2)"""
+        assert cats.available() == 2"""
 
     get_bins_by_resource_template = """
         # From test_templates/resource.py::ResourceBinSession::get_bins_by_resource_template
         cats = self.svc_mgr.get_${cat_name_plural_under}_by_${object_name_under}(self.${object_name_under}_ids[1])
-        self.assertEqual(cats.available(), 2)"""
+        assert cats.available() == 2"""
 
 
 class ResourceBinAssignmentSession:
@@ -658,47 +741,57 @@ class ResourceBinAssignmentSession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
-        cls.${object_name_under}_list = list()
-        cls.${object_name_under}_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+    request.cls.service_config = request.param
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name} for Assignment'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests assignment'
-        cls.assigned_catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.assigned_catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
         for num in [0, 1, 2]:
-            create_form = cls.catalog.get_${object_name_under}_form_for_create([])
+            create_form = request.cls.catalog.get_${object_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + str(num)
             create_form.description = 'Test ${object_name} for ${interface_name} tests'
-            obj = cls.catalog.create_${object_name_under}(create_form)
-            cls.${object_name_under}_list.append(obj)
-            cls.${object_name_under}_ids.append(obj.ident)
+            obj = request.cls.catalog.create_${object_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(obj)
+            request.cls.${object_name_under}_ids.append(obj.ident)
 
-    def setUp(self):
-        # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
-        self.session = self.svc_mgr
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_${object_name_under_plural}():
+                request.cls.catalog.delete_${object_name_under}(obj.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
-        for obj in cls.catalog.get_${object_name_under_plural}():
-            cls.catalog.delete_${object_name_under}(obj.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.assigned_catalog.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    result.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
 
     assign_resource_to_bin_template = """
         # From test_templates/resource.py::ResourceBinAssignmentSession::assign_resource_to_bin_template
         results = self.assigned_catalog.get_${object_name_plural_under}()
-        self.assertEqual(results.available(), 0)
+        assert results.available() == 0
         self.session.${method_name}(self.${object_name_under}_ids[1], self.assigned_catalog.ident)
         results = self.assigned_catalog.get_${object_name_plural_under}()
-        self.assertEqual(results.available(), 1)
+        assert results.available() == 1
         self.session.unassign_${object_name_under}_from_${cat_name_under}(
             self.${object_name_under}_ids[1],
             self.assigned_catalog.ident)"""
@@ -706,49 +799,49 @@ class ResourceBinAssignmentSession:
     unassign_resource_from_bin_template = """
         # From test_templates/resource.py::ResourceBinAssignmentSession::unassign_resource_from_bin_template
         results = self.assigned_catalog.get_${object_name_plural_under}()
-        self.assertEqual(results.available(), 0)
+        assert results.available() == 0
         self.session.assign_${object_name_under}_to_${cat_name_under}(
             self.${object_name_under}_ids[1],
             self.assigned_catalog.ident)
         results = self.assigned_catalog.get_${object_name_plural_under}()
-        self.assertEqual(results.available(), 1)
+        assert results.available() == 1
         self.session.${method_name}(
             self.${object_name_under}_ids[1],
             self.assigned_catalog.ident)
         results = self.assigned_catalog.get_${object_name_plural_under}()
-        self.assertEqual(results.available(), 0)"""
+        assert results.available() == 0"""
 
     can_assign_resources_template = """
         # From test_templates/resource.py::ResourceBinAssignmentSession::can_assign_resources_template
         result = self.session.${method_name}()
-        self.assertTrue(isinstance(result, bool))"""
+        assert isinstance(result, bool)"""
 
     can_assign_resources_to_bin_template = """
         # From test_templates/resource.py::ResourceBinAssignmentSession::can_assign_resources_to_bin_template
         result = self.session.${method_name}(self.assigned_catalog.ident)
-        self.assertTrue(isinstance(result, bool))"""
+        assert isinstance(result, bool)"""
 
     get_assignable_bin_ids_template = """
         # From test_templates/resource.py::ResourceBinAssignmentSession::get_assignable_bin_ids_template
         # Note that our implementation just returns all catalogIds, which does not follow
         #   the OSID spec (should return only the catalogIds below the given one in the hierarchy.
         results = self.session.${method_name}(self.catalog.ident)
-        self.assertTrue(isinstance(results, IdList))
+        assert isinstance(results, IdList)
 
         # Because we're not deleting all banks from all tests, we might
         #   have some crufty banks here...but there should be at least 2.
-        self.assertTrue(results.available() >= 2)"""
+        assert results.available() >= 2"""
 
     get_assignable_bin_ids_for_resource_template = """
         # From test_templates/resource.py::ResourceBinAssignmentSession::get_assignable_bin_ids_for_item_template
         # Note that our implementation just returns all catalogIds, which does not follow
         #   the OSID spec (should return only the catalogIds below the given one in the hierarchy.
         results = self.session.${method_name}(self.catalog.ident, self.${object_name_under}_ids[0])
-        self.assertTrue(isinstance(results, IdList))
+        assert isinstance(results, IdList)
 
         # Because we're not deleting all banks from all tests, we might
         #   have some crufty banks here...but there should be at least 2.
-        self.assertTrue(results.available() >= 2)"""
+        assert results.available() >= 2"""
 
 
 class ResourceAgentSession:
@@ -771,97 +864,118 @@ class ResourceAgentSession:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.resource_list = list()
-        cls.resource_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('RESOURCE', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_bin_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.resource_list = list()
+    request.cls.resource_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'RESOURCE',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
         create_form.description = 'Test Bin for ResourceLookupSession tests'
-        cls.catalog = cls.svc_mgr.create_bin(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_bin(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_resource_form_for_create([])
+            create_form = request.cls.catalog.get_resource_form_for_create([])
             create_form.display_name = 'Test Resource ' + str(num)
             create_form.description = 'Test Resource for ResourceLookupSession tests'
-            obj = cls.catalog.create_resource(create_form)
-            cls.resource_list.append(obj)
-            cls.resource_ids.append(obj.ident)
-        cls.catalog.assign_agent_to_resource(AGENT_ID_0, cls.resource_ids[0])
-        cls.catalog.assign_agent_to_resource(AGENT_ID_1, cls.resource_ids[1])
+            obj = request.cls.catalog.create_resource(create_form)
+            request.cls.resource_list.append(obj)
+            request.cls.resource_ids.append(obj.ident)
+        request.cls.catalog.assign_agent_to_resource(AGENT_ID_0, request.cls.resource_ids[0])
+        request.cls.catalog.assign_agent_to_resource(AGENT_ID_1, request.cls.resource_ids[1])
 
-    def setUp(self):
-        self.session = self.catalog
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_bins():
+                for obj in catalog.get_resources():
+                    catalog.delete_resource(obj.ident)
+                request.cls.svc_mgr.delete_bin(catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_bins():
-            for obj in catalog.get_resources():
-                catalog.delete_resource(obj.ident)
-            cls.svc_mgr.delete_bin(catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.catalog"""
 
     get_resource_id_by_agent = """
         resource_id = self.catalog.get_resource_id_by_agent(AGENT_ID_0)
-        self.assertTrue(isinstance(resource_id, Id))
-        self.assertEqual(resource_id, self.resource_ids[0])"""
+        assert isinstance(resource_id, Id)
+        assert resource_id == self.resource_ids[0]"""
 
     get_resource_by_agent = """
         resource = self.catalog.get_resource_by_agent(AGENT_ID_1)
-        self.assertTrue(isinstance(resource, Resource))
-        self.assertEqual(resource.display_name.text, 'Test Resource 1')"""
+        assert isinstance(resource, Resource)
+        assert resource.display_name.text == 'Test Resource 1'"""
 
     get_agent_ids_by_resource = """
         id_list = self.catalog.get_agent_ids_by_resource(self.resource_ids[0])
-        self.assertEqual(id_list.next(), AGENT_ID_0)
-        self.assertTrue(isinstance(id_list, IdList))"""
+        assert id_list.next() == AGENT_ID_0
+        assert isinstance(id_list, IdList)"""
 
     get_agents_by_resource = """
         agents = self.catalog.get_agents_by_resource(self.resource_ids[0])
-        self.assertEqual(agents.available(), 1)
-        self.assertTrue(isinstance(agents, AgentList))
-        self.assertEqual(agents.next().ident, AGENT_ID_0)"""
+        assert agents.available() == 1
+        assert isinstance(agents, AgentList)
+        assert agents.next().ident == AGENT_ID_0"""
 
 
 class ResourceAgentAssignmentSession:
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.resource_list = list()
-        cls.resource_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('RESOURCE', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_bin_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.resource_list = list()
+    request.cls.resource_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'RESOURCE',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
         create_form.description = 'Test Bin for ResourceLookupSession tests'
-        cls.catalog = cls.svc_mgr.create_bin(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_bin(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_resource_form_for_create([])
+            create_form = request.cls.catalog.get_resource_form_for_create([])
             create_form.display_name = 'Test Resource ' + str(num)
             create_form.description = 'Test Resource for ResourceLookupSession tests'
-            obj = cls.catalog.create_resource(create_form)
-            cls.resource_list.append(obj)
-            cls.resource_ids.append(obj.ident)
+            obj = request.cls.catalog.create_resource(create_form)
+            request.cls.resource_list.append(obj)
+            request.cls.resource_ids.append(obj.ident)
 
-    def setUp(self):
-        self.session = self.catalog
-
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_bins():
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
             for obj in catalog.get_resources():
                 catalog.delete_resource(obj.ident)
-            cls.svc_mgr.delete_bin(catalog.ident)"""
+            request.cls.svc_mgr.delete_bin(catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.catalog"""
 
     assign_agent_to_resource = """
         self.catalog.assign_agent_to_resource(AGENT_ID_0, self.resource_ids[0])
-        with self.assertRaises(errors.AlreadyExists):
+        with pytest.raises(errors.AlreadyExists):
             self.catalog.assign_agent_to_resource(AGENT_ID_0, self.resource_ids[1])"""
 
     unassign_agent_from_resource = """
         self.catalog.assign_agent_to_resource(AGENT_ID_1, self.resource_ids[1])
-        self.assertEqual(self.catalog.get_resource_by_agent(AGENT_ID_1).display_name.text, 'Test Resource 1')
+        assert self.catalog.get_resource_by_agent(AGENT_ID_1).display_name.text == 'Test Resource 1'
         self.catalog.unassign_agent_from_resource(AGENT_ID_1, self.resource_ids[1])
-        with self.assertRaises(errors.NotFound):
+        with pytest.raises(errors.NotFound):
             self.catalog.get_resource_by_agent(AGENT_ID_1)"""
 
 
@@ -882,29 +996,37 @@ class BinLookupSession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::BinLookupSession::init_template
-        cls.catalogs = list()
-        cls.catalog_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::BinLookupSession::init_template
+    request.cls.service_config = request.param
+    request.cls.catalogs = list()
+    request.cls.catalog_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
         for num in [0, 1]:
-            create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
             create_form.display_name = 'Test ${cat_name} ' + str(num)
             create_form.description = 'Test ${cat_name} for ${pkg_name} proxy manager tests'
-            catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-            cls.catalogs.append(catalog)
-            cls.catalog_ids.append(catalog.ident)
+            catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+            request.cls.catalogs.append(catalog)
+            request.cls.catalog_ids.append(catalog.ident)
 
-    def setUp(self):
-        # From test_templates/resource.py::BinLookupSession::init_template
-        self.session = self.svc_mgr
+    def class_tear_down():
+        for catalog in request.cls.svc_mgr.get_${cat_name_under_plural}():
+            request.cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::BinLookupSession::init_template
-        for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::BinLookupSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
 
     use_comparative_bin_view_template = """
         # From test_templates/resource.py::BinLookupSession::use_comparative_bin_view_template
@@ -917,33 +1039,32 @@ class BinLookupSession:
     get_bin_template = """
         # From test_templates/resource.py::BinLookupSession::get_bin_template
         catalog = self.svc_mgr.${method_name}(self.catalogs[0].ident)
-        self.assertEqual(catalog.ident, self.catalogs[0].ident)"""
+        assert catalog.ident == self.catalogs[0].ident"""
 
     get_bins_by_ids_template = """
         # From test_templates/resource.py::BinLookupSession::get_bins_by_ids_template
         catalogs = self.svc_mgr.${method_name}(self.catalog_ids)
-        self.assertTrue(catalogs.available() == 2)
-        self.assertTrue(isinstance(catalogs, ABCObjects.${cat_name}List))
+        assert catalogs.available() == 2
+        assert isinstance(catalogs, ABCObjects.${cat_name}List)
         reversed_catalog_ids = [str(cat_id) for cat_id in self.catalog_ids][::-1]
         for index, catalog in enumerate(catalogs):
-            self.assertEqual(str(catalog.ident),
-                             reversed_catalog_ids[index])"""
+            assert str(catalog.ident) == reversed_catalog_ids[index]"""
 
     get_bins_by_genus_type_template = """
         # From test_templates/resource.py::BinLookupSession::get_bins_by_genus_type_template
         catalogs = self.svc_mgr.${method_name}(DEFAULT_GENUS_TYPE)
-        self.assertTrue(catalogs.available() > 0)
-        self.assertTrue(isinstance(catalogs, ABCObjects.${cat_name}List))"""
+        assert catalogs.available() > 0
+        assert isinstance(catalogs, ABCObjects.${cat_name}List)"""
 
     get_bins_template = """
         # From test_templates/resource.py::BinLookupSession::get_bins_template
         catalogs = self.svc_mgr.${method_name}()
-        self.assertTrue(catalogs.available() > 0)
-        self.assertTrue(isinstance(catalogs, ABCObjects.${cat_name}List))"""
+        assert catalogs.available() > 0
+        assert isinstance(catalogs, ABCObjects.${cat_name}List)"""
 
     can_lookup_bins_template = """
         # From test_templates/resource.py::BinLookupSession::can_lookup_bins_template
-        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
+        assert isinstance(self.session.${method_name}(), bool)"""
 
 
 class BinAdminSession:
@@ -962,53 +1083,61 @@ class BinAdminSession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::BinAdminSession::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::BinAdminSession::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
         # Initialize test catalog:
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
         # Initialize catalog to be deleted:
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name} For Deletion'
         create_form.description = 'Test ${cat_name} for ${interface_name} deletion test'
-        cls.catalog_to_delete = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog_to_delete = request.cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    def setUp(self):
-        # From test_templates/resource.py::BinAdminSession::init_template
-        self.session = self.svc_mgr
+    def class_tear_down():
+        for catalog in request.cls.svc_mgr.get_${cat_name_under_plural}():
+            request.cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::BinAdminSession::init_template
-        for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::BinAdminSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
 
     can_create_bins_template = """
         # From test_templates/resource.py BinAdminSession.can_create_bins_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool)"""
 
     can_delete_bins_template = """
         # From test_templates/resource.py BinAdminSession.can_delete_bins_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool)"""
 
     can_update_bins_template = """
         # From test_templates/resource.py BinAdminSession.can_update_bins_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool)"""
 
     can_create_bin_with_record_types_template = """
         # From test_templates/resource.py BinAdminSession.can_create_bin_with_record_types_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(DEFAULT_TYPE), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(DEFAULT_TYPE), bool)"""
 
     get_bin_form_for_create_template = """
         # From test_templates/resource.py BinAdminSession.get_bin_form_for_create_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         catalog_form = self.svc_mgr.${method_name}([])
-        self.assertTrue(isinstance(catalog_form, ${return_type}))
-        self.assertFalse(catalog_form.is_for_update())"""
+        assert isinstance(catalog_form, ${return_type})
+        assert not catalog_form.is_for_update()"""
 
     create_bin_template = """
         # From test_templates/resource.py BinAdminSession.create_bin_template
@@ -1017,14 +1146,14 @@ class BinAdminSession:
         catalog_form.display_name = 'Test ${cat_name}'
         catalog_form.description = 'Test ${cat_name} for ${interface_name}.${method_name} tests'
         new_catalog = self.svc_mgr.${method_name}(catalog_form)
-        self.assertTrue(isinstance(new_catalog, ${return_type}))"""
+        assert isinstance(new_catalog, ${return_type})"""
 
     get_bin_form_for_update_template = """
         # From test_templates/resource.py BinAdminSession.get_bin_form_for_update_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         catalog_form = self.svc_mgr.${method_name}(self.catalog.ident)
-        self.assertTrue(isinstance(catalog_form, ${return_type}))
-        self.assertTrue(catalog_form.is_for_update())"""
+        assert isinstance(catalog_form, ${return_type})
+        assert catalog_form.is_for_update()"""
 
     update_bin_template = """
         # From test_templates/resource.py BinAdminSession.update_bin_template
@@ -1036,7 +1165,7 @@ class BinAdminSession:
         # From test_templates/resource.py BinAdminSession.delete_bin_template
         cat_id = self.catalog_to_delete.ident
         self.svc_mgr.${method_name}(cat_id)
-        with self.assertRaises(errors.NotFound):
+        with pytest.raises(errors.NotFound):
             self.svc_mgr.get_${cat_name_under}(cat_id)"""
 
     alias_bin_template = """
@@ -1044,7 +1173,7 @@ class BinAdminSession:
         alias_id = Id('${package_name_replace_reserved}.${cat_name}%3Amy-alias%40ODL.MIT.EDU')
         self.svc_mgr.${method_name}(self.catalog_to_delete.ident, alias_id)
         aliased_catalog = self.svc_mgr.get_${cat_name_under}(alias_id)
-        self.assertEqual(self.catalog_to_delete.ident, aliased_catalog.ident)"""
+        assert self.catalog_to_delete.ident == aliased_catalog.ident"""
 
 
 class BinHierarchySession:
@@ -1057,96 +1186,104 @@ class BinHierarchySession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::BinHierarchySession::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        cls.catalogs = dict()
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::BinHierarchySession::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.catalogs = dict()
+    if not is_never_authz(request.cls.service_config):
         for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
-            create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
             create_form.display_name = name
             create_form.description = 'Test ${cat_name} ' + name
-            cls.catalogs[name] = cls.svc_mgr.create_${cat_name_under}(create_form)
-        cls.svc_mgr.add_root_${cat_name_under}(cls.catalogs['Root'].ident)
-        cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
-        cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
-        cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+            request.cls.catalogs[name] = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.svc_mgr.add_root_${cat_name_under}(request.cls.catalogs['Root'].ident)
+        request.cls.svc_mgr.add_child_${cat_name_under}(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 1'].ident)
+        request.cls.svc_mgr.add_child_${cat_name_under}(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 2'].ident)
+        request.cls.svc_mgr.add_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
 
-    def setUp(self):
-        # From test_templates/resource.py::BinHierarchySession::init_template
-        self.session = self.svc_mgr
+    def class_tear_down():
+        request.cls.svc_mgr.remove_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
+        request.cls.svc_mgr.remove_child_${cat_name_under_plural}(request.cls.catalogs['Root'].ident)
+        request.cls.svc_mgr.remove_root_${cat_name_under}(request.cls.catalogs['Root'].ident)
+        for cat_name in request.cls.catalogs:
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalogs[cat_name].ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::BinHierarchySession::init_template
-        cls.svc_mgr.remove_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
-        cls.svc_mgr.remove_child_${cat_name_under_plural}(cls.catalogs['Root'].ident)
-        cls.svc_mgr.remove_root_${cat_name_under}(cls.catalogs['Root'].ident)
-        for cat_name in cls.catalogs:
-            cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::BinHierarchySession::init_template
+    request.cls.session = request.cls.svc_mgr"""
 
     can_access_bin_hierarchy_template = """
         # From test_templates/resource.py::BinHierarchySession::can_access_objective_bank_hierarchy_template
-        self.assertTrue(isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool))"""
+        assert isinstance(self.${svc_mgr_or_catalog}.${method_name}(), bool)"""
 
     get_bin_hierarchy_id_template = """
         # From test_templates/resource.py::BinHierarchySession::get_bin_hierarchy_id_template
         hierarchy_id = self.svc_mgr.${method_name}()
-        self.assertTrue(isinstance(hierarchy_id, Id))"""
+        assert isinstance(hierarchy_id, Id)"""
 
     get_bin_hierarchy_template = """
         # From test_templates/resource.py::BinHierarchySession::get_bin_hierarchy_template
         hierarchy = self.svc_mgr.${method_name}()
-        self.assertTrue(isinstance(hierarchy, Hierarchy))"""
+        assert isinstance(hierarchy, Hierarchy)"""
 
     get_root_bin_ids_template = """
         # From test_templates/resource.py::BinHierarchySession::get_root_bin_ids_template
         root_ids = self.svc_mgr.${method_name}()
-        self.assertTrue(isinstance(root_ids, IdList))
+        assert isinstance(root_ids, IdList)
         # probably should be == 1, but we seem to be getting test cruft,
         # and I can't pinpoint where it's being introduced.
-        self.assertTrue(root_ids.available() >= 1)"""
+        assert root_ids.available() >= 1"""
 
     get_root_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::get_root_bins_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}List
         roots = self.svc_mgr.${method_name}()
-        self.assertTrue(isinstance(roots, ${cat_name}List))
-        self.assertTrue(roots.available() == 1)"""
+        assert isinstance(roots, ${cat_name}List)
+        assert roots.available() == 1"""
 
     has_parent_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::has_parent_bins_template
-        self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool))
-        self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident))
-        self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 2'].ident))
-        self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident))
-        self.assertFalse(self.svc_mgr.${method_name}(self.catalogs['Root'].ident))"""
+        assert isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool)
+        assert self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
+        assert self.svc_mgr.${method_name}(self.catalogs['Child 2'].ident)
+        assert self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident)
+        assert not self.svc_mgr.${method_name}(self.catalogs['Root'].ident)"""
 
     is_parent_of_bin_template = """
         # From test_templates/resource.py::BinHierarchySession::is_parent_of_bin_template
-        self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident), bool))
-        self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Root'].ident, self.catalogs['Child 1'].ident))
-        self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Grandchild 1'].ident))
-        self.assertFalse(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident))"""
+        assert isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident), bool)
+        assert self.svc_mgr.${method_name}(self.catalogs['Root'].ident, self.catalogs['Child 1'].ident)
+        assert self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Grandchild 1'].ident)
+        assert not self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident)"""
 
     get_parent_bin_ids_template = """
         # From test_templates/resource.py::BinHierarchySession::get_parent_bin_ids_template
         from dlkit.abstract_osid.id.objects import ${return_type}
         catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
-        self.assertTrue(isinstance(catalog_list, ${return_type}))
-        self.assertEqual(catalog_list.available(), 1)"""
+        assert isinstance(catalog_list, ${return_type})
+        assert catalog_list.available() == 1"""
 
     get_parent_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::get_parent_bins_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
-        self.assertTrue(isinstance(catalog_list, ${return_type}))
-        self.assertEqual(catalog_list.available(), 1)
-        self.assertEqual(catalog_list.next().display_name.text, 'Root')"""
+        assert isinstance(catalog_list, ${return_type})
+        assert catalog_list.available() == 1
+        assert catalog_list.next().display_name.text == 'Root'"""
 
     is_ancestor_of_bin_template = """
         # From test_templates/resource.py::BinHierarchySession::is_ancestor_of_bin_template
-        self.assertRaises(errors.Unimplemented,
+        pytest.raises(errors.Unimplemented,
                           self.svc_mgr.${method_name},
                           self.catalogs['Root'].ident,
                           self.catalogs['Child 1'].ident)
@@ -1196,7 +1333,7 @@ class BinHierarchySession:
 
     is_descendant_of_bin_template = """
         # From test_templates/resource.py::BinHierarchySession::is_descendant_of_bin_template
-        self.assertRaises(errors.Unimplemented,
+        pytest.raises(errors.Unimplemented,
                           self.svc_mgr.${method_name},
                           self.catalogs['Child 1'].ident,
                           self.catalogs['Root'].ident)
@@ -1245,32 +1382,40 @@ class BinHierarchyDesignSession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::BinHierarchyDesignSession::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        cls.catalogs = dict()
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::BinHierarchyDesignSession::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.catalogs = dict()
+    if not is_never_authz(request.cls.service_config):
         for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
-            create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
             create_form.display_name = name
             create_form.description = 'Test ${cat_name} ' + name
-            cls.catalogs[name] = cls.svc_mgr.create_${cat_name_under}(create_form)
-        cls.svc_mgr.add_root_${cat_name_under}(cls.catalogs['Root'].ident)
-        cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
-        cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
-        cls.svc_mgr.add_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+            request.cls.catalogs[name] = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.svc_mgr.add_root_${cat_name_under}(request.cls.catalogs['Root'].ident)
+        request.cls.svc_mgr.add_child_${cat_name_under}(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 1'].ident)
+        request.cls.svc_mgr.add_child_${cat_name_under}(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 2'].ident)
+        request.cls.svc_mgr.add_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
 
-    def setUp(self):
-        # From test_templates/resource.py::BinHierarchyDesignSession::init_template
-        self.session = self.svc_mgr
+    def class_tear_down():
+        request.cls.svc_mgr.remove_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
+        request.cls.svc_mgr.remove_child_${cat_name_under_plural}(request.cls.catalogs['Root'].ident)
+        for cat_name in request.cls.catalogs:
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalogs[cat_name].ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::BinHierarchyDesignSession::init_template
-        cls.svc_mgr.remove_child_${cat_name_under}(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
-        cls.svc_mgr.remove_child_${cat_name_under_plural}(cls.catalogs['Root'].ident)
-        for cat_name in cls.catalogs:
-            cls.svc_mgr.delete_${cat_name_under}(cls.catalogs[cat_name].ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::BinHierarchyDesignSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
 
     can_modify_bin_hierarchy_template = """
         # From test_templates/resource.py::BinHierarchyDesignSession::can_modify_bin_hierarchy_template
@@ -1369,47 +1514,59 @@ class Resource:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::Resource::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::Resource::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
 
-        form = cls.catalog.get_${object_name_under}_form_for_create([])
+        form = request.cls.catalog.get_${object_name_under}_form_for_create([])
         form.display_name = 'Test object'
-        cls.object = cls.catalog.create_${object_name_under}(form)
+        request.cls.object = request.cls.catalog.create_${object_name_under}(form)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::Resource::init_template
-        for obj in cls.catalog.get_${object_name_under_plural}():
-            cls.catalog.delete_${object_name_under}(obj.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_${object_name_under_plural}():
+                request.cls.catalog.delete_${object_name_under}(obj.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
 
     is_group_template = """
         # From test_templates/resources.py::Resource::is_group_template
-        self.assertTrue(isinstance(self.object.${method_name}(), bool))"""
+        assert isinstance(self.object.${method_name}(), bool)"""
 
     is_demographic = """
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             self.object.is_demographic()"""
 
     has_avatar_template = """
         # From test_templates/resources.py::Resource::has_avatar_template
-        self.assertTrue(isinstance(self.object.${method_name}(), bool))"""
+        assert isinstance(self.object.${method_name}(), bool)"""
 
     get_avatar_id_template = """
         # From test_templates/resources.py::Resource::get_avatar_id_template
-        self.assertRaises(errors.IllegalState,
-                          self.object.${method_name})"""
+        pytest.raises(errors.IllegalState,
+                      self.object.${method_name})"""
 
     get_avatar_template = """
         # From test_templates/resources.py::Resource::get_avatar_template
-        self.assertRaises(errors.IllegalState,
-                          self.object.${method_name})"""
+        pytest.raises(errors.IllegalState,
+                      self.object.${method_name})"""
 
 
 class ResourceQuery:
@@ -1428,23 +1585,31 @@ class ResourceQuery:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::ResourceQuery::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::ResourceQuery::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    def setUp(self):
-        # From test_templates/resource.py::ResourceQuery::init_template
-        self.query = self.catalog.get_${object_name_under}_query()
+    def class_tear_down():
+        request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::ResourceQuery::init_template
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceQuery::init_template
+    request.cls.query = request.cls.catalog.get_${object_name_under}_query()"""
 
     clear_group_terms_template = """
         # From test_templates/resource.py::ResourceQuery::clear_group_terms_template
@@ -1507,23 +1672,30 @@ class ResourceSearch:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::ResourceSearch::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
-        create_form.display_name = 'Test catalog'
-        create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::ResourceSearch::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+    create_form.display_name = 'Test catalog'
+    create_form.description = 'Test catalog description'
+    request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    def setUp(self):
-        # From test_templates/resource.py::ResourceSearch::init_template
-        self.search = self.catalog.get_${object_name_under}_search()
+    def class_tear_down():
+        request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::ResourceSearch::init_template
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceSearch::init_template
+    request.cls.search = request.cls.catalog.get_${object_name_under}_search()"""
 
 
 class ResourceSearchSession:
@@ -1552,32 +1724,41 @@ class ResourceSearchSession:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.resource_list = list()
-        cls.resource_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('RESOURCE', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_bin_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.resource_list = list()
+    request.cls.resource_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'RESOURCE',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
         create_form.description = 'Test Bin for ResourceSearchSession tests'
-        cls.catalog = cls.svc_mgr.create_bin(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_bin(create_form)
         for color in ['Orange', 'Blue', 'Green', 'orange']:
-            create_form = cls.catalog.get_resource_form_for_create([])
+            create_form = request.cls.catalog.get_resource_form_for_create([])
             create_form.display_name = 'Test Resource ' + color
             create_form.description = (
                 'Test Resource for ResourceSearchSession tests, did I mention green')
-            obj = cls.catalog.create_resource(create_form)
-            cls.resource_list.append(obj)
-            cls.resource_ids.append(obj.ident)
+            obj = request.cls.catalog.create_resource(create_form)
+            request.cls.resource_list.append(obj)
+            request.cls.resource_ids.append(obj.ident)
 
-    def setUp(self):
-        self.session = self.catalog
+    def class_tear_down():
+        for obj in request.cls.catalog.get_resources():
+            request.cls.catalog.delete_resource(obj.ident)
+        request.cls.svc_mgr.delete_bin(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_resources():
-            cls.catalog.delete_resource(obj.ident)
-        cls.svc_mgr.delete_bin(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.catalog"""
 
     get_resource_search_template = """
         # From test_templates/resource.py::ResourceSearchSession::get_resource_search_template
@@ -1603,83 +1784,89 @@ class ResourceForm:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::ResourceForm::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::ResourceForm::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    def setUp(self):
-        # From test_templates/resource.py::ResourceForm::init_template
-        self.form = self.catalog.get_${object_name_under}_form_for_create([])
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::ResourceForm::init_template
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceForm::init_template
+    if not is_never_authz(request.cls.service_config):
+        request.cls.form = request.cls.catalog.get_${object_name_under}_form_for_create([])"""
 
     get_group_metadata_template = """
         # From test_templates/resource.py::ResourceForm::get_group_metadata_template
         mdata = self.form.${method_name}()
-        self.assertTrue(isinstance(mdata, Metadata))
-        self.assertTrue(isinstance(mdata.get_element_id(), ABC_Id))
-        self.assertTrue(isinstance(mdata.get_element_label(), ABC_DisplayText))
-        self.assertTrue(isinstance(mdata.get_instructions(), ABC_DisplayText))
-        self.assertEquals(mdata.get_syntax(), '${syntax}')
-        self.assertFalse(mdata.is_array())
-        self.assertTrue(isinstance(mdata.is_required(), bool))
-        self.assertTrue(isinstance(mdata.is_read_only(), bool))
-        self.assertTrue(isinstance(mdata.is_linked(), bool))"""
+        assert isinstance(mdata, Metadata)
+        assert isinstance(mdata.get_element_id(), ABC_Id)
+        assert isinstance(mdata.get_element_label(), ABC_DisplayText)
+        assert isinstance(mdata.get_instructions(), ABC_DisplayText)
+        assert mdata.get_syntax() == '${syntax}'
+        assert not mdata.is_array()
+        assert isinstance(mdata.is_required(), bool)
+        assert isinstance(mdata.is_read_only(), bool)
+        assert isinstance(mdata.is_linked(), bool)"""
 
     get_avatar_metadata_template = """
         # From test_templates/resource.py::ResourceForm::get_avatar_metadata_template
         mdata = self.form.${method_name}()
-        self.assertTrue(isinstance(mdata, Metadata))
-        self.assertTrue(isinstance(mdata.get_element_id(), ABC_Id))
-        self.assertTrue(isinstance(mdata.get_element_label(), ABC_DisplayText))
-        self.assertTrue(isinstance(mdata.get_instructions(), ABC_DisplayText))
-        self.assertEquals(mdata.get_syntax(), '${syntax}')
-        self.assertFalse(mdata.is_array())
-        self.assertTrue(isinstance(mdata.is_required(), bool))
-        self.assertTrue(isinstance(mdata.is_read_only(), bool))
-        self.assertTrue(isinstance(mdata.is_linked(), bool))"""
+        assert isinstance(mdata, Metadata)
+        assert isinstance(mdata.get_element_id(), ABC_Id)
+        assert isinstance(mdata.get_element_label(), ABC_DisplayText)
+        assert isinstance(mdata.get_instructions(), ABC_DisplayText)
+        assert mdata.get_syntax() == '${syntax}'
+        assert not mdata.is_array()
+        assert isinstance(mdata.is_required(), bool)
+        assert isinstance(mdata.is_read_only(), bool)
+        assert isinstance(mdata.is_linked(), bool)"""
 
     set_group_template = """
         # From test_templates/resource.py::ResourceForm::set_group_template
         self.form.${method_name}(True)
-        self.assertTrue(self.form._my_map['${var_name_mixed}'])
-        with self.assertRaises(errors.InvalidArgument):
+        assert self.form._my_map['${var_name_mixed}']
+        with pytest.raises(errors.InvalidArgument):
             self.form.${method_name}('false')"""
 
     clear_group_template = """
         # From test_templates/resource.py::ResourceForm::clear_group_template
         self.form.set_${var_name}(True)
-        self.assertTrue(self.form._my_map['${var_name_mixed}'])
+        assert self.form._my_map['${var_name_mixed}']
         self.form.${method_name}()
-        self.assertIsNone(self.form._my_map['${var_name_mixed}'])"""
+        assert self.form._my_map['${var_name_mixed}'] is None"""
 
     set_avatar_template = """
         # From test_templates/resource.py::ResourceForm::set_avatar_template
-        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], '')
+        assert self.form._my_map['${var_name_mixed}Id'] == ''
         self.form.set_${var_name}(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))
-        self.assertEqual(self.form._my_map['${var_name_mixed}Id'],
-                         'repository.Asset%3Afake-id%40ODL.MIT.EDU')
-        with self.assertRaises(errors.InvalidArgument):
+        assert self.form._my_map['${var_name_mixed}Id'] == 'repository.Asset%3Afake-id%40ODL.MIT.EDU'
+        with pytest.raises(errors.InvalidArgument):
             self.form.${method_name}(True)"""
 
     clear_avatar_template = """
         # From test_templates/resource.py::ResourceForm::clear_avatar_template
         self.form.set_${var_name}(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))
-        self.assertEqual(self.form._my_map['${var_name_mixed}Id'],
-                         'repository.Asset%3Afake-id%40ODL.MIT.EDU')
+        assert self.form._my_map['${var_name_mixed}Id'] == 'repository.Asset%3Afake-id%40ODL.MIT.EDU'
         self.form.${method_name}()
-        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
+        assert self.form._my_map['${var_name_mixed}Id'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
     get_resource_form_record_template = """
-        with self.assertRaises(errors.Unsupported):
+        with pytest.raises(errors.Unsupported):
             self.form.${method_name}(Type('osid.Osid%3Afake-record%40ODL.MIT.EDU'))
         # Here check for a real record?"""
 
@@ -1690,49 +1877,61 @@ class ResourceList:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # Implemented from init template for ResourceList
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from init template for ResourceList
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    def setUp(self):
-        # Implemented from init template for ResourceList
-        from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
-        self.${object_name_under}_list = list()
-        self.${object_name_under}_ids = list()
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_${object_name_under_plural}():
+                request.cls.catalog.delete_${object_name_under}(obj.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Implemented from init template for ResourceList
+    from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+    if not is_never_authz(request.cls.service_config):
         for num in [0, 1]:
-            create_form = self.catalog.get_${object_name_under}_form_for_create([])
+            create_form = request.cls.catalog.get_${object_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + str(num)
             create_form.description = 'Test ${object_name} for ${interface_name} tests'
-            obj = self.catalog.create_${object_name_under}(create_form)
-            self.${object_name_under}_list.append(obj)
-            self.${object_name_under}_ids.append(obj.ident)
-        self.${object_name_under}_list = ${interface_name}(self.${object_name_under}_list)
-        self.object = self.${object_name_under}_list
-
-    @classmethod
-    def tearDownClass(cls):
-        # Implemented from init template for ResourceList
-        for obj in cls.catalog.get_${object_name_under_plural}():
-            cls.catalog.delete_${object_name_under}(obj.ident)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+            obj = request.cls.catalog.create_${object_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(obj)
+            request.cls.${object_name_under}_ids.append(obj.ident)
+    request.cls.${object_name_under}_list = ${interface_name}(request.cls.${object_name_under}_list)
+    request.cls.object = request.cls.${object_name_under}_list"""
 
     get_next_resource_template = """
         # From test_templates/resource.py::ResourceList::get_next_resource_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        self.assertTrue(isinstance(self.${return_type_under}_list.${method_name}(), ${return_type}))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.${return_type_under}_list.${method_name}(), ${return_type})"""
 
     get_next_resources_template = """
         # From test_templates/resource.py::ResourceList::get_next_resources_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}List, ${return_type}
-        new_list = self.${return_type_under}_list.${method_name}(2)
-        self.assertTrue(isinstance(new_list, ${return_type}List))
-        for item in new_list:
-            self.assertTrue(isinstance(item, ${return_type}))"""
+        if not is_never_authz(self.service_config):
+            new_list = self.${return_type_under}_list.${method_name}(2)
+            assert isinstance(new_list, ${return_type}List)
+            for item in new_list:
+                assert isinstance(item, ${return_type})"""
 
 
 class ResourceNodeList:
@@ -1758,25 +1957,34 @@ class Bin:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::Bin::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::Bin::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
 
-    def setUp(self):
-        # From test_templates/resource.py::Bin::init_template
-        form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+    def class_tear_down():
+        pass
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::Bin::init_template
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         form.display_name = 'for testing'
-        self.object = self.svc_mgr.create_${cat_name_under}(form)
+        request.cls.object = request.cls.svc_mgr.create_${cat_name_under}(form)
 
-    def tearDown(self):
-        # From test_templates/resource.py::Bin::init_template
-        self.svc_mgr.delete_${cat_name_under}(self.object.ident)
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.object.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::Bin::init_template
-        pass"""
+    request.addfinalizer(test_tear_down)"""
 
 
 class BinForm:
@@ -1794,23 +2002,32 @@ class BinForm:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::BinForm::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::BinForm::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
 
-    def setUp(self):
-        # From test_templates/resource.py::BinForm::init_template
-        self.object = self.svc_mgr.get_${cat_name_under}_form_for_create([])
-
-    def tearDown(self):
-        # From test_templates/resource.py::BinForm::init_template
+    def class_tear_down():
         pass
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::BinForm::init_template
-        pass"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::BinForm::init_template
+    if not is_never_authz(request.cls.service_config):
+        request.cls.object = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+
+    def test_tear_down():
+        pass
+
+    request.addfinalizer(test_tear_down)"""
 
 
 class BinList:
@@ -1819,35 +2036,45 @@ class BinList:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # Implemented from init template for BinList
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from init template for BinList
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        cls.${object_name_under}_ids = list()
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.${object_name_under}_ids = list()
 
-    def setUp(self):
-        # Implemented from init template for BinList
-        from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
-        self.${object_name_under}_list = list()
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.${object_name_under}_ids:
+                request.cls.svc_mgr.delete_${cat_name_under}(obj)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Implemented from init template for BinList
+    from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
+    request.cls.${object_name_under}_list = list()
+    if not is_never_authz(request.cls.service_config):
         for num in [0, 1]:
-            create_form = self.svc_mgr.get_${object_name_under}_form_for_create([])
+            create_form = request.cls.svc_mgr.get_${object_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + str(num)
             create_form.description = 'Test ${object_name} for ${interface_name} tests'
-            obj = self.svc_mgr.create_${object_name_under}(create_form)
-            self.${object_name_under}_list.append(obj)
-            self.${object_name_under}_ids.append(obj.ident)
-        self.${object_name_under}_list = ${interface_name}(self.${object_name_under}_list)
-
-    @classmethod
-    def tearDownClass(cls):
-        # Implemented from init template for BinList
-        for obj in cls.${object_name_under}_ids:
-            cls.svc_mgr.delete_${cat_name_under}(obj)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+            obj = request.cls.svc_mgr.create_${object_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(obj)
+            request.cls.${object_name_under}_ids.append(obj.ident)
+    request.cls.${object_name_under}_list = ${interface_name}(request.cls.${object_name_under}_list)"""
 
 
 class BinNodeList:
@@ -1856,40 +2083,48 @@ class BinNodeList:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # Implemented from init template for BinNodeList
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from init template for BinNodeList
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        cls.${object_name_under}_ids = list()
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.${object_name_under}_ids = list()
 
-    def setUp(self):
-        # Implemented from init template for BinNodeList
-        from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}, ${object_name}
-        self.${object_name_under}_list = list()
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.${object_name_under}_ids:
+                request.cls.svc_mgr.delete_${cat_name_under}(obj)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Implemented from init template for BinNodeList
+    from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}, ${object_name}
+    request.cls.${object_name_under}_list = list()
+    if not is_never_authz(request.cls.service_config):
         for num in [0, 1]:
-            create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + str(num)
             create_form.description = 'Test ${object_name} for ${interface_name} tests'
-            obj = self.svc_mgr.create_${cat_name_under}(create_form)
-            self.${object_name_under}_list.append(${object_name}(obj.object_map))
-            self.${object_name_under}_ids.append(obj.ident)
+            obj = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(${object_name}(obj.object_map))
+            request.cls.${object_name_under}_ids.append(obj.ident)
         # Not put the catalogs in a hierarchy
-        self.svc_mgr.add_root_${cat_name_under}(self.${object_name_under}_list[0].ident)
-        self.svc_mgr.add_child_${cat_name_under}(
-            self.${object_name_under}_list[0].ident,
-            self.${object_name_under}_list[1].ident)
-        self.${object_name_under}_list = ${interface_name}(self.${object_name_under}_list)
-
-    @classmethod
-    def tearDownClass(cls):
-        # Implemented from init template for BinNodeList
-        for obj in cls.${object_name_under}_ids:
-            cls.svc_mgr.delete_${cat_name_under}(obj)
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+        request.cls.svc_mgr.add_root_${cat_name_under}(request.cls.${object_name_under}_list[0].ident)
+        request.cls.svc_mgr.add_child_${cat_name_under}(
+            request.cls.${object_name_under}_list[0].ident,
+            request.cls.${object_name_under}_list[1].ident)
+    request.cls.${object_name_under}_list = ${interface_name}(request.cls.${object_name_under}_list)"""
 
 
 class BinNode:
@@ -1898,87 +2133,97 @@ class BinNode:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # Implemented from init template for BinNode
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from init template for BinNode
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        cls.${object_name_under}_ids = list()
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.${object_name_under}_ids = list()
 
-    def setUp(self):
-        # Implemented from init template for BinNode
-        from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
-        self.${object_name_under}_list = list()
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Implemented from init template for BinNode
+    from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
+    request.cls.${object_name_under}_list = list()
+    if not is_never_authz(request.cls.service_config):
         for num in [0, 1]:
-            create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
             create_form.display_name = 'Test ${object_name} ' + str(num)
             create_form.description = 'Test ${object_name} for ${interface_name} tests'
-            obj = self.svc_mgr.create_${cat_name_under}(create_form)
-            self.${object_name_under}_list.append(${interface_name}(
+            obj = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(${interface_name}(
                 obj.object_map,
-                runtime=self.svc_mgr._runtime,
-                proxy=self.svc_mgr._proxy))
-            self.${object_name_under}_ids.append(obj.ident)
+                runtime=request.cls.svc_mgr._runtime,
+                proxy=request.cls.svc_mgr._proxy))
+            request.cls.${object_name_under}_ids.append(obj.ident)
         # Not put the catalogs in a hierarchy
-        self.svc_mgr.add_root_${cat_name_under}(self.${object_name_under}_list[0].ident)
-        self.svc_mgr.add_child_${cat_name_under}(
-            self.${object_name_under}_list[0].ident,
-            self.${object_name_under}_list[1].ident)
+        request.cls.svc_mgr.add_root_${cat_name_under}(request.cls.${object_name_under}_list[0].ident)
+        request.cls.svc_mgr.add_child_${cat_name_under}(
+            request.cls.${object_name_under}_list[0].ident,
+            request.cls.${object_name_under}_list[1].ident)
 
-        self.object = self.svc_mgr.get_${cat_name_under}_nodes(
-            self.${object_name_under}_list[0].ident, 0, 5, False)
+        request.cls.object = request.cls.svc_mgr.get_${cat_name_under}_nodes(
+            request.cls.${object_name_under}_list[0].ident, 0, 5, False)
 
-    def tearDown(self):
-        # Implemented from init template for BinNode
-        self.svc_mgr.remove_child_${cat_name_under}(
-            self.${object_name_under}_list[0].ident,
-            self.${object_name_under}_list[1].ident)
-        self.svc_mgr.remove_root_${cat_name_under}(self.${object_name_under}_list[0].ident)
-        for node in self.${object_name_under}_list:
-            self.svc_mgr.delete_${cat_name_under}(node.ident)
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.remove_child_${cat_name_under}(
+                request.cls.${object_name_under}_list[0].ident,
+                request.cls.${object_name_under}_list[1].ident)
+            request.cls.svc_mgr.remove_root_${cat_name_under}(request.cls.${object_name_under}_list[0].ident)
+            for node in request.cls.${object_name_under}_list:
+                request.cls.svc_mgr.delete_${cat_name_under}(node.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # Implemented from init template for BinNode
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(test_tear_down)"""
 
     get_bin_template = """
         # from test_templates/resource.py::BinNode::get_bin_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}
-        self.assertTrue(isinstance(self.${cat_name_under}_list[0].${method_name}(), ${cat_name}))
-        self.assertEqual(str(self.${cat_name_under}_list[0].${method_name}().ident),
-                         str(self.${cat_name_under}_list[0].ident))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.${cat_name_under}_list[0].${method_name}(), ${cat_name})
+            assert str(self.${cat_name_under}_list[0].${method_name}().ident) == str(self.${cat_name_under}_list[0].ident)"""
 
     get_parent_bin_nodes_template = """
         # from test_templates/resource.py::BinNode::get_parent_bin_nodes
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}NodeList
-        node = self.svc_mgr.get_${cat_name_under}_nodes(
-            self.${cat_name_under}_list[1].ident,
-            1,
-            0,
-            False)
-        self.assertTrue(isinstance(node.${method_name}(), ${cat_name}NodeList))
-        self.assertEqual(node.${method_name}().available(),
-                         1)
-        self.assertEqual(str(node.${method_name}().next().ident),
-                         str(self.${cat_name_under}_list[0].ident))"""
+        if not is_never_authz(self.service_config):
+            node = self.svc_mgr.get_${cat_name_under}_nodes(
+                self.${cat_name_under}_list[1].ident,
+                1,
+                0,
+                False)
+            assert isinstance(node.${method_name}(), ${cat_name}NodeList)
+            assert node.${method_name}().available() == 1
+            assert str(node.${method_name}().next().ident) == str(self.${cat_name_under}_list[0].ident)"""
 
     get_child_bin_nodes_template = """
         # from test_templates/resource.py::BinNode::get_child_bin_nodes_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}NodeList
-        node = self.svc_mgr.get_${cat_name_under}_nodes(
-            self.${cat_name_under}_list[0].ident,
-            0,
-            1,
-            False)
-        self.assertTrue(isinstance(node.${method_name}(), ${cat_name}NodeList))
-        self.assertEqual(node.${method_name}().available(),
-                         1)
-        self.assertEqual(str(node.${method_name}().next().ident),
-                         str(self.${cat_name_under}_list[1].ident))"""
+        if not is_never_authz(self.service_config):
+            node = self.svc_mgr.get_${cat_name_under}_nodes(
+                self.${cat_name_under}_list[0].ident,
+                0,
+                1,
+                False)
+            assert isinstance(node.${method_name}(), ${cat_name}NodeList)
+            assert node.${method_name}().available() == 1
+            assert str(node.${method_name}().next().ident) == str(self.${cat_name_under}_list[1].ident)"""
 
 
 class BinQuery:
@@ -1997,24 +2242,32 @@ class BinQuery:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::BinQuery::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::BinQuery::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
-    def setUp(self):
-        # From test_templates/resource.py::BinQuery::init_template
-        self.query = self.svc_mgr.get_${cat_name_under}_query()
+    def class_tear_down():
+        request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::BinQuery::init_template
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::BinQuery::init_template
+    request.cls.query = request.cls.svc_mgr.get_${cat_name_under}_query()"""
 
     clear_group_terms_template = """
         # From test_templates/resource.py::BinQuery::clear_group_terms_template
@@ -2041,24 +2294,32 @@ class BinQuerySession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/resource.py::BinQuerySession::init_template
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::BinQuerySession::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
         create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
         cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
         cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
-    def setUp(self):
-        # From test_templates/resource.py::BinQuerySession::init_template
-        self.session = self.svc_mgr
+    def class_tear_down():
+        request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/resource.py::BinQuerySession::init_template
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::BinQuerySession::init_template
+    request.cls.session = request.cls.svc_mgr"""
 
     get_bin_query_template = """
         # From test_templates/resource.py::BinQuerySession::get_bin_query_template

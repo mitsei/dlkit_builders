@@ -8,7 +8,7 @@ from binder_helpers import under_to_mixed, under_to_caps, camel_to_mixed,\
     remove_plural, camel_to_under, make_plural, camel_to_caps_under,\
     fix_reserved_word
 from build_dlkit import Utilities, BaseBuilder, Templates
-from config import managers_to_implement, packages_to_test
+from config import managers_to_implement, packages_to_test, test_service_configs
 from method_builders import MethodBuilder
 from mappers import Mapper
 
@@ -58,7 +58,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
 
         # Seed the inheritance list with this interface's abc_osid
         if self._is('tests'):
-            inheritance = ['unittest.TestCase']
+            inheritance = ['object']
         elif not self._is('manager') and self.package['name'] != 'osid' and interface['category'] == 'managers':
             inheritance = []
             last_inheritance = [get_full_interface_class()]
@@ -293,6 +293,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 'pkg_name_replaced_upper': self.replace(self.package['name']).upper(),
                 'pkg_name_upper': self.first(self.package['name']).upper(),
                 'interface_name': interface_name,
+                'interface_name_under': camel_to_under(interface_name),
                 'proxy_interface_name': proxy_manager_name(interface_name),
                 'interface_name_title': interface_name.title(),
                 'instance_initers': instance_initers,
@@ -313,7 +314,8 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 'cat_name_under_plural': make_plural(camel_to_under(cat_name)),
                 'cat_name_upper': cat_name.upper(),
                 'init_object': init_object,
-                'svc_mgr_or_catalog': svc_mgr_or_catalog}
+                'svc_mgr_or_catalog': svc_mgr_or_catalog,
+                'test_service_configs': test_service_configs or ['TEST_SERVICE']}
 
     def _grab_service_methods(self, type_check_method):
         self.patterns['implemented_view_methods'] = []
