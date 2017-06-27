@@ -246,6 +246,7 @@ def ${interface_name_under}_class_fixture(request):
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
@@ -259,6 +260,9 @@ def ${interface_name_under}_class_fixture(request):
             request.cls.${object_name_under}_list.append(obj)
             request.cls.${object_name_under}_ids.append(obj.ident)
 
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
+
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
             for obj in request.cls.catalog.get_${object_name_under_plural}():
@@ -270,17 +274,18 @@ def ${interface_name_under}_class_fixture(request):
 
 @pytest.fixture(scope="function")
 def ${interface_name_under}_test_fixture(request):
-    if not is_never_authz(request.cls.service_config):
-        request.cls.session = request.cls.catalog"""
+    request.cls.session = request.cls.catalog"""
 
     get_bin_id_template = """
         # From test_templates/resource.py ResourceLookupSession.get_bin_id_template
-        assert self.catalog.${method_name}() == self.catalog.ident"""
+        if not is_never_authz(self.service_config):
+            assert self.catalog.${method_name}() == self.catalog.ident"""
 
     get_bin_template = """
         # is this test really needed?
         # From test_templates/resource.py::ResourceLookupSession::get_bin_template
-        assert self.catalog is not None"""
+        if not is_never_authz(self.service_config):
+            assert self.catalog is not None"""
 
     can_lookup_resources_template = """
         # From test_templates/resource.py ResourceLookupSession.can_lookup_resources_template
@@ -304,67 +309,92 @@ def ${interface_name_under}_test_fixture(request):
 
     get_resource_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resource_template
-        self.catalog.use_isolated_${cat_name_under}_view()
-        obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
-        assert obj.ident == self.${object_name_under}_list[0].ident
-        self.catalog.use_federated_${cat_name_under}_view()
-        obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
-        assert obj.ident == self.${object_name_under}_list[0].ident"""
+        if not is_never_authz(self.service_config):
+            self.catalog.use_isolated_${cat_name_under}_view()
+            obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
+            assert obj.ident == self.${object_name_under}_list[0].ident
+            self.catalog.use_federated_${cat_name_under}_view()
+            obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
+            assert obj.ident == self.${object_name_under}_list[0].ident
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(self.fake_id)"""
 
     get_resources_by_ids_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_ids_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        objects = self.catalog.${method_name}(self.${object_name_under}_ids)
-        assert isinstance(objects, ${return_type})
-        self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}(self.${object_name_under}_ids)
-        assert objects.available() > 0
-        assert isinstance(objects, ${return_type})"""
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.${method_name}(self.${object_name_under}_ids)
+            assert isinstance(objects, ${return_type})
+            self.catalog.use_federated_${cat_name_under}_view()
+            objects = self.catalog.${method_name}(self.${object_name_under}_ids)
+            assert objects.available() > 0
+            assert isinstance(objects, ${return_type})
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}([self.fake_id])"""
 
     get_resources_by_genus_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_genus_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
-        assert isinstance(objects, ${return_type})
-        self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
-        assert objects.available() > 0
-        assert isinstance(objects, ${return_type})"""
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, ${return_type})
+            self.catalog.use_federated_${cat_name_under}_view()
+            objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
+            assert objects.available() > 0
+            assert isinstance(objects, ${return_type})
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(DEFAULT_GENUS_TYPE)"""
 
     get_resources_by_parent_genus_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_parent_genus_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
-        assert isinstance(objects, ${return_type})
-        self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
-        assert objects.available() == 0
-        assert isinstance(objects, ${return_type})"""
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, ${return_type})
+            self.catalog.use_federated_${cat_name_under}_view()
+            objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
+            assert objects.available() == 0
+            assert isinstance(objects, ${return_type})
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(DEFAULT_GENUS_TYPE)"""
 
     get_resources_by_record_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_record_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        objects = self.catalog.${method_name}(DEFAULT_TYPE)
-        assert isinstance(objects, ${return_type})
-        self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}(DEFAULT_TYPE)
-        assert objects.available() == 0
-        assert isinstance(objects, ${return_type})"""
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.${method_name}(DEFAULT_TYPE)
+            assert isinstance(objects, ${return_type})
+            self.catalog.use_federated_${cat_name_under}_view()
+            objects = self.catalog.${method_name}(DEFAULT_TYPE)
+            assert objects.available() == 0
+            assert isinstance(objects, ${return_type})
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(DEFAULT_TYPE)"""
 
     get_resources_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        objects = self.catalog.${method_name}()
-        assert isinstance(objects, ${return_type})
-        self.catalog.use_federated_${cat_name_under}_view()
-        objects = self.catalog.${method_name}()
-        assert objects.available() > 0
-        assert isinstance(objects, ${return_type})
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.${method_name}()
+            assert isinstance(objects, ${return_type})
+            self.catalog.use_federated_${cat_name_under}_view()
+            objects = self.catalog.${method_name}()
+            assert objects.available() > 0
+            assert isinstance(objects, ${return_type})
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}()
 
     def test_get_${object_name_under}_with_alias(self):
-        self.catalog.alias_${object_name_under}(self.${object_name_under}_ids[0], ALIAS_ID)
-        obj = self.catalog.get_${object_name_under}(ALIAS_ID)
-        assert obj.get_id() == self.${object_name_under}_ids[0]"""
+        if not is_never_authz(self.service_config):
+            self.catalog.alias_${object_name_under}(self.${object_name_under}_ids[0], ALIAS_ID)
+            obj = self.catalog.get_${object_name_under}(ALIAS_ID)
+            assert obj.get_id() == self.${object_name_under}_ids[0]"""
 
 
 class ResourceQuerySession:
@@ -382,6 +412,10 @@ class ResourceQuerySession:
     ]
 
     init_template = """
+class FakeQuery:
+    _cat_id_args_list = []
+
+
 @pytest.fixture(scope="class",
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
@@ -406,6 +440,8 @@ def ${interface_name_under}_class_fixture(request):
             obj = request.cls.catalog.create_${object_name_under}(create_form)
             request.cls.${object_name_under}_list.append(obj)
             request.cls.${object_name_under}_ids.append(obj.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
@@ -419,8 +455,7 @@ def ${interface_name_under}_class_fixture(request):
 @pytest.fixture(scope="function")
 def ${interface_name_under}_test_fixture(request):
     # From test_templates/resource.py::ResourceQuerySession::init_template
-    if not is_never_authz(request.cls.service_config):
-        request.cls.session = request.cls.catalog"""
+    request.cls.session = request.cls.catalog"""
 
     can_query_resources_template = """
         # From test_templates/resource.py ResourceQuerySession::can_query_resources_template
@@ -432,18 +467,26 @@ def ${interface_name_under}_test_fixture(request):
 
     get_resource_query_template = """
         # From test_templates/resource.py ResourceQuerySession::get_resource_query_template
-        query = self.session.${method_name}()
-        assert isinstance(query, ABCQueries.${return_type})"""
+        if not is_never_authz(self.service_config):
+            query = self.session.${method_name}()
+            assert isinstance(query, ABCQueries.${return_type})
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}()"""
 
     get_resources_by_query_template = """
         # From test_templates/resource.py ResourceQuerySession::get_resources_by_query_template
         # Need to add some tests with string types
-        query = self.session.get_${object_name_under}_query()
-        query.match_display_name('orange')
-        assert self.catalog.${method_name}(query).available() == 2
-        query.clear_display_name_terms()
-        query.match_display_name('blue', match=False)
-        assert self.session.${method_name}(query).available() == 3"""
+        if not is_never_authz(self.service_config):
+            query = self.session.get_${object_name_under}_query()
+            query.match_display_name('orange')
+            assert self.catalog.${method_name}(query).available() == 2
+            query.clear_display_name_terms()
+            query.match_display_name('blue', match=False)
+            assert self.session.${method_name}(query).available() == 3
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(FakeQuery())"""
 
 
 class ResourceAdminSession:
@@ -474,11 +517,14 @@ def ${interface_name_under}_class_fixture(request):
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
         request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
@@ -498,12 +544,12 @@ def ${interface_name_under}_test_fixture(request):
         form.description = 'description of ${object_name}'
         form.set_genus_type(NEW_TYPE)
         request.cls.osid_object = request.cls.catalog.create_${object_name_under}(form)
-        request.cls.session = request.cls.catalog
+    request.cls.session = request.cls.catalog
 
     def test_tear_down():
         # From test_templates/resource.py::ResourceAdminSession::init_template
         if not is_never_authz(request.cls.service_config):
-        request.cls.catalog.delete_${object_name_under}(request.cls.osid_object.ident)
+            request.cls.catalog.delete_${object_name_under}(request.cls.osid_object.ident)
 
     request.addfinalizer(test_tear_down)"""
 
@@ -529,55 +575,79 @@ def ${interface_name_under}_test_fixture(request):
 
     get_resource_form_for_create_template = """
         # From test_templates/resource.py::ResourceAdminSession::get_resource_form_for_create_template
-        form = self.catalog.${method_name}([])
-        assert isinstance(form, OsidForm)
-        assert not form.is_for_update()"""
+        if not is_never_authz(self.service_config):
+            form = self.catalog.${method_name}([])
+            assert isinstance(form, OsidForm)
+            assert not form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}([])"""
 
     create_resource_template = """
         # From test_templates/resource.py::ResourceAdminSession::create_resource_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${object_name}
-        assert isinstance(self.osid_object, ${object_name})
-        assert self.osid_object.display_name.text == 'new ${object_name}'
-        assert self.osid_object.description.text == 'description of ${object_name}'
-        assert self.osid_object.genus_type == NEW_TYPE"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.osid_object, ${object_name})
+            assert self.osid_object.display_name.text == 'new ${object_name}'
+            assert self.osid_object.description.text == 'description of ${object_name}'
+            assert self.osid_object.genus_type == NEW_TYPE
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}('foo')"""
 
     get_resource_form_for_update_template = """
         # From test_templates/resource.py::ResourceAdminSession::get_resource_form_for_update_template
-        form = self.catalog.${method_name}(self.osid_object.ident)
-        assert isinstance(form, OsidForm)
-        assert form.is_for_update()"""
+        if not is_never_authz(self.service_config):
+            form = self.catalog.${method_name}(self.osid_object.ident)
+            assert isinstance(form, OsidForm)
+            assert form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(self.fake_id)"""
 
     update_resource_template = """
         # From test_templates/resource.py::ResourceAdminSession::update_resource_template
-        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${object_name}
-        form = self.catalog.get_${object_name_under}_form_for_update(self.osid_object.ident)
-        form.display_name = 'new name'
-        form.description = 'new description'
-        form.set_genus_type(NEW_TYPE_2)
-        updated_object = self.catalog.${method_name}(form)
-        assert isinstance(updated_object, ${object_name})
-        assert updated_object.ident == self.osid_object.ident
-        assert updated_object.display_name.text == 'new name'
-        assert updated_object.description.text == 'new description'
-        assert updated_object.genus_type == NEW_TYPE_2"""
+        if not is_never_authz(self.service_config):
+            from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${object_name}
+            form = self.catalog.get_${object_name_under}_form_for_update(self.osid_object.ident)
+            form.display_name = 'new name'
+            form.description = 'new description'
+            form.set_genus_type(NEW_TYPE_2)
+            updated_object = self.catalog.${method_name}(form)
+            assert isinstance(updated_object, ${object_name})
+            assert updated_object.ident == self.osid_object.ident
+            assert updated_object.display_name.text == 'new name'
+            assert updated_object.description.text == 'new description'
+            assert updated_object.genus_type == NEW_TYPE_2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}('foo')"""
 
     delete_resource_template = """
         # From test_templates/resource.py::ResourceAdminSession::delete_resource_template
-        form = self.catalog.get_${object_name_under}_form_for_create([])
-        form.display_name = 'new ${object_name}'
-        form.description = 'description of ${object_name}'
-        form.set_genus_type(NEW_TYPE)
-        osid_object = self.catalog.create_${object_name_under}(form)
-        self.catalog.${method_name}(osid_object.ident)
-        with pytest.raises(errors.NotFound):
-            self.catalog.get_${object_name_under}(osid_object.ident)"""
+        if not is_never_authz(self.service_config):
+            form = self.catalog.get_${object_name_under}_form_for_create([])
+            form.display_name = 'new ${object_name}'
+            form.description = 'description of ${object_name}'
+            form.set_genus_type(NEW_TYPE)
+            osid_object = self.catalog.create_${object_name_under}(form)
+            self.catalog.${method_name}(osid_object.ident)
+            with pytest.raises(errors.NotFound):
+                self.catalog.get_${object_name_under}(osid_object.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(self.fake_id)"""
 
     alias_resource_template = """
         # From test_templates/resource.py::ResourceAdminSession::alias_resource_template
-        alias_id = Id(self.catalog.ident.namespace + '%3Amy-alias%40ODL.MIT.EDU')
-        self.catalog.${method_name}(self.osid_object.ident, alias_id)
-        aliased_object = self.catalog.get_${object_name_under}(alias_id)
-        assert aliased_object.ident == self.osid_object.ident"""
+        if not is_never_authz(self.service_config):
+            alias_id = Id(self.catalog.ident.namespace + '%3Amy-alias%40ODL.MIT.EDU')
+            self.catalog.${method_name}(self.osid_object.ident, alias_id)
+            aliased_object = self.catalog.get_${object_name_under}(alias_id)
+            assert aliased_object.ident == self.osid_object.ident
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(self.fake_id, self.fake_id)"""
 
 
 class ResourceNotificationSession:
@@ -586,28 +656,109 @@ class ResourceNotificationSession:
     import_statements_pattern = ResourceLookupSession.import_statements_pattern
 
     # Placeholder: still need to write a real ResourceNotificationSession tess
-    init_template = ResourceLookupSession.init_template
+    init_template = """
+class NotificationReceiver(object):
+    # Implemented from resource.ResourceNotificationSession
+    pass
+
+
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from init template for ResourceNotificationSession
+    request.cls.service_config = request.param
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        for num in [0, 1]:
+            create_form = request.cls.catalog.get_${object_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + str(num)
+            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            obj = request.cls.catalog.create_${object_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(obj)
+            request.cls.${object_name_under}_ids.append(obj.ident)
+
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(NotificationReceiver(), proxy=PROXY)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_${object_name_under_plural}():
+                request.cls.catalog.delete_${object_name_under}(obj.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceNotificationSession::init_template
+    request.cls.session = request.cls.catalog"""
 
     register_for_changed_resources_template = """
-        self.session.${method_name}()"""
+        # From test_templates/resource.py::ResourceNotificationSession::register_for_changed_resources_template
+        if not is_never_authz(self.service_config):
+            self.session.${method_name}()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}()"""
 
     register_for_deleted_resources_template = """
-        self.session.${method_name}()"""
+        # From test_templates/resource.py::ResourceNotificationSession::register_for_deleted_resources_template
+        if not is_never_authz(self.service_config):
+            self.session.${method_name}()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}()"""
 
     register_for_changed_resource_template = """
-        self.session.${method_name}(Id('package.Catalog%3Afake%40DLKIT.MIT.EDU'))"""
+        # From test_templates/resource.py::ResourceNotificationSession::register_for_changed_resource_template
+        if not is_never_authz(self.service_config):
+            self.session.${method_name}(self.fake_id)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id)"""
 
     register_for_deleted_resource_template = """
-        self.session.${method_name}(Id('package.Catalog%3Afake%40DLKIT.MIT.EDU'))"""
+        # From test_templates/resource.py::ResourceNotificationSession::register_for_deleted_resource_template
+        if not is_never_authz(self.service_config):
+            self.session.${method_name}(self.fake_id)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id)"""
 
     register_for_new_resources_template = """
-        self.session.${method_name}()"""
+        # From test_templates/resource.py::ResourceNotificationSession::register_for_new_resources_template
+        if not is_never_authz(self.service_config):
+            self.session.${method_name}()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}()"""
 
     reliable_resource_notifications_template = """
+        # From test_templates/resource.py::ResourceNotificationSession::reliable_resource_notifications_template
         self.session.${method_name}()"""
 
     unreliable_resource_notifications_template = """
+        # From test_templates/resource.py::ResourceNotificationSession::unreliable_resource_notifications_template
         self.session.${method_name}()"""
+
+    can_register_for_resource_notifications_template = """
+        # From test_templates/resource.py::ResourceNotificationSession::can_register_for_resource_notifications_template
+        if is_no_authz(self.service_config):
+            with pytest.raises(errors.Unimplemented):
+                self.session.${method_name}()
+        else:
+            assert isinstance(self.session.${method_name}(), bool)"""
 
 
 class ResourceBinSession:
@@ -637,6 +788,7 @@ def ${interface_name_under}_class_fixture(request):
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
@@ -684,45 +836,73 @@ def ${interface_name_under}_test_fixture(request):
 
     get_resource_ids_by_bin_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bin_template
-        objects = self.svc_mgr.get_${object_name_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
-        assert objects.available() == 2"""
+        if not is_never_authz(self.service_config):
+            objects = self.svc_mgr.get_${object_name_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
+            assert objects.available() == 2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     get_resource_ids_by_bins_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bins_template
-        catalog_ids = [self.catalog.ident, self.assigned_catalog.ident]
-        object_ids = self.session.${method_name}(catalog_ids)
-        assert isinstance(object_ids, IdList)
-        # Currently our impl does not remove duplicate objectIds
-        assert object_ids.available() == 5"""
+        if not is_never_authz(self.service_config):
+            catalog_ids = [self.catalog.ident, self.assigned_catalog.ident]
+            object_ids = self.session.${method_name}(catalog_ids)
+            assert isinstance(object_ids, IdList)
+            # Currently our impl does not remove duplicate objectIds
+            assert object_ids.available() == 5
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}([self.fake_id])"""
 
     get_resources_by_bin_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resources_by_bin_template
-        results = self.session.${method_name}(self.assigned_catalog.ident)
-        assert isinstance(results, ABCObjects.${object_name}List)
-        assert results.available() == 2"""
+        if not is_never_authz(self.service_config):
+            results = self.session.${method_name}(self.assigned_catalog.ident)
+            assert isinstance(results, ABCObjects.${object_name}List)
+            assert results.available() == 2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id)"""
 
     get_resources_by_bins_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resources_by_bins_template
-        catalog_ids = [self.catalog.ident, self.assigned_catalog.ident]
-        results = self.session.${method_name}(catalog_ids)
-        assert isinstance(results, ABCObjects.${object_name}List)
-        # Currently our impl does not remove duplicate objects
-        assert results.available() == 5"""
+        if not is_never_authz(self.service_config):
+            catalog_ids = [self.catalog.ident, self.assigned_catalog.ident]
+            results = self.session.${method_name}(catalog_ids)
+            assert isinstance(results, ABCObjects.${object_name}List)
+            # Currently our impl does not remove duplicate objects
+            assert results.available() == 5
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}([self.fake_id])"""
 
     get_resource_by_bin_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_by_bin_template
-        objects = self.svc_mgr.get_${object_name_plural_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
-        assert objects.available() == 2"""
+        if not is_never_authz(self.service_config):
+            objects = self.svc_mgr.${method_name}(self.assigned_catalog.ident)
+            assert objects.available() == 2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     get_bin_ids_by_resource_template = """
         # From test_templates/resource.py::ResourceBinSession::get_bin_ids_by_resource_template
-        cats = self.svc_mgr.get_${cat_name_under}_ids_by_${object_name_under}(self.${object_name_under}_ids[1])
-        assert cats.available() == 2"""
+        if not is_never_authz(self.service_config):
+            cats = self.svc_mgr.${method_name}(self.${object_name_under}_ids[1])
+            assert cats.available() == 2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     get_bins_by_resource_template = """
         # From test_templates/resource.py::ResourceBinSession::get_bins_by_resource_template
-        cats = self.svc_mgr.get_${cat_name_plural_under}_by_${object_name_under}(self.${object_name_under}_ids[1])
-        assert cats.available() == 2"""
+        if not is_never_authz(self.service_config):
+            cats = self.svc_mgr.${method_name}(self.${object_name_under}_ids[1])
+            assert cats.available() == 2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
 
 class ResourceBinAssignmentSession:
@@ -752,7 +932,7 @@ def ${interface_name_under}_class_fixture(request):
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
-
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
@@ -777,7 +957,7 @@ def ${interface_name_under}_class_fixture(request):
             request.cls.svc_mgr.delete_${cat_name_under}(request.cls.assigned_catalog.ident)
             request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    result.addfinalizer(class_tear_down)
+    request.addfinalizer(class_tear_down)
 
 
 @pytest.fixture(scope="function")
@@ -787,29 +967,37 @@ def ${interface_name_under}_test_fixture(request):
 
     assign_resource_to_bin_template = """
         # From test_templates/resource.py::ResourceBinAssignmentSession::assign_resource_to_bin_template
-        results = self.assigned_catalog.get_${object_name_plural_under}()
-        assert results.available() == 0
-        self.session.${method_name}(self.${object_name_under}_ids[1], self.assigned_catalog.ident)
-        results = self.assigned_catalog.get_${object_name_plural_under}()
-        assert results.available() == 1
-        self.session.unassign_${object_name_under}_from_${cat_name_under}(
-            self.${object_name_under}_ids[1],
-            self.assigned_catalog.ident)"""
+        if not is_never_authz(self.service_config):
+            results = self.assigned_catalog.get_${object_name_plural_under}()
+            assert results.available() == 0
+            self.session.${method_name}(self.${object_name_under}_ids[1], self.assigned_catalog.ident)
+            results = self.assigned_catalog.get_${object_name_plural_under}()
+            assert results.available() == 1
+            self.session.unassign_${object_name_under}_from_${cat_name_under}(
+                self.${object_name_under}_ids[1],
+                self.assigned_catalog.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id, self.fake_id)"""
 
     unassign_resource_from_bin_template = """
         # From test_templates/resource.py::ResourceBinAssignmentSession::unassign_resource_from_bin_template
-        results = self.assigned_catalog.get_${object_name_plural_under}()
-        assert results.available() == 0
-        self.session.assign_${object_name_under}_to_${cat_name_under}(
-            self.${object_name_under}_ids[1],
-            self.assigned_catalog.ident)
-        results = self.assigned_catalog.get_${object_name_plural_under}()
-        assert results.available() == 1
-        self.session.${method_name}(
-            self.${object_name_under}_ids[1],
-            self.assigned_catalog.ident)
-        results = self.assigned_catalog.get_${object_name_plural_under}()
-        assert results.available() == 0"""
+        if not is_never_authz(self.service_config):
+            results = self.assigned_catalog.get_${object_name_plural_under}()
+            assert results.available() == 0
+            self.session.assign_${object_name_under}_to_${cat_name_under}(
+                self.${object_name_under}_ids[1],
+                self.assigned_catalog.ident)
+            results = self.assigned_catalog.get_${object_name_plural_under}()
+            assert results.available() == 1
+            self.session.${method_name}(
+                self.${object_name_under}_ids[1],
+                self.assigned_catalog.ident)
+            results = self.assigned_catalog.get_${object_name_plural_under}()
+            assert results.available() == 0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id, self.fake_id)"""
 
     can_assign_resources_template = """
         # From test_templates/resource.py::ResourceBinAssignmentSession::can_assign_resources_template
@@ -825,23 +1013,31 @@ def ${interface_name_under}_test_fixture(request):
         # From test_templates/resource.py::ResourceBinAssignmentSession::get_assignable_bin_ids_template
         # Note that our implementation just returns all catalogIds, which does not follow
         #   the OSID spec (should return only the catalogIds below the given one in the hierarchy.
-        results = self.session.${method_name}(self.catalog.ident)
-        assert isinstance(results, IdList)
+        if not is_never_authz(self.service_config):
+            results = self.session.${method_name}(self.catalog.ident)
+            assert isinstance(results, IdList)
 
-        # Because we're not deleting all banks from all tests, we might
-        #   have some crufty banks here...but there should be at least 2.
-        assert results.available() >= 2"""
+            # Because we're not deleting all banks from all tests, we might
+            #   have some crufty banks here...but there should be at least 2.
+            assert results.available() >= 2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id)"""
 
     get_assignable_bin_ids_for_resource_template = """
-        # From test_templates/resource.py::ResourceBinAssignmentSession::get_assignable_bin_ids_for_item_template
+        # From test_templates/resource.py::ResourceBinAssignmentSession::get_assignable_bin_ids_for_resource_template
         # Note that our implementation just returns all catalogIds, which does not follow
         #   the OSID spec (should return only the catalogIds below the given one in the hierarchy.
-        results = self.session.${method_name}(self.catalog.ident, self.${object_name_under}_ids[0])
-        assert isinstance(results, IdList)
+        if not is_never_authz(self.service_config):
+            results = self.session.${method_name}(self.catalog.ident, self.${object_name_under}_ids[0])
+            assert isinstance(results, IdList)
 
-        # Because we're not deleting all banks from all tests, we might
-        #   have some crufty banks here...but there should be at least 2.
-        assert results.available() >= 2"""
+            # Because we're not deleting all banks from all tests, we might
+            #   have some crufty banks here...but there should be at least 2.
+            assert results.available() >= 2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id, self.fake_id)"""
 
 
 class ResourceAgentSession:
@@ -878,17 +1074,19 @@ def ${interface_name_under}_class_fixture(request):
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
-        create_form.description = 'Test Bin for ResourceLookupSession tests'
+        create_form.description = 'Test Bin for ResourceAgentSession tests'
         request.cls.catalog = request.cls.svc_mgr.create_bin(create_form)
         for num in [0, 1]:
             create_form = request.cls.catalog.get_resource_form_for_create([])
             create_form.display_name = 'Test Resource ' + str(num)
-            create_form.description = 'Test Resource for ResourceLookupSession tests'
+            create_form.description = 'Test Resource for ResourceAgentSession tests'
             obj = request.cls.catalog.create_resource(create_form)
             request.cls.resource_list.append(obj)
             request.cls.resource_ids.append(obj.ident)
         request.cls.catalog.assign_agent_to_resource(AGENT_ID_0, request.cls.resource_ids[0])
         request.cls.catalog.assign_agent_to_resource(AGENT_ID_1, request.cls.resource_ids[1])
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_resource_agent_session(proxy=PROXY)
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
@@ -905,25 +1103,41 @@ def ${interface_name_under}_test_fixture(request):
     request.cls.session = request.cls.catalog"""
 
     get_resource_id_by_agent = """
-        resource_id = self.catalog.get_resource_id_by_agent(AGENT_ID_0)
-        assert isinstance(resource_id, Id)
-        assert resource_id == self.resource_ids[0]"""
+        if not is_never_authz(self.service_config):
+            resource_id = self.catalog.get_resource_id_by_agent(AGENT_ID_0)
+            assert isinstance(resource_id, Id)
+            assert resource_id == self.resource_ids[0]
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_resource_id_by_agent(AGENT_ID_0)"""
 
     get_resource_by_agent = """
-        resource = self.catalog.get_resource_by_agent(AGENT_ID_1)
-        assert isinstance(resource, Resource)
-        assert resource.display_name.text == 'Test Resource 1'"""
+        if not is_never_authz(self.service_config):
+            resource = self.catalog.get_resource_by_agent(AGENT_ID_1)
+            assert isinstance(resource, Resource)
+            assert resource.display_name.text == 'Test Resource 1'
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_resource_by_agent(AGENT_ID_1)"""
 
     get_agent_ids_by_resource = """
-        id_list = self.catalog.get_agent_ids_by_resource(self.resource_ids[0])
-        assert id_list.next() == AGENT_ID_0
-        assert isinstance(id_list, IdList)"""
+        if not is_never_authz(self.service_config):
+            id_list = self.catalog.get_agent_ids_by_resource(self.resource_ids[0])
+            assert id_list.next() == AGENT_ID_0
+            assert isinstance(id_list, IdList)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_agent_ids_by_resource(AGENT_ID_0)"""
 
     get_agents_by_resource = """
-        agents = self.catalog.get_agents_by_resource(self.resource_ids[0])
-        assert agents.available() == 1
-        assert isinstance(agents, AgentList)
-        assert agents.next().ident == AGENT_ID_0"""
+        if not is_never_authz(self.service_config):
+            agents = self.catalog.get_agents_by_resource(self.resource_ids[0])
+            assert agents.available() == 1
+            assert isinstance(agents, AgentList)
+            assert agents.next().ident == AGENT_ID_0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_agents_by_resource(AGENT_ID_0)"""
 
 
 class ResourceAgentAssignmentSession:
@@ -943,21 +1157,23 @@ def ${interface_name_under}_class_fixture(request):
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
-        create_form.description = 'Test Bin for ResourceLookupSession tests'
+        create_form.description = 'Test Bin for ResourceAgentAssignmentSession tests'
         request.cls.catalog = request.cls.svc_mgr.create_bin(create_form)
         for num in [0, 1]:
             create_form = request.cls.catalog.get_resource_form_for_create([])
             create_form.display_name = 'Test Resource ' + str(num)
-            create_form.description = 'Test Resource for ResourceLookupSession tests'
+            create_form.description = 'Test Resource for ResourceAgentAssignmentSession tests'
             obj = request.cls.catalog.create_resource(create_form)
             request.cls.resource_list.append(obj)
             request.cls.resource_ids.append(obj.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_resource_agent_assignment_session(proxy=PROXY)
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
-            for obj in catalog.get_resources():
-                catalog.delete_resource(obj.ident)
-            request.cls.svc_mgr.delete_bin(catalog.ident)
+            for obj in request.cls.catalog.get_resources():
+                request.cls.catalog.delete_resource(obj.ident)
+            request.cls.svc_mgr.delete_bin(request.cls.catalog.ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -967,16 +1183,38 @@ def ${interface_name_under}_test_fixture(request):
     request.cls.session = request.cls.catalog"""
 
     assign_agent_to_resource = """
-        self.catalog.assign_agent_to_resource(AGENT_ID_0, self.resource_ids[0])
-        with pytest.raises(errors.AlreadyExists):
-            self.catalog.assign_agent_to_resource(AGENT_ID_0, self.resource_ids[1])"""
+        if not is_never_authz(self.service_config):
+            self.catalog.assign_agent_to_resource(AGENT_ID_0, self.resource_ids[0])
+            with pytest.raises(errors.AlreadyExists):
+                self.catalog.assign_agent_to_resource(AGENT_ID_0, self.resource_ids[1])
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.assign_agent_to_resource(AGENT_ID_0, AGENT_ID_1)"""
 
     unassign_agent_from_resource = """
-        self.catalog.assign_agent_to_resource(AGENT_ID_1, self.resource_ids[1])
-        assert self.catalog.get_resource_by_agent(AGENT_ID_1).display_name.text == 'Test Resource 1'
-        self.catalog.unassign_agent_from_resource(AGENT_ID_1, self.resource_ids[1])
-        with pytest.raises(errors.NotFound):
-            self.catalog.get_resource_by_agent(AGENT_ID_1)"""
+        if not is_never_authz(self.service_config):
+            self.catalog.assign_agent_to_resource(AGENT_ID_1, self.resource_ids[1])
+            assert self.catalog.get_resource_by_agent(AGENT_ID_1).display_name.text == 'Test Resource 1'
+            self.catalog.unassign_agent_from_resource(AGENT_ID_1, self.resource_ids[1])
+            with pytest.raises(errors.NotFound):
+                self.catalog.get_resource_by_agent(AGENT_ID_1)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.unassign_agent_from_resource(AGENT_ID_1, AGENT_ID_0)"""
+
+    can_assign_agents_to_resource = """
+        if is_no_authz(self.service_config):
+            with pytest.raises(errors.Unimplemented):
+                self.session.can_assign_agents_to_resource(True)
+        else:
+            assert isinstance(self.session.can_assign_agents_to_resource(True), bool)"""
+
+    can_assign_agents = """
+        if is_no_authz(self.service_config):
+            with pytest.raises(errors.Unimplemented):
+                self.session.can_assign_agents()
+        else:
+            assert isinstance(self.session.can_assign_agents(), bool)"""
 
 
 class BinLookupSession:
@@ -1007,6 +1245,7 @@ def ${interface_name_under}_class_fixture(request):
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         for num in [0, 1]:
             create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
@@ -1017,8 +1256,9 @@ def ${interface_name_under}_class_fixture(request):
             request.cls.catalog_ids.append(catalog.ident)
 
     def class_tear_down():
-        for catalog in request.cls.svc_mgr.get_${cat_name_under_plural}():
-            request.cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_${cat_name_under_plural}():
+                request.cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -1038,29 +1278,45 @@ def ${interface_name_under}_test_fixture(request):
 
     get_bin_template = """
         # From test_templates/resource.py::BinLookupSession::get_bin_template
-        catalog = self.svc_mgr.${method_name}(self.catalogs[0].ident)
-        assert catalog.ident == self.catalogs[0].ident"""
+        if not is_never_authz(self.service_config):
+            catalog = self.svc_mgr.${method_name}(self.catalogs[0].ident)
+            assert catalog.ident == self.catalogs[0].ident
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     get_bins_by_ids_template = """
         # From test_templates/resource.py::BinLookupSession::get_bins_by_ids_template
-        catalogs = self.svc_mgr.${method_name}(self.catalog_ids)
-        assert catalogs.available() == 2
-        assert isinstance(catalogs, ABCObjects.${cat_name}List)
-        reversed_catalog_ids = [str(cat_id) for cat_id in self.catalog_ids][::-1]
-        for index, catalog in enumerate(catalogs):
-            assert str(catalog.ident) == reversed_catalog_ids[index]"""
+        if not is_never_authz(self.service_config):
+            catalogs = self.svc_mgr.${method_name}(self.catalog_ids)
+            assert catalogs.available() == 2
+            assert isinstance(catalogs, ABCObjects.${cat_name}List)
+            reversed_catalog_ids = [str(cat_id) for cat_id in self.catalog_ids][::-1]
+            for index, catalog in enumerate(catalogs):
+                assert str(catalog.ident) == reversed_catalog_ids[index]
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}([self.fake_id])"""
 
     get_bins_by_genus_type_template = """
         # From test_templates/resource.py::BinLookupSession::get_bins_by_genus_type_template
-        catalogs = self.svc_mgr.${method_name}(DEFAULT_GENUS_TYPE)
-        assert catalogs.available() > 0
-        assert isinstance(catalogs, ABCObjects.${cat_name}List)"""
+        if not is_never_authz(self.service_config):
+            catalogs = self.svc_mgr.${method_name}(DEFAULT_GENUS_TYPE)
+            assert catalogs.available() > 0
+            assert isinstance(catalogs, ABCObjects.${cat_name}List)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(DEFAULT_GENUS_TYPE)"""
 
     get_bins_template = """
         # From test_templates/resource.py::BinLookupSession::get_bins_template
-        catalogs = self.svc_mgr.${method_name}()
-        assert catalogs.available() > 0
-        assert isinstance(catalogs, ABCObjects.${cat_name}List)"""
+        if not is_never_authz(self.service_config):
+            catalogs = self.svc_mgr.${method_name}()
+            assert catalogs.available() > 0
+            assert isinstance(catalogs, ABCObjects.${cat_name}List)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}()"""
 
     can_lookup_bins_template = """
         # From test_templates/resource.py::BinLookupSession::can_lookup_bins_template
@@ -1092,6 +1348,12 @@ def ${interface_name_under}_class_fixture(request):
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::BinAdminSession::init_template
     if not is_never_authz(request.cls.service_config):
         # Initialize test catalog:
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
@@ -1104,17 +1366,14 @@ def ${interface_name_under}_class_fixture(request):
         create_form.description = 'Test ${cat_name} for ${interface_name} deletion test'
         request.cls.catalog_to_delete = request.cls.svc_mgr.create_${cat_name_under}(create_form)
 
-    def class_tear_down():
-        for catalog in request.cls.svc_mgr.get_${cat_name_under_plural}():
-            request.cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
+    request.cls.session = request.cls.svc_mgr
 
-    request.addfinalizer(class_tear_down)
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_${cat_name_under_plural}():
+                request.cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
 
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    # From test_templates/resource.py::BinAdminSession::init_template
-    request.cls.session = request.cls.svc_mgr"""
+    request.addfinalizer(test_tear_down)"""
 
     can_create_bins_template = """
         # From test_templates/resource.py BinAdminSession.can_create_bins_template
@@ -1135,45 +1394,70 @@ def ${interface_name_under}_test_fixture(request):
     get_bin_form_for_create_template = """
         # From test_templates/resource.py BinAdminSession.get_bin_form_for_create_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        catalog_form = self.svc_mgr.${method_name}([])
-        assert isinstance(catalog_form, ${return_type})
-        assert not catalog_form.is_for_update()"""
+        if not is_never_authz(self.service_config):
+            catalog_form = self.svc_mgr.${method_name}([])
+            assert isinstance(catalog_form, ${return_type})
+            assert not catalog_form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}([])"""
 
     create_bin_template = """
         # From test_templates/resource.py BinAdminSession.create_bin_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        catalog_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
-        catalog_form.display_name = 'Test ${cat_name}'
-        catalog_form.description = 'Test ${cat_name} for ${interface_name}.${method_name} tests'
-        new_catalog = self.svc_mgr.${method_name}(catalog_form)
-        assert isinstance(new_catalog, ${return_type})"""
+        if not is_never_authz(self.service_config):
+            catalog_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+            catalog_form.display_name = 'Test ${cat_name}'
+            catalog_form.description = 'Test ${cat_name} for ${interface_name}.${method_name} tests'
+            new_catalog = self.svc_mgr.${method_name}(catalog_form)
+            assert isinstance(new_catalog, ${return_type})
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}('foo')"""
 
     get_bin_form_for_update_template = """
         # From test_templates/resource.py BinAdminSession.get_bin_form_for_update_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        catalog_form = self.svc_mgr.${method_name}(self.catalog.ident)
-        assert isinstance(catalog_form, ${return_type})
-        assert catalog_form.is_for_update()"""
+        if not is_never_authz(self.service_config):
+            catalog_form = self.svc_mgr.${method_name}(self.catalog.ident)
+            assert isinstance(catalog_form, ${return_type})
+            assert catalog_form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     update_bin_template = """
         # From test_templates/resource.py BinAdminSession.update_bin_template
-        catalog_form = self.svc_mgr.get_${cat_name_under}_form_for_update(self.catalog.ident)
-        # Update some elements here?
-        self.svc_mgr.${method_name}(catalog_form)"""
+        if not is_never_authz(self.service_config):
+            catalog_form = self.svc_mgr.get_${cat_name_under}_form_for_update(self.catalog.ident)
+            # Update some elements here?
+            self.svc_mgr.${method_name}(catalog_form)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}('foo')"""
 
     delete_bin_template = """
         # From test_templates/resource.py BinAdminSession.delete_bin_template
-        cat_id = self.catalog_to_delete.ident
-        self.svc_mgr.${method_name}(cat_id)
-        with pytest.raises(errors.NotFound):
-            self.svc_mgr.get_${cat_name_under}(cat_id)"""
+        if not is_never_authz(self.service_config):
+            cat_id = self.catalog_to_delete.ident
+            self.svc_mgr.${method_name}(cat_id)
+            with pytest.raises(errors.NotFound):
+                self.svc_mgr.get_${cat_name_under}(cat_id)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     alias_bin_template = """
         # From test_templates/resource.py BinAdminSession.alias_bin_template
         alias_id = Id('${package_name_replace_reserved}.${cat_name}%3Amy-alias%40ODL.MIT.EDU')
-        self.svc_mgr.${method_name}(self.catalog_to_delete.ident, alias_id)
-        aliased_catalog = self.svc_mgr.get_${cat_name_under}(alias_id)
-        assert self.catalog_to_delete.ident == aliased_catalog.ident"""
+
+        if not is_never_authz(self.service_config):
+            self.svc_mgr.${method_name}(self.catalog_to_delete.ident, alias_id)
+            aliased_catalog = self.svc_mgr.get_${cat_name_under}(alias_id)
+            assert self.catalog_to_delete.ident == aliased_catalog.ident
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id, alias_id)"""
 
 
 class BinHierarchySession:
@@ -1196,6 +1480,7 @@ def ${interface_name_under}_class_fixture(request):
         proxy=PROXY,
         implementation=request.cls.service_config)
     request.cls.catalogs = dict()
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
             create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
@@ -1208,11 +1493,12 @@ def ${interface_name_under}_class_fixture(request):
         request.cls.svc_mgr.add_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
 
     def class_tear_down():
-        request.cls.svc_mgr.remove_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
-        request.cls.svc_mgr.remove_child_${cat_name_under_plural}(request.cls.catalogs['Root'].ident)
-        request.cls.svc_mgr.remove_root_${cat_name_under}(request.cls.catalogs['Root'].ident)
-        for cat_name in request.cls.catalogs:
-            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalogs[cat_name].ident)
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.remove_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
+            request.cls.svc_mgr.remove_child_${cat_name_under_plural}(request.cls.catalogs['Root'].ident)
+            request.cls.svc_mgr.remove_root_${cat_name_under}(request.cls.catalogs['Root'].ident)
+            for cat_name in request.cls.catalogs:
+                request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalogs[cat_name].ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -1233,60 +1519,92 @@ def ${interface_name_under}_test_fixture(request):
 
     get_bin_hierarchy_template = """
         # From test_templates/resource.py::BinHierarchySession::get_bin_hierarchy_template
-        hierarchy = self.svc_mgr.${method_name}()
-        assert isinstance(hierarchy, Hierarchy)"""
+        if not is_never_authz(self.service_config):
+            hierarchy = self.svc_mgr.${method_name}()
+            assert isinstance(hierarchy, Hierarchy)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}()"""
 
     get_root_bin_ids_template = """
         # From test_templates/resource.py::BinHierarchySession::get_root_bin_ids_template
-        root_ids = self.svc_mgr.${method_name}()
-        assert isinstance(root_ids, IdList)
-        # probably should be == 1, but we seem to be getting test cruft,
-        # and I can't pinpoint where it's being introduced.
-        assert root_ids.available() >= 1"""
+        if not is_never_authz(self.service_config):
+            root_ids = self.svc_mgr.${method_name}()
+            assert isinstance(root_ids, IdList)
+            # probably should be == 1, but we seem to be getting test cruft,
+            # and I can't pinpoint where it's being introduced.
+            assert root_ids.available() >= 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}()"""
 
     get_root_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::get_root_bins_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}List
-        roots = self.svc_mgr.${method_name}()
-        assert isinstance(roots, ${cat_name}List)
-        assert roots.available() == 1"""
+        if not is_never_authz(self.service_config):
+            roots = self.svc_mgr.${method_name}()
+            assert isinstance(roots, ${cat_name}List)
+            assert roots.available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}()"""
 
     has_parent_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::has_parent_bins_template
-        assert isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool)
-        assert self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
-        assert self.svc_mgr.${method_name}(self.catalogs['Child 2'].ident)
-        assert self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident)
-        assert not self.svc_mgr.${method_name}(self.catalogs['Root'].ident)"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool)
+            assert self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
+            assert self.svc_mgr.${method_name}(self.catalogs['Child 2'].ident)
+            assert self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident)
+            assert not self.svc_mgr.${method_name}(self.catalogs['Root'].ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     is_parent_of_bin_template = """
         # From test_templates/resource.py::BinHierarchySession::is_parent_of_bin_template
-        assert isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident), bool)
-        assert self.svc_mgr.${method_name}(self.catalogs['Root'].ident, self.catalogs['Child 1'].ident)
-        assert self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Grandchild 1'].ident)
-        assert not self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident)"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident), bool)
+            assert self.svc_mgr.${method_name}(self.catalogs['Root'].ident, self.catalogs['Child 1'].ident)
+            assert self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Grandchild 1'].ident)
+            assert not self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id, self.fake_id)"""
 
     get_parent_bin_ids_template = """
         # From test_templates/resource.py::BinHierarchySession::get_parent_bin_ids_template
         from dlkit.abstract_osid.id.objects import ${return_type}
-        catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
-        assert isinstance(catalog_list, ${return_type})
-        assert catalog_list.available() == 1"""
+        if not is_never_authz(self.service_config):
+            catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
+            assert isinstance(catalog_list, ${return_type})
+            assert catalog_list.available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     get_parent_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::get_parent_bins_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
-        assert isinstance(catalog_list, ${return_type})
-        assert catalog_list.available() == 1
-        assert catalog_list.next().display_name.text == 'Root'"""
+        if not is_never_authz(self.service_config):
+            catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
+            assert isinstance(catalog_list, ${return_type})
+            assert catalog_list.available() == 1
+            assert catalog_list.next().display_name.text == 'Root'
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     is_ancestor_of_bin_template = """
         # From test_templates/resource.py::BinHierarchySession::is_ancestor_of_bin_template
-        pytest.raises(errors.Unimplemented,
+        if not is_never_authz(self.service_config):
+            pytest.raises(errors.Unimplemented,
                           self.svc_mgr.${method_name},
                           self.catalogs['Root'].ident,
                           self.catalogs['Child 1'].ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id, self.fake_id)
         # self.assertTrue(isinstance(self.svc_mgr.${method_name}(
         #     self.catalogs['Root'].ident,
         #     self.catalogs['Child 1'].ident),
@@ -1303,40 +1621,60 @@ def ${interface_name_under}_test_fixture(request):
 
     has_child_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::has_child_bins_template
-        self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool))
-        self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Root'].ident))
-        self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident))
-        self.assertFalse(self.svc_mgr.${method_name}(self.catalogs['Child 2'].ident))
-        self.assertFalse(self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident), bool)
+            assert self.svc_mgr.${method_name}(self.catalogs['Root'].ident)
+            assert self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
+            assert not self.svc_mgr.${method_name}(self.catalogs['Child 2'].ident)
+            assert not self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     is_child_of_bin_template = """
         # From test_templates/resource.py::BinHierarchySession::is_child_of_bin_template
-        self.assertTrue(isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident), bool))
-        self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident))
-        self.assertTrue(self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident, self.catalogs['Child 1'].ident))
-        self.assertFalse(self.svc_mgr.${method_name}(self.catalogs['Root'].ident, self.catalogs['Child 1'].ident))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident), bool)
+            assert self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, self.catalogs['Root'].ident)
+            assert self.svc_mgr.${method_name}(self.catalogs['Grandchild 1'].ident, self.catalogs['Child 1'].ident)
+            assert not self.svc_mgr.${method_name}(self.catalogs['Root'].ident, self.catalogs['Child 1'].ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id, self.fake_id)"""
 
     get_child_bin_ids_template = """
         # From test_templates/resource.py::BinHierarchySession::get_child_bin_ids_template
         from dlkit.abstract_osid.id.objects import ${return_type}
-        catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
-        self.assertTrue(isinstance(catalog_list, ${return_type}))
-        self.assertEqual(catalog_list.available(), 1)"""
+        if not is_never_authz(self.service_config):
+            catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
+            assert isinstance(catalog_list, ${return_type})
+            assert catalog_list.available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     get_child_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::get_child_bins_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
-        self.assertTrue(isinstance(catalog_list, ${return_type}))
-        self.assertEqual(catalog_list.available(), 1)
-        self.assertEqual(catalog_list.next().display_name.text, 'Grandchild 1')"""
+        if not is_never_authz(self.service_config):
+            catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
+            assert isinstance(catalog_list, ${return_type})
+            assert catalog_list.available() == 1
+            assert catalog_list.next().display_name.text == 'Grandchild 1'
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id)"""
 
     is_descendant_of_bin_template = """
         # From test_templates/resource.py::BinHierarchySession::is_descendant_of_bin_template
-        pytest.raises(errors.Unimplemented,
+        if not is_never_authz(self.service_config):
+            pytest.raises(errors.Unimplemented,
                           self.svc_mgr.${method_name},
                           self.catalogs['Child 1'].ident,
                           self.catalogs['Root'].ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id, self.fake_id)
         # self.assertTrue(isinstance(self.svc_mgr.${method_name}(
         #     self.catalogs['Root'].ident,
         #     self.catalogs['Child 1'].ident),
@@ -1355,30 +1693,39 @@ def ${interface_name_under}_test_fixture(request):
         # From test_templates/resource.py::BinHierarchySession::get_bin_node_ids_template
         # Per the spec, perhaps counterintuitively this method returns a
         #  node, **not** a IdList...
-        node = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
-        self.assertTrue(isinstance(node, OsidNode))
-        self.assertFalse(node.is_root())
-        self.assertFalse(node.is_leaf())
-        self.assertTrue(node.get_child_ids().available(), 1)
-        self.assertTrue(isinstance(node.get_child_ids(), IdList))
-        self.assertTrue(node.get_parent_ids().available(), 1)
-        self.assertTrue(isinstance(node.get_parent_ids(), IdList))"""
+        if not is_never_authz(self.service_config):
+            node = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
+            assert isinstance(node, OsidNode)
+            assert not node.is_root()
+            assert not node.is_leaf()
+            assert node.get_child_ids().available() == 1
+            assert isinstance(node.get_child_ids(), IdList)
+            assert node.get_parent_ids().available() == 1
+            assert isinstance(node.get_parent_ids(), IdList)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id, 1, 2, False)"""
 
     get_bin_nodes_template = """
         # From test_templates/resource.py::BinHierarchySession::get_bin_nodes_template
-        node = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
-        self.assertTrue(isinstance(node, OsidNode))
-        self.assertFalse(node.is_root())
-        self.assertFalse(node.is_leaf())
-        self.assertTrue(node.get_child_ids().available(), 1)
-        self.assertTrue(isinstance(node.get_child_ids(), IdList))
-        self.assertTrue(node.get_parent_ids().available(), 1)
-        self.assertTrue(isinstance(node.get_parent_ids(), IdList))"""
+        if not is_never_authz(self.service_config):
+            node = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident, 1, 2, False)
+            assert isinstance(node, OsidNode)
+            assert not node.is_root()
+            assert not node.is_leaf()
+            assert node.get_child_ids().available() == 1
+            assert isinstance(node.get_child_ids(), IdList)
+            assert node.get_parent_ids().available() == 1
+            assert isinstance(node.get_parent_ids(), IdList)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.svc_mgr.${method_name}(self.fake_id, 1, 2, False)"""
 
 
 class BinHierarchyDesignSession:
 
     import_statements_pattern = [
+        'from dlkit.primordium.id.primitives import Id'
     ]
 
     init_template = """
@@ -1392,6 +1739,7 @@ def ${interface_name_under}_class_fixture(request):
         proxy=PROXY,
         implementation=request.cls.service_config)
     request.cls.catalogs = dict()
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
             create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
@@ -1404,10 +1752,11 @@ def ${interface_name_under}_class_fixture(request):
         request.cls.svc_mgr.add_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
 
     def class_tear_down():
-        request.cls.svc_mgr.remove_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
-        request.cls.svc_mgr.remove_child_${cat_name_under_plural}(request.cls.catalogs['Root'].ident)
-        for cat_name in request.cls.catalogs:
-            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalogs[cat_name].ident)
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.remove_child_${cat_name_under}(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
+            request.cls.svc_mgr.remove_child_${cat_name_under_plural}(request.cls.catalogs['Root'].ident)
+            for cat_name in request.cls.catalogs:
+                request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalogs[cat_name].ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -1419,84 +1768,104 @@ def ${interface_name_under}_test_fixture(request):
 
     can_modify_bin_hierarchy_template = """
         # From test_templates/resource.py::BinHierarchyDesignSession::can_modify_bin_hierarchy_template
-        self.assertTrue(isinstance(self.session.${method_name}(), bool))"""
+        assert isinstance(self.session.${method_name}(), bool)"""
 
     add_root_bin_template = """
         # From test_templates/resource.py::BinHierarchyDesignSession::add_root_bin_template
         # this is tested in the setUpClass
-        roots = self.session.get_root_${cat_name_plural_under}()
-        self.assertTrue(isinstance(roots, ABCObjects.${cat_name}List))
-        self.assertEqual(roots.available(), 1)"""
+        if not is_never_authz(self.service_config):
+            roots = self.session.get_root_${cat_name_plural_under}()
+            assert isinstance(roots, ABCObjects.${cat_name}List)
+            assert roots.available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id)"""
 
     remove_root_bin_template = """
         # From test_templates/resource.py::BinHierarchyDesignSession::remove_root_bin_template
-        roots = self.session.get_root_${cat_name_plural_under}()
-        self.assertEqual(roots.available(), 1)
+        if not is_never_authz(self.service_config):
+            roots = self.session.get_root_${cat_name_plural_under}()
+            assert roots.available() == 1
 
-        create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
-        create_form.display_name = 'new root'
-        create_form.description = 'Test ${cat_name} root'
-        new_${cat_name_under} = self.svc_mgr.create_${cat_name_under}(create_form)
-        self.svc_mgr.add_root_${cat_name_under}(new_${cat_name_under}.ident)
+            create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form.display_name = 'new root'
+            create_form.description = 'Test ${cat_name} root'
+            new_${cat_name_under} = self.svc_mgr.create_${cat_name_under}(create_form)
+            self.svc_mgr.add_root_${cat_name_under}(new_${cat_name_under}.ident)
 
-        roots = self.session.get_root_${cat_name_plural_under}()
-        self.assertEqual(roots.available(), 2)
+            roots = self.session.get_root_${cat_name_plural_under}()
+            assert roots.available() == 2
 
-        self.session.${method_name}(new_${cat_name_under}.ident)
+            self.session.${method_name}(new_${cat_name_under}.ident)
 
-        roots = self.session.get_root_${cat_name_plural_under}()
-        self.assertEqual(roots.available(), 1)"""
+            roots = self.session.get_root_${cat_name_plural_under}()
+            assert roots.available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id)"""
 
     add_child_bin_template = """
         # From test_templates/resource.py::BinHierarchyDesignSession::add_child_bin_template
-        # this is tested in the setUpClass
-        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
-        self.assertTrue(isinstance(children, ABCObjects.${cat_name}List))
-        self.assertEqual(children.available(), 2)"""
+        if not is_never_authz(self.service_config):
+            # this is tested in the setUpClass
+            children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
+            assert isinstance(children, ABCObjects.${cat_name}List)
+            assert children.available() == 2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id, self.fake_id)"""
 
     remove_child_bin_template = """
         # From test_templates/resource.py::BinHierarchyDesignSession::remove_child_bin_template
-        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
-        self.assertEqual(children.available(), 2)
+        if not is_never_authz(self.service_config):
+            children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
+            assert children.available() == 2
 
-        create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
-        create_form.display_name = 'test child'
-        create_form.description = 'Test ${cat_name} child'
-        new_${cat_name_under} = self.svc_mgr.create_${cat_name_under}(create_form)
-        self.svc_mgr.add_child_${cat_name_under}(
-            self.catalogs['Root'].ident,
-            new_${cat_name_under}.ident)
+            create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form.display_name = 'test child'
+            create_form.description = 'Test ${cat_name} child'
+            new_${cat_name_under} = self.svc_mgr.create_${cat_name_under}(create_form)
+            self.svc_mgr.add_child_${cat_name_under}(
+                self.catalogs['Root'].ident,
+                new_${cat_name_under}.ident)
 
-        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
-        self.assertEqual(children.available(), 3)
+            children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
+            assert children.available() == 3
 
-        self.session.${method_name}(
-            self.catalogs['Root'].ident,
-            new_${cat_name_under}.ident)
+            self.session.${method_name}(
+                self.catalogs['Root'].ident,
+                new_${cat_name_under}.ident)
 
-        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
-        self.assertEqual(children.available(), 2)"""
+            children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
+            assert children.available() == 2
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id, self.fake_id)"""
 
     remove_child_bins_template = """
         # From test_templates/resource.py::BinHierarchyDesignSession::remove_child_bins_template
-        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Grandchild 1'].ident)
-        self.assertEqual(children.available(), 0)
+        if not is_never_authz(self.service_config):
+            children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Grandchild 1'].ident)
+            assert children.available() == 0
 
-        create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
-        create_form.display_name = 'test great grandchild'
-        create_form.description = 'Test ${cat_name} child'
-        new_${cat_name_under} = self.svc_mgr.create_${cat_name_under}(create_form)
-        self.svc_mgr.add_child_${cat_name_under}(
-            self.catalogs['Grandchild 1'].ident,
-            new_${cat_name_under}.ident)
+            create_form = self.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form.display_name = 'test great grandchild'
+            create_form.description = 'Test ${cat_name} child'
+            new_${cat_name_under} = self.svc_mgr.create_${cat_name_under}(create_form)
+            self.svc_mgr.add_child_${cat_name_under}(
+                self.catalogs['Grandchild 1'].ident,
+                new_${cat_name_under}.ident)
 
-        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Grandchild 1'].ident)
-        self.assertEqual(children.available(), 1)
+            children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Grandchild 1'].ident)
+            assert children.available() == 1
 
-        self.session.${method_name}(self.catalogs['Grandchild 1'].ident)
+            self.session.${method_name}(self.catalogs['Grandchild 1'].ident)
 
-        children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Grandchild 1'].ident)
-        self.assertEqual(children.available(), 0)"""
+            children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Grandchild 1'].ident)
+            assert children.available() == 0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}(self.fake_id)"""
 
 
 class Resource:
@@ -1615,45 +1984,40 @@ def ${interface_name_under}_test_fixture(request):
         # From test_templates/resource.py::ResourceQuery::clear_group_terms_template
         self.query._query_terms['${var_name_mixed}'] = 'foo'
         self.query.${method_name}()
-        self.assertNotIn('${var_name_mixed}',
-                         self.query._query_terms)"""
+        assert '${var_name_mixed}' not in self.query._query_terms"""
 
     match_avatar_id_template = """
         # From test_templates/resource.py::ResourceQuery::match_avatar_id_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
-        self.assertNotIn('${var_name_mixed}', self.query._query_terms)
+        assert '${var_name_mixed}' not in self.query._query_terms
         self.query.${method_name}(test_id, match=True)
-        self.assertEqual(self.query._query_terms['${var_name_mixed}'], {
+        assert self.query._query_terms['${var_name_mixed}'] == {
             '$$in': [str(test_id)]
-        })"""
+        }"""
 
     clear_avatar_id_terms_template = """
         # From test_templates/resource.py::ResourceQuery::clear_avatar_id_terms_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.match_${var_name}(test_id, match=True)
-        self.assertIn('${var_name_mixed}',
-                      self.query._query_terms)
+        assert '${var_name_mixed}' in self.query._query_terms
         self.query.${method_name}()
-        self.assertNotIn('${var_name_mixed}',
-                         self.query._query_terms)"""
+        assert '${var_name_mixed}' not in self.query._query_terms"""
 
     match_bin_id_template = """
         # From test_templates/resource.py::ResourceQuery::match_bin_id_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.${method_name}(test_id, match=True)
-        self.assertEqual(self.query._query_terms['assigned${cat_name}Ids'], {
+        assert self.query._query_terms['assigned${cat_name}Ids'] == {
             '$$in': [str(test_id)]
-        })"""
+        }"""
 
     clear_bin_id_terms_template = """
         # From test_templates/resource.py::ResourceQuery::clear_bin_id_terms_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.match_${var_name}(test_id, match=True)
-        self.assertIn('assigned${cat_name}Ids',
-                      self.query._query_terms)
+        assert 'assigned${cat_name}Ids' in self.query._query_terms
         self.query.${method_name}()
-        self.assertNotIn('assigned${cat_name}Ids',
-                         self.query._query_terms)"""
+        assert 'assigned${cat_name}Ids' not in self.query._query_terms"""
 
 
 class ResourceSearch:
@@ -1749,9 +2113,10 @@ def ${interface_name_under}_class_fixture(request):
             request.cls.resource_ids.append(obj.ident)
 
     def class_tear_down():
-        for obj in request.cls.catalog.get_resources():
-            request.cls.catalog.delete_resource(obj.ident)
-        request.cls.svc_mgr.delete_bin(request.cls.catalog.ident)
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_resources():
+                request.cls.catalog.delete_resource(obj.ident)
+            request.cls.svc_mgr.delete_bin(request.cls.catalog.ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -1763,14 +2128,14 @@ def ${interface_name_under}_test_fixture(request):
     get_resource_search_template = """
         # From test_templates/resource.py::ResourceSearchSession::get_resource_search_template
         result = self.session.${method_name}()
-        self.assertTrue(isinstance(result, ABCSearches.${return_type}))"""
+        assert isinstance(result, ABCSearches.${return_type})"""
 
     get_resources_by_search_template = """
         # From test_templates/resource.py::ResourceSearchSession::get_resources_by_search_template
         query = self.catalog.get_${object_name_under}_query()
         search = self.session.get_${object_name_under}_search()
         results = self.session.${method_name}(query, search)
-        self.assertTrue(isinstance(results, ABCSearches.${return_type}))"""
+        assert isinstance(results, ABCSearches.${return_type})"""
 
 
 class ResourceForm:
@@ -2304,14 +2669,15 @@ def ${interface_name_under}_class_fixture(request):
         proxy=PROXY,
         implementation=request.cls.service_config)
     if not is_never_authz(request.cls.service_config):
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
     def class_tear_down():
-        request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -2323,14 +2689,26 @@ def ${interface_name_under}_test_fixture(request):
 
     get_bin_query_template = """
         # From test_templates/resource.py::BinQuerySession::get_bin_query_template
-        query = self.session.${method_name}()
-        self.assertTrue(isinstance(query, ABCQueries.${cat_name}Query))"""
+        if not is_never_authz(self.service_config):
+            query = self.session.${method_name}()
+            assert isinstance(query, ABCQueries.${cat_name}Query)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}()"""
 
     get_bins_by_query_template = """
         # From test_templates/resource.py::BinQuerySession::get_bins_by_query_template
-        query = self.session.get_${cat_name_under}_query()
-        query.match_display_name('Test catalog')
-        self.assertEqual(self.session.${method_name}(query).available(), 1)
-        query.clear_display_name_terms()
-        query.match_display_name('Test catalog', match=False)
-        self.assertEqual(self.session.${method_name}(query).available(), 0)"""
+        if not is_never_authz(self.service_config):
+            query = self.session.get_${cat_name_under}_query()
+            query.match_display_name('Test catalog')
+            assert self.session.${method_name}(query).available() == 1
+            query.clear_display_name_terms()
+            query.match_display_name('Test catalog', match=False)
+            assert self.session.${method_name}(query).available() == 0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.${method_name}('foo')"""
+
+    can_search_bins_template = """
+        # From test_templates/resource.py::BinQuerySession::can_search_bins_template
+        assert isinstance(self.session.${method_name}(), bool)"""
