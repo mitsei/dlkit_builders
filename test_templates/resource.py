@@ -1976,7 +1976,8 @@ def ${interface_name_under}_class_fixture(request):
         request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
 
     def class_tear_down():
-        request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -1988,42 +1989,52 @@ def ${interface_name_under}_test_fixture(request):
 
     clear_group_terms_template = """
         # From test_templates/resource.py::ResourceQuery::clear_group_terms_template
-        self.query._query_terms['${var_name_mixed}'] = 'foo'
+        if is_no_authz(self.service_config):
+            self.query._query_terms['${var_name_mixed}'] = 'foo'
         self.query.${method_name}()
-        assert '${var_name_mixed}' not in self.query._query_terms"""
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' not in self.query._query_terms"""
 
     match_avatar_id_template = """
         # From test_templates/resource.py::ResourceQuery::match_avatar_id_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
-        assert '${var_name_mixed}' not in self.query._query_terms
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' not in self.query._query_terms
         self.query.${method_name}(test_id, match=True)
-        assert self.query._query_terms['${var_name_mixed}'] == {
-            '$$in': [str(test_id)]
-        }"""
+        if is_no_authz(self.service_config):
+            assert self.query._query_terms['${var_name_mixed}'] == {
+                '$$in': [str(test_id)]
+            }"""
 
     clear_avatar_id_terms_template = """
         # From test_templates/resource.py::ResourceQuery::clear_avatar_id_terms_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.match_${var_name}(test_id, match=True)
-        assert '${var_name_mixed}' in self.query._query_terms
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' in self.query._query_terms
         self.query.${method_name}()
-        assert '${var_name_mixed}' not in self.query._query_terms"""
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' not in self.query._query_terms"""
 
     match_bin_id_template = """
         # From test_templates/resource.py::ResourceQuery::match_bin_id_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.${method_name}(test_id, match=True)
-        assert self.query._query_terms['assigned${cat_name}Ids'] == {
-            '$$in': [str(test_id)]
-        }"""
+
+        if is_no_authz(self.service_config):
+            assert self.query._query_terms['assigned${cat_name}Ids'] == {
+                '$$in': [str(test_id)]
+            }"""
 
     clear_bin_id_terms_template = """
         # From test_templates/resource.py::ResourceQuery::clear_bin_id_terms_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.match_${var_name}(test_id, match=True)
-        assert 'assigned${cat_name}Ids' in self.query._query_terms
+        if is_no_authz(self.service_config):
+            assert 'assigned${cat_name}Ids' in self.query._query_terms
         self.query.${method_name}()
-        assert 'assigned${cat_name}Ids' not in self.query._query_terms"""
+        if is_no_authz(self.service_config):
+            assert 'assigned${cat_name}Ids' not in self.query._query_terms"""
 
 
 class ResourceSearch:
@@ -2623,14 +2634,15 @@ def ${interface_name_under}_class_fixture(request):
         proxy=PROXY,
         implementation=request.cls.service_config)
     if not is_never_authz(request.cls.service_config):
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
-        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
     def class_tear_down():
-        request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -2638,14 +2650,19 @@ def ${interface_name_under}_class_fixture(request):
 @pytest.fixture(scope="function")
 def ${interface_name_under}_test_fixture(request):
     # From test_templates/resource.py::BinQuery::init_template
-    request.cls.query = request.cls.svc_mgr.get_${cat_name_under}_query()"""
+    if not is_never_authz(request.cls.service_config):
+        request.cls.query = request.cls.svc_mgr.get_${cat_name_under}_query()"""
 
     clear_group_terms_template = """
         # From test_templates/resource.py::BinQuery::clear_group_terms_template
-        self.query._query_terms['${var_name_mixed}'] = 'foo'
-        self.query.${method_name}()
-        self.assertNotIn('${var_name_mixed}',
-                         self.query._query_terms)"""
+        if is_no_authz(self.service_config):
+            self.query._query_terms['${var_name_mixed}'] = 'foo'
+
+        if not is_never_authz(self.service_config):
+            self.query.${method_name}()
+
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' not in self.query._query_terms"""
 
 
 class BinQuerySession:
