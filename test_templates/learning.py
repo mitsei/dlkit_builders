@@ -176,7 +176,7 @@ class ObjectiveHierarchyDesignSession:
     add_child_objective = """
         self.catalog.add_root_objective(self.objective.ident)
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.catalog.get_child_objectives(self.objective.ident)
 
         self.catalog.add_child_objective(self.objective.ident, self.child_ids[0])
@@ -206,7 +206,7 @@ class ObjectiveHierarchyDesignSession:
 
         self.catalog.remove_child_objective(self.objective.ident, self.child_ids[0])
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.catalog.get_child_objectives(self.objective.ident)"""
 
     remove_child_objectives = """
@@ -219,7 +219,7 @@ class ObjectiveHierarchyDesignSession:
 
         self.catalog.remove_child_objectives(self.objective.ident)
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.catalog.get_child_objectives(self.objective.ident)"""
 
     remove_root_objective = """
@@ -626,7 +626,7 @@ class ActivityAdminSession:
         form.set_genus_type(NEW_TYPE)
         osid_object = self.catalog.create_activity(form)
         self.catalog.delete_activity(osid_object.ident)
-        with self.assertRaises(errors.NotFound):
+        with pytest.raises(errors.NotFound):
             self.catalog.get_activity(osid_object.ident)"""
 
 
@@ -669,19 +669,21 @@ class Activity:
         self.assertEqual(result.available(), 0)"""
 
     get_assessments = """
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.object.get_assessments()"""
 
     get_asset_ids_template = """
         # From test_templates/learning.py::Activity::get_asset_ids_template
-        result = self.object.${method_name}()
-        self.assertTrue(isinstance(result, IdList))
-        self.assertEqual(result.available(), 0)"""
+        if not is_never_authz(self.service_config):
+            result = self.object.${method_name}()
+            assert isinstance(result, IdList)
+            assert result.available() == 0"""
 
     get_assets_template = """
         # From test_templates/learning.py::Activity::get_assets_template
-        with self.assertRaises(errors.IllegalState):
-            self.object.get_assets()"""
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.IllegalState):
+                self.object.${method_name}()"""
 
     get_course_ids = """
         result = self.object.get_course_ids()
@@ -690,22 +692,22 @@ class Activity:
 
     get_courses = """
         # We don't have the course service yet
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.object.get_courses()"""
 
     get_objective_template = """
         # From test_templates/learning.py::Activity::get_objective_template
-        result = self.object.${method_name}()
-        self.assertTrue(isinstance(result, ABCObjects.${return_type}))
-        self.assertEqual(str(result.ident),
-                         str(self.${return_type_under}.ident))"""
+        if not is_never_authz(self.service_config):
+            result = self.object.${method_name}()
+            assert isinstance(result, ABCObjects.${return_type})
+            assert str(result.ident) == str(self.${return_type_under}.ident)"""
 
     get_objective_id_template = """
         # From test_templates/learning.py::Activity::get_objective_id_template
-        result = self.object.${method_name}()
-        self.assertTrue(isinstance(result, Id))
-        self.assertEqual(str(result),
-                         str(self.${var_name}.ident))"""
+        if not is_never_authz(self.service_config):
+            result = self.object.${method_name}()
+            assert isinstance(result, Id)
+            assert str(result) == str(self.${var_name}.ident)"""
 
 
 class ActivityForm:
@@ -742,16 +744,15 @@ class ActivityForm:
 
     get_assets_metadata_template = """
         # From test_templates/learning.py::ActivityForm::get_assets_metadata_template
-        self.assertTrue(isinstance(self.form.${method_name}(), Metadata))"""
+        assert isinstance(self.form.${method_name}(), Metadata)"""
 
     set_assets_template = """
         # From test_templates/learning.py::ActivityForm::set_assets_template
         test_id = Id('osid.Osid%3A1%40ODL.MIT.EDU')
         self.form.${method_name}([test_id])
-        self.assertTrue(len(self.form._my_map['${var_name_singular_mixed}Ids']), 1)
-        self.assertEqual(self.form._my_map['${var_name_singular_mixed}Ids'][0],
-                         str(test_id))
-        with self.assertRaises(errors.InvalidArgument):
+        assert len(self.form._my_map['${var_name_singular_mixed}Ids']) == 1
+        assert self.form._my_map['${var_name_singular_mixed}Ids'][0] == str(test_id)
+        with pytest.raises(errors.InvalidArgument):
             self.form.${method_name}('this is not a list')
         # reset this for other tests
         self.form._my_map['${var_name_singular_mixed}Ids'] = list()"""
@@ -760,11 +761,10 @@ class ActivityForm:
         # From test_templates/learning.py::ActivityForm::clear_assets_template
         test_id = Id('osid.Osid%3A1%40ODL.MIT.EDU')
         self.form.set_${var_name}([test_id])
-        self.assertTrue(len(self.form._my_map['${var_name_singular_mixed}Ids']), 1)
-        self.assertEqual(self.form._my_map['${var_name_singular_mixed}Ids'][0],
-                         str(test_id))
+        assert len(self.form._my_map['${var_name_singular_mixed}Ids']) == 1
+        assert self.form._my_map['${var_name_singular_mixed}Ids'][0] == str(test_id)
         self.form.${method_name}()
-        self.assertEqual(self.form._my_map['${var_name_singular_mixed}Ids'], [])"""
+        assert self.form._my_map['${var_name_singular_mixed}Ids'] == []"""
 
 
 class ActivityList:
@@ -1083,7 +1083,7 @@ class ProficiencyQuery:
         })"""
 
     match_minimum_completion = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.match_minimum_completion(float(50.0), True)"""
 
 
@@ -1147,7 +1147,7 @@ class ProficiencyAdminSession:
         create_form.genus_type = NEW_TYPE
         osid_object = self.catalog.create_proficiency(create_form)
         self.catalog.delete_proficiency(osid_object.ident)
-        with self.assertRaises(errors.NotFound):
+        with pytest.raises(errors.NotFound):
             self.catalog.get_proficiency(osid_object.ident)"""
 
 

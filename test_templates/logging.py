@@ -41,7 +41,7 @@ class LogEntry:
 
     get_agent = """
         # because we don't have Agency implemented in authentication
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             self.object.get_agent()"""
 
     get_agent_id = """
@@ -51,11 +51,11 @@ class LogEntry:
                          str(self.catalog._proxy.get_effective_agent_id()))"""
 
     get_resource = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.object.get_resource()"""
 
     get_resource_id = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.object.get_resource_id()"""
 
 
@@ -83,40 +83,37 @@ class LogEntryForm:
     set_priority_template = """
         # From test_templates/logging.py::LogEntryForm::set_priority_template
         self.form.set_${var_name}(Type('type.Type%3Afake-type-id%40ODL.MIT.EDU'))
-        self.assertEqual(self.form._my_map['${var_name_mixed}'],
-                         'type.Type%3Afake-type-id%40ODL.MIT.EDU')
-        with self.assertRaises(errors.InvalidArgument):
+        assert self.form._my_map['${var_name_mixed}'] == 'type.Type%3Afake-type-id%40ODL.MIT.EDU'
+        with pytest.raises(errors.InvalidArgument):
             self.form.${method_name}(True)"""
 
     clear_priority_template = """
         # From test_templates/logging.py::LogEntryForm::clear_priority_template
         self.form.set_${var_name}(Type('type.Type%3Afake-type-id%40ODL.MIT.EDU'))
-        self.assertEqual(self.form._my_map['${var_name_mixed}'],
-                         'type.Type%3Afake-type-id%40ODL.MIT.EDU')
+        assert self.form._my_map['${var_name_mixed}'] == 'type.Type%3Afake-type-id%40ODL.MIT.EDU'
         self.form.${method_name}()
-        self.assertEqual(self.form._my_map['${var_name_mixed}Id'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
+        sassert self.form._my_map['${var_name_mixed}Id'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
     get_priority_metadata_template = """
         # From test_templates/logging.py::LogEntryForm::get_priority_metadata_template
         mdata = self.form.${method_name}()
-        self.assertTrue(isinstance(mdata, Metadata))
-        self.assertTrue(isinstance(mdata.get_element_id(), ABC_Id))
-        self.assertTrue(isinstance(mdata.get_element_label(), ABC_DisplayText))
-        self.assertTrue(isinstance(mdata.get_instructions(), ABC_DisplayText))
-        self.assertEquals(mdata.get_syntax(), '${syntax}')
-        self.assertFalse(mdata.is_array())
-        self.assertTrue(isinstance(mdata.is_required(), bool))
-        self.assertTrue(isinstance(mdata.is_read_only(), bool))
-        self.assertTrue(isinstance(mdata.is_linked(), bool))"""
+        assert isinstance(mdata, Metadata)
+        assert isinstance(mdata.get_element_id(), ABC_Id)
+        assert isinstance(mdata.get_element_label(), ABC_DisplayText)
+        assert isinstance(mdata.get_instructions(), ABC_DisplayText)
+        assert mdata.get_syntax() == '${syntax}'
+        assert not mdata.is_array()
+        assert isinstance(mdata.is_required(), bool)
+        assert isinstance(mdata.is_read_only(), bool)
+        assert isinstance(mdata.is_linked(), bool)"""
 
     set_timestamp = """
         test_time = DateTime.utcnow()
         # By default log entries have this set, so can't use the templated test
-        self.assertIsNotNone(self.form._my_map['timestamp'])
+        assert self.form._my_map['timestamp'] is not None
         self.form.set_timestamp(test_time)
-        self.assertEqual(self.form._my_map['timestamp'],
-                         test_time)
-        with self.assertRaises(errors.InvalidArgument):
+        assert self.form._my_map['timestamp'] == test_time
+        with pytest.raises(errors.InvalidArgument):
             self.form.set_timestamp(True)"""
 
 
@@ -126,11 +123,11 @@ class LogEntryQuery:
     ]
 
     match_priority = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.match_priority('foo', match=True)"""
 
     match_minimum_priority = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.match_minimum_priority('foo', match=True)"""
 
     match_timestamp = """
@@ -144,39 +141,39 @@ class LogEntryQuery:
         })"""
 
     match_any_priority = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.match_any_priority(match=True)"""
 
     clear_minimum_priority_terms = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.clear_minimum_priority_terms()"""
 
     clear_resource_terms = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.clear_resource_terms()"""
 
     supports_resource_query = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.supports_resource_query()"""
 
     supports_agent_query = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.supports_agent_query()"""
 
     supports_log_query = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.supports_log_query()"""
 
     get_resource_query = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.get_resource_query()"""
 
     get_agent_query = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.get_agent_query()"""
 
     get_log_query = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.query.get_log_query()"""
 
 

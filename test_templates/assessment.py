@@ -157,7 +157,7 @@ class AssessmentSession:
         future_offered = self.catalog.create_assessment_offered(form)
         form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
         future_taken = self.catalog.create_assessment_taken(form)
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.session.finish_assessment(future_taken.ident)
 
         self.assertIsNone(self.taken._my_map['completionTime'])
@@ -179,14 +179,14 @@ class AssessmentSession:
         future_offered = self.catalog.create_assessment_offered(form)
         form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
         future_taken = self.catalog.create_assessment_taken(form)
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.catalog.get_first_assessment_section(future_taken.ident)
 
         first_section = self.catalog.get_first_assessment_section(self.taken.ident)
         self.assertNotIn('completionTime', first_section._my_map)
         self.session.finish_assessment_section(first_section.ident)
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             # it is over, so can't GET the section now
             self.catalog.get_assessment_section(first_section.ident)"""
 
@@ -223,7 +223,7 @@ class AssessmentSession:
         form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
         future_taken = self.catalog.create_assessment_taken(form)
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             # cannot even get the sectionId to call the method
             self.catalog.get_first_assessment_section(future_taken.ident)
 
@@ -256,7 +256,7 @@ class AssessmentSession:
         first_question = questions.next()
         second_question = questions.next()
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.session.get_answers(section.ident, second_question.ident)
 
         form = self.session.get_response_form(section.ident, first_question.ident)
@@ -365,12 +365,12 @@ class AssessmentSession:
 
     get_next_assessment_section = """
         section = self.catalog.get_first_assessment_section(self.taken.ident)
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.session.get_next_assessment_section(section.ident)"""
 
     get_previous_assessment_section = """
         section = self.catalog.get_first_assessment_section(self.taken.ident)
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.session.get_previous_assessment_section(section.ident)"""
 
     has_next_assessment_section = """
@@ -395,7 +395,7 @@ class AssessmentSession:
         self.assertEqual(str(second_question.ident),
                          str(test_question.ident))
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.session.get_next_question(section.ident, fourth_question.ident)"""
 
     has_next_question = """
@@ -425,7 +425,7 @@ class AssessmentSession:
         self.assertEqual(str(third_question.ident),
                          str(test_question.ident))
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.session.get_previous_question(section.ident, first_question.ident)"""
 
     has_previous_question = """
@@ -464,7 +464,7 @@ class AssessmentSession:
         self.assertEqual(str(third_question.ident),
                          str(test_question.ident))
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.session.get_next_unanswered_question(section.ident,
                                                       fourth_question.ident)"""
 
@@ -510,7 +510,7 @@ class AssessmentSession:
         self.assertEqual(str(second_question.ident),
                          str(test_question.ident))
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.session.get_previous_unanswered_question(section.ident,
                                                           first_question.ident)"""
 
@@ -584,7 +584,7 @@ class AssessmentSession:
         test_response = self.session.get_response(section.ident, first_question.ident)
         self.assertTrue(isinstance(test_response, Response))
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             test_response.object_map
 
         form = self.session.get_response_form(section.ident, first_question.ident)
@@ -605,7 +605,7 @@ class AssessmentSession:
         first_response = test_responses.next()
         self.assertTrue(isinstance(first_response, Response))
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             first_response.object_map"""
 
     get_response_form = """
@@ -697,7 +697,7 @@ class AssessmentResultsSession:
         self.assertTrue(self.session.can_access_assessment_results())"""
 
     get_grade_entries = """
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.session.get_grade_entries(self.assessment.ident)"""
 
     get_items = """
@@ -715,7 +715,7 @@ class AssessmentResultsSession:
         first_response = test_responses.next()
         self.assertTrue(isinstance(first_response, Response))
 
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             first_response.object_map"""
 
 
@@ -768,7 +768,7 @@ class ItemAdminSession:
         self.assertEqual(updated_item.get_answers().available(), 1)"""
 
     create_question = """
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             # question_map = dict(self._my_map['question'])
             # TypeError: 'NoneType' object is not iterable
             self.osid_object.get_question()
@@ -785,7 +785,7 @@ class ItemAdminSession:
         updated_item = self.catalog.get_item(self.osid_object.ident)
         self.assertEqual(updated_item.get_answers().available(), 1)
 
-        with self.assertRaises(errors.NotFound):
+        with pytest.raises(errors.NotFound):
             self.session.delete_answer(Id('fake.Package%3A000000000000000000000000%40ODL.MIT.EDU'))
 
         self.session.delete_answer(answer.ident)
@@ -793,7 +793,7 @@ class ItemAdminSession:
         self.assertEqual(updated_item.get_answers().available(), 0)"""
 
     delete_question = """
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             # question_map = dict(self._my_map['question'])
             # TypeError: 'NoneType' object is not iterable
             self.osid_object.get_question()
@@ -803,13 +803,13 @@ class ItemAdminSession:
         updated_item = self.catalog.get_item(self.osid_object.ident)
         self.assertTrue(isinstance(updated_item.get_question(), Question))
 
-        with self.assertRaises(errors.NotFound):
+        with pytest.raises(errors.NotFound):
             self.session.delete_question(Id('fake.Package%3A000000000000000000000000%40ODL.MIT.EDU'))
 
         self.session.delete_question(question.ident)
         updated_item = self.catalog.get_item(self.osid_object.ident)
 
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             updated_item.get_question()"""
 
     get_answer_form_for_create = """
@@ -1072,7 +1072,7 @@ class AssessmentTakenAdminSession:
         form.set_genus_type(NEW_TYPE)
         osid_object = self.catalog.create_assessment_taken(form)
         self.catalog.delete_assessment_taken(osid_object.ident)
-        with self.assertRaises(errors.NotFound):
+        with pytest.raises(errors.NotFound):
             self.catalog.get_assessment_taken(osid_object.ident)"""
 
     ##
@@ -1965,31 +1965,31 @@ class AssessmentOffered:
     has_rubric = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set rubricId?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.has_rubric)"""
 
     get_rubric = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set rubricId?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.get_rubric)"""
 
     get_rubric_id = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set rubricId?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.get_rubric_id)"""
 
     is_graded = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set graded?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.is_graded)"""
 
     is_scored = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set scored?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.is_scored)"""
 
 
@@ -2051,7 +2051,7 @@ class AssessmentOfferedAdminSession:
         form.set_genus_type(NEW_TYPE)
         osid_object = self.catalog.create_assessment_offered(form)
         self.catalog.delete_assessment_offered(osid_object.ident)
-        with self.assertRaises(errors.NotFound):
+        with pytest.raises(errors.NotFound):
             self.catalog.get_assessment_offered(osid_object.ident)"""
 
 
@@ -2091,11 +2091,10 @@ class AssessmentOfferedForm:
     set_start_time_template = """
         # From test_templates/assessment.py::AssessmentOfferedForm::set_start_time_template
         test_time = DateTime.utcnow()
-        self.assertIsNone(self.form._my_map['${var_name_mixed}'])
+        assert self.form._my_map['${var_name_mixed}'] is None
         self.form.${method_name}(test_time)
-        self.assertEqual(self.form._my_map['${var_name_mixed}'],
-                         test_time)
-        with self.assertRaises(errors.InvalidArgument):
+        assert self.form._my_map['${var_name_mixed}'] == test_time
+        with pytest.raises(errors.InvalidArgument):
             self.form.${method_name}(True)
         # reset this for other tests
         self.form._my_map['${var_name_mixed}'] = None"""
@@ -2104,22 +2103,21 @@ class AssessmentOfferedForm:
     clear_start_time_template = """
         # From test_templates/assessment.py::AssessmentOfferedForm::clear_start_time_template
         test_time = DateTime.utcnow()
-        self.assertIsNone(self.form._my_map['${var_name_mixed}'])
+        assert self.form._my_map['${var_name_mixed}'] is None
         self.form.set_${var_name}(test_time)
-        self.assertEqual(self.form._my_map['${var_name_mixed}'],
-                         test_time)
+        assert self.form._my_map['${var_name_mixed}'] == test_time
         self.form.${method_name}()
-        self.assertEqual(self.form._my_map['${var_name_mixed}'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
+        assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
     set_duration_template = """
         # From test_templates/assessment.py::AssessmentOfferedForm::set_duration_template
         test_duration = Duration(hours=1)
-        self.assertIsNone(self.form._my_map['${var_name_mixed}'])
+        assert self.form._my_map['${var_name_mixed}']
         self.form.${method_name}(test_duration)
-        self.assertEqual(self.form._my_map['${var_name_mixed}']['seconds'], 3600)
-        self.assertEqual(self.form._my_map['${var_name_mixed}']['days'], 0)
-        self.assertEqual(self.form._my_map['${var_name_mixed}']['microseconds'], 0)
-        with self.assertRaises(errors.InvalidArgument):
+        assert self.form._my_map['${var_name_mixed}']['seconds'] == 3600
+        assert self.form._my_map['${var_name_mixed}']['days'] == 0
+        assert self.form._my_map['${var_name_mixed}']['microseconds'] == 0
+        with pytest.raises(errors.InvalidArgument):
             self.form.${method_name}(1.05)
         # reset this for other tests
         self.form._my_map['${var_name_mixed}'] = None"""
@@ -2127,13 +2125,13 @@ class AssessmentOfferedForm:
     clear_duration_template = """
         # From test_templates/assessment.py::AssessmentOfferedForm::clear_duration_template
         test_duration = Duration(hours=1)
-        self.assertIsNone(self.form._my_map['${var_name_mixed}'])
+        assert self.form._my_map['${var_name_mixed}'] is None
         self.form.set_${var_name}(test_duration)
-        self.assertEqual(self.form._my_map['${var_name_mixed}']['seconds'], 3600)
-        self.assertEqual(self.form._my_map['${var_name_mixed}']['days'], 0)
-        self.assertEqual(self.form._my_map['${var_name_mixed}']['microseconds'], 0)
+        assert self.form._my_map['${var_name_mixed}']['seconds'] == 3600
+        assert self.form._my_map['${var_name_mixed}']['days'] == 0
+        assert self.form._my_map['${var_name_mixed}']['microseconds'] == 0
         self.form.${method_name}()
-        self.assertEqual(self.form._my_map['${var_name_mixed}'], self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0])"""
+        assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
 
 class AssessmentOfferedList:
@@ -2381,7 +2379,7 @@ class AssessmentTaken:
                          str(self.catalog._proxy.get_effective_agent_id()))"""
 
     get_taker = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.object.get_taker()"""
 
     get_taking_agent_id = """
@@ -2390,7 +2388,7 @@ class AssessmentTaken:
                          str(self.catalog._proxy.get_effective_agent_id()))"""
 
     get_taking_agent = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.object.get_taking_agent()"""
 
     has_started = """
@@ -2399,7 +2397,7 @@ class AssessmentTaken:
 
     get_actual_start_time = """
         # tests if the taker has started the assessment
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.object.actual_start_time
         # Also test the other branches of this method
         form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
@@ -2417,7 +2415,7 @@ class AssessmentTaken:
 
     get_completion_time = """
         # tests if the taker has "finished" the assessment
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.object.completion_time
         # Also test the other branches of this method
         form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
@@ -2433,7 +2431,7 @@ class AssessmentTaken:
         self.catalog.delete_assessment_taken(taken.ident)"""
 
     get_time_spent = """
-        with self.assertRaises(errors.IllegalState):
+        with pytest.raises(errors.IllegalState):
             self.object.time_spent
         # Also test the other branches of this method
         form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
@@ -2451,7 +2449,7 @@ class AssessmentTaken:
         # From test_templates/assessment.py::AssessmentTaken::get_completion_template
         # Our implementation is probably wrong -- there is no "completion" setter
         # in the form / spec...so unclear how the value gets here.
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.${method_name})"""
 
     get_score_template = """
@@ -2462,49 +2460,49 @@ class AssessmentTaken:
     has_rubric = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set rubricId?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.has_rubric)"""
 
     get_rubric = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set rubricId?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.get_rubric)"""
 
     get_rubric_id = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set rubricId?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.get_rubric_id)"""
 
     is_graded = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set graded?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.is_graded)"""
 
     is_scored = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set scored?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.is_scored)"""
 
     get_score_system = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set scoreSystemId?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.get_score_system)"""
 
     get_score_system_id = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set scoreSystemId?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.get_score_system_id)"""
 
     get_feedback = """
         # This may be an error in the spec -- not in _my_map
         # since there are no form methods to set feedback?
-        self.assertRaises(KeyError,
+        pytest.raises(KeyError,
                           self.object.get_feedback)"""
 
 
@@ -2662,11 +2660,11 @@ class AssessmentSection:
                          str(self.taken.ident))"""
 
     has_allocated_time = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.section.has_allocated_time()"""
 
     get_allocated_time = """
-        with self.assertRaises(errors.Unimplemented):
+        with pytest.raises(errors.Unimplemented):
             self.section.get_allocated_time()"""
 
     are_items_sequential = """
@@ -2834,5 +2832,5 @@ class BankQuery:
 
 class BankForm:
     get_bank_form_record = """
-        with self.assertRaises(errors.Unsupported):
+        with pytest.raises(errors.Unsupported):
             self.object.get_bank_form_record(DEFAULT_TYPE)"""
