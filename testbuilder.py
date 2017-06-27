@@ -57,27 +57,24 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
             pass  # no object to call the method on?
         else:
             with pytest.raises(errors.Unimplemented):
-                self.{0}.{1}({2})""".format(
-    test_object,
-    method['name'],
-    ', '.join((len(method['args']) * ['True'])))
+                self.{0}.{1}({2})""".format(test_object,
+                                            method['name'],
+                                            ', '.join((len(method['args']) * ['True'])))
             elif method['name'].endswith('_record'):
                 impl = """        if is_never_authz(self.service_config):
             pass  # no object to call the method on?
         else:
             with pytest.raises(errors.Unsupported):
-                self.{0}.{1}({2})""".format(
-    test_object,
-    method['name'],
-    ', '.join((len(method['args']) * ['True'])))
+                self.{0}.{1}({2})""".format(test_object,
+                                            method['name'],
+                                            ', '.join((len(method['args']) * ['True'])))
             else:
                 impl = """        if is_never_authz(self.service_config):
             pass  # no object to call the method on?
         else:
             with pytest.raises(errors.Unimplemented):
-                self.{0}.{1}()""".format(
-    test_object,
-    method['name'])
+                self.{0}.{1}()""".format(test_object,
+                                         method['name'])
         else:
             context = self._get_method_context(method, interface)
             interface_sn = interface['shortname']
