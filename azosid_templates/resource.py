@@ -121,7 +121,7 @@ class ResourceManager:
         # osid.resource.ResourceManager.get_resource_notification_session_template
         try:
             return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(),
+                provider_session=self._provider_manager.${method_name}(${arg0_name}),
                 authz_session=self._get_authz_session(),
                 override_lookup_session=self._get_override_lookup_session(),
                 provider_manager=self._provider_manager)
@@ -133,7 +133,7 @@ class ResourceManager:
         # osid.resource.ResourceManager.get_resource_notification_session_for_bin_template
         try:
             return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}),
+                provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}),
                 authz_session=self._get_authz_session(),
                 override_lookup_session=self._get_override_lookup_session(),
                 provider_manager=self._provider_manager)
@@ -228,7 +228,7 @@ class ResourceProxyManager:
         # osid.resource.ResourceManager.get_resource_notification_session_template
         try:
             return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(proxy),
+                provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
                 authz_session=self._get_authz_session(),
                 override_lookup_session=self._get_override_lookup_session(),
                 provider_manager=self._provider_manager,
@@ -241,7 +241,7 @@ class ResourceProxyManager:
         # osid.resource.ResourceManager.get_resource_notification_session_for_bin_template
         try:
             return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
+                provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}, proxy),
                 authz_session=self._get_authz_session(),
                 override_lookup_session=self._get_override_lookup_session(),
                 provider_manager=self._provider_manager,
