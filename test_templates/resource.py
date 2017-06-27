@@ -1153,8 +1153,6 @@ class ResourceAgentAssignmentSession:
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
     request.cls.service_config = request.param
-    request.cls.resource_list = list()
-    request.cls.resource_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         'RESOURCE',
         proxy=PROXY,
@@ -1163,6 +1161,9 @@ def ${interface_name_under}_class_fixture(request):
 
 @pytest.fixture(scope="function")
 def ${interface_name_under}_test_fixture(request):
+    request.cls.resource_list = list()
+    request.cls.resource_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
