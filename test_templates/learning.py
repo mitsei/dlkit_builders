@@ -615,9 +615,13 @@ class ActivityAdminSession:
 
     get_activity_form_for_create_template = """
         # From test_templates/learning.py::ActivityAdminSession::get_activity_form_for_create_template
-        form = self.catalog.${method_name}(self.parent_object.ident, [])
-        self.assertTrue(isinstance(form, OsidForm))
-        self.assertFalse(form.is_for_update())"""
+        if not is_never_authz(self.service_config):
+            form = self.catalog.${method_name}(self.parent_object.ident, [])
+            assert isinstance(form, OsidForm)
+            assert not form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(self.fake_id, [])"""
 
     delete_activity = """
         form = self.catalog.get_activity_form_for_create(self.parent_object.ident, [])

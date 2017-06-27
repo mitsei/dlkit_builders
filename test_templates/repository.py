@@ -66,11 +66,11 @@ def ${interface_name_under}_test_fixture(request):
             results = self.parent_object.get_${aggregated_objects_name_under}()
             assert isinstance(results, ABCObjects.${aggregated_object_name}List)
             assert results.available() == 0
-    
+
             form = self.catalog.get_${aggregated_object_name_under}_form_for_create(self.parent_object.ident, [])
             result = self.catalog.${method_name}(form)
             assert isinstance(result, ABCObjects.${aggregated_object_name})
-    
+
             updated_parent = self.catalog.get_${object_name_under}(self.parent_object.ident)
             results = updated_parent.get_${aggregated_objects_name_under}()
             assert results.available() == 1
@@ -82,7 +82,7 @@ def ${interface_name_under}_test_fixture(request):
         if not is_never_authz(self.service_config):
             form = self.catalog.get_${aggregated_object_name_under}_form_for_create(self.parent_object.ident, [])
             new_aggregated_object = self.catalog.create_${aggregated_object_name_under}(form)
-    
+
             form = self.catalog.${method_name}(new_aggregated_object.ident)
             assert isinstance(form, OsidForm)
             assert form.is_for_update()
@@ -95,9 +95,9 @@ def ${interface_name_under}_test_fixture(request):
             form = self.catalog.get_${aggregated_object_name_under}_form_for_create(self.parent_object.ident, [])
             form.display_name = 'old name'
             new_aggregated_object = self.catalog.create_${aggregated_object_name_under}(form)
-    
+
             assert new_aggregated_object.display_name.text == 'old name'
-    
+
             form = self.catalog.get_${aggregated_object_name_under}_form_for_update(new_aggregated_object.ident)
             form.display_name = 'new name'
             result = self.catalog.${method_name}(form)
@@ -111,13 +111,13 @@ def ${interface_name_under}_test_fixture(request):
         if not is_never_authz(self.service_config):
             form = self.catalog.get_${aggregated_object_name_under}_form_for_create(self.parent_object.ident, [])
             result = self.catalog.create_${aggregated_object_name_under}(form)
-    
+
             updated_parent = self.catalog.get_${object_name_under}(self.parent_object.ident)
             results = updated_parent.get_${aggregated_objects_name_under}()
             assert results.available() == 1
-    
+
             self.catalog.${method_name}(result.ident)
-    
+
             results = self.parent_object.get_${aggregated_objects_name_under}()
             assert results.available() == 0
         else:
@@ -156,6 +156,8 @@ def ${interface_name_under}_class_fixture(request):
             obj = request.cls.catalog.create_${object_name_under}(create_form)
             request.cls.${object_name_under}_list.append(obj)
             request.cls.${object_name_under}_ids.append(obj.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
@@ -236,10 +238,10 @@ class CompositionQuerySession:
             self.catalog.update_composition(cfu)
             query = self.catalog.get_composition_query()
             query.match_display_name('orange')
-            self.assertEqual(self.catalog.get_compositions_by_query(query).available(), 1)
+            assert self.catalog.get_compositions_by_query(query).available() == 1
             query.clear_display_name_terms()
             query.match_display_name('blue', match=False)
-            self.assertEqual(self.catalog.get_compositions_by_query(query).available(), 2)
+            assert self.catalog.get_compositions_by_query(query).available() == 2
             cfu = self.catalog.get_composition_form_for_update(self.composition_list[3].ident)
             cfu.set_sequestered(False)
             self.catalog.update_composition(cfu)
@@ -278,7 +280,7 @@ def ${interface_name_under}_class_fixture(request):
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
-            request.cls.svc_mgr.delete_repository(request.cls.catalog.ident)        
+            request.cls.svc_mgr.delete_repository(request.cls.catalog.ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -700,9 +702,12 @@ def ${interface_name_under}_class_fixture(request):
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
         request.cls.catalog = request.cls.svc_mgr.create_repository(create_form)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_asset_search_session(proxy=PROXY)
 
     def class_tear_down():
-        request.cls.svc_mgr.delete_repository(cls.catalog.ident)
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_repository(request.cls.catalog.ident)
 
     request.addfinalizer(class_tear_down)
 
@@ -712,8 +717,12 @@ def ${interface_name_under}_test_fixture(request):
     request.cls.session = request.cls.catalog"""
 
     get_asset_search = """
-        search = self.session.get_asset_search()
-        assert isinstance(search, searches.AssetSearch)"""
+        if not is_never_authz(self.service_config):
+            search = self.session.get_asset_search()
+            assert isinstance(search, searches.AssetSearch)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_asset_search()"""
 
     get_assets_by_search = """
         if not is_never_authz(self.service_config):
@@ -725,12 +734,16 @@ def ${interface_name_under}_test_fixture(request):
             assert results.get_result_size() == 0
         else:
             with pytest.raises(errors.PermissionDenied):
-                self.session.get_assets_by_search('foo', 'foo')"""
+                self.session.get_assets_by_search(FakeQuery(), 'foo')"""
 
 
 class AssetNotificationSession:
     register_for_new_assets_by_genus_type = """
-        self.session.register_for_new_assets_by_genus_type(Id('package.Catalog%3Afake%40DLKIT.MIT.EDU'))"""
+        if not is_never_authz(self.service_config):
+            self.session.register_for_new_assets_by_genus_type(Id('package.Catalog%3Afake%40DLKIT.MIT.EDU'))
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.register_for_new_assets_by_genus_type(Id('package.Catalog%3Afake%40DLKIT.MIT.EDU'))"""
 
 
 class AssetContent:

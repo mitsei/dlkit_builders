@@ -427,12 +427,18 @@ class FakeQuery:
 def ${interface_name_under}_class_fixture(request):
     # From test_templates/resource.py::ResourceQuerySession::init_template
     request.cls.service_config = request.param
-    request.cls.${object_name_under}_list = list()
-    request.cls.${object_name_under}_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceQuerySession::init_template
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
@@ -449,19 +455,15 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for obj in request.cls.catalog.get_${object_name_under_plural}():
                 request.cls.catalog.delete_${object_name_under}(obj.ident)
             request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    # From test_templates/resource.py::ResourceQuerySession::init_template
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
     can_query_resources_template = """
         # From test_templates/resource.py ResourceQuerySession::can_query_resources_template
@@ -473,12 +475,8 @@ def ${interface_name_under}_test_fixture(request):
 
     get_resource_query_template = """
         # From test_templates/resource.py ResourceQuerySession::get_resource_query_template
-        if not is_never_authz(self.service_config):
-            query = self.session.${method_name}()
-            assert isinstance(query, ABCQueries.${return_type})
-        else:
-            with pytest.raises(errors.PermissionDenied):
-                self.session.${method_name}()"""
+        query = self.session.${method_name}()
+        assert isinstance(query, ABCQueries.${return_type})"""
 
     get_resources_by_query_template = """
         # From test_templates/resource.py ResourceQuerySession::get_resources_by_query_template
