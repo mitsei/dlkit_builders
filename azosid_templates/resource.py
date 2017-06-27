@@ -768,14 +768,14 @@ class ResourceBinAssignmentSession:
         # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids
         if not self._can('assign'):
             raise PermissionDenied()
-        return self._provider_session.get_assignable_${cat_name_under}_ids()"""
+        return self._provider_session.get_assignable_${cat_name_under}_ids(${cat_name_under}_id)"""
 
     get_assignable_bin_ids_for_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource
         if not self._can('assign'):
             raise PermissionDenied()
-        return self._provider_session.get_assignable_${cat_name_under}_ids_for_${object_name_under}(${object_name_under}_id)"""
+        return self._provider_session.get_assignable_${cat_name_under}_ids_for_${object_name_under}(${cat_name_under}_id, ${object_name_under}_id)"""
 
     assign_resource_to_bin_template = """
         # Implemented from azosid template for -
