@@ -116,6 +116,30 @@ class ResourceManager:
         except AttributeError:
             raise OperationFailed()"""
 
+    get_resource_notification_session_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_template
+        try:
+            return getattr(sessions, '${return_type}')(
+                provider_session=self._provider_manager.${method_name}(),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
+        except AttributeError:
+            raise OperationFailed()"""
+
+    get_resource_notification_session_for_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_for_bin_template
+        try:
+            return getattr(sessions, '${return_type}')(
+                provider_session=self._provider_manager.${method_name}(${arg0_name}),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
+        except AttributeError:
+            raise OperationFailed()"""
+
 
 class ResourceProxyManager:
     import_statements_pattern = [
@@ -189,6 +213,32 @@ class ResourceProxyManager:
     get_resource_admin_session_for_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
+        try:
+            return getattr(sessions, '${return_type}')(
+                provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager,
+                proxy=proxy)
+        except AttributeError:
+            raise OperationFailed()"""
+
+    get_resource_notification_session_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_template
+        try:
+            return getattr(sessions, '${return_type}')(
+                provider_session=self._provider_manager.${method_name}(proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager,
+                proxy=proxy)
+        except AttributeError:
+            raise OperationFailed()"""
+
+    get_resource_notification_session_for_bin_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceManager.get_resource_notification_session_for_bin_template
         try:
             return getattr(sessions, '${return_type}')(
                 provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
@@ -421,7 +471,7 @@ class ResourceQuerySession:
         # Implemented from azosid template for -
         # osid.resource.ResourceQuerySession.can_search_resources_template
         return (self._can('${func_name}') or
-                bool(self._get_overriding_${cat_name_under}_ids()))"""
+                bool(self._get_overriding_catalog_ids('${func_name}')))"""
 
     get_resource_query_template = """
         # Implemented from azosid template for -
@@ -663,7 +713,7 @@ class ResourceBinSession:
         # osid.resource.ResourceBinSession.get_resources_by_bin_template
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.get_${object_name_under}_ids_by_${cat_name_under}(${cat_name_under}_id)"""
+        return self._provider_session.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id)"""
 
     get_resource_ids_by_bins_template = """
         # Implemented from azosid template for -
@@ -677,7 +727,7 @@ class ResourceBinSession:
         # osid.resource.ResourceBinSession.get_resources_by_bins
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.get_${object_name_plural_under}_ids_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
+        return self._provider_session.get_${object_name_plural_under}_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
 
     get_bin_ids_by_resource_template = """
         # Implemented from azosid template for -
