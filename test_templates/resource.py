@@ -70,6 +70,8 @@ def ${interface_name_under}_class_fixture(request):
         catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
         request.cls.catalog_id = catalog.get_id()
         request.cls.receiver = NotificationReceiver()
+    else:
+        request.cls.catalog_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
@@ -129,6 +131,7 @@ class ResourceProxyManager:
 
     import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
+        'from dlkit.primordium.id.primitives import Id'
     ]
 
     init_template = """
@@ -146,13 +149,16 @@ def ${interface_name_under}_class_fixture(request):
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${pkg_name} proxy manager tests'
         catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
         request.cls.catalog_id = catalog.get_id()
-        request.cls.receiver = request.cls.NotificationReceiver()
+    else:
+        request.cls.catalog_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+    request.cls.receiver = NotificationReceiver()
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
@@ -1154,6 +1160,9 @@ def ${interface_name_under}_class_fixture(request):
         proxy=PROXY,
         implementation=request.cls.service_config)
 
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_bin_form_for_create([])
         create_form.display_name = 'Test Bin'
@@ -1169,18 +1178,15 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_resource_agent_assignment_session(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for obj in request.cls.catalog.get_resources():
                 request.cls.catalog.delete_resource(obj.ident)
             request.cls.svc_mgr.delete_bin(request.cls.catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
     assign_agent_to_resource = """
         if not is_never_authz(self.service_config):
