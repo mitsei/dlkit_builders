@@ -1,3 +1,5 @@
+import string
+
 from binder_helpers import remove_plural, camel_to_under
 from build_dlkit import BaseBuilder
 from interface_builders import InterfaceBuilder
@@ -102,7 +104,7 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
     def _update_module_imports(self, modules, interface):
         imports = modules[interface['category']]['imports']
         self.append(imports, 'import pytest')
-        self.append(imports, 'from ..utilities.general import is_never_authz')
+        self.append(imports, 'from ..utilities.general import is_never_authz, is_no_authz')
 
         # Check to see if there are any additional inheritances required
         # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
@@ -143,6 +145,12 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
         fixture_methods = self._make_init_methods(interface)
+
+        # always apply the context to fixture methods, so we get the configured params in there
+        context = self._get_init_context('', interface)
+        template = string.Template(fixture_methods)
+        fixture_methods = template.substitute(context)
+
         methods = self.make_methods(interface)
         additional_methods = self._additional_methods(interface)
         additional_classes = self._additional_classes(interface)
