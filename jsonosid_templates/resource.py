@@ -1610,6 +1610,13 @@ class BinQuerySession:
         # handled in a service adapter above the pay grade of this impl.
         return True"""
 
+    can_search_bins_template = """
+        # Implemented from template for
+        # osid.resource.BinQuerySession.can_search_bins_template
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
     get_bin_query_template = """
         # Implemented from template for
         # osid.resource.BinQuerySession.get_bin_query_template

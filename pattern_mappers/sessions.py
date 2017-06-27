@@ -216,6 +216,18 @@ def map_session_patterns(interface, package, index):
                             arg0_name=method['args'][0]['var_name'],
                             arg0_type_full=method['args'][0]['arg_type']))
 
+        # CatalogQuerySession methods for authorization hint.
+        elif (interface['shortname'] == index['package_catalog_caps'] + 'QuerySession' and
+                method['name'] == 'can_search_' + make_plural(index['package_catalog_under'])):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='resource.BinQuerySession.can_search_bins',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            return_type_full=method['return_type'],
+                            cat_name=index['package_catalog_caps']))
+
         ##################################################################
         #  Inspect this package's CatalogSearchSession methods.         ##
         ##################################################################
