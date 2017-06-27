@@ -5,30 +5,40 @@ class LoggingSession:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('LOGGING', proxy=PROXY, implementation='TEST_SERVICE')
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'LOGGING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
         # Initialize test catalog:
-        create_form = cls.svc_mgr.get_log_form_for_create([])
+        create_form = request.cls.svc_mgr.get_log_form_for_create([])
         create_form.display_name = 'Test Log'
         create_form.description = 'Test Log for LogAdminSession tests'
-        cls.catalog = cls.svc_mgr.create_log(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_log(create_form)
         # Initialize catalog to be deleted:
-        create_form = cls.svc_mgr.get_log_form_for_create([])
+        create_form = request.cls.svc_mgr.get_log_form_for_create([])
         create_form.display_name = 'Test Log For Deletion'
         create_form.description = 'Test Log for LogAdminSession deletion test'
-        cls.catalog_to_delete = cls.svc_mgr.create_log(create_form)
+        request.cls.catalog_to_delete = request.cls.svc_mgr.create_log(create_form)
 
-    def setUp(self):
-        self.session = self.svc_mgr
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_logs():
+                request.cls.svc_mgr.delete_log(catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_logs():
-            cls.svc_mgr.delete_log(catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.svc_mgr"""
 
     can_log = """
-        self.assertTrue(isinstance(self.session.can_log(), bool))"""
+        assert isinstance(self.session.can_log(), bool)"""
 
 
 class LogEntry:
@@ -46,9 +56,8 @@ class LogEntry:
 
     get_agent_id = """
         result = self.object.get_agent_id()
-        self.assertTrue(isinstance(result, Id))
-        self.assertEqual(str(result),
-                         str(self.catalog._proxy.get_effective_agent_id()))"""
+        assert isinstance(result, Id)
+        assert str(result) == str(self.catalog._proxy.get_effective_agent_id())"""
 
     get_resource = """
         with pytest.raises(errors.Unimplemented):
@@ -66,19 +75,31 @@ class LogEntryForm:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+    
+        request.cls.form = request.cls.catalog.get_${object_name_under}_form_for_create([])
 
-        cls.form = cls.catalog.get_${object_name_under}_form_for_create([])
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.svc_mgr.delete_${cat_name_under}(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
 
     set_priority_template = """
         # From test_templates/logging.py::LogEntryForm::set_priority_template
@@ -92,7 +113,7 @@ class LogEntryForm:
         self.form.set_${var_name}(Type('type.Type%3Afake-type-id%40ODL.MIT.EDU'))
         assert self.form._my_map['${var_name_mixed}'] == 'type.Type%3Afake-type-id%40ODL.MIT.EDU'
         self.form.${method_name}()
-        sassert self.form._my_map['${var_name_mixed}Id'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
+        assert self.form._my_map['${var_name_mixed}Id'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
     get_priority_metadata_template = """
         # From test_templates/logging.py::LogEntryForm::get_priority_metadata_template
@@ -133,12 +154,12 @@ class LogEntryQuery:
     match_timestamp = """
         start_date = DateTime.utcnow()
         end_date = DateTime.utcnow()
-        self.assertNotIn('timestamp', self.query._query_terms)
+        assert 'timestamp' not in self.query._query_terms
         self.query.match_timestamp(start_date, end_date, True)
-        self.assertEqual(self.query._query_terms['timestamp'], {
+        assert self.query._query_terms['timestamp'] == {
             '$gte': start_date,
             '$lte': end_date
-        })"""
+        }"""
 
     match_any_priority = """
         with pytest.raises(errors.Unimplemented):
@@ -201,19 +222,29 @@ class LogQuery:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('LOGGING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_log_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'LOGGING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_log_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_log(create_form)
-        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
+        request.cls.catalog = request.cls.svc_mgr.create_log(create_form)
+        request.cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
-    def setUp(self):
-        # Since the session isn't implemented, we just construct a LogQuery directly
-        self.query = LogQuery(runtime=self.catalog._runtime)
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_log(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.svc_mgr.delete_log(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Since the session isn't implemented, we just construct a LogQuery directly
+    request.cls.query = LogQuery(runtime=request.cls.catalog._runtime)"""
