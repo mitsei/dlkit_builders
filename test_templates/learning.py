@@ -5,129 +5,160 @@ class ObjectiveRequisiteSession:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.requisite_list = list()
-        cls.requisite_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.requisite_list = list()
+    request.cls.requisite_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'LEARNING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
         create_form.description = 'Test ObjectiveBank for ObjectiveRequisiteSession tests'
-        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
-        create_form = cls.catalog.get_objective_form_for_create([])
+        request.cls.catalog = request.cls.svc_mgr.create_objective_bank(create_form)
+        create_form = request.cls.catalog.get_objective_form_for_create([])
         create_form.display_name = 'Test Objective for ObjectiveRequisiteSession Lookup'
         create_form.description = 'Test Objective for ObjectiveRequisiteSession tests'
-        cls.objective = cls.catalog.create_objective(create_form)
+        request.cls.objective = request.cls.catalog.create_objective(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_objective_form_for_create([])
+            create_form = request.cls.catalog.get_objective_form_for_create([])
             create_form.display_name = 'Test Objective ' + str(num)
             create_form.description = 'Test Objective for ObjectiveRequisiteSession tests'
-            obj = cls.catalog.create_objective(create_form)
-            cls.requisite_list.append(obj)
-            cls.requisite_ids.append(obj.ident)
-            cls.catalog.assign_objective_requisite(cls.objective.ident, obj.ident)
+            obj = request.cls.catalog.create_objective(create_form)
+            request.cls.requisite_list.append(obj)
+            request.cls.requisite_ids.append(obj.ident)
+            request.cls.catalog.assign_objective_requisite(request.cls.objective.ident, obj.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def setUp(self):
-        self.session = self.catalog
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_objective_banks():
+                for obj_id in request.cls.requisite_ids:
+                    catalog.delete_objective(obj_id)
+                for obj in catalog.get_objectives():
+                    catalog.delete_objective(obj.ident)
+                request.cls.svc_mgr.delete_objective_bank(catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_objective_banks():
-            for obj_id in cls.requisite_ids:
-                catalog.delete_objective(obj_id)
-            for obj in catalog.get_objectives():
-                catalog.delete_objective(obj.ident)
-            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.catalog"""
 
     get_requisite_objectives_template = """
-        requisites = self.catalog.get_requisite_objectives(self.objective.ident)
-        self.assertEqual(
-            requisites.available(),
-            len(self.requisite_ids)
-        )
-        for req in requisites:
-            self.assertIn(
-                req.ident,
-                self.requisite_ids
-            )"""
+        # From test_templates/learning.py::ObjectiveRequsiteSession::get_requisite_objectives_template
+        if not is_never_authz(self.service_config):
+            requisites = self.catalog.${method_name}(self.${object_name_under}.ident)
+            assert requisites.available() == len(self.requisite_ids))
+            for req in requisites:
+                assert req.ident in self.requisite_ids
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(self.fake_id)"""
 
     get_dependent_objectives_template = """
-        dependents = self.catalog.get_dependent_objectives(self.objective.ident)
-        self.assertEqual(
-            dependents.available(),
-            0
-        )
-        dependents = self.catalog.get_dependent_objectives(self.requisite_ids[0])
-        self.assertEqual(
-            dependents.available(),
-            1
-        )
-        self.assertEqual(
-            dependents.next().ident,
-            self.objective.ident
-        )"""
+        # From test_templates/learning.py::ObjectiveRequsiteSession::get_dependent_objectives_template
+        if not is_never_authz(self.service_config):
+            dependents = self.catalog.${method_name}(self.${object_name_under}.ident)
+            assert dependents.available() == 0
+            dependents = self.catalog.get_dependent_objectives(self.requisite_ids[0])
+            assert dependents.available() == 1
+            assert dependents.next().ident == self.objective.ident
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(self.fake_id)"""
 
 
 class ObjectiveRequisiteAssignmentSession:
 
     import_statements_pattern = [
-        'from dlkit.abstract_osid.learning.objects import ObjectiveList'
+        'from dlkit.abstract_osid.${pkg_name_replaced_reserved} import objects as ABCObjects',
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.requisite_list = list()
-        cls.requisite_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('LEARNING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_objective_bank_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.requisite_list = list()
+    request.cls.requisite_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'LEARNING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
         create_form.description = 'Test ObjectiveBank for ObjectiveRequisiteAssignmentSession tests'
-        cls.catalog = cls.svc_mgr.create_objective_bank(create_form)
-        create_form = cls.catalog.get_objective_form_for_create([])
+        request.cls.catalog = request.cls.svc_mgr.create_objective_bank(create_form)
+        create_form = request.cls.catalog.get_objective_form_for_create([])
         create_form.display_name = 'Test Objective for ObjectiveRequisiteAssignmentSession Lookup'
         create_form.description = 'Test Objective for ObjectiveRequisiteAssignmentSession tests'
-        cls.objective = cls.catalog.create_objective(create_form)
+        request.cls.objective = request.cls.catalog.create_objective(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_objective_form_for_create([])
+            create_form = request.cls.catalog.get_objective_form_for_create([])
             create_form.display_name = 'Test Objective ' + str(num)
             create_form.description = 'Test Objective for ObjectiveRequisiteAssignmentSession tests'
-            obj = cls.catalog.create_objective(create_form)
-            cls.requisite_list.append(obj)
-            cls.requisite_ids.append(obj.ident)
+            obj = request.cls.catalog.create_objective(create_form)
+            request.cls.requisite_list.append(obj)
+            request.cls.requisite_ids.append(obj.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def setUp(self):
-        self.session = self.catalog
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_objective_banks():
+                for obj_id in request.cls.requisite_ids:
+                    catalog.delete_objective(obj_id)
+                for obj in catalog.get_objectives():
+                    catalog.delete_objective(obj.ident)
+                request.cls.svc_mgr.delete_objective_bank(catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_objective_banks():
-            for obj_id in cls.requisite_ids:
-                catalog.delete_objective(obj_id)
-            for obj in catalog.get_objectives():
-                catalog.delete_objective(obj.ident)
-            cls.svc_mgr.delete_objective_bank(catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.catalog"""
 
     assign_objective_requisite_template = """
-        results = self.catalog.get_requisite_objectives(self.objective.ident)
-        self.assertTrue(isinstance(results, ObjectiveList))
-        self.assertEqual(results.available(), 0)
+        # From test_templates/learning.py::ObjectiveRequsiteAssignmentSession::assign_objective_requisite_template
+        if not is_never_authz(self.service_config):
+            results = self.catalog.get_requisite_${object_name_plural_under}(self.${object_name_under}.ident)
+            assert isinstance(results, ABCObjects.${return_type})
+            assert results.available() == 0
 
-        self.catalog.assign_objective_requisite(self.objective.ident, self.requisite_ids[0])
+            self.catalog.${method_name}(self.${object_name_under}.ident, self.requisite_ids[0])
 
-        results = self.catalog.get_requisite_objectives(self.objective.ident)
-        self.assertEqual(results.available(), 1)"""
+            results = self.catalog.get_requisite_${object_name_plural_under}(self.${object_name_under}.ident)
+            assert results.available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(self.fake_id, self.fake_id)"""
 
     unassign_objective_requisite_template = """
-        self.catalog.assign_objective_requisite(self.objective.ident, self.requisite_ids[0])
+        # From test_templates/learning.py::ObjectiveRequsiteAssignmentSession::unassign_objective_requisite_template
+        if not is_never_authz(self.service_config):
+            self.catalog.assign_${object_name_under}_requisite(self.${object_name_under}.ident, self.requisite_ids[0])
 
-        results = self.catalog.get_requisite_objectives(self.objective.ident)
-        self.assertEqual(results.available(), 1)
+            results = self.catalog.get_requisite_${object_name_plural_under}(self.${object_name_under}.ident)
+            assert results.available() == 1
 
-        self.catalog.unassign_objective_requisite(self.objective.ident, self.requisite_ids[0])
+            self.catalog.${method_name}(self.${object_name_under}.ident, self.requisite_ids[0])
 
-        results = self.catalog.get_requisite_objectives(self.objective.ident)
-        self.assertEqual(results.available(), 0)"""
+            results = self.catalog.get_requisite_${object_name_plural_under}(self.${object_name_under}.ident)
+            assert results.available() == 0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.${method_name}(self.fake_id, self.fake_id)"""
 
 
 class ObjectiveHierarchyDesignSession:
