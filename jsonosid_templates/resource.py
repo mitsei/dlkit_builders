@@ -399,7 +399,7 @@ class ResourceSearchSession:
             result = collection.find(query_terms)[${arg1_name}.start:${arg1_name}.end]
         else:
             result = collection.find(query_terms)
-        return searches.${return_type}(result, runtime=self._runtime)"""
+        return searches.${return_type}(result, dict(${arg0_name}._query_terms), runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
@@ -1727,16 +1727,16 @@ class ResourceQuery:
 
 class ResourceSearch:
 
-    import_statements = [
+    import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from ..primitives import Id',
         'from ..osid import searches as osid_searches',
         'from ..utilities import get_registry',
     ]
 
-    init = """
+    init_template = """
     def __init__(self, runtime):
-        self._namespace = 'resource.Resource'
+        self._namespace = '${pkg_name}.${object_name}'
         self._runtime = runtime
         record_type_data_sets = get_registry('RESOURCE_RECORD_TYPES', runtime)
         self._record_type_data_sets = record_type_data_sets
@@ -1747,30 +1747,36 @@ class ResourceSearch:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
         osid_searches.OsidSearch.__init__(self, runtime)"""
 
-    search_among_resources = """
-        self._id_list = resource_ids"""
+    search_among_resources_template = """
+        self._id_list = ${arg0_name}"""
 
 
 class ResourceSearchResults:
 
-    import_statements = [
+    import_statements_pattern = [
         'from dlkit.abstract_osid.osid import errors',
         'from . import objects',
+        'from . import queries',
     ]
 
-    init = """
-    def __init__(self, results, runtime):
+    init_template = """
+    def __init__(self, results, query_terms, runtime):
         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
         # self._results = [r for r in results]
+        self._namespace = '${pkg_name}.${object_name}'
         self._results = results
+        self._query_terms = query_terms
         self._runtime = runtime
         self.retrieved = False"""
 
-    get_resources = """
+    get_resources_template = """
         if self.retrieved:
             raise errors.IllegalState('List has already been retrieved.')
         self.retrieved = True
-        return objects.ResourceList(self._results, runtime=self._runtime)"""
+        return objects.${return_type}(self._results, runtime=self._runtime)"""
+
+    get_resource_query_inspector_template = """
+        return queries.${return_type}(self._query_terms, runtime=self._runtime)"""
 
 
 class ResourceForm:

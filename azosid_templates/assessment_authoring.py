@@ -65,11 +65,14 @@ class AssessmentAuthoringProfile:
         osid_managers.OsidProfile.__init__(self)
 
     def _get_hierarchy_session(self, proxy=None):
-        # currently proxy not used, even if it's passed in...
+        if proxy is not None:
+            try:
+                return self._provider_manager.get_bank_hierarchy_session(proxy)
+            except Unimplemented:
+                return None
         try:
-            base_package_mgr = self._get_base_package_provider_manager('assessment')
-            return base_package_mgr.get_bank_hierarchy_session(proxy)
-        except Unsupported:
+            return self._provider_manager.get_bank_hierarchy_session()
+        except Unimplemented:
             return None
 
     def _get_base_package_provider_manager(self, base_package):

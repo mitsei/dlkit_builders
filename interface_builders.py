@@ -265,6 +265,10 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             object_name = interface_name[:-4]
         elif init_pattern == 'resource.ResourceQuery':
             object_name = interface_name[:-5]
+        elif init_pattern == 'resource.ResourceSearch':
+            object_name = interface_name[:-6]
+        elif init_pattern == 'resource.ResourceSearchResults':
+            object_name = interface_name[:-13]
 
         # Special one for services test builder to select whether a session method
         # should be called from a service manager or catalog

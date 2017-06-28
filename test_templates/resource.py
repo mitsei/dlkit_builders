@@ -1225,19 +1225,27 @@ class ResourceQuery:
         # From test_templates/resource.py::ResourceQuery::match_bin_id_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.${method_name}(test_id, match=True)
-        self.assertEqual(self.query._query_terms['assigned${cat_name}Ids'], {
-            '$$in': [str(test_id)]
-        })"""
+        # The following knows too much about implementation details:
+        from dlkit.authz_adapter.utilities import QueryWrapper
+        if not isinstance(self.query, QueryWrapper):
+            self.assertEqual(self.query._query_terms['assigned${cat_name}Ids'], {
+                '$$in': [str(test_id)]})
+        else:
+            self.assertEqual(self.query._cat_id_args_list[0]['${cat_name_under}_id'], test_id)"""
 
     clear_bin_id_terms_template = """
         # From test_templates/resource.py::ResourceQuery::clear_bin_id_terms_template
         test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
         self.query.match_${var_name}(test_id, match=True)
-        self.assertIn('assigned${cat_name}Ids',
-                      self.query._query_terms)
+        # The following knows too much about implementation details:
+        from dlkit.authz_adapter.utilities import QueryWrapper
+        if not isinstance(self.query, QueryWrapper):
+            self.assertIn('assigned${cat_name}Ids',
+                          self.query._query_terms)
         self.query.${method_name}()
-        self.assertNotIn('assigned${cat_name}Ids',
-                         self.query._query_terms)"""
+        if not isinstance(self.query, QueryWrapper):
+            self.assertNotIn('assigned${cat_name}Ids',
+                             self.query._query_terms)"""
 
 
 class ResourceForm:

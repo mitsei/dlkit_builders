@@ -6,7 +6,7 @@ from pattern_mappers.core import map_osid_patterns, map_type_patterns, map_id_pa
 from pattern_mappers.data import map_object_form_data_patterns, map_object_data_patterns, map_admin_session_data_patterns
 from pattern_mappers.objects import map_object_form_patterns,\
     map_object_patterns, map_list_patterns, map_receiver_patterns,\
-    map_query_patterns, map_catalog_patterns,\
+    map_query_patterns, map_search_patterns, map_search_results_patterns, map_catalog_patterns,\
     map_catalog_query_patterns, map_catalog_node_patterns
 
 
@@ -278,6 +278,10 @@ def map_patterns(package, index, base_package=None):
         elif any(q in interface['inherit_shortnames']
                  for q in ['OsidObjectQuery', 'OsidRelationshipQuery']):
             map_query_patterns(interface, package, index)
+        elif 'OsidSearch' in interface['inherit_shortnames']:
+            map_search_patterns(interface, package, index)
+        elif 'OsidSearchResults' in interface['inherit_shortnames']:
+            map_search_results_patterns(interface, package, index)
         elif 'OsidList' in interface['inherit_shortnames']:
             map_list_patterns(interface, package, index)
         elif 'OsidReceiver' in interface['inherit_shortnames']:

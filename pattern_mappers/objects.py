@@ -1412,6 +1412,99 @@ def map_query_patterns(interface, package, index):
     return index
 
 
+def map_search_patterns(interface, package, index):
+
+    object_name = interface['shortname'][:-6]
+    index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceSearch'
+
+    for method in interface['methods']:
+        var_name = method['name'].split('_', 1)[-1]
+
+        # Search methods that search among ids
+        if (method['name'].startswith('search_among')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='resource.ResourceSearch.search_among_resources',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name[5:],
+                            object_name=object_name,
+                            arg0_name=method['args'][0]['var_name'],
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            cat_name=index['package_catalog_caps']))
+
+        # Search methods that order search results
+        elif (method['name'].startswith('order_')):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='resource.ResourceSearch.order_resource_results',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name,
+                            object_name=object_name,
+                            arg0_name=method['args'][0]['var_name'],
+                            arg0_type_full=method['args'][0]['arg_type'],
+                            cat_name=index['package_catalog_caps']))
+
+        else:
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name']))
+    return index
+
+
+def map_search_results_patterns(interface, package, index):
+
+    object_name = interface['shortname'][:-13]
+    index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceSearchResults'
+
+    for method in interface['methods']:
+        var_name = method['name'].split('_', 1)[-1]
+
+        # SearchResults methods that search among ids
+        if (method['name'].startswith('get_') and
+                not method['name'].endswith('_record') and
+                'query_inspector' not in method['name']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='resource.ResourceSearchResults.get_resources',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name,
+                            object_name=object_name,
+                            cat_name=index['package_catalog_caps'],
+                            return_type_full=method['return_type']))
+
+        # SearchResults methods that get a query inspector
+        elif (method['name'].startswith('get_') and
+              'query_inspector' in method['name']):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='resource.ResourceSearchResults.get_resource_query_inspector',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            var_name=var_name,
+                            object_name=object_name,
+                            cat_name=index['package_catalog_caps'],
+                            return_type_full=method['return_type']))
+
+        else:
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name']))
+    return index
+
+
 def map_catalog_query_patterns(interface, package, index):
 
     object_name = interface['shortname'][:-5]
