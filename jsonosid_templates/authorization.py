@@ -364,6 +364,10 @@ class AuthorizationForm:
         self._my_map['assignedVaultIds'] = [str(kwargs['vault_id'])]
         self._my_map['functionId'] = str(kwargs['function_id'])
         self._my_map['qualifierId'] = str(kwargs['qualifier_id'])
+        self._my_map['agentId'] = None
+        self._my_map['resourceId'] = None
+        self._my_map['trustId'] = None
+        self._my_map['implicit'] = None
         if 'agent_id' in kwargs:
             self._my_map['agentId'] = str(kwargs['agent_id'])
         if 'resource_id' in kwargs:

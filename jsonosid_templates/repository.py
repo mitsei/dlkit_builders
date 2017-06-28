@@ -541,7 +541,7 @@ class AssetAdminSession:
             raise errors.Unsupported('${arg0_name} did not originate from this session')
         if not ${arg0_name}.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
-        ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_under}Id']).get_identifier()
+        ${object_name_under}_id = Id(${arg0_name}._my_map['${object_name_mixed}Id']).get_identifier()
         ${object_name_under} = collection.find_one(
             {'$$and': [{'_id': ObjectId(${object_name_under}_id)},
                       {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
@@ -1140,6 +1140,8 @@ class AssetContent:
         return self._my_map['${var_name_mixed}']"""
 
     get_data = """
+        if not bool(self._my_map['data']):
+            raise errors.IllegalState('no data')
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
@@ -1190,7 +1192,9 @@ class AssetContentForm:
 
     set_data = """
         if data is None:
-            raise errors.NullArgument()
+            raise errors.NullArgument('data cannot be None')
+        if not isinstance(data, DataInputStream):
+            raise errors.InvalidArgument('data must be instance of DataInputStream')
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
@@ -1203,7 +1207,7 @@ class AssetContentForm:
                 self.get_data_metadata().is_required()):
             raise errors.NoAccess()
         if self._my_map['data'] == self._data_default:
-            pass
+            return
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)

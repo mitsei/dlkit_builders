@@ -486,13 +486,24 @@ class AssessmentPart:
         return session"""
 
     get_assessment_part = """
+        if not self.has_parent_part():
+            raise errors.IllegalState('no parent part')
         lookup_session = self._get_assessment_part_lookup_session()
         return lookup_session.get_assessment_part(self.get_assessment_part_id())"""
 
+    get_assessment_part_id = """
+        if not self.has_parent_part():
+            raise errors.IllegalState('no parent part')
+        return Id(self._my_map['assessmentPartId'])"""
+
     get_child_assessment_part_ids = """
+        if not self.has_children():
+            raise errors.IllegalState('no children assessment parts')
         return IdList(self._my_map['childIds'])"""
 
     get_child_assessment_parts = """
+        if not self.has_children():
+            raise errors.IllegalState('no children assessment parts')
         # only returned unsequestered children?
         lookup_session = self._get_assessment_part_lookup_session()
         lookup_session.use_sequestered_assessment_part_view()
@@ -676,7 +687,11 @@ class SequenceRuleForm:
         self._my_map['minimumScore'] = self._minimum_score_default
         self._my_map['maximumScore'] = self._maximum_score_default
         self._my_map['assessmentPartId'] = str(kwargs['assessment_part_id'])
-        self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]"""
+        self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]
+        self._my_map['appliedAssessmentPartIds'] = []"""
+
+    get_applied_assessment_parts_metadata = """
+        raise errors.Unimplemented()"""
 
 
 class SequenceRuleAdminSession:
@@ -703,3 +718,53 @@ class SequenceRuleAdminSession:
                 assessment_part_id=assessment_part_id)
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
+
+
+class SequenceRuleQuery:
+    init = """
+    def __init__(self, runtime):
+        self._namespace = 'assessment_authoring.SequenceRuleQuery'
+        self._runtime = runtime
+        record_type_data_sets = get_registry('SEQUENCE_RULE_QUERY_RECORD_TYPES', runtime)
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidRuleQuery.__init__(self, runtime)"""
+
+
+class SequenceRuleLookupSession:
+    get_sequence_rules_for_assessment = """
+        # First, recursively get all the partIds for the assessment
+        def get_all_children_part_ids(part):
+            child_ids = []
+            if part.has_children():
+                child_ids = list(part.get_child_assessment_part_ids())
+                for child in part.get_child_assessment_parts():
+                    child_ids += get_all_children_part_ids(child)
+            return child_ids
+
+        all_assessment_part_ids = []
+
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = mgr.get_assessment_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
+        assessment = lookup_session.get_assessment(assessment_id)
+
+        if assessment.has_children():
+            mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
+            lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
+            lookup_session.use_federated_bank_view()
+            all_assessment_part_ids = list(assessment.get_child_ids())
+            for child_part_id in assessment.get_child_ids():
+                child_part = lookup_session.get_assessment_part(child_part_id)
+                all_assessment_part_ids += get_all_children_part_ids(child_part)
+
+        id_strs = [str(part_id) for part_id in all_assessment_part_ids]
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='SequenceRule',
+                                         runtime=self._runtime)
+        result = collection.find(
+            dict({'assessmentPartId': {'$in': id_strs}},
+                 **self._view_filter()))
+        return objects.SequenceRuleList(result, runtime=self._runtime)"""

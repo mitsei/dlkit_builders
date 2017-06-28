@@ -1127,9 +1127,17 @@ class Bin:
         else:
             session_class = getattr(self._provider_manager, 'get_' + session_name + '_for_${cat_name_under}')
             if self._proxy is None:
-                session = session_class(self._catalog.get_id())
+                if 'notification_session' in session_name:
+                    # Is there something else we should do about the receiver field?
+                    session = session_class('fake receiver', self._catalog.get_id())
+                else:
+                    session = session_class(self._catalog.get_id())
             else:
-                session = session_class(self._catalog.get_id(), self._proxy)
+                if 'notification_session' in session_name:
+                    # Is there something else we should do about the receiver field?
+                    session = session_class('fake receiver', self._catalog.get_id(), self._proxy)
+                else:
+                    session = session_class(self._catalog.get_id(), self._proxy)
             self._set_${cat_name_under}_view(session)
             self._set_object_view(session)
             self._set_operable_view(session)
@@ -1144,14 +1152,6 @@ class Bin:
 
     def get_${cat_name_under}(self):
         \"\"\"Strange little method to assure conformance for inherited Sessions."\"\"
-        return self
-
-    def get_objective_hierarchy_id(self):
-        \"\"\"WHAT am I doing here?\"\"\"
-        return self._catalog_id
-
-    def get_objective_hierarchy(self):
-        \"\"\"WHAT am I doing here?\"\"\"
         return self
 
     def __getattr__(self, name):
