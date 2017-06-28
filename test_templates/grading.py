@@ -5,57 +5,63 @@ class GradeSystem:
     ]
 
     get_grade_ids = """
-        grade_ids = self.object.get_grade_ids()
-        self.assertTrue(isinstance(grade_ids, IdList))
-        self.assertEqual(grade_ids.available(), 0)"""
+        if not is_never_authz(self.service_config):
+            grade_ids = self.object.get_grade_ids()
+            assert isinstance(grade_ids, IdList)
+            assert grade_ids.available() == 0"""
 
     get_grades = """
-        grades = self.object.get_grades()
-        self.assertTrue(isinstance(grades, GradeList))
-        self.assertEqual(grades.available(), 0)"""
+        if not is_never_authz(self.service_config):
+            grades = self.object.get_grades()
+            assert isinstance(grades, GradeList)
+            assert grades.available() == 0"""
 
     get_highest_numeric_score = """
-        score = self.object.get_highest_numeric_score()
-        self.assertIsNone(score)
+        if not is_never_authz(self.service_config):
+            score = self.object.get_highest_numeric_score()
+            assert score is None
 
-        # if this is set, should be a Decimal
-        form = self.catalog.get_grade_system_form_for_create([])
-        form.set_highest_numeric_score(100.0)
-        new_grade_system = self.catalog.create_grade_system(form)
+            # if this is set, should be a Decimal
+            form = self.catalog.get_grade_system_form_for_create([])
+            form.set_highest_numeric_score(100.0)
+            new_grade_system = self.catalog.create_grade_system(form)
 
-        self.assertEqual(new_grade_system.get_highest_numeric_score(), 100.0)"""
+            assert new_grade_system.get_highest_numeric_score() == 100.0"""
 
     get_lowest_numeric_score = """
-        score = self.object.get_lowest_numeric_score()
-        self.assertIsNone(score)
+        if not is_never_authz(self.service_config):
+            score = self.object.get_lowest_numeric_score()
+            assert score is None
 
-        # if this is set, should be a Decimal
-        form = self.catalog.get_grade_system_form_for_create([])
-        form.set_lowest_numeric_score(0.0)
-        new_grade_system = self.catalog.create_grade_system(form)
+            # if this is set, should be a Decimal
+            form = self.catalog.get_grade_system_form_for_create([])
+            form.set_lowest_numeric_score(0.0)
+            new_grade_system = self.catalog.create_grade_system(form)
 
-        self.assertEqual(new_grade_system.get_lowest_numeric_score(), 0.0)"""
+            assert new_grade_system.get_lowest_numeric_score() == 0.0"""
 
     get_numeric_score_increment = """
-        score = self.object.get_numeric_score_increment()
-        self.assertIsNone(score)
+        if not is_never_authz(self.service_config):
+            score = self.object.get_numeric_score_increment()
+            assert score is None
 
-        # if this is set, should be a Decimal
-        form = self.catalog.get_grade_system_form_for_create([])
-        form.set_numeric_score_increment(1.0)
-        new_grade_system = self.catalog.create_grade_system(form)
+            # if this is set, should be a Decimal
+            form = self.catalog.get_grade_system_form_for_create([])
+            form.set_numeric_score_increment(1.0)
+            new_grade_system = self.catalog.create_grade_system(form)
 
-        self.assertEqual(new_grade_system.get_numeric_score_increment(), 1.0)"""
+            assert new_grade_system.get_numeric_score_increment() == 1.0"""
 
     is_based_on_grades = """
-        # when not set on create, returns None
-        self.assertIsNone(self.object.is_based_on_grades())
+        if not is_never_authz(self.service_config):
+            # when not set on create, returns None
+            assert self.object.is_based_on_grades() is None
 
-        form = self.catalog.get_grade_system_form_for_create([])
-        form.set_based_on_grades(True)
-        new_grade_system = self.catalog.create_grade_system(form)
+            form = self.catalog.get_grade_system_form_for_create([])
+            form.set_based_on_grades(True)
+            new_grade_system = self.catalog.create_grade_system(form)
 
-        self.assertTrue(new_grade_system.is_based_on_grades())"""
+            assert new_grade_system.is_based_on_grades()"""
 
 
 class GradeSystemForm:
@@ -65,48 +71,56 @@ class GradeSystemForm:
     ]
 
     clear_highest_numeric_score = """
-        self.form.set_highest_numeric_score(100.0)
-        self.assertIsNotNone(self.form._my_map['highestNumericScore'])
-        self.form.clear_highest_numeric_score()
-        self.assertIsNone(self.form._my_map['highestNumericScore'])"""
+        if not is_never_authz(self.service_config):
+            self.form.set_highest_numeric_score(100.0)
+            assert self.form._my_map['highestNumericScore'] is not None
+            self.form.clear_highest_numeric_score()
+            assert self.form._my_map['highestNumericScore'] is None"""
 
     clear_lowest_numeric_score = """
-        self.form.set_lowest_numeric_score(100.0)
-        self.assertIsNotNone(self.form._my_map['lowestNumericScore'])
-        self.form.clear_lowest_numeric_score()
-        self.assertIsNone(self.form._my_map['lowestNumericScore'])"""
+        if not is_never_authz(self.service_config):
+            self.form.set_lowest_numeric_score(100.0)
+            assert self.form._my_map['lowestNumericScore'] is not None
+            self.form.clear_lowest_numeric_score()
+            assert self.form._my_map['lowestNumericScore'] is None"""
 
     clear_numeric_score_increment = """
-        self.form.set_numeric_score_increment(100.0)
-        self.assertIsNotNone(self.form._my_map['numericScoreIncrement'])
-        self.form.clear_numeric_score_increment()
-        self.assertIsNone(self.form._my_map['numericScoreIncrement'])"""
+        if not is_never_authz(self.service_config):
+            self.form.set_numeric_score_increment(100.0)
+            assert self.form._my_map['numericScoreIncrement'] is not None
+            self.form.clear_numeric_score_increment()
+            assert self.form._my_map['numericScoreIncrement'] is None"""
 
     clear_based_on_grades = """
-        self.form.set_based_on_grades(True)
-        self.assertIsNotNone(self.form._my_map['basedOnGrades'])
-        self.form.clear_based_on_grades()
-        self.assertIsNone(self.form._my_map['basedOnGrades'])"""
+        if not is_never_authz(self.service_config):
+            self.form.set_based_on_grades(True)
+            assert self.form._my_map['basedOnGrades'] is not None
+            self.form.clear_based_on_grades()
+            assert self.form._my_map['basedOnGrades'] is None"""
 
     set_highest_numeric_score = """
-        self.assertIsNone(self.form._my_map['highestNumericScore'])
-        self.form.set_highest_numeric_score(100.0)
-        self.assertIsNotNone(self.form._my_map['highestNumericScore'])"""
+        if not is_never_authz(self.service_config):
+            assert self.form._my_map['highestNumericScore'] is None
+            self.form.set_highest_numeric_score(100.0)
+            assert self.form._my_map['highestNumericScore'] is not None"""
 
     set_lowest_numeric_score = """
-        self.assertIsNone(self.form._my_map['lowestNumericScore'])
-        self.form.set_lowest_numeric_score(100.0)
-        self.assertIsNotNone(self.form._my_map['lowestNumericScore'])"""
+        if not is_never_authz(self.service_config):
+            assert self.form._my_map['lowestNumericScore'] is None
+            self.form.set_lowest_numeric_score(100.0)
+            assert self.form._my_map['lowestNumericScore'] is not None"""
 
     set_numeric_score_increment = """
-        self.assertIsNone(self.form._my_map['numericScoreIncrement'])
-        self.form.set_numeric_score_increment(100.0)
-        self.assertIsNotNone(self.form._my_map['numericScoreIncrement'])"""
+        if not is_never_authz(self.service_config):
+            assert self.form._my_map['numericScoreIncrement'] is None
+            self.form.set_numeric_score_increment(100.0)
+            assert self.form._my_map['numericScoreIncrement'] is not None"""
 
     set_based_on_grades = """
-        self.assertIsNone(self.form._my_map['basedOnGrades'])
-        self.form.set_based_on_grades(True)
-        self.assertIsNotNone(self.form._my_map['basedOnGrades'])"""
+        if not is_never_authz(self.service_config):
+            assert self.form._my_map['basedOnGrades'] is None
+            self.form.set_based_on_grades(True)
+            assert self.form._my_map['basedOnGrades'] is not None"""
 
 
 class GradebookColumn:
@@ -125,48 +139,62 @@ class GradebookColumn:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-        form = cls.catalog.get_grade_system_form_for_create([])
+        form = request.cls.catalog.get_grade_system_form_for_create([])
         form.display_name = 'Grade system'
-        cls.grade_system = cls.catalog.create_grade_system(form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(form)
 
-    def setUp(self):
-        form = self.catalog.get_gradebook_column_form_for_create([])
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(obj.ident)
+            for obj in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(obj.ident)
+            request.cls.catalog.delete_grade_system(request.cls.grade_system.ident)
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_gradebook_column_form_for_create([])
         form.display_name = 'Gradebook Column'
-        form.set_grade_system(self.grade_system.ident)
-        self.object = self.catalog.create_gradebook_column(form)
+        form.set_grade_system(request.cls.grade_system.ident)
+        request.cls.object = request.cls.catalog.create_gradebook_column(form)
 
-    def tearDown(self):
-        for gradebook_column in self.catalog.get_gradebook_columns():
-            self.catalog.delete_gradebook_column(gradebook_column.ident)
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for gradebook_column in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(gradebook_column.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_grade_entries():
-            cls.catalog.delete_grade_entry(obj.ident)
-        for obj in cls.catalog.get_gradebook_columns():
-            cls.catalog.delete_gradebook_column(obj.ident)
-        cls.catalog.delete_grade_system(cls.grade_system.ident)
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+    request.addfinalizer(test_tear_down)"""
 
     get_grade_system = """
-        grade_system = self.object.get_grade_system()
-        self.assertTrue(isinstance(grade_system, GradeSystem))
-        self.assertTrue(str(grade_system.ident),
-                        str(self.grade_system.ident))"""
+        if not is_never_authz(self.service_config):
+            grade_system = self.object.get_grade_system()
+            assert isinstance(grade_system, GradeSystem)
+            assert str(grade_system.ident) == str(self.grade_system.ident)"""
 
     get_grade_system_id = """
-        grade_system_id = self.object.get_grade_system_id()
-        self.assertTrue(isinstance(grade_system_id, Id))
-        self.assertTrue(str(grade_system_id),
-                        str(self.grade_system.ident))"""
+        if not is_never_authz(self.service_config):
+            grade_system_id = self.object.get_grade_system_id()
+            assert isinstance(grade_system_id, Id)
+            assert str(grade_system_id) == str(self.grade_system.ident)"""
 
 
 class GradebookColumnLookupSession:
@@ -187,60 +215,77 @@ class GradebookColumnLookupSession:
 
     # Until we figure out how to do Relationship init patterns properly:
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.grade_entry_list = list()
-        cls.grade_entry_ids = list()
-        cls.gradebook_column_list = list()
-        cls.gradebook_column_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.grade_entry_list = list()
+    request.cls.grade_entry_ids = list()
+    request.cls.gradebook_column_list = list()
+    request.cls.gradebook_column_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test Gradebook'
         create_form.description = 'Test Gradebook for GradebookColumnLookupSession tests'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
-        create_form = cls.catalog.get_grade_system_form_for_create([])
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
+        create_form = request.cls.catalog.get_grade_system_form_for_create([])
         create_form.display_name = 'Test Grade System'
         create_form.description = 'Test Grade System for GradebookColumnLookupSession tests'
         create_form.based_on_grades = False
         create_form.lowest_numeric_score = 0
         create_form.highest_numeric_score = 100
         create_form.numeric_score_increment = 1
-        cls.grade_system = cls.catalog.create_grade_system(create_form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_gradebook_column_form_for_create([])
+            create_form = request.cls.catalog.get_gradebook_column_form_for_create([])
             create_form.display_name = 'Test GradebookColumn ' + str(num)
             create_form.description = 'Test GradebookColumn for GradebookColumnLookupSession tests'
-            create_form.grade_system = cls.grade_system.ident
-            obj = cls.catalog.create_gradebook_column(create_form)
-            cls.gradebook_column_list.append(obj)
-            cls.gradebook_column_ids.append(obj.ident)
+            create_form.grade_system = request.cls.grade_system.ident
+            obj = request.cls.catalog.create_gradebook_column(create_form)
+            request.cls.gradebook_column_list.append(obj)
+            request.cls.gradebook_column_ids.append(obj.ident)
         for num in range(0, 100):
-            create_form = cls.catalog.get_grade_entry_form_for_create(cls.gradebook_column_ids[0], AGENT_ID, [])
+            create_form = request.cls.catalog.get_grade_entry_form_for_create(request.cls.gradebook_column_ids[0], AGENT_ID, [])
             create_form.display_name = 'Test GradeEntry ' + str(num)
             create_form.description = 'Test GradeEntry for GradebookColumnLookupSession tests'
             create_form.set_score(float(num))
-            object = cls.catalog.create_grade_entry(create_form)
-            cls.grade_entry_list.append(object)
-            cls.grade_entry_ids.append(object.ident)
+            object = request.cls.catalog.create_grade_entry(create_form)
+            request.cls.grade_entry_list.append(object)
+            request.cls.grade_entry_ids.append(object.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def setUp(self):
-        self.session = self.catalog
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_gradebooks():
+                for obj in catalog.get_grade_entries():
+                    catalog.delete_grade_entry(obj.ident)
+                for obj in catalog.get_gradebook_columns():
+                    catalog.delete_gradebook_column(obj.ident)
+                for obj in catalog.get_grade_systems():
+                    catalog.delete_grade_system(obj.ident)
+                request.cls.svc_mgr.delete_gradebook(catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_gradebooks():
-            for obj in catalog.get_grade_entries():
-                catalog.delete_grade_entry(obj.ident)
-            for obj in catalog.get_gradebook_columns():
-                catalog.delete_gradebook_column(obj.ident)
-            for obj in catalog.get_grade_systems():
-                catalog.delete_grade_system(obj.ident)
-            cls.svc_mgr.delete_gradebook(catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.catalog"""
 
     # skip this one until gradebook column summary is supported
     get_gradebook_column_summary = """
-        self.assertTrue(isinstance(self.catalog.get_gradebook_column_summary(self.gradebook_column_ids[0]),
-                                   GradebookColumnSummary))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.catalog.get_gradebook_column_summary(self.gradebook_column_ids[0]),
+                              GradebookColumnSummary)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_gradebook_column_summary(self.fake_id)"""
 
 
 class GradeEntryLookupSession:
@@ -260,54 +305,67 @@ class GradeEntryLookupSession:
 
     # Until we figure out how to do Relationship init patterns properly:
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.grade_entry_list = list()
-        cls.grade_entry_ids = list()
-        cls.gradebook_column_list = list()
-        cls.gradebook_column_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.grade_entry_list = list()
+    request.cls.grade_entry_ids = list()
+    request.cls.gradebook_column_list = list()
+    request.cls.gradebook_column_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test Gradebook'
         create_form.description = 'Test Gradebook for GradeEntryLookupSession tests'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
-        create_form = cls.catalog.get_grade_system_form_for_create([])
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
+        create_form = request.cls.catalog.get_grade_system_form_for_create([])
         create_form.display_name = 'Test Grade System'
         create_form.description = 'Test Grade System for GradeEntryLookupSession tests'
         create_form.based_on_grades = False
         create_form.lowest_numeric_score = 0
         create_form.highest_numeric_score = 5
         create_form.numeric_score_increment = 0.25
-        cls.grade_system = cls.catalog.create_grade_system(create_form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_gradebook_column_form_for_create([])
+            create_form = request.cls.catalog.get_gradebook_column_form_for_create([])
             create_form.display_name = 'Test GradebookColumn ' + str(num)
             create_form.description = 'Test GradebookColumn for GradeEntryLookupSession tests'
-            create_form.grade_system = cls.grade_system.ident
-            obj = cls.catalog.create_gradebook_column(create_form)
-            cls.gradebook_column_list.append(obj)
-            cls.gradebook_column_ids.append(obj.ident)
+            create_form.grade_system = request.cls.grade_system.ident
+            obj = request.cls.catalog.create_gradebook_column(create_form)
+            request.cls.gradebook_column_list.append(obj)
+            request.cls.gradebook_column_ids.append(obj.ident)
         for num in [0, 1]:
-            create_form = cls.catalog.get_grade_entry_form_for_create(cls.gradebook_column_ids[num], AGENT_ID, [])
+            create_form = request.cls.catalog.get_grade_entry_form_for_create(request.cls.gradebook_column_ids[num], AGENT_ID, [])
             create_form.display_name = 'Test GradeEntry ' + str(num)
             create_form.description = 'Test GradeEntry for GradeEntryLookupSession tests'
-            object = cls.catalog.create_grade_entry(create_form)
-            cls.grade_entry_list.append(object)
-            cls.grade_entry_ids.append(object.ident)
+            object = request.cls.catalog.create_grade_entry(create_form)
+            request.cls.grade_entry_list.append(object)
+            request.cls.grade_entry_ids.append(object.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def setUp(self):
-        self.session = self.catalog
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_gradebooks():
+                for obj in catalog.get_grade_entries():
+                    catalog.delete_grade_entry(obj.ident)
+                for obj in catalog.get_gradebook_columns():
+                    catalog.delete_gradebook_column(obj.ident)
+                for obj in catalog.get_grade_systems():
+                    catalog.delete_grade_system(obj.ident)
+                request.cls.svc_mgr.delete_gradebook(catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_gradebooks():
-            for obj in catalog.get_grade_entries():
-                catalog.delete_grade_entry(obj.ident)
-            for obj in catalog.get_gradebook_columns():
-                catalog.delete_gradebook_column(obj.ident)
-            for obj in catalog.get_grade_systems():
-                catalog.delete_grade_system(obj.ident)
-            cls.svc_mgr.delete_gradebook(catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.catalog"""
 
     get_grade_entries_for_gradebook_column_on_date = """
         end_date = DateTime.utcnow() + datetime.timedelta(days=5)
@@ -320,56 +378,75 @@ class GradeEntryLookupSession:
             'second': end_date.second,
             'microsecond': end_date.microsecond
         })
-        results = self.session.get_grade_entries_for_gradebook_column_on_date(self.gradebook_column_ids[0],
-                                                                              DateTime.utcnow(),
-                                                                              end_date)
-        self.assertTrue(isinstance(results, ABCObjects.GradeEntryList))
-        self.assertEqual(results.available(), 1)"""
+        if not is_never_authz(self.service_config):
+            results = self.session.get_grade_entries_for_gradebook_column_on_date(self.gradebook_column_ids[0],
+                                                                                  DateTime.utcnow(),
+                                                                                  end_date)
+            assert isinstance(results, ABCObjects.GradeEntryList)
+            assert results.available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_grade_entries_for_gradebook_column_on_date(self.fake_id,
+                                                                            DateTime.utcnow(),
+                                                                            end_date)"""
 
 
 class GradeEntryQuerySession:
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.grade_entry_list = list()
-        cls.grade_entry_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.grade_entry_list = list()
+    request.cls.grade_entry_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test Gradebook'
         create_form.description = 'Test Gradebook for GradeEntryQuerySession tests'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-        form = cls.catalog.get_grade_system_form_for_create([])
+        form = request.cls.catalog.get_grade_system_form_for_create([])
         form.display_name = 'Test grade system'
-        grade_system = cls.catalog.create_grade_system(form)
+        grade_system = request.cls.catalog.create_grade_system(form)
 
-        form = cls.catalog.get_gradebook_column_form_for_create([])
+        form = request.cls.catalog.get_gradebook_column_form_for_create([])
         form.display_name = 'Test gradebook column'
         form.set_grade_system(grade_system.ident)
-        gradebook_column = cls.catalog.create_gradebook_column(form)
+        gradebook_column = request.cls.catalog.create_gradebook_column(form)
 
         for color in ['Orange', 'Blue', 'Green', 'orange']:
-            create_form = cls.catalog.get_grade_entry_form_for_create(gradebook_column.ident, AGENT_ID, [])
+            create_form = request.cls.catalog.get_grade_entry_form_for_create(gradebook_column.ident, AGENT_ID, [])
             create_form.display_name = 'Test GradeEntry ' + color
             create_form.description = (
                 'Test GradeEntry for GradeEntryQuerySession tests, did I mention green')
-            obj = cls.catalog.create_grade_entry(create_form)
-            cls.grade_entry_list.append(obj)
-            cls.grade_entry_ids.append(obj.ident)
+            obj = request.cls.catalog.create_grade_entry(create_form)
+            request.cls.grade_entry_list.append(obj)
+            request.cls.grade_entry_ids.append(obj.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def setUp(self):
-        self.session = self.catalog
+    request.cls.session = request.cls.catalog
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_gradebooks():
-            for obj in catalog.get_grade_entries():
-                catalog.delete_grade_entry(obj.ident)
-            for obj in catalog.get_gradebook_columns():
-                catalog.delete_gradebook_column(obj.ident)
-            for obj in catalog.get_grade_systems():
-                catalog.delete_grade_system(obj.ident)
-            cls.svc_mgr.delete_gradebook(catalog.ident)"""
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_gradebooks():
+                for obj in catalog.get_grade_entries():
+                    catalog.delete_grade_entry(obj.ident)
+                for obj in catalog.get_gradebook_columns():
+                    catalog.delete_gradebook_column(obj.ident)
+                for obj in catalog.get_grade_systems():
+                    catalog.delete_grade_system(obj.ident)
+                request.cls.svc_mgr.delete_gradebook(catalog.ident)
+
+    request.addfinalizer(test_tear_down)"""
 
 
 class Grade:
@@ -379,88 +456,105 @@ class Grade:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-        form = cls.catalog.get_grade_system_form_for_create([])
+        form = request.cls.catalog.get_grade_system_form_for_create([])
         form.display_name = 'Grade system'
-        cls.grade_system = cls.catalog.create_grade_system(form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(form)
 
-    def setUp(self):
-        form = self.catalog.get_grade_form_for_create(
-            self.grade_system.ident,
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(obj.ident)
+            for obj in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(obj.ident)
+            request.cls.catalog.delete_grade_system(request.cls.grade_system.ident)
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_grade_form_for_create(
+            request.cls.grade_system.ident,
             [])
         form.display_name = 'Test object'
-        self.object = self.catalog.create_grade(form)
+        request.cls.object = request.cls.catalog.create_grade(form)
 
-    def tearDown(self):
-        for grade in self.grade_system.get_grades():
-            self.catalog.delete_grade(grade.ident)
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for grade in request.cls.grade_system.get_grades():
+                request.cls.catalog.delete_grade(grade.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_grade_entries():
-            cls.catalog.delete_grade_entry(obj.ident)
-        for obj in cls.catalog.get_gradebook_columns():
-            cls.catalog.delete_gradebook_column(obj.ident)
-        cls.catalog.delete_grade_system(cls.grade_system.ident)
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+    request.addfinalizer(test_tear_down)"""
 
     get_grade_system = """
-        grade_system = self.object.get_grade_system()
-        self.assertTrue(isinstance(grade_system, ABCObjects.GradeSystem))
-        self.assertEqual(str(grade_system.ident),
-                         str(self.grade_system.ident))"""
+        if not is_never_authz(self.service_config):
+            grade_system = self.object.get_grade_system()
+            assert isinstance(grade_system, ABCObjects.GradeSystem)
+            assert str(grade_system.ident) == str(self.grade_system.ident)"""
 
     get_grade_system_id = """
-        grade_system_id = self.object.get_grade_system_id()
-        self.assertTrue(isinstance(grade_system_id, Id))
-        self.assertEqual(str(grade_system_id),
-                         str(self.grade_system.ident))"""
+        if not is_never_authz(self.service_config):
+            grade_system_id = self.object.get_grade_system_id()
+            assert isinstance(grade_system_id, Id)
+            assert str(grade_system_id) == str(self.grade_system.ident)"""
 
     get_input_score_end_range = """
-        end_range = self.object.get_input_score_end_range()
-        self.assertIsNone(end_range)
+        if not is_never_authz(self.service_config):
+            end_range = self.object.get_input_score_end_range()
+            assert end_range is None
 
-        # if this is set, should be a Decimal
-        form = self.catalog.get_grade_form_for_create(
-            self.grade_system.ident,
-            [])
-        form.set_input_score_end_range(50.0)
-        new_grade = self.catalog.create_grade(form)
+            # if this is set, should be a Decimal
+            form = self.catalog.get_grade_form_for_create(
+                self.grade_system.ident,
+                [])
+            form.set_input_score_end_range(50.0)
+            new_grade = self.catalog.create_grade(form)
 
-        self.assertEqual(new_grade.get_input_score_end_range(), 50.0)"""
+            assert new_grade.get_input_score_end_range() == 50.0"""
 
     get_input_score_start_range = """
-        start_range = self.object.get_input_score_end_range()
-        self.assertIsNone(start_range)
+        if not is_never_authz(self.service_config):
+            start_range = self.object.get_input_score_end_range()
+            assert start_range is None
 
-        # if this is set, should be a Decimal
-        form = self.catalog.get_grade_form_for_create(
-            self.grade_system.ident,
-            [])
-        form.set_input_score_start_range(50.0)
-        new_grade = self.catalog.create_grade(form)
+            # if this is set, should be a Decimal
+            form = self.catalog.get_grade_form_for_create(
+                self.grade_system.ident,
+                [])
+            form.set_input_score_start_range(50.0)
+            new_grade = self.catalog.create_grade(form)
 
-        self.assertEqual(new_grade.get_input_score_start_range(), 50.0)"""
+            assert new_grade.get_input_score_start_range() == 50.0"""
 
     get_output_score = """
-        score = self.object.get_output_score()
-        self.assertIsNone(score)
+        if not is_never_authz(self.service_config):
+            score = self.object.get_output_score()
+            assert score is None
 
-        # if this is set, should be a Decimal
-        form = self.catalog.get_grade_form_for_create(
-            self.grade_system.ident,
-            [])
-        form.set_output_score(50.0)
-        new_grade = self.catalog.create_grade(form)
+            # if this is set, should be a Decimal
+            form = self.catalog.get_grade_form_for_create(
+                self.grade_system.ident,
+                [])
+            form.set_output_score(50.0)
+            new_grade = self.catalog.create_grade(form)
 
-        self.assertEqual(new_grade.get_output_score(), 50.0)"""
+            assert new_grade.get_output_score() == 50.0"""
 
 
 class GradeForm:
@@ -469,68 +563,88 @@ class GradeForm:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-        form = cls.catalog.get_grade_system_form_for_create([])
+        form = request.cls.catalog.get_grade_system_form_for_create([])
         form.display_name = 'Grade system'
-        cls.grade_system = cls.catalog.create_grade_system(form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(form)
 
-    def setUp(self):
-        self.form = self.catalog.get_grade_form_for_create(
-            self.grade_system.ident,
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(obj.ident)
+            for obj in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(obj.ident)
+            request.cls.catalog.delete_grade_system(request.cls.grade_system.ident)
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        request.cls.form = request.cls.catalog.get_grade_form_for_create(
+            request.cls.grade_system.ident,
             [])
 
-    def tearDown(self):
-        for grade in self.grade_system.get_grades():
-            self.catalog.delete_grade(grade.ident)
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for grade in request.cls.grade_system.get_grades():
+                request.cls.catalog.delete_grade(grade.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_grade_entries():
-            cls.catalog.delete_grade_entry(obj.ident)
-        for obj in cls.catalog.get_gradebook_columns():
-            cls.catalog.delete_gradebook_column(obj.ident)
-        cls.catalog.delete_grade_system(cls.grade_system.ident)
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+    request.addfinalizer(test_tear_down)"""
 
     clear_input_score_end_range = """
-        self.form.set_input_score_end_range(50.0)
-        self.assertIsNotNone(self.form._my_map['inputScoreEndRange'])
-        self.form.clear_input_score_end_range()
-        self.assertIsNone(self.form._my_map['inputScoreEndRange'])"""
+        if not is_never_authz(self.service_config):
+            self.form.set_input_score_end_range(50.0)
+            assert self.form._my_map['inputScoreEndRange'] is not None
+            self.form.clear_input_score_end_range()
+            assert self.form._my_map['inputScoreEndRange'] is None"""
 
     clear_input_score_start_range = """
-        self.form.set_input_score_start_range(50.0)
-        self.assertIsNotNone(self.form._my_map['inputScoreStartRange'])
-        self.form.clear_input_score_start_range()
-        self.assertIsNone(self.form._my_map['inputScoreStartRange'])"""
+        if not is_never_authz(self.service_config):
+            self.form.set_input_score_start_range(50.0)
+            assert self.form._my_map['inputScoreStartRange'] is not None
+            self.form.clear_input_score_start_range()
+            assert self.form._my_map['inputScoreStartRange'] is None"""
 
     clear_output_score = """
-        self.form.set_output_score(50.0)
-        self.assertIsNotNone(self.form._my_map['outputScore'])
-        self.form.clear_output_score()
-        self.assertIsNone(self.form._my_map['outputScore'])"""
+        if not is_never_authz(self.service_config):
+            self.form.set_output_score(50.0)
+            assert self.form._my_map['outputScore'] is not None
+            self.form.clear_output_score()
+            assert self.form._my_map['outputScore'] is None"""
 
     set_input_score_end_range = """
-        self.assertIsNone(self.form._my_map['inputScoreEndRange'])
-        self.form.set_input_score_end_range(50.0)
-        self.assertEqual(self.form._my_map['inputScoreEndRange'], 50.0)"""
+        if not is_never_authz(self.service_config):
+            assert self.form._my_map['inputScoreEndRange'] is None
+            self.form.set_input_score_end_range(50.0)
+            assert self.form._my_map['inputScoreEndRange'] == 50.0"""
 
     set_input_score_start_range = """
-        self.assertIsNone(self.form._my_map['inputScoreStartRange'])
-        self.form.set_input_score_start_range(50.0)
-        self.assertEqual(self.form._my_map['inputScoreStartRange'], 50.0)"""
+        if not is_never_authz(self.service_config):
+            assert self.form._my_map['inputScoreStartRange'] is None
+            self.form.set_input_score_start_range(50.0)
+            assert self.form._my_map['inputScoreStartRange'] == 50.0"""
 
     set_output_score = """
-        self.assertIsNone(self.form._my_map['outputScore'])
-        self.form.set_output_score(50.0)
-        self.assertEqual(self.form._my_map['outputScore'], 50.0)"""
+        if not is_never_authz(self.service_config):
+            assert self.form._my_map['outputScore'] is None
+            self.form.set_output_score(50.0)
+            assert self.form._my_map['outputScore'] == 50.0"""
 
 
 class GradeList:
@@ -540,53 +654,69 @@ class GradeList:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-        form = cls.catalog.get_grade_system_form_for_create([])
+        form = request.cls.catalog.get_grade_system_form_for_create([])
         form.display_name = 'Grade system'
-        cls.grade_system = cls.catalog.create_grade_system(form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(form)
 
-    def setUp(self):
-        self.grade_list = []
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(obj.ident)
+            for obj in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(obj.ident)
+            request.cls.catalog.delete_grade_system(request.cls.grade_system.ident)
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.grade_list = []
+    if not is_never_authz(request.cls.service_config):
         for num in [0, 1]:
-            form = self.catalog.get_grade_form_for_create(
-                self.grade_system.ident,
+            form = request.cls.catalog.get_grade_form_for_create(
+                request.cls.grade_system.ident,
                 [])
-            new_grade = self.catalog.create_grade(form)
-            self.grade_list.append(new_grade)
-        self.grade_list = GradeList(self.grade_list,
-                                    runtime=self.catalog._runtime,
-                                    proxy=self.catalog._proxy)
+            new_grade = request.cls.catalog.create_grade(form)
+            request.cls.grade_list.append(new_grade)
+        request.cls.grade_list = GradeList(request.cls.grade_list,
+                                           runtime=request.cls.catalog._runtime,
+                                           proxy=request.cls.catalog._proxy)
 
-    def tearDown(self):
-        for grade in self.grade_system.get_grades():
-            self.catalog.delete_grade(grade.ident)
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for grade in request.cls.grade_system.get_grades():
+                request.cls.catalog.delete_grade(grade.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_grade_entries():
-            cls.catalog.delete_grade_entry(obj.ident)
-        for obj in cls.catalog.get_gradebook_columns():
-            cls.catalog.delete_gradebook_column(obj.ident)
-        cls.catalog.delete_grade_system(cls.grade_system.ident)
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+    request.addfinalizer(test_tear_down)"""
 
     get_next_grade = """
         from dlkit.abstract_osid.grading.objects import Grade
-        self.assertTrue(isinstance(self.grade_list.get_next_grade(), Grade))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.grade_list.get_next_grade(), Grade)"""
 
     get_next_grades = """
         from dlkit.abstract_osid.grading.objects import Grade, GradeList
-        new_list = self.grade_list.get_next_grades(2)
-        self.assertTrue(isinstance(new_list, GradeList))
-        for item in new_list:
-            self.assertTrue(isinstance(item, Grade))"""
+        if not is_never_authz(self.service_config):
+            new_list = self.grade_list.get_next_grades(2)
+            assert isinstance(new_list, GradeList)
+            for item in new_list:
+                assert isinstance(item, Grade)"""
 
 
 class GradeQuery:
@@ -596,21 +726,32 @@ class GradeQuery:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-    def setUp(self):
-        # Since the session isn't implemented, we just construct an ActivityQuery directly
-        self.query = GradeQuery(runtime=self.catalog._runtime)
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Since the session isn't implemented, we just construct an ActivityQuery directly
+    if not is_never_authz(request.cls.service_config):
+        request.cls.query = GradeQuery(runtime=request.cls.catalog._runtime)"""
 
 
 class GradeEntry:
@@ -629,101 +770,125 @@ class GradeEntry:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-        form = cls.catalog.get_grade_system_form_for_create([])
+        form = request.cls.catalog.get_grade_system_form_for_create([])
         form.display_name = 'Grade system'
-        cls.grade_system = cls.catalog.create_grade_system(form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(form)
 
-        form = cls.catalog.get_gradebook_column_form_for_create([])
+        form = request.cls.catalog.get_gradebook_column_form_for_create([])
         form.display_name = 'Gradebook Column'
-        form.set_grade_system(cls.grade_system.ident)
-        cls.column = cls.catalog.create_gradebook_column(form)
+        form.set_grade_system(request.cls.grade_system.ident)
+        request.cls.column = request.cls.catalog.create_gradebook_column(form)
 
-    def setUp(self):
-        form = self.catalog.get_grade_entry_form_for_create(
-            self.column.ident,
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(obj.ident)
+            for obj in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(obj.ident)
+            request.cls.catalog.delete_grade_system(request.cls.grade_system.ident)
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_grade_entry_form_for_create(
+            request.cls.column.ident,
             AGENT_ID,
             [])
         form.display_name = 'Test object'
-        self.object = self.catalog.create_grade_entry(form)
+        request.cls.object = request.cls.catalog.create_grade_entry(form)
 
-    def tearDown(self):
-        for grade_entry in self.catalog.get_grade_entries():
-            self.catalog.delete_grade_entry(grade_entry.ident)
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for grade_entry in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(grade_entry.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_grade_entries():
-            cls.catalog.delete_grade_entry(obj.ident)
-        for obj in cls.catalog.get_gradebook_columns():
-            cls.catalog.delete_gradebook_column(obj.ident)
-        cls.catalog.delete_grade_system(cls.grade_system.ident)
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+    request.addfinalizer(test_tear_down)"""
 
     get_grade = """
-        with self.assertRaises(errors.IllegalState):
-            self.object.get_grade()"""
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.IllegalState):
+                self.object.get_grade()"""
 
     get_grade_id = """
-        with self.assertRaises(errors.IllegalState):
-            self.object.get_grade()"""
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.IllegalState):
+                self.object.get_grade()"""
 
     get_gradebook_column = """
-        self.assertTrue(isinstance(self.object.get_gradebook_column(), GradebookColumn))
-        self.assertEqual(str(self.object.get_gradebook_column().ident),
-                         str(self.column.ident))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_gradebook_column(), GradebookColumn)
+            assert str(self.object.get_gradebook_column().ident) == str(self.column.ident)"""
 
     get_gradebook_column_id = """
-        self.assertTrue(isinstance(self.object.get_gradebook_column_id(), Id))
-        self.assertEqual(str(self.object.get_gradebook_column_id()),
-                         str(self.column.ident))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_gradebook_column_id(), Id)
+            assert str(self.object.get_gradebook_column_id()) == str(self.column.ident)"""
 
     get_grading_agent = """
-        agent = self.object.get_grading_agent()
-        self.assertTrue(isinstance(agent, Agent))"""
+        if not is_never_authz(self.service_config):
+            agent = self.object.get_grading_agent()
+            assert isinstance(agent, Agent)"""
 
     get_grading_agent_id = """
-        agent_id = self.object.get_grading_agent_id()
-        self.assertTrue(isinstance(agent_id, Id))"""
+        if not is_never_authz(self.service_config):
+            agent_id = self.object.get_grading_agent_id()
+            assert isinstance(agent_id, Id)"""
 
     get_key_resource = """
-        agent = self.object.get_key_resource()
-        self.assertTrue(isinstance(agent, Agent))"""
+        if not is_never_authz(self.service_config):
+            agent = self.object.get_key_resource()
+            assert isinstance(agent, Agent)"""
 
     get_key_resource_id = """
-        agent_id = self.object.get_key_resource_id()
-        self.assertTrue(isinstance(agent_id, Id))"""
+        if not is_never_authz(self.service_config):
+            agent_id = self.object.get_key_resource_id()
+            assert isinstance(agent_id, Id)"""
 
     get_score = """
-        score = self.object.get_score()
-        self.assertIsNone(score)
+        if not is_never_authz(self.service_config):
+            score = self.object.get_score()
+            assert score is None
 
-        # if this is set, should be a Decimal
-        form = self.catalog.get_grade_entry_form_for_create(
-            self.column.ident,
-            AGENT_ID,
-            [])
-        form.set_score(50.0)
-        new_grade_entry = self.catalog.create_grade_entry(form)
+            # if this is set, should be a Decimal
+            form = self.catalog.get_grade_entry_form_for_create(
+                self.column.ident,
+                AGENT_ID,
+                [])
+            form.set_score(50.0)
+            new_grade_entry = self.catalog.create_grade_entry(form)
 
-        self.assertEqual(new_grade_entry.get_score(), 50.0)"""
+            assert new_grade_entry.get_score() == 50.0"""
 
     get_time_graded = """
-        with self.assertRaises(errors.IllegalState):
-            self.object.get_time_graded()"""
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.IllegalState):
+                self.object.get_time_graded()"""
 
     is_graded = """
-        self.assertTrue(isinstance(self.object.is_graded(), bool))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.is_graded(), bool)"""
 
     overrides_calculated_entry = """
-        self.assertTrue(isinstance(self.object.overrides_calculated_entry(), bool))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.overrides_calculated_entry(), bool)"""
 
 
 class GradeEntryForm:
@@ -739,43 +904,54 @@ class GradeEntryForm:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-        form = cls.catalog.get_grade_system_form_for_create([])
+        form = request.cls.catalog.get_grade_system_form_for_create([])
         form.display_name = 'Grade system'
         form.set_based_on_grades(True)
-        cls.grade_system = cls.catalog.create_grade_system(form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(form)
 
-        form = cls.catalog.get_gradebook_column_form_for_create([])
+        form = request.cls.catalog.get_gradebook_column_form_for_create([])
         form.display_name = 'Gradebook Column'
-        form.set_grade_system(cls.grade_system.ident)
-        cls.column = cls.catalog.create_gradebook_column(form)
+        form.set_grade_system(request.cls.grade_system.ident)
+        request.cls.column = request.cls.catalog.create_gradebook_column(form)
 
-    def setUp(self):
-        self.form = self.catalog.get_grade_entry_form_for_create(
-            self.column.ident,
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(obj.ident)
+            for obj in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(obj.ident)
+            request.cls.catalog.delete_grade_system(request.cls.grade_system.ident)
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        request.cls.form = request.cls.catalog.get_grade_entry_form_for_create(
+            request.cls.column.ident,
             AGENT_ID,
-            [])
-
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_grade_entries():
-            cls.catalog.delete_grade_entry(obj.ident)
-        for obj in cls.catalog.get_gradebook_columns():
-            cls.catalog.delete_gradebook_column(obj.ident)
-        cls.catalog.delete_grade_system(cls.grade_system.ident)
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+            [])"""
 
     set_ignored_for_calculations = """
         self.form.set_ignored_for_calculations(True)
-        self.assertTrue(self.form._my_map['ignoredForCalculations'])
-        with self.assertRaises(errors.InvalidArgument):
+        assert self.form._my_map['ignoredForCalculations']
+        with pytest.raises(errors.InvalidArgument):
             self.form.set_ignored_for_calculations('false')"""
 
     clear_grade = """
@@ -783,33 +959,32 @@ class GradeEntryForm:
         # Except we need a valid ``grade`` for the initial ``set_grade`` to
         #   work, so we provide a hand-written impl here.
         self.form._my_map['gradeId'] = 'repository.Asset%3Afake-id%40ODL.MIT.EDU'
-        self.assertEqual(self.form._my_map['gradeId'],
-                         'repository.Asset%3Afake-id%40ODL.MIT.EDU')
+        assert self.form._my_map['gradeId'] == 'repository.Asset%3Afake-id%40ODL.MIT.EDU'
         self.form.clear_grade()
-        self.assertEqual(self.form._my_map['gradeId'], '')"""
+        assert self.form._my_map['gradeId'] == ''"""
 
     clear_score = """
         # because this GradeSystem is basedOnGrades, cannot use form.set_score()
         #   to set the initial data
         self.form._my_map['score'] = 50.0
-        self.assertIsNotNone(self.form._my_map['score'])
+        assert self.form._my_map['score'] is not None
         self.form.clear_score()
 
         # Also, because this is basedOnGrades, no exception thrown
         #  AND this method also does nothing...how confusing
-        self.assertIsNotNone(self.form._my_map['score'])"""
+        assert self.form._my_map['score'] is not None"""
 
     set_score = """
         # because this GradeSystem is basedOnGrades, set_score() throws
         #   an exception
-        with self.assertRaises(errors.InvalidArgument):
+        with pytest.raises(errors.InvalidArgument):
             self.form.set_score(50.0)"""
 
     set_grade = """
         # This should come from ResourceForm.set_avatar_template,
         #   but we override because in this case, there is no acceptable
         #   gradeId set, so we get an exception.
-        with self.assertRaises(errors.InvalidArgument):
+        with pytest.raises(errors.InvalidArgument):
             self.form.set_grade(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))"""
 
 
@@ -826,49 +1001,59 @@ class GradeEntryList:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-        form = cls.catalog.get_grade_system_form_for_create([])
+        form = request.cls.catalog.get_grade_system_form_for_create([])
         form.display_name = 'Grade system'
         form.set_based_on_grades(True)
-        cls.grade_system = cls.catalog.create_grade_system(form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(form)
 
-        form = cls.catalog.get_gradebook_column_form_for_create([])
+        form = request.cls.catalog.get_gradebook_column_form_for_create([])
         form.display_name = 'Gradebook Column'
-        form.set_grade_system(cls.grade_system.ident)
-        cls.column = cls.catalog.create_gradebook_column(form)
+        form.set_grade_system(request.cls.grade_system.ident)
+        request.cls.column = request.cls.catalog.create_gradebook_column(form)
 
-    def setUp(self):
-        from dlkit.json_.grading.objects import GradeEntryList
-        self.grade_entry_list = list()
-        self.grade_entry_ids = list()
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(obj.ident)
+            for obj in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(obj.ident)
+            request.cls.catalog.delete_grade_system(request.cls.grade_system.ident)
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
 
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    from dlkit.json_.grading.objects import GradeEntryList
+    request.cls.grade_entry_list = list()
+    request.cls.grade_entry_ids = list()
+    if not is_never_authz(request.cls.service_config):
         for num in [0, 1]:
-            form = self.catalog.get_grade_entry_form_for_create(
-                self.column.ident,
+            form = request.cls.catalog.get_grade_entry_form_for_create(
+                request.cls.column.ident,
                 AGENT_ID,
                 [])
 
-            obj = self.catalog.create_grade_entry(form)
+            obj = request.cls.catalog.create_grade_entry(form)
 
-            self.grade_entry_list.append(obj)
-            self.grade_entry_ids.append(obj.ident)
-        self.grade_entry_list = GradeEntryList(self.grade_entry_list)
-
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_grade_entries():
-            cls.catalog.delete_grade_entry(obj.ident)
-        for obj in cls.catalog.get_gradebook_columns():
-            cls.catalog.delete_gradebook_column(obj.ident)
-        cls.catalog.delete_grade_system(cls.grade_system.ident)
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+            request.cls.grade_entry_list.append(obj)
+            request.cls.grade_entry_ids.append(obj.ident)
+        request.cls.grade_entry_list = GradeEntryList(request.cls.grade_entry_list)"""
 
 
 class GradebookColumnSummary:
@@ -886,83 +1071,101 @@ class GradebookColumnSummary:
 
     # Until we figure out how to do Relationship init patterns properly:
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.grade_entry_list = list()
-        cls.grade_entry_ids = list()
-        cls.gradebook_column_list = list()
-        cls.gradebook_column_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.grade_entry_list = list()
+    request.cls.grade_entry_ids = list()
+    request.cls.gradebook_column_list = list()
+    request.cls.gradebook_column_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test Gradebook'
         create_form.description = 'Test Gradebook for GradebookColumnLookupSession tests'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
-        create_form = cls.catalog.get_grade_system_form_for_create([])
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
+        create_form = request.cls.catalog.get_grade_system_form_for_create([])
         create_form.display_name = 'Test Grade System'
         create_form.description = 'Test Grade System for GradebookColumnLookupSession tests'
         create_form.based_on_grades = False
         create_form.lowest_numeric_score = 0
         create_form.highest_numeric_score = 100
         create_form.numeric_score_increment = 1
-        cls.grade_system = cls.catalog.create_grade_system(create_form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_gradebook_column_form_for_create([])
+            create_form = request.cls.catalog.get_gradebook_column_form_for_create([])
             create_form.display_name = 'Test GradebookColumn ' + str(num)
             create_form.description = 'Test GradebookColumn for GradebookColumnLookupSession tests'
-            create_form.grade_system = cls.grade_system.ident
-            obj = cls.catalog.create_gradebook_column(create_form)
-            cls.gradebook_column_list.append(obj)
-            cls.gradebook_column_ids.append(obj.ident)
+            create_form.grade_system = request.cls.grade_system.ident
+            obj = request.cls.catalog.create_gradebook_column(create_form)
+            request.cls.gradebook_column_list.append(obj)
+            request.cls.gradebook_column_ids.append(obj.ident)
         for num in range(0, 100):
-            create_form = cls.catalog.get_grade_entry_form_for_create(cls.gradebook_column_ids[0], AGENT_ID, [])
+            create_form = request.cls.catalog.get_grade_entry_form_for_create(request.cls.gradebook_column_ids[0], AGENT_ID, [])
             create_form.display_name = 'Test GradeEntry ' + str(num)
             create_form.description = 'Test GradeEntry for GradebookColumnLookupSession tests'
             create_form.set_score(float(num))
-            object = cls.catalog.create_grade_entry(create_form)
-            cls.grade_entry_list.append(object)
-            cls.grade_entry_ids.append(object.ident)
-        cls.object = cls.catalog.get_gradebook_column_summary(cls.gradebook_column_ids[0])
+            object = request.cls.catalog.create_grade_entry(create_form)
+            request.cls.grade_entry_list.append(object)
+            request.cls.grade_entry_ids.append(object.ident)
+        request.cls.object = request.cls.catalog.get_gradebook_column_summary(request.cls.gradebook_column_ids[0])
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_gradebooks():
-            for obj in catalog.get_grade_entries():
-                catalog.delete_grade_entry(obj.ident)
-            for obj in catalog.get_gradebook_columns():
-                catalog.delete_gradebook_column(obj.ident)
-            for obj in catalog.get_grade_systems():
-                catalog.delete_grade_system(obj.ident)
-            cls.svc_mgr.delete_gradebook(catalog.ident)"""
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_gradebooks():
+                for obj in catalog.get_grade_entries():
+                    catalog.delete_grade_entry(obj.ident)
+                for obj in catalog.get_gradebook_columns():
+                    catalog.delete_gradebook_column(obj.ident)
+                for obj in catalog.get_grade_systems():
+                    catalog.delete_grade_system(obj.ident)
+                request.cls.svc_mgr.delete_gradebook(catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
 
     get_gradebook_column_id = """
-        self.assertTrue(isinstance(self.object.get_gradebook_column_id(), Id))
-        self.assertEqual(str(self.object.get_gradebook_column_id()),
-                         str(self.gradebook_column_ids[0]))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_gradebook_column_id(), Id)
+            assert str(self.object.get_gradebook_column_id()) == str(self.gradebook_column_ids[0])"""
 
     get_gradebook_column = """
-        self.assertTrue(isinstance(self.object.get_gradebook_column(), GradebookColumn))
-        self.assertEqual(str(self.object.get_gradebook_column().ident),
-                         str(self.gradebook_column_ids[0]))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_gradebook_column(), GradebookColumn)
+            assert str(self.object.get_gradebook_column().ident) == str(self.gradebook_column_ids[0])"""
 
     get_mean = """
-        self.assertTrue(isinstance(self.object.get_mean(), Decimal))
-        self.assertEqual(self.object.get_mean(), Decimal(49.5))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_mean(), Decimal)
+            assert self.object.get_mean() == Decimal(49.5)"""
 
     get_median = """
-        self.assertTrue(isinstance(self.object.get_median(), Decimal))
-        self.assertEqual(self.object.get_median(), Decimal(49.5))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_median(), Decimal)
+            assert self.object.get_median() == Decimal(49.5)"""
 
     get_rms = """
-        self.assertTrue(isinstance(self.object.get_rms(), Decimal))
-        self.assertEqual(self.object.get_rms(), Decimal('57.30183243143276652887614453'))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_rms(), Decimal)
+            assert self.object.get_rms() == Decimal('57.30183243143276652887614453')"""
 
     get_standard_deviation = """
-        self.assertTrue(isinstance(self.object.get_standard_deviation(), Decimal))
-        self.assertEqual(self.object.get_standard_deviation(), Decimal('28.86607004772211800433171979'))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_standard_deviation(), Decimal)
+            assert self.object.get_standard_deviation() == Decimal('28.86607004772211800433171979')"""
 
     get_sum = """
-        self.assertTrue(isinstance(self.object.get_sum(), Decimal))
-        self.assertEqual(self.object.get_sum(), Decimal('4950'))"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_sum(), Decimal)
+            assert self.object.get_sum() == Decimal('4950')"""
 
 
 class GradebookColumnSummaryQuery:
@@ -972,31 +1175,42 @@ class GradebookColumnSummaryQuery:
 
     # Until we figure out how to do Relationship init patterns properly:
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.grade_entry_list = list()
-        cls.grade_entry_ids = list()
-        cls.gradebook_column_list = list()
-        cls.gradebook_column_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.grade_entry_list = list()
+    request.cls.grade_entry_ids = list()
+    request.cls.gradebook_column_list = list()
+    request.cls.gradebook_column_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test Gradebook'
         create_form.description = 'Test Gradebook for GradebookColumnLookupSession tests'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
 
-    def setUp(self):
-        # Since the session isn't implemented, we just construct a GradebookColumnSummaryQuery directly
-        self.query = GradebookColumnSummaryQuery(runtime=self.catalog._runtime)
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(obj.ident)
+            for obj in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(obj.ident)
+            for obj in request.cls.catalog.get_grade_systems():
+                request.cls.catalog.delete_grade_system(obj.ident)
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_grade_entries():
-            cls.catalog.delete_grade_entry(obj.ident)
-        for obj in cls.catalog.get_gradebook_columns():
-            cls.catalog.delete_gradebook_column(obj.ident)
-        for obj in cls.catalog.get_grade_systems():
-            cls.catalog.delete_grade_system(obj.ident)
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Since the session isn't implemented, we just construct a GradebookColumnSummaryQuery directly
+    if not is_never_authz(request.cls.service_config):
+        request.cls.query = GradebookColumnSummaryQuery(runtime=request.cls.catalog._runtime)"""
 
 
 class GradeEntryAdminSession:
@@ -1006,74 +1220,95 @@ class GradeEntryAdminSession:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.grade_entry_list = list()
-        cls.grade_entry_ids = list()
-        cls.gradebook_column_list = list()
-        cls.gradebook_column_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.grade_entry_list = list()
+    request.cls.grade_entry_ids = list()
+    request.cls.gradebook_column_list = list()
+    request.cls.gradebook_column_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test Gradebook'
-        create_form.description = 'Test Gradebook for GradeEntryLookupSession tests'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
-        create_form = cls.catalog.get_grade_system_form_for_create([])
+        create_form.description = 'Test Gradebook for GradeEntryAdminSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
+        create_form = request.cls.catalog.get_grade_system_form_for_create([])
         create_form.display_name = 'Test Grade System'
-        create_form.description = 'Test Grade System for GradeEntryLookupSession tests'
+        create_form.description = 'Test Grade System for GradeEntryAdminSession tests'
         create_form.based_on_grades = False
         create_form.lowest_numeric_score = 0
         create_form.highest_numeric_score = 5
         create_form.numeric_score_increment = 0.25
-        cls.grade_system = cls.catalog.create_grade_system(create_form)
+        request.cls.grade_system = request.cls.catalog.create_grade_system(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_gradebook_column_form_for_create([])
+            create_form = request.cls.catalog.get_gradebook_column_form_for_create([])
             create_form.display_name = 'Test GradebookColumn ' + str(num)
-            create_form.description = 'Test GradebookColumn for GradeEntryLookupSession tests'
-            create_form.grade_system = cls.grade_system.ident
-            obj = cls.catalog.create_gradebook_column(create_form)
-            cls.gradebook_column_list.append(obj)
-            cls.gradebook_column_ids.append(obj.ident)
+            create_form.description = 'Test GradebookColumn for GradeEntryAdminSession tests'
+            create_form.grade_system = request.cls.grade_system.ident
+            obj = request.cls.catalog.create_gradebook_column(create_form)
+            request.cls.gradebook_column_list.append(obj)
+            request.cls.gradebook_column_ids.append(obj.ident)
         for num in [0, 1]:
-            create_form = cls.catalog.get_grade_entry_form_for_create(cls.gradebook_column_ids[num], AGENT_ID, [])
+            create_form = request.cls.catalog.get_grade_entry_form_for_create(request.cls.gradebook_column_ids[num], AGENT_ID, [])
             create_form.display_name = 'Test GradeEntry ' + str(num)
-            create_form.description = 'Test GradeEntry for GradeEntryLookupSession tests'
-            object = cls.catalog.create_grade_entry(create_form)
-            cls.grade_entry_list.append(object)
-            cls.grade_entry_ids.append(object.ident)
+            create_form.description = 'Test GradeEntry for GradeEntryAdminSession tests'
+            object = request.cls.catalog.create_grade_entry(create_form)
+            request.cls.grade_entry_list.append(object)
+            request.cls.grade_entry_ids.append(object.ident)
 
-        create_form = cls.catalog.get_grade_entry_form_for_create(cls.gradebook_column_ids[0], AGENT_ID, [])
+        create_form = request.cls.catalog.get_grade_entry_form_for_create(request.cls.gradebook_column_ids[0], AGENT_ID, [])
         create_form.display_name = 'new GradeEntry'
         create_form.description = 'description of GradeEntry'
         create_form.genus_type = NEW_TYPE
-        cls.osid_object = cls.catalog.create_grade_entry(create_form)
+        request.cls.osid_object = request.cls.catalog.create_grade_entry(create_form)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def setUp(self):
-        self.session = self.catalog
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_grade_entries():
+                request.cls.catalog.delete_grade_entry(obj.ident)
+            for obj in request.cls.catalog.get_gradebook_columns():
+                request.cls.catalog.delete_gradebook_column(obj.ident)
+            for obj in request.cls.catalog.get_grade_systems():
+                request.cls.catalog.delete_grade_system(obj.ident)
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_grade_entries():
-            cls.catalog.delete_grade_entry(obj.ident)
-        for obj in cls.catalog.get_gradebook_columns():
-            cls.catalog.delete_gradebook_column(obj.ident)
-        for obj in cls.catalog.get_grade_systems():
-            cls.catalog.delete_grade_system(obj.ident)
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.catalog"""
 
     get_grade_entry_form_for_create = """
-        form = self.catalog.get_grade_entry_form_for_create(self.gradebook_column_ids[0], AGENT_ID, [])
-        self.assertTrue(isinstance(form, OsidForm))
-        self.assertFalse(form.is_for_update())"""
+        if not is_never_authz(self.service_config):
+            form = self.catalog.get_grade_entry_form_for_create(self.gradebook_column_ids[0], AGENT_ID, [])
+            assert isinstance(form, OsidForm)
+            assert not form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_grade_entry_form_for_create(self.fake_id, AGENT_ID, [])"""
 
     delete_grade_entry = """
-        create_form = self.catalog.get_grade_entry_form_for_create(self.gradebook_column_ids[0], AGENT_ID, [])
-        create_form.display_name = 'new GradeEntry'
-        create_form.description = 'description of GradeEntry'
-        create_form.genus_type = NEW_TYPE
-        osid_object = self.catalog.create_grade_entry(create_form)
-        self.catalog.delete_grade_entry(osid_object.ident)
-        with self.assertRaises(errors.NotFound):
-            self.catalog.get_grade_entry(osid_object.ident)"""
+        if not is_never_authz(self.service_config):
+            create_form = self.catalog.get_grade_entry_form_for_create(self.gradebook_column_ids[0], AGENT_ID, [])
+            create_form.display_name = 'new GradeEntry'
+            create_form.description = 'description of GradeEntry'
+            create_form.genus_type = NEW_TYPE
+            osid_object = self.catalog.create_grade_entry(create_form)
+            self.catalog.delete_grade_entry(osid_object.ident)
+            with pytest.raises(errors.NotFound):
+                self.catalog.get_grade_entry(osid_object.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.delete_grade_entry(self.fake_id)"""
 
 
 class GradebookQuery:
@@ -1082,82 +1317,115 @@ class GradebookQuery:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_gradebook(create_form)
-        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
+        request.cls.catalog = request.cls.svc_mgr.create_gradebook(create_form)
+        request.cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
-    def setUp(self):
-        # Since the session isn't implemented, we just construct a GradebookQuery directly
-        self.query = GradebookQuery(runtime=self.catalog._runtime)
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_gradebook(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.svc_mgr.delete_gradebook(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Since the session isn't implemented, we just construct a GradebookQuery directly
+    if not is_never_authz(request.cls.service_config):
+        request.cls.query = GradebookQuery(runtime=request.cls.catalog._runtime)"""
 
 
 class GradebookHierarchySession:
     init = """
-    # Override this because spec doesn't have a method ``remove_child_gradebooks``
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        cls.catalogs = dict()
+# Override this because spec doesn't have a method ``remove_child_gradebooks``
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.catalogs = dict()
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
         for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
-            create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+            create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
             create_form.display_name = name
             create_form.description = 'Test Gradebook ' + name
-            cls.catalogs[name] = cls.svc_mgr.create_gradebook(create_form)
-        cls.svc_mgr.add_root_gradebook(cls.catalogs['Root'].ident)
-        cls.svc_mgr.add_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
-        cls.svc_mgr.add_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
-        cls.svc_mgr.add_child_gradebook(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+            request.cls.catalogs[name] = request.cls.svc_mgr.create_gradebook(create_form)
+        request.cls.svc_mgr.add_root_gradebook(request.cls.catalogs['Root'].ident)
+        request.cls.svc_mgr.add_child_gradebook(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 1'].ident)
+        request.cls.svc_mgr.add_child_gradebook(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 2'].ident)
+        request.cls.svc_mgr.add_child_gradebook(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
 
-    def setUp(self):
-        self.session = self.svc_mgr
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.remove_child_gradebook(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
+            request.cls.svc_mgr.remove_child_gradebook(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 1'].ident)
+            request.cls.svc_mgr.remove_child_gradebook(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 2'].ident)
+            request.cls.svc_mgr.remove_root_gradebook(request.cls.catalogs['Root'].ident)
+            for cat_name in request.cls.catalogs:
+                request.cls.svc_mgr.delete_gradebook(request.cls.catalogs[cat_name].ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
-        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
-        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
-        cls.svc_mgr.remove_root_gradebook(cls.catalogs['Root'].ident)
-        for cat_name in cls.catalogs:
-            cls.svc_mgr.delete_gradebook(cls.catalogs[cat_name].ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.svc_mgr"""
 
 
 class GradebookHierarchyDesignSession:
     init = """
-    # Override this because spec doesn't have a method ``remove_child_gradebooks``
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('GRADING', proxy=PROXY, implementation='TEST_SERVICE')
-        cls.catalogs = dict()
+# Override this because spec doesn't have a method ``remove_child_gradebooks``
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'GRADING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.catalogs = dict()
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
         for name in ['Root', 'Child 1', 'Child 2', 'Grandchild 1']:
-            create_form = cls.svc_mgr.get_gradebook_form_for_create([])
+            create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
             create_form.display_name = name
             create_form.description = 'Test Gradebook ' + name
-            cls.catalogs[name] = cls.svc_mgr.create_gradebook(create_form)
-        cls.svc_mgr.add_root_gradebook(cls.catalogs['Root'].ident)
-        cls.svc_mgr.add_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
-        cls.svc_mgr.add_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
-        cls.svc_mgr.add_child_gradebook(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
+            request.cls.catalogs[name] = request.cls.svc_mgr.create_gradebook(create_form)
+        request.cls.svc_mgr.add_root_gradebook(request.cls.catalogs['Root'].ident)
+        request.cls.svc_mgr.add_child_gradebook(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 1'].ident)
+        request.cls.svc_mgr.add_child_gradebook(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 2'].ident)
+        request.cls.svc_mgr.add_child_gradebook(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
 
-    def setUp(self):
-        self.session = self.svc_mgr
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.remove_child_gradebook(request.cls.catalogs['Child 1'].ident, request.cls.catalogs['Grandchild 1'].ident)
+            request.cls.svc_mgr.remove_child_gradebook(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 1'].ident)
+            request.cls.svc_mgr.remove_child_gradebook(request.cls.catalogs['Root'].ident, request.cls.catalogs['Child 2'].ident)
+            request.cls.svc_mgr.remove_root_gradebook(request.cls.catalogs['Root'].ident)
+            for cat_name in request.cls.catalogs:
+                request.cls.svc_mgr.delete_gradebook(request.cls.catalogs[cat_name].ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Child 1'].ident, cls.catalogs['Grandchild 1'].ident)
-        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 1'].ident)
-        cls.svc_mgr.remove_child_gradebook(cls.catalogs['Root'].ident, cls.catalogs['Child 2'].ident)
-        cls.svc_mgr.remove_root_gradebook(cls.catalogs['Root'].ident)
-        for cat_name in cls.catalogs:
-            cls.svc_mgr.delete_gradebook(cls.catalogs[cat_name].ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.svc_mgr"""
 
 
 class GradeSystemAdminSession:
@@ -1167,83 +1435,100 @@ class GradeSystemAdminSession:
     ]
 
     can_create_grade_with_record_types = """
-        self.assertTrue(
-            isinstance(self.session.can_create_grade_with_record_types(self.osid_object.ident,
-                                                                       DEFAULT_TYPE),
-                       bool))"""
+        assert isinstance(self.session.can_create_grade_with_record_types(self.osid_object.ident,
+                                                                          DEFAULT_TYPE),
+                          bool)"""
 
     can_create_grades = """
-        self.assertTrue(
-            isinstance(self.session.can_create_grades(self.osid_object.ident),
-                       bool))"""
+        assert isinstance(self.session.can_create_grades(self.osid_object.ident),
+                          bool)"""
 
     can_delete_grades = """
-        self.assertTrue(
-            isinstance(self.session.can_delete_grades(self.osid_object.ident),
-                       bool))"""
+        assert isinstance(self.session.can_delete_grades(self.osid_object.ident),
+                          bool)"""
 
     create_grade = """
-        self.assertEqual(self.osid_object.get_grades().available(), 0)
-        form = self.session.get_grade_form_for_create(
-            self.osid_object.ident,
-            [])
-        form.display_name = 'Test object'
-        grade = self.session.create_grade(form)
-        self.assertTrue(isinstance(grade, Grade))
-        self.assertEqual(grade.display_name.text, 'Test object')
+        if not is_never_authz(self.service_config):
+            assert self.osid_object.get_grades().available() == 0
+            form = self.session.get_grade_form_for_create(
+                self.osid_object.ident,
+                [])
+            form.display_name = 'Test object'
+            grade = self.session.create_grade(form)
+            assert isinstance(grade, Grade)
+            assert grade.display_name.text == 'Test object'
 
-        updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
-        self.assertEqual(updated_grade_system.get_grades().available(), 1)"""
+            updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
+            assert updated_grade_system.get_grades().available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.create_grade('foo')"""
 
     delete_grade = """
-        form = self.session.get_grade_form_for_create(
-            self.osid_object.ident,
-            [])
-        form.display_name = 'Test object'
-        grade = self.session.create_grade(form)
-        self.assertTrue(isinstance(grade, Grade))
-        self.assertEqual(grade.display_name.text, 'Test object')
+        if not is_never_authz(self.service_config):
+            form = self.session.get_grade_form_for_create(
+                self.osid_object.ident,
+                [])
+            form.display_name = 'Test object'
+            grade = self.session.create_grade(form)
+            assert isinstance(grade, Grade)
+            assert grade.display_name.text == 'Test object'
 
-        updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
-        self.assertEqual(updated_grade_system.get_grades().available(), 1)
+            updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
+            assert updated_grade_system.get_grades().available() == 1
 
-        self.session.delete_grade(grade.ident)
+            self.session.delete_grade(grade.ident)
 
-        updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
-        self.assertEqual(updated_grade_system.get_grades().available(), 0)"""
+            updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
+            assert updated_grade_system.get_grades().available() == 0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.delete_grade(self.fake_id)"""
 
     get_grade_form_for_create = """
-        form = self.session.get_grade_form_for_create(
-            self.osid_object.ident,
-            [])
-        self.assertTrue(isinstance(form, OsidForm))
-        self.assertFalse(form.is_for_update())"""
+        if not is_never_authz(self.service_config):
+            form = self.session.get_grade_form_for_create(
+                self.osid_object.ident,
+                [])
+            assert isinstance(form, OsidForm)
+            assert not form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_grade_form_for_create(self.fake_id, [])"""
 
     get_grade_form_for_update = """
-        form = self.session.get_grade_form_for_create(
-            self.osid_object.ident,
-            [])
-        grade = self.session.create_grade(form)
-        form = self.session.get_grade_form_for_update(grade.ident)
-        self.assertTrue(isinstance(form, OsidForm))
-        self.assertTrue(form.is_for_update())"""
+        if not is_never_authz(self.service_config):
+            form = self.session.get_grade_form_for_create(
+                self.osid_object.ident,
+                [])
+            grade = self.session.create_grade(form)
+            form = self.session.get_grade_form_for_update(grade.ident)
+            assert isinstance(form, OsidForm)
+            assert form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_grade_form_for_update(self.fake_id)"""
 
     update_grade = """
-        self.assertEqual(self.osid_object.get_grades().available(), 0)
-        form = self.session.get_grade_form_for_create(
-            self.osid_object.ident,
-            [])
-        form.display_name = 'Test object'
-        grade = self.session.create_grade(form)
-        self.assertTrue(isinstance(grade, Grade))
-        self.assertEqual(grade.display_name.text, 'Test object')
+        if not is_never_authz(self.service_config):
+            assert self.osid_object.get_grades().available() == 0
+            form = self.session.get_grade_form_for_create(
+                self.osid_object.ident,
+                [])
+            form.display_name = 'Test object'
+            grade = self.session.create_grade(form)
+            assert isinstance(grade, Grade)
+            assert grade.display_name.text == 'Test object'
 
-        form = self.session.get_grade_form_for_update(grade.ident)
-        form.display_name = 'new name'
-        grade = self.session.update_grade(form)
+            form = self.session.get_grade_form_for_update(grade.ident)
+            form.display_name = 'new name'
+            grade = self.session.update_grade(form)
 
-        self.assertTrue(isinstance(grade, Grade))
-        self.assertEqual(grade.display_name.text, 'new name')
+            assert isinstance(grade, Grade)
+            assert grade.display_name.text == 'new name'
 
-        updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
-        self.assertEqual(updated_grade_system.get_grades().available(), 1)"""
+            updated_grade_system = self.catalog.get_grade_system(self.osid_object.ident)
+            assert updated_grade_system.get_grades().available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.update_grade('foo')"""

@@ -1922,25 +1922,30 @@ def ${interface_name_under}_test_fixture(request):
 
     is_group_template = """
         # From test_templates/resources.py::Resource::is_group_template
-        assert isinstance(self.object.${method_name}(), bool)"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.${method_name}(), bool)"""
 
     is_demographic = """
-        with pytest.raises(AttributeError):
-            self.object.is_demographic()"""
+        if not is_never_authz(self.service_config):
+            with pytest.raises(AttributeError):
+                self.object.is_demographic()"""
 
     has_avatar_template = """
         # From test_templates/resources.py::Resource::has_avatar_template
-        assert isinstance(self.object.${method_name}(), bool)"""
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.${method_name}(), bool)"""
 
     get_avatar_id_template = """
         # From test_templates/resources.py::Resource::get_avatar_id_template
-        pytest.raises(errors.IllegalState,
-                      self.object.${method_name})"""
+        if not is_never_authz(self.service_config):
+            pytest.raises(errors.IllegalState,
+                          self.object.${method_name})"""
 
     get_avatar_template = """
         # From test_templates/resources.py::Resource::get_avatar_template
-        pytest.raises(errors.IllegalState,
-                      self.object.${method_name})"""
+        if not is_never_authz(self.service_config):
+            pytest.raises(errors.IllegalState,
+                          self.object.${method_name})"""
 
 
 class ResourceQuery:

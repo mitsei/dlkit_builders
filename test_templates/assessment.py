@@ -2454,8 +2454,8 @@ class AssessmentTaken:
 
     get_score_template = """
         # From test_templates/assessment.py::AssessmentTaken::get_score_template
-        self.assertTrue(isinstance(self.object.${method_name}(), Decimal))
-        self.assertEqual(self.object.${method_name}(), Decimal(0.0))"""
+        assert isinstance(self.object.${method_name}(), Decimal)
+        assert self.object.${method_name}() == Decimal(0.0)"""
 
     has_rubric = """
         # This may be an error in the spec -- not in _my_map
