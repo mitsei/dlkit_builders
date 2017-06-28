@@ -32,3 +32,17 @@ class SubjectHierarchyDesignSession:
         if not self._can('modify'):
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
+
+
+class SubjectHierarchySession:
+    get_child_subjects_template = """
+        # From azosid_templates/ontology.py::SubjectHierarchySession::get_child_subjects_template
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        return self._provider_session.${method_name}(${arg0_name})"""
+
+    get_root_subjects_template = """
+        # From azosid_templates/ontology.py::SubjectHierarchySession::get_root_subjects_template
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        return self._provider_session.${method_name}()"""
