@@ -88,7 +88,7 @@ def ${interface_name_under}_class_fixture(request):
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
         request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
-    
+
         request.cls.form = request.cls.catalog.get_${object_name_under}_form_for_create([])
 
     def class_tear_down():
