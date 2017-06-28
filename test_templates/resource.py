@@ -2350,6 +2350,7 @@ def ${interface_name_under}_class_fixture(request):
 
     def class_tear_down():
         pass
+
     request.addfinalizer(class_tear_down)
 
 
