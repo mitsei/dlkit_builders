@@ -1428,6 +1428,89 @@ def ${interface_name_under}_test_fixture(request):
     request.cls.session = request.cls.svc_mgr"""
 
 
+class GradeSystemLookupSession:
+    # Override these locally for GradeSystem because with GradeSystemQuerySession implemented,
+    #   the authz adapter will return an empty List instead of throwing PermissionDenied
+    get_grade_system = """
+        if not is_never_authz(self.service_config):
+            self.catalog.use_isolated_gradebook_view()
+            obj = self.catalog.get_grade_system(self.grade_system_list[0].ident)
+            assert obj.ident == self.grade_system_list[0].ident
+            self.catalog.use_federated_gradebook_view()
+            obj = self.catalog.get_grade_system(self.grade_system_list[0].ident)
+            assert obj.ident == self.grade_system_list[0].ident
+        else:
+            with pytest.raises(errors.NotFound):
+                self.catalog.get_grade_system(self.fake_id)"""
+
+    get_grade_systems_by_ids = """
+        from dlkit.abstract_osid.grading.objects import GradeSystemList
+        objects = self.catalog.get_grade_systems_by_ids(self.grade_system_ids)
+        assert isinstance(objects, GradeSystemList)
+        self.catalog.use_federated_gradebook_view()
+        objects = self.catalog.get_grade_systems_by_ids(self.grade_system_ids)
+        assert isinstance(objects, GradeSystemList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    get_grade_systems_by_genus_type = """
+        from dlkit.abstract_osid.grading.objects import GradeSystemList
+        objects = self.catalog.get_grade_systems_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, GradeSystemList)
+        self.catalog.use_federated_gradebook_view()
+        objects = self.catalog.get_grade_systems_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, GradeSystemList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    get_grade_systems_by_parent_genus_type = """
+        from dlkit.abstract_osid.grading.objects import GradeSystemList
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.get_grade_systems_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, GradeSystemList)
+            self.catalog.use_federated_gradebook_view()
+            objects = self.catalog.get_grade_systems_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert objects.available() == 0
+            assert isinstance(objects, GradeSystemList)
+        else:
+            with pytest.raises(errors.Unimplemented):
+                # because the never_authz "tries harder" and runs the actual query...
+                #    whereas above the method itself in JSON returns an empty list
+                self.catalog.get_grade_systems_by_parent_genus_type(DEFAULT_GENUS_TYPE)"""
+
+    get_grade_systems_by_record_type = """
+        from dlkit.abstract_osid.grading.objects import GradeSystemList
+        objects = self.catalog.get_grade_systems_by_record_type(DEFAULT_TYPE)
+        assert isinstance(objects, GradeSystemList)
+        self.catalog.use_federated_gradebook_view()
+        objects = self.catalog.get_grade_systems_by_record_type(DEFAULT_TYPE)
+        assert objects.available() == 0
+        assert isinstance(objects, GradeSystemList)"""
+
+    get_grade_systems = """
+        from dlkit.abstract_osid.grading.objects import GradeSystemList
+        objects = self.catalog.get_grade_systems()
+        assert isinstance(objects, GradeSystemList)
+        self.catalog.use_federated_gradebook_view()
+        objects = self.catalog.get_grade_systems()
+        assert isinstance(objects, GradeSystemList)
+
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0
+
+    def test_get_grade_system_with_alias(self):
+        if not is_never_authz(self.service_config):
+            self.catalog.alias_grade_system(self.grade_system_ids[0], ALIAS_ID)
+            obj = self.catalog.get_grade_system(ALIAS_ID)
+            assert obj.get_id() == self.grade_system_ids[0]"""
+
+
 class GradeSystemAdminSession:
     import_statements = [
         'from dlkit.abstract_osid.grading.objects import Grade',

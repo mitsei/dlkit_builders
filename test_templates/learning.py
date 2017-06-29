@@ -15,7 +15,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -93,7 +93,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -175,7 +175,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -302,6 +302,89 @@ def ${interface_name_under}_test_fixture(request):
                 self.session.remove_root_objective(self.fake_id)"""
 
 
+class ObjectiveLookupSession:
+    # Override these locally for Objective because with ObjectiveQuerySession implemented,
+    #   the authz adapter will return an empty List instead of throwing PermissionDenied
+    get_objective = """
+        if not is_never_authz(self.service_config):
+            self.catalog.use_isolated_objective_bank_view()
+            obj = self.catalog.get_objective(self.objective_list[0].ident)
+            assert obj.ident == self.objective_list[0].ident
+            self.catalog.use_federated_objective_bank_view()
+            obj = self.catalog.get_objective(self.objective_list[0].ident)
+            assert obj.ident == self.objective_list[0].ident
+        else:
+            with pytest.raises(errors.NotFound):
+                self.catalog.get_objective(self.fake_id)"""
+
+    get_objectives_by_ids = """
+        from dlkit.abstract_osid.learning.objects import ObjectiveList
+        objects = self.catalog.get_objectives_by_ids(self.objective_ids)
+        assert isinstance(objects, ObjectiveList)
+        self.catalog.use_federated_objective_bank_view()
+        objects = self.catalog.get_objectives_by_ids(self.objective_ids)
+        assert isinstance(objects, ObjectiveList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    get_objectives_by_genus_type = """
+        from dlkit.abstract_osid.learning.objects import ObjectiveList
+        objects = self.catalog.get_objectives_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, ObjectiveList)
+        self.catalog.use_federated_objective_bank_view()
+        objects = self.catalog.get_objectives_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, ObjectiveList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    get_objectives_by_parent_genus_type = """
+        from dlkit.abstract_osid.learning.objects import ObjectiveList
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.get_objectives_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, ObjectiveList)
+            self.catalog.use_federated_objective_bank_view()
+            objects = self.catalog.get_objectives_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert objects.available() == 0
+            assert isinstance(objects, ObjectiveList)
+        else:
+            with pytest.raises(errors.Unimplemented):
+                # because the never_authz "tries harder" and runs the actual query...
+                #    whereas above the method itself in JSON returns an empty list
+                self.catalog.get_objectives_by_parent_genus_type(DEFAULT_GENUS_TYPE)"""
+
+    get_objectives_by_record_type = """
+        from dlkit.abstract_osid.learning.objects import ObjectiveList
+        objects = self.catalog.get_objectives_by_record_type(DEFAULT_TYPE)
+        assert isinstance(objects, ObjectiveList)
+        self.catalog.use_federated_objective_bank_view()
+        objects = self.catalog.get_objectives_by_record_type(DEFAULT_TYPE)
+        assert objects.available() == 0
+        assert isinstance(objects, ObjectiveList)"""
+
+    get_objectives = """
+        from dlkit.abstract_osid.learning.objects import ObjectiveList
+        objects = self.catalog.get_objectives()
+        assert isinstance(objects, ObjectiveList)
+        self.catalog.use_federated_objective_bank_view()
+        objects = self.catalog.get_objectives()
+        assert isinstance(objects, ObjectiveList)
+
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0
+
+    def test_get_objective_with_alias(self):
+        if not is_never_authz(self.service_config):
+            self.catalog.alias_objective(self.objective_ids[0], ALIAS_ID)
+            obj = self.catalog.get_objective(ALIAS_ID)
+            assert obj.get_id() == self.objective_ids[0]"""
+
+
 class ObjectiveHierarchySession:
     init = """
 @pytest.fixture(scope="class",
@@ -312,7 +395,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -577,7 +660,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -636,7 +719,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -697,7 +780,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -756,7 +839,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -1150,7 +1233,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -1422,7 +1505,7 @@ def ${interface_name_under}_class_fixture(request):
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -1509,7 +1592,7 @@ def ${interface_name_under}_class_fixture(request):
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
         request.cls.catalog = request.cls.svc_mgr.create_objective_bank(create_form)
-        request.cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
+        request.cls.fake_id = Id('objective.objective%3A1%40ODL.MIT.EDU')
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):

@@ -226,6 +226,66 @@ def ${interface_name_under}_test_fixture(request):
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.get_compositions()"""
 
+    get_compositions_by_record_type = """
+        # Override this because we haven't implemented CompositionQuerySession, so will
+        #   throw PermissionDenied with NEVER_AUTHZ
+        from dlkit.abstract_osid.repository.objects import CompositionList
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.get_compositions_by_record_type(DEFAULT_TYPE)
+            assert isinstance(objects, CompositionList)
+            self.catalog.use_federated_repository_view()
+            objects = self.catalog.get_compositions_by_record_type(DEFAULT_TYPE)
+            assert objects.available() == 0
+            assert isinstance(objects, CompositionList)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_compositions_by_record_type(DEFAULT_TYPE)"""
+
+    get_compositions_by_parent_genus_type = """
+        # Override this because we haven't implemented CompositionQuerySession, so will
+        #   throw PermissionDenied with NEVER_AUTHZ
+        from dlkit.abstract_osid.repository.objects import CompositionList
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.get_compositions_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, CompositionList)
+            self.catalog.use_federated_repository_view()
+            objects = self.catalog.get_compositions_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert objects.available() == 0
+            assert isinstance(objects, CompositionList)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_compositions_by_parent_genus_type(DEFAULT_GENUS_TYPE)"""
+
+    get_compositions_by_genus_type = """
+        # Override this because we haven't implemented CompositionQuerySession, so will
+        #   throw PermissionDenied with NEVER_AUTHZ
+        from dlkit.abstract_osid.repository.objects import CompositionList
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.get_compositions_by_genus_type(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, CompositionList)
+            self.catalog.use_federated_repository_view()
+            objects = self.catalog.get_compositions_by_genus_type(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, CompositionList)
+            assert objects.available() > 0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_compositions_by_genus_type(DEFAULT_GENUS_TYPE)"""
+
+    get_compositions_by_ids = """
+        # Override this because we haven't implemented CompositionQuerySession, so will
+        #   throw PermissionDenied with NEVER_AUTHZ
+        from dlkit.abstract_osid.repository.objects import CompositionList
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.get_compositions_by_ids(self.composition_ids)
+            assert isinstance(objects, CompositionList)
+            self.catalog.use_federated_repository_view()
+            objects = self.catalog.get_compositions_by_ids(self.composition_ids)
+            assert isinstance(objects, CompositionList)
+            assert objects.available() > 0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_compositions_by_ids(self.composition_ids)"""
+
 
 class CompositionQuerySession:
 
