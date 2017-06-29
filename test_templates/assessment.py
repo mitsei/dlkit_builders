@@ -2090,48 +2090,52 @@ class AssessmentOfferedForm:
 
     set_start_time_template = """
         # From test_templates/assessment.py::AssessmentOfferedForm::set_start_time_template
-        test_time = DateTime.utcnow()
-        assert self.form._my_map['${var_name_mixed}'] is None
-        self.form.${method_name}(test_time)
-        assert self.form._my_map['${var_name_mixed}'] == test_time
-        with pytest.raises(errors.InvalidArgument):
-            self.form.${method_name}(True)
-        # reset this for other tests
-        self.form._my_map['${var_name_mixed}'] = None"""
+        if not is_never_authz(self.service_config):
+            test_time = DateTime.utcnow()
+            assert self.form._my_map['${var_name_mixed}'] is None
+            self.form.${method_name}(test_time)
+            assert self.form._my_map['${var_name_mixed}'] == test_time
+            with pytest.raises(errors.InvalidArgument):
+                self.form.${method_name}(True)
+            # reset this for other tests
+            self.form._my_map['${var_name_mixed}'] = None"""
 
     # This looks just like the generic one. Need to find in the pattern?
     clear_start_time_template = """
         # From test_templates/assessment.py::AssessmentOfferedForm::clear_start_time_template
-        test_time = DateTime.utcnow()
-        assert self.form._my_map['${var_name_mixed}'] is None
-        self.form.set_${var_name}(test_time)
-        assert self.form._my_map['${var_name_mixed}'] == test_time
-        self.form.${method_name}()
-        assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
+        if not is_never_authz(self.service_config):
+            test_time = DateTime.utcnow()
+            assert self.form._my_map['${var_name_mixed}'] is None
+            self.form.set_${var_name}(test_time)
+            assert self.form._my_map['${var_name_mixed}'] == test_time
+            self.form.${method_name}()
+            assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
     set_duration_template = """
         # From test_templates/assessment.py::AssessmentOfferedForm::set_duration_template
-        test_duration = Duration(hours=1)
-        assert self.form._my_map['${var_name_mixed}']
-        self.form.${method_name}(test_duration)
-        assert self.form._my_map['${var_name_mixed}']['seconds'] == 3600
-        assert self.form._my_map['${var_name_mixed}']['days'] == 0
-        assert self.form._my_map['${var_name_mixed}']['microseconds'] == 0
-        with pytest.raises(errors.InvalidArgument):
-            self.form.${method_name}(1.05)
-        # reset this for other tests
-        self.form._my_map['${var_name_mixed}'] = None"""
+        if not is_never_authz(self.service_config):
+            test_duration = Duration(hours=1)
+            assert self.form._my_map['${var_name_mixed}'] is None
+            self.form.${method_name}(test_duration)
+            assert self.form._my_map['${var_name_mixed}']['seconds'] == 3600
+            assert self.form._my_map['${var_name_mixed}']['days'] == 0
+            assert self.form._my_map['${var_name_mixed}']['microseconds'] == 0
+            with pytest.raises(errors.InvalidArgument):
+                self.form.${method_name}(1.05)
+            # reset this for other tests
+            self.form._my_map['${var_name_mixed}'] = None"""
 
     clear_duration_template = """
         # From test_templates/assessment.py::AssessmentOfferedForm::clear_duration_template
-        test_duration = Duration(hours=1)
-        assert self.form._my_map['${var_name_mixed}'] is None
-        self.form.set_${var_name}(test_duration)
-        assert self.form._my_map['${var_name_mixed}']['seconds'] == 3600
-        assert self.form._my_map['${var_name_mixed}']['days'] == 0
-        assert self.form._my_map['${var_name_mixed}']['microseconds'] == 0
-        self.form.${method_name}()
-        assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
+        if not is_never_authz(self.service_config):
+            test_duration = Duration(hours=1)
+            assert self.form._my_map['${var_name_mixed}'] is None
+            self.form.set_${var_name}(test_duration)
+            assert self.form._my_map['${var_name_mixed}']['seconds'] == 3600
+            assert self.form._my_map['${var_name_mixed}']['days'] == 0
+            assert self.form._my_map['${var_name_mixed}']['microseconds'] == 0
+            self.form.${method_name}()
+            assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
 
 class AssessmentOfferedList:
