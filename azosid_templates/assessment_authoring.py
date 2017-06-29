@@ -24,6 +24,9 @@ class AssessmentPartItemSession:
         self._auth_bank_ids = None
         self._unauth_bank_ids = None"""
 
+    can_access_assessment_part_items = """
+        return self._provider_session.can_access_assessment_part_items()"""
+
 
 class AssessmentPartItemDesignSession:
     init = """
@@ -33,6 +36,9 @@ class AssessmentPartItemDesignSession:
         self._id_namespace = 'assessment_authoring.AssessmentPart'
         self._auth_bank_ids = None
         self._unauth_bank_ids = None"""
+
+    can_design_assessment_parts = """
+        return self._provider_session.can_design_assessment_parts()"""
 
 
 class AssessmentAuthoringManager:
