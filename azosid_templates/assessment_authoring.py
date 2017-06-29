@@ -56,7 +56,7 @@ class AssessmentAuthoringProxyManager:
 
 
 class AssessmentAuthoringProfile:
-    import_statements_pattern = [
+    import_statements = [
         "from ..osid.osid_errors import Unsupported"
     ]
 
@@ -68,7 +68,7 @@ class AssessmentAuthoringProfile:
         # currently proxy not used, even if it's passed in...
         try:
             base_package_mgr = self._get_base_package_provider_manager('assessment')
-            return base_package_mgr.get_bank_hierarchy_session(proxy)
+            return base_package_mgr.get_bank_hierarchy_session(proxy=proxy)
         except Unsupported:
             return None
 
@@ -78,7 +78,7 @@ class AssessmentAuthoringProfile:
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         try:
             # need to add version argument
-            return self._my_runtime.get_proxy_manager(base_package.upper(), provider_impl)
+            return self._my_runtime.get_proxy_manager(base_package.upper(), provider_impl, proxy=self._proxy)
         except AttributeError:
             # need to add version argument
             return self._my_runtime.get_manager(base_package.upper(), provider_impl)
