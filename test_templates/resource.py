@@ -246,13 +246,18 @@ class ResourceLookupSession:
 def ${interface_name_under}_class_fixture(request):
     # Implemented from init template for ResourceLookupSession
     request.cls.service_config = request.param
-    request.cls.${object_name_under}_list = list()
-    request.cls.${object_name_under}_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
@@ -265,22 +270,18 @@ def ${interface_name_under}_class_fixture(request):
             obj = request.cls.catalog.create_${object_name_under}(create_form)
             request.cls.${object_name_under}_list.append(obj)
             request.cls.${object_name_under}_ids.append(obj.ident)
-
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for obj in request.cls.catalog.get_${object_name_under_plural}():
                 request.cls.catalog.delete_${object_name_under}(obj.ident)
             request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
     get_bin_id_template = """
         # From test_templates/resource.py ResourceLookupSession.get_bin_id_template
@@ -323,36 +324,34 @@ def ${interface_name_under}_test_fixture(request):
             obj = self.catalog.${method_name}(self.${object_name_under}_list[0].ident)
             assert obj.ident == self.${object_name_under}_list[0].ident
         else:
-            with pytest.raises(errors.PermissionDenied):
+            with pytest.raises(errors.NotFound):
                 self.catalog.${method_name}(self.fake_id)"""
 
     get_resources_by_ids_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_ids_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
+        objects = self.catalog.${method_name}(self.${object_name_under}_ids)
+        assert isinstance(objects, ${return_type})
+        self.catalog.use_federated_${cat_name_under}_view()
+        objects = self.catalog.${method_name}(self.${object_name_under}_ids)
+        assert isinstance(objects, ${return_type})
         if not is_never_authz(self.service_config):
-            objects = self.catalog.${method_name}(self.${object_name_under}_ids)
-            assert isinstance(objects, ${return_type})
-            self.catalog.use_federated_${cat_name_under}_view()
-            objects = self.catalog.${method_name}(self.${object_name_under}_ids)
             assert objects.available() > 0
-            assert isinstance(objects, ${return_type})
         else:
-            with pytest.raises(errors.PermissionDenied):
-                self.catalog.${method_name}([self.fake_id])"""
+            assert objects.available() == 0"""
 
     get_resources_by_genus_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_genus_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
+        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, ${return_type})
+        self.catalog.use_federated_${cat_name_under}_view()
+        objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, ${return_type})
         if not is_never_authz(self.service_config):
-            objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
-            assert isinstance(objects, ${return_type})
-            self.catalog.use_federated_${cat_name_under}_view()
-            objects = self.catalog.${method_name}(DEFAULT_GENUS_TYPE)
             assert objects.available() > 0
-            assert isinstance(objects, ${return_type})
         else:
-            with pytest.raises(errors.PermissionDenied):
-                self.catalog.${method_name}(DEFAULT_GENUS_TYPE)"""
+            assert objects.available() == 0"""
 
     get_resources_by_parent_genus_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_parent_genus_type_template
@@ -365,36 +364,34 @@ def ${interface_name_under}_test_fixture(request):
             assert objects.available() == 0
             assert isinstance(objects, ${return_type})
         else:
-            with pytest.raises(errors.PermissionDenied):
+            with pytest.raises(errors.Unimplemented):
+                # because the never_authz "tries harder" and runs the actual query...
+                #    whereas above the method itself in JSON returns an empty list
                 self.catalog.${method_name}(DEFAULT_GENUS_TYPE)"""
 
     get_resources_by_record_type_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_by_record_type_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
-        if not is_never_authz(self.service_config):
-            objects = self.catalog.${method_name}(DEFAULT_TYPE)
-            assert isinstance(objects, ${return_type})
-            self.catalog.use_federated_${cat_name_under}_view()
-            objects = self.catalog.${method_name}(DEFAULT_TYPE)
-            assert objects.available() == 0
-            assert isinstance(objects, ${return_type})
-        else:
-            with pytest.raises(errors.PermissionDenied):
-                self.catalog.${method_name}(DEFAULT_TYPE)"""
+        objects = self.catalog.${method_name}(DEFAULT_TYPE)
+        assert isinstance(objects, ${return_type})
+        self.catalog.use_federated_${cat_name_under}_view()
+        objects = self.catalog.${method_name}(DEFAULT_TYPE)
+        assert objects.available() == 0
+        assert isinstance(objects, ${return_type})"""
 
     get_resources_template = """
         # From test_templates/resource.py ResourceLookupSession.get_resources_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
+        objects = self.catalog.${method_name}()
+        assert isinstance(objects, ${return_type})
+        self.catalog.use_federated_${cat_name_under}_view()
+        objects = self.catalog.${method_name}()
+        assert isinstance(objects, ${return_type})
+
         if not is_never_authz(self.service_config):
-            objects = self.catalog.${method_name}()
-            assert isinstance(objects, ${return_type})
-            self.catalog.use_federated_${cat_name_under}_view()
-            objects = self.catalog.${method_name}()
             assert objects.available() > 0
-            assert isinstance(objects, ${return_type})
         else:
-            with pytest.raises(errors.PermissionDenied):
-                self.catalog.${method_name}()
+            assert objects.available() == 0
 
     def test_get_${object_name_under}_with_alias(self):
         if not is_never_authz(self.service_config):
