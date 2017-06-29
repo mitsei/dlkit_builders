@@ -60,14 +60,16 @@ class AssessmentAuthoringManager:
 
     get_sequence_rule_admin_session_for_bank = """
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_admin_session_for_bank(*args, **kwargs)"""
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_admin_session_for_bank(*args, **kwargs)
 
-    get_assessment_part_item_session = """
+    def get_assessment_part_item_session(self, *args, **kwargs):
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session(*args, **kwargs)"""
+        # Missing in the spec
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session(*args, **kwargs)
 
-    get_assessment_part_item_session_for_bank = """
+    def get_assessment_part_item_session_for_bank(self, *args, **kwargs):
         \"\"\"Pass through to provider method\"\"\"
+        # Missing in the spec
         return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session_for_bank(*args, **kwargs)"""
 
 
@@ -110,13 +112,13 @@ class AssessmentAuthoringProxyManager:
 
     get_sequence_rule_admin_session_for_bank = """
         \"\"\"Pass through to provider method\"\"\"
-        return AssessmentManager.get_sequence_rule_admin_session_for_bank(*args, **kwargs)"""
+        return AssessmentManager.get_sequence_rule_admin_session_for_bank(*args, **kwargs)
 
-    get_assessment_part_item_session = """
+    def get_assessment_part_item_session(self, *args, **kwargs):
         \"\"\"Pass through to provider method\"\"\"
-        return AssessmentManager.get_assessment_part_item_session(*args, **kwargs)"""
+        return AssessmentManager.get_assessment_part_item_session(*args, **kwargs)
 
-    get_assessment_part_item_session_for_bank = """
+    def get_assessment_part_item_session_for_bank(self, *args, **kwargs):
         \"\"\"Pass through to provider method\"\"\"
         return AssessmentManager.get_assessment_part_item_session_for_bank(*args, **kwargs)"""
 
@@ -489,6 +491,12 @@ class AssessmentPartItemSession:
         # Note: this method is different from the underlying signature
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_item_session').get_assessment_part_items(*args, **kwargs)"""
+
+    get_assessment_parts_by_item = """
+        \"\"\"Pass through to provider method\"\"\"
+        # Note: this method is different from the underlying signature
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_item_session').get_assessment_parts_by_item(*args, **kwargs)"""
 
     can_access_assessment_part_items = """
         \"\"\"Pass through to provider method\"\"\"
