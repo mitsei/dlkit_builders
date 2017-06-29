@@ -70,7 +70,17 @@ class AssessmentAuthoringManager:
     def get_assessment_part_item_session_for_bank(self, *args, **kwargs):
         \"\"\"Pass through to provider method\"\"\"
         # Missing in the spec
-        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session_for_bank(*args, **kwargs)"""
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session_for_bank(*args, **kwargs)
+
+    def get_assessment_part_item_design_session(self, *args, **kwargs):
+        \"\"\"Pass through to provider method\"\"\"
+        # Missing in the spec
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_design_session(*args, **kwargs)
+
+    def get_assessment_part_item_design_session_for_bank(self, *args, **kwargs):
+        \"\"\"Pass through to provider method\"\"\"
+        # Missing in the spec
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_design_session_for_bank(*args, **kwargs)"""
 
 
 class AssessmentAuthoringProxyManager:
