@@ -332,10 +332,12 @@ class ResourceQuerySession:
             and_list.append(view_filter)
         if and_list:
             query_terms = {'$$and': and_list}
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        result = collection.find(query_terms).sort('_id', DESCENDING)
+            collection = JSONClientValidated('${package_name_replace}',
+                                             collection='${object_name}',
+                                             runtime=self._runtime)
+            result = collection.find(query_terms).sort('_id', DESCENDING)
+        else:
+            result = []
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
 
