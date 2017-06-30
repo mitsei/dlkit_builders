@@ -374,11 +374,6 @@ DISABLED = -1"""
         # write out both the import statements and class definitions to the
         # appropriate module for this package.
         for module in modules:
-            if module == 'records' and self.package['name'] != 'osid':
-                module_name = 'record_templates'
-            else:
-                module_name = module
-
             if modules[module]['body'].strip() != '':
                 with open('{0}/{1}.py'.format(self._app_name(),
                                               fix_reserved_word(self.first(self.package['name']), is_module=True)), 'w') as write_file:

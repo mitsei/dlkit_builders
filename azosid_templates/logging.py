@@ -8,3 +8,8 @@ class LoggingProfile:
         # Implemented from azosid template for -
         # osid.logging.LoggingProfile.get_content_types
         return self._provider_manager.get_content_types()"""
+
+
+class LoggingSession:
+    can_log = """
+        return self._provider_session.can_log()"""

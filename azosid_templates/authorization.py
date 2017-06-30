@@ -8,6 +8,15 @@ class AuthorizationAdminSession:
             qualifier_id,
             authorization_record_types)"""
 
+    get_authorization_form_for_create_for_resource = """
+        if not self._can('create'):
+            raise PermissionDenied()
+        return self._provider_session.get_authorization_form_for_create_for_agent(
+            resource_id,
+            function_id,
+            qualifier_id,
+            authorization_record_types)"""
+
 
 class VaultLookupSession:
     get_vaults_by_genus_type = """

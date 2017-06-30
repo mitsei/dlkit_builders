@@ -1,4 +1,6 @@
-from binder_helpers import remove_plural
+import string
+
+from binder_helpers import remove_plural, camel_to_under
 from build_dlkit import BaseBuilder
 from interface_builders import InterfaceBuilder
 
@@ -53,22 +55,28 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
                      (not is_catalog() and not is_record_method()))):
                 # i.e. AssessmentManager.get_bank_record() throws Unimplemented()
                 # i.e. Question.get_question_record() throws Unsupported()
-                impl = '{0}with self.assertRaises(errors.Unimplemented):\n{0}{1}self.{2}.{3}({4})'.format(self._dind,
-                                                                                                          self._ind,
-                                                                                                          test_object,
-                                                                                                          method['name'],
-                                                                                                          ', '.join((len(method['args']) * ['True'])))
+                impl = """        if is_never_authz(self.service_config):
+            pass  # no object to call the method on?
+        else:
+            with pytest.raises(errors.Unimplemented):
+                self.{0}.{1}({2})""".format(test_object,
+                                            method['name'],
+                                            ', '.join((len(method['args']) * ['True'])))
             elif method['name'].endswith('_record'):
-                impl = '{0}with self.assertRaises(errors.Unsupported):\n{0}{1}self.{2}.{3}({4})'.format(self._dind,
-                                                                                                        self._ind,
-                                                                                                        test_object,
-                                                                                                        method['name'],
-                                                                                                        ', '.join((len(method['args']) * ['True'])))
+                impl = """        if is_never_authz(self.service_config):
+            pass  # no object to call the method on?
+        else:
+            with pytest.raises(errors.Unsupported):
+                self.{0}.{1}({2})""".format(test_object,
+                                            method['name'],
+                                            ', '.join((len(method['args']) * ['True'])))
             else:
-                impl = '{0}with self.assertRaises(errors.Unimplemented):\n{0}{1}self.{2}.{3}()'.format(self._dind,
-                                                                                                       self._ind,
-                                                                                                       test_object,
-                                                                                                       method['name'])
+                impl = """        if is_never_authz(self.service_config):
+            pass  # no object to call the method on?
+        else:
+            with pytest.raises(errors.Unimplemented):
+                self.{0}.{1}()""".format(test_object,
+                                         method['name'])
         else:
             context = self._get_method_context(method, interface)
             interface_sn = interface['shortname']
@@ -88,14 +96,15 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
                                                  ', '.join(args))
 
         if method_impl == '{}pass'.format(self._dind):
-            method_sig = '{}@unittest.skip(\'unimplemented test\')\n{}'.format(self._ind,
-                                                                               method_sig)
+            method_sig = '{}@pytest.mark.skip(\'unimplemented test\')\n{}'.format(self._ind,
+                                                                                  method_sig)
 
         return method_sig
 
     def _update_module_imports(self, modules, interface):
         imports = modules[interface['category']]['imports']
-        self.append(imports, 'import unittest')
+        self.append(imports, 'import pytest')
+        self.append(imports, 'from ..utilities.general import is_never_authz, is_no_authz')
 
         # Check to see if there are any additional inheritances required
         # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
@@ -124,15 +133,24 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
                                                      interface['shortname'])
 
     def class_sig(self, interface, inheritance):
-        return 'class Test{}{}:'.format(interface['shortname'],
-                                        inheritance)
+        fixtures = '@pytest.mark.usefixtures("{0}_class_fixture", "{0}_test_fixture")'.format(camel_to_under(interface['shortname']))
+
+        return '{0}\nclass Test{1}{2}:'.format(fixtures,
+                                               interface['shortname'],
+                                               inheritance)
 
     def make(self):
         self.make_osids()
 
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
-        init_methods = self._make_init_methods(interface)
+        fixture_methods = self._make_init_methods(interface)
+
+        # always apply the context to fixture methods, so we get the configured params in there
+        context = self._get_init_context('', interface)
+        template = string.Template(fixture_methods)
+        fixture_methods = template.substitute(context)
+
         methods = self.make_methods(interface)
         additional_methods = self._additional_methods(interface)
         additional_classes = self._additional_classes(interface)
@@ -144,21 +162,18 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
             # extra newlines generated in self._additional_classes
             methods += additional_classes
 
-        init_methods_not_blank = init_methods != '' and not init_methods.isspace()
-        if init_methods_not_blank:
-            init_methods = self._wrap(init_methods) + '\n'
+        fixture_methods_not_blank = fixture_methods != '' and not fixture_methods.isspace()
+        if fixture_methods_not_blank:
+            fixture_methods = self._wrap(fixture_methods) + '\n'
         else:
-            init_methods = ''
+            fixture_methods = ''
 
         if methods:
-            if init_methods_not_blank:
-                methods = '{0}\n'.format(methods)
-            else:
-                methods = '\n{0}\n'.format(methods)
+            methods = '\n' + methods
 
-        body = '\n\n{0}\n{1}\n{2}{3}'.format(self.class_sig(interface, inheritance),
+        body = '\n\n{0}\n{1}\n{2}{3}'.format(fixture_methods,
+                                             self.class_sig(interface, inheritance),
                                              self._wrap(self.class_doc(interface)),
-                                             init_methods,
                                              methods)
         return body
 

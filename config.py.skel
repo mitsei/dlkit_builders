@@ -307,3 +307,7 @@ variants_to_implement = [
     'NodeList',
     'Search',
 ]
+
+test_service_configs = [
+    'TEST_SERVICE'
+]
