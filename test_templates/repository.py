@@ -125,6 +125,89 @@ def ${interface_name_under}_test_fixture(request):
                 self.catalog.${method_name}(self.fake_id)"""
 
 
+class AssetLookupSession:
+    # Override these locally for Asset because with AssetQuerySession implemented,
+    #   the authz adapter will return an empty List instead of throwing PermissionDenied
+    get_asset = """
+        if not is_never_authz(self.service_config):
+            self.catalog.use_isolated_repository_view()
+            obj = self.catalog.get_asset(self.asset_list[0].ident)
+            assert obj.ident == self.asset_list[0].ident
+            self.catalog.use_federated_repository_view()
+            obj = self.catalog.get_asset(self.asset_list[0].ident)
+            assert obj.ident == self.asset_list[0].ident
+        else:
+            with pytest.raises(errors.NotFound):
+                self.catalog.get_asset(self.fake_id)"""
+
+    get_assets_by_ids = """
+        from dlkit.abstract_osid.repository.objects import AssetList
+        objects = self.catalog.get_assets_by_ids(self.asset_ids)
+        assert isinstance(objects, AssetList)
+        self.catalog.use_federated_repository_view()
+        objects = self.catalog.get_assets_by_ids(self.asset_ids)
+        assert isinstance(objects, AssetList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    get_assets_by_genus_type = """
+        from dlkit.abstract_osid.repository.objects import AssetList
+        objects = self.catalog.get_assets_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, AssetList)
+        self.catalog.use_federated_repository_view()
+        objects = self.catalog.get_assets_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, AssetList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    get_assets_by_parent_genus_type = """
+        from dlkit.abstract_osid.repository.objects import AssetList
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.get_assets_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, AssetList)
+            self.catalog.use_federated_repository_view()
+            objects = self.catalog.get_assets_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert objects.available() == 0
+            assert isinstance(objects, AssetList)
+        else:
+            with pytest.raises(errors.Unimplemented):
+                # because the never_authz "tries harder" and runs the actual query...
+                #    whereas above the method itself in JSON returns an empty list
+                self.catalog.get_assets_by_parent_genus_type(DEFAULT_GENUS_TYPE)"""
+
+    get_assets_by_record_type = """
+        from dlkit.abstract_osid.repository.objects import AssetList
+        objects = self.catalog.get_assets_by_record_type(DEFAULT_TYPE)
+        assert isinstance(objects, AssetList)
+        self.catalog.use_federated_repository_view()
+        objects = self.catalog.get_assets_by_record_type(DEFAULT_TYPE)
+        assert objects.available() == 0
+        assert isinstance(objects, AssetList)"""
+
+    get_assets = """
+        from dlkit.abstract_osid.repository.objects import AssetList
+        objects = self.catalog.get_assets()
+        assert isinstance(objects, AssetList)
+        self.catalog.use_federated_repository_view()
+        objects = self.catalog.get_assets()
+        assert isinstance(objects, AssetList)
+
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0
+
+    def test_get_asset_with_alias(self):
+        if not is_never_authz(self.service_config):
+            self.catalog.alias_asset(self.asset_ids[0], ALIAS_ID)
+            obj = self.catalog.get_asset(ALIAS_ID)
+            assert obj.get_id() == self.asset_ids[0]"""
+
+
 class CompositionLookupSession:
 
     import_statements_pattern = ResourceLookupSession.import_statements_pattern
