@@ -162,6 +162,87 @@ def ${interface_name_under}_test_fixture(request):
         # this should not be here...
         pass"""
 
+    # Override these locally for AssessmentPart because with AssessmentPartQuerySession implemented,
+    #   the authz adapter will return an empty List instead of throwing PermissionDenied
+    get_assessment_part = """
+        if not is_never_authz(self.service_config):
+            self.catalog.use_isolated_bank_view()
+            obj = self.catalog.get_assessment_part(self.assessment_part_list[0].ident)
+            assert obj.ident == self.assessment_part_list[0].ident
+            self.catalog.use_federated_bank_view()
+            obj = self.catalog.get_assessment_part(self.assessment_part_list[0].ident)
+            assert obj.ident == self.assessment_part_list[0].ident
+        else:
+            with pytest.raises(errors.NotFound):
+                self.catalog.get_assessment_part(self.fake_id)"""
+
+    get_assessment_parts_by_ids = """
+        from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartList
+        objects = self.catalog.get_assessment_parts_by_ids(self.assessment_part_ids)
+        assert isinstance(objects, AssessmentPartList)
+        self.catalog.use_federated_bank_view()
+        objects = self.catalog.get_assessment_parts_by_ids(self.assessment_part_ids)
+        assert isinstance(objects, AssessmentPartList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    get_assessment_parts_by_genus_type = """
+        from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartList
+        objects = self.catalog.get_assessment_parts_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, AssessmentPartList)
+        self.catalog.use_federated_bank_view()
+        objects = self.catalog.get_assessment_parts_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, AssessmentPartList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    get_assessment_parts_by_parent_genus_type = """
+        from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartList
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.get_assessment_parts_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, AssessmentPartList)
+            self.catalog.use_federated_bank_view()
+            objects = self.catalog.get_assessment_parts_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert objects.available() == 0
+            assert isinstance(objects, AssessmentPartList)
+        else:
+            with pytest.raises(errors.Unimplemented):
+                # because the never_authz "tries harder" and runs the actual query...
+                #    whereas above the method itself in JSON returns an empty list
+                self.catalog.get_assessment_parts_by_parent_genus_type(DEFAULT_GENUS_TYPE)"""
+
+    get_assessment_parts_by_record_type = """
+        from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartList
+        objects = self.catalog.get_assessment_parts_by_record_type(DEFAULT_TYPE)
+        assert isinstance(objects, AssessmentPartList)
+        self.catalog.use_federated_bank_view()
+        objects = self.catalog.get_assessment_parts_by_record_type(DEFAULT_TYPE)
+        assert objects.available() == 0
+        assert isinstance(objects, AssessmentPartList)"""
+
+    get_assessment_parts = """
+        from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartList
+        objects = self.catalog.get_assessment_parts()
+        assert isinstance(objects, AssessmentPartList)
+        self.catalog.use_federated_bank_view()
+        objects = self.catalog.get_assessment_parts()
+        assert isinstance(objects, AssessmentPartList)
+
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0
+
+    def test_get_assessment_part_with_alias(self):
+        if not is_never_authz(self.service_config):
+            self.catalog.alias_assessment_part(self.assessment_part_ids[0], ALIAS_ID)
+            obj = self.catalog.get_assessment_part(ALIAS_ID)
+            assert obj.get_id() == self.assessment_part_ids[0]"""
+
 
 class AssessmentPartQuerySession:
 
