@@ -167,7 +167,7 @@ class AssessmentSession:
     get_incomplete_assessment_sections = """
         if not self._can('take'):
             raise PermissionDenied()
-        return self._provider_session.is_assessment_section_complete(assessment_taken_id)"""
+        return self._provider_session.get_incomplete_assessment_sections(assessment_taken_id)"""
 
     has_assessment_section_begun = """
         if not self._can('take'):

@@ -16,35 +16,47 @@ class CommentLookupSession:
     ]
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        # From test_templates/commenting.py::CommentLookupSession::init_template
-        cls.${object_name_under}_list = list()
-        cls.${object_name_under}_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/commenting.py::CommentLookupSession::init_template
+    request.cls.service_config = request.param
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_${object_name_under}_form_for_create(AGENT_ID, [])
+            create_form = request.cls.catalog.get_${object_name_under}_form_for_create(AGENT_ID, [])
             create_form.display_name = 'Test ${object_name} ' + str(num)
             create_form.description = 'Test ${object_name} for ${interface_name} tests'
-            object = cls.catalog.create_${object_name_under}(create_form)
-            cls.${object_name_under}_list.append(object)
-            cls.${object_name_under}_ids.append(object.ident)
+            object = request.cls.catalog.create_${object_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(object)
+            request.cls.${object_name_under}_ids.append(object.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def setUp(self):
-        # From test_templates/commenting.py::CommentLookupSession::init_template
-        self.session = self.catalog
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_${cat_name_under_plural}():
+                for obj in catalog.get_${object_name_under_plural}():
+                    catalog.delete_${object_name_under}(obj.ident)
+                request.cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        # From test_templates/commenting.py::CommentLookupSession::init_template
-        for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
-            for obj in catalog.get_${object_name_under_plural}():
-                catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/commenting.py::CommentLookupSession::init_template
+    request.cls.session = request.cls.catalog"""
 
 
 class CommentForm:
@@ -61,19 +73,32 @@ class CommentForm:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('COMMENTING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_book_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'COMMENTING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_book_form_for_create([])
         create_form.display_name = 'Test Book'
         create_form.description = 'Test Book for CommentForm tests'
-        cls.catalog = cls.svc_mgr.create_book(create_form)
-        cls.form = cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+        request.cls.catalog = request.cls.svc_mgr.create_book(create_form)
+        request.cls.form = request.cls.catalog.get_comment_form_for_create(AGENT_ID, [])
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_books():
-            cls.svc_mgr.delete_book(catalog.ident)"""
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_books():
+                request.cls.svc_mgr.delete_book(catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
 
 
 class CommentList:
@@ -90,35 +115,46 @@ class CommentList:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('COMMENTING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_book_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'COMMENTING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_book_form_for_create([])
         create_form.display_name = 'Test Book'
         create_form.description = 'Test Book for CommentForm tests'
-        cls.catalog = cls.svc_mgr.create_book(create_form)
-        cls.form = cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+        request.cls.catalog = request.cls.svc_mgr.create_book(create_form)
+        request.cls.form = request.cls.catalog.get_comment_form_for_create(AGENT_ID, [])
 
-    def setUp(self):
-        from dlkit.json_.commenting.objects import CommentList
-        self.comment_list = list()
-        self.comment_ids = list()
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_books():
+                for comment in catalog.get_comments():
+                    catalog.delete_comment(comment.ident)
+                request.cls.svc_mgr.delete_book(catalog.ident)
 
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    from dlkit.json_.commenting.objects import CommentList
+    request.cls.comment_list = list()
+    request.cls.comment_ids = list()
+
+    if not is_never_authz(request.cls.service_config):
         for num in [0, 1]:
-            form = self.catalog.get_comment_form_for_create(AGENT_ID, [])
+            form = request.cls.catalog.get_comment_form_for_create(AGENT_ID, [])
 
-            obj = self.catalog.create_comment(form)
+            obj = request.cls.catalog.create_comment(form)
 
-            self.comment_list.append(obj)
-            self.comment_ids.append(obj.ident)
-        self.comment_list = CommentList(self.comment_list)
-
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_books():
-            for comment in catalog.get_comments():
-                catalog.delete_comment(comment.ident)
-            cls.svc_mgr.delete_book(catalog.ident)"""
+            request.cls.comment_list.append(obj)
+            request.cls.comment_ids.append(obj.ident)
+        request.cls.comment_list = CommentList(request.cls.comment_list)"""
 
 
 class CommentQuerySession:
@@ -126,33 +162,50 @@ class CommentQuerySession:
     import_statements_pattern = CommentLookupSession.import_statements_pattern
 
     init_template = """
-    @classmethod
-    def setUpClass(cls):
-        cls.${object_name_under}_list = list()
-        cls.${object_name_under}_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('${pkg_name_upper}', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+class FakeQuery:
+    _cat_id_args_list = []
+
+
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
         create_form.description = 'Test ${cat_name} for ${interface_name} tests'
-        cls.catalog = cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
         for color in ['Orange', 'Blue', 'Green', 'orange']:
-            create_form = cls.catalog.get_${object_name_under}_form_for_create(AGENT_ID, [])
+            create_form = request.cls.catalog.get_${object_name_under}_form_for_create(AGENT_ID, [])
             create_form.display_name = 'Test ${object_name} ' + color
             create_form.description = (
                 'Test ${object_name} for ${interface_name} tests, did I mention green')
-            obj = cls.catalog.create_${object_name_under}(create_form)
-            cls.${object_name_under}_list.append(obj)
-            cls.${object_name_under}_ids.append(obj.ident)
+            obj = request.cls.catalog.create_${object_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(obj)
+            request.cls.${object_name_under}_ids.append(obj.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def setUp(self):
-        self.session = self.catalog
+    request.cls.session = request.cls.catalog
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_${cat_name_under_plural}():
-            for obj in catalog.get_${object_name_under_plural}():
-                catalog.delete_${object_name_under}(obj.ident)
-            cls.svc_mgr.delete_${cat_name_under}(catalog.ident)"""
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_${cat_name_under_plural}():
+                for obj in catalog.get_${object_name_under_plural}():
+                    catalog.delete_${object_name_under}(obj.ident)
+                request.cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
+
+    request.addfinalizer(test_tear_down)"""
 
 
 class CommentAdminSession:
@@ -163,49 +216,73 @@ class CommentAdminSession:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.comment_list = list()
-        cls.comment_ids = list()
-        cls.svc_mgr = Runtime().get_service_manager('COMMENTING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_book_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.comment_list = list()
+    request.cls.comment_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'COMMENTING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_book_form_for_create([])
         create_form.display_name = 'Test Book'
         create_form.description = 'Test Book for CommentAdminSession tests'
-        cls.catalog = cls.svc_mgr.create_book(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_book(create_form)
         for num in [0, 1]:
-            create_form = cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+            create_form = request.cls.catalog.get_comment_form_for_create(AGENT_ID, [])
             create_form.display_name = 'Test Comment ' + str(num)
             create_form.description = 'Test Comment for CommentAdminSession tests'
-            object = cls.catalog.create_comment(create_form)
-            cls.comment_list.append(object)
-            cls.comment_ids.append(object.ident)
-        create_form = cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+            object = request.cls.catalog.create_comment(create_form)
+            request.cls.comment_list.append(object)
+            request.cls.comment_ids.append(object.ident)
+        create_form = request.cls.catalog.get_comment_form_for_create(AGENT_ID, [])
         create_form.display_name = 'new Comment'
         create_form.description = 'description of Comment'
         create_form.genus_type = NEW_TYPE
-        cls.osid_object = cls.catalog.create_comment(create_form)
+        request.cls.osid_object = request.cls.catalog.create_comment(create_form)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    @classmethod
-    def tearDownClass(cls):
-        for catalog in cls.svc_mgr.get_books():
-            for obj in catalog.get_comments():
-                catalog.delete_comment(obj.ident)
-            cls.svc_mgr.delete_book(catalog.ident)"""
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for catalog in request.cls.svc_mgr.get_books():
+                for obj in catalog.get_comments():
+                    catalog.delete_comment(obj.ident)
+                request.cls.svc_mgr.delete_book(catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
 
     get_comment_form_for_create = """
-        form = self.catalog.get_comment_form_for_create(AGENT_ID, [])
-        self.assertTrue(isinstance(form, OsidForm))
-        self.assertFalse(form.is_for_update())"""
+        if not is_never_authz(self.service_config):
+            form = self.catalog.get_comment_form_for_create(AGENT_ID, [])
+            assert isinstance(form, OsidForm)
+            assert not form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_comment_form_for_create(AGENT_ID, [])"""
 
     delete_comment = """
-        form = self.catalog.get_comment_form_for_create(AGENT_ID, [])
-        form.display_name = 'new Comment'
-        form.description = 'description of Comment'
-        form.set_genus_type(NEW_TYPE)
-        osid_object = self.catalog.create_comment(form)
-        self.catalog.delete_comment(osid_object.ident)
-        with self.assertRaises(errors.NotFound):
-            self.catalog.get_comment(osid_object.ident)"""
+        if not is_never_authz(self.service_config):
+            form = self.catalog.get_comment_form_for_create(AGENT_ID, [])
+            form.display_name = 'new Comment'
+            form.description = 'description of Comment'
+            form.set_genus_type(NEW_TYPE)
+            osid_object = self.catalog.create_comment(form)
+            self.catalog.delete_comment(osid_object.ident)
+            with pytest.raises(errors.NotFound):
+                self.catalog.get_comment(osid_object.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.delete_comment(AGENT_ID)"""
 
 
 class Comment:
@@ -216,41 +293,56 @@ class Comment:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('COMMENTING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_book_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'COMMENTING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_book_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_book(create_form)
+        request.cls.catalog = request.cls.svc_mgr.create_book(create_form)
 
-        form = cls.catalog.get_comment_form_for_create(
+        form = request.cls.catalog.get_comment_form_for_create(
             Id('resource.Resource%3A1%40ODL.MIT.EDU'),
             [])
         form.display_name = 'Test object'
-        cls.object = cls.catalog.create_comment(form)
+        request.cls.object = request.cls.catalog.create_comment(form)
 
-    @classmethod
-    def tearDownClass(cls):
-        for obj in cls.catalog.get_comments():
-            cls.catalog.delete_comment(obj.ident)
-        cls.svc_mgr.delete_book(cls.catalog.ident)"""
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_comments():
+                request.cls.catalog.delete_comment(obj.ident)
+            request.cls.svc_mgr.delete_book(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
 
     get_commenting_agent = """
-        # because the resource doesn't actually exist
-        with self.assertRaises(errors.OperationFailed):
-            self.object.get_commenting_agent()"""
+        if not is_never_authz(self.service_config):
+            # because the resource doesn't actually exist
+            with pytest.raises(errors.OperationFailed):
+                self.object.get_commenting_agent()"""
 
     get_commenting_agent_id = """
-        result = self.object.get_commenting_agent_id()
-        self.assertTrue(isinstance(result, Id))
-        self.assertEqual(str(result),
-                         str(self.catalog._proxy.get_effective_agent_id()))"""
+        if not is_never_authz(self.service_config):
+            result = self.object.get_commenting_agent_id()
+            assert isinstance(result, Id)
+            assert str(result) == str(self.catalog._proxy.get_effective_agent_id())"""
 
     get_text = """
-        result = self.object.get_text()
-        self.assertTrue(isinstance(result, DisplayText))
-        self.assertEqual(result.text, '')"""
+        if not is_never_authz(self.service_config):
+            result = self.object.get_text()
+            assert isinstance(result, DisplayText)
+            assert result.text == ''"""
 
 
 class CommentQuery:
@@ -265,19 +357,30 @@ class BookQuery:
     ]
 
     init = """
-    @classmethod
-    def setUpClass(cls):
-        cls.svc_mgr = Runtime().get_service_manager('COMMENTING', proxy=PROXY, implementation='TEST_SERVICE')
-        create_form = cls.svc_mgr.get_book_form_for_create([])
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'COMMENTING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_book_form_for_create([])
         create_form.display_name = 'Test catalog'
         create_form.description = 'Test catalog description'
-        cls.catalog = cls.svc_mgr.create_book(create_form)
-        cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
+        request.cls.catalog = request.cls.svc_mgr.create_book(create_form)
+        request.cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
 
-    def setUp(self):
-        # Since the session isn't implemented, we just construct an BookQuery directly
-        self.query = BookQuery(runtime=self.catalog._runtime)
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_book(request.cls.catalog.ident)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.svc_mgr.delete_book(cls.catalog.ident)"""
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Since the session isn't implemented, we just construct an BookQuery directly
+    if not is_never_authz(request.cls.service_config):
+        request.cls.query = BookQuery(runtime=request.cls.catalog._runtime)"""

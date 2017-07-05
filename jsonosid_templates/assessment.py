@@ -1807,10 +1807,12 @@ class AssessmentQuerySession:
             if and_list:
                 query_terms = {'$and': and_list}
 
-            collection = JSONClientValidated('assessment',
-                                             collection='Assessment',
-                                             runtime=self._runtime)
-            result = collection.find(query_terms).sort('_id', DESCENDING)
+                collection = JSONClientValidated('assessment',
+                                                 collection='Assessment',
+                                                 runtime=self._runtime)
+                result = collection.find(query_terms).sort('_id', DESCENDING)
+            else:
+                result = []
             return objects.AssessmentList(result, runtime=self._runtime, proxy=self._proxy)"""
 
 

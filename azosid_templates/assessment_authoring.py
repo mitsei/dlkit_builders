@@ -15,48 +15,134 @@ class AssessmentPartLookupSession:
         return self._try_harder(query)"""
 
 
+class AssessmentPartItemSession:
+    init = """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
+        self._id_namespace = 'assessment_authoring.AssessmentPart'
+        self._auth_bank_ids = None
+        self._unauth_bank_ids = None"""
+
+    can_access_assessment_part_items = """
+        return self._provider_session.can_access_assessment_part_items()"""
+
+
+class AssessmentPartItemDesignSession:
+    init = """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
+        self._id_namespace = 'assessment_authoring.AssessmentPart'
+        self._auth_bank_ids = None
+        self._unauth_bank_ids = None"""
+
+    can_design_assessment_parts = """
+        return self._provider_session.can_design_assessment_parts()"""
+
+
 class AssessmentAuthoringManager:
     # The following is here only until Tom fixes spec and adds these methods
     additional_methods = """
     def get_assessment_part_item_session(self):
-        return self._provider_manager.get_assessment_part_item_session()
+        try:
+            return getattr(sessions, 'AssessmentPartItemSession')(
+                provider_session=self._provider_manager.get_assessment_part_item_session(),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
+        except AttributeError:
+            raise OperationFailed()
 
     assessment_part_item_session = property(fget=get_assessment_part_item_session)
 
     def get_assessment_part_item_session_for_bank(self, bank_id):
-        return self._provider_manager.get_assessment_part_item_session_for_bank(bank_id)
+        try:
+            return getattr(sessions, 'AssessmentPartItemSession')(
+                provider_session=self._provider_manager.get_assessment_part_item_session_for_bank(bank_id),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
+        except AttributeError:
+            raise OperationFailed()
 
     def get_assessment_part_item_design_session(self):
-        return self._provider_manager.get_assessment_part_item_design_session()
+        try:
+            return getattr(sessions, 'AssessmentPartItemDesignSession')(
+                provider_session=self._provider_manager.get_assessment_part_item_design_session(),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
+        except AttributeError:
+            raise OperationFailed()
 
     assessment_part_item_design_session = property(fget=get_assessment_part_item_design_session)
 
     def get_assessment_part_item_design_session_for_bank(self, bank_id):
-        return self._provider_manager.get_assessment_part_item_design_session_for_bank(bank_id)"""
+        try:
+            return getattr(sessions, 'AssessmentPartItemDesignSession')(
+                provider_session=self._provider_manager.get_assessment_part_item_design_session_for_bank(bank_id),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager)
+        except AttributeError:
+            raise OperationFailed()"""
 
 
 class AssessmentAuthoringProxyManager:
     # The following is here only until Tom fixes spec and adds these methods
     additional_methods = """
     def get_assessment_part_item_session(self, proxy):
-        return self._provider_manager.get_assessment_part_item_session(proxy)
+        try:
+            return getattr(sessions, 'AssessmentPartItemSession')(
+                provider_session=self._provider_manager.get_assessment_part_item_session(proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager,
+                proxy=proxy)
+        except AttributeError:
+            raise OperationFailed()
 
     assessment_part_item_session = property(fget=get_assessment_part_item_session)
 
     def get_assessment_part_item_session_for_bank(self, bank_id, proxy):
-        return self._provider_manager.get_assessment_part_item_session_for_bank(bank_id, proxy)
+        try:
+            return getattr(sessions, 'AssessmentPartItemSession')(
+                provider_session=self._provider_manager.get_assessment_part_item_session_for_bank(bank_id, proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager,
+                proxy=proxy)
+        except AttributeError:
+            raise OperationFailed()
 
     def get_assessment_part_item_design_session(self, proxy):
-        return self._provider_manager.get_assessment_part_item_design_session(proxy)
+        try:
+            return getattr(sessions, 'AssessmentPartItemDesignSession')(
+                provider_session=self._provider_manager.get_assessment_part_item_design_session(proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager,
+                proxy=proxy)
+        except AttributeError:
+            raise OperationFailed()
 
     assessment_part_item_design_session = property(fget=get_assessment_part_item_design_session)
 
     def get_assessment_part_item_design_session_for_bank(self, bank_id, proxy):
-        return self._provider_manager.get_assessment_part_item_design_session_for_bank(bank_id, proxy)"""
+        try:
+            return getattr(sessions, 'AssessmentPartItemDesignSession')(
+                provider_session=self._provider_manager.get_assessment_part_item_design_session_for_bank(bank_id, proxy),
+                authz_session=self._get_authz_session(),
+                override_lookup_session=self._get_override_lookup_session(),
+                provider_manager=self._provider_manager,
+                proxy=proxy)
+        except AttributeError:
+            raise OperationFailed()"""
 
 
 class AssessmentAuthoringProfile:
-    import_statements_pattern = [
+    import_statements = [
         "from ..osid.osid_errors import Unsupported"
     ]
 
@@ -69,11 +155,11 @@ class AssessmentAuthoringProfile:
         if proxy is not None:
             try:
                 return base_package_mgr.get_bank_hierarchy_session(proxy)
-            except Unimplemented:
+            except Unsupported:
                 return None
         try:
             return base_package_mgr.get_bank_hierarchy_session()
-        except Unimplemented:
+        except Unsupported:
             return None
 
     def _get_base_package_provider_manager(self, base_package, proxy=None):
@@ -174,9 +260,31 @@ class AssessmentPartAdminSession:
             raise PermissionDenied()
         return self._provider_session.update_assessment_part(assessment_part_id, assessment_part_form)"""
 
+
 class SequenceRuleAdminSession:
 
     get_sequence_rule_form_for_create = """
         if not self._can('create'):
             raise PermissionDenied()
         return self._provider_session.get_sequence_rule_form_for_create(assessment_part_id, next_assessment_part_id, sequence_rule_record_types)"""
+
+
+class SequenceRuleAdminSession:
+    get_sequence_rule_form_for_create = """
+        if not self._can('create'):
+            raise PermissionDenied()
+        return self._provider_session.get_sequence_rule_form_for_create(assessment_part_id,
+                                                                        next_assessment_part_id,
+                                                                        sequence_rule_record_types)"""
+
+
+class SequenceRuleLookupSession:
+    get_sequence_rules_for_assessment_parts = """
+        if self._can('lookup'):
+            return self._provider_session.get_sequence_rules_for_assessment_parts(assessment_part_id,
+                                                                                  next_assessment_part_id)
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_sequence_rule_query()
+        for sequence_rule_id in (assessment_part_id):
+            query.match_assessment_part_id(sequence_rule_id, match=True)
+        return self._try_harder(query)"""

@@ -216,6 +216,18 @@ def map_session_patterns(interface, package, index):
                             arg0_name=method['args'][0]['var_name'],
                             arg0_type_full=method['args'][0]['arg_type']))
 
+        # CatalogQuerySession methods for authorization hint.
+        elif (interface['shortname'] == index['package_catalog_caps'] + 'QuerySession' and
+                method['name'] == 'can_search_' + make_plural(index['package_catalog_under'])):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='resource.BinQuerySession.can_search_bins',
+                kwargs=dict(interface_name=interface['shortname'],
+                            package_name=package['name'],
+                            module_name=interface['category'],
+                            method_name=method['name'],
+                            return_type_full=method['return_type'],
+                            cat_name=index['package_catalog_caps']))
+
         ##################################################################
         #  Inspect this package's CatalogSearchSession methods.         ##
         ##################################################################
@@ -2370,6 +2382,23 @@ def map_session_patterns(interface, package, index):
                                    object_name=interface['shortname'].replace('NotificationSession', ''),
                                    arg_count=1))
 
+        # ObjectNotificationSession methods that register for a changed object or by genus type.
+        # Note that this MUST occur before the case for startswith register_for_new_ and regsiter_for_changed_
+        #   otherwise those will get caught first
+        elif (interface['shortname'].endswith('NotificationSession') and
+                (method['name'].startswith('register_for_changed_') or
+                 (method['name'].startswith('register_for') and method['name'].endswith('by_genus_type'))) and
+                len(method['args']) == 1):
+            index[interface['shortname'] + '.' + method['name']] = dict(
+                pattern='resource.ResourceNotificationSession.register_for_changed_resource',
+                kwargs=make_twargs(index,
+                                   package,
+                                   interface,
+                                   method,
+                                   rtype=False,
+                                   object_name=interface['shortname'].replace('NotificationSession', ''),
+                                   arg_count=1))
+
         # ObjectNotificationSession methods that register for a new object.
         elif (interface['shortname'].endswith('NotificationSession') and
                 method['name'].startswith('register_for_new_')):
@@ -2381,21 +2410,6 @@ def map_session_patterns(interface, package, index):
                                    method,
                                    rtype=False,
                                    object_name=interface['shortname'].replace('NotificationSession', '')))
-
-        ##
-        # ObjectNotificationSession methods that register for a changed object.
-        elif (interface['shortname'].endswith('NotificationSession') and
-                method['name'].startswith('register_for_changed_') and
-                len(method['args']) == 1):
-            index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.register_for_changed_resource',
-                kwargs=make_twargs(index,
-                                   package,
-                                   interface,
-                                   method,
-                                   rtype=False,
-                                   object_name=interface['shortname'].replace('NotificationSession', ''),
-                                   arg_count=1))
 
         # ObjectNotificationSession methods that register changed objects.
         elif (interface['shortname'].endswith('NotificationSession') and

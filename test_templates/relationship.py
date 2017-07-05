@@ -37,24 +37,25 @@ class RelationshipLookupSession:
 
     get_relationships_for_source_on_date_template = """
         # From test_templates/relationship.py::RelationshipLookupSession::get_relationships_for_source_on_date_template
-        end_date = DateTime.utcnow() + datetime.timedelta(days=5)
-        end_date = DateTime(**{
-            'year': end_date.year,
-            'month': end_date.month,
-            'day': end_date.day,
-            'hour': end_date.hour,
-            'minute': end_date.minute,
-            'second': end_date.second,
-            'microsecond': end_date.microsecond
-        })
+        if not is_never_authz(self.service_config):
+            end_date = DateTime.utcnow() + datetime.timedelta(days=5)
+            end_date = DateTime(**{
+                'year': end_date.year,
+                'month': end_date.month,
+                'day': end_date.day,
+                'hour': end_date.hour,
+                'minute': end_date.minute,
+                'second': end_date.second,
+                'microsecond': end_date.microsecond
+            })
 
-        # NOTE: this first argument will probably break in many of the other methods,
-        #   since it's not clear they always use something like AGENT_ID
-        # i.e. in get_grade_entries_for_gradebook_column_on_date it needs to be
-        #   a gradebookColumnId.
-        results = self.session.${method_name}(AGENT_ID, DateTime.utcnow(), end_date)
-        self.assertTrue(isinstance(results, ABCObjects.${return_type}))
-        self.assertEqual(results.available(), 2)"""
+            # NOTE: this first argument will probably break in many of the other methods,
+            #   since it's not clear they always use something like AGENT_ID
+            # i.e. in get_grade_entries_for_gradebook_column_on_date it needs to be
+            #   a gradebookColumnId.
+            results = self.session.${method_name}(AGENT_ID, DateTime.utcnow(), end_date)
+            assert isinstance(results, ABCObjects.${return_type})
+            assert results.available() == 2"""
 
 
 class RelationshipAdminSession:
