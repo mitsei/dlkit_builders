@@ -2130,50 +2130,50 @@ class ItemQuery:
         self._clear_terms('learningObjectiveIds')"""
 
 
-class ItemSearch:
+# class ItemSearch:
+#
+#     import_statements = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#         'from ..osid import searches as osid_searches',
+#         'from ..utilities import get_registry',
+#     ]
+#
+#     init = """
+#     def __init__(self, runtime):
+#         self._namespace = 'assessment.Item'
+#         self._runtime = runtime
+#         record_type_data_sets = get_registry('ITEM_RECORD_TYPES', runtime)
+#         self._record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_ids = []
+#         self._id_list = None
+#         for data_set in record_type_data_sets:
+#             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+#         osid_searches.OsidSearch.__init__(self, runtime)"""
+#     search_among_items = """
+#         self._id_list = item_ids"""
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..osid import searches as osid_searches',
-        'from ..utilities import get_registry',
-    ]
 
-    init = """
-    def __init__(self, runtime):
-        self._namespace = 'assessment.Item'
-        self._runtime = runtime
-        record_type_data_sets = get_registry('ITEM_RECORD_TYPES', runtime)
-        self._record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_ids = []
-        self._id_list = None
-        for data_set in record_type_data_sets:
-            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)"""
-    search_among_items = """
-        self._id_list = item_ids"""
-
-
-class ItemSearchResults:
-
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import objects',
-    ]
-
-    init = """
-    def __init__(self, results, runtime):
-        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
-        self._results = results
-        self._runtime = runtime
-        self.retrieved = False"""
-
-    get_items = """
-        if self.retrieved:
-            raise errors.IllegalState('List has already been retrieved.')
-        self.retrieved = True
-        return objects.ItemList(self._results, runtime=self._runtime)"""
+# class ItemSearchResults:
+#
+#     import_statements = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from . import objects',
+#     ]
+#
+#     init = """
+#     def __init__(self, results, runtime):
+#         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+#         self._results = results
+#         self._runtime = runtime
+#         self.retrieved = False"""
+#
+#     get_items = """
+#         if self.retrieved:
+#             raise errors.IllegalState('List has already been retrieved.')
+#         self.retrieved = True
+#         return objects.ItemList(self._results, runtime=self._runtime)"""
 
 
 class ItemSearchSession:

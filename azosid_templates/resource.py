@@ -619,6 +619,12 @@ class ResourceAdminSession:
             raise PermissionDenied()
         return self._provider_session.${method_name}(${arg0_name})"""
 
+    can_manage_resource_aliases_template = """
+        # Implemented from azosid template for -
+        # osid.resource.ResourceAdminSession.can_manage_resource_aliases
+        return (self._can('${func_name}') or
+                bool(self._get_overriding_catalog_ids('${func_name}')))"""
+
     alias_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceAdminSession.alias_resources

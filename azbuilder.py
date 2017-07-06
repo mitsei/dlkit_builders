@@ -70,7 +70,7 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
             self.append(imports, 'from ..primitives import Id')
         elif cat == 'managers' and inherit_category != 'UNKNOWN_MODULE':
             # Add the osid_error import
-            self.append(imports, 'from ..osid.osid_errors import Unimplemented, OperationFailed')
+            self.append(imports, 'from ..osid.osid_errors import Unimplemented, OperationFailed, Unsupported')
             # Add the session import
             self.append(imports, 'from . import sessions')
             # Add the primitive import

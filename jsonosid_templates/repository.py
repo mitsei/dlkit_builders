@@ -1065,50 +1065,50 @@ class AssetForm:
         self._my_map['${var_name_mixed}'] = dict(self._${var_name}_default)"""
 
 
-class AssetSearch:
+# class AssetSearch:
+#
+#     import_statements = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#         'from ..utilities import get_registry',
+#         'from ..osid import searches as osid_searches',
+#     ]
+#
+#     init = """
+#     def __init__(self, runtime):
+#         self._namespace = 'repository.Asset'
+#         record_type_data_sets = get_registry('ASSET_RECORD_TYPES', runtime)
+#         self._record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_ids = []
+#         self._id_list = None
+#         for data_set in record_type_data_sets:
+#             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+#         osid_searches.OsidSearch.__init__(self, runtime)"""
+#
+#     search_among_assets = """
+#         self._id_list = asset_ids"""
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..utilities import get_registry',
-        'from ..osid import searches as osid_searches',
-    ]
 
-    init = """
-    def __init__(self, runtime):
-        self._namespace = 'repository.Asset'
-        record_type_data_sets = get_registry('ASSET_RECORD_TYPES', runtime)
-        self._record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_ids = []
-        self._id_list = None
-        for data_set in record_type_data_sets:
-            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)"""
-
-    search_among_assets = """
-        self._id_list = asset_ids"""
-
-
-class AssetSearchResults:
-
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import objects',
-    ]
-
-    init = """
-    def __init__(self, results, runtime):
-        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
-        self._results = results
-        self._runtime = runtime
-        self.retrieved = False"""
-
-    get_assets = """
-        if self.retrieved:
-            raise errors.IllegalState('List has already been retrieved.')
-        self.retrieved = True
-        return objects.AssetList(self._results, runtime=self._runtime)"""
+# class AssetSearchResults:
+#
+#     import_statements = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from . import objects',
+#     ]
+#
+#     init = """
+#     def __init__(self, results, runtime):
+#         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+#         self._results = results
+#         self._runtime = runtime
+#         self.retrieved = False"""
+#
+#     get_assets = """
+#         if self.retrieved:
+#             raise errors.IllegalState('List has already been retrieved.')
+#         self.retrieved = True
+#         return objects.AssetList(self._results, runtime=self._runtime)"""
 
 
 class AssetSearchSession:
@@ -1321,50 +1321,50 @@ class CompositionQuery:
         self._clear_terms('assetIds')"""
 
 
-class CompositionSearch:
+# class CompositionSearch:
+#
+#     import_statements = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#         'from ..utilities import get_registry',
+#         'from ..osid import searches as osid_searches',
+#     ]
+#
+#     init = """
+#     def __init__(self, runtime):
+#         self._namespace = 'repository.Composition'
+#         record_type_data_sets = get_registry('COMPOSITION_RECORD_TYPES', runtime)
+#         self._record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_ids = []
+#         self._id_list = None
+#         for data_set in record_type_data_sets:
+#             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+#         osid_searches.OsidSearch.__init__(self, runtime)"""
+#
+#     search_among_compositions = """
+#         self._id_list = composition_ids"""
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..utilities import get_registry',
-        'from ..osid import searches as osid_searches',
-    ]
 
-    init = """
-    def __init__(self, runtime):
-        self._namespace = 'repository.Composition'
-        record_type_data_sets = get_registry('COMPOSITION_RECORD_TYPES', runtime)
-        self._record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_ids = []
-        self._id_list = None
-        for data_set in record_type_data_sets:
-            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)"""
-
-    search_among_compositions = """
-        self._id_list = composition_ids"""
-
-
-class CompositionSearchResults:
-
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import objects',
-    ]
-
-    init = """
-    def __init__(self, results, runtime):
-        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
-        self._results = results
-        self._runtime = runtime
-        self.retrieved = False"""
-
-    get_compositions = """
-        if self.retrieved:
-            raise errors.IllegalState('List has already been retrieved.')
-        self.retrieved = True
-        return objects.CompositionList(self._results, runtime=self._runtime)"""
+# class CompositionSearchResults:
+#
+#     import_statements = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from . import objects',
+#     ]
+#
+#     init = """
+#     def __init__(self, results, runtime):
+#         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+#         self._results = results
+#         self._runtime = runtime
+#         self.retrieved = False"""
+#
+#     get_compositions = """
+#         if self.retrieved:
+#             raise errors.IllegalState('List has already been retrieved.')
+#         self.retrieved = True
+#         return objects.CompositionList(self._results, runtime=self._runtime)"""
 
 
 class CompositionRepositorySession:
