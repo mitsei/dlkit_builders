@@ -286,9 +286,6 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         self._confirm_build_method(impl_class, method_n)
 
         context = self._get_method_context(method, interface)
-        if method_n == 'get_catalog_ids_by_id':
-            import pdb
-            pdb.set_trace()
         template_name = self._get_template_name(pattern, interface_sn, method_n)
 
         # Check if there is a 'by hand' implementation available for this method
