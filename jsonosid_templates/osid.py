@@ -866,6 +866,10 @@ class OsidForm:
         'from ..utilities import is_string',
         'import uuid',
         'from decimal import Decimal',
+        'from dlkit.abstract_osid.id.primitives import Id as abc_id',
+        'from dlkit.abstract_osid.type.primitives import Type as abc_type',
+        'from dlkit.abstract_osid.calendaring.primitives import DateTime as abc_datetime',
+        'from dlkit.abstract_osid.calendaring.primitives import Duration as abc_duration'
     ]
 
     init = """
@@ -1018,7 +1022,12 @@ class OsidForm:
         if metadata.is_read_only():
             raise errors.NoAccess()
         if isinstance(inpt, abc_display_text):
-            display_text = inpt
+            display_text = {
+                'text': inpt.text,
+                'languageTypeId': str(inpt.language_type),
+                'formatTypeId': str(inpt.format_type),
+                'scriptTypeId': str(inpt.script_type)
+            }
         elif self._is_valid_string(inpt, metadata):
             display_text = dict(metadata.get_default_string_values()[0])
             display_text.update({'text': inpt})
