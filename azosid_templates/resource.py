@@ -712,42 +712,42 @@ class ResourceBinSession:
         # osid.resource.ResourceBinSession.get_resource_ids_by_bin
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.get_${object_name_under}_ids_by_${cat_name_under}(${cat_name_under}_id)"""
+        return self._provider_session.${method_name}(${cat_name_under}_id)"""
 
     get_resources_by_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_resources_by_bin_template
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id)"""
+        return self._provider_session.${method_name}(${cat_name_under}_id)"""
 
     get_resource_ids_by_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_resource_ids_by_bins
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.get_${object_name_under}_ids_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
+        return self._provider_session.${method_name}(${cat_name_under}_ids)"""
 
     get_resources_by_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_resources_by_bins
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.get_${object_name_plural_under}_by_${cat_name_plural_under}(${cat_name_under}_ids)"""
+        return self._provider_session.${method_name}(${cat_name_under}_ids)"""
 
     get_bin_ids_by_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_bin_ids_by_resource
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.get_${cat_name_under}_ids_by_${object_name_under}(${object_name_under}_id)"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_bins_by_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_bins_by_resource
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.get_${cat_name_plural_under}_by_${object_name_under}(${object_name_under}_id)"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
 
 class ResourceBinAssignmentSession:
@@ -774,28 +774,28 @@ class ResourceBinAssignmentSession:
         # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids
         if not self._can('assign'):
             raise PermissionDenied()
-        return self._provider_session.get_assignable_${cat_name_under}_ids(${cat_name_under}_id)"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_assignable_bin_ids_for_resource_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource
         if not self._can('assign'):
             raise PermissionDenied()
-        return self._provider_session.get_assignable_${cat_name_under}_ids_for_${object_name_under}(${cat_name_under}_id, ${object_name_under}_id)"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
     assign_resource_to_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
         if not self._can('assign'):
             raise PermissionDenied()
-        return self._provider_session.assign_${object_name_under}_to_${cat_name_under}(${object_name_under}_id, ${cat_name_under}_id)"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
     unassign_resource_from_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
         if not self._can('assign'):
             raise PermissionDenied()
-        return self._provider_session.unassign_${object_name_under}_from_${cat_name_under}(${object_name_under}_id, ${cat_name_under}_id)"""
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
 
 
 class ResourceAgentSession:

@@ -926,7 +926,7 @@ def ${interface_name_under}_test_fixture(request):
     get_resource_ids_by_bin_template = """
         # From test_templates/resource.py::ResourceBinSession::get_resource_ids_by_bin_template
         if not is_never_authz(self.service_config):
-            objects = self.svc_mgr.get_${object_name_under}_ids_by_${cat_name_under}(self.assigned_catalog.ident)
+            objects = self.svc_mgr.${method_name}(self.assigned_catalog.ident)
             assert objects.available() == 2
         else:
             with pytest.raises(errors.PermissionDenied):
