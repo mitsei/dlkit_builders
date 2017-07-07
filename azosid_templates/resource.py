@@ -272,8 +272,9 @@ class ResourceLookupSession:
     #     return self._overriding_${cat_name_under}_ids
 
     def _try_overriding_${cat_name_under_plural}(self, query):
-        for catalog_id in self._get_overriding_catalog_ids('lookup'):
-            query.match_${cat_name_under}_id(catalog_id, match=True)
+        if self._get_overriding_catalog_ids('lookup') is not None:
+            for catalog_id in self._get_overriding_catalog_ids('lookup'):
+                query.match_${cat_name_under}_id(catalog_id, match=True)
         return self._query_session.get_${object_name_under_plural}_by_query(query), query
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
@@ -434,8 +435,9 @@ class ResourceQuerySession:
     #     return self._overriding_${cat_name_under}_ids
 
     def _try_overriding_${cat_name_under_plural}(self, query):
-        for ${cat_name_under}_id in self._get_overriding_catalog_ids('search'):
-            query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
+        if self._get_overriding_catalog_ids('search') is not None:
+            for ${cat_name_under}_id in self._get_overriding_catalog_ids('search'):
+                query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
         return self._query_session.get_${object_name_under_plural}_by_query(query), query
 
     def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
