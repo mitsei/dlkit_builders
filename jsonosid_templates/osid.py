@@ -518,7 +518,7 @@ class OsidSession:
             else:
                 uses_cataloging = True
                 lookup_session = cataloging_manager.get_catalog_lookup_session()
-                self._my_catalog_map = lookup_session.get_catalog(self._catalog_identifier)._my_map
+                self._my_catalog_map = lookup_session.get_catalog(catalog_id)._my_map
                 self._catalog = Catalog(osid_object_map=self._my_catalog_map, runtime=self._runtime,
                                         proxy=self._proxy)
         else:
