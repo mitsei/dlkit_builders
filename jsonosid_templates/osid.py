@@ -499,13 +499,12 @@ class OsidSession:
             self._catalog_identifier = catalog_id.get_identifier()
 
             try:
-                # Try cataloging first? It seems there is no way to check the runtime config here,
-                #   since in testing, this appears to already be the "CatalogingProviderImpl" config
-                collection = JSONClientValidated('cataloging',
-                                                 collection='Catalog',
-                                                 runtime=self._runtime)
-                self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
-            except errors.NotFound:
+                config = self._runtime.get_configuration()
+                parameter_id = Id('parameter:' + db_name + 'CatalogingProviderImpl@mongo')
+                provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+                self._cataloging_manager = self._runtime.get_manager('CATALOGING',
+                                                                     provider_impl)  # need to add version argument
+            except (AttributeError, KeyError, errors.NotFound):
                 try:
                     collection = JSONClientValidated(db_name,
                                                      collection=cat_name,
@@ -518,6 +517,10 @@ class OsidSession:
                         raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
             else:
                 uses_cataloging = True
+                collection = JSONClientValidated('cataloging',
+                                                 collection='Catalog',
+                                                 runtime=self._runtime)
+                self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
                 self._catalog = Catalog(osid_object_map=self._my_catalog_map, runtime=self._runtime,
                                         proxy=self._proxy)
         else:
