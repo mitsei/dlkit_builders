@@ -502,8 +502,8 @@ class OsidSession:
                 config = self._runtime.get_configuration()
                 parameter_id = Id('parameter:' + db_name + 'CatalogingProviderImpl@mongo')
                 provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
-                self._cataloging_manager = self._runtime.get_manager('CATALOGING',
-                                                                     provider_impl)  # need to add version argument
+                cataloging_manager = self._runtime.get_manager('CATALOGING',
+                                                                provider_impl)  # need to add version argument
             except (AttributeError, KeyError, errors.NotFound):
                 try:
                     collection = JSONClientValidated(db_name,
@@ -517,10 +517,8 @@ class OsidSession:
                         raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
             else:
                 uses_cataloging = True
-                collection = JSONClientValidated('cataloging',
-                                                 collection='Catalog',
-                                                 runtime=self._runtime)
-                self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
+                lookup_session = cataloging_manager.get_catalog_lookup_session()
+                self._my_catalog_map = lookup_session.get_catalog(self._catalog_identifier)._my_map
                 self._catalog = Catalog(osid_object_map=self._my_catalog_map, runtime=self._runtime,
                                         proxy=self._proxy)
         else:
