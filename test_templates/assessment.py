@@ -3666,7 +3666,9 @@ class BankQuery:
 
 class BankForm:
     get_bank_form_record = """
-        if not is_never_authz(self.service_config):
+        if uses_cataloging(self.service_config):
+            pass  # cannot call the _get_record() methods on catalogs
+        elif not is_never_authz(self.service_config):
             with pytest.raises(errors.Unsupported):
                 self.object.get_bank_form_record(DEFAULT_TYPE)"""
 
