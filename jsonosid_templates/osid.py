@@ -503,7 +503,7 @@ class OsidSession:
                 parameter_id = Id('parameter:' + db_name + 'CatalogingProviderImpl@mongo')
                 provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
                 cataloging_manager = self._runtime.get_manager('CATALOGING',
-                                                                provider_impl)  # need to add version argument
+                                                               provider_impl)  # need to add version argument
             except (AttributeError, KeyError, errors.NotFound):
                 try:
                     collection = JSONClientValidated(db_name,
