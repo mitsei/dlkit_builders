@@ -2602,7 +2602,7 @@ def ${interface_name_under}_test_fixture(request):
 class BinNode:
 
     import_statements_pattern = [
-        'from dlkit.abstract_osid.cataloging.objects import Catalog'
+        'from dlkit.abstract_osid.osid.objects import OsidCatalog'
     ]
 
     init_template = """
@@ -2669,10 +2669,7 @@ def ${interface_name_under}_test_fixture(request):
         # from test_templates/resource.py::BinNode::get_bin_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}
         if not is_never_authz(self.service_config):
-            if uses_cataloging(self.service_config):
-                assert isinstance(self.${cat_name_under}_list[0].${method_name}(), Catalog)
-            else:
-                assert isinstance(self.${cat_name_under}_list[0].${method_name}(), ${cat_name})
+            assert isinstance(self.${cat_name_under}_list[0].${method_name}(), OsidCatalog)
             assert str(self.${cat_name_under}_list[0].${method_name}().ident) == str(self.${cat_name_under}_list[0].ident)"""
 
     get_parent_bin_nodes_template = """
