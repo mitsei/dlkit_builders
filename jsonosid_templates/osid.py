@@ -438,6 +438,7 @@ class OsidSession:
         'from ..utilities import get_locale_with_proxy',
         'from ..utilities import make_catalog_map',
         'from ..utilities import camel_to_under',
+        'from ..cataloging.objects import Catalog',
         'from .. import types',
         'COMPARATIVE = 0',
         'PLENARY = 1',
@@ -493,23 +494,39 @@ class OsidSession:
         self._catalog_identifier = None
         self._init_proxy_and_runtime(proxy, runtime)
 
+        uses_cataloging = False
         if catalog_id is not None and catalog_id.get_identifier() != PHANTOM_ROOT_IDENTIFIER:
             self._catalog_identifier = catalog_id.get_identifier()
 
-            collection = JSONClientValidated(db_name,
-                                             collection=cat_name,
-                                             runtime=self._runtime)
             try:
+                # Try cataloging first? It seems there is no way to check the runtime config here,
+                #   since in testing, this appears to already be the "CatalogingProviderImpl" config
+                collection = JSONClientValidated('cataloging',
+                                                 collection='Catalog',
+                                                 runtime=self._runtime)
                 self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
             except errors.NotFound:
-                if catalog_id.get_identifier_namespace() != db_name + '.' + cat_name:
-                    self._my_catalog_map = self._create_orchestrated_cat(catalog_id, db_name, cat_name)
-                else:
-                    raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
+                try:
+                    collection = JSONClientValidated(db_name,
+                                                     collection=cat_name,
+                                                     runtime=self._runtime)
+                    self._my_catalog_map = collection.find_one({'_id': ObjectId(self._catalog_identifier)})
+                except errors.NotFound:
+                    if catalog_id.get_identifier_namespace() != db_name + '.' + cat_name:
+                        self._my_catalog_map = self._create_orchestrated_cat(catalog_id, db_name, cat_name)
+                    else:
+                        raise errors.NotFound('could not find catalog identifier ' + catalog_id.get_identifier() + cat_name)
+            else:
+                uses_cataloging = True
+                self._catalog = Catalog(osid_object_map=self._my_catalog_map, runtime=self._runtime,
+                                        proxy=self._proxy)
         else:
             self._catalog_identifier = PHANTOM_ROOT_IDENTIFIER
             self._my_catalog_map = make_catalog_map(cat_name, identifier=self._catalog_identifier)
-        self._catalog = cat_class(osid_object_map=self._my_catalog_map, runtime=self._runtime, proxy=self._proxy)
+
+        if not uses_cataloging:
+            self._catalog = cat_class(osid_object_map=self._my_catalog_map, runtime=self._runtime, proxy=self._proxy)
+
         self._catalog._authority = self._authority  # there should be a better way...
         self._catalog_id = self._catalog.get_id()
         self._forms = dict()
