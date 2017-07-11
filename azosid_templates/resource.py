@@ -64,15 +64,12 @@ class ResourceManager:
             query_session.use_federated_${cat_name_under}_view()
         except Unimplemented:
             query_session = None
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                hierarchy_session=self._get_hierarchy_session(),
-                query_session=query_session)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            hierarchy_session=self._get_hierarchy_session(),
+            query_session=query_session)"""
 
     get_resource_lookup_session_for_bin_template = """
         # Implemented from azosid template for -
@@ -82,63 +79,48 @@ class ResourceManager:
             query_session.use_federated_${cat_name_under}_view()
         except Unimplemented:
             query_session = None
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                hierarchy_session=self._get_hierarchy_session(),
-                query_session=query_session)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            hierarchy_session=self._get_hierarchy_session(),
+            query_session=query_session)"""
 
     get_resource_admin_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_template
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                provider_manager=self._provider_manager)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)"""
 
     get_resource_admin_session_for_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                provider_manager=self._provider_manager)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)"""
 
     get_resource_notification_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_template
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                provider_manager=self._provider_manager)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)"""
 
     get_resource_notification_session_for_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_for_bin_template
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                provider_manager=self._provider_manager)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)"""
 
 
 class ResourceProxyManager:
@@ -167,16 +149,13 @@ class ResourceProxyManager:
             query_session.use_federated_${cat_name_under}_view()
         except Unimplemented:
             query_session = None
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(proxy),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                proxy=proxy,
-                hierarchy_session=self._get_hierarchy_session(proxy),
-                query_session=query_session)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(proxy),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            proxy=proxy,
+            hierarchy_session=self._get_hierarchy_session(proxy),
+            query_session=query_session)"""
 
     get_resource_lookup_session_for_bin_template = """
         # Implemented from azosid template for -
@@ -186,68 +165,53 @@ class ResourceProxyManager:
             query_session.use_federated_${cat_name_under}_view()
         except Unimplemented:
             query_session = None
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                proxy=proxy,
-                hierarchy_session=self._get_hierarchy_session(proxy),
-                query_session=query_session)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            proxy=proxy,
+            hierarchy_session=self._get_hierarchy_session(proxy),
+            query_session=query_session)"""
 
     get_resource_admin_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_template
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(proxy),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                provider_manager=self._provider_manager,
-                proxy=proxy)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(proxy),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager,
+            proxy=proxy)"""
 
     get_resource_admin_session_for_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_lookup_session_for_bin_template
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                provider_manager=self._provider_manager,
-                proxy=proxy)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager,
+            proxy=proxy)"""
 
     get_resource_notification_session_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_template
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                provider_manager=self._provider_manager,
-                proxy=proxy)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}, proxy),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager,
+            proxy=proxy)"""
 
     get_resource_notification_session_for_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceManager.get_resource_notification_session_for_bin_template
-        try:
-            return getattr(sessions, '${return_type}')(
-                provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}, proxy),
-                authz_session=self._get_authz_session(),
-                override_lookup_session=self._get_override_lookup_session(),
-                provider_manager=self._provider_manager,
-                proxy=proxy)
-        except AttributeError:
-            raise OperationFailed()"""
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}, proxy),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager,
+            proxy=proxy)"""
 
 
 class ResourceLookupSession:
