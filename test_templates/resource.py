@@ -1416,6 +1416,7 @@ def ${interface_name_under}_test_fixture(request):
 class BinAdminSession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.osid.objects import OsidCatalogForm, OsidCatalog',
         'from dlkit.runtime import PROXY_SESSION, proxy_example',
         'from dlkit.runtime.managers import Runtime',
         'from dlkit.primordium.id.primitives import Id',
@@ -1486,7 +1487,7 @@ def ${interface_name_under}_test_fixture(request):
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         if not is_never_authz(self.service_config):
             catalog_form = self.svc_mgr.${method_name}([])
-            assert isinstance(catalog_form, ${return_type})
+            assert isinstance(catalog_form, OsidCatalogForm)
             assert not catalog_form.is_for_update()
         else:
             with pytest.raises(errors.PermissionDenied):
@@ -1500,7 +1501,7 @@ def ${interface_name_under}_test_fixture(request):
             catalog_form.display_name = 'Test ${cat_name}'
             catalog_form.description = 'Test ${cat_name} for ${interface_name}.${method_name} tests'
             new_catalog = self.svc_mgr.${method_name}(catalog_form)
-            assert isinstance(new_catalog, ${return_type})
+            assert isinstance(new_catalog, OsidCatalog)
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.svc_mgr.${method_name}('foo')"""
@@ -1510,7 +1511,7 @@ def ${interface_name_under}_test_fixture(request):
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         if not is_never_authz(self.service_config):
             catalog_form = self.svc_mgr.${method_name}(self.catalog.ident)
-            assert isinstance(catalog_form, ${return_type})
+            assert isinstance(catalog_form, OsidCatalogForm)
             assert catalog_form.is_for_update()
         else:
             with pytest.raises(errors.PermissionDenied):
@@ -1553,6 +1554,7 @@ def ${interface_name_under}_test_fixture(request):
 class BinHierarchySession:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.osid.objects import OsidList',
         'from dlkit.abstract_osid.id.objects import IdList',
         'from dlkit.abstract_osid.hierarchy.objects import Hierarchy',
         'from dlkit.abstract_osid.osid.objects import OsidNode',
@@ -1633,7 +1635,7 @@ def ${interface_name_under}_test_fixture(request):
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}List
         if not is_never_authz(self.service_config):
             roots = self.svc_mgr.${method_name}()
-            assert isinstance(roots, ${cat_name}List)
+            assert isinstance(roots, OsidList)
             assert roots.available() == 1
         else:
             with pytest.raises(errors.PermissionDenied):
@@ -1675,10 +1677,9 @@ def ${interface_name_under}_test_fixture(request):
 
     get_parent_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::get_parent_bins_template
-        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         if not is_never_authz(self.service_config):
             catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
-            assert isinstance(catalog_list, ${return_type})
+            assert isinstance(catalog_list, OsidList)
             assert catalog_list.available() == 1
             assert catalog_list.next().display_name.text == 'Root'
         else:
@@ -1745,10 +1746,9 @@ def ${interface_name_under}_test_fixture(request):
 
     get_child_bins_template = """
         # From test_templates/resource.py::BinHierarchySession::get_child_bins_template
-        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${return_type}
         if not is_never_authz(self.service_config):
             catalog_list = self.svc_mgr.${method_name}(self.catalogs['Child 1'].ident)
-            assert isinstance(catalog_list, ${return_type})
+            assert isinstance(catalog_list, OsidList)
             assert catalog_list.available() == 1
             assert catalog_list.next().display_name.text == 'Grandchild 1'
         else:
@@ -1865,7 +1865,7 @@ def ${interface_name_under}_test_fixture(request):
         # this is tested in the setUpClass
         if not is_never_authz(self.service_config):
             roots = self.session.get_root_${cat_name_plural_under}()
-            assert isinstance(roots, ABCObjects.${cat_name}List)
+            assert isinstance(roots, OsidList)
             assert roots.available() == 1
         else:
             with pytest.raises(errors.PermissionDenied):
@@ -1899,7 +1899,7 @@ def ${interface_name_under}_test_fixture(request):
         if not is_never_authz(self.service_config):
             # this is tested in the setUpClass
             children = self.session.get_child_${cat_name_plural_under}(self.catalogs['Root'].ident)
-            assert isinstance(children, ABCObjects.${cat_name}List)
+            assert isinstance(children, OsidList)
             assert children.available() == 2
         else:
             with pytest.raises(errors.PermissionDenied):
@@ -2602,6 +2602,7 @@ def ${interface_name_under}_test_fixture(request):
 class BinNode:
 
     import_statements_pattern = [
+        'from dlkit.abstract_osid.osid.objects import OsidCatalog'
     ]
 
     init_template = """
@@ -2668,7 +2669,7 @@ def ${interface_name_under}_test_fixture(request):
         # from test_templates/resource.py::BinNode::get_bin_template
         from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}
         if not is_never_authz(self.service_config):
-            assert isinstance(self.${cat_name_under}_list[0].${method_name}(), ${cat_name})
+            assert isinstance(self.${cat_name_under}_list[0].${method_name}(), OsidCatalog)
             assert str(self.${cat_name_under}_list[0].${method_name}().ident) == str(self.${cat_name_under}_list[0].ident)"""
 
     get_parent_bin_nodes_template = """

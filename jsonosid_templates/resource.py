@@ -784,7 +784,7 @@ class ResourceBinSession:
     get_resources_by_bin_template = """
         # Implemented from template for
         # osid.resource.ResourceBinSession.get_resources_by_bin
-        mgr = self._get_provider_manager('${package_name_replace_upper}')
+        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${object_name_under}_lookup_session_for_${cat_name_under}(${arg0_name}, proxy=self._proxy)
         lookup_session.use_isolated_${cat_name_under}_view()
         return lookup_session.get_${object_name_plural_under}()"""
@@ -821,7 +821,7 @@ class ResourceBinSession:
     get_bins_by_resource_template = """
         # Implemented from template for
         # osid.resource.ResourceBinSession.get_bins_by_resource
-        mgr = self._get_provider_manager('${package_name_replace_upper}')
+        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         return lookup_session.get_${cat_name_plural_under}_by_ids(
             self.get_${cat_name_under}_ids_by_${object_name_under}(${arg0_name}))"""
@@ -889,7 +889,7 @@ class ResourceBinAssignmentSession:
         # osid.resource.ResourceBinAssignmentSession.unassign_resource_from_bin
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
-        cat = lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
+        lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
         self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
 
     reassign_resource_to_bin_template = """
@@ -1168,7 +1168,7 @@ class BinAdminSession:
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         if self._catalog_session is not None:
-            return self._catalog_session.can_create_catalogs_with_record_types(catalog_record_types=${arg0_name})
+            return self._catalog_session.can_create_catalog_with_record_types(catalog_record_types=${arg0_name})
         return True"""
 
     get_bin_form_for_create_import_templates = [
@@ -1325,7 +1325,7 @@ class BinAdminSession:
         # Implemented from template for
         # osid.resource.BinLookupSession.alias_bin_template
         if self._catalog_session is not None:
-            return self._catalog_session.alias_catalog(catalog_id=${arg0_name}, alias_id=${arg1_name})
+            return self._catalog_session.alias_catalog(catalog_id=${arg0_name}, alias_id=alias_id)
         self._alias_id(primary_id=${arg0_name}, equivalent_id=alias_id)"""
 
 
@@ -1433,14 +1433,14 @@ class BinHierarchySession:
         # Implemented from template for
         # osid.resource.BinHierarchySession.get_parent_bin_ids
         if self._catalog_session is not None:
-            return self._catalog_session.git_parent_catalog_ids()
+            return self._catalog_session.get_parent_catalog_ids(catalog_id=${arg0_name})
         return self._hierarchy_session.get_parents(id_=${arg0_name})"""
 
     get_parent_bins_template = """
         # Implemented from template for
         # osid.resource.BinHierarchySession.get_parent_bins
         if self._catalog_session is not None:
-            return self._catalog_session.git_parent_catalogs(catalog_id=${arg0_name})
+            return self._catalog_session.get_parent_catalogs(catalog_id=${arg0_name})
         return ${cat_name}LookupSession(
             self._proxy,
             self._runtime).get_${cat_name_plural_under}_by_ids(
@@ -1601,7 +1601,10 @@ class BinQuerySession:
     _session_namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
         OsidSession._init_catalog(self, proxy, runtime)
+        if self._cataloging_manager is not None:
+            self._catalog_session = self._cataloging_manager.get_catalog_query_session()
         self._forms = dict()
         self._kwargs = kwargs"""
 
@@ -1627,6 +1630,8 @@ class BinQuerySession:
     get_bins_by_query_template = """
         # Implemented from template for
         # osid.resource.BinQuerySession.get_bins_by_query_template
+        if self._catalog_session is not None:
+            return self._catalog_session.get_catalogs_by_query(${arg0_name})
         query_terms = dict(${arg0_name}._query_terms)
         collection = JSONClientValidated('${package_name}',
                                          collection='${cat_name}',

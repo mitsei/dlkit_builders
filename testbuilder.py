@@ -57,6 +57,8 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
                 # i.e. Question.get_question_record() throws Unsupported()
                 impl = """        if is_never_authz(self.service_config):
             pass  # no object to call the method on?
+        elif uses_cataloging(self.service_config):
+            pass  # cannot call the _get_record() methods on catalogs
         else:
             with pytest.raises(errors.Unimplemented):
                 self.{0}.{1}({2})""".format(test_object,
@@ -104,7 +106,7 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
     def _update_module_imports(self, modules, interface):
         imports = modules[interface['category']]['imports']
         self.append(imports, 'import pytest')
-        self.append(imports, 'from ..utilities.general import is_never_authz, is_no_authz')
+        self.append(imports, 'from ..utilities.general import is_never_authz, is_no_authz, uses_cataloging')
 
         # Check to see if there are any additional inheritances required
         # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
