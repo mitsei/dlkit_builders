@@ -237,6 +237,7 @@ class ResourceLookupSession:
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
         'DEFAULT_GENUS_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'GenusType\', \'authority\': \'DLKIT.MIT.EDU\'})',
         'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.abstract_osid.${base_pkg_name_reserved}.objects import ${cat_name} as ABC${cat_name}',
         'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
 
@@ -292,8 +293,7 @@ def ${interface_name_under}_test_fixture(request):
         # is this test really needed?
         # From test_templates/resource.py::ResourceLookupSession::get_bin_template
         if not is_never_authz(self.service_config):
-            from dlkit.abstract_osid.${package_name}.objects import ${return_type}
-            assert isinstance(self.catalog.${method_name}(), ${return_type})"""
+            assert isinstance(self.catalog.${method_name}(), ABC${return_type})"""
 
     can_lookup_resources_template = """
         # From test_templates/resource.py ResourceLookupSession.can_lookup_resources_template
@@ -700,6 +700,13 @@ def ${interface_name_under}_test_fixture(request):
             form = self.catalog.${method_name}(self.osid_object.ident)
             assert isinstance(form, OsidForm)
             assert form.is_for_update()
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}(['This is Doomed!'])
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}(
+                    Id(authority='Respect my Authoritay!',
+                       namespace='${package_name}.{object_name}',
+                       identifier='1'))
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.${method_name}(self.fake_id)"""
@@ -718,6 +725,12 @@ def ${interface_name_under}_test_fixture(request):
             assert updated_object.display_name.text == 'new name'
             assert updated_object.description.text == 'new description'
             assert updated_object.genus_type == NEW_TYPE_2
+            with pytest.raises(errors.IllegalState):
+                self.catalog.${method_name}(form)
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}('I Will Break You!')
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}(self.form)
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.${method_name}('foo')"""
