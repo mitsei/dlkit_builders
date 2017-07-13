@@ -290,6 +290,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 'implpkg_name': self._abc_pkg_name(abc=False, reserved_word=False),
                 'kitpkg_name': self._abc_pkg_name(abc=False),
                 'pkg_name': self.package['name'],
+                'base_pkg_name_reserved': fixed_package_name.split('.')[0],
                 'pkg_name_caps': self.first(self.package['name']).title(),
                 'pkg_name_replaced': self.replace(self.package['name']),
                 'pkg_name_replaced_reserved': self.replace(fixed_package_name),
