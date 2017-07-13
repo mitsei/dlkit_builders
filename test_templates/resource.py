@@ -1498,6 +1498,8 @@ def ${interface_name_under}_test_fixture(request):
             catalog_form = self.svc_mgr.${method_name}([])
             assert isinstance(catalog_form, OsidCatalogForm)
             assert not catalog_form.is_for_update()
+            with pytest.raises(errors.InvalidArgument):
+                self.svc_mgr.${method_name}([1])
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.svc_mgr.${method_name}([])"""
@@ -1511,6 +1513,13 @@ def ${interface_name_under}_test_fixture(request):
             catalog_form.description = 'Test ${cat_name} for ${interface_name}.${method_name} tests'
             new_catalog = self.svc_mgr.${method_name}(catalog_form)
             assert isinstance(new_catalog, OsidCatalog)
+            with pytest.raises(errors.IllegalState):
+                self.svc_mgr.${method_name}(catalog_form)
+            with pytest.raises(errors.InvalidArgument):
+                self.svc_mgr.${method_name}('I Will Break You!')
+            update_form = self.svc_mgr.get_${cat_name_under}_form_for_update(new_catalog.ident)
+            with pytest.raises(errors.InvalidArgument):
+                self.svc_mgr.${method_name}(update_form)
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.svc_mgr.${method_name}('foo')"""
