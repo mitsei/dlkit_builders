@@ -47,11 +47,11 @@ def ${interface_name_under}_class_fixture(request):
 @pytest.fixture(scope="function")
 def ${interface_name_under}_test_fixture(request):
     if not is_never_authz(request.cls.service_config):
-        form = request.cls.catalog.get_asset_form_for_create([])
-        form.display_name = 'new Asset'
-        form.description = 'description of Asset'
-        form.set_genus_type(NEW_TYPE)
-        request.cls.osid_object = request.cls.catalog.create_asset(form)
+        request.cls.form = request.cls.catalog.get_asset_form_for_create([])
+        request.cls.form.display_name = 'new Asset'
+        request.cls.form.description = 'description of Asset'
+        request.cls.form.set_genus_type(NEW_TYPE)
+        request.cls.osid_object = request.cls.catalog.create_asset(request.cls.form)
         request.cls.parent_object = request.cls.osid_object
     request.cls.session = request.cls.catalog
 

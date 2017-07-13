@@ -952,13 +952,13 @@ def ${interface_name_under}_class_fixture(request):
             request.cls.sequence_rule_list.append(obj)
             request.cls.sequence_rule_ids.append(obj.ident)
 
-        create_form = request.cls.catalog.get_sequence_rule_form_for_create(request.cls.assessment_part_1.ident,
-                                                                            request.cls.assessment_part_2.ident,
-                                                                            [])
-        create_form.display_name = 'new SequenceRule'
-        create_form.description = 'description of SequenceRule'
-        create_form.genus_type = NEW_TYPE
-        request.cls.osid_object = request.cls.catalog.create_sequence_rule(create_form)
+        request.cls.form = request.cls.catalog.get_sequence_rule_form_for_create(request.cls.assessment_part_1.ident,
+                                                                                 request.cls.assessment_part_2.ident,
+                                                                                 [])
+        request.cls.form.display_name = 'new SequenceRule'
+        request.cls.form.description = 'description of SequenceRule'
+        request.cls.form.genus_type = NEW_TYPE
+        request.cls.osid_object = request.cls.catalog.create_sequence_rule(request.cls.form)
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
@@ -1308,12 +1308,12 @@ def ${interface_name_under}_class_fixture(request):
 @pytest.fixture(scope="function")
 def ${interface_name_under}_test_fixture(request):
     if not is_never_authz(request.cls.service_config):
-        form = request.cls.catalog.get_assessment_part_form_for_create_for_assessment(request.cls.assessment.ident,
-                                                                                      [SIMPLE_SEQUENCE_RECORD_TYPE])
-        form.display_name = 'new AssessmentPart'
-        form.description = 'description of AssessmentPart'
-        form.set_genus_type(NEW_TYPE)
-        request.cls.osid_object = request.cls.catalog.create_assessment_part_for_assessment(form)
+        request.cls.form = request.cls.catalog.get_assessment_part_form_for_create_for_assessment(request.cls.assessment.ident,
+                                                                                                  [SIMPLE_SEQUENCE_RECORD_TYPE])
+        request.cls.form.display_name = 'new AssessmentPart'
+        request.cls.form.description = 'description of AssessmentPart'
+        request.cls.form.set_genus_type(NEW_TYPE)
+        request.cls.osid_object = request.cls.catalog.create_assessment_part_for_assessment(request.cls.form)
     request.cls.session = request.cls.catalog
 
     def test_tear_down():

@@ -953,11 +953,11 @@ def ${interface_name_under}_class_fixture(request):
 @pytest.fixture(scope="function")
 def ${interface_name_under}_test_fixture(request):
     if not is_never_authz(request.cls.service_config):
-        create_form = request.cls.catalog.get_item_form_for_create([])
-        create_form.display_name = 'new Item'
-        create_form.description = 'description of Item'
-        create_form.set_genus_type(NEW_TYPE)
-        request.cls.osid_object = request.cls.catalog.create_item(create_form)
+        request.cls.form = request.cls.catalog.get_item_form_for_create([])
+        request.cls.form.display_name = 'new Item'
+        request.cls.form.description = 'description of Item'
+        request.cls.form.set_genus_type(NEW_TYPE)
+        request.cls.osid_object = request.cls.catalog.create_item(request.cls.form)
     request.cls.session = request.cls.catalog"""
 
     create_answer = """
@@ -1339,11 +1339,11 @@ def ${interface_name_under}_class_fixture(request):
         create_form.description = 'Test AssessmentOffered for AssessmentTakenAdminSession tests'
         obj = request.cls.catalog.create_assessment_offered(create_form)
         request.cls.assessment_offered = obj
-        form = request.cls.catalog.get_assessment_taken_form_for_create(request.cls.assessment_offered.ident, [])
-        form.display_name = 'new AssessmentTaken'
-        form.description = 'description of AssessmentTaken'
-        form.set_genus_type(NEW_TYPE)
-        request.cls.osid_object = request.cls.catalog.create_assessment_taken(form)
+        request.cls.form = request.cls.catalog.get_assessment_taken_form_for_create(request.cls.assessment_offered.ident, [])
+        request.cls.form.display_name = 'new AssessmentTaken'
+        request.cls.form.description = 'description of AssessmentTaken'
+        request.cls.form.set_genus_type(NEW_TYPE)
+        request.cls.osid_object = request.cls.catalog.create_assessment_taken(request.cls.form)
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
@@ -2684,11 +2684,11 @@ def ${interface_name_under}_class_fixture(request):
             obj = request.cls.catalog.create_assessment_offered(create_form)
             request.cls.assessment_offered_list.append(obj)
             request.cls.assessment_offered_ids.append(obj.ident)
-        create_form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident, [])
-        create_form.display_name = 'new AssessmentOffered'
-        create_form.description = 'description of AssessmentOffered'
-        create_form.genus_type = NEW_TYPE
-        request.cls.osid_object = request.cls.catalog.create_assessment_offered(create_form)
+        request.cls.form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident, [])
+        request.cls.form.display_name = 'new AssessmentOffered'
+        request.cls.form.description = 'description of AssessmentOffered'
+        request.cls.form.genus_type = NEW_TYPE
+        request.cls.osid_object = request.cls.catalog.create_assessment_offered(request.cls.form)
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 

@@ -628,11 +628,11 @@ def ${interface_name_under}_class_fixture(request):
 def ${interface_name_under}_test_fixture(request):
     # From test_templates/resource.py::ResourceAdminSession::init_template
     if not is_never_authz(request.cls.service_config):
-        form = request.cls.catalog.get_${object_name_under}_form_for_create([])
-        form.display_name = 'new ${object_name}'
-        form.description = 'description of ${object_name}'
-        form.set_genus_type(NEW_TYPE)
-        request.cls.osid_object = request.cls.catalog.create_${object_name_under}(form)
+        request.cls.form = request.cls.catalog.get_${object_name_under}_form_for_create([])
+        request.cls.form.display_name = 'new ${object_name}'
+        request.cls.form.description = 'description of ${object_name}'
+        request.cls.form.set_genus_type(NEW_TYPE)
+        request.cls.osid_object = request.cls.catalog.create_${object_name_under}(request.cls.form)
     request.cls.session = request.cls.catalog
 
     def test_tear_down():
@@ -668,6 +668,8 @@ def ${interface_name_under}_test_fixture(request):
             form = self.catalog.${method_name}([])
             assert isinstance(form, OsidForm)
             assert not form.is_for_update()
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}([1])
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.${method_name}([])"""
@@ -680,6 +682,13 @@ def ${interface_name_under}_test_fixture(request):
             assert self.osid_object.display_name.text == 'new ${object_name}'
             assert self.osid_object.description.text == 'description of ${object_name}'
             assert self.osid_object.genus_type == NEW_TYPE
+            with pytest.raises(errors.IllegalState):
+                self.catalog.${method_name}(self.form)
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}('I Will Break You!')
+            update_form = self.catalog.get_${object_name_under}_form_for_update(self.osid_object.ident)
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}(update_form)
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.${method_name}('foo')"""
