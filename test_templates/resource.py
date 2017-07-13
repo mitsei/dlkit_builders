@@ -292,7 +292,8 @@ def ${interface_name_under}_test_fixture(request):
         # is this test really needed?
         # From test_templates/resource.py::ResourceLookupSession::get_bin_template
         if not is_never_authz(self.service_config):
-            assert self.catalog is not None"""
+            from dlkit.abstract_osid.${package_name}.objects import ${return_type}
+            assert isinstance(self.catalog.${method_name}(), ${return_type})"""
 
     can_lookup_resources_template = """
         # From test_templates/resource.py ResourceLookupSession.can_lookup_resources_template
