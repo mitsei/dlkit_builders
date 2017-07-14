@@ -607,6 +607,10 @@ def ${interface_name_under}_class_fixture(request):
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
+    request.cls.assessment_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
     request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
