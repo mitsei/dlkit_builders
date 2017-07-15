@@ -46,11 +46,9 @@ class GradeEntryAdminSession:
                                          runtime=self._runtime)
         if not isinstance(grade_entry_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        if grade_entry_id.get_identifier_namespace() != 'grading.GradeEntry':
-            if grade_entry_id.get_authority() != self._authority:
-                raise errors.InvalidArgument()
-            else:
-                grade_entry_id = self._get_grade_entry_id_with_enclosure(grade_entry_id)
+        if (grade_entry_id.get_identifier_namespace() != 'grading.GradeEntry' or
+                grade_entry_id.get_authority() != self._authority):
+            raise errors.InvalidArgument()
         result = collection.find_one({'_id': ObjectId(grade_entry_id.get_identifier())})
 
         obj_form = objects.GradeEntryForm(

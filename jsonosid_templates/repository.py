@@ -596,6 +596,28 @@ class AssetAdminSession:
             proxy=self._proxy)._delete()
         collection.save(${object_name_under})"""
 
+    additional_methods = """
+    def _get_asset_id_with_enclosure(self, enclosure_id):
+        \"\"\"Create an Asset with an enclosed foreign object.
+
+        This is here to support AssetCompositionSession.set_asset. May need
+        to add this in other objects to support other osid.Containable objects.
+        return: (osid.id.Id) - the id of the new Asset
+
+        \"\"\"
+        mgr = self._get_provider_manager('REPOSITORY')
+        query_session = mgr.get_asset_query_session_for_repository(self._catalog_id, proxy=self._proxy)
+        query_form = query_session.get_asset_query()
+        query_form.match_enclosed_object_id(enclosure_id)
+        query_result = query_session.get_assets_by_query(query_form)
+        if query_result.available() > 0:
+            asset_id = query_result.next().get_id()
+        else:
+            create_form = self.get_asset_form_for_create([ENCLOSURE_RECORD_TYPE])
+            create_form.set_enclosed_object(enclosure_id)
+            asset_id = self.create_asset(create_form).get_id()
+        return asset_id"""
+
 
 class CompositionLookupSession:
 
