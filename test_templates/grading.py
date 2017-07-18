@@ -1262,11 +1262,11 @@ def ${interface_name_under}_class_fixture(request):
             request.cls.grade_entry_list.append(object)
             request.cls.grade_entry_ids.append(object.ident)
 
-        create_form = request.cls.catalog.get_grade_entry_form_for_create(request.cls.gradebook_column_ids[0], AGENT_ID, [])
-        create_form.display_name = 'new GradeEntry'
-        create_form.description = 'description of GradeEntry'
-        create_form.genus_type = NEW_TYPE
-        request.cls.osid_object = request.cls.catalog.create_grade_entry(create_form)
+        request.cls.form = request.cls.catalog.get_grade_entry_form_for_create(request.cls.gradebook_column_ids[0], AGENT_ID, [])
+        request.cls.form.display_name = 'new GradeEntry'
+        request.cls.form.description = 'description of GradeEntry'
+        request.cls.form.genus_type = NEW_TYPE
+        request.cls.osid_object = request.cls.catalog.create_grade_entry(request.cls.form)
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 

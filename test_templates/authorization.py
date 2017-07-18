@@ -677,15 +677,15 @@ def ${interface_name_under}_class_fixture(request):
             request.cls.authorization_list.append(object)
             request.cls.authorization_ids.append(object.ident)
 
-        form = request.cls.catalog.get_authorization_form_for_create_for_agent(
+        request.cls.form = request.cls.catalog.get_authorization_form_for_create_for_agent(
             AGENT_ID,
             LOOKUP_RESOURCE_FUNCTION_ID,
             Id(**{\'identifier\': \'foo\', \'namespace\': \'resource.Resource\', \'authority\': \'ODL.MIT.EDU\'}),
             [])
-        form.display_name = 'new Authorization'
-        form.description = 'description of Authorization'
-        form.genus_type = NEW_TYPE
-        request.cls.osid_object = request.cls.catalog.create_authorization(form)
+        request.cls.form.display_name = 'new Authorization'
+        request.cls.form.description = 'description of Authorization'
+        request.cls.form.genus_type = NEW_TYPE
+        request.cls.osid_object = request.cls.catalog.create_authorization(request.cls.form)
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 

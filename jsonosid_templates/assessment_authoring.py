@@ -283,11 +283,9 @@ class AssessmentPartAdminSession:
                                          runtime=self._runtime)
         if not isinstance(assessment_part_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        if assessment_part_id.get_identifier_namespace() != 'assessment_authoring.AssessmentPart':
-            if assessment_part_id.get_authority() != self._authority:
-                raise errors.InvalidArgument()
-            else:
-                assessment_part_id = self._get_assessment_part_id_with_enclosure(assessment_part_id)
+        if (assessment_part_id.get_identifier_namespace() != 'assessment_authoring.AssessmentPart' or
+                assessment_part_id.get_authority() != self._authority):
+            raise errors.InvalidArgument()
         result = collection.find_one({'_id': ObjectId(assessment_part_id.get_identifier())})
 
         mdata = {}

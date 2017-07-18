@@ -858,11 +858,11 @@ def ${interface_name_under}_class_fixture(request):
             request.cls.activity_list.append(obj)
             request.cls.activity_ids.append(obj.ident)
 
-        create_form = request.cls.catalog.get_activity_form_for_create(request.cls.objective.ident, [])
-        create_form.display_name = 'new Activity'
-        create_form.description = 'description of Activity'
-        create_form.genus_type = NEW_TYPE
-        request.cls.osid_object = request.cls.catalog.create_activity(create_form)
+        request.cls.form = request.cls.catalog.get_activity_form_for_create(request.cls.objective.ident, [])
+        request.cls.form.display_name = 'new Activity'
+        request.cls.form.description = 'description of Activity'
+        request.cls.form.genus_type = NEW_TYPE
+        request.cls.osid_object = request.cls.catalog.create_activity(request.cls.form)
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
@@ -1525,11 +1525,11 @@ def ${interface_name_under}_class_fixture(request):
             request.cls.proficiency_list.append(obj)
             request.cls.proficiency_ids.append(obj.ident)
 
-        create_form = request.cls.catalog.get_proficiency_form_for_create(request.cls.objective.ident, AGENT_ID, [])
-        create_form.display_name = 'new Proficiency'
-        create_form.description = 'description of Proficiency'
-        create_form.genus_type = NEW_TYPE
-        request.cls.osid_object = request.cls.catalog.create_proficiency(create_form)
+        request.cls.form = request.cls.catalog.get_proficiency_form_for_create(request.cls.objective.ident, AGENT_ID, [])
+        request.cls.form.display_name = 'new Proficiency'
+        request.cls.form.description = 'description of Proficiency'
+        request.cls.form.genus_type = NEW_TYPE
+        request.cls.osid_object = request.cls.catalog.create_proficiency(request.cls.form)
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 

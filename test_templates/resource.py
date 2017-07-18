@@ -237,6 +237,7 @@ class ResourceLookupSession:
         'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
         'DEFAULT_GENUS_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'GenusType\', \'authority\': \'DLKIT.MIT.EDU\'})',
         'from dlkit.primordium.id.primitives import Id',
+        'from dlkit.abstract_osid.${base_pkg_name_reserved}.objects import ${cat_name} as ABC${cat_name}',
         'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
     ]
 
@@ -292,7 +293,7 @@ def ${interface_name_under}_test_fixture(request):
         # is this test really needed?
         # From test_templates/resource.py::ResourceLookupSession::get_bin_template
         if not is_never_authz(self.service_config):
-            assert self.catalog is not None"""
+            assert isinstance(self.catalog.${method_name}(), ABC${return_type})"""
 
     can_lookup_resources_template = """
         # From test_templates/resource.py ResourceLookupSession.can_lookup_resources_template
@@ -606,6 +607,10 @@ def ${interface_name_under}_class_fixture(request):
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
+    request.cls.assessment_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
     request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
@@ -628,11 +633,11 @@ def ${interface_name_under}_class_fixture(request):
 def ${interface_name_under}_test_fixture(request):
     # From test_templates/resource.py::ResourceAdminSession::init_template
     if not is_never_authz(request.cls.service_config):
-        form = request.cls.catalog.get_${object_name_under}_form_for_create([])
-        form.display_name = 'new ${object_name}'
-        form.description = 'description of ${object_name}'
-        form.set_genus_type(NEW_TYPE)
-        request.cls.osid_object = request.cls.catalog.create_${object_name_under}(form)
+        request.cls.form = request.cls.catalog.get_${object_name_under}_form_for_create([])
+        request.cls.form.display_name = 'new ${object_name}'
+        request.cls.form.description = 'description of ${object_name}'
+        request.cls.form.set_genus_type(NEW_TYPE)
+        request.cls.osid_object = request.cls.catalog.create_${object_name_under}(request.cls.form)
     request.cls.session = request.cls.catalog
 
     def test_tear_down():
@@ -668,6 +673,8 @@ def ${interface_name_under}_test_fixture(request):
             form = self.catalog.${method_name}([])
             assert isinstance(form, OsidForm)
             assert not form.is_for_update()
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}([1])
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.${method_name}([])"""
@@ -680,6 +687,13 @@ def ${interface_name_under}_test_fixture(request):
             assert self.osid_object.display_name.text == 'new ${object_name}'
             assert self.osid_object.description.text == 'description of ${object_name}'
             assert self.osid_object.genus_type == NEW_TYPE
+            with pytest.raises(errors.IllegalState):
+                self.catalog.${method_name}(self.form)
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}('I Will Break You!')
+            update_form = self.catalog.get_${object_name_under}_form_for_update(self.osid_object.ident)
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}(update_form)
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.${method_name}('foo')"""
@@ -690,6 +704,13 @@ def ${interface_name_under}_test_fixture(request):
             form = self.catalog.${method_name}(self.osid_object.ident)
             assert isinstance(form, OsidForm)
             assert form.is_for_update()
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}(['This is Doomed!'])
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}(
+                    Id(authority='Respect my Authoritay!',
+                       namespace='${package_name}.{object_name}',
+                       identifier='1'))
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.${method_name}(self.fake_id)"""
@@ -708,6 +729,12 @@ def ${interface_name_under}_test_fixture(request):
             assert updated_object.display_name.text == 'new name'
             assert updated_object.description.text == 'new description'
             assert updated_object.genus_type == NEW_TYPE_2
+            with pytest.raises(errors.IllegalState):
+                self.catalog.${method_name}(form)
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}('I Will Break You!')
+            with pytest.raises(errors.InvalidArgument):
+                self.catalog.${method_name}(self.form)
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.${method_name}('foo')"""
@@ -1489,6 +1516,8 @@ def ${interface_name_under}_test_fixture(request):
             catalog_form = self.svc_mgr.${method_name}([])
             assert isinstance(catalog_form, OsidCatalogForm)
             assert not catalog_form.is_for_update()
+            with pytest.raises(errors.InvalidArgument):
+                self.svc_mgr.${method_name}([1])
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.svc_mgr.${method_name}([])"""
@@ -1502,6 +1531,13 @@ def ${interface_name_under}_test_fixture(request):
             catalog_form.description = 'Test ${cat_name} for ${interface_name}.${method_name} tests'
             new_catalog = self.svc_mgr.${method_name}(catalog_form)
             assert isinstance(new_catalog, OsidCatalog)
+            with pytest.raises(errors.IllegalState):
+                self.svc_mgr.${method_name}(catalog_form)
+            with pytest.raises(errors.InvalidArgument):
+                self.svc_mgr.${method_name}('I Will Break You!')
+            update_form = self.svc_mgr.get_${cat_name_under}_form_for_update(new_catalog.ident)
+            with pytest.raises(errors.InvalidArgument):
+                self.svc_mgr.${method_name}(update_form)
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.svc_mgr.${method_name}('foo')"""

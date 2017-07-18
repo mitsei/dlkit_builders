@@ -239,11 +239,11 @@ def ${interface_name_under}_class_fixture(request):
             object = request.cls.catalog.create_comment(create_form)
             request.cls.comment_list.append(object)
             request.cls.comment_ids.append(object.ident)
-        create_form = request.cls.catalog.get_comment_form_for_create(AGENT_ID, [])
-        create_form.display_name = 'new Comment'
-        create_form.description = 'description of Comment'
-        create_form.genus_type = NEW_TYPE
-        request.cls.osid_object = request.cls.catalog.create_comment(create_form)
+        request.cls.form = request.cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+        request.cls.form.display_name = 'new Comment'
+        request.cls.form.description = 'description of Comment'
+        request.cls.form.genus_type = NEW_TYPE
+        request.cls.osid_object = request.cls.catalog.create_comment(request.cls.form)
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
