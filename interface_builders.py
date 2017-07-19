@@ -297,6 +297,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 'pkg_name_replaced_reserved': self.replace(fixed_package_name),
                 'pkg_name_replaced_caps': self.replace(self.package['name'].title(), desired=''),
                 'pkg_name_replaced_upper': self.replace(self.package['name']).upper(),
+                'pkg_name_replaced_under': camel_to_under(self.replace(self.package['name'])),
                 'pkg_name_upper': self.first(self.package['name']).upper(),
                 'interface_name': interface_name,
                 'interface_name_under': camel_to_under(interface_name),

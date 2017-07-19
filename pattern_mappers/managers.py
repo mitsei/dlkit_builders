@@ -4,11 +4,11 @@ LOOKUP_STYLE_SESSIONS = ['LookupSession', 'QuerySession']
 
 def map_manager_patterns(interface, package, index):
     if interface['shortname'].endswith('Profile'):
-        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceProfile'
+        index[interface['shortname'] + '.init_pattern'] = 'osid_managers.GenericProfile'
     if interface['shortname'].endswith('Manager'):
-        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceManager'
+        index[interface['shortname'] + '.init_pattern'] = 'osid_managers.GenericManager'
     if interface['shortname'].endswith('ProxyManager'):
-        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceProxyManager'
+        index[interface['shortname'] + '.init_pattern'] = 'osid_managers.GenericProxyManager'
 
     for method in interface['methods']:
 
@@ -30,7 +30,7 @@ def map_manager_patterns(interface, package, index):
         # Profile methods that test whether visible federation is supported.
         if method['name'] == 'supports_visible_federation':
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProfile.supports_visible_federation',
+                pattern='osid_managers.GenericProfile.supports_visible_federation',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -42,7 +42,7 @@ def map_manager_patterns(interface, package, index):
                 method['return_type'] == 'boolean' and
                 not method['args']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProfile.supports_resource_lookup',
+                pattern='osid_managers.GenericProfile.supports_object_lookup',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -55,7 +55,7 @@ def map_manager_patterns(interface, package, index):
                 method['return_type'] == 'boolean' and
                 'osid.type.Type' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProfile.supports_resource_record_type',
+                pattern='osid_managers.GenericProfile.supports_object_record_type',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -69,7 +69,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith('record_types') and
                 method['return_type'] == 'osid.type.TypeList'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProfile.get_resource_record_types',
+                pattern='osid_managers.GenericProfile.get_object_record_types',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -113,7 +113,7 @@ def map_manager_patterns(interface, package, index):
                 method['return_type'].endswith('Session') and
                 'osid.proxy.Proxy' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProxyManager.get_resource_notification_session',
+                pattern='osid_managers.GenericProxyManager.get_object_notification_session',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -131,7 +131,7 @@ def map_manager_patterns(interface, package, index):
                 method['return_type'].endswith('Session') and
                 'osid.proxy.Proxy' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProxyManager.get_resource_notification_session_for_bin',
+                pattern='osid_managers.GenericProxyManager.get_object_notification_session_for_catalog',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -151,7 +151,7 @@ def map_manager_patterns(interface, package, index):
                 method['return_type'].endswith('Session') and
                 'osid.proxy.Proxy' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProxyManager.get_resource_lookup_session',
+                pattern='osid_managers.GenericProxyManager.get_object_lookup_session',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -170,7 +170,7 @@ def map_manager_patterns(interface, package, index):
                 method['return_type'].endswith('Session') and
                 'osid.proxy.Proxy' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProxyManager.get_resource_lookup_session_for_bin',
+                pattern='osid_managers.GenericProxyManager.get_object_lookup_session_for_catalog',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -191,7 +191,7 @@ def map_manager_patterns(interface, package, index):
                 method['return_type'].endswith('Session') and
                 'osid.proxy.Proxy' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProxyManager.get_resource_admin_session',
+                pattern='osid_managers.GenericProxyManager.get_object_lookup_session',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -208,7 +208,7 @@ def map_manager_patterns(interface, package, index):
                 method['return_type'].endswith('Session') and
                 'osid.proxy.Proxy' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProxyManager.get_resource_admin_session_for_bin',
+                pattern='osid_managers.GenericProxyManager.get_object_lookup_session_for_catalog',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -226,7 +226,7 @@ def map_manager_patterns(interface, package, index):
         elif (method['name'].startswith('get') and
                 method['name'].endswith('proxy_manager')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceProxyManager.get_resource_batch_proxy_manager',
+                pattern='osid_managers.GenericProxyManager.get_object_batch_proxy_manager',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -244,7 +244,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith('smart_' + index['package_catalog_under'] + '_session') and
                 method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceManager.get_resource_smart_bin_session',
+                pattern='osid_managers.GenericManager.get_object_smart_bin_session',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -260,7 +260,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith('notification_session') and
                 method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceManager.get_resource_notification_session',
+                pattern='osid_managers.GenericManager.get_object_notification_session',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -276,7 +276,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith('notification_session_for_' + index['package_catalog_under']) and
                 method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceManager.get_resource_notification_session_for_bin',
+                pattern='osid_managers.GenericManager.get_object_notification_session_for_catalog',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -294,7 +294,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith('session') and
                 method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceManager.get_resource_lookup_session',
+                pattern='osid_managers.GenericManager.get_object_lookup_session',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -311,7 +311,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith(index['package_catalog_under']) and
                 method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceManager.get_resource_lookup_session_for_bin',
+                pattern='osid_managers.GenericManager.get_object_lookup_session_for_catalog',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -328,7 +328,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith('session') and
                 method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceManager.get_resource_admin_session',
+                pattern='osid_managers.GenericManager.get_object_admin_session',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -343,7 +343,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith(index['package_catalog_under']) and
                 method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceManager.get_resource_admin_session_for_bin',
+                pattern='osid_managers.GenericManager.get_object_admin_session_for_catalog',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -358,7 +358,7 @@ def map_manager_patterns(interface, package, index):
         elif (method['name'].startswith('get') and
                 method['name'].endswith('manager')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceManager.get_resource_batch_manager',
+                pattern='osid_managers.GenericManager.get_object_batch_manager',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],

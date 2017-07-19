@@ -25,12 +25,12 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
             decorators.append('{0}@raise_null_argument'.format(self._ind))
         return decorators
 
-    def _compile_method(self, args, decorators, method_sig, method_doc, method_impl):
+    def _compile_method(self, args, decorators, method_doc, method_impl):
         if decorators:
             decorators = '\n'.join(decorators)
-            return decorators + '\n' + method_sig + '\n' + method_impl
+            return decorators + '\n' + method_impl
         else:
-            return method_sig + '\n' + method_impl
+            return method_impl
 
     def _get_method_args(self, method, interface):
         args = ['self']

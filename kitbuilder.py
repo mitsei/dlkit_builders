@@ -31,8 +31,8 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                                                                                          self._dind)
         return impl
 
-    def _compile_method(self, args, decorators, method_sig, method_doc, method_impl):
-        return method_sig + '\n' + method_impl
+    def _compile_method(self, args, decorators, method_doc, method_impl):
+        return method_impl
 
     def _confirm_build_method(self, impl_class, method_name):
         # Check if this method is marked to be skipped (the assumption
