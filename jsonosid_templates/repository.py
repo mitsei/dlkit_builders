@@ -616,7 +616,33 @@ class AssetAdminSession:
             create_form = self.get_asset_form_for_create([ENCLOSURE_RECORD_TYPE])
             create_form.set_enclosed_object(enclosure_id)
             asset_id = self.create_asset(create_form).get_id()
-        return asset_id"""
+        return asset_id
+
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    @utilities.arguments_not_none
+    def duplicate_asset(self, asset_id):
+        collection = JSONClientValidated('repository',
+                                         collection='Asset',
+                                         runtime=self._runtime)
+        mgr = self._get_provider_manager('REPOSITORY')
+        lookup_session = mgr.get_asset_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_repository_view()
+        try:
+            lookup_session.use_unsequestered_asset_view()
+        except AttributeError:
+            pass
+        asset_map = dict(lookup_session.get_asset(asset_id)._my_map)
+        del asset_map['_id']
+        if 'repositoryId' in asset_map:
+            asset_map['repositoryId'] = str(self._catalog_id)
+        if 'assignedRepositoryIds' in asset_map:
+            asset_map['assignedRepositoryIds'] = [str(self._catalog_id)]
+        insert_result = collection.insert_one(asset_map)
+        result = objects.Asset(
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
+        return result"""
 
 
 class CompositionLookupSession:
@@ -1342,6 +1368,34 @@ class CompositionQuery:
     clear_asset_id_terms = """
         self._clear_terms('assetIds')"""
 
+
+class CompositionAdminSession:
+    additional_methods = """
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    @utilities.arguments_not_none
+    def duplicate_composition(self, composition_id):
+        collection = JSONClientValidated('repository',
+                                         collection='Composition',
+                                         runtime=self._runtime)
+        mgr = self._get_provider_manager('REPOSITORY')
+        lookup_session = mgr.get_composition_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_repository_view()
+        try:
+            lookup_session.use_unsequestered_composition_view()
+        except AttributeError:
+            pass
+        composition_map = dict(lookup_session.get_composition(composition_id)._my_map)
+        del composition_map['_id']
+        if 'repositoryId' in composition_map:
+            composition_map['repositoryId'] = str(self._catalog_id)
+        if 'assignedRepositoryIds' in composition_map:
+            composition_map['assignedRepositoryIds'] = [str(self._catalog_id)]
+        insert_result = collection.insert_one(composition_map)
+        result = objects.Composition(
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
+        return result"""
 
 # class CompositionSearch:
 #

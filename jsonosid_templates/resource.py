@@ -534,33 +534,34 @@ class ResourceAdminSession:
         obj_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
-        return obj_form
+        return obj_form"""
 
-    # This is out of spec, but used by the EdX / LORE record extensions...
-    @utilities.arguments_not_none
-    def duplicate_${object_name_under}(self, ${object_name_under}_id):
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        mgr = self._get_provider_manager('${package_name_replace_upper}')
-        lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
-        lookup_session.use_federated_${cat_name_under}_view()
-        try:
-            lookup_session.use_unsequestered_${object_name_under}_view()
-        except AttributeError:
-            pass
-        ${object_name_under}_map = dict(lookup_session.get_${object_name_under}(${object_name_under}_id)._my_map)
-        del ${object_name_under}_map['_id']
-        if '${cat_name_lower}Id' in ${object_name_under}_map:
-            ${object_name_under}_map['${cat_name_lower}Id'] = str(self._catalog_id)
-        if 'assigned${cat_name}Ids' in ${object_name_under}_map:
-            ${object_name_under}_map['assigned${cat_name}Ids'] = [str(self._catalog_id)]
-        insert_result = collection.insert_one(${object_name_under}_map)
-        result = objects.${object_name}(
-            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime,
-            proxy=self._proxy)
-        return result"""
+    # This is out of spec, but used by the EdX / LORE record extensions for assets / compositions
+    # So put it in additional methods there only.
+    # @utilities.arguments_not_none
+    # def duplicate_${object_name_under}(self, ${object_name_under}_id):
+    #     collection = JSONClientValidated('${package_name_replace}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     mgr = self._get_provider_manager('${package_name_replace_upper}')
+    #     lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
+    #     lookup_session.use_federated_${cat_name_under}_view()
+    #     try:
+    #         lookup_session.use_unsequestered_${object_name_under}_view()
+    #     except AttributeError:
+    #         pass
+    #     ${object_name_under}_map = dict(lookup_session.get_${object_name_under}(${object_name_under}_id)._my_map)
+    #     del ${object_name_under}_map['_id']
+    #     if '${cat_name_lower}Id' in ${object_name_under}_map:
+    #         ${object_name_under}_map['${cat_name_lower}Id'] = str(self._catalog_id)
+    #     if 'assigned${cat_name}Ids' in ${object_name_under}_map:
+    #         ${object_name_under}_map['assigned${cat_name}Ids'] = [str(self._catalog_id)]
+    #     insert_result = collection.insert_one(${object_name_under}_map)
+    #     result = objects.${object_name}(
+    #         osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+    #         runtime=self._runtime,
+    #         proxy=self._proxy)
+    #     return result"""
 
     update_resource_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
