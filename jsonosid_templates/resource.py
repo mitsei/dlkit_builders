@@ -536,7 +536,8 @@ class ResourceAdminSession:
 
         return obj_form"""
 
-    # This is out of spec and not used.  So "Goodby!"
+    # This is out of spec, but used by the EdX / LORE record extensions for assets / compositions
+    # So put it in additional methods there only.
     # @utilities.arguments_not_none
     # def duplicate_${object_name_under}(self, ${object_name_under}_id):
     #     collection = JSONClientValidated('${package_name_replace}',
