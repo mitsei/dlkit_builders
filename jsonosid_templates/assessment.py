@@ -609,6 +609,33 @@ class ItemAdminSession:
                                 runtime=self._runtime,
                                 proxy=self._proxy)"""
 
+    additional_methods = """
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    @utilities.arguments_not_none
+    def duplicate_item(self, item_id):
+        collection = JSONClientValidated('assessment',
+                                         collection='Item',
+                                         runtime=self._runtime)
+        mgr = self._get_provider_manager('ASSESSMENT')
+        lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
+        try:
+            lookup_session.use_unsequestered_item_view()
+        except AttributeError:
+            pass
+        item_map = dict(lookup_session.get_item(item_id)._my_map)
+        del item_map['_id']
+        if 'bankId' in item_map:
+            item_map['bankId'] = str(self._catalog_id)
+        if 'assignedBankIds' in item_map:
+            item_map['assignedBankIds'] = [str(self._catalog_id)]
+        insert_result = collection.insert_one(item_map)
+        result = objects.Item(
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
+        return result"""
+
 
 class AssessmentAdminSession:
 
@@ -667,6 +694,33 @@ class AssessmentAdminSession:
         collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
         remove_children_parts(str(assessment_id))
         """
+
+    additional_methods = """
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    @utilities.arguments_not_none
+    def duplicate_assessment(self, assessment_id):
+        collection = JSONClientValidated('assessment',
+                                         collection='Assessment',
+                                         runtime=self._runtime)
+        mgr = self._get_provider_manager('ASSESSMENT')
+        lookup_session = mgr.get_assessment_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
+        try:
+            lookup_session.use_unsequestered_assessment_view()
+        except AttributeError:
+            pass
+        assessment_map = dict(lookup_session.get_assessment(assessment_id)._my_map)
+        del assessment_map['_id']
+        if 'bankId' in assessment_map:
+            assessment_map['bankId'] = str(self._catalog_id)
+        if 'assignedBankIds' in assessment_map:
+            assessment_map['assignedBankIds'] = [str(self._catalog_id)]
+        insert_result = collection.insert_one(assessment_map)
+        result = objects.Assessment(
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
+        return result"""
 
 
 class AssessmentTakenLookupSession:

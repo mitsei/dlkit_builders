@@ -128,6 +128,9 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
             if self._root_dir not in sys.path:
                 parent_path = os.path.abspath(os.path.join(self._abs_path, os.pardir))
                 sys.path.insert(0, parent_path)
+            dlkit_parent_dir = os.path.abspath(os.path.join(self._build_dir, os.pardir))
+            if dlkit_parent_dir not in sys.path:
+                sys.path.insert(0, dlkit_parent_dir)
             profile_module = '{}.{}.profile'.format(self._import_path(self._root_dir, limited=False),
                                                     self._abc_pkg_name(abc=False))
             old_profile = import_module(profile_module)
