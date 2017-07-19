@@ -102,6 +102,10 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             if hasattr(impl_class, 'inheritance'):
                 inheritance += getattr(impl_class, 'inheritance')
 
+            # Try to consolidate ProxyManager code with Manager code, so inherit the Manager
+            if self.is_proxy_manager(interface):
+                inheritance.append(interface['shortname'].replace('Proxy', ''))
+
         if self._in(['services', 'doc_dlkit']):
             # Don't forget the OsidSession inheritance:
             if (('OsidManager' in interface['inherit_shortnames'] or
@@ -146,7 +150,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                     if hasattr(templates, self.last(init_pattern)):
                         template_class = getattr(templates, self.last(init_pattern))
                         if hasattr(template_class, import_statement):
-                            template_imports += getattr(template_class, import_statement)
+                            template_imports += self.get_impl_from_templates(template_class, import_statement)
                 except ImportError:
                     return default
 
@@ -167,7 +171,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 imports = 'import_statements_pattern'
                 if (template_class and
                         hasattr(template_class, imports)):
-                    template_imports += getattr(template_class, imports)
+                    template_imports += self.get_impl_from_templates(template_class, imports)
 
             # also apply the context here
             context = self._get_init_context(interface_name, interface)
@@ -368,16 +372,13 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             return getattr(impl_class, 'init') + '\n'
         elif interface['shortname'] + '.init_pattern' in self.patterns:
             init_pattern = self.patterns[interface['shortname'] + '.init_pattern']
-            try:
-                templates = import_module(self._package_templates(self.first(init_pattern)))
-            except ImportError:
-                pass
+            templates = import_module(self._package_templates(self.first(init_pattern)))
 
         if templates is not None and hasattr(templates, self.last(init_pattern)):
             template_class = getattr(templates, self.last(init_pattern))
             if hasattr(template_class, 'init_template'):
                 context = self._get_init_context(init_pattern, interface)
-                template = string.Template(getattr(template_class, 'init_template'))
+                template = string.Template(self.get_impl_from_templates(template_class, 'init_template'))
 
                 return template.substitute(context) + '\n'
 
@@ -482,14 +483,11 @@ def make_metadata_initers(interface_name, persisted_data, initialized_data, retu
                                                                                                      default_type)
 
     imports = ''
-    initer = ''
     default = ''
     for data_name in persisted_data:
-        data_name_upper = camel_to_caps_under(interface_name[:-4]) + '_' + data_name.upper()
 
         if (persisted_data[data_name] != 'OsidCatalog' and
                 data_name not in initialized_data):
-            # template = string.Template(METADATA_INITER)
             if persisted_data[data_name] == 'boolean':
                 default += default_string(data_name, 'boolean')
             elif (persisted_data[data_name] == 'string' and
@@ -520,8 +518,6 @@ def make_metadata_initers(interface_name, persisted_data, initialized_data, retu
             elif persisted_data[data_name] == 'decimal':
                 default += default_string(data_name, 'decimal')
 
-            # initer += template.substitute({'data_name': data_name,
-            #                               'data_name_upper': data_name_upper})
     return (imports + default).strip()
 
 

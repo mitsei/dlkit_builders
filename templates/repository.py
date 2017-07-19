@@ -1030,13 +1030,6 @@ class Asset:
         # Implemented from template for osid.repository.Asset.get_title_template
         return DisplayText(self._my_map['${var_name_mixed}'])"""
 
-    can_distribute_verbatim_template = """
-        # Implemented from template for osid.repository.AssetForm.can_distribute_verbatim
-        if self._my_map['${var_name_mixed}'] is None:
-            raise errors.IllegalState()
-        else:
-            return self._my_map['${var_name_mixed}']"""
-
     get_asset_content_ids_template = """
         # Implemented from template for osid.repository.Asset.get_asset_content_ids_template
         id_list = []
@@ -1071,20 +1064,6 @@ class Asset:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
-
-
-class AssetForm:
-
-    set_title_template = """
-        # Implemented from template for osid.repository.AssetForm.set_title_template
-        self._my_map['${var_name_mixed}'] = self._get_display_text(${arg0_name}, self.get_${var_name}_metadata())"""
-
-    clear_title_template = """
-        # Implemented from template for osid.repository.AssetForm.clear_title_template
-        if (self.get_${var_name}_metadata().is_read_only() or
-                self.get_${var_name}_metadata().is_required()):
-            raise errors.NoAccess()
-        self._my_map['${var_name_mixed}'] = dict(self._${var_name}_default)"""
 
 
 # class AssetSearch:
@@ -1195,23 +1174,6 @@ class AssetContentForm:
         'from ..utilities import JSONClientValidated'
     ]
 
-    set_url_template = """
-        # Implemented from template for osid.repository.AssetContentForm.set_url_template
-        if self.get_${var_name}_metadata().is_read_only():
-            raise errors.NoAccess()
-        if not self._is_valid_${arg0_type}(
-                ${arg0_name},
-                self.get_${var_name}_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['${var_name_mixed}'] = ${arg0_name}"""
-
-    clear_url_template = """
-        # Implemented from template for osid.repository.AssetContentForm.clear_url_template
-        if (self.get_${var_name}_metadata().is_read_only() or
-                self.get_${var_name}_metadata().is_required()):
-            raise errors.NoAccess()
-        self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
-
     set_data = """
         if data is None:
             raise errors.NullArgument('data cannot be None')
@@ -1236,14 +1198,6 @@ class AssetContentForm:
         filesys.delete(self._my_map['data'])
         self._my_map['data'] = self._data_default
         del self._my_map['base64']"""
-
-    # get_url_metadata = """
-    #     # special one-off implementation of ResourceForm.get_group_metadata_template
-    #     metadata = dict(self._mdata['url'])
-    #     metadata.update({'existing_string_values': [self._my_map['url']]})
-    #     return Metadata(**metadata)
-    #
-    # url_metadata = property(fget=get_url_metadata)"""
 
 
 class Composition:

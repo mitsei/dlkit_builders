@@ -273,7 +273,7 @@ class BaseBuilder(Utilities):
         # need to be coded in the impl_class as a list of strings with the
         # attribute name 'import_statements'
         if hasattr(impl_class, 'import_statements'):
-            for import_str in getattr(impl_class, 'import_statements'):
+            for import_str in self.get_impl_from_templates(impl_class, 'import_statements'):
                 self.append(imports, import_str)
 
         # Look for module import statements defined in class patterns. These
@@ -556,10 +556,18 @@ except ImportError:
     def interface_maps(self, interface_maps_dir):
         self._interface_maps_dir = self._make_dir(interface_maps_dir)
 
+    @staticmethod
+    def is_proxy_manager(interface):
+        return 'ProxyManager' in interface['shortname']
+
     def module_body(self, interface):
         inheritance = self._get_class_inheritance(interface)
         init_methods = self._make_init_methods(interface)
-        methods = self.make_methods(interface)
+
+        if self.is_proxy_manager(interface):
+            methods = ''
+        else:
+            methods = self.make_methods(interface)
         additional_methods = self._additional_methods(interface)
         additional_classes = self._additional_classes(interface)
 
@@ -807,6 +815,14 @@ class Templates(Utilities):
                         pass
 
         return arg_map
+
+    def get_impl_from_templates(self, class_, name_):
+        from method_builders import stripn
+        # temporarily accept both cases until we get all the templates converted over to dicts
+        template_impl = getattr(class_, name_)
+        if isinstance(template_impl, dict):
+            return stripn(template_impl[self._language][self._class])
+        return stripn(template_impl)
 
     def get_templated_imports(self, arg_context, package_name, method, interface):
         """gets an import template and maps the keys to the actual arg names.

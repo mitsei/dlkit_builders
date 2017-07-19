@@ -16,8 +16,9 @@ class GenericProfile(object):
         'python': {
             'json': """
     def ${method_name}(self):
+        ${doc_string}
         # Implemented from template for
-        # templates.generic.osid_managers.GenericProfile.supports_visible_federation_template
+        # templates.osid_managers.GenericProfile.supports_visible_federation_template
         return '${method_name}' in profile.SUPPORTS"""
         }
     }
@@ -26,8 +27,9 @@ class GenericProfile(object):
         'python': {
             'json': """
     def ${method_name}(self):
+        ${doc_string}
         # Implemented from template for
-        # templates.generic.osid_managers.GenericProfile.supports_object_lookup_template
+        # templates.osid_managers.GenericProfile.supports_object_lookup_template
         return '${method_name}' in profile.SUPPORTS"""
         }
     }
@@ -36,8 +38,9 @@ class GenericProfile(object):
         'python': {
             'json': """
     def ${method_name}(self):
+        ${doc_string}
         # Implemented from template for
-        # templates.generic.osid_managers.GenericProfile.get_object_record_types_template
+        # templates.osid_managers.GenericProfile.get_object_record_types_template
         record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         record_types = []
         for record_type_map in record_type_maps:
@@ -50,8 +53,9 @@ class GenericProfile(object):
         'python': {
             'json': """
     def ${method_name}(self):
+        ${doc_string}
         # Implemented from template for
-        # templates.generic.osid_managers.GenericProfile.supports_object_record_type_template
+        # templates.osid_managers.GenericProfile.supports_object_record_type_template
         record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         supports = False
         for record_type_map in record_type_maps:
@@ -86,12 +90,13 @@ class GenericManager(object):
         'python': {
             'json': """
     def ${method_name}(self, **kwargs):
+        ${doc_string}
         # Implemented from template for
-        # templates.generic.osid_managers.GenericManager.get_object_lookup_session_template
+        # templates.osid_managers.GenericManager.get_object_lookup_session_template
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         if 'proxy' in kwargs:
-            return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime)
+            return ${return_module}.${return_type}(proxy=kwargs['proxy'], runtime=self._runtime)
         return ${return_module}.${return_type}(runtime=self._runtime)"""
         }
     }
@@ -100,8 +105,9 @@ class GenericManager(object):
         'python': {
             'json': """
     def ${method_name}(self, ${arg0_name}, **kwargs):
+        ${doc_string}
         # Implemented from template for
-        # templates.generic.osid_managers.GenericManager.get_object_lookup_session_for_catalog_template
+        # templates.osid_managers.GenericManager.get_object_lookup_session_for_catalog_template
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         ##
@@ -109,7 +115,10 @@ class GenericManager(object):
         ##
         # pylint: disable=no-member
         if 'proxy' in kwargs:
-            return ${return_module}.${return_type}(${arg0_name}, proxy=proxy, runtime=self._runtime)
+            return ${return_module}.${return_type}(
+                ${arg0_name},
+                proxy=kwargs['proxy'],
+                runtime=self._runtime)
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)"""
         }
     }
@@ -118,13 +127,17 @@ class GenericManager(object):
         'python': {
             'json': """
     def ${method_name}(self, ${arg0_name}, **kwargs):
+        ${doc_string}
         # Implemented from template for
-        # templates.generic.osid_managers.GenericManager.get_object_notification_session_template
+        # templates.osid_managers.GenericManager.get_object_notification_session_template
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         # pylint: disable=no-member
         if 'proxy' in kwargs:
-            return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime, receiver=${arg0_name})
+            return ${return_module}.${return_type}(
+                proxy=kwargs['proxy'],
+                runtime=self._runtime,
+                receiver=${arg0_name})
         return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name})"""
         }
     }
@@ -132,9 +145,10 @@ class GenericManager(object):
     get_object_notification_session_for_catalog_template = {
         'python': {
             'json': """
-    def ${method_name}(self, ${arg0_name}, **kwargs):
+    def ${method_name}(self, ${arg0_name}, ${arg1_name}, **kwargs):
+        ${doc_string}
         # Implemented from template for
-        # templates.generic.osid_managers.GenericManager.get_object_notification_session_for_catalog_template
+        # templates.osid_managers.GenericManager.get_object_notification_session_for_catalog_template
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         ##
@@ -142,8 +156,15 @@ class GenericManager(object):
         ##
         # pylint: disable=no-member
         if 'proxy' in kwargs:
-            return ${return_module}.${return_type}(catalog_id=${arg1_name}, proxy=proxy, runtime=self._runtime, receiver=${arg0_name})
-        return ${return_module}.${return_type}(catalog_id=${arg1_name}, runtime=self._runtime, receiver=${arg0_name})"""
+            return ${return_module}.${return_type}(
+                catalog_id=${arg1_name},
+                proxy=kwargs['proxy'],
+                runtime=self._runtime,
+                receiver=${arg0_name})
+        return ${return_module}.${return_type}(
+            catalog_id=${arg1_name},
+            runtime=self._runtime,
+            receiver=${arg0_name})"""
         }
     }
 

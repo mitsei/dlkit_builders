@@ -284,38 +284,6 @@ class Activity:
         return lookup_session.get_${return_type_list_object_plural_under}_by_ids(self.get_${var_name_singular}_ids())"""
 
 
-class ActivityForm:
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
-
-    get_assets_metadata_template = """
-        # Implemented from template for osid.learning.ActivityForm.get_assets_metadata_template
-        metadata = dict(self._mdata['${var_name}'])
-        metadata.update({'existing_${var_name}_values': self._my_map['${var_name_singular_mixed}Ids']})
-        return Metadata(**metadata)"""
-
-    set_assets_template = """
-        # Implemented from template for osid.learning.ActivityForm.set_assets_template
-        if not isinstance(${arg0_name}, list):
-            raise errors.InvalidArgument()
-        if self.get_${var_name}_metadata().is_read_only():
-            raise errors.NoAccess()
-        idstr_list = []
-        for object_id in ${arg0_name}:
-            if not self._is_valid_id(object_id):
-                raise errors.InvalidArgument()
-            idstr_list.append(str(object_id))
-        self._my_map['${var_name_singular_mixed}Ids'] = idstr_list"""
-
-    clear_assets_template = """
-        # Implemented from template for osid.learning.ActivityForm.clear_assets_template
-        if (self.get_${var_name}_metadata().is_read_only() or
-                self.get_${var_name}_metadata().is_required()):
-            raise errors.NoAccess()
-        self._my_map['${var_name_singular_mixed}Ids'] = self._${var_name}_default"""
-
-
 class ObjectiveHierarchySession:
     init = """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):

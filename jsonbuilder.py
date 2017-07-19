@@ -25,7 +25,10 @@ class JSONBuilder(InterfaceBuilder, BaseBuilder):
 
     def _clean_up_impl(self, impl, interface, method):
         if impl == '':
-            impl = '{}raise errors.Unimplemented()'.format(self._dind)
+            impl = '{0}def {1}({2}):\n{3}raise errors.Unimplemented()'.format(self._ind,
+                                                                              method['name'],
+                                                                              ','.join(self._get_method_args(method, interface)),
+                                                                              self._dind)
         else:
             context = self._get_method_context(method, interface)
             interface_sn = interface['shortname']

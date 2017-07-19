@@ -110,28 +110,6 @@ class GradeSystem:
     object_map = property(fget=get_object_map)"""
 
 
-class GradeSystemForm:
-
-    set_lowest_numeric_score_template = """
-        # Implemented from template for osid.grading.GradeSystemForm.set_lowest_numeric_score
-        if self.get_${var_name}_metadata().is_read_only():
-            raise errors.NoAccess()
-        try:
-            ${arg0_name} = float(${arg0_name})
-        except ValueError:
-            raise errors.InvalidArgument()
-        if not self._is_valid_${arg0_type}(${arg0_name}, self.get_${var_name}_metadata()):
-            raise errors.InvalidArgument()
-        self._my_map['${var_name_mixed}'] = ${arg0_name}"""
-
-    clear_lowest_numeric_score_template = """
-        # Implemented from template for osid.grading.GradeSystemForm.clear_lowest_numeric_score
-        if (self.get_${var_name}_metadata().is_read_only() or
-                self.get_${var_name}_metadata().is_required()):
-            raise errors.NoAccess()
-        self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
-
-
 class GradeEntry:
 
     import_statements = [

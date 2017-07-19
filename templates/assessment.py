@@ -533,8 +533,8 @@ class ItemAdminSession:
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         item_id = Id(question_form._my_map['itemId']).get_identifier()
         question_form._my_map['_id'] = ObjectId(item_id)
-        item = collection.find_one({'$and': [{'_id': ObjectId(item_id)},
-                                             {'assigned' + self._catalog_name + 'Ids': {'$in': [str(self._catalog_id)]}}]})
+        item = collection.find_one({'$$and': [{'_id': ObjectId(item_id)},
+                                              {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
         # set the name in the question, so it can be shown to students
         question_form._my_map['displayName']['text'] = item['displayName']['text']
         question_form._my_map['description']['text'] = item['description']['text']
@@ -596,8 +596,8 @@ class ItemAdminSession:
         if not question_form.is_valid():
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         item_id = Id(question_form._my_map['itemId']).get_identifier()
-        item = collection.find_one({'$and': [{'_id': ObjectId(item_id)},
-                                   {'assigned' + self._catalog_name + 'Ids': {'$in': [str(self._catalog_id)]}}]})
+        item = collection.find_one({'$$and': [{'_id': ObjectId(item_id)},
+                                   {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]})
         item['question'] = question_form._my_map
         try:
             collection.save(item)
@@ -724,7 +724,7 @@ class AssessmentTakenLookupSession:
             ao_ids.append(str(assessment_offered.get_id()))
 
         result = collection.find(
-            dict({'assessmentOfferedId': {'$in': ao_ids}},
+            dict({'assessmentOfferedId': {'$$in': ao_ids}},
                  **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result,
                                            runtime=self._runtime,
@@ -757,7 +757,7 @@ class AssessmentOfferedAdminSession:
                                          collection='Assessment',
                                          runtime=self._runtime)
         assessment_map = collection.find_one(
-            {'$and': [{'_id': ObjectId(assessment_id.get_identifier())}, {'bankId': str(self._catalog_id)}]})
+            {'$$and': [{'_id': ObjectId(assessment_id.get_identifier())}, {'bankId': str(self._catalog_id)}]})
 
         if assessment_offered_record_types == []:
             # WHY are we passing bank_id = self._catalog_id below, seems redundant:
@@ -828,9 +828,9 @@ class AssessmentTakenAdminSession:
         try:
             if assessment_offered.has_max_attempts():
                 max_attempts = assessment_offered.get_max_attempts()
-                num_takens = collection.find({'$and': [{'assessmentOfferedId': str(assessment_offered.get_id())},
-                                                       {'takingAgentId': str(self.get_effective_agent_id())},
-                                                       {'assigned' + self._catalog_name + 'Ids': {'$in': [str(self._catalog_id)]}}]}).count()
+                num_takens = collection.find({'$$and': [{'assessmentOfferedId': str(assessment_offered.get_id())},
+                                                        {'takingAgentId': str(self.get_effective_agent_id())},
+                                                        {'assigned' + self._catalog_name + 'Ids': {'$$in': [str(self._catalog_id)]}}]}).count()
                 if num_takens >= max_attempts:
                     raise errors.PermissionDenied('exceeded max attempts')
         except AttributeError:
@@ -1771,13 +1771,13 @@ class AssessmentQuerySession:
             collection = JSONClientValidated('assessment',
                                              collection='AssessmentOffered',
                                              runtime=self._runtime)
-            match = '$in' in assessment_query._query_terms['assessmentOfferedId'].keys()
+            match = '$$in' in assessment_query._query_terms['assessmentOfferedId'].keys()
             if match:
-                match_identifiers = [ObjectId(Id(i).identifier) for i in assessment_query._query_terms['assessmentOfferedId']['$in']]
-                query = {'$in': match_identifiers}
+                match_identifiers = [ObjectId(Id(i).identifier) for i in assessment_query._query_terms['assessmentOfferedId']['$$in']]
+                query = {'$$in': match_identifiers}
             else:
-                match_identifiers = [ObjectId(Id(i).identifier) for i in assessment_query._query_terms['assessmentOfferedId']['$in']]
-                query = {'$nin': match_identifiers}
+                match_identifiers = [ObjectId(Id(i).identifier) for i in assessment_query._query_terms['assessmentOfferedId']['$$in']]
+                query = {'$$nin': match_identifiers}
 
             result = collection.find({
                 "_id": query
@@ -1789,7 +1789,7 @@ class AssessmentQuerySession:
                                              collection='Assessment',
                                              runtime=self._runtime)
             result = collection.find({
-                "_id": {"$in": assessment_ids}
+                "_id": {"$$in": assessment_ids}
             })
             return objects.AssessmentList(result, runtime=self._runtime, proxy=self._proxy)
         else:
@@ -1800,12 +1800,12 @@ class AssessmentQuerySession:
             for term in assessment_query._keyword_terms:
                 or_list.append({term: assessment_query._keyword_terms[term]})
             if or_list:
-                and_list.append({'$or': or_list})
+                and_list.append({'$$or': or_list})
             view_filter = self._view_filter()
             if view_filter:
                 and_list.append(view_filter)
             if and_list:
-                query_terms = {'$and': and_list}
+                query_terms = {'$$and': and_list}
 
                 collection = JSONClientValidated('assessment',
                                                  collection='Assessment',
@@ -2115,7 +2115,7 @@ class ItemQuery:
 
     match_any_learning_objective = """
         match_key = 'learningObjectiveIds'
-        param = '$exists'
+        param = '$$exists'
         if match:
             flag = 'true'
         else:
@@ -2124,7 +2124,7 @@ class ItemQuery:
             self._query_terms[match_key][param] = flag
         else:
             self._query_terms[match_key] = {param: flag}
-        self._query_terms[match_key]['$nin'] = [[], ['']]"""
+        self._query_terms[match_key]['$$nin'] = [[], ['']]"""
 
     clear_learning_objective_terms = """
         self._clear_terms('learningObjectiveIds')"""
@@ -2200,5 +2200,5 @@ class BankQuery:
         # any bank
         bank_descendants = self._get_descendant_catalog_ids(bank_id)
         identifiers = [ObjectId(i.identifier) for i in bank_descendants]
-        self._query_terms['_id'] = {'$in': identifiers}
+        self._query_terms['_id'] = {'$$in': identifiers}
 """

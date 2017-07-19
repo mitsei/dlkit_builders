@@ -18,8 +18,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
     def _build_method_doc(self, method):
         detail_docs = self._get_method_doc(method)
 
-        method_doc = '{0}\"\"\"{1}'.format(self._dind,
-                                           method['doc']['headline'])
+        method_doc = '\"\"\"{0}'.format(method['doc']['headline'])
 
         if method['doc']['body'].strip() != '':
             method_doc += '\n\n{0}'.format(method['doc']['body'])
@@ -33,15 +32,13 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
     def _clean_up_impl(self, impl, interface, method):
         return impl
 
-    def _compile_method(self, args, decorators, method_doc, method_impl):
+    def _compile_method(self, args, decorators, method_impl):
         if decorators:
             decorators = '\n'.join(decorators)
-            return self._wrap('{0}\n{1}\n{2}'.format(decorators,
-                                                     method_doc,
-                                                     method_impl))
+            return self._wrap('{0}\n{1}'.format(decorators,
+                                                stripn(method_impl)))
         else:
-            return self._wrap('{0}\n{1}'.format(method_doc,
-                                                method_impl))
+            return self._wrap('{0}'.format(method_impl))
 
     def _confirm_build_method(self, impl_class, method_name):
         pass
@@ -223,6 +220,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 context['svc_mgr_or_catalog'] = 'svc_mgr'
             else:
                 context['svc_mgr_or_catalog'] = 'catalog'
+
+            context['doc_string'] = self._build_method_doc(method)
         return context
 
     def _get_method_decorators(self, method, interface, args):
@@ -255,9 +254,8 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         args = self._get_method_args(method, interface)
         decorators = self._get_method_decorators(method, interface, args)
         method_impl = self._make_method_impl(method, interface)
-        method_doc = self._build_method_doc(method)
 
-        return self._compile_method(args, decorators, method_doc, method_impl)
+        return self._compile_method(args, decorators, method_impl)
 
     def _make_method_impl(self, method, interface):
         impl = ''
@@ -287,7 +285,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         # Check if there is a 'by hand' implementation available for this method
         if (impl_class and
                 hasattr(impl_class, method_n)):
-            impl = stripn(getattr(impl_class, method_n)[self._language][self._class])
+            impl = self.get_impl_from_templates(impl_class, method_n)
         # If there is no 'by hand' implementation, get the template for the
         # method implementation that serves as the pattern, if one exists.
         elif (template_class and
@@ -296,9 +294,11 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             if self._is('services') and getattr(template_class, template_name) is None:
                 raise SkipMethod()
 
-            template_str = stripn(getattr(template_class, template_name)[self._language][self._class])
-            template = string.Template(template_str)
-            impl = stripn(template.substitute(context))
+            impl = self.get_impl_from_templates(template_class, template_name)
+
+        # always pass through the context to get things like ``doc_string``
+        template = string.Template(impl)
+        impl = stripn(template.substitute(context))
 
         return self._clean_up_impl(impl, interface, method)
 
@@ -477,5 +477,11 @@ def strip_prefixes(name):
                 raise ValueError
 
 
-def stripn(_string):
-    return _string.strip('\n')
+def stripn(input_):
+    try:
+        if isinstance(input_, basestring):
+            return input_.strip('\n')
+    except NameError:
+        if isinstance(input_, string):
+            return input_.strip('\n')
+    return input_

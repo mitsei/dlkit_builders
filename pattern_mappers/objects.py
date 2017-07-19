@@ -7,7 +7,7 @@ OSID_Calendaring_Primitives = ['osid.calendaring.Time', 'osid.calendaring.DateTi
 
 def map_object_form_patterns(interface, package, index):
     object_name = interface['shortname'][:-4]
-    index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceForm'
+    index[interface['shortname'] + '.init_pattern'] = 'osid_form.GenericObjectForm'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
@@ -17,7 +17,7 @@ def map_object_form_patterns(interface, package, index):
                 len(method['arg_types']) == 1 and
                 method['arg_types'][0] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceForm.set_group',
+                pattern='osid_form.GenericObjectForm.set_simple_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -33,7 +33,7 @@ def map_object_form_patterns(interface, package, index):
               len(index[object_name + '.arg_detail'][var_name]) == 1 and
               index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceForm.clear_group',
+                pattern='osid_form.GenericObjectForm.clear_simple_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -47,7 +47,7 @@ def map_object_form_patterns(interface, package, index):
                 len(method['arg_types']) == 1 and
                 method['arg_types'][0] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceForm.set_avatar',
+                pattern='osid_form.GenericObjectForm.set_id_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -64,7 +64,7 @@ def map_object_form_patterns(interface, package, index):
               len(index[object_name + '.arg_detail'][var_name]) == 1 and
               index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceForm.clear_avatar',
+                pattern='osid_form.GenericObjectForm.clear_id_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -79,7 +79,7 @@ def map_object_form_patterns(interface, package, index):
                 method['arg_types'][0] == 'osid.id.Id[]' and
                 method['args'][0]['array'] is True):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ActivityForm.set_assets',
+                pattern='osid_form.GenericObjectForm.set_id_list_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -97,7 +97,7 @@ def map_object_form_patterns(interface, package, index):
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.id.Id[]' and
                 index[object_name + '.arg_detail'][var_name][0]['array'] is True):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ActivityForm.clear_assets',
+                pattern='osid_form.GenericObjectForm.clear_id_list_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -111,7 +111,7 @@ def map_object_form_patterns(interface, package, index):
                 var_name[:-9] in index[object_name + '.persisted_data'] and
                 index[object_name + '.persisted_data'][var_name[:-9]] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceForm.get_avatar_metadata',
+                pattern='osid_form.GenericObjectForm.get_id_attribute_metadata',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -126,7 +126,7 @@ def map_object_form_patterns(interface, package, index):
                 var_name[:-9] in index[object_name + '.persisted_data'] and
                 index[object_name + '.persisted_data'][var_name[:-9]] == 'osid.id.Id[]'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ActivityForm.get_assets_metadata',
+                pattern='osid_form.GenericObjectForm.get_id_list_attribute_metadata',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -141,7 +141,8 @@ def map_object_form_patterns(interface, package, index):
                 var_name[:-9] in index[object_name + '.persisted_data'] and
                 index[object_name + '.persisted_data'][var_name[:-9]] == 'osid.type.Type'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='logging.LogEntryForm.get_priority_metadata',
+                # pattern='logging.LogEntryForm.get_priority_metadata',
+                pattern='osid_form.GenericObjectForm.get_id_attribute_metadata',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -161,7 +162,7 @@ def map_object_form_patterns(interface, package, index):
                 except KeyError:
                     arg_type = 'none'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceForm.get_group_metadata',
+                pattern='osid_form.GenericObjectForm.get_simple_attribute_metadata',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -178,7 +179,7 @@ def map_object_form_patterns(interface, package, index):
                 index[interface['shortname'][:-4] + '.return_types'][var_name] == 'osid.locale.DisplayText'):
             print("FOUND DISPLAY TEXT {0}".format(var_name))
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetForm.set_title',
+                pattern='osid_form.GenericObjectForm.set_display_text_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -193,7 +194,7 @@ def map_object_form_patterns(interface, package, index):
                 len(method['arg_types']) == 1 and
                 method['arg_types'][0] == 'string'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetContentForm.set_url',
+                pattern='osid_form.GenericObjectForm.set_string_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -208,7 +209,7 @@ def map_object_form_patterns(interface, package, index):
                 len(method['arg_types']) == 1 and
                 method['arg_types'][0] == 'decimal'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='grading.GradeSystemForm.set_lowest_numeric_score',
+                pattern='osid_form.GenericObjectForm.set_decimal_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -224,7 +225,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'decimal'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='grading.GradeSystemForm.clear_lowest_numeric_score',
+                pattern='osid_form.GenericObjectForm.clear_decimal_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -271,7 +272,7 @@ def map_object_form_patterns(interface, package, index):
                 index[object_name + '.return_types'][var_name] == 'osid.locale.DisplayText' and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'string'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetForm.clear_title',
+                pattern='osid_form.GenericObjectForm.clear_display_text_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -285,7 +286,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'string'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetContentForm.clear_url',
+                pattern='osid_form.GenericObjectForm.clear_string_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -402,7 +403,7 @@ def map_object_form_patterns(interface, package, index):
                 len(method['arg_types']) == 1 and
                 method['arg_types'][0] == 'osid.type.Type'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='logging.LogEntryForm.set_priority',
+                pattern='osid_form.GenericObjectForm.set_id_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -418,7 +419,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.type.Type'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='logging.LogEntryForm.clear_priority',
+                pattern='osid_form.GenericObjectForm.clear_id_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -430,7 +431,7 @@ def map_object_form_patterns(interface, package, index):
         elif (method['name'].startswith('get_') and
                 method['name'].endswith('_record')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceForm.get_resource_form_record',
+                pattern='osid_form.GenericObjectForm.get_object_form_record',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -453,7 +454,7 @@ def map_object_form_patterns(interface, package, index):
 
 def map_object_patterns(interface, package, index):
     object_name = interface['shortname']
-    index[object_name + '.init_pattern'] = 'resource.Resource'
+    index[object_name + '.init_pattern'] = 'osid_object.GenericObject'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
@@ -483,7 +484,7 @@ def map_object_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.is_group',
+                pattern='osid_object.GenericObject.is_attribute_boolean',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -498,7 +499,7 @@ def map_object_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.is_group',
+                pattern='osid_object.GenericObject.is_attribute_boolean',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -512,7 +513,7 @@ def map_object_patterns(interface, package, index):
                 method['name'].startswith('is_') and
                 index[object_name + '.instance_data'][var_name] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.is_group',
+                pattern='osid_object.GenericObject.is_attribute_boolean',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -528,7 +529,7 @@ def map_object_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.Asset.can_distribute_verbatim',
+                pattern='osid_object.GenericObject.can_attribute_boolean',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -576,7 +577,7 @@ def map_object_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.has_avatar',
+                pattern='osid_object.GenericObject.has_id_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -591,7 +592,7 @@ def map_object_patterns(interface, package, index):
                 method['name'].startswith('has_') and
                 index[object_name + '.instance_data'][var_name] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.has_avatar',
+                pattern='osid_object.GenericObject.has_id_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -999,7 +1000,7 @@ def map_object_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.get_avatar_id',
+                pattern='osid_object.GenericObject.get_id_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1017,7 +1018,7 @@ def map_object_patterns(interface, package, index):
                  'is_' + var_name + 'd' in interface['method_names']) and
                 index[object_name + '.instance_data'][var_name] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.get_avatar_id',
+                pattern='osid_object.GenericObject.get_id_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1147,7 +1148,7 @@ def map_object_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.get_avatar_id',
+                pattern='osid_object.GenericObject.get_id_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1163,7 +1164,7 @@ def map_object_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.get_avatar',
+                pattern='osid_object.GenericObject.get_id_attribute_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1183,7 +1184,7 @@ def map_object_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 index[object_name + '.instance_data'][var_name] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.get_avatar',
+                pattern='osid_object.GenericObject.get_id_attribute_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1213,7 +1214,7 @@ def map_object_patterns(interface, package, index):
         elif (method['name'].startswith('get_') and
                 method['name'].endswith('_record')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.Resource.get_resource_record',
+                pattern='osid_object.GenericObject.get_object_record',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1250,7 +1251,7 @@ def map_list_patterns(interface, package, index):
         # then this is a catalog node, so part of a hierarchy
         index[interface['shortname'] + '.init_pattern'] = 'resource.BinNodeList'
     else:
-        index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceList'
+        index[interface['shortname'] + '.init_pattern'] = 'osid_object.GenericObjectList'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 2)[-1]
@@ -1258,7 +1259,7 @@ def map_list_patterns(interface, package, index):
         if (method['name'].startswith('get_next') and
                 method['arg_types'] == []):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceList.get_next_resource',
+                pattern='osid_object.GenericObjectList.get_next_resource',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1270,7 +1271,7 @@ def map_list_patterns(interface, package, index):
         elif (method['name'].startswith('get_next') and
                 method['arg_types'][0] == 'cardinal'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceList.get_next_resources',
+                pattern='osid_object.GenericObjectList.get_next_resources',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1300,7 +1301,7 @@ def map_catalog_patterns(interface, package, index):
 def map_query_patterns(interface, package, index):
 
     object_name = interface['shortname'][:-5]
-    index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceQuery'
+    index[interface['shortname'] + '.init_pattern'] = 'osid_object.GenericObjectQuery'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
@@ -1310,7 +1311,7 @@ def map_query_patterns(interface, package, index):
                 var_name[:-6] == index['package_catalog_under'] + '_id' and
                 method['name'].startswith('clear_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceQuery.clear_bin_id_terms',
+                pattern='osid_object.GenericObjectQuery.clear_bin_id_terms',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1323,7 +1324,7 @@ def map_query_patterns(interface, package, index):
         elif (method['name'].endswith('_id_terms') and
                 method['name'].startswith('clear_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceQuery.clear_avatar_id_terms',
+                pattern='osid_object.GenericObjectQuery.clear_avatar_id_terms',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1337,7 +1338,7 @@ def map_query_patterns(interface, package, index):
                 var_name[:-6] in index[object_name + '.persisted_data'] and
                 method['name'].startswith('clear_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceQuery.clear_group_terms',
+                pattern='osid_object.GenericObjectQuery.clear_group_terms',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1371,7 +1372,7 @@ def map_query_patterns(interface, package, index):
         elif (method['name'] == 'match_' + index['package_catalog_under'] + '_id' and
                 len(method['args']) == 2):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceQuery.match_bin_id',
+                pattern='osid_object.GenericObjectQuery.match_bin_id',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1389,7 +1390,7 @@ def map_query_patterns(interface, package, index):
                 method['name'].endswith('_id') and
                 len(method['args']) == 2):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceQuery.match_avatar_id',
+                pattern='osid_object.GenericObjectQuery.match_avatar_id',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1415,7 +1416,7 @@ def map_query_patterns(interface, package, index):
 def map_search_patterns(interface, package, index):
 
     object_name = interface['shortname'][:-6]
-    index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceSearch'
+    index[interface['shortname'] + '.init_pattern'] = 'osid_object.GenericObjectSearch'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
@@ -1423,7 +1424,7 @@ def map_search_patterns(interface, package, index):
         # Search methods that search among ids
         if (method['name'].startswith('search_among')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceSearch.search_among_resources',
+                pattern='osid_object.GenericObjectSearch.search_among_resources',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1437,7 +1438,7 @@ def map_search_patterns(interface, package, index):
         # Search methods that order search results
         elif (method['name'].startswith('order_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceSearch.order_resource_results',
+                pattern='osid_object.GenericObjectSearch.order_resource_results',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1461,7 +1462,7 @@ def map_search_patterns(interface, package, index):
 def map_search_results_patterns(interface, package, index):
 
     object_name = interface['shortname'][:-13]
-    index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceSearchResults'
+    index[interface['shortname'] + '.init_pattern'] = 'osid_object.GenericObjectSearchResults'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
@@ -1471,7 +1472,7 @@ def map_search_results_patterns(interface, package, index):
                 not method['name'].endswith('_record') and
                 'query_inspector' not in method['name']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceSearchResults.get_resources',
+                pattern='osid_object.GenericObjectSearchResults.get_resources',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1485,7 +1486,7 @@ def map_search_results_patterns(interface, package, index):
         elif (method['name'].startswith('get_') and
               'query_inspector' in method['name']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceSearchResults.get_resource_query_inspector',
+                pattern='osid_object.GenericObjectSearchResults.get_resource_query_inspector',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1598,7 +1599,7 @@ def map_catalog_node_patterns(interface, package, index):
 def map_receiver_patterns(interface, package, index):
 
     object_name = interface['shortname'][:-len('Receiver')]
-    index[interface['shortname'] + '.init_pattern'] = 'resource.ResourceReceiver'
+    index[interface['shortname'] + '.init_pattern'] = 'osid_object.GenericObjectReceiver'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
@@ -1608,7 +1609,7 @@ def map_receiver_patterns(interface, package, index):
         # When upgrading to RC6
         if method['name'].startswith('new_'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceReceiver.new_resources',
+                pattern='osid_object.GenericObjectReceiver.new_resources',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1626,7 +1627,7 @@ def map_receiver_patterns(interface, package, index):
         # When upgrading to RC6
         elif method['name'].startswith('changed_'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceReceiver.changed_resources',
+                pattern='osid_object.GenericObjectReceiver.changed_resources',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1644,7 +1645,7 @@ def map_receiver_patterns(interface, package, index):
         # When upgrading to RC6
         elif method['name'].startswith('deleted_'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceReceiver.deleted_resources',
+                pattern='osid_object.GenericObjectReceiver.deleted_resources',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],

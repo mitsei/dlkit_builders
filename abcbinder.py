@@ -59,6 +59,7 @@ class ABCBuilder(InterfaceBuilder, Mapper, BaseBuilder):
 
         return (decorator + '\n' +
                 self._wrap(method_sig) + '\n' +
+                self._dind +
                 self._wrap(method_doc) + '\n' +
                 self._wrap(method_impl))
 
