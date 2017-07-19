@@ -269,9 +269,6 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
         pattern = self._get_pattern(method, interface)
         impl_class = self._load_impl_class(interface_sn)
-        if self._is("json"):
-            import pdb
-            pdb.set_trace()
 
         template_class = None
         if pattern:
@@ -284,14 +281,13 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     template_class = getattr(templates, pattern.split('.')[-2])
 
         self._confirm_build_method(impl_class, method_n)
-
         context = self._get_method_context(method, interface)
         template_name = self._get_template_name(pattern, interface_sn, method_n)
 
         # Check if there is a 'by hand' implementation available for this method
         if (impl_class and
                 hasattr(impl_class, method_n)):
-            impl = stripn(getattr(impl_class, method_n))
+            impl = stripn(getattr(impl_class, method_n)[self._language][self._class])
         # If there is no 'by hand' implementation, get the template for the
         # method implementation that serves as the pattern, if one exists.
         elif (template_class and
@@ -300,7 +296,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             if self._is('services') and getattr(template_class, template_name) is None:
                 raise SkipMethod()
 
-            template_str = stripn(getattr(template_class, template_name))
+            template_str = stripn(getattr(template_class, template_name)[self._language][self._class])
             template = string.Template(template_str)
             impl = stripn(template.substitute(context))
 

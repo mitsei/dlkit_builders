@@ -109,6 +109,7 @@ class BaseBuilder(Utilities):
         self._pkg_suffix = ''
         self._root_dir = None
         self._class = None
+        self._language = 'python'
         self._utf_code = '# -*- coding: utf-8 -*-\n'
 
         self.package_maps = package_maps_dir

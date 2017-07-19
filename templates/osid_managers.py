@@ -1,7 +1,7 @@
 class GenericProfile(object):
     import_statements_pattern = {
         'python': {
-            'json_': [
+            'json': [
                 'from ..primitives import Type',
                 'from ..type.objects import TypeList',
                 'from . import sessions',
@@ -14,7 +14,7 @@ class GenericProfile(object):
 
     supports_visible_federation_template = {
         'python': {
-            'json_': """
+            'json': """
     def ${method_name}(self):
         # Implemented from template for
         # templates.generic.osid_managers.GenericProfile.supports_visible_federation_template
@@ -24,7 +24,7 @@ class GenericProfile(object):
 
     supports_object_lookup_template = {
         'python': {
-            'json_': """
+            'json': """
     def ${method_name}(self):
         # Implemented from template for
         # templates.generic.osid_managers.GenericProfile.supports_object_lookup_template
@@ -34,7 +34,7 @@ class GenericProfile(object):
 
     get_object_record_types_template = {
         'python': {
-            'json_': """
+            'json': """
     def ${method_name}(self):
         # Implemented from template for
         # templates.generic.osid_managers.GenericProfile.get_object_record_types_template
@@ -48,7 +48,7 @@ class GenericProfile(object):
 
     supports_object_record_type_template = {
         'python': {
-            'json_': """
+            'json': """
     def ${method_name}(self):
         # Implemented from template for
         # templates.generic.osid_managers.GenericProfile.supports_object_record_type_template
@@ -68,7 +68,7 @@ class GenericManager(object):
 
     import_statements_pattern = {
         'python': {
-            'json_': [
+            'json': [
                 'from dlkit.abstract_osid.osid import errors',
             ]
         }
@@ -76,7 +76,7 @@ class GenericManager(object):
 
     init_template = {
         'python': {
-            'json_': """
+            'json': """
     def __init__(self):
         osid_managers.OsidManager.__init__(self)"""
         }
@@ -84,7 +84,7 @@ class GenericManager(object):
 
     get_object_lookup_session_template = {
         'python': {
-            'json_': """
+            'json': """
     def ${method_name}(self, **kwargs):
         # Implemented from template for
         # templates.generic.osid_managers.GenericManager.get_object_lookup_session_template
@@ -98,7 +98,7 @@ class GenericManager(object):
 
     get_object_lookup_session_for_catalog_template = {
         'python': {
-            'json_': """
+            'json': """
     def ${method_name}(self, ${arg0_name}, **kwargs):
         # Implemented from template for
         # templates.generic.osid_managers.GenericManager.get_object_lookup_session_for_catalog_template
@@ -116,7 +116,7 @@ class GenericManager(object):
 
     get_object_notification_session_template = {
         'python': {
-            'json_': """
+            'json': """
     def ${method_name}(self, ${arg0_name}, **kwargs):
         # Implemented from template for
         # templates.generic.osid_managers.GenericManager.get_object_notification_session_template
@@ -131,7 +131,7 @@ class GenericManager(object):
 
     get_object_notification_session_for_catalog_template = {
         'python': {
-            'json_': """
+            'json': """
     def ${method_name}(self, ${arg0_name}, **kwargs):
         # Implemented from template for
         # templates.generic.osid_managers.GenericManager.get_object_notification_session_for_catalog_template
@@ -151,7 +151,7 @@ class GenericManager(object):
 class GenericProxyManager(object):
     init_template = {
         'python': {
-            'json_': """
+            'json': """
     def __init__(self):
         osid_managers.OsidProxyManager.__init__(self)"""
         }
