@@ -225,7 +225,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'decimal'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid_form.GenericObjectForm.clear_decimal_attribute',
+                pattern='osid_form.GenericObjectForm.clear_simple_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -239,7 +239,7 @@ def map_object_form_patterns(interface, package, index):
                 method['arg_types'][0] in ['osid.calendaring.DateTime', 'timestamp']):
             print("FOUND STRING {0}".format(var_name))
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='assessment.AssessmentOfferedForm.set_start_time',
+                pattern='osid_form.GenericObjectForm.set_date_time_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -255,7 +255,7 @@ def map_object_form_patterns(interface, package, index):
                 method['arg_types'][0] == 'osid.calendaring.Duration'):
             print("FOUND STRING {0}".format(var_name))
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='assessment.AssessmentOfferedForm.set_duration',
+                pattern='osid_form.GenericObjectForm.set_duration_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -286,7 +286,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'string'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid_form.GenericObjectForm.clear_string_attribute',
+                pattern='osid_form.GenericObjectForm.clear_simple_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -300,7 +300,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] in ['osid.calendaring.DateTime', 'timestamp']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='assessment.AssessmentOfferedForm.clear_start_time',
+                pattern='osid_form.GenericObjectForm.clear_simple_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -314,7 +314,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.calendaring.Duration'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='assessment.AssessmentOfferedForm.clear_duration',
+                pattern='osid_form.GenericObjectForm.clear_simple_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -327,7 +327,7 @@ def map_object_form_patterns(interface, package, index):
                 len(method['arg_types']) == 1 and
                 method['arg_types'][0] == 'osid.transport.DataInputStream'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetContentForm.set_content_data',
+                pattern='osid_form.GenericObjectForm.set_data_input_stream_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -343,7 +343,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.transport.DataInputStream'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetContentForm.clear_content_data',
+                pattern='osid_form.GenericObjectForm.clear_data_input_stream_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -356,7 +356,7 @@ def map_object_form_patterns(interface, package, index):
                 len(method['arg_types']) == 1 and
                 method['arg_types'][0] == 'osid.type.Type'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetContentForm.add_accessibility_type',
+                pattern='osid_form.GenericObjectForm.set_id_list_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -371,7 +371,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][var_name]) == 1 and
                 index[object_name + '.arg_detail'][var_name][0]['arg_type'] == 'osid.type.Type'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetContentForm.remove_accessibility_type',
+                pattern='osid_form.GenericObjectForm.clear_single_id_list_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -390,7 +390,7 @@ def map_object_form_patterns(interface, package, index):
                 len(index[object_name + '.arg_detail'][remove_plural(var_name)]) == 1 and
                 index[object_name + '.arg_detail'][remove_plural(var_name)][0]['arg_type'] == 'osid.type.Type'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetContentForm.clear_accessibility_types',
+                pattern='osid_form.GenericObjectForm.clear_id_list_attribute',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
