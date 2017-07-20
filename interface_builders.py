@@ -422,7 +422,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         self.write_modules(modules)
 
     def _package_to_be_implemented(self):
-        if self._is('tests') and self.package['name'] not in packages_to_test:
+        if (self._is('tests') or self._is('test_authz')) and self.package['name'] not in packages_to_test:
             return False
 
         if self.package['name'] not in managers_to_implement:

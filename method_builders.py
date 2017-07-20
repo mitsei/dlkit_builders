@@ -369,7 +369,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 # Only expected from kitosid / services builder
                 pass
             else:
-                if not self._is('tests'):
+                if not self._is('tests') and not self._is('test_authz'):  # Should be a boolean flag, something like if self._make_properties (returns boolean)
                     # Here is where we add the Python properties stuff:
                     if argless_get(method):
                         body.append(simple_property('get', method))

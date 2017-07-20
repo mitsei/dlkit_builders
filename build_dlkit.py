@@ -863,6 +863,13 @@ class Builder(Utilities):
         else:
             TestBuilder(build_dir=self.build_dir).make()
 
+    def testauthz(self, create_parent_dir=False):
+        from testauthzbuilder import TestAuthZBuilder
+        if create_parent_dir:
+            TestAuthZBuilder(build_dir=self.build_dir + '/../tests').make()
+        else:
+            TestAuthZBuilder(build_dir=self.build_dir).make()
+
     def update_hash_file(self):
         """Create / update a simple file that keeps track of what
          builder commit was used to generate the files"""
@@ -895,6 +902,7 @@ if __name__ == '__main__':
         print("  services: build the dlkit convenience service impls")
         print("  manager: build the manager_impls base classes")
         print("  tests: build the tests")
+        print("  testauthz: builds special object tests for authz adaptation")
         print("  docs: build the documentation in Sphinx format")
         print("  --all: build all of the above")
         print("  --buildto <directory>: the target build-to directory")
@@ -928,6 +936,7 @@ if __name__ == '__main__':
                     'services',
                     'manager',
                     'tests',
+                    'testauthz',
                     'docs',
                     'help',
                     '?']
@@ -1001,6 +1010,10 @@ if __name__ == '__main__':
                 if '--buildto' not in sys.argv:
                     raise AttributeError('tests requires a --buildto when built individually')
                 builder.tests(non_test_build)
+            if 'testauthz' in sys.argv:
+                if '--buildto' not in sys.argv:
+                    raise AttributeError('testauthz requires a --buildto when built individually')
+                builder.testauthz(non_test_build)
             if 'docs' in sys.argv:
                 builder.docs()
             # Create a build-hash file so we know what commit built dlkit
