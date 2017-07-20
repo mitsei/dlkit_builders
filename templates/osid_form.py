@@ -86,8 +86,8 @@ ${persisted_initers}"""
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
-             }
         }
+    }
 
     set_id_attribute_template = {
         'python': {
