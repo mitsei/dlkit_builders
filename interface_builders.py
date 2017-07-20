@@ -203,11 +203,11 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
 
         # Check for any special data initializations and call the appropriate makers
         # to assemble them.
-        if init_pattern == 'resource.Bin':
+        if init_pattern == 'osid_catalog.GenericCatalog':
             object_name = interface_name
-        elif init_pattern == 'resource.BinForm':
+        elif init_pattern == 'osid_form.GenericCatalogForm':
             object_name = interface_name[:-4]
-        elif init_pattern == 'resource.BinNode':
+        elif init_pattern == 'osid_catalog.GenericCatalogNode':
             object_name = interface_name[:-4]
         elif init_pattern == 'resource.BinList':
             object_name = interface_name[:-4]
@@ -235,9 +235,9 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             object_name = interface_name.replace('LookupSession', '')
         elif init_pattern == 'repository.CompositionQuerySession':
             object_name = interface_name.replace('QuerySession', '')
-        elif init_pattern == 'resource.Resource':
+        elif init_pattern == 'osid_object.GenericObject':
             object_name = interface_name
-        elif init_pattern == 'resource.ResourceForm':
+        elif init_pattern == 'osid_form.GenericObjectForm':
             object_name = interface_name[:-4]
             if not self._is('authz'):
                 if object_name in self.patterns['package_relationships_caps']:
@@ -272,7 +272,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                         metadata_initers += '\n'
                 except KeyError:
                     pass
-        elif init_pattern == 'resource.ResourceList':
+        elif init_pattern == 'osid_list.GenericObjectList':
             object_name = interface_name[:-4]
         elif init_pattern == 'resource.ResourceQuery':
             object_name = interface_name[:-5]

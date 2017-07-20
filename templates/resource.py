@@ -1,3 +1,137 @@
+
+class ResourceProfile:
+
+    import_statements_pattern = [
+        'from ..primitives import Type',
+        'from ..type.objects import TypeList',
+        'from . import sessions',
+        'from dlkit.abstract_osid.osid import errors',
+        'from . import profile',
+        'from ..utilities import get_registry',
+    ]
+
+    supports_visible_federation_template = """
+        # Implemented from template for
+        # osid.resource.ResourceProfile.supports_visible_federation
+        return '${method_name}' in profile.SUPPORTS"""
+
+    supports_resource_lookup_template = """
+        # Implemented from template for
+        # osid.resource.ResourceProfile.supports_resource_lookup
+        return '${method_name}' in profile.SUPPORTS"""
+
+    get_resource_record_types_template = """
+        # Implemented from template for
+        # osid.resource.ResourceProfile.get_resource_record_types_template
+        record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
+        record_types = []
+        for record_type_map in record_type_maps:
+            record_types.append(Type(**record_type_maps[record_type_map]))
+        return TypeList(record_types)"""
+
+    supports_resource_record_type_template = """
+        # Implemented from template for
+        # osid.resource.ResourceProfile.supports_resource_record_type_template
+        record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
+        supports = False
+        for record_type_map in record_type_maps:
+            if (${arg0_name}.get_authority() == record_type_maps[record_type_map]['authority'] and
+                    ${arg0_name}.get_identifier_namespace() == record_type_maps[record_type_map]['namespace'] and
+                    ${arg0_name}.get_identifier() == record_type_maps[record_type_map]['identifier']):
+                supports = True
+        return supports"""
+
+
+class ResourceManager:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init_template = """
+    def __init__(self):
+        osid_managers.OsidManager.__init__(self)"""
+
+    get_resource_lookup_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(runtime=self._runtime)"""
+
+    get_resource_lookup_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)"""
+
+    get_resource_admin_session_template = get_resource_lookup_session_template
+
+    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
+
+    get_resource_notification_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name})"""
+
+    get_resource_notification_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name})"""
+
+
+class ResourceProxyManager:
+
+    import_statements_pattern = [
+        'from dlkit.abstract_osid.osid import errors',
+    ]
+
+    init_template = """
+    def __init__(self):
+        osid_managers.OsidProxyManager.__init__(self)"""
+
+    get_resource_lookup_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime)"""
+
+    get_resource_lookup_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime)"""
+
+    get_resource_admin_session_template = get_resource_lookup_session_template
+
+    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
+
+    get_resource_notification_session_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime, receiver=${arg0_name})"""
+
+    get_resource_notification_session_for_bin_template = """
+        if not self.supports_${support_check}():
+            raise errors.Unimplemented()
+        ##
+        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+        ##
+        # pylint: disable=no-member
+        return ${return_module}.${return_type}(catalog_id=${arg1_name}, proxy=proxy, runtime=self._runtime, receiver=${arg0_name})"""
+
+
 class ResourceLookupSession:
 
     import_statements_pattern = [
@@ -402,7 +536,8 @@ class ResourceAdminSession:
 
         return obj_form"""
 
-    # This is out of spec and not used.  So "Goodby!"
+    # This is out of spec, but used by the EdX / LORE record extensions for assets / compositions
+    # So put it in additional methods there only.
     # @utilities.arguments_not_none
     # def duplicate_${object_name_under}(self, ${object_name_under}_id):
     #     collection = JSONClientValidated('${package_name_replace}',
@@ -1489,8 +1624,55 @@ class BinQuerySession:
 
 class Resource:
 
-    is_demographic = """
-            return self._demographic"""
+    #     import_statements_pattern = [
+    #         'from dlkit.abstract_osid.osid import errors',
+    #         'from ..primitives import Id',
+    #         'from ..utilities import get_registry',
+    #     ]
+    #
+    #     # Note: self._catalog_name = '${cat_name_under}' below is currently
+    #     # only for osid.OsidObject.get_object_map() setting the now deprecated
+    #     # ${cat_name}Id element and may be removed someday
+    #     init_template = """
+    #     _namespace = '${implpkg_name}.${interface_name}'
+    #
+    #     def __init__(self, **kwargs):
+    #         osid_objects.OsidObject.__init__(self, object_name='${object_name_upper}', **kwargs)
+    #         self._catalog_name = '${cat_name}'
+    # ${instance_initers}"""
+    #
+    #     is_group_template = """
+    #         # Implemented from template for osid.resource.Resource.is_group_template
+    #         return bool(self._my_map['${var_name_mixed}'])"""
+    #
+    #     is_demographic = """
+    #         return self._demographic"""
+    #
+    #     has_avatar_template = """
+    #         # Implemented from template for osid.resource.Resource.has_avatar_template
+    #         return bool(self._my_map['${var_name_mixed}Id'])"""
+    #
+    #     get_avatar_id_template = """
+    #         # Implemented from template for osid.resource.Resource.get_avatar_id_template
+    #         if not bool(self._my_map['${var_name_mixed}Id']):
+    #             raise errors.IllegalState('this ${object_name} has no ${var_name}')
+    #         else:
+    #             return Id(self._my_map['${var_name_mixed}Id'])"""
+    #
+    #     get_avatar_template = """
+    #         # Implemented from template for osid.resource.Resource.get_avatar_template
+    #         if not bool(self._my_map['${var_name_mixed}Id']):
+    #             raise errors.IllegalState('this ${object_name} has no ${var_name}')
+    #         mgr = self._get_provider_manager('${return_pkg_caps}')
+    #         if not mgr.supports_${return_type_under}_lookup():
+    #             raise errors.OperationFailed('${return_pkg_title} does not support ${return_type} lookup')
+    #         lookup_session = mgr.get_${return_type_under}_lookup_session(proxy=getattr(self, "_proxy", None))
+    #         lookup_session.use_federated_${return_cat_name_under}_view()
+    #         osid_object = lookup_session.get_${return_type_under}(self.get_${var_name}_id())
+    #         return osid_object"""
+    #
+    #     get_resource_record_template = """
+    #         return self._get_record(${arg0_name})"""
 
     additional_methods = """
     def get_object_map(self):
@@ -1502,45 +1684,45 @@ class Resource:
     object_map = property(fget=get_object_map)"""
 
 
-class ResourceQuery:
-
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..utilities import get_registry',
-    ]
-
-    init_template = """
-    def __init__(self, runtime):
-        self._namespace = '${pkg_name_replaced}.${object_name}'
-        self._runtime = runtime
-        record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
-        self._all_supported_record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_ids = []
-        for data_set in record_type_data_sets:
-            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidObjectQuery.__init__(self, runtime)
-"""
-
-    clear_group_terms_template = """
-        # Implemented from template for osid.resource.ResourceQuery.clear_group_terms
-        self._clear_terms('${var_name_mixed}')"""
-
-    match_bin_id_template = """
-        # Implemented from template for osid.resource.ResourceQuery.match_bin_id
-        self._add_match('assigned${cat_name}Ids', str(${arg0_name}), ${arg1_name})"""
-
-    clear_bin_id_terms_template = """
-        # Implemented from template for osid.resource.ResourceQuery.clear_bin_id_terms
-        self._clear_terms('assigned${cat_name}Ids')"""
-
-    match_avatar_id_template = """
-        # Implemented from template for osid.resource.ResourceQuery.match_avatar_id
-        self._add_match('${var_name_mixed}', str(${arg0_name}), ${arg1_name})"""
-
-    clear_avatar_id_terms_template = """
-        # Implemented from template for osid.resource.ResourceQuery.clear_avatar_id
-        self._clear_terms('${var_name_mixed}')"""
+# class ResourceQuery:
+#
+#     import_statements_pattern = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#         'from ..utilities import get_registry',
+#     ]
+#
+#     init_template = """
+#     def __init__(self, runtime):
+#         self._namespace = '${pkg_name_replaced}.${object_name}'
+#         self._runtime = runtime
+#         record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
+#         self._all_supported_record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_ids = []
+#         for data_set in record_type_data_sets:
+#             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+#         osid_queries.OsidObjectQuery.__init__(self, runtime)
+# """
+#
+#     clear_group_terms_template = """
+#         # Implemented from template for osid.resource.ResourceQuery.clear_group_terms
+#         self._clear_terms('${var_name_mixed}')"""
+#
+#     match_bin_id_template = """
+#         # Implemented from template for osid.resource.ResourceQuery.match_bin_id
+#         self._add_match('assigned${cat_name}Ids', str(${arg0_name}), ${arg1_name})"""
+#
+#     clear_bin_id_terms_template = """
+#         # Implemented from template for osid.resource.ResourceQuery.clear_bin_id_terms
+#         self._clear_terms('assigned${cat_name}Ids')"""
+#
+#     match_avatar_id_template = """
+#         # Implemented from template for osid.resource.ResourceQuery.match_avatar_id
+#         self._add_match('${var_name_mixed}', str(${arg0_name}), ${arg1_name})"""
+#
+#     clear_avatar_id_terms_template = """
+#         # Implemented from template for osid.resource.ResourceQuery.clear_avatar_id
+#         self._clear_terms('${var_name_mixed}')"""
 
 
 class ResourceSearch:
@@ -1597,38 +1779,116 @@ class ResourceSearchResults:
         return queries.${return_type}(self._query_terms, runtime=self._runtime)"""
 
 
-class ResourceList:
+# class ResourceForm:
+#
+#     import_statements_pattern = [
+#         'import importlib',
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#         'from ..osid.metadata import Metadata',
+#         'from . import default_mdata',
+#         'from ..utilities import get_registry',
+#         'from ..utilities import update_display_text_defaults',
+#     ]
+#
+#     init_template = """
+#     _namespace = '${implpkg_name}.${object_name}'
+#
+#     def __init__(self, **kwargs):
+#         ${init_object}.__init__(self, object_name='${object_name_upper}', **kwargs)
+#         self._mdata = default_mdata.get_${object_name_under}_mdata()
+#         self._init_metadata(**kwargs)
+#         if not self.is_for_update():
+#             self._init_map(**kwargs)
+#
+#     def _init_metadata(self, **kwargs):
+#         \"\"\"Initialize form metadata\"\"\"
+# ${metadata_super_initers}        ${init_object}._init_metadata(self, **kwargs)
+#         ${metadata_initers}
+#     def _init_map(self, record_types=None, **kwargs):
+#         \"\"\"Initialize form map\"\"\"
+# ${map_super_initers}        ${init_object}._init_map(self, record_types=record_types)
+# ${persisted_initers}"""
+#
+#     # this needs to be re-designed to know about variable syntax type
+#     get_group_metadata_template = """
+#         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
+#         metadata = dict(self._mdata['${var_name}'])
+#         metadata.update({'existing_${syntax_under}_values': self._my_map['${var_name_mixed}']})
+#         return Metadata(**metadata)"""
+#
+#     get_avatar_metadata_template = """
+#         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
+#         metadata = dict(self._mdata['${var_name}'])
+#         metadata.update({'existing_${syntax_under}_values': self._my_map['${var_name_mixed}Id']})
+#         return Metadata(**metadata)"""
+#
+#     set_group_template = """
+#         # Implemented from template for osid.resource.ResourceForm.set_group_template
+#         if self.get_${var_name}_metadata().is_read_only():
+#             raise errors.NoAccess()
+#         if not self._is_valid_${arg0_type}(${arg0_name}):
+#             raise errors.InvalidArgument()
+#         self._my_map['${var_name_mixed}'] = ${arg0_name}"""
+#
+#     clear_group_template = """
+#         # Implemented from template for osid.resource.ResourceForm.clear_group_template
+#         if (self.get_${var_name}_metadata().is_read_only() or
+#                 self.get_${var_name}_metadata().is_required()):
+#             raise errors.NoAccess()
+#         self._my_map['${var_name_mixed}'] = self._${var_name}_default"""
+#
+#     set_avatar_template = """
+#         # Implemented from template for osid.resource.ResourceForm.set_avatar_template
+#         if self.get_${var_name}_metadata().is_read_only():
+#             raise errors.NoAccess()
+#         if not self._is_valid_id(${arg0_name}):
+#             raise errors.InvalidArgument()
+#         self._my_map['${var_name_mixed}Id'] = str(${arg0_name})"""
+#
+#     clear_avatar_template = """
+#         # Implemented from template for osid.resource.ResourceForm.clear_avatar_template
+#         if (self.get_${var_name}_metadata().is_read_only() or
+#                 self.get_${var_name}_metadata().is_required()):
+#             raise errors.NoAccess()
+#         self._my_map['${var_name_mixed}Id'] = self._${var_name}_default"""
+#
+#     get_resource_form_record_template = """
+#         return self._get_record(${arg0_name})"""
 
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-    ]
 
-    get_next_resource_template = """
-        # Implemented from template for osid.resource.ResourceList.get_next_resource
-        return next(self)
+# class ResourceList:
+#
+#     import_statements_pattern = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#     ]
+#
+#     get_next_resource_template = """
+#         # Implemented from template for osid.resource.ResourceList.get_next_resource
+#         return next(self)
+#
+#     def next(self):
+#         return self._get_next_object(${return_type})
+#
+#     __next__ = next"""
+#
+#     get_next_resources_template = """
+#         # Implemented from template for osid.resource.ResourceList.get_next_resources
+#         return self._get_next_n(${return_type}List, number=${arg0_name})"""
 
-    def next(self):
-        return self._get_next_object(${return_type})
 
-    __next__ = next"""
-
-    get_next_resources_template = """
-        # Implemented from template for osid.resource.ResourceList.get_next_resources
-        return self._get_next_n(${return_type}List, number=${arg0_name})"""
-
-
-class Bin:
-
-    import_statements_pattern = [
-        'import importlib',
-    ]
-
-    init_template = """
-    _namespace = '${implpkg_name}.${interface_name}'
-
-    def __init__(self, **kwargs):
-        osid_objects.OsidCatalog.__init__(self, object_name='${object_name_upper}', **kwargs)"""
+# class Bin:
+#
+#     import_statements_pattern = [
+#         'import importlib',
+#     ]
+#
+#     init_template = """
+#     _namespace = '${implpkg_name}.${interface_name}'
+#
+#     def __init__(self, **kwargs):
+#         osid_objects.OsidCatalog.__init__(self, object_name='${object_name_upper}', **kwargs)"""
 
 # Someday we need to support templating for additional_methods_pattern:
 #     additional_methods_pattern = """
@@ -1638,119 +1898,119 @@ class Bin:
 #         self._catalog = catalog"""
 
 
-class BinForm:
-
-    import_statements_pattern = [
-        'from . import default_mdata'
-    ]
-
-    init_template = """
-    _namespace = '${implpkg_name}.${object_name}'
-
-    def __init__(self, **kwargs):
-        osid_objects.OsidCatalogForm.__init__(self, object_name='${object_name_upper}', **kwargs)
-        self._mdata = default_mdata.get_${object_name_under}_mdata()
-        self._init_metadata(**kwargs)
-        if not self.is_for_update():
-            self._init_map(**kwargs)
-
-    def _init_metadata(self, **kwargs):
-        \"\"\"Initialize form metadata\"\"\"
-        osid_objects.OsidCatalogForm._init_metadata(self, **kwargs)
-
-    def _init_map(self, record_types=None, **kwargs):
-        \"\"\"Initialize form map\"\"\"
-        osid_objects.OsidCatalogForm._init_map(self, record_types, **kwargs)
-"""
-
-    get_bin_form_record_template = """
-        return self._get_record(${cat_name_lower}_record_type)"""
-
-
-class BinQuery:
-
-    import_statements_pattern = [
-        'from ..primitives import Id',
-        'from ..id.objects import IdList',
-        'from ..utilities import get_registry',
-    ]
-
-    init_template = """
-    def __init__(self, runtime):
-        self._runtime = runtime
-        record_type_data_sets = get_registry('${cat_name_upper}_RECORD_TYPES', runtime)
-        self._all_supported_record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_ids = []
-        for data_set in record_type_data_sets:
-            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidCatalogQuery.__init__(self, runtime)
-
-    def _get_descendant_catalog_ids(self, catalog_id):
-        hm = self._get_provider_manager('HIERARCHY')
-        hts = hm.get_hierarchy_traversal_session_for_hierarchy(
-            Id(authority='${pkg_name_upper}',
-               namespace='CATALOG',
-               identifier='${cat_name_upper}')
-        )  # What about the Proxy?
-        descendants = []
-        if hts.has_children(catalog_id):
-            for child_id in hts.get_children(catalog_id):
-                descendants += list(self._get_descendant_catalog_ids(child_id))
-                descendants.append(child_id)
-        return IdList(descendants)
-"""
-
-    clear_group_terms_template = """
-        self._clear_terms('${var_name_mixed}')"""
+# class BinForm:
+#
+#     import_statements_pattern = [
+#         'from . import default_mdata'
+#     ]
+#
+#     init_template = """
+#     _namespace = '${implpkg_name}.${object_name}'
+#
+#     def __init__(self, **kwargs):
+#         osid_objects.OsidCatalogForm.__init__(self, object_name='${object_name_upper}', **kwargs)
+#         self._mdata = default_mdata.get_${object_name_under}_mdata()
+#         self._init_metadata(**kwargs)
+#         if not self.is_for_update():
+#             self._init_map(**kwargs)
+#
+#     def _init_metadata(self, **kwargs):
+#         \"\"\"Initialize form metadata\"\"\"
+#         osid_objects.OsidCatalogForm._init_metadata(self, **kwargs)
+#
+#     def _init_map(self, record_types=None, **kwargs):
+#         \"\"\"Initialize form map\"\"\"
+#         osid_objects.OsidCatalogForm._init_map(self, record_types, **kwargs)
+# """
+#
+#     get_bin_form_record_template = """
+#         return self._get_record(${cat_name_lower}_record_type)"""
 
 
-class BinNode:
+# class BinQuery:
+#
+#     import_statements_pattern = [
+#         'from ..primitives import Id',
+#         'from ..id.objects import IdList',
+#         'from ..utilities import get_registry',
+#     ]
+#
+#     init_template = """
+#     def __init__(self, runtime):
+#         self._runtime = runtime
+#         record_type_data_sets = get_registry('${cat_name_upper}_RECORD_TYPES', runtime)
+#         self._all_supported_record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_ids = []
+#         for data_set in record_type_data_sets:
+#             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+#         osid_queries.OsidCatalogQuery.__init__(self, runtime)
+#
+#     def _get_descendant_catalog_ids(self, catalog_id):
+#         hm = self._get_provider_manager('HIERARCHY')
+#         hts = hm.get_hierarchy_traversal_session_for_hierarchy(
+#             Id(authority='${pkg_name_upper}',
+#                namespace='CATALOG',
+#                identifier='${cat_name_upper}')
+#         )  # What about the Proxy?
+#         descendants = []
+#         if hts.has_children(catalog_id):
+#             for child_id in hts.get_children(catalog_id):
+#                 descendants += list(self._get_descendant_catalog_ids(child_id))
+#                 descendants.append(child_id)
+#         return IdList(descendants)
+# """
+#
+#     clear_group_terms_template = """
+#         self._clear_terms('${var_name_mixed}')"""
 
-    import_statements_pattern = [
-        'from ..utilities import get_provider_manager',
-        'from dlkit.primordium.id.primitives import Id',
-    ]
 
-    init_template = """
-    def __init__(self, node_map, runtime=None, proxy=None, lookup_session=None):
-        osid_objects.OsidNode.__init__(self, node_map)
-        self._lookup_session = lookup_session
-        self._runtime = runtime
-        self._proxy = proxy
-
-    def get_object_node_map(self):
-        node_map = dict(self.get_${object_name_under}().get_object_map())
-        node_map['type'] = '${object_name}Node'
-        node_map['parentNodes'] = []
-        node_map['childNodes'] = []
-        for ${object_name_under}_node in self.get_parent_${object_name_under}_nodes():
-            node_map['parentNodes'].append(${object_name_under}_node.get_object_node_map())
-        for ${object_name_under}_node in self.get_child_${object_name_under}_nodes():
-            node_map['childNodes'].append(${object_name_under}_node.get_object_node_map())
-        return node_map"""
-
-    get_bin_template = """
-        if self._lookup_session is None:
-            mgr = get_provider_manager('${package_name_upper}', runtime=self._runtime, proxy=self._proxy)
-            self._lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=getattr(self, "_proxy", None))
-        return self._lookup_session.get_${object_name_under}(Id(self._my_map['id']))"""
-
-    get_parent_bin_nodes_template = """
-        parent_${object_name_under}_nodes = []
-        for node in self._my_map['parentNodes']:
-            parent_${object_name_under}_nodes.append(${object_name}Node(
-                node._my_map,
-                runtime=self._runtime,
-                proxy=self._proxy,
-                lookup_session=self._lookup_session))
-        return ${return_type}(parent_${object_name_under}_nodes)"""
-
-    get_child_bin_nodes_template = """
-        parent_${object_name_under}_nodes = []
-        for node in self._my_map['childNodes']:
-            parent_${object_name_under}_nodes.append(${object_name}Node(
-                node._my_map,
-                runtime=self._runtime,
-                proxy=self._proxy,
-                lookup_session=self._lookup_session))
-        return ${return_type}(parent_${object_name_under}_nodes)"""
+# class BinNode:
+#
+#     import_statements_pattern = [
+#         'from ..utilities import get_provider_manager',
+#         'from dlkit.primordium.id.primitives import Id',
+#     ]
+#
+#     init_template = """
+#     def __init__(self, node_map, runtime=None, proxy=None, lookup_session=None):
+#         osid_objects.OsidNode.__init__(self, node_map)
+#         self._lookup_session = lookup_session
+#         self._runtime = runtime
+#         self._proxy = proxy
+#
+#     def get_object_node_map(self):
+#         node_map = dict(self.get_${object_name_under}().get_object_map())
+#         node_map['type'] = '${object_name}Node'
+#         node_map['parentNodes'] = []
+#         node_map['childNodes'] = []
+#         for ${object_name_under}_node in self.get_parent_${object_name_under}_nodes():
+#             node_map['parentNodes'].append(${object_name_under}_node.get_object_node_map())
+#         for ${object_name_under}_node in self.get_child_${object_name_under}_nodes():
+#             node_map['childNodes'].append(${object_name_under}_node.get_object_node_map())
+#         return node_map"""
+#
+#     get_bin_template = """
+#         if self._lookup_session is None:
+#             mgr = get_provider_manager('${package_name_upper}', runtime=self._runtime, proxy=self._proxy)
+#             self._lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=getattr(self, "_proxy", None))
+#         return self._lookup_session.get_${object_name_under}(Id(self._my_map['id']))"""
+#
+#     get_parent_bin_nodes_template = """
+#         parent_${object_name_under}_nodes = []
+#         for node in self._my_map['parentNodes']:
+#             parent_${object_name_under}_nodes.append(${object_name}Node(
+#                 node._my_map,
+#                 runtime=self._runtime,
+#                 proxy=self._proxy,
+#                 lookup_session=self._lookup_session))
+#         return ${return_type}(parent_${object_name_under}_nodes)"""
+#
+#     get_child_bin_nodes_template = """
+#         parent_${object_name_under}_nodes = []
+#         for node in self._my_map['childNodes']:
+#             parent_${object_name_under}_nodes.append(${object_name}Node(
+#                 node._my_map,
+#                 runtime=self._runtime,
+#                 proxy=self._proxy,
+#                 lookup_session=self._lookup_session))
+#         return ${return_type}(parent_${object_name_under}_nodes)"""

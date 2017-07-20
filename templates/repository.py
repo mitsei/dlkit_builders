@@ -1026,28 +1026,28 @@ class Asset:
                 raise AttributeError()
         # HOW TO PASS TO EXTENSIBLE!!!!"""
 
-    get_title_template = """
-        # Implemented from template for osid.repository.Asset.get_title_template
-        return DisplayText(self._my_map['${var_name_mixed}'])"""
+    # get_title_template = """
+    #     # Implemented from template for osid.repository.Asset.get_title_template
+    #     return DisplayText(self._my_map['${var_name_mixed}'])"""
 
-    get_asset_content_ids_template = """
-        # Implemented from template for osid.repository.Asset.get_asset_content_ids_template
-        id_list = []
-        for ${var_name} in self.get_${var_name_plural}():
-            id_list.append(${var_name}.get_id())
-        return IdList(id_list)"""
+    # get_asset_content_ids_template = """
+    #     # Implemented from template for osid.repository.Asset.get_asset_content_ids_template
+    #     id_list = []
+    #     for ${var_name} in self.get_${var_name_plural}():
+    #         id_list.append(${var_name}.get_id())
+    #     return IdList(id_list)"""
 
-    get_asset_contents_template = """
-        # Implemented from template for osid.repository.Asset.get_asset_contents_template
-        return ${aggregated_object_name}List(
-            self._my_map['${var_name_plural_mixed}'],
-            runtime=self._runtime,
-            proxy=self._proxy)
-
-    def _delete(self):
-        for ${aggregated_object_name_under} in self.get_${aggregated_objects_name_under}():
-            ${aggregated_object_name_under}._delete()
-        osid_objects.OsidObject._delete(self)"""
+    # get_asset_contents_template = """
+    #     # Implemented from template for osid.repository.Asset.get_asset_contents_template
+    #     return ${aggregated_object_name}List(
+    #         self._my_map['${var_name_plural_mixed}'],
+    #         runtime=self._runtime,
+    #         proxy=self._proxy)
+    #
+    # def _delete(self):
+    #     for ${aggregated_object_name_under} in self.get_${aggregated_objects_name_under}():
+    #         ${aggregated_object_name_under}._delete()
+    #     osid_objects.OsidObject._delete(self)"""
 
     is_composition = """
         return bool(self._my_map['compositionId'])"""
@@ -1127,18 +1127,18 @@ class AssetContent:
         'from ..utilities import JSONClientValidated'
     ]
 
-    has_url_template = """
-        # Implemented from template for osid.repository.AssetContent.has_url_template
-        try:
-            return bool(self._my_map['${var_name_mixed}'])
-        except KeyError:
-            return False"""
-
-    get_url_template = """
-        # Implemented from template for osid.repository.AssetContent.get_url_template
-        if not bool(self._my_map['${var_name_mixed}']):
-            raise errors.IllegalState()
-        return self._my_map['${var_name_mixed}']"""
+    # has_url_template = """
+    #     # Implemented from template for osid.repository.AssetContent.has_url_template
+    #     try:
+    #         return bool(self._my_map['${var_name_mixed}'])
+    #     except KeyError:
+    #         return False"""
+    #
+    # get_url_template = """
+    #     # Implemented from template for osid.repository.AssetContent.get_url_template
+    #     if not bool(self._my_map['${var_name_mixed}']):
+    #         raise errors.IllegalState()
+    #     return self._my_map['${var_name_mixed}']"""
 
     get_data = """
         if not bool(self._my_map['data']):

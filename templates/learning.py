@@ -233,31 +233,31 @@ class Activity:
         'from ..id.objects import IdList',
     ]
 
-    get_objective_id_template = """
-        # Implemented from template for osid.learning.Activity.get_objective_id
-        if not bool(self._my_map['${var_name_mixed}Id']):
-            raise errors.IllegalState('${var_name} empty')
-        return Id(self._my_map['${var_name_mixed}Id'])"""
+    # get_objective_id_template = """
+    #     # Implemented from template for osid.learning.Activity.get_objective_id
+    #     if not bool(self._my_map['${var_name_mixed}Id']):
+    #         raise errors.IllegalState('${var_name} empty')
+    #     return Id(self._my_map['${var_name_mixed}Id'])"""
 
-    get_objective_template = """
-        # Implemented from template for osid.learning.Activity.get_objective
-        if not bool(self._my_map['${var_name_mixed}Id']):
-            raise errors.IllegalState('${var_name} empty')
-        mgr = self._get_provider_manager('${return_pkg_replace_caps}')
-        if not mgr.supports_${return_type_under}_lookup():
-            raise errors.OperationFailed('${return_pkg_replace_title} does not support ${return_type} lookup')
-        lookup_session = mgr.get_${return_type_under}_lookup_session(proxy=getattr(self, "_proxy", None))
-        lookup_session.use_federated_${return_cat_name_under}_view()
-        return lookup_session.get_${return_type_under}(self.get_${var_name}_id())"""
+    # get_objective_template = """
+    #     # Implemented from template for osid.learning.Activity.get_objective
+    #     if not bool(self._my_map['${var_name_mixed}Id']):
+    #         raise errors.IllegalState('${var_name} empty')
+    #     mgr = self._get_provider_manager('${return_pkg_replace_caps}')
+    #     if not mgr.supports_${return_type_under}_lookup():
+    #         raise errors.OperationFailed('${return_pkg_replace_title} does not support ${return_type} lookup')
+    #     lookup_session = mgr.get_${return_type_under}_lookup_session(proxy=getattr(self, "_proxy", None))
+    #     lookup_session.use_federated_${return_cat_name_under}_view()
+    #     return lookup_session.get_${return_type_under}(self.get_${var_name}_id())"""
 
-    is_course_based_activity = """
-        return bool(self._my_map['courseIds'])"""
-
-    is_assessment_based_activity = """
-        return bool(self._my_map['assessmentIds'])"""
-
-    is_asset_based_activity = """
-        return bool(self._my_map['assetIds'])"""
+    # is_course_based_activity = """
+    #     return bool(self._my_map['courseIds'])"""
+    #
+    # is_assessment_based_activity = """
+    #     return bool(self._my_map['assessmentIds'])"""
+    #
+    # is_asset_based_activity = """
+    #     return bool(self._my_map['assetIds'])"""
 
     # This is actually used by Grading.GradeSystem.is_based_on_grades
     # Something wrong with our patterns, if it isn't going to the source pattern of
@@ -266,22 +266,22 @@ class Activity:
         # Implemented from template for osid.learning.Activity.is_asset_based_activity_template
         return self._my_map['${var_name_mixed}']"""
 
-    get_asset_ids_template = """
-        # Implemented from template for osid.learning.Activity.get_asset_ids_template
-        return IdList(self._my_map['${var_name_mixed}Ids'])"""
+    # get_asset_ids_template = """
+    #     # Implemented from template for osid.learning.Activity.get_asset_ids_template
+    #     return IdList(self._my_map['${var_name_mixed}Ids'])"""
 
-    get_assets_template = """
-        # Implemented from template for osid.learning.Activity.get_assets_template
-        if not bool(self._my_map['${var_name_singular_mixed}Ids']):
-            raise errors.IllegalState('no ${var_name_singular_mixed}Ids')
-        mgr = self._get_provider_manager('${return_pkg_caps}')
-        if not mgr.supports_${return_type_list_object_under}_lookup():
-            raise errors.OperationFailed('${return_pkg_title} does not support ${return_type_list_object} lookup')
-
-        # What about the Proxy?
-        lookup_session = mgr.get_${return_type_list_object_under}_lookup_session(proxy=getattr(self, "_proxy", None))
-        lookup_session.use_federated_${return_cat_name_under}_view()
-        return lookup_session.get_${return_type_list_object_plural_under}_by_ids(self.get_${var_name_singular}_ids())"""
+    # get_assets_template = """
+    #     # Implemented from template for osid.learning.Activity.get_assets_template
+    #     if not bool(self._my_map['${var_name_singular_mixed}Ids']):
+    #         raise errors.IllegalState('no ${var_name_singular_mixed}Ids')
+    #     mgr = self._get_provider_manager('${return_pkg_caps}')
+    #     if not mgr.supports_${return_type_list_object_under}_lookup():
+    #         raise errors.OperationFailed('${return_pkg_title} does not support ${return_type_list_object} lookup')
+    #
+    #     # What about the Proxy?
+    #     lookup_session = mgr.get_${return_type_list_object_under}_lookup_session(proxy=getattr(self, "_proxy", None))
+    #     lookup_session.use_federated_${return_cat_name_under}_view()
+    #     return lookup_session.get_${return_type_list_object_plural_under}_by_ids(self.get_${var_name_singular}_ids())"""
 
 
 class ObjectiveHierarchySession:

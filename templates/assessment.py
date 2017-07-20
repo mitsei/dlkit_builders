@@ -1040,9 +1040,13 @@ class Answer:
 class Item:
 
     get_question_id = """
+    def ${method_name}(self):
+        ${doc_string}
         return self.get_question().get_id()"""
 
     get_question = """
+    def ${method_name}(self):
+        ${doc_string}
         question_map = dict(self._my_map['question'])
         question_map['learningObjectiveIds'] = self._my_map['learningObjectiveIds']
         return Question(osid_object_map=question_map,
@@ -1388,11 +1392,15 @@ class AssessmentOffered:
         return Duration(**self._my_map['${var_name_mixed}'])"""
 
     are_items_sequential = """
+    def ${method_name}(self):
+        ${doc_string}
         if self._my_map['itemsSequential'] is None:
             return self.get_assessment().are_items_sequential()
         return bool(self._my_map['itemsSequential'])"""
 
     are_items_shuffled = """
+    def ${method_name}(self):
+        ${doc_string}
         if self._my_map['itemsShuffled'] is None:
             return self.get_assessment().are_items_shuffled()
         return bool(self._my_map['itemsShuffled'])"""
@@ -1400,9 +1408,9 @@ class AssessmentOffered:
 
 class AssessmentOfferedQuery:
 
-    match_start_time_template = """
-        self._match_minimum_date_time('${var_name_mixed}', ${arg0_name}, match)
-        self._match_maximum_date_time('${var_name_mixed}', ${arg1_name}, match)"""
+    # match_start_time_template = """
+    #     self._match_minimum_date_time('${var_name_mixed}', ${arg0_name}, match)
+    #     self._match_maximum_date_time('${var_name_mixed}', ${arg1_name}, match)"""
 
     match_assessment_id = """
         self._add_match('assessmentId', str(assessment_id), match)"""
@@ -1589,21 +1597,31 @@ class AssessmentTaken:
                 section._delete()"""
 
     get_taker_id = """
+    def ${method_name}(self):
+        ${doc_string}
         if self._my_map['takerId']:
             return Id(self._my_map['takerId'])
         else:
             return Id(self._my_map['takingAgentId'])"""
 
     get_taker = """
+    def ${method_name}(self):
+        ${doc_string}
         raise errors.Unimplemented()"""
 
     get_taking_agent_id = """
+    def ${method_name}(self):
+        ${doc_string}
         return Id(self._my_map['takingAgentId'])"""
 
     get_taking_agent = """
+    def ${method_name}(self):
+        ${doc_string}
         raise errors.Unimplemented()"""
 
     has_started = """
+    def ${method_name}(self):
+        ${doc_string}
         assessment_offered = self.get_assessment_offered()
         if assessment_offered.has_start_time():
             return DateTime.utcnow() >= assessment_offered.get_start_time()
@@ -1611,6 +1629,8 @@ class AssessmentTaken:
             return True"""
 
     get_actual_start_time = """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.has_started():
             raise errors.IllegalState('this assessment has not yet started')
         if self._my_map['actualStartTime'] is None:
@@ -1626,6 +1646,8 @@ class AssessmentTaken:
                             microsecond=start_time.microsecond)"""
 
     has_ended = """
+    def ${method_name}(self):
+        ${doc_string}
         assessment_offered = self.get_assessment_offered()
         now = DateTime.utcnow()
         # There's got to be a better way to do this:
@@ -1645,6 +1667,8 @@ class AssessmentTaken:
             return False"""
 
     get_completion_time = """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.has_ended():
             raise errors.IllegalState('this assessment has not yet ended')
         if not self._my_map['completionTime']:
@@ -1659,6 +1683,8 @@ class AssessmentTaken:
                         microsecond=completion_time.microsecond)"""
 
     get_time_spent = """
+    def ${method_name}(self):
+        ${doc_string}
         # Take another look at this. Not sure it's correct:
         if not self.has_started or not self.has_ended():
             raise errors.IllegalState()
@@ -1667,14 +1693,16 @@ class AssessmentTaken:
         else:
             raise errors.IllegalState()"""
 
-    # This is not right.  Needs to be calculated?
-    get_completion_template = """
-        # Implemented from template for osid.assessment.AssessmentTaken.get_completion_template
+    # Override the template in this case for ``get_cardinal_attribute_template``, because
+    # needs to be calculated?
+    get_completion = """
+    def ${method_name}(self):
+        ${doc_string}
         return int(self._my_map['${var_name_mixed}'])"""
 
-    get_score_template = """
-        # Implemented from template for osid.assessment.AssessmentTaken.get_score_template
-        return Decimal(self._my_map['${var_name_mixed}'])"""
+    # get_score_template = """
+    #     # Implemented from template for osid.assessment.AssessmentTaken.get_score_template
+    #     return Decimal(self._my_map['${var_name_mixed}'])"""
 
 
 class AssessmentTakenForm:
@@ -2141,11 +2169,11 @@ class ItemSearchSession:
     ]
 
 
-class BankForm:
-    get_bank_form_record = """
-        # this should be templated from Resource, but
-        # would have to update pattern mappers
-        return self._get_record(bank_record_type)"""
+# class BankForm:
+#     get_bank_form_record = """
+#         # this should be templated from Resource, but
+#         # would have to update pattern mappers
+#         return self._get_record(bank_record_type)"""
 
 
 class BankQuery:

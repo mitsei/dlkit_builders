@@ -66,15 +66,15 @@ class GradeSystem:
         'from decimal import Decimal',
     ]
 
-    get_lowest_numeric_score_template = """
-        # Implemented from template for osid.grading.GradeSystem.get_lowest_numeric_score_template
-        if self._my_map['${var_name_mixed}'] is None:
-            return None
-        else:
-            return Decimal(str(self._my_map['${var_name_mixed}']))"""
+    # get_lowest_numeric_score_template = """
+    #     # Implemented from template for osid.grading.GradeSystem.get_lowest_numeric_score_template
+    #     if self._my_map['${var_name_mixed}'] is None:
+    #         return None
+    #     else:
+    #         return Decimal(str(self._my_map['${var_name_mixed}']))"""
 
     # But the real implementations need to check is_based_on_grades():
-
+    # So overwrite the templated version
     get_lowest_numeric_score = """
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')

@@ -74,12 +74,12 @@ class LogEntry:
         'from ..osid.osid_errors import *',
     ]
 
-    get_priority_template = """
-        # Implemented from template for osid.logging.LogEntry.get_priority
-        if not self._my_map['${var_name_mixed}']:
-            raise errors.IllegalState('this ${object_name} has no ${var_name}')
-        else:
-            return Id(self._my_map['${var_name_mixed}'])"""
+    # get_priority_template = """
+    #     # Implemented from template for osid.logging.LogEntry.get_priority
+    #     if not self._my_map['${var_name_mixed}Id']:
+    #         raise errors.IllegalState('this ${object_name} has no ${var_name}')
+    #     else:
+    #         return Id(self._my_map['${var_name_mixed}Id'])"""
 
     get_resource_id = """
         raise errors.Unimplemented()"""

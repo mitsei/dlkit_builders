@@ -231,6 +231,8 @@ ${persisted_initers}"""
         }
     }
 
+    clear_string_attribute_template = clear_simple_attribute_template
+
     set_decimal_attribute_template = {
         'python': {
             'json': """
@@ -249,6 +251,8 @@ ${persisted_initers}"""
         }
     }
 
+    clear_decimal_attribute_template = clear_simple_attribute_template
+
     set_date_time_attribute_template = {
         'python': {
             'json': """
@@ -266,6 +270,8 @@ ${persisted_initers}"""
         self._my_map['${var_name_mixed}'] = ${arg0_name}"""
         }
     }
+
+    clear_date_time_attribute_template = clear_simple_attribute_template
 
     set_duration_attribute_template = {
         'python': {
@@ -288,6 +294,8 @@ ${persisted_initers}"""
         self._my_map['${var_name_mixed}'] = map"""
         }
     }
+
+    clear_duration_attribute_template = clear_simple_attribute_template
 
     set_data_input_stream_attribute_template = {
         'python': {
@@ -328,3 +336,34 @@ ${persisted_initers}"""
         }
     }
 
+
+class GenericCatalogForm(object):
+    import_statements_pattern = {
+        'python': {
+            'json': [
+                'from . import default_mdata'
+            ]
+        }
+    }
+
+    init_template = """
+    # From: templates/osid_form.py::GenericCatalogForm::init_template
+    _namespace = '${implpkg_name}.${object_name}'
+
+    def __init__(self, **kwargs):
+        osid_objects.OsidCatalogForm.__init__(self, object_name='${object_name_upper}', **kwargs)
+        self._mdata = default_mdata.get_${object_name_under}_mdata()
+        self._init_metadata(**kwargs)
+        if not self.is_for_update():
+            self._init_map(**kwargs)
+
+    def _init_metadata(self, **kwargs):
+        \"\"\"Initialize form metadata\"\"\"
+        osid_objects.OsidCatalogForm._init_metadata(self, **kwargs)
+
+    def _init_map(self, record_types=None, **kwargs):
+        \"\"\"Initialize form map\"\"\"
+        osid_objects.OsidCatalogForm._init_map(self, record_types, **kwargs)
+    """
+
+    get_catalog_form_record_template = GenericObjectForm.get_object_form_record_template
