@@ -1,46 +1,54 @@
 
 class AssessmentManager:
 
-    import_statements = [
-        'from . import sessions',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from . import sessions',
+            ]
+        }
+    }
 
-    awkward_get_assessment_taken_query_session_for_bank_to_delete = """
-        if not self.supports_assessment_taken_query():
-            raise errors.Unimplemented()
-        return sessions.AssessmentTakenQuerySession(bank_id, runtime=self._runtime)
-
-    def get_assessment_taken_admin_session(self):
-        if not self.supports_assessment_taken_admin():
-            raise errors.Unimplemented()
-        return sessions.AssessmentTakenAdminSession(runtime=self._runtime)
-
-    def get_assessment_taken_admin_session_for_bank(self, bank_id):
-        if not self.supports_assessment_taken_admin():
-            raise errors.Unimplemented()
-        return sessions.AssessmentTakenAdminSession(bank_id, runtime=self._runtime)"""
+    # awkward_get_assessment_taken_query_session_for_bank_to_delete = """
+    #     if not self.supports_assessment_taken_query():
+    #         raise errors.Unimplemented()
+    #     return sessions.AssessmentTakenQuerySession(bank_id, runtime=self._runtime)
+    #
+    # def get_assessment_taken_admin_session(self):
+    #     if not self.supports_assessment_taken_admin():
+    #         raise errors.Unimplemented()
+    #     return sessions.AssessmentTakenAdminSession(runtime=self._runtime)
+    #
+    # def get_assessment_taken_admin_session_for_bank(self, bank_id):
+    #     if not self.supports_assessment_taken_admin():
+    #         raise errors.Unimplemented()
+    #     return sessions.AssessmentTakenAdminSession(bank_id, runtime=self._runtime)"""
 
 
 class AssessmentProxyManager:
 
-    import_statements = [
-        'from . import sessions',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from . import sessions',
+            ]
+        }
+    }
 
-    awkward_get_assessment_taken_query_session_for_bank_to_delete = """
-        if not self.supports_assessment_taken_query():
-            raise errors.Unimplemented()
-        return sessions.AssessmentTakenQuerySession(bank_id, proxy, runtime=self._runtime)
-
-    def get_assessment_taken_admin_session(self, proxy):
-        if not self.supports_assessment_taken_admin():
-            raise errors.Unimplemented()
-        return sessions.AssessmentTakenAdminSession(proxy=proxy, runtime=self._runtime)
-
-    def get_assessment_taken_admin_session_for_bank(self, bank_id, proxy):
-        if not self.supports_assessment_taken_admin():
-            raise errors.Unimplemented()
-        return sessions.AssessmentTakenAdminSession(bank_id, proxy=proxy, runtime=self._runtime)"""
+    # awkward_get_assessment_taken_query_session_for_bank_to_delete = """
+    #     if not self.supports_assessment_taken_query():
+    #         raise errors.Unimplemented()
+    #     return sessions.AssessmentTakenQuerySession(bank_id, proxy, runtime=self._runtime)
+    #
+    # def get_assessment_taken_admin_session(self, proxy):
+    #     if not self.supports_assessment_taken_admin():
+    #         raise errors.Unimplemented()
+    #     return sessions.AssessmentTakenAdminSession(proxy=proxy, runtime=self._runtime)
+    #
+    # def get_assessment_taken_admin_session_for_bank(self, bank_id, proxy):
+    #     if not self.supports_assessment_taken_admin():
+    #         raise errors.Unimplemented()
+    #     return sessions.AssessmentTakenAdminSession(bank_id, proxy=proxy, runtime=self._runtime)"""
 
 
 class AssessmentSession:
@@ -1412,8 +1420,14 @@ class AssessmentOfferedQuery:
     #     self._match_minimum_date_time('${var_name_mixed}', ${arg0_name}, match)
     #     self._match_maximum_date_time('${var_name_mixed}', ${arg1_name}, match)"""
 
-    match_assessment_id = """
+    match_assessment_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_id, match):
+        ${doc_string}
         self._add_match('assessmentId', str(assessment_id), match)"""
+        }
+    }
 
 
 class AssessmentTaken:
@@ -1718,23 +1732,53 @@ class AssessmentTakenForm:
 
 
 class AssessmentTakenQuery:
-    match_taking_agent_id = """
+    match_taking_agent_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, agent_id, match):
+        ${doc_string}
         self._add_match('takingAgentId', str(agent_id), bool(match))"""
+        }
+    }
 
-    match_assessment_offered_id = """
+    match_assessment_offered_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_offered_id, match):
+        ${doc_string}
         self._add_match('assessmentOfferedId', str(assessment_offered_id), match)"""
+        }
+    }
 
 
 class AssessmentQuery:
     # TODO: These all seem wrong, now that we have AssessmentParts??
-    match_item_id = """
+    match_item_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, item_id, match):
+        ${doc_string}
         self._add_match('itemIds', str(item_id), match)"""
+        }
+    }
 
-    clear_item_id_terms = """
+    clear_item_id_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._clear_terms('itemIds')"""
+        }
+    }
 
-    match_assessment_offered_id = """
+    match_assessment_offered_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_offered_id, match):
+        ${doc_string}
         self._add_match('assessmentOfferedId', str(assessment_offered_id), match)"""
+        }
+    }
 
 
 class AssessmentQuerySession:
@@ -2093,13 +2137,29 @@ class Response:
 
 class ItemQuery:
 
-    match_learning_objective_id = """
+    match_learning_objective_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, objective_id, match):
+        ${doc_string}
         self._add_match('learningObjectiveIds', str(objective_id), bool(match))"""
+        }
+    }
 
-    clear_learning_objective_id_terms = """
+    clear_learning_objective_id_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._clear_terms('learningObjectiveIds')"""
+        }
+    }
 
-    match_any_learning_objective = """
+    match_any_learning_objective = {
+        'python': {
+            'json': """
+    def ${method_name}(self, match):
+        ${doc_string}
         match_key = 'learningObjectiveIds'
         param = '$$exists'
         if match:
@@ -2111,9 +2171,17 @@ class ItemQuery:
         else:
             self._query_terms[match_key] = {param: flag}
         self._query_terms[match_key]['$$nin'] = [[], ['']]"""
+        }
+    }
 
-    clear_learning_objective_terms = """
+    clear_learning_objective_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._clear_terms('learningObjectiveIds')"""
+        }
+    }
 
 
 # class ItemSearch:
@@ -2177,14 +2245,23 @@ class ItemSearchSession:
 
 
 class BankQuery:
-    import_statements = [
-        'from bson import ObjectId'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from bson import ObjectId'
+            ]
+        }
+    }
 
-    match_ancestor_bank_id = """
+    match_ancestor_bank_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, bank_id, match):
+        ${doc_string}
         # matches when the bank_id param is an ancestor of
         # any bank
         bank_descendants = self._get_descendant_catalog_ids(bank_id)
         identifiers = [ObjectId(i.identifier) for i in bank_descendants]
-        self._query_terms['_id'] = {'$$in': identifiers}
-"""
+        self._query_terms['_id'] = {'$$in': identifiers}"""
+        }
+    }

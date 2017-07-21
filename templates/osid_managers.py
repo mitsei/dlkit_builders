@@ -101,6 +101,8 @@ class GenericManager(object):
         }
     }
 
+    get_object_admin_session_template = get_object_lookup_session_template
+
     get_object_lookup_session_for_catalog_template = {
         'python': {
             'json': """
@@ -122,6 +124,8 @@ class GenericManager(object):
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)"""
         }
     }
+
+    get_object_admin_session_for_catalog_template = get_object_lookup_session_for_catalog_template
 
     get_object_notification_session_template = {
         'python': {

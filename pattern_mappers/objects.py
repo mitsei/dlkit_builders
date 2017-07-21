@@ -1439,7 +1439,7 @@ def map_query_patterns(interface, package, index):
 def map_search_patterns(interface, package, index):
 
     object_name = interface['shortname'][:-6]
-    index[interface['shortname'] + '.init_pattern'] = 'osid_object.GenericObjectSearch'
+    index[interface['shortname'] + '.init_pattern'] = 'osid_search.GenericObjectSearch'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
@@ -1447,7 +1447,7 @@ def map_search_patterns(interface, package, index):
         # Search methods that search among ids
         if (method['name'].startswith('search_among')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid_object.GenericObjectSearch.search_among_resources',
+                pattern='osid_search.GenericObjectSearch.search_among_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1461,7 +1461,7 @@ def map_search_patterns(interface, package, index):
         # Search methods that order search results
         elif (method['name'].startswith('order_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid_object.GenericObjectSearch.order_resource_results',
+                pattern='osid_search.GenericObjectSearch.order_object_results',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1485,7 +1485,7 @@ def map_search_patterns(interface, package, index):
 def map_search_results_patterns(interface, package, index):
 
     object_name = interface['shortname'][:-13]
-    index[interface['shortname'] + '.init_pattern'] = 'osid_object.GenericObjectSearchResults'
+    index[interface['shortname'] + '.init_pattern'] = 'osid_search.GenericObjectSearchResults'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 1)[-1]
@@ -1495,7 +1495,7 @@ def map_search_results_patterns(interface, package, index):
                 not method['name'].endswith('_record') and
                 'query_inspector' not in method['name']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid_object.GenericObjectSearchResults.get_resources',
+                pattern='osid_search.GenericObjectSearchResults.get_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1509,7 +1509,7 @@ def map_search_results_patterns(interface, package, index):
         elif (method['name'].startswith('get_') and
               'query_inspector' in method['name']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid_object.GenericObjectSearchResults.get_resource_query_inspector',
+                pattern='osid_search.GenericObjectSearchResults.get_object_query_inspector',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],

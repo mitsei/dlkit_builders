@@ -244,7 +244,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith('smart_' + index['package_catalog_under'] + '_session') and
                 method['return_type'].endswith('Session')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid_managers.GenericManager.get_object_smart_bin_session',
+                pattern='osid_managers.GenericManager.get_object_smart_catalog_session',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],

@@ -42,94 +42,94 @@ class ResourceProfile:
         return supports"""
 
 
-class ResourceManager:
+# class ResourceManager:
 
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    # import_statements_pattern = [
+    #     'from dlkit.abstract_osid.osid import errors',
+    # ]
+    #
+    # init_template = """
+    # def __init__(self):
+    #     osid_managers.OsidManager.__init__(self)"""
+    #
+    # get_resource_lookup_session_template = """
+    #     if not self.supports_${support_check}():
+    #         raise errors.Unimplemented()
+    #     # pylint: disable=no-member
+    #     return ${return_module}.${return_type}(runtime=self._runtime)"""
+    #
+    # get_resource_lookup_session_for_bin_template = """
+    #     if not self.supports_${support_check}():
+    #         raise errors.Unimplemented()
+    #     ##
+    #     # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+    #     ##
+    #     # pylint: disable=no-member
+    #     return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)"""
+    #
+    # get_resource_admin_session_template = get_resource_lookup_session_template
+    #
+    # get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
+    #
+    # get_resource_notification_session_template = """
+    #     if not self.supports_${support_check}():
+    #         raise errors.Unimplemented()
+    #     # pylint: disable=no-member
+    #     return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name})"""
+    #
+    # get_resource_notification_session_for_bin_template = """
+    #     if not self.supports_${support_check}():
+    #         raise errors.Unimplemented()
+    #     ##
+    #     # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+    #     ##
+    #     # pylint: disable=no-member
+    #     return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name})"""
 
-    init_template = """
-    def __init__(self):
-        osid_managers.OsidManager.__init__(self)"""
 
-    get_resource_lookup_session_template = """
-        if not self.supports_${support_check}():
-            raise errors.Unimplemented()
-        # pylint: disable=no-member
-        return ${return_module}.${return_type}(runtime=self._runtime)"""
-
-    get_resource_lookup_session_for_bin_template = """
-        if not self.supports_${support_check}():
-            raise errors.Unimplemented()
-        ##
-        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
-        ##
-        # pylint: disable=no-member
-        return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)"""
-
-    get_resource_admin_session_template = get_resource_lookup_session_template
-
-    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
-
-    get_resource_notification_session_template = """
-        if not self.supports_${support_check}():
-            raise errors.Unimplemented()
-        # pylint: disable=no-member
-        return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name})"""
-
-    get_resource_notification_session_for_bin_template = """
-        if not self.supports_${support_check}():
-            raise errors.Unimplemented()
-        ##
-        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
-        ##
-        # pylint: disable=no-member
-        return ${return_module}.${return_type}(${arg1_name}, runtime=self._runtime, receiver=${arg0_name})"""
-
-
-class ResourceProxyManager:
-
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
-
-    init_template = """
-    def __init__(self):
-        osid_managers.OsidProxyManager.__init__(self)"""
-
-    get_resource_lookup_session_template = """
-        if not self.supports_${support_check}():
-            raise errors.Unimplemented()
-        # pylint: disable=no-member
-        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime)"""
-
-    get_resource_lookup_session_for_bin_template = """
-        if not self.supports_${support_check}():
-            raise errors.Unimplemented()
-        ##
-        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
-        ##
-        # pylint: disable=no-member
-        return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime)"""
-
-    get_resource_admin_session_template = get_resource_lookup_session_template
-
-    get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
-
-    get_resource_notification_session_template = """
-        if not self.supports_${support_check}():
-            raise errors.Unimplemented()
-        # pylint: disable=no-member
-        return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime, receiver=${arg0_name})"""
-
-    get_resource_notification_session_for_bin_template = """
-        if not self.supports_${support_check}():
-            raise errors.Unimplemented()
-        ##
-        # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
-        ##
-        # pylint: disable=no-member
-        return ${return_module}.${return_type}(catalog_id=${arg1_name}, proxy=proxy, runtime=self._runtime, receiver=${arg0_name})"""
+# class ResourceProxyManager:
+#
+#     import_statements_pattern = [
+#         'from dlkit.abstract_osid.osid import errors',
+#     ]
+#
+#     init_template = """
+#     def __init__(self):
+#         osid_managers.OsidProxyManager.__init__(self)"""
+#
+#     get_resource_lookup_session_template = """
+#         if not self.supports_${support_check}():
+#             raise errors.Unimplemented()
+#         # pylint: disable=no-member
+#         return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime)"""
+#
+#     get_resource_lookup_session_for_bin_template = """
+#         if not self.supports_${support_check}():
+#             raise errors.Unimplemented()
+#         ##
+#         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+#         ##
+#         # pylint: disable=no-member
+#         return ${return_module}.${return_type}(${arg0_name}, proxy, self._runtime)"""
+#
+#     get_resource_admin_session_template = get_resource_lookup_session_template
+#
+#     get_resource_admin_session_for_bin_template = get_resource_lookup_session_for_bin_template
+#
+#     get_resource_notification_session_template = """
+#         if not self.supports_${support_check}():
+#             raise errors.Unimplemented()
+#         # pylint: disable=no-member
+#         return ${return_module}.${return_type}(proxy=proxy, runtime=self._runtime, receiver=${arg0_name})"""
+#
+#     get_resource_notification_session_for_bin_template = """
+#         if not self.supports_${support_check}():
+#             raise errors.Unimplemented()
+#         ##
+#         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
+#         ##
+#         # pylint: disable=no-member
+#         return ${return_module}.${return_type}(catalog_id=${arg1_name}, proxy=proxy, runtime=self._runtime, receiver=${arg0_name})"""
 
 
 class ResourceLookupSession:
@@ -1725,58 +1725,58 @@ class Resource:
 #         self._clear_terms('${var_name_mixed}')"""
 
 
-class ResourceSearch:
+# class ResourceSearch:
+#
+#     import_statements_pattern = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#         'from ..osid import searches as osid_searches',
+#         'from ..utilities import get_registry',
+#     ]
+#
+#     init_template = """
+#     def __init__(self, runtime):
+#         self._namespace = '${pkg_name}.${object_name}'
+#         self._runtime = runtime
+#         record_type_data_sets = get_registry('RESOURCE_RECORD_TYPES', runtime)
+#         self._record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_data_sets = record_type_data_sets
+#         self._all_supported_record_type_ids = []
+#         self._id_list = None
+#         for data_set in record_type_data_sets:
+#             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+#         osid_searches.OsidSearch.__init__(self, runtime)"""
+#
+#     search_among_resources_template = """
+#         self._id_list = ${arg0_name}"""
 
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..osid import searches as osid_searches',
-        'from ..utilities import get_registry',
-    ]
 
-    init_template = """
-    def __init__(self, runtime):
-        self._namespace = '${pkg_name}.${object_name}'
-        self._runtime = runtime
-        record_type_data_sets = get_registry('RESOURCE_RECORD_TYPES', runtime)
-        self._record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_ids = []
-        self._id_list = None
-        for data_set in record_type_data_sets:
-            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)"""
-
-    search_among_resources_template = """
-        self._id_list = ${arg0_name}"""
-
-
-class ResourceSearchResults:
-
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import objects',
-        'from . import queries',
-    ]
-
-    init_template = """
-    def __init__(self, results, query_terms, runtime):
-        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
-        # self._results = [r for r in results]
-        self._namespace = '${pkg_name}.${object_name}'
-        self._results = results
-        self._query_terms = query_terms
-        self._runtime = runtime
-        self.retrieved = False"""
-
-    get_resources_template = """
-        if self.retrieved:
-            raise errors.IllegalState('List has already been retrieved.')
-        self.retrieved = True
-        return objects.${return_type}(self._results, runtime=self._runtime)"""
-
-    get_resource_query_inspector_template = """
-        return queries.${return_type}(self._query_terms, runtime=self._runtime)"""
+# class ResourceSearchResults:
+#
+#     import_statements_pattern = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from . import objects',
+#         'from . import queries',
+#     ]
+#
+#     init_template = """
+#     def __init__(self, results, query_terms, runtime):
+#         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+#         # self._results = [r for r in results]
+#         self._namespace = '${pkg_name}.${object_name}'
+#         self._results = results
+#         self._query_terms = query_terms
+#         self._runtime = runtime
+#         self.retrieved = False"""
+#
+#     get_resources_template = """
+#         if self.retrieved:
+#             raise errors.IllegalState('List has already been retrieved.')
+#         self.retrieved = True
+#         return objects.${return_type}(self._results, runtime=self._runtime)"""
+#
+#     get_resource_query_inspector_template = """
+#         return queries.${return_type}(self._query_terms, runtime=self._runtime)"""
 
 
 # class ResourceForm:

@@ -274,11 +274,11 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                     pass
         elif init_pattern == 'osid_list.GenericObjectList':
             object_name = interface_name[:-4]
-        elif init_pattern == 'resource.ResourceQuery':
+        elif init_pattern == 'osid_query.GenericObjectQuery':
             object_name = interface_name[:-5]
-        elif init_pattern == 'resource.ResourceSearch':
+        elif init_pattern == 'osid_search.GenericObjectSearch':
             object_name = interface_name[:-6]
-        elif init_pattern == 'resource.ResourceSearchResults':
+        elif init_pattern == 'osid_search.GenericObjectSearchResults':
             object_name = interface_name[:-13]
 
         # Special one for services test builder to select whether a session method
