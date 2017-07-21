@@ -77,13 +77,13 @@ def map_manager_patterns(interface, package, index):
                             var_name=method['name'][4:],
                             object_name_under=method['name'][4:-13]))
 
-        # Profile methods that test whether a particulaar Type is supported.
+        # Profile methods that test whether a particular Type is supported.
         elif (method['name'].startswith('supports') and
                 method['name'].endswith('type') and
                 method['return_type'] == 'boolean' and
                 'osid.type.Type' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.RepositoryProfile.supports_coordinate_type',
+                pattern='osid_managers.GenericProfile.supports_type',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -96,7 +96,7 @@ def map_manager_patterns(interface, package, index):
                 method['name'].endswith('types') and
                 method['return_type'] == 'osid.type.TypeList'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.RepositoryProfile.get_coordinate_types',
+                pattern='osid_managers.GenericProfile.get_type_list',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],

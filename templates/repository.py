@@ -1,15 +1,15 @@
 
-class RepositoryProfile:
+# class RepositoryProfile:
 
-    get_coordinate_types_template = """
-        # Implemented from template for
-        # osid.repository.RepositoryProfile.get_coordinate_types
-        return TypeList([])"""
-
-    supports_coordinate_type_template = """
-        # Implemented from template for
-        # osid.repository.RepositoryProfile.supports_coordinate_type
-        return False"""
+    # get_coordinate_types_template = """
+    #     # Implemented from template for
+    #     # osid.repository.RepositoryProfile.get_coordinate_types
+    #     return TypeList([])"""
+    #
+    # supports_coordinate_type_template = """
+    #     # Implemented from template for
+    #     # osid.repository.RepositoryProfile.supports_coordinate_type
+    #     return False"""
 
 
 class RepositoryManager:

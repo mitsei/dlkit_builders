@@ -67,6 +67,26 @@ class GenericProfile(object):
         }
     }
 
+    get_type_list_template = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        # From: templates.osid_managers.GenericProfile.get_type_list_template
+        return TypeList([])"""
+        }
+    }
+
+    supports_type_template = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        # From: templates.osid_managers.GenericProfile.supports_type_template
+        return False"""
+        }
+    }
+
 
 class GenericManager(object):
 
