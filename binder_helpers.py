@@ -72,6 +72,12 @@ def camel_to_mixed(string):
     return ''.join(words)
 
 
+def under_to_camel(string):
+    """ underscore_delimited to CamelCase. """
+    words = string.title().split('_')
+    return ''.join(words)
+
+
 def under_to_mixed(string):
     """ underscore_delimited to mixedCase. """
     words = string.title().split('_')

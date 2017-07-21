@@ -1,154 +1,154 @@
 from .resource import ResourceAdminSession
 
 
-class RelationshipLookupSession:
+# class RelationshipLookupSession:
 
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..primitives import DateTime',
-        'from ..osid.sessions import OsidSession',
-        'from ..utilities import JSONClientValidated',
-        'from ..utilities import overlap',
-        'from . import objects',
-        'from bson.objectid import ObjectId',
-        'DESCENDING = -1',
-        'ASCENDING = 1',
-        'CREATED = True',
-        'UPDATED = True'
-    ]
+    # import_statements_pattern = [
+    #     'from dlkit.abstract_osid.osid import errors',
+    #     'from ..primitives import Id',
+    #     'from ..primitives import DateTime',
+    #     'from ..osid.sessions import OsidSession',
+    #     'from ..utilities import JSONClientValidated',
+    #     'from ..utilities import overlap',
+    #     'from . import objects',
+    #     'from bson.objectid import ObjectId',
+    #     'DESCENDING = -1',
+    #     'ASCENDING = 1',
+    #     'CREATED = True',
+    #     'UPDATED = True'
+    # ]
 
-    use_effective_relationship_view_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.use_effective_relationship_view
-        self._use_effective_view()"""
-
-    use_any_effective_relationship_view_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.use_any_effective_relationship_view
-        self._use_any_effective_view()"""
-
-    get_relationships_on_date_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_on_date
-        ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}():
-            if overlap(${arg0_name}, ${arg1_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
-                ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-
-    get_relationships_for_source_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_for_source
-        # NOTE: This implementation currently ignores plenary and effective views
-        collection = JSONClientValidated('${package_name}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        result = collection.find(
-            dict({'${source_name_mixed}Id': str(${arg0_name})},
-                 **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
-
-    get_relationships_for_source_on_date_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_for_source_on_date
-        ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_for_${source_name}(${arg0_name}):
-            if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
-                ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-
-    get_relationships_by_genus_type_for_source_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source
-        # NOTE: This implementation currently ignores plenary and effective views
-        collection = JSONClientValidated('${package_name}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        result = collection.find(
-            dict({'${source_name_mixed}Id': str(${arg0_name}),
-                  'genusTypeId': str(${arg1_name})},
-                 **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
-
-    get_relationships_by_genus_type_for_source_on_date_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source_on_date
-        ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${source_name}():
-            if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
-                ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-
-    get_relationships_for_destination_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
-        # NOTE: This implementation currently ignores plenary and effective views
-        collection = JSONClientValidated('${package_name}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        result = collection.find(
-            dict({'${destination_name_mixed}Id': str(${arg0_name})},
-                 **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
-
-    get_relationships_for_destination_on_date_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_for_destination_on_date
-        ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_for_${destination_name}():
-            if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
-                ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-
-    get_relationships_by_genus_type_for_destination_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination
-        # NOTE: This implementation currently ignores plenary and effective views
-        collection = JSONClientValidated('${package_name}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        result = collection.find(
-            dict({'${destination_name_mixed}Id': str(${arg0_name}),
-                  'genusTypeId': str(${arg1_name})},
-                 **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
-
-    get_relationships_by_genus_type_for_destination_on_date_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination_on_date
-        ${object_name_under}_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${destination_name}():
-            if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
-                ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
-
-    get_relationships_for_peers_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_for_peers
-        # NOTE: This implementation currently ignores plenary and effective views
-        collection = JSONClientValidated('${package_name}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        result = collection.find(
-            dict({'${source_name_mixed}Id': str(${arg0_name}),
-                  '${destination_name_mixed}Id': str(${arg1_name})},
-                 **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
-
-    get_relationships_by_genus_type_for_peers_template = """
-        # Implemented from template for
-        # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers
-        # NOTE: This implementation currently ignores plenary and effective views
-        collection = JSONClientValidated('${package_name}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        result = collection.find(
-            dict({'${source_name_mixed}Id': str(${arg0_name}),
-                  '${destination_name_mixed}Id': str(${arg1_name}),
-                  'genusTypeId': str(${arg2_name})},
-                 **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
+    # use_effective_relationship_view_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.use_effective_relationship_view
+    #     self._use_effective_view()"""
+    #
+    # use_any_effective_relationship_view_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.use_any_effective_relationship_view
+    #     self._use_any_effective_view()"""
+    #
+    # get_relationships_on_date_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_on_date
+    #     ${object_name_under}_list = []
+    #     for ${object_name_under} in self.get_${object_name_plural_under}():
+    #         if overlap(${arg0_name}, ${arg1_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+    #             ${object_name_under}_list.append(${object_name_under})
+    #     return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+    #
+    # get_relationships_for_source_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_for_source
+    #     # NOTE: This implementation currently ignores plenary and effective views
+    #     collection = JSONClientValidated('${package_name}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     result = collection.find(
+    #         dict({'${source_name_mixed}Id': str(${arg0_name})},
+    #              **self._view_filter())).sort('_sort_id', ASCENDING)
+    #     return objects.${object_name}List(result, runtime=self._runtime)"""
+    #
+    # get_relationships_for_source_on_date_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_for_source_on_date
+    #     ${object_name_under}_list = []
+    #     for ${object_name_under} in self.get_${object_name_plural_under}_for_${source_name}(${arg0_name}):
+    #         if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+    #             ${object_name_under}_list.append(${object_name_under})
+    #     return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+    #
+    # get_relationships_by_genus_type_for_source_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source
+    #     # NOTE: This implementation currently ignores plenary and effective views
+    #     collection = JSONClientValidated('${package_name}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     result = collection.find(
+    #         dict({'${source_name_mixed}Id': str(${arg0_name}),
+    #               'genusTypeId': str(${arg1_name})},
+    #              **self._view_filter())).sort('_sort_id', ASCENDING)
+    #     return objects.${object_name}List(result, runtime=self._runtime)"""
+    #
+    # get_relationships_by_genus_type_for_source_on_date_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_source_on_date
+    #     ${object_name_under}_list = []
+    #     for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${source_name}():
+    #         if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+    #             ${object_name_under}_list.append(${object_name_under})
+    #     return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+    #
+    # get_relationships_for_destination_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_for_destination
+    #     # NOTE: This implementation currently ignores plenary and effective views
+    #     collection = JSONClientValidated('${package_name}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     result = collection.find(
+    #         dict({'${destination_name_mixed}Id': str(${arg0_name})},
+    #              **self._view_filter())).sort('_sort_id', ASCENDING)
+    #     return objects.${object_name}List(result, runtime=self._runtime)"""
+    #
+    # get_relationships_for_destination_on_date_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_for_destination_on_date
+    #     ${object_name_under}_list = []
+    #     for ${object_name_under} in self.get_${object_name_plural_under}_for_${destination_name}():
+    #         if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+    #             ${object_name_under}_list.append(${object_name_under})
+    #     return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+    #
+    # get_relationships_by_genus_type_for_destination_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination
+    #     # NOTE: This implementation currently ignores plenary and effective views
+    #     collection = JSONClientValidated('${package_name}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     result = collection.find(
+    #         dict({'${destination_name_mixed}Id': str(${arg0_name}),
+    #               'genusTypeId': str(${arg1_name})},
+    #              **self._view_filter())).sort('_sort_id', ASCENDING)
+    #     return objects.${object_name}List(result, runtime=self._runtime)"""
+    #
+    # get_relationships_by_genus_type_for_destination_on_date_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_destination_on_date
+    #     ${object_name_under}_list = []
+    #     for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${destination_name}():
+    #         if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
+    #             ${object_name_under}_list.append(${object_name_under})
+    #     return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+    #
+    # get_relationships_for_peers_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_for_peers
+    #     # NOTE: This implementation currently ignores plenary and effective views
+    #     collection = JSONClientValidated('${package_name}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     result = collection.find(
+    #         dict({'${source_name_mixed}Id': str(${arg0_name}),
+    #               '${destination_name_mixed}Id': str(${arg1_name})},
+    #              **self._view_filter())).sort('_sort_id', ASCENDING)
+    #     return objects.${object_name}List(result, runtime=self._runtime)"""
+    #
+    # get_relationships_by_genus_type_for_peers_template = """
+    #     # Implemented from template for
+    #     # osid.relationship.RelationshipLookupSession.get_relationships_by_genus_type_for_peers
+    #     # NOTE: This implementation currently ignores plenary and effective views
+    #     collection = JSONClientValidated('${package_name}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     result = collection.find(
+    #         dict({'${source_name_mixed}Id': str(${arg0_name}),
+    #               '${destination_name_mixed}Id': str(${arg1_name}),
+    #               'genusTypeId': str(${arg2_name})},
+    #              **self._view_filter())).sort('_sort_id', ASCENDING)
+    #     return objects.${object_name}List(result, runtime=self._runtime)"""
 
 
 class RelationshipAdminSession:

@@ -156,26 +156,26 @@ class ObjectiveAdminSession:
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
 
-class ActivityLookupSession:
-
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from . import objects',
-        'from ..utilities import JSONClientValidated',
-    ]
-
-    get_activities_for_objective_template = """
-        # Implemented from template for
-        # osid.learning.ActivityLookupSession.get_activities_for_objective_template
-        # NOTE: This implementation currently ignores plenary view
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        result = collection.find(
-            dict({'${arg0_object_mixed}Id': str(${arg0_name})},
-                 **self._view_filter()))
-        return objects.${return_type}(result, runtime=self._runtime)"""
+# class ActivityLookupSession:
+#
+#     import_statements_pattern = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#         'from . import objects',
+#         'from ..utilities import JSONClientValidated',
+#     ]
+#
+#     get_activities_for_objective_template = """
+#         # Implemented from template for
+#         # osid.learning.ActivityLookupSession.get_activities_for_objective_template
+#         # NOTE: This implementation currently ignores plenary view
+#         collection = JSONClientValidated('${package_name_replace}',
+#                                          collection='${object_name}',
+#                                          runtime=self._runtime)
+#         result = collection.find(
+#             dict({'${arg0_object_mixed}Id': str(${arg0_name})},
+#                  **self._view_filter()))
+#         return objects.${return_type}(result, runtime=self._runtime)"""
 
 
 class ActivityAdminSession:

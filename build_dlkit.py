@@ -830,9 +830,10 @@ class Templates(Utilities):
         imports = []
         import_templates = self._get_templates(interface, method, '_import_templates')
         if import_templates is not None:
-            for item in import_templates:
-                template = string.Template(item)
-                imports.append(template.substitute(arg_context))
+            if self._language in import_templates and self._class in import_templates[self._language]:
+                for item in import_templates[self._language][self._class]:
+                    template = string.Template(item)
+                    imports.append(template.substitute(arg_context))
 
         return imports
 

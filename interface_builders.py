@@ -6,7 +6,7 @@ import string
 
 from binder_helpers import under_to_mixed, under_to_caps, camel_to_mixed,\
     remove_plural, camel_to_under, make_plural, camel_to_caps_under,\
-    fix_reserved_word
+    fix_reserved_word, under_to_camel
 from build_dlkit import Utilities, BaseBuilder, Templates
 from config import managers_to_implement, packages_to_test, test_service_configs
 from method_builders import MethodBuilder
@@ -184,6 +184,32 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
 
     def _get_init_context(self, init_pattern, interface):
         """get the init context, for templating"""
+        def grab_object_name():
+            """from the interface, get the object name. Typically want to remove the XSession part
+
+            i.e. assessment.Bank => assessment.Bank
+                 assessment.Item => assessment.Item
+                 assessment.ItemLookupSession => assessment.Item
+                 resource.ResourceBinAssignmentSession => resource.Resource
+                 grading.GradeSystemAdminSession => grading.GradeSystem
+
+            """
+            package_name = interface_name.split('.')[0]
+            underscore_name = camel_to_under(interface_name.split('.')[-1])
+            # In general, keep only the first word in ``underscore_name``, however also have to
+            #   account for two-word objects, like AssessmentPart and SequenceRule
+            two_word_objects = ['assessment_part', 'sequence_rule', 'grade_entry',
+                                'log_entry', 'grade_system', 'gradebook_column',
+                                'asset_content']
+
+            object_name_ = under_to_camel(underscore_name.split('_')[0])
+
+            if any(two in underscore_name for two in two_word_objects):
+                object_name_ = under_to_camel(next(two for two in two_word_objects
+                                                   if two in underscore_name))
+
+            return '{0}.{1}'.format(package_name, object_name_)
+
         def init_string(name, init_type):
             return '\n{}osid_objects.{}._init_{}(self)'.format(self._dind,
                                                                name,
@@ -194,51 +220,16 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         metadata_initers = ''
         metadata_super_initers = ''
         map_super_initers = ''
-        object_name = ''
         init_object = ''
 
         interface_name = interface['shortname']
+        object_name = grab_object_name()
 
         cat_name = self.patterns['package_catalog_caps']
 
         # Check for any special data initializations and call the appropriate makers
         # to assemble them.
-        if init_pattern == 'osid_catalog.GenericCatalog':
-            object_name = interface_name
-        elif init_pattern == 'osid_form.GenericCatalogForm':
-            object_name = interface_name[:-4]
-        elif init_pattern == 'osid_catalog.GenericCatalogNode':
-            object_name = interface_name[:-4]
-        elif init_pattern == 'resource.BinList':
-            object_name = interface_name[:-4]
-        elif init_pattern == 'resource.BinNodeList':
-            object_name = interface_name[:-4]
-        elif init_pattern == 'resource.ResourceLookupSession':
-            object_name = interface_name[:-13]
-        elif init_pattern == 'resource.ResourceQuerySession':
-            object_name = interface_name[:-12]
-        elif init_pattern == 'resource.ResourceSearchSession':
-            object_name = interface_name.replace('SearchSession', '')
-        elif init_pattern == 'resource.ResourceAdminSession':
-            object_name = interface_name[:-12]
-        elif init_pattern == 'resource.ResourceNotificationSession':
-            object_name = interface_name[:-len('NotificationSession')]
-        elif init_pattern == 'resource.ResourceBinSession':
-            object_name = interface_name.replace(cat_name + 'Session', '')
-        elif init_pattern == 'resource.ResourceBinAssignmentSession':
-            object_name = interface_name.replace(cat_name + 'AssignmentSession', '')
-        elif init_pattern == 'commenting.CommentLookupSession':
-            object_name = interface_name.replace('LookupSession', '')
-        elif init_pattern == 'commenting.CommentQuerySession':
-            object_name = interface_name.replace('QuerySession', '')
-        elif init_pattern == 'repository.CompositionLookupSession':
-            object_name = interface_name.replace('LookupSession', '')
-        elif init_pattern == 'repository.CompositionQuerySession':
-            object_name = interface_name.replace('QuerySession', '')
-        elif init_pattern == 'osid_object.GenericObject':
-            object_name = interface_name
-        elif init_pattern == 'osid_form.GenericObjectForm':
-            object_name = interface_name[:-4]
+        if init_pattern == 'osid_form.GenericObjectForm':
             if not self._is('authz'):
                 if object_name in self.patterns['package_relationships_caps']:
                     init_object = 'osid_objects.OsidRelationshipForm'
@@ -256,30 +247,22 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                     map_super_initers += '\n'
                 try:
                     persisted_initers = make_persistance_initers(
-                        self.patterns[interface_name[:-4] + '.persisted_data'],
-                        self.patterns[interface_name[:-4] + '.initialized_data'],
-                        self.patterns[interface_name[:-4] + '.aggregate_data'])
+                        self.patterns[object_name + '.persisted_data'],
+                        self.patterns[object_name + '.initialized_data'],
+                        self.patterns[object_name + '.aggregate_data'])
                 except KeyError:
                     pass
 
                 try:
                     metadata_initers = make_metadata_initers(
                         interface_name,
-                        self.patterns[interface_name[:-4] + '.persisted_data'],
-                        self.patterns[interface_name[:-4] + '.initialized_data'],
-                        self.patterns[interface_name[:-4] + '.return_types'])
+                        self.patterns[object_name + '.persisted_data'],
+                        self.patterns[object_name + '.initialized_data'],
+                        self.patterns[object_name + '.return_types'])
                     if metadata_initers != '':
                         metadata_initers += '\n'
                 except KeyError:
                     pass
-        elif init_pattern == 'osid_list.GenericObjectList':
-            object_name = interface_name[:-4]
-        elif init_pattern == 'osid_query.GenericObjectQuery':
-            object_name = interface_name[:-5]
-        elif init_pattern == 'osid_search.GenericObjectSearch':
-            object_name = interface_name[:-6]
-        elif init_pattern == 'osid_search.GenericObjectSearchResults':
-            object_name = interface_name[:-13]
 
         # Special one for services test builder to select whether a session method
         # should be called from a service manager or catalog

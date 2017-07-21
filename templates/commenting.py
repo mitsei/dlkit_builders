@@ -2,18 +2,18 @@ from .resource import ResourceLookupSession
 from .resource import ResourceQuerySession
 
 
-class CommentLookupSession:
+# class CommentLookupSession:
+#
+#     import_statements_pattern = ResourceLookupSession.import_statements_pattern
+#
+#     init_template = ResourceLookupSession.init_template
 
-    import_statements_pattern = ResourceLookupSession.import_statements_pattern
 
-    init_template = ResourceLookupSession.init_template
-
-
-class CommentQuerySession:
-
-    import_statements_pattern = ResourceQuerySession.import_statements_pattern
-
-    init_template = ResourceQuerySession.init_template
+# class CommentQuerySession:
+#
+#     import_statements_pattern = ResourceQuerySession.import_statements_pattern
+#
+#     init_template = ResourceQuerySession.init_template
 
 
 class CommentAdminSession:

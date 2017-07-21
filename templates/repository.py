@@ -619,101 +619,101 @@ class AssetAdminSession:
         return asset_id"""
 
 
-class CompositionLookupSession:
+# class CompositionLookupSession:
 
-    import_statements = [
-        'ACTIVE = 0',
-        'ANY_STATUS = 1',
-        'SEQUESTERED = 0',
-        'UNSEQUESTERED = 1',
-    ]
+#     import_statements = [
+#         'ACTIVE = 0',
+#         'ANY_STATUS = 1',
+#         'SEQUESTERED = 0',
+#         'UNSEQUESTERED = 1',
+#     ]
+#
+#     init_template = """
+#     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+#         OsidSession.__init__(self)
+#         self._catalog_class = objects.${cat_name}
+#         self._catalog_name = '${cat_name}'
+#         OsidSession._init_object(
+#             self,
+#             catalog_id,
+#             proxy,
+#             runtime,
+#             db_name='${pkg_name_replaced}',
+#             cat_name='${cat_name}',
+#             cat_class=objects.${cat_name})
+#         self._kwargs = kwargs
+#         self._status_view = ACTIVE
+#         self._sequestered_view = SEQUESTERED
+#
+#     def _view_filter(self):
+#         \"\"\"
+#         Overrides OsidSession._view_filter to add sequestering filter.
+#
+#         \"\"\"
+#         view_filter = OsidSession._view_filter(self)
+#         if self._sequestered_view == SEQUESTERED:
+#             view_filter['sequestered'] = False
+#         return view_filter
+# """
 
-    init_template = """
-    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        self._catalog_class = objects.${cat_name}
-        self._catalog_name = '${cat_name}'
-        OsidSession._init_object(
-            self,
-            catalog_id,
-            proxy,
-            runtime,
-            db_name='${pkg_name_replaced}',
-            cat_name='${cat_name}',
-            cat_class=objects.${cat_name})
-        self._kwargs = kwargs
-        self._status_view = ACTIVE
-        self._sequestered_view = SEQUESTERED
-
-    def _view_filter(self):
-        \"\"\"
-        Overrides OsidSession._view_filter to add sequestering filter.
-
-        \"\"\"
-        view_filter = OsidSession._view_filter(self)
-        if self._sequestered_view == SEQUESTERED:
-            view_filter['sequestered'] = False
-        return view_filter
-"""
-
-    use_active_composition_view_template = """
-        # Implemented from template for
-        # osid.repository.CompositionLookupSession.use_active_composition_view_template
-        self._status_view = ACTIVE"""
-
-    use_any_status_composition_view_template = """
-        # Implemented from template for
-        # osid.repository.CompositionLookupSession.use_any_status_composition_view_template
-        self._status_view = ANY_STATUS"""
-
-    use_sequestered_composition_view_template = """
-        # Implemented from template for
-        # osid.repository.CompositionLookupSession.use_sequestered_composition_view_template
-        self._sequestered_view = SEQUESTERED"""
-
-    use_unsequestered_composition_view_template = """
-        # Implemented from template for
-        # osid.repository.CompositionLookupSession.use_unsequestered_composition_view_template
-        self._sequestered_view = UNSEQUESTERED"""
+    # use_active_composition_view_template = """
+    #     # Implemented from template for
+    #     # osid.repository.CompositionLookupSession.use_active_composition_view_template
+    #     self._status_view = ACTIVE"""
+    #
+    # use_any_status_composition_view_template = """
+    #     # Implemented from template for
+    #     # osid.repository.CompositionLookupSession.use_any_status_composition_view_template
+    #     self._status_view = ANY_STATUS"""
+    #
+    # use_sequestered_composition_view_template = """
+    #     # Implemented from template for
+    #     # osid.repository.CompositionLookupSession.use_sequestered_composition_view_template
+    #     self._sequestered_view = SEQUESTERED"""
+    #
+    # use_unsequestered_composition_view_template = """
+    #     # Implemented from template for
+    #     # osid.repository.CompositionLookupSession.use_unsequestered_composition_view_template
+    #     self._sequestered_view = UNSEQUESTERED"""
 
 
 class CompositionQuerySession:
 
-    import_statements = [
-        'ACTIVE = 0',
-        'ANY_STATUS = 1',
-        'SEQUESTERED = 0',
-        'UNSEQUESTERED = 1',
-    ]
-
-    init_template = CompositionLookupSession.init_template
-
-    old_init = """
-    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        self._catalog_class = objects.Repository
-        self._catalog_name = 'Repository'
-        OsidSession._init_object(
-            self,
-            catalog_id,
-            proxy,
-            runtime,
-            db_name='repository',
-            cat_name='Repository',
-            cat_class=objects.Repository)
-        self._kwargs = kwargs
-        self._status_view = ACTIVE
-        self._sequestered_view = SEQUESTERED
-
-    def _view_filter(self):
-        \"\"\"
-        Overrides OsidSession._view_filter to add sequestering filter.
-
-        \"\"\"
-        view_filter = OsidSession._view_filter(self)
-        if self._sequestered_view == SEQUESTERED:
-            view_filter['sequestered'] = False
-        return view_filter"""
+    # import_statements = [
+    #     'ACTIVE = 0',
+    #     'ANY_STATUS = 1',
+    #     'SEQUESTERED = 0',
+    #     'UNSEQUESTERED = 1',
+    # ]
+    #
+    # init_template = CompositionLookupSession.init_template
+    #
+    # old_init = """
+    # def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+    #     OsidSession.__init__(self)
+    #     self._catalog_class = objects.Repository
+    #     self._catalog_name = 'Repository'
+    #     OsidSession._init_object(
+    #         self,
+    #         catalog_id,
+    #         proxy,
+    #         runtime,
+    #         db_name='repository',
+    #         cat_name='Repository',
+    #         cat_class=objects.Repository)
+    #     self._kwargs = kwargs
+    #     self._status_view = ACTIVE
+    #     self._sequestered_view = SEQUESTERED
+    #
+    # def _view_filter(self):
+    #     \"\"\"
+    #     Overrides OsidSession._view_filter to add sequestering filter.
+    #
+    #     \"\"\"
+    #     view_filter = OsidSession._view_filter(self)
+    #     if self._sequestered_view == SEQUESTERED:
+    #         view_filter['sequestered'] = False
+    #     return view_filter"""
 
     old_use_sequestered_composition_view = """ #NOW TEMPLATED FROM LOOKUP SESSION
         self._sequestered_view = SEQUESTERED"""
@@ -731,43 +731,43 @@ class CompositionSearchSession:
 
 class AssetCompositionSession:
 
-    import_statements = [
-        'from dlkit.primordium.id.primitives import Id'
-    ]
+    # import_statements = [
+    #     'from dlkit.primordium.id.primitives import Id'
+    # ]
 
-    import_statements_pattern = [
-        'from dlkit.primordium.id.primitives import Id'
-    ]
-
-    old_init = """
-    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        self._catalog_class = objects.Repository
-        self._catalog_name = 'Repository'
-        OsidSession._init_object(
-            self,
-            catalog_id,
-            proxy,
-            runtime,
-            db_name='repository',
-            cat_name='Repository',
-            cat_class=objects.Repository)
-        self._kwargs = kwargs"""
-
-    init_template = """
-    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        self._catalog_class = objects.${cat_name}
-        self._catalog_name = '${cat_name}'
-        OsidSession._init_object(
-            self,
-            catalog_id,
-            proxy,
-            runtime,
-            db_name='${pkg_name_replaced}',
-            cat_name='${cat_name}',
-            cat_class=objects.${cat_name})
-        self._kwargs = kwargs"""
+    # import_statements_pattern = [
+    #     'from dlkit.primordium.id.primitives import Id'
+    # ]
+    #
+    # old_init = """
+    # def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+    #     OsidSession.__init__(self)
+    #     self._catalog_class = objects.Repository
+    #     self._catalog_name = 'Repository'
+    #     OsidSession._init_object(
+    #         self,
+    #         catalog_id,
+    #         proxy,
+    #         runtime,
+    #         db_name='repository',
+    #         cat_name='Repository',
+    #         cat_class=objects.Repository)
+    #     self._kwargs = kwargs"""
+    #
+    # init_template = """
+    # def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+    #     OsidSession.__init__(self)
+    #     self._catalog_class = objects.${cat_name}
+    #     self._catalog_name = '${cat_name}'
+    #     OsidSession._init_object(
+    #         self,
+    #         catalog_id,
+    #         proxy,
+    #         runtime,
+    #         db_name='${pkg_name_replaced}',
+    #         cat_name='${cat_name}',
+    #         cat_class=objects.${cat_name})
+    #     self._kwargs = kwargs"""
 
     can_access_asset_compositions_template = """
         # Implemented from template for
@@ -835,39 +835,39 @@ class AssetCompositionSession:
 
 class AssetCompositionDesignSession:
 
-    import_statements_pattern = [
-        'from ..list_utilities import move_id_ahead, move_id_behind, order_ids',
-    ]
-
-    old_init = """
-    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        self._catalog_class = objects.Repository
-        self._catalog_name = 'Repository'
-        OsidSession._init_object(
-            self,
-            catalog_id,
-            proxy,
-            runtime,
-            db_name='repository',
-            cat_name='Repository',
-            cat_class=objects.Repository)
-        self._kwargs = kwargs"""
-
-    init_template = """
-    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        self._catalog_class = objects.${cat_name}
-        self._catalog_name = '${cat_name}'
-        OsidSession._init_object(
-            self,
-            catalog_id,
-            proxy,
-            runtime,
-            db_name='${pkg_name_replaced}',
-            cat_name='${cat_name}',
-            cat_class=objects.${cat_name})
-        self._kwargs = kwargs"""
+    # import_statements_pattern = [
+    #     'from ..list_utilities import move_id_ahead, move_id_behind, order_ids',
+    # ]
+    #
+    # old_init = """
+    # def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+    #     OsidSession.__init__(self)
+    #     self._catalog_class = objects.Repository
+    #     self._catalog_name = 'Repository'
+    #     OsidSession._init_object(
+    #         self,
+    #         catalog_id,
+    #         proxy,
+    #         runtime,
+    #         db_name='repository',
+    #         cat_name='Repository',
+    #         cat_class=objects.Repository)
+    #     self._kwargs = kwargs"""
+    #
+    # init_template = """
+    # def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+    #     OsidSession.__init__(self)
+    #     self._catalog_class = objects.${cat_name}
+    #     self._catalog_name = '${cat_name}'
+    #     OsidSession._init_object(
+    #         self,
+    #         catalog_id,
+    #         proxy,
+    #         runtime,
+    #         db_name='${pkg_name_replaced}',
+    #         cat_name='${cat_name}',
+    #         cat_class=objects.${cat_name})
+    #     self._kwargs = kwargs"""
 
     old_can_compose_assets = """
         return True"""
