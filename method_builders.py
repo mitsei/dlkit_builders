@@ -75,6 +75,9 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             arg_list.append(arg['var_name'])
         context['arg_list'] = ', '.join(arg_list)
 
+        context['method_name'] = method['name']
+        context['doc_string'] = self._build_method_doc(method)
+
         if 'package_name' in context:
             # Add keyword arguments to template kwargs that are particular
             # to the json implementation
@@ -221,7 +224,6 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             else:
                 context['svc_mgr_or_catalog'] = 'catalog'
 
-            context['doc_string'] = self._build_method_doc(method)
         return context
 
     def _get_method_decorators(self, method, interface, args):
@@ -294,6 +296,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             if self._is('services') and getattr(template_class, template_name) is None:
                 raise SkipMethod()
 
+            context['pattern_name'] = self.get_pattern_name(pattern)
             impl = self.get_impl_from_templates(template_class, template_name)
 
         # always pass through the context to get things like ``doc_string``

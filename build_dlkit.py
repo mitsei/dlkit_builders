@@ -762,6 +762,9 @@ class Templates(Utilities):
                 impl_class = getattr(impls, interface_name)
         return impl_class
 
+    def _get_relative_template_dir(self):
+        return self.last(self._template_dir, char='/')
+
     def _package_templates(self, package):
         local_template_dir = remove_abs_path(self._template_dir)
         if isinstance(package, dict) and 'name' in package:
@@ -823,6 +826,10 @@ class Templates(Utilities):
         if isinstance(template_impl, dict):
             return stripn(template_impl[self._language][self._class])
         return stripn(template_impl)
+
+    def get_pattern_name(self, pattern):
+        return '# Built from: {0}/{1}'.format(self._get_relative_template_dir(),
+                                              pattern)
 
     def get_templated_imports(self, arg_context, package_name, method, interface):
         """gets an import template and maps the keys to the actual arg names.

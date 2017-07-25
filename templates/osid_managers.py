@@ -17,8 +17,7 @@ class GenericProfile(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # Implemented from template for
-        # templates.osid_managers.GenericProfile.supports_visible_federation_template
+        ${pattern_name}
         return '${method_name}' in profile.SUPPORTS"""
         }
     }
@@ -28,8 +27,7 @@ class GenericProfile(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # Implemented from template for
-        # templates.osid_managers.GenericProfile.supports_object_lookup_template
+        ${pattern_name}
         return '${method_name}' in profile.SUPPORTS"""
         }
     }
@@ -39,8 +37,7 @@ class GenericProfile(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # Implemented from template for
-        # templates.osid_managers.GenericProfile.get_object_record_types_template
+        ${pattern_name}
         record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         record_types = []
         for record_type_map in record_type_maps:
@@ -54,8 +51,7 @@ class GenericProfile(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # Implemented from template for
-        # templates.osid_managers.GenericProfile.supports_object_record_type_template
+        ${pattern_name}
         record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
         supports = False
         for record_type_map in record_type_maps:
@@ -72,7 +68,7 @@ class GenericProfile(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates.osid_managers.GenericProfile.get_type_list_template
+        ${pattern_name}
         return TypeList([])"""
         }
     }
@@ -82,7 +78,7 @@ class GenericProfile(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates.osid_managers.GenericProfile.supports_type_template
+        ${pattern_name}
         return False"""
         }
     }
@@ -111,8 +107,7 @@ class GenericManager(object):
             'json': """
     def ${method_name}(self, **kwargs):
         ${doc_string}
-        # Implemented from template for
-        # templates.osid_managers.GenericManager.get_object_lookup_session_template
+        ${pattern_name}
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         if 'proxy' in kwargs:
@@ -128,8 +123,7 @@ class GenericManager(object):
             'json': """
     def ${method_name}(self, ${arg0_name}, **kwargs):
         ${doc_string}
-        # Implemented from template for
-        # templates.osid_managers.GenericManager.get_object_lookup_session_for_catalog_template
+        ${pattern_name}
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         ##
@@ -152,8 +146,7 @@ class GenericManager(object):
             'json': """
     def ${method_name}(self, ${arg0_name}, **kwargs):
         ${doc_string}
-        # Implemented from template for
-        # templates.osid_managers.GenericManager.get_object_notification_session_template
+        ${pattern_name}
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         # pylint: disable=no-member
@@ -171,8 +164,7 @@ class GenericManager(object):
             'json': """
     def ${method_name}(self, ${arg0_name}, ${arg1_name}, **kwargs):
         ${doc_string}
-        # Implemented from template for
-        # templates.osid_managers.GenericManager.get_object_notification_session_for_catalog_template
+        ${pattern_name}
         if not self.supports_${support_check}():
             raise errors.Unimplemented()
         ##
@@ -197,6 +189,7 @@ class GenericProxyManager(object):
     init_template = {
         'python': {
             'json': """
+    ${pattern_name}
     def __init__(self):
         osid_managers.OsidProxyManager.__init__(self)"""
         }

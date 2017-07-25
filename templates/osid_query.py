@@ -12,7 +12,7 @@ class GenericCatalogQuery(object):
     init_template = {
         'python': {
             'json': """
-    # From: templates/osid_query.py::GenericCatalogQuery::init_template
+    ${pattern_name}
     def __init__(self, runtime):
         self._runtime = runtime
         record_type_data_sets = get_registry('${cat_name_upper}_RECORD_TYPES', runtime)
@@ -43,7 +43,7 @@ class GenericCatalogQuery(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_query.py::GenericCatalogQuery::clear_simple_terms_template
+        ${pattern_name}
         self._clear_terms('${var_name_mixed}')"""
         }
     }
@@ -63,7 +63,7 @@ class GenericObjectQuery(object):
     init_template = {
         'python': {
             'json': """
-    # From: templates/osid_query.py::GenericObjectQuery::init_template
+    ${pattern_name}
     def __init__(self, runtime):
         self._namespace = '${pkg_name_replaced}.${object_name}'
         self._runtime = runtime
@@ -83,7 +83,7 @@ class GenericObjectQuery(object):
             'json': """
     def ${method_name}(self, ${arg0_name}, ${arg1_name}):
         ${doc_string}
-        # From: templates/osid_query.py::GenericObjectQuery::match_catalog_id_template
+        ${pattern_name}
         self._add_match('assigned${cat_name}Ids', str(${arg0_name}), ${arg1_name})"""
         }
     }
@@ -93,7 +93,7 @@ class GenericObjectQuery(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_query.py::GenericObjectQuery::clear_catalog_id_terms_template
+        ${pattern_name}
         self._clear_terms('assigned${cat_name}Ids')"""
         }
     }
@@ -103,7 +103,7 @@ class GenericObjectQuery(object):
             'json': """
     def ${method_name}(self, ${arg0_name}, ${arg1_name}):
         ${doc_string}
-        # From: templates/osid_query.py::GenericObjectQuery::match_id_attribute_template
+        ${pattern_name}
         self._add_match('${var_name_mixed}', str(${arg0_name}), ${arg1_name})"""
         }
     }
@@ -115,7 +115,7 @@ class GenericObjectQuery(object):
             'json': """
     def ${method_name}(self, ${arg0_name}, ${arg1_name}, match):
         ${doc_string}
-        # From: templates/osid_query.py::GenericObjectQuery::match_date_time_template
+        ${pattern_name}
         self._match_minimum_date_time('${var_name_mixed}', ${arg0_name}, match)
         self._match_maximum_date_time('${var_name_mixed}', ${arg1_name}, match)"""
         }

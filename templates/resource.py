@@ -266,7 +266,7 @@ class ResourceProfile:
     #     return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
 
-class ResourceQuerySession:
+# class ResourceQuerySession:
 
     # import_statements_pattern = [
     #     'from dlkit.abstract_osid.osid import errors',
@@ -292,119 +292,119 @@ class ResourceQuerySession:
     #         cat_class=objects.${cat_name})
     #     self._kwargs = kwargs"""
 
-    can_query_resources_template = """
-        # Implemented from template for
-        # osid.resource.ResourceQuerySession.can_query_resources
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        return True"""
-
-    can_search_resources_template = """
-        # Implemented from template for
-        # osid.resource.ResourceQuerySession.can_search_resources
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        return True"""
-
-    get_resource_query_template = """
-        # Implemented from template for
-        # osid.resource.ResourceQuerySession.get_resource_query_template
-        return queries.${return_type}(runtime=self._runtime)"""
-
-    get_resources_by_query_template = """
-        # Implemented from template for
-        # osid.resource.ResourceQuerySession.get_resources_by_query
-        and_list = list()
-        or_list = list()
-        for term in ${arg0_name}._query_terms:
-            if '$$in' in ${arg0_name}._query_terms[term] and '$$nin' in ${arg0_name}._query_terms[term]:
-                and_list.append(
-                    {'$$or': [{term: {'$$in': ${arg0_name}._query_terms[term]['$$in']}},
-                             {term: {'$$nin': ${arg0_name}._query_terms[term]['$$nin']}}]})
-            else:
-                and_list.append({term: ${arg0_name}._query_terms[term]})
-        for term in ${arg0_name}._keyword_terms:
-            or_list.append({term: ${arg0_name}._keyword_terms[term]})
-        if or_list:
-            and_list.append({'$$or': or_list})
-        view_filter = self._view_filter()
-        if view_filter:
-            and_list.append(view_filter)
-        if and_list:
-            query_terms = {'$$and': and_list}
-            collection = JSONClientValidated('${package_name_replace}',
-                                             collection='${object_name}',
-                                             runtime=self._runtime)
-            result = collection.find(query_terms).sort('_id', DESCENDING)
-        else:
-            result = []
-        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
-
-
-class ResourceSearchSession:
-
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..osid.sessions import OsidSession',
-        'from ..utilities import JSONClientValidated',
-        'from . import queries',
-        'from . import searches',
-        'from bson.objectid import ObjectId',
-        'DESCENDING = -1',
-        'ASCENDING = 1'
-    ]
-
-    init_template = """
-    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        self._catalog_class = objects.${cat_name}
-        self._catalog_name = '${cat_name}'
-        OsidSession._init_object(
-            self,
-            catalog_id,
-            proxy,
-            runtime,
-            db_name='${pkg_name_replaced}',
-            cat_name='${cat_name}',
-            cat_class=objects.${cat_name})
-        self._kwargs = kwargs"""
-
-    get_resource_search_template = """
-        # Implemented from template for
-        # osid.resource.ResourceSearchSession.get_resource_search_template
-        return searches.${return_type}(runtime=self._runtime)"""
-
-    get_resources_by_search_template = """
-        # Implemented from template for
-        # osid.resource.ResourceSearchSession.get_resources_by_search_template
-        # Copied from osid.resource.ResourceQuerySession.get_resources_by_query_template
-        and_list = list()
-        or_list = list()
-        for term in ${arg0_name}._query_terms:
-            and_list.append({term: ${arg0_name}._query_terms[term]})
-        for term in ${arg0_name}._keyword_terms:
-            or_list.append({term: ${arg0_name}._keyword_terms[term]})
-        if ${arg1_name}._id_list is not None:
-            identifiers = [ObjectId(i.identifier) for i in ${arg1_name}._id_list]
-            and_list.append({'_id': {'$$in': identifiers}})
-        if or_list:
-            and_list.append({'$$or': or_list})
-        view_filter = self._view_filter()
-        if view_filter:
-            and_list.append(view_filter)
-        if and_list:
-            query_terms = {'$$and': and_list}
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        if ${arg1_name}.start is not None and ${arg1_name}.end is not None:
-            result = collection.find(query_terms)[${arg1_name}.start:${arg1_name}.end]
-        else:
-            result = collection.find(query_terms)
-        return searches.${return_type}(result, dict(${arg0_name}._query_terms), runtime=self._runtime)"""
+    # can_query_resources_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceQuerySession.can_query_resources
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     return True"""
+    #
+    # can_search_resources_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceQuerySession.can_search_resources
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     return True"""
+    #
+    # get_resource_query_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceQuerySession.get_resource_query_template
+    #     return queries.${return_type}(runtime=self._runtime)"""
+    #
+    # get_resources_by_query_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceQuerySession.get_resources_by_query
+    #     and_list = list()
+    #     or_list = list()
+    #     for term in ${arg0_name}._query_terms:
+    #         if '$$in' in ${arg0_name}._query_terms[term] and '$$nin' in ${arg0_name}._query_terms[term]:
+    #             and_list.append(
+    #                 {'$$or': [{term: {'$$in': ${arg0_name}._query_terms[term]['$$in']}},
+    #                          {term: {'$$nin': ${arg0_name}._query_terms[term]['$$nin']}}]})
+    #         else:
+    #             and_list.append({term: ${arg0_name}._query_terms[term]})
+    #     for term in ${arg0_name}._keyword_terms:
+    #         or_list.append({term: ${arg0_name}._keyword_terms[term]})
+    #     if or_list:
+    #         and_list.append({'$$or': or_list})
+    #     view_filter = self._view_filter()
+    #     if view_filter:
+    #         and_list.append(view_filter)
+    #     if and_list:
+    #         query_terms = {'$$and': and_list}
+    #         collection = JSONClientValidated('${package_name_replace}',
+    #                                          collection='${object_name}',
+    #                                          runtime=self._runtime)
+    #         result = collection.find(query_terms).sort('_id', DESCENDING)
+    #     else:
+    #         result = []
+    #     return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
 
 
-class ResourceAdminSession:
+# class ResourceSearchSession:
+#
+#     import_statements = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..osid.sessions import OsidSession',
+#         'from ..utilities import JSONClientValidated',
+#         'from . import queries',
+#         'from . import searches',
+#         'from bson.objectid import ObjectId',
+#         'DESCENDING = -1',
+#         'ASCENDING = 1'
+#     ]
+#
+#     init_template = """
+#     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+#         OsidSession.__init__(self)
+#         self._catalog_class = objects.${cat_name}
+#         self._catalog_name = '${cat_name}'
+#         OsidSession._init_object(
+#             self,
+#             catalog_id,
+#             proxy,
+#             runtime,
+#             db_name='${pkg_name_replaced}',
+#             cat_name='${cat_name}',
+#             cat_class=objects.${cat_name})
+#         self._kwargs = kwargs"""
+#
+#     get_resource_search_template = """
+#         # Implemented from template for
+#         # osid.resource.ResourceSearchSession.get_resource_search_template
+#         return searches.${return_type}(runtime=self._runtime)"""
+#
+#     get_resources_by_search_template = """
+#         # Implemented from template for
+#         # osid.resource.ResourceSearchSession.get_resources_by_search_template
+#         # Copied from osid.resource.ResourceQuerySession.get_resources_by_query_template
+#         and_list = list()
+#         or_list = list()
+#         for term in ${arg0_name}._query_terms:
+#             and_list.append({term: ${arg0_name}._query_terms[term]})
+#         for term in ${arg0_name}._keyword_terms:
+#             or_list.append({term: ${arg0_name}._keyword_terms[term]})
+#         if ${arg1_name}._id_list is not None:
+#             identifiers = [ObjectId(i.identifier) for i in ${arg1_name}._id_list]
+#             and_list.append({'_id': {'$$in': identifiers}})
+#         if or_list:
+#             and_list.append({'$$or': or_list})
+#         view_filter = self._view_filter()
+#         if view_filter:
+#             and_list.append(view_filter)
+#         if and_list:
+#             query_terms = {'$$and': and_list}
+#         collection = JSONClientValidated('${package_name_replace}',
+#                                          collection='${object_name}',
+#                                          runtime=self._runtime)
+#         if ${arg1_name}.start is not None and ${arg1_name}.end is not None:
+#             result = collection.find(query_terms)[${arg1_name}.start:${arg1_name}.end]
+#         else:
+#             result = collection.find(query_terms)
+#         return searches.${return_type}(result, dict(${arg0_name}._query_terms), runtime=self._runtime)"""
+
+
+# class ResourceAdminSession:
 
     # import_statements_pattern = [
     #     'from dlkit.abstract_osid.osid import errors',
@@ -436,202 +436,202 @@ class ResourceAdminSession:
     #     self._forms = dict()
     #     self._kwargs = kwargs"""
 
-    can_create_resources_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.can_create_resources
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        return True"""
-
-    can_create_resource_with_record_types_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.can_create_resource_with_record_types
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        return True"""
-
-    get_resource_form_for_create_import_templates = [
-        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
-    ]
-
-    get_resource_form_for_create_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
-        for arg in ${arg0_name}:
-            if not isinstance(arg, ABC${arg0_type}):
-                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
-        if ${arg0_name} == []:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id(),
-                proxy=self._proxy)
-        else:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                record_types=${arg0_name},
-                runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id(),
-                proxy=self._proxy)
-        self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
-
-    create_resource_import_templates = [
-        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
-    ]
-
-    create_resource_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.create_resource_template
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise errors.InvalidArgument('argument type is not an ${arg0_type}')
-        if ${arg0_name}.is_for_update():
-            raise errors.InvalidArgument('the ${arg0_type} is for update only, not create')
-        try:
-            if self._forms[${arg0_name}.get_id().get_identifier()] == CREATED:
-                raise errors.IllegalState('${arg0_name} already used in a create transaction')
-        except KeyError:
-            raise errors.Unsupported('${arg0_name} did not originate from this session')
-        if not ${arg0_name}.is_valid():
-            raise errors.InvalidArgument('one or more of the form elements is invalid')
-        insert_result = collection.insert_one(${arg0_name}._my_map)
-
-        self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
-        result = objects.${return_type}(
-            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
-            runtime=self._runtime,
-            proxy=self._proxy)
-
-        return result"""
-
-    can_update_resources_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.can_update_resources
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        return True"""
-
-    get_resource_form_for_update_import_templates = [
-        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
-    ]
-
-    get_resource_form_for_update_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        if (${arg0_name}.get_identifier_namespace() != '${package_name_replace}.${object_name}' or
-                ${arg0_name}.get_authority() != self._authority):
-            raise errors.InvalidArgument()
-        result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
-
-        obj_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
-        self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-
-        return obj_form"""
-
-    # This is out of spec, but used by the EdX / LORE record extensions for assets / compositions
-    # So put it in additional methods there only.
-    # @utilities.arguments_not_none
-    # def duplicate_${object_name_under}(self, ${object_name_under}_id):
+    # can_create_resources_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.can_create_resources
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     return True"""
+    #
+    # can_create_resource_with_record_types_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.can_create_resource_with_record_types
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     return True"""
+    #
+    # get_resource_form_for_create_import_templates = [
+    #     'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    # ]
+    #
+    # get_resource_form_for_create_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.get_resource_form_for_create_template
+    #     for arg in ${arg0_name}:
+    #         if not isinstance(arg, ABC${arg0_type}):
+    #             raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
+    #     if ${arg0_name} == []:
+    #         obj_form = objects.${return_type}(
+    #             ${cat_name_under}_id=self._catalog_id,
+    #             runtime=self._runtime,
+    #             effective_agent_id=self.get_effective_agent_id(),
+    #             proxy=self._proxy)
+    #     else:
+    #         obj_form = objects.${return_type}(
+    #             ${cat_name_under}_id=self._catalog_id,
+    #             record_types=${arg0_name},
+    #             runtime=self._runtime,
+    #             effective_agent_id=self.get_effective_agent_id(),
+    #             proxy=self._proxy)
+    #     self._forms[obj_form.get_id().get_identifier()] = not CREATED
+    #     return obj_form"""
+    #
+    # create_resource_import_templates = [
+    #     'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    # ]
+    #
+    # create_resource_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.create_resource_template
     #     collection = JSONClientValidated('${package_name_replace}',
     #                                      collection='${object_name}',
     #                                      runtime=self._runtime)
-    #     mgr = self._get_provider_manager('${package_name_replace_upper}')
-    #     lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
-    #     lookup_session.use_federated_${cat_name_under}_view()
+    #     if not isinstance(${arg0_name}, ABC${arg0_type}):
+    #         raise errors.InvalidArgument('argument type is not an ${arg0_type}')
+    #     if ${arg0_name}.is_for_update():
+    #         raise errors.InvalidArgument('the ${arg0_type} is for update only, not create')
     #     try:
-    #         lookup_session.use_unsequestered_${object_name_under}_view()
-    #     except AttributeError:
-    #         pass
-    #     ${object_name_under}_map = dict(lookup_session.get_${object_name_under}(${object_name_under}_id)._my_map)
-    #     del ${object_name_under}_map['_id']
-    #     if '${cat_name_lower}Id' in ${object_name_under}_map:
-    #         ${object_name_under}_map['${cat_name_lower}Id'] = str(self._catalog_id)
-    #     if 'assigned${cat_name}Ids' in ${object_name_under}_map:
-    #         ${object_name_under}_map['assigned${cat_name}Ids'] = [str(self._catalog_id)]
-    #     insert_result = collection.insert_one(${object_name_under}_map)
-    #     result = objects.${object_name}(
+    #         if self._forms[${arg0_name}.get_id().get_identifier()] == CREATED:
+    #             raise errors.IllegalState('${arg0_name} already used in a create transaction')
+    #     except KeyError:
+    #         raise errors.Unsupported('${arg0_name} did not originate from this session')
+    #     if not ${arg0_name}.is_valid():
+    #         raise errors.InvalidArgument('one or more of the form elements is invalid')
+    #     insert_result = collection.insert_one(${arg0_name}._my_map)
+    #
+    #     self._forms[${arg0_name}.get_id().get_identifier()] = CREATED
+    #     result = objects.${return_type}(
     #         osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
     #         runtime=self._runtime,
     #         proxy=self._proxy)
+    #
     #     return result"""
+    #
+    # can_update_resources_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.can_update_resources
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     return True"""
+    #
+    # get_resource_form_for_update_import_templates = [
+    #     'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    # ]
+    #
+    # get_resource_form_for_update_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.get_resource_form_for_update_template
+    #     collection = JSONClientValidated('${package_name_replace}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     if not isinstance(${arg0_name}, ABC${arg0_type}):
+    #         raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+    #     if (${arg0_name}.get_identifier_namespace() != '${package_name_replace}.${object_name}' or
+    #             ${arg0_name}.get_authority() != self._authority):
+    #         raise errors.InvalidArgument()
+    #     result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
+    #
+    #     obj_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
+    #     self._forms[obj_form.get_id().get_identifier()] = not UPDATED
+    #
+    #     return obj_form"""
+    #
+    # # This is out of spec, but used by the EdX / LORE record extensions for assets / compositions
+    # # So put it in additional methods there only.
+    # # @utilities.arguments_not_none
+    # # def duplicate_${object_name_under}(self, ${object_name_under}_id):
+    # #     collection = JSONClientValidated('${package_name_replace}',
+    # #                                      collection='${object_name}',
+    # #                                      runtime=self._runtime)
+    # #     mgr = self._get_provider_manager('${package_name_replace_upper}')
+    # #     lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
+    # #     lookup_session.use_federated_${cat_name_under}_view()
+    # #     try:
+    # #         lookup_session.use_unsequestered_${object_name_under}_view()
+    # #     except AttributeError:
+    # #         pass
+    # #     ${object_name_under}_map = dict(lookup_session.get_${object_name_under}(${object_name_under}_id)._my_map)
+    # #     del ${object_name_under}_map['_id']
+    # #     if '${cat_name_lower}Id' in ${object_name_under}_map:
+    # #         ${object_name_under}_map['${cat_name_lower}Id'] = str(self._catalog_id)
+    # #     if 'assigned${cat_name}Ids' in ${object_name_under}_map:
+    # #         ${object_name_under}_map['assigned${cat_name}Ids'] = [str(self._catalog_id)]
+    # #     insert_result = collection.insert_one(${object_name_under}_map)
+    # #     result = objects.${object_name}(
+    # #         osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+    # #         runtime=self._runtime,
+    # #         proxy=self._proxy)
+    # #     return result"""
+    #
+    # update_resource_import_templates = [
+    #     'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    # ]
+    #
+    # update_resource_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.update_resource_template
+    #     collection = JSONClientValidated('${package_name_replace}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     if not isinstance(${arg0_name}, ABC${arg0_type}):
+    #         raise errors.InvalidArgument('argument type is not an ${arg0_type}')
+    #     if not ${arg0_name}.is_for_update():
+    #         raise errors.InvalidArgument('the ${arg0_type} is for update only, not create')
+    #     try:
+    #         if self._forms[${arg0_name}.get_id().get_identifier()] == UPDATED:
+    #             raise errors.IllegalState('${arg0_name} already used in an update transaction')
+    #     except KeyError:
+    #         raise errors.Unsupported('${arg0_name} did not originate from this session')
+    #     if not ${arg0_name}.is_valid():
+    #         raise errors.InvalidArgument('one or more of the form elements is invalid')
+    #     collection.save(${arg0_name}._my_map)
+    #
+    #     self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
+    #
+    #     # Note: this is out of spec. The OSIDs don't require an object to be returned:
+    #     return objects.${return_type}(
+    #         osid_object_map=${arg0_name}._my_map,
+    #         runtime=self._runtime,
+    #         proxy=self._proxy)"""
+    #
+    # can_delete_resources_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.can_delete_resources
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     return True"""
+    #
+    # delete_resource_import_templates = [
+    #     'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+    # ]
+    #
+    # delete_resource_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.delete_resource_template
+    #     collection = JSONClientValidated('${package_name_replace}',
+    #                                      collection='${object_name}',
+    #                                      runtime=self._runtime)
+    #     if not isinstance(${arg0_name}, ABC${arg0_type}):
+    #         raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+    #     ${object_name_under}_map = collection.find_one(
+    #         dict({'_id': ObjectId(${arg0_name}.get_identifier())},
+    #              **self._view_filter()))
+    #
+    #     objects.${object_name}(osid_object_map=${object_name_under}_map, runtime=self._runtime, proxy=self._proxy)._delete()
+    #     collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
+    #
+    # can_manage_resource_aliases_template = """
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     return True"""
+    #
+    # alias_resource_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceAdminSession.alias_resources_template
+    #     self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
 
-    update_resource_import_templates = [
-        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
-    ]
 
-    update_resource_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.update_resource_template
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise errors.InvalidArgument('argument type is not an ${arg0_type}')
-        if not ${arg0_name}.is_for_update():
-            raise errors.InvalidArgument('the ${arg0_type} is for update only, not create')
-        try:
-            if self._forms[${arg0_name}.get_id().get_identifier()] == UPDATED:
-                raise errors.IllegalState('${arg0_name} already used in an update transaction')
-        except KeyError:
-            raise errors.Unsupported('${arg0_name} did not originate from this session')
-        if not ${arg0_name}.is_valid():
-            raise errors.InvalidArgument('one or more of the form elements is invalid')
-        collection.save(${arg0_name}._my_map)
-
-        self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
-
-        # Note: this is out of spec. The OSIDs don't require an object to be returned:
-        return objects.${return_type}(
-            osid_object_map=${arg0_name}._my_map,
-            runtime=self._runtime,
-            proxy=self._proxy)"""
-
-    can_delete_resources_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.can_delete_resources
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        return True"""
-
-    delete_resource_import_templates = [
-        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
-    ]
-
-    delete_resource_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.delete_resource_template
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        ${object_name_under}_map = collection.find_one(
-            dict({'_id': ObjectId(${arg0_name}.get_identifier())},
-                 **self._view_filter()))
-
-        objects.${object_name}(osid_object_map=${object_name_under}_map, runtime=self._runtime, proxy=self._proxy)._delete()
-        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
-
-    can_manage_resource_aliases_template = """
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        return True"""
-
-    alias_resource_template = """
-        # Implemented from template for
-        # osid.resource.ResourceAdminSession.alias_resources_template
-        self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
-
-
-class ResourceNotificationSession:
+# class ResourceNotificationSession:
 
     # import_statements_pattern = [
     #     'from dlkit.abstract_osid.osid import errors',
@@ -683,57 +683,57 @@ class ResourceNotificationSession:
     #     del MONGO_LISTENER.receivers[self._ns][self._receiver]
     #     super(${interface_name}, self).__del__()"""
 
-    reliable_resource_notifications_template = """
-        # Implemented from template for
-        # osid.resource.ResourceNotificationSession.reliable_resource_notifications
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = True"""
+    # reliable_resource_notifications_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceNotificationSession.reliable_resource_notifications
+    #     MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = True"""
+    #
+    # unreliable_resource_notifications_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceNotificationSession.unreliable_resource_notifications
+    #     MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = False"""
+    #
+    # acknowledge_notification_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceNotificationSession.acknowledge_notification
+    #     try:
+    #         del MONGO_LISTENER.notifications[notification_id]
+    #     except KeyError:
+    #         pass"""
+    #
+    # register_for_new_resources_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceNotificationSession.register_for_new_resources
+    #     MONGO_LISTENER.receivers[self._ns][self._receiver]['i'] = True"""
+    #
+    # register_for_changed_resources_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceNotificationSession.register_for_changed_resources
+    #     MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = True"""
+    #
+    # register_for_changed_resource_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceNotificationSession.register_for_changed_resource
+    #     if not MONGO_LISTENER.receivers[self._ns][self._receiver]['u']:
+    #         MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = []
+    #     if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['u'], list):
+    #         MONGO_LISTENER.receivers[self._ns][self._receiver]['u'].append(${arg0_name}.get_identifier())"""
+    #
+    # register_for_deleted_resources_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceNotificationSession.register_for_deleted_resources
+    #     MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = True"""
+    #
+    # register_for_deleted_resource_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceNotificationSession.register_for_deleted_resource
+    #     if not MONGO_LISTENER.receivers[self._ns][self._receiver]['d']:
+    #         MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = []
+    #     if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['d'], list):
+    #         MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())"""
 
-    unreliable_resource_notifications_template = """
-        # Implemented from template for
-        # osid.resource.ResourceNotificationSession.unreliable_resource_notifications
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = False"""
 
-    acknowledge_notification_template = """
-        # Implemented from template for
-        # osid.resource.ResourceNotificationSession.acknowledge_notification
-        try:
-            del MONGO_LISTENER.notifications[notification_id]
-        except KeyError:
-            pass"""
-
-    register_for_new_resources_template = """
-        # Implemented from template for
-        # osid.resource.ResourceNotificationSession.register_for_new_resources
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['i'] = True"""
-
-    register_for_changed_resources_template = """
-        # Implemented from template for
-        # osid.resource.ResourceNotificationSession.register_for_changed_resources
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = True"""
-
-    register_for_changed_resource_template = """
-        # Implemented from template for
-        # osid.resource.ResourceNotificationSession.register_for_changed_resource
-        if not MONGO_LISTENER.receivers[self._ns][self._receiver]['u']:
-            MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = []
-        if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['u'], list):
-            MONGO_LISTENER.receivers[self._ns][self._receiver]['u'].append(${arg0_name}.get_identifier())"""
-
-    register_for_deleted_resources_template = """
-        # Implemented from template for
-        # osid.resource.ResourceNotificationSession.register_for_deleted_resources
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = True"""
-
-    register_for_deleted_resource_template = """
-        # Implemented from template for
-        # osid.resource.ResourceNotificationSession.register_for_deleted_resource
-        if not MONGO_LISTENER.receivers[self._ns][self._receiver]['d']:
-            MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = []
-        if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['d'], list):
-            MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())"""
-
-
-class ResourceBinSession:
+# class ResourceBinSession:
 
     # import_statements_pattern = [
     #     'from ..id.objects import IdList',
@@ -747,68 +747,68 @@ class ResourceBinSession:
     #     self._catalog_view = COMPARATIVE
     #     self._kwargs = kwargs"""
 
-    can_lookup_resource_bin_mappings_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinSession.can_lookup_resource_bin_mappings
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        return True"""
+    # can_lookup_resource_bin_mappings_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinSession.can_lookup_resource_bin_mappings
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     return True"""
+    #
+    # get_resource_ids_by_bin_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinSession.get_resource_ids_by_bin
+    #     id_list = []
+    #     for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_under}(${arg0_name}):
+    #         id_list.append(${object_name_under}.get_id())
+    #     return IdList(id_list)"""
+    #
+    # get_resources_by_bin_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinSession.get_resources_by_bin
+    #     mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
+    #     lookup_session = mgr.get_${object_name_under}_lookup_session_for_${cat_name_under}(${arg0_name}, proxy=self._proxy)
+    #     lookup_session.use_isolated_${cat_name_under}_view()
+    #     return lookup_session.get_${object_name_plural_under}()"""
+    #
+    # get_resource_ids_by_bins_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinSession.get_resource_ids_by_bins
+    #     id_list = []
+    #     for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_plural_under}(${arg0_name}):
+    #         id_list.append(${object_name_under}.get_id())
+    #     return IdList(id_list)"""
+    #
+    # get_resources_by_bins_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinSession.get_resources_by_bins
+    #     ${object_name_under}_list = []
+    #     for ${cat_name_under}_id in ${arg0_name}:
+    #         ${object_name_under}_list += list(
+    #             self.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
+    #     return objects.${return_type}(${object_name_under}_list)"""
+    #
+    # get_bin_ids_by_resource_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinSession.get_bin_ids_by_resource
+    #     mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
+    #     lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
+    #     lookup_session.use_federated_${cat_name_under}_view()
+    #     ${object_name_under} = lookup_session.get_${object_name_under}(${arg0_name})
+    #     id_list = []
+    #     for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
+    #         id_list.append(Id(idstr))
+    #     return IdList(id_list)"""
+    #
+    # get_bins_by_resource_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinSession.get_bins_by_resource
+    #     mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
+    #     lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
+    #     return lookup_session.get_${cat_name_plural_under}_by_ids(
+    #         self.get_${cat_name_under}_ids_by_${object_name_under}(${arg0_name}))"""
 
-    get_resource_ids_by_bin_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinSession.get_resource_ids_by_bin
-        id_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_under}(${arg0_name}):
-            id_list.append(${object_name_under}.get_id())
-        return IdList(id_list)"""
 
-    get_resources_by_bin_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinSession.get_resources_by_bin
-        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${object_name_under}_lookup_session_for_${cat_name_under}(${arg0_name}, proxy=self._proxy)
-        lookup_session.use_isolated_${cat_name_under}_view()
-        return lookup_session.get_${object_name_plural_under}()"""
-
-    get_resource_ids_by_bins_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinSession.get_resource_ids_by_bins
-        id_list = []
-        for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_plural_under}(${arg0_name}):
-            id_list.append(${object_name_under}.get_id())
-        return IdList(id_list)"""
-
-    get_resources_by_bins_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinSession.get_resources_by_bins
-        ${object_name_under}_list = []
-        for ${cat_name_under}_id in ${arg0_name}:
-            ${object_name_under}_list += list(
-                self.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
-        return objects.${return_type}(${object_name_under}_list)"""
-
-    get_bin_ids_by_resource_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinSession.get_bin_ids_by_resource
-        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
-        lookup_session.use_federated_${cat_name_under}_view()
-        ${object_name_under} = lookup_session.get_${object_name_under}(${arg0_name})
-        id_list = []
-        for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
-            id_list.append(Id(idstr))
-        return IdList(id_list)"""
-
-    get_bins_by_resource_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinSession.get_bins_by_resource
-        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
-        return lookup_session.get_${cat_name_plural_under}_by_ids(
-            self.get_${cat_name_under}_ids_by_${object_name_under}(${arg0_name}))"""
-
-
-class ResourceBinAssignmentSession:
+# class ResourceBinAssignmentSession:
 
     # import_statements_pattern = [
     #     'from ..id.objects import IdList',
@@ -823,65 +823,65 @@ class ResourceBinAssignmentSession:
     #     self._forms = dict()
     #     self._kwargs = kwargs"""
 
-    can_assign_resources_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinAssignmentSession.can_assign_resources
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        return True"""
-
-    can_assign_resources_to_bin_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinAssignmentSession.can_assign_resources_to_bin
-        # NOTE: It is expected that real authentication hints will be
-        # handled in a service adapter above the pay grade of this impl.
-        if ${arg0_name}.get_identifier() == '000000000000000000000000':
-            return False
-        return True"""
-
-    get_assignable_bin_ids_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids
-        # This will likely be overridden by an authorization adapter
-        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
-        ${cat_name_plural_under} = lookup_session.get_${cat_name_plural_under}()
-        id_list = []
-        for ${cat_name_under} in ${cat_name_plural_under}:
-            id_list.append(${cat_name_under}.get_id())
-        return IdList(id_list)"""
-
-    get_assignable_bin_ids_for_resource_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource
-        # This will likely be overridden by an authorization adapter
-        return self.get_assignable_${cat_name_under}_ids(${arg0_name})"""
-
-    assign_resource_to_bin_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
-        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
-        lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
-        self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
-
-    unassign_resource_from_bin_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinAssignmentSession.unassign_resource_from_bin
-        mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
-        lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
-        lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
-        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
-
-    reassign_resource_to_bin_template = """
-        # Implemented from template for
-        # osid.resource.ResourceBinAssignmentSession.reassign_resource_to_bin
-        self.assign_${object_name_under}_to_${cat_name_under}(${arg0_name}, ${arg2_name})
-        try:
-            self.unassign_${object_name_under}_from_${cat_name_under}(${arg0_name}, ${arg1_name})
-        except:  # something went wrong, roll back assignment to ${arg2_name}
-            self.unassign_${object_name_under}_from_${cat_name_under}(${arg0_name}, ${arg2_name})
-            raise"""
+    # can_assign_resources_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinAssignmentSession.can_assign_resources
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     return True"""
+    #
+    # can_assign_resources_to_bin_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinAssignmentSession.can_assign_resources_to_bin
+    #     # NOTE: It is expected that real authentication hints will be
+    #     # handled in a service adapter above the pay grade of this impl.
+    #     if ${arg0_name}.get_identifier() == '000000000000000000000000':
+    #         return False
+    #     return True"""
+    #
+    # get_assignable_bin_ids_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids
+    #     # This will likely be overridden by an authorization adapter
+    #     mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
+    #     lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
+    #     ${cat_name_plural_under} = lookup_session.get_${cat_name_plural_under}()
+    #     id_list = []
+    #     for ${cat_name_under} in ${cat_name_plural_under}:
+    #         id_list.append(${cat_name_under}.get_id())
+    #     return IdList(id_list)"""
+    #
+    # get_assignable_bin_ids_for_resource_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource
+    #     # This will likely be overridden by an authorization adapter
+    #     return self.get_assignable_${cat_name_under}_ids(${arg0_name})"""
+    #
+    # assign_resource_to_bin_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinAssignmentSession.assign_resource_to_bin
+    #     mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
+    #     lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
+    #     lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
+    #     self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
+    #
+    # unassign_resource_from_bin_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinAssignmentSession.unassign_resource_from_bin
+    #     mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
+    #     lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
+    #     lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
+    #     self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
+    #
+    # reassign_resource_to_bin_template = """
+    #     # Implemented from template for
+    #     # osid.resource.ResourceBinAssignmentSession.reassign_resource_to_bin
+    #     self.assign_${object_name_under}_to_${cat_name_under}(${arg0_name}, ${arg2_name})
+    #     try:
+    #         self.unassign_${object_name_under}_from_${cat_name_under}(${arg0_name}, ${arg1_name})
+    #     except:  # something went wrong, roll back assignment to ${arg2_name}
+    #         self.unassign_${object_name_under}_from_${cat_name_under}(${arg0_name}, ${arg2_name})
+    #         raise"""
 
 
 class ResourceAgentSession:

@@ -194,21 +194,31 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                  grading.GradeSystemAdminSession => grading.GradeSystem
 
             """
-            package_name = interface_name.split('.')[0]
-            underscore_name = camel_to_under(interface_name.split('.')[-1])
+            just_the_object_name = interface_name
+            if '.' in interface_name:
+                just_the_object_name = self.last(interface_name)
+            if 'Form' in just_the_object_name:
+                just_the_object_name = just_the_object_name.replace('Form', '')
+
+            underscore_name = camel_to_under(just_the_object_name)
+
             # In general, keep only the first word in ``underscore_name``, however also have to
             #   account for two-word objects, like AssessmentPart and SequenceRule
             two_word_objects = ['assessment_part', 'sequence_rule', 'grade_entry',
                                 'log_entry', 'grade_system', 'gradebook_column',
-                                'asset_content']
+                                'asset_content', 'assessment_offered', 'assessment_taken',
+                                'assessment_section']
 
             object_name_ = under_to_camel(underscore_name.split('_')[0])
 
-            if any(two in underscore_name for two in two_word_objects):
-                object_name_ = under_to_camel(next(two for two in two_word_objects
-                                                   if two in underscore_name))
+            if any(two in underscore_name for two in two_word_objects) or 'profile' in underscore_name:
+                try:
+                    object_name_ = under_to_camel(next(two for two in two_word_objects
+                                                       if two in underscore_name))
+                except StopIteration:
+                    object_name_ = interface_name
 
-            return '{0}.{1}'.format(package_name, object_name_)
+            return object_name_
 
         def init_string(name, init_type):
             return '\n{}osid_objects.{}._init_{}(self)'.format(self._dind,
@@ -352,7 +362,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         impl_class = self._load_impl_class(interface['shortname'],
                                            package_name=self._abc_pkg_name(abc=False, reserved_word=False))
         if hasattr(impl_class, 'init'):
-            return getattr(impl_class, 'init') + '\n'
+            return self.get_impl_from_templates(impl_class, 'init') + '\n'
         elif interface['shortname'] + '.init_pattern' in self.patterns:
             init_pattern = self.patterns[interface['shortname'] + '.init_pattern']
             templates = import_module(self._package_templates(self.first(init_pattern)))
@@ -361,6 +371,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             template_class = getattr(templates, self.last(init_pattern))
             if hasattr(template_class, 'init_template'):
                 context = self._get_init_context(init_pattern, interface)
+                context['pattern_name'] = self.get_pattern_name('{0}.init_template'.format(init_pattern))
                 template = string.Template(self.get_impl_from_templates(template_class, 'init_template'))
 
                 return template.substitute(context) + '\n'

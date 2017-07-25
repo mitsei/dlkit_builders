@@ -13,7 +13,7 @@ class GenericObjectList(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_list.py::GenericObjectList::get_next_object_template
+        ${pattern_name}
         return next(self)
 
     def next(self):
@@ -28,7 +28,7 @@ class GenericObjectList(object):
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_list.py::GenericObjectList::get_next_objects_template
+        ${pattern_name}
         return self._get_next_n(${return_type}List, number=${arg0_name})"""
         }
     }

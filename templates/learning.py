@@ -25,44 +25,44 @@ class ObjectiveRequisiteSession:
             cat_class=objects.ObjectiveBank)
         self._forms = dict()"""
 
-    get_requisite_objectives_template = """
-        # Implemented from template for
-        # osid.learning.ObjectiveRequisiteSession.get_requisite_objectives_template
-        # NOTE: This implementation currently ignores plenary view
-        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
-        relm = self._get_provider_manager('RELATIONSHIP')
-        rls = relm.get_relationship_lookup_session(proxy=self._proxy)
-        rls.use_federated_family_view()
-        requisite_relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name},
-                                                                                 requisite_type)
-        destination_ids = [ObjectId(r.get_destination_id().identifier)
-                           for r in requisite_relationships]
-        collection = JSONClientValidated('learning',
-                                         collection='Objective',
-                                         runtime=self._runtime)
-        result = collection.find({'_id': {'$$in': destination_ids}})
-        return objects.${return_type}(result, runtime=self._runtime)"""
-
-    can_lookup_objective_prerequisites = """
-        return True"""
-
-    get_dependent_objectives_template = """
-        # Implemented from template for
-        # osid.learning.ObjectiveRequisiteSession.get_dependent_objectives_template
-        # NOTE: This implementation currently ignores plenary view
-        requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
-        relm = self._get_provider_manager('RELATIONSHIP')
-        rls = relm.get_relationship_lookup_session(proxy=self._proxy)
-        rls.use_federated_family_view()
-        requisite_relationships = rls.get_relationships_by_genus_type_for_destination(${arg0_name},
-                                                                                      requisite_type)
-        source_ids = [ObjectId(r.get_source_id().identifier)
-                      for r in requisite_relationships]
-        collection = JSONClientValidated('learning',
-                                         collection='Objective',
-                                         runtime=self._runtime)
-        result = collection.find({'_id': {'$$in': source_ids}})
-        return objects.${return_type}(result, runtime=self._runtime)"""
+    # get_requisite_objectives_template = """
+    #     # Implemented from template for
+    #     # osid.learning.ObjectiveRequisiteSession.get_requisite_objectives_template
+    #     # NOTE: This implementation currently ignores plenary view
+    #     requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+    #     relm = self._get_provider_manager('RELATIONSHIP')
+    #     rls = relm.get_relationship_lookup_session(proxy=self._proxy)
+    #     rls.use_federated_family_view()
+    #     requisite_relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name},
+    #                                                                              requisite_type)
+    #     destination_ids = [ObjectId(r.get_destination_id().identifier)
+    #                        for r in requisite_relationships]
+    #     collection = JSONClientValidated('learning',
+    #                                      collection='Objective',
+    #                                      runtime=self._runtime)
+    #     result = collection.find({'_id': {'$$in': destination_ids}})
+    #     return objects.${return_type}(result, runtime=self._runtime)"""
+    #
+    # can_lookup_objective_prerequisites = """
+    #     return True"""
+    #
+    # get_dependent_objectives_template = """
+    #     # Implemented from template for
+    #     # osid.learning.ObjectiveRequisiteSession.get_dependent_objectives_template
+    #     # NOTE: This implementation currently ignores plenary view
+    #     requisite_type = Type(**Relationship().get_type_data('OBJECTIVE.REQUISITE'))
+    #     relm = self._get_provider_manager('RELATIONSHIP')
+    #     rls = relm.get_relationship_lookup_session(proxy=self._proxy)
+    #     rls.use_federated_family_view()
+    #     requisite_relationships = rls.get_relationships_by_genus_type_for_destination(${arg0_name},
+    #                                                                                   requisite_type)
+    #     source_ids = [ObjectId(r.get_source_id().identifier)
+    #                   for r in requisite_relationships]
+    #     collection = JSONClientValidated('learning',
+    #                                      collection='Objective',
+    #                                      runtime=self._runtime)
+    #     result = collection.find({'_id': {'$$in': source_ids}})
+    #     return objects.${return_type}(result, runtime=self._runtime)"""
 
 
 class ObjectiveRequisiteAssignmentSession:
@@ -87,73 +87,73 @@ class ObjectiveRequisiteAssignmentSession:
             cat_class=objects.ObjectiveBank)
         self._forms = dict()"""
 
-    assign_objective_requisite_import_templates = [
-        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
-        'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}'
-    ]
+    # assign_objective_requisite_import_templates = [
+    #     'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
+    #     'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}'
+    # ]
+    #
+    # assign_objective_requisite_template = """
+    #     requisite_type = Type(**Relationship().get_type_data('${object_name_upper}.REQUISITE'))
+    #
+    #     ras = self._get_provider_manager(
+    #         'RELATIONSHIP').get_relationship_admin_session_for_family(
+    #         self.get_${cat_name_under}_id(), proxy=self._proxy)
+    #     rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name}, [])
+    #     rfc.set_display_name('${object_name} Requisite')
+    #     rfc.set_description('An ${object_name} Requisite created by the ${object_name}RequisiteAssignmentSession')
+    #     rfc.set_genus_type(requisite_type)
+    #     ras.create_relationship(rfc)"""
+    #
+    # unassign_objective_requisite_import_templates = [
+    #     'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
+    #     'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}',
+    # ]
+    #
+    # unassign_objective_requisite_template = """
+    #     requisite_type = Type(**Relationship().get_type_data('${object_name_upper}.REQUISITE'))
+    #     rls = self._get_provider_manager(
+    #         'RELATIONSHIP').get_relationship_lookup_session_for_family(
+    #         self.get_${cat_name_under}_id(), proxy=self._proxy)
+    #     ras = self._get_provider_manager(
+    #         'RELATIONSHIP').get_relationship_admin_session_for_family(
+    #         self.get_${cat_name_under}_id(), proxy=self._proxy)
+    #     rls.use_federated_family_view()
+    #     relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name}, requisite_type)
+    #     if relationships.available() == 0:
+    #         raise errors.IllegalState('no ${object_name} found')
+    #     for relationship in relationships:
+    #         if str(relationship.get_destination_id()) == str(${arg1_name}):
+    #             ras.delete_relationship(relationship.ident)"""
 
-    assign_objective_requisite_template = """
-        requisite_type = Type(**Relationship().get_type_data('${object_name_upper}.REQUISITE'))
 
-        ras = self._get_provider_manager(
-            'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_${cat_name_under}_id(), proxy=self._proxy)
-        rfc = ras.get_relationship_form_for_create(${arg0_name}, ${arg1_name}, [])
-        rfc.set_display_name('${object_name} Requisite')
-        rfc.set_description('An ${object_name} Requisite created by the ${object_name}RequisiteAssignmentSession')
-        rfc.set_genus_type(requisite_type)
-        ras.create_relationship(rfc)"""
-
-    unassign_objective_requisite_import_templates = [
-        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
-        'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}',
-    ]
-
-    unassign_objective_requisite_template = """
-        requisite_type = Type(**Relationship().get_type_data('${object_name_upper}.REQUISITE'))
-        rls = self._get_provider_manager(
-            'RELATIONSHIP').get_relationship_lookup_session_for_family(
-            self.get_${cat_name_under}_id(), proxy=self._proxy)
-        ras = self._get_provider_manager(
-            'RELATIONSHIP').get_relationship_admin_session_for_family(
-            self.get_${cat_name_under}_id(), proxy=self._proxy)
-        rls.use_federated_family_view()
-        relationships = rls.get_relationships_by_genus_type_for_source(${arg0_name}, requisite_type)
-        if relationships.available() == 0:
-            raise errors.IllegalState('no ${object_name} found')
-        for relationship in relationships:
-            if str(relationship.get_destination_id()) == str(${arg1_name}):
-                ras.delete_relationship(relationship.ident)"""
-
-
-class ObjectiveAdminSession:
-
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..utilities import JSONClientValidated',
-    ]
-
-    delete_objective_import_templates = [
-        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
-    ]
-
-    delete_objective_template = """
-        # Implemented from template for
-        # osid.learning.ObjectiveAdminSession.delete_objective_template
-
-        if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${dependent_object_name}',
-                                         runtime=self._runtime)
-        if collection.find({'${object_name_mixed}Id': str(${arg0_name})}).count() != 0:
-            raise errors.IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
-
-        collection = JSONClientValidated('${package_name_replace}',
-                                         collection='${object_name}',
-                                         runtime=self._runtime)
-        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
+# class ObjectiveAdminSession:
+#
+#     import_statements_pattern = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#         'from ..utilities import JSONClientValidated',
+#     ]
+#
+#     delete_objective_import_templates = [
+#         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
+#     ]
+#
+#     delete_objective_template = """
+#         # Implemented from template for
+#         # osid.learning.ObjectiveAdminSession.delete_objective_template
+#
+#         if not isinstance(${arg0_name}, ABC${arg0_type}):
+#             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
+#         collection = JSONClientValidated('${package_name_replace}',
+#                                          collection='${dependent_object_name}',
+#                                          runtime=self._runtime)
+#         if collection.find({'${object_name_mixed}Id': str(${arg0_name})}).count() != 0:
+#             raise errors.IllegalState('there are still ${dependent_object_name}s associated with this ${object_name}')
+#
+#         collection = JSONClientValidated('${package_name_replace}',
+#                                          collection='${object_name}',
+#                                          runtime=self._runtime)
+#         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
 
 
 # class ActivityLookupSession:
@@ -178,47 +178,47 @@ class ObjectiveAdminSession:
 #         return objects.${return_type}(result, runtime=self._runtime)"""
 
 
-class ActivityAdminSession:
+# class ActivityAdminSession:
+#
+#     import_statements_pattern = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..primitives import Id',
+#         'from . import objects',
+#     ]
 
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from . import objects',
-    ]
-
-    get_activity_form_for_create_import_templates = [
-        'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
-        'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}'
-    ]
-
-    get_activity_form_for_create_template = """
-        # Implemented from template for
-        # osid.learning.ActivityAdminSession.get_activity_form_for_create_template
-
-        if not isinstance(${arg0_name}, ABC${arg0_type}):
-            raise errors.InvalidArgument('argument is not a valid OSID ${arg0_type}')
-        for arg in ${arg1_name}:
-            if not isinstance(arg, ABC${arg1_type}):
-                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg1_type}')
-        if ${arg1_name} == []:
-            # WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                ${arg0_name}=${arg0_name},
-                catalog_id=self._catalog_id,
-                runtime=self._runtime,
-                proxy=self._proxy)
-        else:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                record_types=${arg1_name},
-                ${arg0_name}=${arg0_name},
-                catalog_id=self._catalog_id,
-                runtime=self._runtime,
-                proxy=self._proxy)
-        obj_form._for_update = False
-        self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+    # get_activity_form_for_create_import_templates = [
+    #     'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
+    #     'from ${arg1_abcapp_name}.${arg1_abcpkg_name}.${arg1_module} import ${arg1_type} as ABC${arg1_type}'
+    # ]
+    #
+    # get_activity_form_for_create_template = """
+    #     # Implemented from template for
+    #     # osid.learning.ActivityAdminSession.get_activity_form_for_create_template
+    #
+    #     if not isinstance(${arg0_name}, ABC${arg0_type}):
+    #         raise errors.InvalidArgument('argument is not a valid OSID ${arg0_type}')
+    #     for arg in ${arg1_name}:
+    #         if not isinstance(arg, ABC${arg1_type}):
+    #             raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg1_type}')
+    #     if ${arg1_name} == []:
+    #         # WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
+    #         obj_form = objects.${return_type}(
+    #             ${cat_name_under}_id=self._catalog_id,
+    #             ${arg0_name}=${arg0_name},
+    #             catalog_id=self._catalog_id,
+    #             runtime=self._runtime,
+    #             proxy=self._proxy)
+    #     else:
+    #         obj_form = objects.${return_type}(
+    #             ${cat_name_under}_id=self._catalog_id,
+    #             record_types=${arg1_name},
+    #             ${arg0_name}=${arg0_name},
+    #             catalog_id=self._catalog_id,
+    #             runtime=self._runtime,
+    #             proxy=self._proxy)
+    #     obj_form._for_update = False
+    #     self._forms[obj_form.get_id().get_identifier()] = not CREATED
+    #     return obj_form"""
 
 
 class Activity:

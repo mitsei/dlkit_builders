@@ -53,22 +53,28 @@ class AssessmentProxyManager:
 
 class AssessmentSession:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from ..primitives import Type',
-        'from dlkit.abstract_osid.osid import errors',
-        'from bson.objectid import ObjectId',
-        'from . import objects',
-        'from ..osid.sessions import OsidSession',
-        'from ..utilities import JSONClientValidated',
-        'from ..utilities import get_registry',
-        'SUBMITTED = True',
-        'from importlib import import_module',
-        'from .assessment_utilities import get_assessment_section as get_section_util',
-        'from .assessment_utilities import check_effective',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from ..primitives import Type',
+                'from dlkit.abstract_osid.osid import errors',
+                'from bson.objectid import ObjectId',
+                'from . import objects',
+                'from ..osid.sessions import OsidSession',
+                'from ..utilities import JSONClientValidated',
+                'from ..utilities import get_registry',
+                'SUBMITTED = True',
+                'from importlib import import_module',
+                'from .assessment_utilities import get_assessment_section as get_section_util',
+                'from .assessment_utilities import check_effective',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Bank
@@ -82,20 +88,44 @@ class AssessmentSession:
             cat_class=objects.Bank)
         self._forms = dict()
         self._assessments_taken = dict()"""
+        }
+    }
 
-    can_take_assessments = """
+    can_take_assessments = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
+        }
+    }
 
-    has_assessment_begun = """
+    has_assessment_begun = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         return self._get_assessment_taken(assessment_taken_id).has_started()"""
+        }
+    }
 
-    is_assessment_over = """
+    is_assessment_over = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         return self._get_assessment_taken(assessment_taken_id).has_ended()"""
+        }
+    }
 
     # This method has been deprecated and NOT updated:
-    finished_assessment = """
+    finished_assessment = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         collection = JSONClientValidated('assessment',
                                          collection='AssessmentTaken',
                                          runtime=self._runtime)
@@ -107,112 +137,242 @@ class AssessmentSession:
             collection.save(assessment_taken_map)
         else:
             raise errors.IllegalState()"""
+        }
+    }
 
-    requires_synchronous_sections = """
+    requires_synchronous_sections = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         return self._get_assessment_taken(assessment_taken_id).get_assessment_offered().are_sections_sequential()"""
+        }
+    }
 
-    get_first_assessment_section = """
+    get_first_assessment_section = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         return assessment_taken._get_first_assessment_section()"""
+        }
+    }
 
-    has_next_assessment_section = """
+    has_next_assessment_section = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         try:
             self.get_next_assessment_section(assessment_section_id)
         except errors.IllegalState:
             return False
         else:
             return True"""
+        }
+    }
 
-    get_next_assessment_section = """
+    get_next_assessment_section = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
         return assessment_taken._get_next_assessment_section(assessment_section_id)"""
+        }
+    }
 
-    has_previous_assessment_section = """
+    has_previous_assessment_section = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         try:
             self.get_previous_assessment_section(assessment_section_id)
         except errors.IllegalState:
             return False
         else:
             return True"""
+        }
+    }
 
-    get_previous_assessment_section = """
+    get_previous_assessment_section = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
         return assessment_taken._get_previous_assessment_section(assessment_section_id)"""
+        }
+    }
 
-    get_assessment_section = """
+    get_assessment_section = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         return get_section_util(assessment_section_id, runtime=self._runtime, proxy=self._proxy)"""
+        }
+    }
 
-    get_assessment_sections = """
+    get_assessment_sections = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         return assessment_taken._get_assessment_sections()"""
+        }
+    }
 
-    is_assessment_section_complete = """
+    is_assessment_section_complete = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).is_complete()"""
+        }
+    }
 
-    get_incomplete_assessment_sections = """
+    get_incomplete_assessment_sections = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         section_list = []
         for section in self.get_assessment_sections(assessment_taken_id):
             if not section.is_complete():
                 section_list.append(section)
         return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)"""
+        }
+    }
 
     # Has this method has been deprecated???
     # IMPLEMENT ME PROPERLY!
-    has_assessment_section_begun = """
+    has_assessment_section_begun = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         return get_section_util(assessment_section_id,
                                 runtime=self._runtime)._assessment_taken.has_started()"""
+        }
+    }
 
     # Has this method has been deprecated???
-    is_assessment_section_over = """
+    is_assessment_section_over = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         return get_section_util(assessment_section_id,
                                 runtime=self._runtime).is_over()"""
+        }
+    }
 
     # This method has been deprecated:
-    finished_assessment_section = """
-            raise errors.IllegalState()
-        self.finished_assessment(assessment_section_id)"""
+    # finished_assessment_section = """
+    #         raise errors.IllegalState()
+    #     self.finished_assessment(assessment_section_id)"""
 
     # Has this method has been deprecated???
-    requires_synchronous_responses = """
+    requires_synchronous_responses = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).are_items_sequential()"""
+        }
+    }
 
-    get_first_question = """
+    get_first_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_first_question()"""
+        }
+    }
 
-    has_next_question = """
+    has_next_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         try:
             self.get_next_question(assessment_section_id, item_id)
         except errors.IllegalState:
             return False
         else:
             return True"""
+        }
+    }
 
-    get_next_question = """
+    get_next_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id)"""
+        }
+    }
 
-    has_previous_question = """
+    has_previous_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         try:
             self.get_previous_question(assessment_section_id, item_id)
         except errors.IllegalState:
             return False
         else:
             return True"""
+        }
+    }
 
-    get_previous_question = """
+    get_previous_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id, reverse=True)"""
+        }
+    }
 
-    get_question = """
+    get_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_question(question_id=item_id)"""
+        }
+    }
 
-    get_questions = """
+    get_questions = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         # Does this want to return a blocking list of available questions?
         return self.get_assessment_section(assessment_section_id).get_questions()"""
+        }
+    }
 
-    get_response_form_import_templates = [
-        'from dlkit.abstract_osid.id.primitives import Id as ABCId'
-    ]
+    get_response_form_import_templates = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.id.primitives import Id as ABCId'
+            ]
+        }
+    }
 
-    get_response_form = """
+    get_response_form = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         if not isinstance(item_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
 
@@ -256,12 +416,22 @@ class AssessmentSession:
         obj_form._for_update = False  # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form"""
+        }
+    }
 
-    submit_response_import_templates = [
-        'from dlkit.abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
-    ]
+    submit_response_import_templates = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.assessment.objects import AnswerForm as ABCAnswerForm'
+            ]
+        }
+    }
 
-    submit_response = """
+    submit_response = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id, answer_form):
+        ${doc_string}
         if not isinstance(answer_form, ABCAnswerForm):
             raise errors.InvalidArgument('argument type is not an AnswerForm')
 
@@ -280,28 +450,64 @@ class AssessmentSession:
         answer_form._my_map['_id'] = ObjectId()
         self.get_assessment_section(assessment_section_id).submit_response(item_id, answer_form)
         self._forms[answer_form.get_id().get_identifier()] = SUBMITTED"""
+        }
+    }
 
-    skip_item = """
+    skip_item = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         # add conditional: if the assessment or part allows us to skip:
         self.get_assessment_section(assessment_section_id).submit_response(item_id, None)"""
+        }
+    }
 
-    is_question_answered = """
+    is_question_answered = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).is_question_answered(item_id)"""
+        }
+    }
 
-    get_unanswered_questions = """
+    get_unanswered_questions = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_questions(answered=False)"""
+        }
+    }
 
-    has_unanswered_questions = """
+    has_unanswered_questions = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         # There's probably a more efficient way to implement this:
         return bool(self.get_unanswered_questions(assessment_section_id).available())"""
+        }
+    }
 
-    get_first_unanswered_question = """
+    get_first_unanswered_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         questions = self.get_unanswered_questions(assessment_section_id)
         if not questions.available():
             raise errors.IllegalState('There are no more unanswered questions available')
         return questions.next()"""
+        }
+    }
 
-    has_next_unanswered_question = """
+    has_next_unanswered_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         # There's probably a more efficient way to implement this:
         try:
             self.get_next_unanswered_question(assessment_section_id, item_id)
@@ -309,8 +515,14 @@ class AssessmentSession:
             return False
         else:
             return True"""
+        }
+    }
 
-    get_next_unanswered_question = """
+    get_next_unanswered_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         # Or this could call through to get_next_question in the section
         questions = self.get_unanswered_questions(assessment_section_id)
         for question in questions:
@@ -320,8 +532,14 @@ class AssessmentSession:
                 else:
                     raise errors.IllegalState('No next unanswered question is available')
         raise errors.NotFound('item_id is not found in Section')"""
+        }
+    }
 
-    has_previous_unanswered_question = """
+    has_previous_unanswered_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         # There's probably a more efficient way to implement this:
         try:
             self.get_previous_unanswered_question(assessment_section_id, item_id)
@@ -329,8 +547,14 @@ class AssessmentSession:
             return False
         else:
             return True"""
+        }
+    }
 
-    get_previous_unanswered_question = """
+    get_previous_unanswered_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         # Or this could call through to get_next_question in the section with reverse=True
         questions = self.get_unanswered_questions(assessment_section_id)
         previous_question = questions.next()
@@ -342,34 +566,70 @@ class AssessmentSession:
             else:
                 previous_question = question
         raise errors.NotFound('item_id is not found in Section')"""
+        }
+    }
 
-    get_response = """
+    get_response = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_response(question_id=item_id)"""
+        }
+    }
 
-    get_responses = """
+    get_responses = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_responses()"""
+        }
+    }
 
-    clear_response = """
+    clear_response = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
         # Should probably check to see if responses can be cleared, but how?
         self.get_assessment_section(assessment_section_id).submit_response(item_id, None)"""
+        }
+    }
 
-    finish_assessment_section = """
+    finish_assessment_section = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
         self.get_assessment_section(assessment_section_id).finish()"""
+        }
+    }
 
     # This is no longer needed:
-    finish = """
+    finish = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id):
+        ${doc_string}
         self.finished_assessment(assessment_section_id)
 
     def finish_assessment_section(self, assessment_section_id):
         self.finish(assessment_section_id)"""
+        }
+    }
 
-    finish_assessment = """
+    finish_assessment = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         assessment_taken_map = assessment_taken._my_map
         if assessment_taken.has_started() and not assessment_taken.has_ended():
@@ -381,8 +641,14 @@ class AssessmentSession:
             collection.save(assessment_taken_map)
         else:
             raise errors.IllegalState()"""
+        }
+    }
 
-    is_answer_available = """
+    is_answer_available = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         # Note: we need more settings elsewhere to indicate answer available conditions
         # This makes the simple assumption that answers are available only when
         # a response has been submitted for an Item.
@@ -395,13 +661,23 @@ class AssessmentSession:
             return False
         else:
             return True"""
+        }
+    }
 
-    get_answers = """
+    get_answers = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_section_id, item_id):
+        ${doc_string}
         if self.is_answer_available(assessment_section_id, item_id):
             return self.get_assessment_section(assessment_section_id).get_answers(question_id=item_id)
         raise errors.IllegalState()"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def _get_assessment_taken(self, assessment_taken_id):
         \"\"\"Helper method for getting an AssessmentTaken objects given an Id.\"\"\"
         if assessment_taken_id not in self._assessments_taken:
@@ -411,20 +687,28 @@ class AssessmentSession:
             self._assessments_taken[assessment_taken_id] = (
                 lookup_session.get_assessment_taken(assessment_taken_id))
         return self._assessments_taken[assessment_taken_id]"""
+        }
+    }
 
 
 class AssessmentResultsSession:
 
-    import_statements = [
-        'from .assessment_utilities import get_assessment_section',
-        'from .assessment_utilities import get_item_lookup_session',
-        'from ..utilities import OsidListList',
-        'from ..primitives import Id',
-        'from .objects import ItemList',
-        'from .objects import ResponseList',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from .assessment_utilities import get_assessment_section',
+                'from .assessment_utilities import get_item_lookup_session',
+                'from ..utilities import OsidListList',
+                'from ..primitives import Id',
+                'from .objects import ItemList',
+                'from .objects import ResponseList',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Bank
@@ -436,13 +720,25 @@ class AssessmentResultsSession:
             db_name='assessment',
             cat_name='Bank',
             cat_class=objects.Bank)"""
+        }
+    }
 
-    can_access_assessment_results = """
+    can_access_assessment_results = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
+        }
+    }
 
-    get_items = """
+    get_items = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
         taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
         taken_lookup_session.use_federated_bank_view()
@@ -458,8 +754,14 @@ class AssessmentResultsSession:
                 for question in section._my_map['questions']:
                     item_list.append(ils.get_item(Id(question['questionId'])))
         return ItemList(item_list)"""
+        }
+    }
 
-    get_responses = """
+    get_responses = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_id):
+        ${doc_string}
         mgr = self._get_provider_manager('ASSESSMENT', local=True)
         taken_lookup_session = mgr.get_assessment_taken_lookup_session(proxy=self._proxy)
         taken_lookup_session.use_federated_bank_view()
@@ -472,34 +774,60 @@ class AssessmentResultsSession:
                                                  proxy=self._proxy)
                 response_list.append(section.get_responses())
         return ResponseList(response_list)"""
+         }
+    }
 
-    are_results_available = """
+    are_results_available = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # not implemented yet
         return False"""
+        }
+    }
 
-    get_grade_entries = """
+    get_grade_entries = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # not implemented yet and are_results_available is False
         raise errors.IllegalState()"""
+        }
+    }
 
 
 class ItemAdminSession:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from dlkit.abstract_osid.osid import errors',
-        'from bson.objectid import ObjectId',
-        'from ..utilities import JSONClientValidated',
-        'UPDATED = True',
-        'CREATED = True'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from dlkit.abstract_osid.osid import errors',
+                'from bson.objectid import ObjectId',
+                'from ..utilities import JSONClientValidated',
+                'UPDATED = True',
+                'CREATED = True'
+            ]
+        }
+    }
 
     # This method is hand implemented to raise errors.and error if the item
     # is found to be associated with an assessment
-    delete_item_import_templates = [
-        'from dlkit.abstract_osid.id.primitives import Id as ABCId'
-    ]
+    delete_item_import_templates = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.id.primitives import Id as ABCId'
+            ]
+        }
+    }
 
-    delete_item = """
+    delete_item = {
+        'python': {
+            'json': """
+    def ${method_name}(self, item_id):
+        ${doc_string}
         if not isinstance(item_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         collection = JSONClientValidated('assessment_authoring',
@@ -516,15 +844,25 @@ class ItemAdminSession:
                      runtime=self._runtime,
                      proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(item_id.get_identifier())})"""
+        }
+    }
 
     # These methods overwrite the canonical aggregate object admin methods to
     # deal with authoring Questions with are special: ie. there is only one per
     # Item.  Perhaps we will see this pattern again and can make templates.
-    create_question_import_templates = [
-        'from dlkit.abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
-    ]
+    create_question_import_templates = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
+            ]
+        }
+    }
 
-    create_question = """
+    create_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, question_form):
+        ${doc_string}
         collection = JSONClientValidated('assessment',
                                          collection='Item',
                                          runtime=self._runtime)
@@ -555,8 +893,14 @@ class ItemAdminSession:
         return objects.Question(osid_object_map=question_form._my_map,
                                 runtime=self._runtime,
                                 proxy=self._proxy)"""
+        }
+    }
 
-    delete_question = """
+    delete_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, question_id):
+        ${doc_string}
         collection = JSONClientValidated('assessment',
                                          collection='Item',
                                          runtime=self._runtime)
@@ -566,12 +910,22 @@ class ItemAdminSession:
 
         item['question'] = None
         collection.save(item)"""
+        }
+    }
 
-    get_question_form_for_update_import_templates = [
-        'from dlkit.abstract_osid.id.primitives import Id as ABCId'
-    ]
+    get_question_form_for_update_import_templates = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.id.primitives import Id as ABCId'
+            ]
+        }
+    }
 
-    get_question_form_for_update = """
+    get_question_form_for_update = {
+        'python': {
+            'json': """
+    def ${method_name}(self, question_id):
+        ${doc_string}
         collection = JSONClientValidated('assessment',
                                          collection='Item',
                                          runtime=self._runtime)
@@ -583,12 +937,22 @@ class ItemAdminSession:
                                         proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
+        }
+    }
 
-    update_question_import_templates = [
-        'from dlkit.abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
-    ]
+    update_question_import_templates = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.assessment.objects import QuestionForm as ABCQuestionForm'
+            ]
+        }
+    }
 
-    update_question = """
+    update_question = {
+        'python': {
+            'json': """
+    def ${method_name}(self, question_form):
+        ${doc_string}
         collection = JSONClientValidated('assessment',
                                          collection='Item',
                                          runtime=self._runtime)
@@ -616,26 +980,71 @@ class ItemAdminSession:
         return objects.Question(osid_object_map=question_form._my_map,
                                 runtime=self._runtime,
                                 proxy=self._proxy)"""
+        }
+    }
+
+    additional_methods = {
+        'python': {
+            'json': """
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    @utilities.arguments_not_none
+    def duplicate_item(self, item_id):
+        collection = JSONClientValidated('assessment',
+                                         collection='Item',
+                                         runtime=self._runtime)
+        mgr = self._get_provider_manager('ASSESSMENT')
+        lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
+        try:
+            lookup_session.use_unsequestered_item_view()
+        except AttributeError:
+            pass
+        item_map = dict(lookup_session.get_item(item_id)._my_map)
+        del item_map['_id']
+        if 'bankId' in item_map:
+            item_map['bankId'] = str(self._catalog_id)
+        if 'assignedBankIds' in item_map:
+            item_map['assignedBankIds'] = [str(self._catalog_id)]
+        insert_result = collection.insert_one(item_map)
+        result = objects.Item(
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
+        return result"""
+        }
+    }
 
 
 class AssessmentAdminSession:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from dlkit.abstract_osid.osid import errors',
-        'from bson.objectid import ObjectId',
-        'from ..utilities import JSONClientValidated',
-        'from .assessment_utilities import get_assessment_part_lookup_session',
-        'UPDATED = True',
-        'CREATED = True'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from dlkit.abstract_osid.osid import errors',
+                'from bson.objectid import ObjectId',
+                'from ..utilities import JSONClientValidated',
+                'from .assessment_utilities import get_assessment_part_lookup_session',
+                'UPDATED = True',
+                'CREATED = True'
+            ]
+        }
+    }
 
-    delete_assessment_import_templates = [
-        'from dlkit.abstract_osid.id.primitives import Id as ABCId',
-        'from ..assessment_authoring import objects as assessment_authoring_objects'
-    ]
+    delete_assessment_import_templates = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.id.primitives import Id as ABCId',
+                'from ..assessment_authoring import objects as assessment_authoring_objects'
+            ]
+        }
+    }
 
-    delete_assessment = """
+    delete_assessment = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_id):
+        ${doc_string}
         \"\"\"Delete all the children AssessmentParts recursively, too\"\"\"
         def remove_children_parts(parent_id):
             part_collection = JSONClientValidated('assessment_authoring',
@@ -673,22 +1082,62 @@ class AssessmentAdminSession:
                                          collection='Assessment',
                                          runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
-        remove_children_parts(str(assessment_id))
-        """
+        remove_children_parts(str(assessment_id))"""
+        }
+    }
+
+    additional_methods = {
+        'python': {
+            'json': """
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    @utilities.arguments_not_none
+    def duplicate_assessment(self, assessment_id):
+        collection = JSONClientValidated('assessment',
+                                         collection='Assessment',
+                                         runtime=self._runtime)
+        mgr = self._get_provider_manager('ASSESSMENT')
+        lookup_session = mgr.get_assessment_lookup_session(proxy=self._proxy)
+        lookup_session.use_federated_bank_view()
+        try:
+            lookup_session.use_unsequestered_assessment_view()
+        except AttributeError:
+            pass
+        assessment_map = dict(lookup_session.get_assessment(assessment_id)._my_map)
+        del assessment_map['_id']
+        if 'bankId' in assessment_map:
+            assessment_map['bankId'] = str(self._catalog_id)
+        if 'assignedBankIds' in assessment_map:
+            assessment_map['assignedBankIds'] = [str(self._catalog_id)]
+        insert_result = collection.insert_one(assessment_map)
+        result = objects.Assessment(
+            osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
+            runtime=self._runtime,
+            proxy=self._proxy)
+        return result"""
+        }
+    }
 
 
 class AssessmentTakenLookupSession:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import objects',
-        'from ..utilities import JSONClientValidated'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from dlkit.abstract_osid.osid import errors',
+                'from . import objects',
+                'from ..utilities import JSONClientValidated'
+            ]
+        }
+    }
 
     # This is hand-built, but there may be a pattern to try to map, specifically
     # getting objects for another package object and a persisted id thingy
-    get_assessments_taken_for_taker_and_assessment_offered = """
+    get_assessments_taken_for_taker_and_assessment_offered = {
+        'python': {
+            'json': """
+    def ${method_name}(self, resource_id, assessment_offered_id):
+        ${doc_string}
         # NOTE: This implementation currently ignores plenary view
         collection = JSONClientValidated('assessment',
                                          collection='AssessmentTaken',
@@ -712,8 +1161,14 @@ class AssessmentTakenLookupSession:
                   'takingAgentId': str(resource_id)},
                  **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result, runtime=self._runtime, proxy=self._proxy)"""
+        }
+    }
 
-    get_assessments_taken_for_assessment = """
+    get_assessments_taken_for_assessment = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_id):
+        ${doc_string}
         collection = JSONClientValidated('assessment',
                                          collection='AssessmentOffered',
                                          runtime=self._runtime)
@@ -737,78 +1192,92 @@ class AssessmentTakenLookupSession:
         return objects.AssessmentTakenList(result,
                                            runtime=self._runtime,
                                            proxy=self._proxy)"""
+        }
+    }
 
 
-class AssessmentOfferedAdminSession:
-
-    deprecated_import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..utilities import JSONClientValidated',
-        'UPDATED = True',
-        'CREATED = True',
-    ]
-
-    deprecated_get_assessment_offered_form_for_create = """
-
-        # This impl differs from the usual get_osid_object_form_for_create method in that it
-        # sets a default display name based on the underlying Assessment...
-        from dlkit.abstract_osid.id.primitives import Id as ABCId
-        from dlkit.abstract_osid.type.primitives import Type as ABCType
-        if not isinstance(assessment_id, ABCId):
-            raise errors.InvalidArgument('argument is not a valid OSID Id')
-        for arg in assessment_offered_record_types:
-            if not isinstance(arg, ABCType):
-                raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
-
-        #...Here:
-        collection = JSONClientValidated('assessment',
-                                         collection='Assessment',
-                                         runtime=self._runtime)
-        assessment_map = collection.find_one(
-            {'$$and': [{'_id': ObjectId(assessment_id.get_identifier())}, {'bankId': str(self._catalog_id)}]})
-
-        if assessment_offered_record_types == []:
-            # WHY are we passing bank_id = self._catalog_id below, seems redundant:
-            obj_form = objects.AssessmentOfferedForm(
-                bank_id=self._catalog_id,
-                assessment_id=assessment_id,
-                catalog_id=self._catalog_id,
-                default_display_name=assessment_map['displayName']['text'],
-                runtime=self._runtime,
-                proxy=self._proxy)
-        else:
-            obj_form = objects.AssessmentOfferedForm(
-                bank_id=self._catalog_id,
-                record_types=assessment_offered_record_types,
-                assessment_id=assessment_id,
-                catalog_id=self._catalog_id,
-                default_display_name=assessment_map['displayName']['text'],
-                runtime=self._runtime,
-                proxy=self._proxy)
-        obj_form._for_update = False
-        self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+# class AssessmentOfferedAdminSession:
+#
+#     deprecated_import_statements = [
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from ..utilities import JSONClientValidated',
+#         'UPDATED = True',
+#         'CREATED = True',
+#     ]
+#
+#     deprecated_get_assessment_offered_form_for_create = """
+#
+#         # This impl differs from the usual get_osid_object_form_for_create method in that it
+#         # sets a default display name based on the underlying Assessment...
+#         from dlkit.abstract_osid.id.primitives import Id as ABCId
+#         from dlkit.abstract_osid.type.primitives import Type as ABCType
+#         if not isinstance(assessment_id, ABCId):
+#             raise errors.InvalidArgument('argument is not a valid OSID Id')
+#         for arg in assessment_offered_record_types:
+#             if not isinstance(arg, ABCType):
+#                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
+#
+#         #...Here:
+#         collection = JSONClientValidated('assessment',
+#                                          collection='Assessment',
+#                                          runtime=self._runtime)
+#         assessment_map = collection.find_one(
+#             {'$$and': [{'_id': ObjectId(assessment_id.get_identifier())}, {'bankId': str(self._catalog_id)}]})
+#
+#         if assessment_offered_record_types == []:
+#             # WHY are we passing bank_id = self._catalog_id below, seems redundant:
+#             obj_form = objects.AssessmentOfferedForm(
+#                 bank_id=self._catalog_id,
+#                 assessment_id=assessment_id,
+#                 catalog_id=self._catalog_id,
+#                 default_display_name=assessment_map['displayName']['text'],
+#                 runtime=self._runtime,
+#                 proxy=self._proxy)
+#         else:
+#             obj_form = objects.AssessmentOfferedForm(
+#                 bank_id=self._catalog_id,
+#                 record_types=assessment_offered_record_types,
+#                 assessment_id=assessment_id,
+#                 catalog_id=self._catalog_id,
+#                 default_display_name=assessment_map['displayName']['text'],
+#                 runtime=self._runtime,
+#                 proxy=self._proxy)
+#         obj_form._for_update = False
+#         self._forms[obj_form.get_id().get_identifier()] = not CREATED
+#         return obj_form"""
 
 
 class AssessmentTakenAdminSession:
 
-    deprecated_import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..utilities import JSONClientValidated',
-        'UPDATED = True',
-        'CREATED = True',
-    ]
+    # deprecated_import_statements = [
+    #     'from dlkit.abstract_osid.osid import errors',
+    #     'from ..utilities import JSONClientValidated',
+    #     'UPDATED = True',
+    #     'CREATED = True',
+    # ]
 
-    import_statements = [
-        'from dlkit.primordium.calendaring.primitives import DateTime'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.primordium.calendaring.primitives import DateTime'
+            ]
+        }
+    }
 
-    create_assessment_taken_import_templates = [
-        'from dlkit.abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm',
-        'from ..osid.osid_errors import PermissionDenied'
-    ]
+    create_assessment_taken_import_templates = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.assessment.objects import AssessmentTakenForm as ABCAssessmentTakenForm',
+                'from ..osid.osid_errors import PermissionDenied'
+            ]
+        }
+    }
 
-    create_assessment_taken = """
+    create_assessment_taken = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_taken_form):
+        ${doc_string}
         # This impl differs from the usual create_osid_object method in that it
         # sets an agent id and default display name based on the underlying Assessment
         # and checks for exceeding max attempts...
@@ -851,8 +1320,14 @@ class AssessmentTakenAdminSession:
             osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
             runtime=self._runtime,
             proxy=self._proxy)"""
+        }
+    }
 
-    get_assessment_taken_form_for_create = """
+    get_assessment_taken_form_for_create = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_offered_id, assessment_taken_record_types):
+        ${doc_string}
         if not isinstance(assessment_offered_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
         for arg in assessment_taken_record_types:
@@ -891,18 +1366,26 @@ class AssessmentTakenAdminSession:
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
+        }
+    }
 
 
 class AssessmentBasicAuthoringSession:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import objects',
-        'from ..osid.sessions import OsidSession',
-        'from .assessment_utilities import get_first_part_id_for_assessment',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from . import objects',
+                'from ..osid.sessions import OsidSession',
+                'from .assessment_utilities import get_first_part_id_for_assessment',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Bank
@@ -931,58 +1414,105 @@ class AssessmentBasicAuthoringSession:
                 create=True,
                 bank_id=self._catalog_id)
         return self._first_part_index[assessment_id]"""
+        }
+    }
 
-    can_author_assessments = """
+    can_author_assessments = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
+        }
+    }
 
-    get_items = """
+    get_items = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_id):
+        ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         return self._part_item_session.get_assessment_part_items(self._get_first_part_id(assessment_id))"""
+        }
+    }
 
-    add_item = """
+    add_item = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_id, item_id):
+        ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         self._part_item_design_session.add_item(item_id, self._get_first_part_id(assessment_id))"""
+        }
+    }
 
-    remove_item = """
+    remove_item = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_id, item_id):
+        ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         self._part_item_design_session.remove_item(item_id, self._get_first_part_id(assessment_id))"""
+        }
+    }
 
-    move_item = """
+    move_item = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_id, item_Id, preceeding_item_id):
+        ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         self._part_item_design_session.move_item_behind(item_id, self._get_first_part_id(assessment_id), preceeding_item_id)"""
+        }
+    }
 
-    order_items = """
+    order_items = {
+        'python': {
+            'json': """
+    def ${method_name}(self, item_ids, assessment_id):
+        ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         self._part_item_design_session.order_items(item_ids, self._get_first_part_id(assessment_id))"""
+        }
+    }
 
 
 class Question:
 
-    import_statements = [
-        'from ..id.objects import IdList',
-        'from ..primitives import Id',
-        'from ..utilities import JSONClientValidated',
-        'from bson.objectid import ObjectId',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..id.objects import IdList',
+                'from ..primitives import Id',
+                'from ..utilities import JSONClientValidated',
+                'from bson.objectid import ObjectId',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='QUESTION', **kwargs)
         self._catalog_name = 'Bank'
         if 'item_id' in kwargs:
             self._item_id = kwargs['item_id']
         else:
-            self._item_id = Id(kwargs['osid_object_map']['itemId'])
-        """
+            self._item_id = Id(kwargs['osid_object_map']['itemId'])"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     # Overide osid.Identifiable.get_id() method to cast this question id as its item id:
     def get_id(self):
         return self._item_id
@@ -1032,27 +1562,39 @@ class Question:
         return obj_map
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 class Answer:
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_object_map(self):
         obj_map = dict(self._my_map)
         del obj_map['itemId']
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 class Item:
 
-    get_question_id = """
+    get_question_id = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         return self.get_question().get_id()"""
+        }
+    }
 
-    get_question = """
+    get_question = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         question_map = dict(self._my_map['question'])
@@ -1060,8 +1602,12 @@ class Item:
         return Question(osid_object_map=question_map,
                         runtime=self._runtime,
                         proxy=self._proxy)"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_configuration(self):
         config = dict()
         try:
@@ -1190,15 +1736,23 @@ class Item:
         if self.are_confused_learning_objective_ids_available_for_response(response):
             pass  # return Objective IdList
         raise errors.IllegalState()"""
+        }
+    }
 
 
 class Assessment:
 
-    import_statements = [
-        "from .assessment_utilities import SIMPLE_SEQUENCE_RECORD_TYPE"
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                "from .assessment_utilities import SIMPLE_SEQUENCE_RECORD_TYPE"
+            ]
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def has_children(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return self._supports_simple_sequencing() and self._my_map['childIds']
@@ -1267,15 +1821,23 @@ class Assessment:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 class AssessmentForm:
 
-    import_statements = [
-        "from .assessment_utilities import SIMPLE_SEQUENCE_RECORD_TYPE"
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                "from .assessment_utilities import SIMPLE_SEQUENCE_RECORD_TYPE"
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'assessment.Assessment'
 
     def __init__(self, **kwargs):
@@ -1299,8 +1861,12 @@ class AssessmentForm:
         self._my_map['levelId'] = self._level_default
         if self._supports_simple_sequencing():
             self._my_map['childIds'] = []"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def _supports_simple_sequencing(self):
         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])
 
@@ -1309,18 +1875,26 @@ class AssessmentForm:
         if not self._supports_simple_sequencing():
             raise errors.IllegalState()
         self._my_map['childIds'] = [str(i) for i in child_ids]"""
+        }
+    }
 
 
 class AssessmentOffered:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from ..primitives import DateTime',
-        'from ..primitives import Duration',
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from ..primitives import DateTime',
+                'from ..primitives import Duration',
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_display_name(self):
         # Overrides osid.objects.OsidObject.get_display_name to default to Assessment's
         # display_name if none has been authored for this AssessmentOffered
@@ -1377,41 +1951,51 @@ class AssessmentOffered:
     def are_sections_shuffled(self):
         \"\"\"This method can be overwritten by a record extension.\"\"\"
         return self.get_assessment().uses_shuffled_section_sequencing()  # Records should check this"""
+        }
+    }
 
-    has_start_time_template = """
-        # Implemented from template for osid.assessment.AssessmentOffered.has_start_time_template
-        return bool(self._my_map['${var_name_mixed}'])"""
+    # has_start_time_template = """
+    #     # Implemented from template for osid.assessment.AssessmentOffered.has_start_time_template
+    #     return bool(self._my_map['${var_name_mixed}'])"""
+    #
+    # get_start_time_template = """
+    #     # Implemented from template for osid.assessment.AssessmentOffered.get_start_time_template
+    #     if not bool(self._my_map['${var_name_mixed}']):
+    #         raise errors.IllegalState()
+    #     dt = self._my_map['${var_name_mixed}']
+    #     return DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)"""
+    #
+    # has_duration_template = """
+    #     # Implemented from template for osid.assessment.AssessmentOffered.has_duration_template
+    #     return bool(self._my_map['${var_name_mixed}'])"""
+    #
+    # get_duration_template = """
+    #     # Implemented from template for osid.assessment.AssessmentOffered.get_duration_template
+    #     if not bool(self._my_map['${var_name_mixed}']):
+    #         raise errors.IllegalState()
+    #     return Duration(**self._my_map['${var_name_mixed}'])"""
 
-    get_start_time_template = """
-        # Implemented from template for osid.assessment.AssessmentOffered.get_start_time_template
-        if not bool(self._my_map['${var_name_mixed}']):
-            raise errors.IllegalState()
-        dt = self._my_map['${var_name_mixed}']
-        return DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)"""
-
-    has_duration_template = """
-        # Implemented from template for osid.assessment.AssessmentOffered.has_duration_template
-        return bool(self._my_map['${var_name_mixed}'])"""
-
-    get_duration_template = """
-        # Implemented from template for osid.assessment.AssessmentOffered.get_duration_template
-        if not bool(self._my_map['${var_name_mixed}']):
-            raise errors.IllegalState()
-        return Duration(**self._my_map['${var_name_mixed}'])"""
-
-    are_items_sequential = """
+    are_items_sequential = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         if self._my_map['itemsSequential'] is None:
             return self.get_assessment().are_items_sequential()
         return bool(self._my_map['itemsSequential'])"""
+        }
+    }
 
-    are_items_shuffled = """
+    are_items_shuffled = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         if self._my_map['itemsShuffled'] is None:
             return self.get_assessment().are_items_shuffled()
         return bool(self._my_map['itemsShuffled'])"""
+        }
+    }
 
 
 class AssessmentOfferedQuery:
@@ -1432,31 +2016,41 @@ class AssessmentOfferedQuery:
 
 class AssessmentTaken:
 
-    import_statements = [
-        'from decimal import Decimal',
-        'from ..primitives import Id',
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..osid.objects import OsidObject',
-        'from ..utilities import JSONClientValidated',
-        'from .assessment_utilities import get_first_part_id_for_assessment',
-        'from .assessment_utilities import get_next_part_id',
-        'from .assessment_utilities import get_assessment_section',
-        'from dlkit.primordium.calendaring.primitives import DateTime, Duration',
-        'from dlkit.primordium.id.primitives import Id',
-        'from bson.objectid import ObjectId',
-        'from ..primitives import DateTime, DisplayText',
-        'ASSESSMENT_AUTHORITY = \'assessment-session\''
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from decimal import Decimal',
+                'from ..primitives import Id',
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..osid.objects import OsidObject',
+                'from ..utilities import JSONClientValidated',
+                'from .assessment_utilities import get_first_part_id_for_assessment',
+                'from .assessment_utilities import get_next_part_id',
+                'from .assessment_utilities import get_assessment_section',
+                'from dlkit.primordium.calendaring.primitives import DateTime, Duration',
+                'from dlkit.primordium.id.primitives import Id',
+                'from bson.objectid import ObjectId',
+                'from ..primitives import DateTime, DisplayText',
+                'ASSESSMENT_AUTHORITY = \'assessment-session\''
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'assessment.AssessmentTaken'
 
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='ASSESSMENT_TAKEN', **kwargs)
         self._catalog_name = 'Bank'
         self._assessment_sections = dict()"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_display_name(self):
         # Overrides osid.objects.OsidObject.get_display_name to default to AssessmentOffered's
         # display_name if none has been authored for this AssessmentTaken
@@ -1609,31 +2203,51 @@ class AssessmentTaken:
             for section_id in self._my_map['sections']:
                 section = get_assessment_section(Id(section_id), runtime=self._runtime, proxy=self._proxy)
                 section._delete()"""
+        }
+    }
 
-    get_taker_id = """
+    get_taker_id = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         if self._my_map['takerId']:
             return Id(self._my_map['takerId'])
         else:
             return Id(self._my_map['takingAgentId'])"""
+        }
+    }
 
-    get_taker = """
-    def ${method_name}(self):
-        ${doc_string}
-        raise errors.Unimplemented()"""
+    # get_taker = {
+    #     'python': {
+    #         'json': """
+    # def ${method_name}(self):
+    #     ${doc_string}
+    #     raise errors.Unimplemented()"""
+    #     }
+    # }
 
-    get_taking_agent_id = """
+    get_taking_agent_id = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         return Id(self._my_map['takingAgentId'])"""
+        }
+    }
 
-    get_taking_agent = """
-    def ${method_name}(self):
-        ${doc_string}
-        raise errors.Unimplemented()"""
+    # get_taking_agent = {
+    #     'python': {
+    #         'json': """
+    # def ${method_name}(self):
+    #     ${doc_string}
+    #     raise errors.Unimplemented()"""
+    #     }
+    # }
 
-    has_started = """
+    has_started = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         assessment_offered = self.get_assessment_offered()
@@ -1641,8 +2255,12 @@ class AssessmentTaken:
             return DateTime.utcnow() >= assessment_offered.get_start_time()
         else:
             return True"""
+        }
+    }
 
-    get_actual_start_time = """
+    get_actual_start_time = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         if not self.has_started():
@@ -1658,8 +2276,12 @@ class AssessmentTaken:
                             minute=start_time.minute,
                             second=start_time.second,
                             microsecond=start_time.microsecond)"""
+        }
+    }
 
-    has_ended = """
+    has_ended = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         assessment_offered = self.get_assessment_offered()
@@ -1679,8 +2301,12 @@ class AssessmentTaken:
             return now >= self._my_map['actualStartTime'] + assessment_offered.get_duration()
         else:
             return False"""
+        }
+    }
 
-    get_completion_time = """
+    get_completion_time = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         if not self.has_ended():
@@ -1695,8 +2321,12 @@ class AssessmentTaken:
                         minute=completion_time.minute,
                         second=completion_time.second,
                         microsecond=completion_time.microsecond)"""
+        }
+    }
 
-    get_time_spent = """
+    get_time_spent = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         # Take another look at this. Not sure it's correct:
@@ -1706,13 +2336,19 @@ class AssessmentTaken:
             return self.get_completion_time() - self.get_actual_start_time()
         else:
             raise errors.IllegalState()"""
+        }
+    }
 
     # Override the template in this case for ``get_cardinal_attribute_template``, because
     # needs to be calculated?
-    get_completion = """
+    get_completion = {
+        'python': {
+            'json': """
     def ${method_name}(self):
         ${doc_string}
         return int(self._my_map['${var_name_mixed}'])"""
+        }
+    }
 
     # get_score_template = """
     #     # Implemented from template for osid.assessment.AssessmentTaken.get_score_template
@@ -1722,13 +2358,17 @@ class AssessmentTaken:
 class AssessmentTakenForm:
     # These import statements are here to make sure that the DisplayText related default
     # types are available for initializing data:
-    import_statements = [
-        'from .. import types',
-        'from ..primitives import Type',
-        'default_language_type = Type(**types.Language().get_type_data(\'DEFAULT\'))',
-        'default_script_type = Type(**types.Script().get_type_data(\'DEFAULT\'))',
-        'default_format_type = Type(**types.Format().get_type_data(\'DEFAULT\'))'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from .. import types',
+                'from ..primitives import Type',
+                'default_language_type = Type(**types.Language().get_type_data(\'DEFAULT\'))',
+                'default_script_type = Type(**types.Script().get_type_data(\'DEFAULT\'))',
+                'default_format_type = Type(**types.Format().get_type_data(\'DEFAULT\'))'
+            ]
+        }
+    }
 
 
 class AssessmentTakenQuery:
@@ -1782,7 +2422,11 @@ class AssessmentQuery:
 
 
 class AssessmentQuerySession:
-    get_assessments_by_query = """
+    get_assessments_by_query = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_query):
+        ${doc_string}
         \"\"\"Gets a list of ``Assessments`` matching the given assessment query.
 
         arg:    assessment_query (osid.assessment.AssessmentQuery): the
@@ -1844,25 +2488,33 @@ class AssessmentQuerySession:
             else:
                 result = []
             return objects.AssessmentList(result, runtime=self._runtime, proxy=self._proxy)"""
+        }
+    }
 
 
 class AssessmentSection:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from .assessment_utilities import get_default_question_map',
-        'from .assessment_utilities import get_default_part_map',
-        'from .assessment_utilities import get_assessment_part_lookup_session',
-        'from .assessment_utilities import get_item_lookup_session',
-        'from .rules import Response',
-        'from dlkit.abstract_osid.id.primitives import Id as abc_id',
-        'from urllib import unquote',
-        'import json',
-        'UNANSWERED = 0',
-        'NULL_RESPONSE = 1',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from .assessment_utilities import get_default_question_map',
+                'from .assessment_utilities import get_default_part_map',
+                'from .assessment_utilities import get_assessment_part_lookup_session',
+                'from .assessment_utilities import get_item_lookup_session',
+                'from .rules import Response',
+                'from dlkit.abstract_osid.id.primitives import Id as abc_id',
+                'from urllib import unquote',
+                'import json',
+                'UNANSWERED = 0',
+                'NULL_RESPONSE = 1',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'assessment.AssessmentSection'
 
     def __init__(self, **kwargs):
@@ -2002,21 +2654,29 @@ class AssessmentSection:
             except AttributeError:
                 return object.__getattribute__(self, name)
         return object.__getattribute__(self, name)"""
+        }
+    }
 
 
 class Response:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..utilities import get_registry',
-        'from .assessment_utilities import get_item_lookup_session',
-        'from collections import OrderedDict',
-        'UNANSWERED = 0',
-        'NULL_SUBMISSION = 1',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..utilities import get_registry',
+                'from .assessment_utilities import get_item_lookup_session',
+                'from collections import OrderedDict',
+                'UNANSWERED = 0',
+                'NULL_SUBMISSION = 1',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'assessment.Response'
 
     def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, section=None, **kwargs):
@@ -2073,11 +2733,23 @@ class Response:
                 return getattr(self._my_answer, name)
             except:
                 raise"""
+        }
+    }
 
-    get_item_id = """
+    get_item_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return self._item_id"""
+        }
+    }
 
-    get_item = """
+    get_item = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # So, for now we're assuming that what should be returned here is the question.
         # We could change this class impl to "know" if it came from a ResponseLookupSession call
         # and return the whole Item if so.
@@ -2096,15 +2768,25 @@ class Response:
             else:
                 raise errors.NotFound()
         return item.get_question()"""
+        }
+    }
 
-    get_response_record = """
+    get_response_record = {
+        'python': {
+            'json': """
+    def ${method_name}(self, item_record_type):
+        ${doc_string}
         if not self.has_record_type(item_record_type):
             raise errors.Unsupported()
         if str(item_record_type) not in self._records:
             raise errors.Unimplemented()
         return self._records[str(item_record_type)]"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def is_answered(self):
         if self._my_answer in [UNANSWERED, NULL_SUBMISSION]:
             return False
@@ -2133,6 +2815,8 @@ class Response:
         if self._is_correct is not None:
             return self._is_correct
         raise errors.IllegalState('do not know if this response is correct')"""
+        }
+    }
 
 
 class ItemQuery:
@@ -2232,9 +2916,13 @@ class ItemQuery:
 
 class ItemSearchSession:
 
-    import_statements = [
-        'from . import searches',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from . import searches',
+            ]
+        }
+    }
 
 
 # class BankForm:

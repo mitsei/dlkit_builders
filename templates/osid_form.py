@@ -19,7 +19,7 @@ class GenericObjectForm:
     init_template = {
         'python': {
             'json': """
-    # From: templates/osid_form.py::GenericObjectForm::init_template
+    ${pattern_name}
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, **kwargs):
@@ -46,7 +46,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::get_simple_attribute_metadata_template
+        ${pattern_name}
         metadata = dict(self._mdata['${var_name}'])
         metadata.update({'existing_${syntax_under}_values': self._my_map['${var_name_mixed}']})
         return Metadata(**metadata)"""
@@ -58,7 +58,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::get_id_attribute_metadata_template
+        ${pattern_name}
         metadata = dict(self._mdata['${var_name}'])
         metadata.update({'existing_${syntax_under}_values': self._my_map['${var_name_mixed}Id']})
         return Metadata(**metadata)"""
@@ -70,7 +70,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::set_simple_attribute_template
+        ${pattern_name}
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess('${arg0_name} is read only')
         if not self._is_valid_${arg0_type}(${arg0_name}):
@@ -84,7 +84,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::clear_simple_attribute_template
+        ${pattern_name}
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess('Sorry you cannot clear ${var_name}')
@@ -97,7 +97,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::set_id_attribute_template
+        ${pattern_name}
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess('${arg0_name} is read only')
         if not self._is_valid_${syntax_under}(${arg0_name}):
@@ -111,7 +111,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::clear_id_attribute_template
+        ${pattern_name}
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess('Sorry you cannot clear ${var_name}')
@@ -124,7 +124,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, $arg0_name):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::get_object_form_record_template
+        ${pattern_name}
         return self._get_record(${arg0_name})"""
         }
     }
@@ -134,7 +134,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::get_id_list_attribute_metadata_template
+        ${pattern_name}
         metadata = dict(self._mdata['${var_name}'])
         metadata.update({'existing_${var_name}_values': self._my_map['${var_name_singular_mixed}Ids']})
         return Metadata(**metadata)"""
@@ -146,7 +146,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::set_id_list_attribute_template
+        ${pattern_name}
         if not isinstance(${arg0_name}, list):
             raise errors.InvalidArgument()
         if self.get_${var_name}_metadata().is_read_only():
@@ -165,7 +165,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::clear_id_list_attribute_template
+        ${pattern_name}
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess('Sorry you cannot clear ${var_name}')
@@ -178,7 +178,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::clear_single_id_list_attribute_template
+        ${pattern_name}
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess('Sorry you cannot clear ${var_name}')
@@ -194,7 +194,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::set_display_text_attribute_template
+        ${pattern_name}
         self._my_map['${var_name_mixed}'] = self._get_display_text(${arg0_name}, self.get_${var_name}_metadata())"""
         }
     }
@@ -205,7 +205,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::clear_display_text_attribute_template
+        ${pattern_name}
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess('Sorry you cannot clear ${var_name}')
@@ -220,7 +220,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::set_string_attribute_template
+        ${pattern_name}
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess('${arg0_name} is read only')
         if not self._is_valid_${arg0_type}(
@@ -238,7 +238,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::set_decimal_attribute_template
+        ${pattern_name}
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess('${arg0_name} is read only')
         try:
@@ -258,7 +258,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::set_date_time_attribute_template
+        ${pattern_name}
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess('${arg0_name} is read only')
         if not isinstance(${arg0_name}, DateTime):
@@ -278,7 +278,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::set_duration_attribute_template
+        ${pattern_name}
         if self.get_${var_name}_metadata().is_read_only():
             raise errors.NoAccess('${arg0_name} is read only')
         if not isinstance(${arg0_name}, Duration):
@@ -302,7 +302,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::set_data_input_stream_attribute_template
+        ${pattern_name}
         if ${arg0_name} is None:
             raise errors.NullArgument('${arg0_name} cannot be None')
         if not isinstance(${arg0_name}, DataInputStream):
@@ -321,7 +321,7 @@ ${persisted_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_form.py::GenericObjectForm::clear_data_input_stream_attribute_template
+        ${pattern_name}
         if (self.get_${var_name}_metadata().is_read_only() or
                 self.get_${var_name}_metadata().is_required()):
             raise errors.NoAccess('Sorry you cannot clear ${var_name}')
@@ -347,7 +347,7 @@ class GenericCatalogForm(object):
     }
 
     init_template = """
-    # From: templates/osid_form.py::GenericCatalogForm::init_template
+    ${pattern_name}
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, **kwargs):

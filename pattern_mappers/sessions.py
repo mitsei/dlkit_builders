@@ -1402,7 +1402,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_search') and
                 method['return_type'] == 'boolean'):
 
-            pattern = 'resource.ResourceQuerySession.can_search_resources'
+            pattern = 'osid_session.GenericObjectQuerySession.can_search_objects'
 
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern=pattern,
@@ -1419,7 +1419,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_by_query')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceQuerySession.get_resources_by_query',
+                pattern='osid_session.GenericObjectQuerySession.get_objects_by_query',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1435,7 +1435,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_query')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceQuerySession.get_resource_query',
+                pattern='osid_session.GenericObjectQuerySession.get_object_query',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1481,7 +1481,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_by_search')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceSearchSession.get_resources_by_search',
+                pattern='osid_session.GenericObjectSearchSession.get_objects_by_search',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1499,7 +1499,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_search_order')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceSearchSession.get_resource_search_order',
+                pattern='osid_session.GenericObjectSearchSession.get_object_search_order',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1513,7 +1513,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_search')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceSearchSession.get_resource_search',
+                pattern='osid_session.GenericObjectSearchSession.get_object_search',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1527,7 +1527,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_query_from_inspector')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceSearchSession.get_resource_query_from_inspector',
+                pattern='osid_session.GenericObjectSearchSession.get_object_query_from_inspector',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1557,10 +1557,10 @@ def map_session_patterns(interface, package, index):
                 method['name'].endswith('_with_record_types') and
                 method['return_type'] == 'boolean'):
 
-            pattern = 'resource.ResourceAdminSession.can_create_resource_with_record_types'
+            pattern = 'osid_session.GenericObjectAdminSession.can_create_object_with_record_types'
 
             if interface['shortname'].startswith(index['package_catalog_caps']):
-                pattern = 'resource.BinAdminSession.can_create_bin_with_record_types'
+                pattern = 'osid_session.GenericCatalogAdminSession.can_create_catalog_with_record_types'
 
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern=pattern,
@@ -1576,13 +1576,13 @@ def map_session_patterns(interface, package, index):
         # Session methods that return an authn hint for a given object id.
         # NOTE: This needs to be looked at more carefully.  There are a number
         # of kinds of situations in the osids where authn hints are provided
-        # for an Id for aparently various reasons.
+        # for an Id for apparently various reasons.
         elif (interface['shortname'].endswith('AdminSession') and
                 method['name'].startswith('can_update_') and
                 method['return_type'] == 'boolean' and
                 'osid.id.Id' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='authentication.AgentAdminSession.can_update_agent',
+                pattern='osid_session.GenericObjectAdminSession.can_update_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1596,10 +1596,10 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_create_') and
                 method['return_type'] == 'boolean'):
 
-            pattern = 'resource.ResourceAdminSession.can_create_resources'
+            pattern = 'osid_session.GenericObjectAdminSession.can_create_objects'
 
             if interface['shortname'].startswith(index['package_catalog_caps']):
-                pattern = 'resource.BinAdminSession.can_create_bins'
+                pattern = 'osid_session.GenericCatalogAdminSession.can_create_catalogs'
 
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern=pattern,
@@ -1616,10 +1616,10 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_update_') and
                 method['return_type'] == 'boolean'):
 
-            pattern = 'resource.ResourceAdminSession.can_update_resources'
+            pattern = 'osid_session.GenericObjectAdminSession.can_update_objects'
 
             if interface['shortname'].startswith(index['package_catalog_caps']):
-                pattern = 'resource.BinAdminSession.can_update_bins'
+                pattern = 'osid_session.GenericCatalogAdminSession.can_update_catalogs'
 
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern=pattern,
@@ -1636,10 +1636,10 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_delete_') and
                 method['return_type'] == 'boolean'):
 
-            pattern = 'resource.ResourceAdminSession.can_delete_resources'
+            pattern = 'osid_session.GenericObjectAdminSession.can_delete_objects'
 
             if interface['shortname'].startswith(index['package_catalog_caps']):
-                pattern = 'resource.BinAdminSession.can_delete_bins'
+                pattern = 'osid_session.GenericCatalogAdminSession.can_delete_catalogs'
 
             index[interface['shortname'] + '.' + method['name']] = dict(
                 pattern=pattern,
@@ -1657,7 +1657,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].endswith('_aliases') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceAdminSession.can_manage_resource_aliases',
+                pattern='osid_session.GenericObjectAdminSession.can_manage_object_aliases',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1675,7 +1675,7 @@ def map_session_patterns(interface, package, index):
                 method['args'][0]['arg_type'] == 'osid.id.Id' and
                 method['args'][0]['var_name'].split('_')[0] in index['package_objects_under']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ActivityAdminSession.get_activity_form_for_create',
+                pattern='osid_session.GenericObjectAdminSession.get_subjugated_object_form_for_create',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1698,7 +1698,7 @@ def map_session_patterns(interface, package, index):
                 method['args'][0]['arg_type'] == 'osid.id.Id' and
                 method['args'][1]['arg_type'] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='relationship.RelationshipAdminSession.get_relationship_form_for_create',
+                pattern='osid_session.GenericRelationshipAdminSession.get_relationship_form_for_create',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1713,7 +1713,7 @@ def map_session_patterns(interface, package, index):
                             arg2_name=method['args'][2]['var_name'],
                             arg2_type_full=method['args'][2]['arg_type']))
 
-        # ObjectAdminSession get_x_form_for_create methods that draw relatioships between two
+        # ObjectAdminSession get_x_form_for_create methods that draw relationships between two
         # osid objects where one object ids is included as the first parameter.
         elif (interface['shortname'].endswith('AdminSession') and
                 method['name'][4:-16] in index['package_relationships_under'] and
@@ -1722,7 +1722,7 @@ def map_session_patterns(interface, package, index):
                 len(method['args']) == 2 and
                 method['args'][0]['arg_type'] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='commenting.CommentAdminSession.get_comment_form_for_create',
+                pattern='osid_session.GenericRelationshipAdminSession.get_relationship_form_for_create_for_agent',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1740,7 +1740,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_form_for_create')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceAdminSession.get_resource_form_for_create',
+                pattern='osid_session.GenericObjectAdminSession.get_object_form_for_create',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1770,7 +1770,7 @@ def map_session_patterns(interface, package, index):
                  method['name'] == 'create_question') and
                 len(method['args']) > 0):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetAdminSession.create_asset_content',
+                pattern='osid_session.GenericDependentObjectAdminSession.create_dependent_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1794,7 +1794,7 @@ def map_session_patterns(interface, package, index):
                 method['args'][0]['arg_type'] = 'assessment.AssessmentOfferedForm'
 
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceAdminSession.create_resource',
+                pattern='osid_session.GenericObjectAdminSession.create_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1825,7 +1825,7 @@ def map_session_patterns(interface, package, index):
                  method['name'] == 'get_answer_form_for_update' or
                  method['name'] == 'get_question_form_for_update')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetAdminSession.get_asset_content_form_for_update',
+                pattern='osid_session.GenericDependentObjectAdminSession.get_dependent_object_form_for_update',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1843,7 +1843,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_form_for_update')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceAdminSession.get_resource_form_for_update',
+                pattern='osid_session.GenericObjectAdminSession.get_object_form_for_update',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1872,7 +1872,7 @@ def map_session_patterns(interface, package, index):
                  method['name'] == 'update_answer' or
                  method['name'] == 'update_question')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetAdminSession.update_asset_content',
+                pattern='osid_session.GenericDependentObjectAdminSession.update_dependent_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1891,7 +1891,7 @@ def map_session_patterns(interface, package, index):
                 camel_to_under((method['arg_types'][0]).split('.')[-1]) ==
                 method['name'][7:] + '_form'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceAdminSession.update_resource',
+                pattern='osid_session.GenericObjectAdminSession.update_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1909,7 +1909,7 @@ def map_session_patterns(interface, package, index):
                 camel_to_under((method['arg_types'][1]).split('.')[-1]) ==
                 method['name'][7:] + '_form'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceAdminSession.update_resource',
+                pattern='osid_session.GenericObjectAdminSession.update_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1932,7 +1932,7 @@ def map_session_patterns(interface, package, index):
                 camel_to_under(interface['shortname'][:-12]) == method['name'][7:] and
                 'osid.id.Id' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveAdminSession.delete_objective',
+                pattern='osid_session.GenericRequisiteObjectAdminSession.delete_requisite_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1954,7 +1954,7 @@ def map_session_patterns(interface, package, index):
                 (method['name'][7:] in index[interface['shortname'][:-12] + '.aggregate_data'] or
                  make_plural(method['name'][7:]) in index[interface['shortname'][:-12] + '.aggregate_data'])):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetAdminSession.delete_asset_content',
+                pattern='osid_session.GenericDependentObjectAdminSession.delete_dependent_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1972,7 +1972,7 @@ def map_session_patterns(interface, package, index):
                 camel_to_under(interface['shortname'][:-12]) == method['name'][7:] and
                 'osid.id.Id' in method['arg_types']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceAdminSession.delete_resource',
+                pattern='osid_session.GenericObjectAdminSession.delete_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -1988,7 +1988,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('delete_') and
                 camel_to_under(interface['shortname'][:-12]) == remove_plural(method['name'][7:])):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ProficiencyAdminSession.delete_proficiencies',
+                pattern='osid_session.GenericObjectAdminSession.delete_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2001,7 +2001,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('alias_') and
                 camel_to_under(interface['shortname'][:-12]) == method['name'][6:]):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceAdminSession.alias_resource',
+                pattern='osid_session.GenericObjectAdminSession.alias_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2019,7 +2019,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_hierarchy_id')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_subject_hierarchy_id',
+                pattern='osid_session.GenericObjectHierarchySession.get_object_hierarchy_id',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2033,7 +2033,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_hierarchy')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_subject_hierarchy',
+                pattern='osid_session.GenericObjectHierarchySession.get_object_hierarchy',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2051,7 +2051,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_access') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.can_access_subject_hierarchy',
+                pattern='osid_session.GenericObjectHierarchySession.can_access_object_hierarchy',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2065,7 +2065,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_root_') and
                 method['name'].endswith('_ids')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_root_subject_ids',
+                pattern='osid_session.GenericObjectHierarchySession.get_root_object_ids',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2078,7 +2078,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('HierarchySession') and
                 method['name'].startswith('get_root_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_root_subjects',
+                pattern='osid_session.GenericObjectHierarchySession.get_root_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2093,7 +2093,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('has_parent_') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.has_parent_subjects',
+                pattern='osid_session.GenericObjectHierarchySession.has_parent_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2109,7 +2109,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('is_parent_of') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.is_parent_of_subject',
+                pattern='osid_session.GenericObjectHierarchySession.is_parent_of_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2125,7 +2125,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_parent_') and
                 method['name'].endswith('_ids')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_parent_subject_ids',
+                pattern='osid_session.GenericObjectHierarchySession.get_parent_object_ids',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2139,7 +2139,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('HierarchySession') and
                 method['name'].startswith('get_parent_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_parent_subjects',
+                pattern='osid_session.GenericObjectHierarchySession.get_parent_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2155,7 +2155,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('is_ancestor_of') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.is_ancestor_of_subject',
+                pattern='osid_session.GenericObjectHierarchySession.is_ancestor_of_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2172,7 +2172,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('has_child_') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.has_child_subjects',
+                pattern='osid_session.GenericObjectHierarchySession.has_child_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2188,7 +2188,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('is_child_of') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.is_child_of_subject',
+                pattern='osid_session.GenericObjectHierarchySession.is_child_of_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2204,7 +2204,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_child_') and
                 method['name'].endswith('_ids')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_child_subject_ids',
+                pattern='osid_session.GenericObjectHierarchySession.get_child_object_ids',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2218,7 +2218,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('HierarchySession') and
                 method['name'].startswith('get_child_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_child_subjects',
+                pattern='osid_session.GenericObjectHierarchySession.get_child_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2234,7 +2234,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('is_descendant_of') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.is_descendant_of_subject',
+                pattern='osid_session.GenericObjectHierarchySession.is_descendant_of_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2250,7 +2250,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_node_ids')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_subject_node_ids',
+                pattern='osid_session.GenericObjectHierarchySession.get_object_node_ids',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2268,7 +2268,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 method['name'].endswith('_nodes')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchySession.get_subject_nodes',
+                pattern='osid_session.GenericObjectHierarchySession.get_object_nodes',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2290,7 +2290,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_modify') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchyDesignSession.can_modify_subject_hierarchy',
+                pattern='osid_session.GenericObjectHierarchyDesignSession.can_modify_object_hierarchy',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=True, object_name=interface['shortname'][:-22]))
 
@@ -2298,7 +2298,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('HierarchyDesignSession') and
                 method['name'].startswith('add_root_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchyDesignSession.add_root_subject',
+                pattern='osid_session.GenericObjectHierarchyDesignSession.add_root_object',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=False, object_name=interface['shortname'][:-22], arg_count=1))
 
@@ -2306,7 +2306,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('HierarchyDesignSession') and
                 method['name'].startswith('remove_root_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchyDesignSession.remove_root_subject',
+                pattern='osid_session.GenericObjectHierarchyDesignSession.remove_root_object',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=False, object_name=interface['shortname'][:-22], arg_count=1))
 
@@ -2314,7 +2314,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('HierarchyDesignSession') and
                 method['name'].startswith('add_child_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchyDesignSession.add_child_subject',
+                pattern='osid_session.GenericObjectHierarchyDesignSession.add_child_object',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=False, object_name=interface['shortname'][:-22], arg_count=2))
 
@@ -2323,7 +2323,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('remove_child_') and
                 len(method['args']) == 2):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchyDesignSession.remove_child_subject',
+                pattern='osid_session.GenericObjectHierarchyDesignSession.remove_child_object',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=False, object_name=interface['shortname'][:-22], arg_count=2))
 
@@ -2332,7 +2332,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('remove_child_') and
                 len(method['args']) == 1):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='ontology.SubjectHierarchyDesignSession.remove_child_subjects',
+                pattern='osid_session.GenericObjectHierarchyDesignSession.remove_child_objects',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=False, object_name=interface['shortname'][:-22], arg_count=1))
 
@@ -2345,7 +2345,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_register_for_') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.BinNotificationSession.can_register_for_bin_notifications',
+                pattern='osid_session.GenericCatalogNotificationSession.can_register_for_catalog_notifications',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2362,7 +2362,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_register_for_') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.can_register_for_resource_notifications',
+                pattern='osid_session.GenericObjectNotificationSession.can_register_for_object_notifications',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2374,7 +2374,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('NotificationSession') and
                 method['name'].startswith('acknowledge_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.acknowledge_resource_notification',
+                pattern='osid_session.GenericObjectNotificationSession.acknowledge_object_notification',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2391,7 +2391,7 @@ def map_session_patterns(interface, package, index):
                  (method['name'].startswith('register_for') and method['name'].endswith('by_genus_type'))) and
                 len(method['args']) == 1):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.register_for_changed_resource',
+                pattern='osid_session.GenericObjectNotificationSession.register_for_changed_object',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2404,7 +2404,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('NotificationSession') and
                 method['name'].startswith('register_for_new_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.register_for_new_resources',
+                pattern='osid_session.GenericObjectNotificationSession.register_for_new_objects',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2416,7 +2416,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('NotificationSession') and
                 method['name'].startswith('register_for_changed_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.register_for_changed_resources',
+                pattern='osid_session.GenericObjectNotificationSession.register_for_changed_objects',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2430,7 +2430,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('register_for_deleted_') and
                 len(method['args']) == 1):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.register_for_deleted_resource',
+                pattern='osid_session.GenericObjectNotificationSession.register_for_deleted_object',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2443,7 +2443,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('NotificationSession') and
                 method['name'].startswith('register_for_deleted_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.register_for_deleted_resources',
+                pattern='osid_session.GenericObjectNotificationSession.register_for_deleted_objects',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2464,7 +2464,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinSession.can_lookup_resource_bin_mappings',
+                pattern='osid_session.GenericObjectCatalogSession.can_lookup_object_catalog_mappings',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2482,7 +2482,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinSession.get_resource_ids_by_bin',
+                pattern='osid_session.GenericObjectCatalogSession.get_object_ids_by_catalog',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2501,7 +2501,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinSession.get_resources_by_bin',
+                pattern='osid_session.GenericObjectCatalogSession.get_objects_by_catalog',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2520,7 +2520,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinSession.get_resource_ids_by_bins',
+                pattern='osid_session.GenericObjectCatalogSession.get_object_ids_by_catalogs',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2539,7 +2539,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinSession.get_resources_by_bins',
+                pattern='osid_session.GenericObjectCatalogSession.get_objects_by_catalogs',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2558,7 +2558,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinSession.get_bin_ids_by_resource',
+                pattern='osid_session.GenericObjectCatalogSession.get_catalog_ids_by_object',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2577,7 +2577,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinSession.get_bins_by_resource',
+                pattern='osid_session.GenericObjectCatalogSession.get_catalogs_by_object',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2600,7 +2600,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinAssignmentSession.can_assign_resources',
+                pattern='osid_session.GenericObjectCatalogAssignmentSession.can_assign_objects',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2618,7 +2618,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinAssignmentSession.can_assign_resources_to_bin',
+                pattern='osid_session.GenericObjectCatalogAssignmentSession.can_assign_objects_to_catalog',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2637,7 +2637,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinAssignmentSession.get_assignable_bin_ids',
+                pattern='osid_session.GenericObjectCatalogAssignmentSession.get_assignable_catalog_ids',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2656,7 +2656,7 @@ def map_session_patterns(interface, package, index):
             if object_name_ == '':
                 object_name_ = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinAssignmentSession.get_assignable_bin_ids_for_resource',
+                pattern='osid_session.GenericObjectCatalogAssignmentSession.get_assignable_catalog_ids_for_object',
                 kwargs=make_twargs(
                     index,
                     package,
@@ -2674,7 +2674,7 @@ def map_session_patterns(interface, package, index):
             if object_name == '':
                 object_name = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinAssignmentSession.assign_resource_to_bin',
+                pattern='osid_session.GenericObjectCatalogAssignmentSession.assign_object_to_catalog',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2691,7 +2691,7 @@ def map_session_patterns(interface, package, index):
             if object_name == '':
                 object_name = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinAssignmentSession.unassign_resource_from_bin',
+                pattern='osid_session.GenericObjectCatalogAssignmentSession.unassign_object_from_catalog',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2708,7 +2708,7 @@ def map_session_patterns(interface, package, index):
             if object_name == '':
                 object_name = 'Id'
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceBinAssignmentSession.reassign_resource_to_bin',
+                pattern='osid_session.GenericObjectCatalogAssignmentSession.reassign_object_to_catalog',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2718,7 +2718,7 @@ def map_session_patterns(interface, package, index):
                                    arg_count=3))
 
         ##################################################################
-        #  Inspect this package's HierarchyDesignSession methods.       ##
+        #  Inspect this package's ObjectRequisiteSession methods.       ##
         ##################################################################
 
         # ObjectRequisiteSession methods that return an authorization hint.
@@ -2726,7 +2726,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_lookup_') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteSession.can_lookup_objective_prerequisites',
+                pattern='osid_session.GenericRelationshipLookupSession.can_lookup_object_prerequisites',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=True, object_name=interface['shortname'][:-22]))
 
@@ -2734,7 +2734,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('RequisiteSession') and
                 method['name'].startswith('get_requisite_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteSession.get_requisite_objectives',
+                pattern='osid_session.GenericRelationshipLookupSession.get_requisite_objects',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=True, object_name=interface['shortname'][:-16], arg_count=1))
 
@@ -2742,7 +2742,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('RequisiteSession') and
                 method['name'].startswith('get_all_requisite_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteSession.get_all_requisite_objectives',
+                pattern='osid_session.GenericRelationshipLookupSession.get_all_requisite_objects',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=True, object_name=interface['shortname'][:-16], arg_count=1))
 
@@ -2750,7 +2750,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('RequisiteSession') and
                 method['name'].startswith('get_dependent_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteSession.get_dependent_objectives',
+                pattern='osid_session.GenericRelationshipLookupSession.get_dependent_objects',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=True, object_name=interface['shortname'][:-16], arg_count=1))
 
@@ -2760,7 +2760,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('is_') and
                 method['name'].endswith('_required')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteSession.is_objective_required',
+                pattern='osid_session.GenericRelationshipLookupSession.is_object_required',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=True, object_name=interface['shortname'][:-16], arg_count=2))
 
@@ -2769,7 +2769,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('RequisiteSession') and
                 method['name'].startswith('get_equivalent_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteSession.get_equivalent_objectives',
+                pattern='osid_session.GenericRelationshipLookupSession.get_equivalent_objects',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=True, object_name=interface['shortname'][:-16], arg_count=1))
 
@@ -2782,7 +2782,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_assign') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteAssignmentSession.can_assign_requisites',
+                pattern='osid_session.GenericRelationshipAdminSession.can_assign_requisites',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=True, object_name=interface['shortname'][:-26]))
 
@@ -2791,7 +2791,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('assign_') and
                 method['name'].endswith('_requisite')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteAssignmentSession.assign_objective_requisite',
+                pattern='osid_session.GenericRelationshipAdminSession.assign_object_requisite',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=False, object_name=interface['shortname'][:-26], arg_count=2))
 
@@ -2800,7 +2800,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('unassign_') and
                 method['name'].endswith('_requisite')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteAssignmentSession.unassign_objective_requisite',
+                pattern='osid_session.GenericRelationshipAdminSession.unassign_object_requisite',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=False, object_name=interface['shortname'][:-26], arg_count=2))
 
@@ -2808,7 +2808,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('RequisiteAssignmentSession') and
                 method['name'].startswith('assign_equivalent_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteAssignmentSession.assign_equivalent_objective',
+                pattern='osid_session.GenericRelationshipAdminSession.assign_equivalent_object',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=False, object_name=interface['shortname'][:-26], arg_count=2))
 
@@ -2816,7 +2816,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'].endswith('RequisiteAssignmentSession') and
                 method['name'].startswith('unassign_equivalent_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='learning.ObjectiveRequisiteAssignmentSession.unassign_equivalent_objective',
+                pattern='osid_session.GenericRelationshipAdminSession.unassign_equivalent_object',
                 kwargs=make_twargs(index, package, interface, method,
                                    rtype=False, object_name=interface['shortname'][:-26], arg_count=2))
 
@@ -2830,7 +2830,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_access_') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetCompositionSession.can_access_asset_compositions',
+                pattern='osid_session.GenericObjectContainableSession.can_access_object_containables',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2845,7 +2845,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 '_by_' in method['name']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetCompositionSession.get_compositions_by_asset',
+                pattern='osid_session.GenericObjectContainableSession.get_containables_by_object',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2861,7 +2861,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('get_') and
                 is_containable_name_in_method_name(index, method['name'])):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetCompositionSession.get_composition_assets',
+                pattern='osid_session.GenericObjectContainableSession.get_containable_objects',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2881,7 +2881,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('can_') and
                 method['return_type'] == 'boolean'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetCompositionDesignSession.can_compose_assets',
+                pattern='osid_session.GenericObjectContainableDesignSession.can_compose_objects',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2895,7 +2895,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
                 method['name'].startswith('add_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetCompositionDesignSession.add_asset',
+                pattern='osid_session.GenericObjectContainableDesignSession.add_object_to_containable',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2912,7 +2912,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('move_') and
                 method['name'].endswith('_ahead')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetCompositionDesignSession.move_asset_ahead',
+                pattern='osid_session.GenericObjectContainableDesignSession.move_object_ahead',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2928,7 +2928,7 @@ def map_session_patterns(interface, package, index):
                 method['name'].startswith('move_') and
                 method['name'].endswith('_behind')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetCompositionDesignSession.move_asset_behind',
+                pattern='osid_session.GenericObjectContainableDesignSession.move_object_behind',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2943,7 +2943,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
                 method['name'].startswith('order_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetCompositionDesignSession.order_assets',
+                pattern='osid_session.GenericObjectContainableDesignSession.order_objects',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2959,7 +2959,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
                 method['name'].startswith('remove_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='repository.AssetCompositionDesignSession.remove_asset',
+                pattern='osid_session.GenericObjectContainableDesignSession.remove_object',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,
@@ -2978,7 +2978,7 @@ def map_session_patterns(interface, package, index):
         elif (method['name'] == 'get_' + index['package_catalog_under'] + '_id' and
                 method['return_type'] == 'osid.id.Id'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceLookupSession.get_bin_id',
+                pattern='osid_session.GenericObjectLookupSession.get_catalog_id',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -2990,7 +2990,7 @@ def map_session_patterns(interface, package, index):
         elif (method['name'].startswith('use_comparative') and
                 method['name'].endswith(index['package_catalog_under'] + '_view')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.BinLookupSession.use_comparative_bin_view',
+                pattern='osid_session.GenericCatalogLookupSession.use_comparative_catalog_view',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -3002,7 +3002,7 @@ def map_session_patterns(interface, package, index):
         elif (method['name'].startswith('use_plenary') and
                 method['name'].endswith(index['package_catalog_under'] + '_view')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.BinLookupSession.use_plenary_bin_view',
+                pattern='osid_session.GenericCatalogLookupSession.use_plenary_catalog_view',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -3013,7 +3013,7 @@ def map_session_patterns(interface, package, index):
         # Session methods that set comparative object views.
         elif method['name'].startswith('use_comparative'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceLookupSession.use_comparative_resource_view',
+                pattern='osid_session.GenericObjectLookupSession.use_comparative_object_view',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -3024,7 +3024,7 @@ def map_session_patterns(interface, package, index):
         # Session methods that set plenary object views.
         elif method['name'].startswith('use_plenary'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceLookupSession.use_plenary_resource_view',
+                pattern='osid_session.GenericObjectLookupSession.use_plenary_object_view',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -3036,7 +3036,7 @@ def map_session_patterns(interface, package, index):
         elif (method['name'].startswith('use_federated') and
                 method['name'].endswith(index['package_catalog_under'] + '_view')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceLookupSession.use_federated_bin_view',
+                pattern='osid_session.GenericObjectLookupSession.use_federated_catalog_view',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -3048,7 +3048,7 @@ def map_session_patterns(interface, package, index):
         elif (method['name'].startswith('use_isolated') and
                 method['name'].endswith(index['package_catalog_under'] + '_view')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceLookupSession.use_isolated_bin_view',
+                pattern='osid_session.GenericObjectLookupSession.use_isolated_catalog_view',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -3059,7 +3059,7 @@ def map_session_patterns(interface, package, index):
         # Session methods that set reliable notifications.
         elif method['name'].startswith('reliable'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.reliable_resource_notifications',
+                pattern='osid_session.GenericObjectNotificationSession.reliable_object_notifications',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -3070,7 +3070,7 @@ def map_session_patterns(interface, package, index):
         # Session methods that set unreliable notifications.
         elif method['name'].startswith('unreliable'):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceNotificationSession.unreliable_resource_notifications',
+                pattern='osid_session.GenericObjectNotificationSession.unreliable_object_notifications',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],

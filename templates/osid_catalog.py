@@ -11,7 +11,7 @@ class GenericCatalogNode(object):
     init_template = {
         'python': {
             'json': """
-    # From: templates/osid_catalog.py::GenericCatalogNode::init_template
+    ${pattern_name}
     def __init__(self, node_map, runtime=None, proxy=None, lookup_session=None):
         osid_objects.OsidNode.__init__(self, node_map)
         self._lookup_session = lookup_session
@@ -36,7 +36,7 @@ class GenericCatalogNode(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_catalog.py::GenericCatalogNode::get_catalog_template
+        ${pattern_name}
         if self._lookup_session is None:
             mgr = get_provider_manager('${package_name_upper}', runtime=self._runtime, proxy=self._proxy)
             self._lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=getattr(self, "_proxy", None))
@@ -49,7 +49,7 @@ class GenericCatalogNode(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_catalog.py::GenericCatalogNode::get_parent_catalog_nodes_template
+        ${pattern_name}
         parent_${object_name_under}_nodes = []
         for node in self._my_map['parentNodes']:
             parent_${object_name_under}_nodes.append(${object_name}Node(
@@ -66,7 +66,7 @@ class GenericCatalogNode(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_catalog.py::GenericCatalogNode::get_child_catalog_nodes_template
+        ${pattern_name}
         parent_${object_name_under}_nodes = []
         for node in self._my_map['childNodes']:
             parent_${object_name_under}_nodes.append(${object_name}Node(
@@ -91,7 +91,7 @@ class GenericCatalog(object):
     init_template = {
         'python': {
             'json': """
-    # From: templates/osid_catalog.py::GenericCatalog::init_template
+    ${pattern_name}
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, **kwargs):

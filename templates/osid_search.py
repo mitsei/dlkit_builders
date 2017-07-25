@@ -14,7 +14,7 @@ class GenericObjectSearch(object):
     init_template = {
         'python': {
             'json': """
-    # From: templates/osid_search.py::GenericObjectSearch::init_template
+    ${pattern_name}
     def __init__(self, runtime):
         self._namespace = '${pkg_name}.${object_name}'
         self._runtime = runtime
@@ -34,7 +34,7 @@ class GenericObjectSearch(object):
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_search.py::GenericObjectSearch::search_among_objects_template
+        ${pattern_name}
         self._id_list = ${arg0_name}"""
         }
     }
@@ -55,7 +55,7 @@ class GenericObjectSearchResults(object):
     init_template = {
         'python': {
             'json': """
-    # From: templates/osid_search.py::GenericObjectSearchResults::init_template
+    ${pattern_name}
     def __init__(self, results, query_terms, runtime):
         # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
         # self._results = [r for r in results]
@@ -72,7 +72,7 @@ class GenericObjectSearchResults(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_search.py::GenericObjectSearchResults::get_objects_template
+        ${pattern_name}
         if self.retrieved:
             raise errors.IllegalState('List has already been retrieved.')
         self.retrieved = True
@@ -85,7 +85,7 @@ class GenericObjectSearchResults(object):
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_search.py::GenericObjectSearchResults::get_object_query_inspector_template
+        ${pattern_name}
         return queries.${return_type}(self._query_terms, runtime=self._runtime)"""
         }
     }

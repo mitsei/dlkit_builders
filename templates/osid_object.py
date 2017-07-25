@@ -15,7 +15,7 @@ class GenericObject(object):
     init_template = {
         'python': {
             'json': """
-    # From: templates/osid_object.py::GenericObject::init_template
+    ${pattern_name}
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, **kwargs):
@@ -30,7 +30,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::is_attribute_boolean_template
+        ${pattern_name}
         return bool(self._my_map['${var_name_mixed}'])"""
         }
     }
@@ -40,7 +40,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::is_object_based_object_template
+        ${pattern_name}
         return bool(self._my_map['${var_name}Ids'])"""
         }
     }
@@ -50,7 +50,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::can_attribute_boolean_template
+        ${pattern_name}
         if self._my_map['${var_name_mixed}'] is None:
             raise errors.IllegalState()
         else:
@@ -63,7 +63,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::has_id_attribute_template
+        ${pattern_name}
         return bool(self._my_map['${var_name_mixed}Id'])"""
         }
     }
@@ -73,7 +73,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_id_attribute_template
+        ${pattern_name}
         if not bool(self._my_map['${var_name_mixed}Id']):
             raise errors.IllegalState('${var_name} not set')
         else:
@@ -86,7 +86,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_id_attribute_object_template
+        ${pattern_name}
         if not bool(self._my_map['${var_name_mixed}Id']):
             raise errors.IllegalState('this ${object_name} has no ${var_name}')
         mgr = self._get_provider_manager('${return_pkg_caps}')
@@ -104,7 +104,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_object_record_template
+        ${pattern_name}
         return self._get_record(${arg0_name})"""
         }
     }
@@ -114,7 +114,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::has_simple_attribute_template
+        ${pattern_name}
         try:
             return bool(self._my_map['${var_name_mixed}'])
         except KeyError:
@@ -128,7 +128,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_display_text_attribute_template
+        ${pattern_name}
         return DisplayText(display_text_map=self._my_map['${var_name_mixed}'])"""
         }
     }
@@ -140,7 +140,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_string_attribute_template
+        ${pattern_name}
         if not self.has_${var_name}():
             raise errors.IllegalState('${var_name} not set')
         return self._my_map['${var_name_mixed}']"""
@@ -152,7 +152,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_decimal_attribute_template
+        ${pattern_name}
         if not self.has_${var_name}():
             raise errors.IllegalState('${var_name} not set')
         return Decimal(str(self._my_map['${var_name_mixed}']))"""
@@ -166,7 +166,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_cardinal_attribute_template
+        ${pattern_name}
         if not self.has_${var_name}():
             raise errors.IllegalState('${var_name} not set')
         return int(self._my_map['${var_name_mixed}'])"""
@@ -182,7 +182,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_date_time_attribute_template
+        ${pattern_name}
         if not self.has_${var_name}():
             raise errors.IllegalState('${var_name} not set')
         dt = self._my_map['${var_name_mixed}']
@@ -197,7 +197,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_duration_attribute_template
+        ${pattern_name}
         if not self.has_${var_name}():
             raise errors.IllegalState('${var_name} not set')
         return Duration(**self._my_map['${var_name_mixed}'])"""
@@ -211,7 +211,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_id_list_attribute_same_package_template
+        ${pattern_name}
         id_list = []
         for ${var_name} in self.get_${var_name_plural}():
             id_list.append(${var_name}.get_id())
@@ -224,7 +224,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_id_list_attribute_different_package_template
+        ${pattern_name}
         return IdList(self._my_map['${var_name_mixed}Ids'])"""
         }
     }
@@ -234,7 +234,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_initialized_id_attribute_template
+        ${pattern_name}
         return Id(self._my_map['${var_name_mixed}Id'])"""
         }
     }
@@ -244,7 +244,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_aggregated_objects_template
+        ${pattern_name}
         return ${aggregated_object_name}List(
             self._my_map['${var_name_plural_mixed}'],
             runtime=self._runtime,
@@ -262,7 +262,7 @@ ${instance_initers}"""
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        # From: templates/osid_object.py::GenericObject::get_id_list_objects_different_package_template
+        ${pattern_name}
         if not bool(self._my_map['${var_name_singular_mixed}Ids']):
             raise errors.IllegalState('no ${var_name_singular_mixed}Ids')
         mgr = self._get_provider_manager('${return_pkg_caps}')
