@@ -1,12 +1,20 @@
 
 class GradeEntryAdminSession:
 
-    import_statements = [
-        'from dlkit.abstract_osid.id.primitives import Id as ABCId',
-        'from dlkit.abstract_osid.type.primitives import Type as ABCType'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.id.primitives import Id as ABCId',
+                'from dlkit.abstract_osid.type.primitives import Type as ABCType'
+            ]
+        }
+    }
 
-    get_grade_entry_form_for_create = """
+    get_grade_entry_form_for_create = {
+        'python': {
+            'json': """
+    def ${method_name}(self, gradebook_column_id, resource_id, grade_entry_record_types):
+        ${doc_string}
         if not isinstance(gradebook_column_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
         if not isinstance(resource_id, ABCId):
@@ -39,8 +47,14 @@ class GradeEntryAdminSession:
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
+        }
+    }
 
-    get_grade_entry_form_for_update = """
+    get_grade_entry_form_for_update = {
+        'python': {
+            'json': """
+    def ${method_name}(self, grade_entry_id):
+        ${doc_string}
         collection = JSONClientValidated('grading',
                                          collection='GradeEntry',
                                          runtime=self._runtime)
@@ -59,12 +73,18 @@ class GradeEntryAdminSession:
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
+        }
+    }
 
 
 class GradeSystem:
-    import_statements_pattern = [
-        'from decimal import Decimal',
-    ]
+    import_statements_pattern = {
+        'python': {
+            'json': [
+                'from decimal import Decimal',
+            ]
+        }
+    }
 
     # get_lowest_numeric_score_template = """
     #     # Implemented from template for osid.grading.GradeSystem.get_lowest_numeric_score_template
@@ -75,31 +95,51 @@ class GradeSystem:
 
     # But the real implementations need to check is_based_on_grades():
     # So overwrite the templated version
-    get_lowest_numeric_score = """
+    get_lowest_numeric_score = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
         if self._my_map['lowestNumericScore'] is None:
             return None
         else:
             return Decimal(str(self._my_map['lowestNumericScore']))"""
+        }
+    }
 
-    get_highest_numeric_score = """
+    get_highest_numeric_score = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
         if self._my_map['highestNumericScore'] is None:
             return None
         else:
             return Decimal(str(self._my_map['highestNumericScore']))"""
+        }
+    }
 
-    get_numeric_score_increment = """
+    get_numeric_score_increment = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if self.is_based_on_grades():
             raise errors.IllegalState('This GradeSystem is based on grades')
         if self._my_map['numericScoreIncrement'] is None:
             return None
         else:
             return Decimal(str(self._my_map['numericScoreIncrement']))"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_object_map(self):
         obj_map = dict(self._my_map)
         obj_map['grades'] = []
@@ -108,22 +148,44 @@ class GradeSystem:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 class GradeEntry:
 
-    import_statements = [
-        'from dlkit.primordium.id.primitives import Id',
-        'from ..resource.simple_agent import Agent',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.primordium.id.primitives import Id',
+                'from ..resource.simple_agent import Agent',
+            ]
+        }
+    }
 
-    get_key_resource_id = """
+    get_key_resource_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return Id(self._my_map['resourceId'])"""
+        }
+    }
 
-    get_key_resource = """
+    get_key_resource = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return Agent(self.get_key_resource_id())"""
+        }
+    }
 
-    get_time_graded = """
+    get_time_graded = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.is_graded() or self.is_derived():
             raise errors.IllegalState()
         time_graded = self._my_map['timeGraded']
@@ -135,45 +197,89 @@ class GradeEntry:
             minute=time_graded.minute,
             second=time_graded.second,
             microsecond=time_graded.microsecond)"""
+        }
+    }
 
-    is_graded = """
+    is_graded = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return bool(self._my_map['gradeId'] != '' or self._my_map['score'] is not None)"""
+        }
+    }
 
-    get_grading_agent_id = """
+    get_grading_agent_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.is_graded or self.is_derived():
             raise errors.IllegalState()
         return Id(self._my_map['gradingAgentId'])"""
+        }
+    }
 
-    get_grading_agent = """
+    get_grading_agent = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return Agent(self.get_grading_agent_id())"""
+        }
+    }
 
-    overrides_calculated_entry = """
+    overrides_calculated_entry = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return bool(self._my_map['overriddenCalculatedEntryId'])"""
+        }
+    }
 
-    get_overridden_calculated_entry_id = """
+    get_overridden_calculated_entry_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.overrides_calculated_entry():
             raise errors.IllegalState()
         return self._my_map['overriddenCalculatedEntryId']"""
+        }
+    }
 
-    get_grade = """
+    get_grade = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         grade_system = self.get_gradebook_column().get_grade_system()
 
         for grade in grade_system.get_grades():
             if str(grade.ident) == self._my_map['gradeId']:
                 return grade
         raise errors.IllegalState('gradeId does not exist in this GradeSystem')"""
+        }
+    }
 
 
 class GradeEntryForm:
 
-    import_statements = [
-        'from dlkit.primordium.id.primitives import Id',
-        'from dlkit.primordium.calendaring.primitives import DateTime',
-        'from ..utilities import now_map',
-        'from decimal import Decimal'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.calendaring.primitives import DateTime',
+                'from ..utilities import now_map',
+                'from decimal import Decimal'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'grading.GradeEntry'
 
     def __init__(self, **kwargs):
@@ -225,10 +331,15 @@ class GradeEntryForm:
         self._my_map['assignedGradebookIds'] = [str(kwargs['gradebook_id'])]
         self._my_map['derived'] = False  # This is probably not persisted data
         self._my_map['timeGraded'] = None
-        self._my_map['overriddenCalculatedEntryId'] = ''  # This will soon do something different
-"""
+        self._my_map['overriddenCalculatedEntryId'] = ''  # This will soon do something different"""
+        }
+    }
 
-    set_grade = """
+    set_grade = {
+        'python': {
+            'json': """
+    def ${method_name}(self, grade_id):
+        ${doc_string}
         if not self._grade_system.is_based_on_grades():
             raise errors.InvalidArgument()
         if self.get_grade_metadata().is_read_only():
@@ -240,8 +351,14 @@ class GradeEntryForm:
         self._my_map['gradeId'] = str(grade_id)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
         self._my_map['timeGraded'] = DateTime.utcnow()"""
+        }
+    }
 
-    clear_grade = """
+    clear_grade = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self._grade_system.is_based_on_grades():
             return  # do nothing, spec does not raise error
         if (self.get_grade_metadata().is_read_only() or
@@ -250,8 +367,14 @@ class GradeEntryForm:
         self._my_map['gradeId'] = self._grade_default
         self._my_map['gradingAgentId'] = ''
         self._my_map['timeGraded'] = None"""
+        }
+    }
 
-    set_score = """
+    set_score = {
+        'python': {
+            'json': """
+    def ${method_name}(self, score):
+        ${doc_string}
         if self._grade_system.is_based_on_grades():
             raise errors.InvalidArgument()
         if self.get_score_metadata().is_read_only():
@@ -266,8 +389,14 @@ class GradeEntryForm:
         self._my_map['score'] = float(score)
         self._my_map['gradingAgentId'] = str(self._effective_agent_id)
         self._my_map['timeGraded'] = DateTime.utcnow()"""
+        }
+    }
 
-    clear_score = """
+    clear_score = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if self._grade_system.is_based_on_grades():
             return  # do nothing, spec does not raise error
         if (self.get_score_metadata().is_read_only() or
@@ -276,45 +405,76 @@ class GradeEntryForm:
         self._my_map['score'] = self._score_default
         self._my_map['gradingAgentId'] = ''
         self._my_map['timeGraded'] = None"""
+        }
+    }
 
 
 class GradeEntryQuery:
-    match_gradebook_column_id = """
+    match_gradebook_column_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, gradebook_column_id):
+        ${doc_string}
         self._add_match('gradebookColumnId',
                         str(gradebook_column_id),
-                        match)
-    """
+                        match)"""
+        }
+    }
 
 
 class GradebookColumnLookupSession:
-    import_statements = [
-        'from .objects import GradebookColumnSummary',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from .objects import GradebookColumnSummary',
+            ]
+        }
+    }
 
-    supports_summary = """
+    supports_summary = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Not yet:
         return False"""
+        }
+    }
 
-    get_gradebook_column_summary = """
+    get_gradebook_column_summary = {
+        'python': {
+            'json': """
+    def ${method_name}(self, gradebook_column_id):
+        ${doc_string}
         gradebook_column = self.get_gradebook_column(gradebook_column_id)
         summary_map = gradebook_column._my_map
         summary_map['gradebookColumnId'] = str(gradebook_column.ident)
         return GradebookColumnSummary(osid_object_map=summary_map,
                                       runtime=self._runtime,
                                       proxy=self._proxy)"""
+        }
+    }
 
 
 class GradebookColumnAdminSession:
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def _has_entries(self, gradebook_column_id):
         grading_manager = self._get_provider_manager('GRADING')
         gels = grading_manager.get_grade_entry_lookup_session(proxy=getattr(self, "_proxy", None))
         gels.use_federated_gradebook_view()
         entries = gels.get_grade_entries_for_gradebook_column(gradebook_column_id)
         return entries.available() > 0"""
+        }
+    }
 
-    delete_gradebook_column = """
+    delete_gradebook_column = {
+        'python': {
+            'json': """
+    def ${method_name}(self, gradebook_column_id):
+        ${doc_string}
         if not isinstance(gradebook_column_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
 
@@ -335,10 +495,15 @@ class GradebookColumnAdminSession:
         objects.GradebookColumn(osid_object_map=gradebook_column_map,
                                 runtime=self._runtime,
                                 proxy=self._proxy)._delete()
-        collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})
-        """
+        collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})"""
+        }
+    }
 
-    update_gradebook_column = """
+    update_gradebook_column = {
+        'python': {
+            'json': """
+    def ${method_name}(self, gradebook_column_form):
+        ${doc_string}
         collection = JSONClientValidated('grading',
                                          collection='GradebookColumn',
                                          runtime=self._runtime)
@@ -369,20 +534,28 @@ class GradebookColumnAdminSession:
         return objects.GradebookColumn(
             osid_object_map=gradebook_column_form._my_map,
             runtime=self._runtime,
-            proxy=self._proxy)
-        """
+            proxy=self._proxy)"""
+        }
+    }
 
 
 class GradebookColumnQuery:
 
-    match_grade_system_id = """
-        self._add_match('gradeSystemId', str(grade_system_id), bool(match))
-    """
+    match_grade_system_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, grade_system_id, match):
+        ${doc_string}
+        self._add_match('gradeSystemId', str(grade_system_id), bool(match))"""
+        }
+    }
 
 
 class GradeSystemAdminSession:
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def _has_columns(self, grade_system_id):
         grading_manager = self._get_provider_manager('GRADING')
         gcqs = grading_manager.get_gradebook_column_query_session(proxy=self._proxy)
@@ -391,8 +564,14 @@ class GradeSystemAdminSession:
         querier.match_grade_system_id(grade_system_id, match=True)
         columns = gcqs.get_gradebook_columns_by_query(querier)
         return columns.available() > 0"""
+        }
+    }
 
-    delete_grade_system = """
+    delete_grade_system = {
+        'python': {
+            'json': """
+    def ${method_name}(self, grade_system_id):
+        ${doc_string}
         collection = JSONClientValidated('grading',
                                          collection='GradeSystem',
                                          runtime=self._runtime)
@@ -408,19 +587,26 @@ class GradeSystemAdminSession:
         objects.GradeSystem(osid_object_map=grade_system_map,
                             runtime=self._runtime,
                             proxy=self._proxy)._delete()
-        collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})
-        """
+        collection.delete_one({'_id': ObjectId(grade_system_id.get_identifier())})"""
+        }
+    }
 
 
 class GradebookColumnSummary:
-    import_statements = [
-        'import numpy as np',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'import numpy as np',
+            ]
+        }
+    }
 
     # Note: self._catalog_name = 'Gradebook below is currently
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # gradebookId element and may be removed someday
-    init = """
+    init = {
+        'python': {
+            'json': """
     _record_type_data_sets = {}
     _namespace = 'grading.GradebookColumnSummary'
 
@@ -450,29 +636,69 @@ class GradebookColumnSummary:
             return [e.get_grade().get_output_score() for e in self._entries if e.is_graded()]
         else:
             return [e.get_score() for e in self._entries if e.is_graded()]"""
+        }
+    }
 
-    get_mean = """
+    get_mean = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return np.mean(self._entry_scores)"""
+        }
+    }
 
-    get_median = """
+    get_median = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return np.median(self._entry_scores)"""
+        }
+    }
 
-    get_mode = """
+    get_mode = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # http://stackoverflow.com/questions/10797819/finding-the-mode-of-a-list-in-python
         return max(set(self._entry_scores), key=self._entry_scores.count)"""
+        }
+    }
 
-    get_rms = """
+    get_rms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return np.sqrt(np.mean(np.square(self._entry_scores)))"""
+        }
+    }
 
-    get_standard_deviation = """
+    get_standard_deviation = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return np.std(self._entry_scores)"""
+        }
+    }
 
-    get_sum = """
+    get_sum = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return sum(self._entry_scores)"""
+        }
+    }
 
 
 class GradebookColumnSummaryQuery:
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, runtime):
         self._namespace = 'grading.GradebookColumnSummaryQuery'
         self._runtime = runtime
@@ -482,3 +708,5 @@ class GradebookColumnSummaryQuery:
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
         osid_queries.OsidRuleQuery.__init__(self, runtime)"""
+        }
+    }

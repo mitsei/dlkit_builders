@@ -1,16 +1,22 @@
 
 class HierarchyTraversalSession:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from ..primitives import Type',
-        'from ..osid.sessions import OsidSession',
-        'from . import objects',
-        'from ..id.objects import IdList',
-        'from ..utilities import convert_catalog_id_to_object_id_string'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from ..primitives import Type',
+                'from ..osid.sessions import OsidSession',
+                'from . import objects',
+                'from ..id.objects import IdList',
+                'from ..utilities import convert_catalog_id_to_object_id_string'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _session_namespace = 'hierarchy.HierarchyTraversalSession'
 
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
@@ -77,67 +83,127 @@ class HierarchyTraversalSession:
                                        display_label=display_label,
                                        description=description,
                                        domain=domain)"""
+        }
+    }
 
-    can_access_hierarchy = """
+    can_access_hierarchy = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
+        }
+    }
 
-    get_roots = """
+    get_roots = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         id_list = []
         for r in self._rls.get_relationships_by_genus_type_for_source(self._phantom_root_id, self._relationship_type):
             id_list.append(r.get_destination_id())
         return IdList(id_list)"""
+        }
+    }
 
-    has_parents = """
+    has_parents = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_):
+        ${doc_string}
         if self.get_parents(id_).available() == 0:
             return False
         return True"""
+        }
+    }
 
-    is_parent = """
+    is_parent = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_, parent_id):
+        ${doc_string}
         return bool(self._rls.get_relationships_by_genus_type_for_peers(
             parent_id,
             id_,
             self._relationship_type).available())"""
+        }
+    }
 
-    get_parents = """
+    get_parents = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_):
+        ${doc_string}
         id_list = []
         for r in self._rls.get_relationships_by_genus_type_for_destination(id_, self._relationship_type):
             ident = r.get_source_id()
             if ident != self._phantom_root_id:
                 id_list.append(ident)
         return IdList(id_list)"""
+        }
+    }
 
-    is_ancestor = """
+    is_ancestor = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_, ancestor_id):
+        ${doc_string}
         raise errors.Unimplemented()"""
+        }
+    }
 
-    has_children = """
+    has_children = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_):
+        ${doc_string}
         if self.get_children(id_).available() == 0:
             return False
         return True"""
+        }
+    }
 
-    is_child = """
+    is_child = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_, child_id):
+        ${doc_string}
         return bool(self._rls.get_relationships_by_genus_type_for_peers(
             id_,
             child_id,
             self._relationship_type).available())"""
+        }
+    }
 
-    get_children = """
+    get_children = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_):
+        ${doc_string}
         id_list = []
         for r in self._rls.get_relationships_by_genus_type_for_source(id_, self._relationship_type):
             id_list.append(r.get_destination_id())
         return IdList(id_list)"""
-
-    is_descendent = """
-        raise errors.Unimplemented()"""
-
-    get_nodes_arg_template = {
-        1: 10,  # ancestor_levels,
-        2: 10,  # descendant_levels
-        3: False  # include_siblings
+        }
     }
 
-    get_nodes = """
+    is_descendent = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_, descendant_id):
+        ${doc_string}
+        raise errors.Unimplemented()"""
+        }
+    }
+
+    get_nodes = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_, ancestor_levels=10, descendant_levels=10, include_siblings=False):
+        ${doc_string}
         # This impl ignores include_siblings, assumes false
         include_siblings = bool(include_siblings)
         parent_node_list = []
@@ -155,20 +221,28 @@ class HierarchyTraversalSession:
                              'root': not self.has_parents(id_),
                              'leaf': not self.has_children(id_),
                              'sequestered': False})"""
+        }
+    }
 
 
 class HierarchyDesignSession:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from ..primitives import Type',
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..osid.sessions import OsidSession',
-        'from ..id.objects import IdList',
-        'from ..utilities import convert_catalog_id_to_object_id_string'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from ..primitives import Type',
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..osid.sessions import OsidSession',
+                'from ..id.objects import IdList',
+                'from ..utilities import convert_catalog_id_to_object_id_string'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _session_namespace = 'hierarchy.HierarchyDesignSession'
 
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
@@ -233,19 +307,37 @@ class HierarchyDesignSession:
                                        display_label=display_label,
                                        description=description,
                                        domain=domain)"""
+        }
+    }
 
-    can_modify_hierarchy = """
+    can_modify_hierarchy = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
+        }
+    }
 
-    add_root = """
+    add_root = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_):
+        ${doc_string}
         if (bool(self._rls.get_relationships_by_genus_type_for_source(id_, self._relationship_type).available()) or
                 bool(self._rls.get_relationships_by_genus_type_for_destination(id_, self._relationship_type).available())):
             raise errors.AlreadyExists()
         self._assign_as_root(id_)"""
+        }
+    }
 
-    add_child = """
+    add_child = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_, child_id):
+        ${doc_string}
         if bool(self._rls.get_relationships_by_genus_type_for_peers(id_, child_id, self._relationship_type).available()):
             raise errors.AlreadyExists()
         rfc = self._ras.get_relationship_form_for_create(id_, child_id, [])
@@ -253,28 +345,50 @@ class HierarchyDesignSession:
         rfc.set_description(self._relationship_type.get_display_name().get_text() + ' relationship for parent: ' + str(id_) + ' and child: ' + str(child_id))
         rfc.set_genus_type(self._relationship_type)
         self._ras.create_relationship(rfc)"""
+        }
+    }
 
-    remove_root = """
+    remove_root = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_):
+        ${doc_string}
         result = self._rls.get_relationships_by_genus_type_for_peers(self._phantom_root_id, id_, self._relationship_type)
         if not bool(result.available()):
             raise errors.NotFound()
         self._ras.delete_relationship(result.get_next_relationship().get_id())
         self._adopt_orphans(id_)"""
+        }
+    }
 
-    remove_child = """
+    remove_child = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_, child_id):
+        ${doc_string}
         result = self._rls.get_relationships_by_genus_type_for_peers(id_, child_id, self._relationship_type)
         if not bool(result.available()):
             raise errors.NotFound()
         self._ras.delete_relationship(result.get_next_relationship().get_id())"""
+        }
+    }
 
-    remove_children = """
+    remove_children = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_):
+        ${doc_string}
         results = self._rls.get_relationships_by_genus_type_for_source(id_, self._relationship_type)
         if results.available() == 0:
             raise errors.NotFound()
         for r in results:
             self._ras.delete_relationship(r.get_id())"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def _adopt_orphans(self, negligent_parent_id):
         \"\"\"Clean up orphaned children\"\"\"
         for child_id in self._hts.get_children(negligent_parent_id):
@@ -289,18 +403,30 @@ class HierarchyDesignSession:
         rfc.set_description(self._relationship_type.get_display_name().get_text() + ' relationship for implicit root and child: ' + str(id_))
         rfc.set_genus_type(self._relationship_type)
         self._ras.create_relationship(rfc)"""
+        }
+    }
 
 
 class HierarchyAdminSession:
-    import_statements = [
-        'from ..utilities import JSONClientValidated'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..utilities import JSONClientValidated'
+            ]
+        }
+    }
 
-    delete_hierarchy_import_templates = [
-        'from dlkit.abstract_osid.id.primitives import Id as ABCId'
-    ]
+    delete_hierarchy_import_templates = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.id.primitives import Id as ABCId'
+            ]
+        }
+    }
 
-    delete_hierarchy = """
+    delete_hierarchy = {
+        'python': {
+            'json': """
         collection = JSONClientValidated('hierarchy',
                                          collection='Hierarchy',
                                          runtime=self._runtime)
@@ -310,27 +436,49 @@ class HierarchyAdminSession:
         # Should we delete the underlying Relationship Family here???
 
         collection.delete_one({'_id': ObjectId(hierarchy_id.get_identifier())})"""
+        }
+    }
 
 
 class Hierarchy:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
 
 class HierarchyQuery:
 
-    import_statements = [
-        'from ..osid.osid_errors import Unimplemented',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..osid.osid_errors import Unimplemented',
+            ]
+        }
+    }
 
 
 class Node:
 
-    get_parents = """
+    get_parents = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return NodeList(self._my_map['parentNodes'])"""
+        }
+    }
 
-    get_children = """
+    get_children = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return NodeList(self._my_map['childNodes'])"""
+        }
+    }

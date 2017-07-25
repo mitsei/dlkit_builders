@@ -1,6 +1,3 @@
-from .resource import ResourceAdminSession
-
-
 # class RelationshipLookupSession:
 
 # import_statements_pattern = [
@@ -200,19 +197,19 @@ from .resource import ResourceAdminSession
 #         return obj_form"""
 
 
-class Relationship:
-
-    import_statements = [
-        'from ..primitives import Id'
-    ]
-
-    # get_source_id_template = """
-    #     # Implemented from template for osid.relationship.Relationship.get_source_id
-    #     return Id(self._my_map['${var_name_mixed}Id'])"""
-
-
-class RelationshipQuery:
-
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors'
-    ]
+# class Relationship:
+#
+#     import_statements = [
+#         'from ..primitives import Id'
+#     ]
+#
+#     # get_source_id_template = """
+#     #     # Implemented from template for osid.relationship.Relationship.get_source_id
+#     #     return Id(self._my_map['${var_name_mixed}Id'])"""
+#
+#
+# class RelationshipQuery:
+#
+#     import_statements = [
+#         'from dlkit.abstract_osid.osid import errors'
+#     ]

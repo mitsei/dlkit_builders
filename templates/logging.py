@@ -1,13 +1,19 @@
 class LoggingSession:
 
-    import_statements = [
-        'from ..primitives import *',
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import objects',
-        'from ..osid.sessions import OsidSession'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import *',
+                'from dlkit.abstract_osid.osid import errors',
+                'from . import objects',
+                'from ..osid.sessions import OsidSession'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         OsidSession.__init__(self)
         self._catalog_class = objects.Log
@@ -18,25 +24,49 @@ class LoggingSession:
         self._leas = lm.get_log_entry_admin_session_for_log(self._catalog_id, proxy=self._proxy)
         self._lels = lm.get_log_entry_lookup_session_for_log(self._catalog_id, proxy=self._proxy)
         self._content_types = lm.get_content_types()"""
+        }
+    }
 
-    can_log = """
+    can_log = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True"""
+        }
+    }
 
-    log = """
+    log = {
+        'python': {
+            'json': """
+    def ${method_name}(self, content, content_type):
+        ${doc_string}
         if content_type not in self._content_types:
             raise errors.Unsupported()
-        lefc = self._leas.get_content_form_for_create([])
-        lefc.set_timestamp(DateTime.utcnow())"""
+        lefc = self._leas.get_content_form_for_create([content_type])
+        lefc.set_timestamp(DateTime.utcnow())
+        lefc.set_content(content)
+        self._leas.create_log_entry(lefc)"""
+        }
+    }
 
 
 class LogEntryAdminSession:
-    import_statements_pattern = [
-        'from ..primitives import DateTime'
-    ]
+    import_statements_pattern = {
+        'python': {
+            'json': [
+                'from ..primitives import DateTime'
+            ]
+        }
+    }
 
-    create_log_entry = """
+    create_log_entry = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         collection = JSONClientValidated('logging',
                                          collection='LogEntry',
                                          runtime=self._runtime)
@@ -65,14 +95,20 @@ class LogEntryAdminSession:
             proxy=self._proxy)
 
         return result"""
+        }
+    }
 
 
 class LogEntry:
 
-    import_statements_pattern = [
-        'from ..primitives import *',
-        'from ..osid.osid_errors import *',
-    ]
+    import_statements_pattern = {
+        'python': {
+            'json': [
+                'from ..primitives import *',
+                'from ..osid.osid_errors import *',
+            ]
+        }
+    }
 
     # get_priority_template = """
     #     # Implemented from template for osid.logging.LogEntry.get_priority
@@ -81,13 +117,27 @@ class LogEntry:
     #     else:
     #         return Id(self._my_map['${var_name_mixed}Id'])"""
 
-    get_resource_id = """
+    get_resource_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         raise errors.Unimplemented()"""
+        }
+    }
 
-    get_resource = """
+    get_resource = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         raise errors.Unimplemented()"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_object_map(self):
         obj_map = dict(self._my_map)
         if obj_map['timestamp'] is not None:
@@ -106,17 +156,25 @@ class LogEntry:
         return obj_map
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 class LogEntryForm:
 
-    import_statements_pattern = [
-        'from ..primitives import *',
-        'from ..osid.osid_errors import *',
-        'import datetime'
-    ]
+    import_statements_pattern = {
+        'python': {
+            'json': [
+                'from ..primitives import *',
+                'from ..osid.osid_errors import *',
+                'import datetime'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, **kwargs):
         osid_objects.OsidObjectForm.__init__(self, object_name='LOG_ENTRY', **kwargs)
         self._mdata = default_mdata.get_log_entry_mdata()
@@ -137,8 +195,16 @@ class LogEntryForm:
         self._my_map['timestamp'] = self._timestamp_default
         self._my_map['assignedLogIds'] = [str(kwargs['log_id'])]
         self._my_map['agentId'] = self._agent_default"""
+        }
+    }
 
 
 class LogEntryQuery:
-    match_agent_id = """
+    match_agent_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, agent_id, match):
+        ${doc_string}
         self._add_match("agentId", str(agent_id), match)"""
+        }
+    }

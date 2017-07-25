@@ -15,7 +15,9 @@
 class RepositoryManager:
     # This is here temporarily until Tom adds missing methods to RepositoryManager
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     @utilities.arguments_not_none
     def get_asset_composition_session_for_repository(self, repository_id):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
@@ -48,12 +50,16 @@ class RepositoryManager:
 
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         return sessions.AssetContentLookupSession(repository_id, runtime=self._runtime)  # pylint: disable=no-member"""
+        }
+    }
 
 
 class RepositoryProxyManager:
     # This is here temporarily until Tom adds missing methods to RepositoryProxyManager
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     @utilities.arguments_not_none
     def get_asset_composition_session_for_repository(self, repository_id, proxy):
         # This impl is temporary until Tom adds missing methods to RepositoryProxyManager in spec
@@ -86,11 +92,15 @@ class RepositoryProxyManager:
 
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         return sessions.AssetContentLookupSession(catalog_id=repository_id, proxy=proxy, runtime=self._runtime)  # pylint: disable=no-member"""
+        }
+    }
 
 
 class AssetLookupSession:
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     # def get_asset_content(self, asset_content_id):
     #     collection = JSONClientValidated('repository',
     #                                      collection='Asset',
@@ -456,6 +466,8 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
                  **self._view_filter()))
         asset_content_maps = [ac for ac in result['assetContents'] if ac['genusTypeId'] == str(asset_content_genus_type)]
         return objects.AssetContentList(asset_content_maps, runtime=self._runtime, proxy=self._proxy)"""
+        }
+    }
 
 
 class AssetAdminSession:
@@ -707,7 +719,7 @@ class AssetAdminSession:
     #     self._sequestered_view = UNSEQUESTERED"""
 
 
-class CompositionQuerySession:
+# class CompositionQuerySession:
 
     # import_statements = [
     #     'ACTIVE = 0',
@@ -745,18 +757,22 @@ class CompositionQuerySession:
     #         view_filter['sequestered'] = False
     #     return view_filter"""
 
-    old_use_sequestered_composition_view = """ #NOW TEMPLATED FROM LOOKUP SESSION
-        self._sequestered_view = SEQUESTERED"""
-
-    old_use_unsequestered_composition_view = """ #NOW TEMPLATED LOOKUP SESSION
-        self._sequestered_view = UNSEQUESTERED"""
+    # old_use_sequestered_composition_view = """ #NOW TEMPLATED FROM LOOKUP SESSION
+    #     self._sequestered_view = SEQUESTERED"""
+    #
+    # old_use_unsequestered_composition_view = """ #NOW TEMPLATED LOOKUP SESSION
+    #     self._sequestered_view = UNSEQUESTERED"""
 
 
 class CompositionSearchSession:
 
-    import_statements = [
-        'from . import searches',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from . import searches',
+            ]
+        }
+    }
 
 
 # class AssetCompositionSession:
@@ -1030,16 +1046,22 @@ class CompositionSearchSession:
 
 class Asset:
 
-    import_statements = [
-        'from ..primitives import DisplayText',
-        'from ..id.objects import IdList',
-        'from ..osid.markers import Extensible'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import DisplayText',
+                'from ..id.objects import IdList',
+                'from ..osid.markers import Extensible'
+            ]
+        }
+    }
 
     # Note: self._catalog_name = 'Repository' below is currently
     # only for osid.OsidObject.get_object_map() setting the now deprecated
     # repositoryId element and may be removed someday
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'repository.Asset'
 
     def __init__(self, **kwargs):
@@ -1055,6 +1077,8 @@ class Asset:
             except AttributeError:
                 raise AttributeError()
         # HOW TO PASS TO EXTENSIBLE!!!!"""
+        }
+    }
 
     # get_title_template = """
     #     # Implemented from template for osid.repository.Asset.get_title_template
@@ -1079,13 +1103,27 @@ class Asset:
     #         ${aggregated_object_name_under}._delete()
     #     osid_objects.OsidObject._delete(self)"""
 
-    is_composition = """
+    is_composition = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return bool(self._my_map['compositionId'])"""
+        }
+    }
 
-    is_copyright_status_known = """
+    is_copyright_status_known = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return bool(self._my_map['copyright']['text'])"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_object_map(self):
         obj_map = dict(self._my_map)
         obj_map['assetContent'] = obj_map['assetContents'] = [ac.object_map
@@ -1094,6 +1132,8 @@ class Asset:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 # class AssetSearch:
@@ -1144,18 +1184,26 @@ class Asset:
 
 class AssetSearchSession:
 
-    import_statements = [
-        'from . import searches',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from . import searches',
+            ]
+        }
+    }
 
 
 class AssetContent:
 
-    import_statements = [
-        'import gridfs',
-        'from ..primitives import DataInputStream',
-        'from ..utilities import JSONClientValidated'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'import gridfs',
+                'from ..primitives import DataInputStream',
+                'from ..utilities import JSONClientValidated'
+            ]
+        }
+    }
 
     # has_url_template = """
     #     # Implemented from template for osid.repository.AssetContent.has_url_template
@@ -1170,15 +1218,23 @@ class AssetContent:
     #         raise errors.IllegalState()
     #     return self._my_map['${var_name_mixed}']"""
 
-    get_data = """
+    get_data = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not bool(self._my_map['data']):
             raise errors.IllegalState('no data')
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
         filesys = gridfs.GridFS(dbase)
         return DataInputStream(filesys.get(self._my_map['data']))"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def _delete(self):
         dbase = JSONClientValidated('repository',
                                     runtime=self._runtime).raw()
@@ -1192,19 +1248,29 @@ class AssetContent:
             if self._my_map['data'] and filesys.exists(self._my_map['data']):
                 filesys.delete(self._my_map['data'])
         osid_objects.OsidObject._delete(self)"""
+        }
+    }
 
 
 class AssetContentForm:
 
-    import_statements = [
-        'import base64',
-        'import gridfs',
-        'from ..primitives import DataInputStream',
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..utilities import JSONClientValidated'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'import base64',
+                'import gridfs',
+                'from ..primitives import DataInputStream',
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..utilities import JSONClientValidated'
+            ]
+        }
+    }
 
-    set_data = """
+    set_data = {
+        'python': {
+            'json': """
+    def ${method_name}(self, data):
+        ${doc_string}
         if data is None:
             raise errors.NullArgument('data cannot be None')
         if not isinstance(data, DataInputStream):
@@ -1215,8 +1281,14 @@ class AssetContentForm:
         self._my_map['data'] = filesys.put(data._my_data)
         data._my_data.seek(0)
         self._my_map['base64'] = base64.b64encode(data._my_data.read())"""
+        }
+    }
 
-    clear_data = """
+    clear_data = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_data_metadata().is_read_only() or
                 self.get_data_metadata().is_required()):
             raise errors.NoAccess()
@@ -1228,6 +1300,8 @@ class AssetContentForm:
         filesys.delete(self._my_map['data'])
         self._my_map['data'] = self._data_default
         del self._my_map['base64']"""
+        }
+    }
 
 
 class Composition:
@@ -1235,13 +1309,21 @@ class Composition:
     # This two methods are defined here because of an inconsistency with
     # Naming conventions.  The pattern mapper expected get_child_ids.  The second
     # should otherwise come from the template for learning.Activity.get_asset_ids
-    get_children_ids = """
+    get_children_ids = {
+        'pythohn': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return IdList(self._my_map['childIds'])
 
     def get_child_ids(self):
         return self.get_children_ids()"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_object_map(self):
         obj_map = dict(self._my_map)
         if 'assetIds' in obj_map:
@@ -1249,11 +1331,15 @@ class Composition:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 class CompositionForm:
     # per Tom Coppeto. We are moving composition design to the CompositionForm
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_children_metadata(self):
         \"\"\"Gets the metadata for children.
 
@@ -1303,28 +1389,66 @@ class CompositionForm:
         self._my_map['childIds'] = self._children_default
 
     children = property(fset=set_children, fdel=clear_children)"""
+        }
+    }
 
 
 class CompositionQuery:
-    match_containing_composition_id = """
+    match_containing_composition_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, composition_id, match):
+        ${doc_string}
         # I'm not sure this does what the spec says it should do...
         #   I think it should look at a hierarchy of compositions.
         self._add_match('_id', composition_id.identifier, match)"""
+        }
+    }
 
-    clear_containing_composition_id_terms = """
+    clear_containing_composition_id_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._clear_terms('_id')"""
+        }
+    }
 
-    match_contained_composition_id = """
+    match_contained_composition_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, composition_id, match):
+        ${doc_string}
         self._add_match('childIds', str(composition_id), match)"""
+        }
+    }
 
-    clear_contained_composition_id_terms = """
+    clear_contained_composition_id_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._clear_terms('childIds')"""
+        }
+    }
 
-    match_asset_id = """
+    match_asset_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, asset_id, match):
+        ${doc_string}
         self._add_match('assetIds', str(asset_id), match)"""
+        }
+    }
 
-    clear_asset_id_terms = """
+    clear_asset_id_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._clear_terms('assetIds')"""
+        }
+    }
 
 
 class CompositionAdminSession:
@@ -1407,7 +1531,11 @@ class CompositionAdminSession:
 
 
 class CompositionRepositorySession:
-    get_repository_ids_by_composition = """
+    get_repository_ids_by_composition = {
+        'python': {
+            'json': """
+    def ${method_name}(self, composition_id):
+        ${doc_string}
         mgr = self._get_provider_manager('REPOSITORY', local=True)
         lookup_session = mgr.get_composition_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_repository_view()
@@ -1418,10 +1546,14 @@ class CompositionRepositorySession:
             for idstr in composition._my_map['assignedRepositoryIds']:
                 id_list.append(Id(idstr))
         return IdList(id_list)"""
+        }
+    }
 
 
 class AssetQuerySession:
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_asset_content_query(self):
         return queries.AssetContentQuery(runtime=self._runtime)
 
@@ -1493,3 +1625,5 @@ class AssetQuerySession:
         return objects.AssetContentList(matching_asset_contents,
                                         runtime=self._runtime,
                                         proxy=self._proxy)"""
+        }
+    }

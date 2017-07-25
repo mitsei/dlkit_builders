@@ -1,22 +1,42 @@
 
 class TypeProfile:
 
-    supports_type_lookup = """
+    supports_type_lookup = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         from . import profile
         return 'supports_type_lookup' in profile.SUPPORTS"""
+        }
+    }
 
-    supports_type_admin = """
+    supports_type_admin = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         from . import profile
         return 'supports_type_admin' in profile.SUPPORTS"""
+        }
+    }
 
 
 class TypeManager:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors'
+            ]
+        }
+    }
 
-    get_type_lookup_session = """
+    get_type_lookup_session = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.supports_type_lookup():
             raise errors.Unimplemented()
         try:
@@ -28,8 +48,14 @@ class TypeManager:
         except AttributeError:
             raise errors.OperationFailed()
         return session"""
+        }
+    }
 
-    get_type_admin_session = """
+    get_type_admin_session = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.supports_type_admin():
             raise errors.Unimplemented()
         try:
@@ -41,16 +67,24 @@ class TypeManager:
         except AttributeError:
             raise errors.OperationFailed()
         return session"""
+        }
+    }
 
 
 class TypeLookupSession:
 
-    import_statements = [
-        'from .primitives import Type',
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from .primitives import Type',
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, *args, **kwargs):
         from pymongo import MongoClient
         from ..osid.sessions import OsidSession
@@ -58,31 +92,53 @@ class TypeLookupSession:
         OsidSession.__init__(self, *args, **kwargs)
         client = MongoClient()
         self._db = client['type']"""
+        }
+    }
 
-    can_lookup_types = """
+    can_lookup_types = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return True"""
+        }
+    }
 
-    get_type = """
+    get_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         from .primitives import Type
         collection = self._db['Type']
-        result = collection.find_one({'$and': [{'namespace': namespace},
+        result = collection.find_one({'$$and': [{'namespace': namespace},
                                                {'identifier': identifier},
                                                {'authority': authority}]})
         if result is None:
             raise errors.NotFound()
         return Type(result)"""
+        }
+    }
 
-    get_types = """
+    get_types = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         from .objects import TypeList
         collection = self._db['Type']
         result = collection.find()
         count = collection.count()
         return TypeList(result, count)"""
+        }
+    }
 
 
 class TypeAdminSession:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_identifier = None, *args, **kwargs):
         from pymongo import MongoClient
         from ..osid.sessions import OsidSession
@@ -90,18 +146,30 @@ class TypeAdminSession:
         self._forms = dict()
         client = MongoClient()
         self._db = client['type']"""
+        }
+    }
 
-    can_create_types = """
+    can_create_types = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return True"""
+        }
+    }
 
-    get_type_form_for_create = """
+    get_type_form_for_create = {
+        'python': {
+            'json': """
+    def ${method_name}(self, type_):
+        ${doc_string}
         from dlkit.abstract_osid.type.primitives import Type as ABCType
         from .objects import TypeForm
         collection = self._db['Type']
         CREATED = True
         if not isinstance(type_, ABCType):
             raise errors.InvalidArgument('argument is not a Type')
-        result = collection.find_one({'$and': [{'namespace': type_.get_identifier_namespace()},
+        result = collection.find_one({'$$and': [{'namespace': type_.get_identifier_namespace()},
                                                {'identifier': type_.get_identifier()},
                                                {'authority': type_.get_authority()}]})
         if result is not None:
@@ -110,8 +178,14 @@ class TypeAdminSession:
         form._for_update = False
         self._forms[form.get_id().get_identifier()] = not CREATED
         return form"""
+        }
+    }
 
-    create_type = """
+    create_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, type_form):
+        ${doc_string}
         from dlkit.abstract_osid.type.objects import TypeForm as ABCTypeForm
         collection = self._db['Type']
         CREATED = True
@@ -133,14 +207,32 @@ class TypeAdminSession:
         from .primitives import Type
         self._forms[type_form.get_id().get_identifier()] = CREATED
         return Type(collection.find_one({'_id': id_}))"""
+        }
+    }
 
-    can_update_types = """
+    can_update_types = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return True"""
+        }
+    }
 
-    can_update_type = """
+    can_update_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, type_):
+        ${doc_string}
         return True"""
+        }
+    }
 
-    get_type_form_for_update = """
+    get_type_form_for_update = {
+        'python': {
+            'json': """
+    def ${method_name}(self, type_):
+        ${doc_string}
         from dlkit.abstract_osid.type.primitives import Type as ABCType
         from .objects import TypeForm
         from .primitives import Type
@@ -148,7 +240,7 @@ class TypeAdminSession:
         UPDATED = True
         if not isinstance(type_, ABCType):
             return InvalidArgument('the argument is not a valid OSID Type')
-        result = collection.find_one({'$and': [{'namespace': type_.get_identifier_namespace()},
+        result = collection.find_one({'$$and': [{'namespace': type_.get_identifier_namespace()},
                                                {'identifier': type_.get_identifier()},
                                                {'authority': type_.get_authority()}]})
         if result is None:
@@ -156,8 +248,14 @@ class TypeAdminSession:
         type_form = TypeForm(type_=Type(result), update=True)
         self._forms[type_form.get_id().get_identifier()] = not UPDATED
         return type_form"""
+        }
+    }
 
-    update_type = """
+    update_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, type_form):
+        ${doc_string}
         from dlkit.abstract_osid.type.objects import TypeForm as ABCTypeForm
         collection = self._db['Type']
         UPDATED = True
@@ -177,14 +275,32 @@ class TypeAdminSession:
         except:  # what exceptions does mongodb save raise?
             raise errors.OperationFailed()
         self._forms[type_form.get_id().get_identifier()] = UPDATED"""
+        }
+    }
 
-    can_delete_types = """
+    can_delete_types = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return True"""
+        }
+    }
 
-    can_delete_type = """
+    can_delete_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, type_):
+        ${doc_string}
         return True"""
+        }
+    }
 
-    delete_type = """
+    delete_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, type_):
+        ${doc_string}
         from dlkit.abstract_osid.type.primitives import Type as ABCType
         from bson.objectid import ObjectId
         collection = self._db['Type']
@@ -198,6 +314,8 @@ class TypeAdminSession:
             raise errors.OperationFailed()
         if result['n'] == 0:
             raise errors.NotFound()"""
+        }
+    }
 
 
 class TypeForm:

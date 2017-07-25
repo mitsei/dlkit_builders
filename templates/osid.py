@@ -1,15 +1,21 @@
 
 class OsidProfile:
 
-    import_statements = [
-        'from . import profile',
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..primitives import Type',
-        'from ..utilities import set_json_client'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from . import profile',
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..primitives import Id',
+                'from ..primitives import Type',
+                'from ..utilities import set_json_client'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
 
     def __init__(self):
         self._runtime = None
@@ -21,27 +27,50 @@ class OsidProfile:
             raise errors.IllegalState('this manager has already been initialized.')
         self._runtime = runtime
         self._config = runtime.get_configuration()
-        set_json_client(runtime)
-"""
+        set_json_client(runtime)"""
+        }
+    }
 
-    get_id = """
+    get_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return Id(**profile.ID)"""
+        }
+    }
 
-    get_display_name = """
+    get_display_name = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return DisplayText(
             text=profile.DISPLAYNAME,
             language_type=Type(**profile.LANGUAGETYPE),
             script_type=Type(**profile.SCRIPTTYPE),
             format_type=Type(**profile.FORMATTYPE))"""
+        }
+    }
 
-    get_description = """
+    get_description = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return DisplayText(
             text=profile.DESCRIPTION,
             language_type=Type(**profile.LANGUAGETYPE),
             script_type=Type(**profile.SCRIPTTYPE),
             format_type=Type(**profile.FORMATTYPE))"""
+        }
+    }
 
-    get_version = """
+    get_version = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # THIS ALL NEEDS TO BE FIXED:
         # try:
         #    from ..installation.primitives import Version
@@ -55,12 +84,24 @@ class OsidProfile:
         #    components=profile.VERSIONCOMPONENTS,
         #    scheme=Type(**profile.VERSIONSCHEME))
         raise errors.Unimplemented()"""
+        }
+    }
 
-    get_release_date = """
+    get_release_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # NEED TO IMPLEMENT
         raise errors.Unimplemented()"""
+        }
+    }
 
-    supports_osid_version = """
+    supports_osid_version = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # THIS ALL NEEDS TO BE FIXED:
         # try:
         #    from ..installation.primitives import Version
@@ -74,54 +115,112 @@ class OsidProfile:
         #    components=profile.OSIDVERSION,
         #    scheme=Type(**profile.VERSIONSCHEME))
         raise errors.Unimplemented()"""
+        }
+    }
 
-    get_locales = """
+    get_locales = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # NEED TO IMPLEMENT
         raise errors.Unimplemented()"""
+        }
+    }
 
-    supports_journal_rollback = """
+    supports_journal_rollback = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Perhaps someday I will support journaling
         return False"""
+        }
+    }
 
-    supports_journal_branching = """
+    supports_journal_branching = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Perhaps someday I will support journaling
         return False"""
+        }
+    }
 
-    get_branch_id = """
+    get_branch_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Perhaps someday I will support journaling
         raise errors.Unimplemented()"""
+        }
+    }
 
-    get_branch = """
+    get_branch = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Perhaps someday I will support journaling
         raise errors.Unimplemented()"""
+        }
+    }
 
-    get_proxy_record_types = """
+    get_proxy_record_types = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # NEED TO IMPLEMENT
         raise errors.Unimplemented()"""
+        }
+    }
 
-    supports_proxy_record_type = """
+    supports_proxy_record_type = {
+        'python': {
+            'json': """
         # NEED TO IMPLEMENT
         raise errors.Unimplemented()"""
+        }
+    }
 
 
 class OsidManager:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import DisplayText',
-        'from pymongo import MongoClient',
-        'from .. import JSON_CLIENT',
-        'from dlkit.abstract_osid.proxy.rules import Proxy as abc_proxy',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..primitives import DisplayText',
+                'from pymongo import MongoClient',
+                'from .. import JSON_CLIENT',
+                'from dlkit.abstract_osid.proxy.rules import Proxy as abc_proxy',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self):
         OsidProfile.__init__(self)"""
+        }
+    }
 
-    initialize = """
+    initialize = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         OsidProfile._initialize_manager(self, runtime)"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def _proxy_in_args(self, *args, **kwargs):
         for arg in args:
             if isinstance(arg, abc_proxy):
@@ -130,41 +229,71 @@ class OsidManager:
             return True
         else:
             return False"""
+        }
+    }
 
 
 class OsidProxyManager:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self):
         OsidProfile.__init__(self)"""
+        }
+    }
 
-    initialize = """
+    initialize = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         OsidProfile._initialize_manager(self, runtime)"""
+        }
+    }
 
 
 class OsidRuntimeManager:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, configuration_key=None):
         self._configuration_key = configuration_key"""
+        }
+    }
 
 
 class Identifiable:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'osid.Identifiable'
 
     def __init__(self, runtime=None):
@@ -177,32 +306,51 @@ class Identifiable:
             self._authority = runtime.get_configuration().get_value_by_parameter(
                 authority_param_id).get_string_value()
         except (AttributeError, KeyError, errors.NotFound):
-            self._authority = 'ODL.MIT.EDU'
-"""
+            self._authority = 'ODL.MIT.EDU'"""
+        }
+    }
 
-    get_id = """
+    get_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return Id(
             identifier=str(self._my_map['_id']),
             namespace=self._namespace,
             authority=self._authority)"""
+        }
+    }
 
-    is_current = """
+    is_current = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Osid Objects in this implementation will immediately become stale.
         return False"""
+        }
+    }
 
 
 class Extensible:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from ..primitives import Type',
-        'from importlib import import_module',
-        'from ..utilities import get_provider_manager',
-        'from ..utilities import get_registry',
-        'from collections import OrderedDict'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from ..primitives import Type',
+                'from importlib import import_module',
+                'from ..utilities import get_provider_manager',
+                'from ..utilities import get_registry',
+                'from collections import OrderedDict'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
         self._records = OrderedDict()
         self._supported_record_type_ids = []
@@ -290,34 +438,65 @@ class Extensible:
                                     runtime=self._runtime,
                                     proxy=getattr(self, '_proxy', None),
                                     local=local)"""
+        }
+    }
 
-    has_record_type = """
+    has_record_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, record_type):
+        ${doc_string}
         return str(record_type) in self._supported_record_type_ids"""
+        }
+    }
 
-    get_record_types = """
+    get_record_types = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         from ..type.objects import TypeList
         type_list = []
         for type_idstr in self._supported_record_type_ids:
             type_list.append(Type(**self._record_type_data_sets[Id(type_idstr).get_identifier()]))
         return TypeList(type_list)"""
+        }
+    }
 
 
 class Temporal:
 
-    import_statements = [
-        'from ..primitives import DateTime',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import DateTime',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self):
-        self._my_map = {}
-"""
+        self._my_map = {}"""
+        }
+    }
 
-    is_effective = """
+    is_effective = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         now = DateTime.utcnow()
         return self.get_start_date() <= now and self.get_end_date() >= now"""
+        }
+    }
 
-    get_start_date = """
+    get_start_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         sdate = self._my_map['startDate']
         return DateTime(
             sdate.year,
@@ -327,8 +506,14 @@ class Temporal:
             sdate.minute,
             sdate.second,
             sdate.microsecond)"""
+        }
+    }
 
-    get_end_date = """
+    get_end_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         edate = self._my_map['endDate']
         return DateTime(
             edate.year,
@@ -338,40 +523,72 @@ class Temporal:
             edate.minute,
             edate.second,
             edate.microsecond)"""
+        }
+    }
 
 
 class Containable:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self):
         self._my_map = {}"""
+        }
+    }
 
-    is_sequestered = """
+    is_sequestered = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return self._my_map['sequestered']"""
+        }
+    }
 
 
 class Sourceable:
 
-    import_statements = [
-        'from dlkit.primordium.id.primitives import Id',
-        'from dlkit.primordium.locale.primitives import DisplayText',
-        'from .. import types'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.locale.primitives import DisplayText',
+                'from .. import types'
+            ]
+        }
+    }
 
-    get_provider_id = """
+    get_provider_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if 'providerId' not in self._my_map or not self._my_map['providerId']:
             raise errors.IllegalState('this sourceable object has no provider set')
         return Id(self._my_map['providerId'])"""
+        }
+    }
 
-    get_provider = """
+    get_provider = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if 'providerId' not in self._my_map or not self._my_map['providerId']:
             raise errors.IllegalState('this sourceable object has no provider set')
         mgr = self._get_provider_manager('RESOURCE')
         lookup_session = mgr.get_resource_lookup_session()  # What about the Proxy?
         lookup_session.use_federated_bin_view()
         return lookup_session.get_resource(self.get_provider_id())"""
+        }
+    }
 
-    get_branding_ids = """
+    get_branding_ids = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         from ..id.objects import IdList
         if 'brandingIds' not in self._my_map:
             return IdList([])
@@ -379,14 +596,26 @@ class Sourceable:
         for idstr in self._my_map['brandingIds']:
             id_list.append(Id(idstr))
         return IdList(id_list)"""
+        }
+    }
 
-    get_branding = """
+    get_branding = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         mgr = self._get_provider_manager('REPOSITORY')
         lookup_session = mgr.get_asset_lookup_session()
         lookup_session.use_federated_repository_view()
         return lookup_session.get_assets_by_ids(self.get_branding_ids())"""
+        }
+    }
 
-    get_license = """
+    get_license = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if 'license' in self._my_map:
             license_text = self._my_map['license']
             return DisplayText(display_text_map=license_text)
@@ -394,63 +623,95 @@ class Sourceable:
                            language_type=types.Language().get_type_data('DEFAULT'),
                            format_type=types.Format().get_type_data('DEFAULT'),
                            script_type=types.Script().get_type_data('DEFAULT'))"""
+        }
+    }
 
 
 class Operable:
 
-    is_active = """
+    is_active = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # THIS MAY NOT BE RIGHT. REVIEW LOGIC FROM OSID DOC
         return self.is_operational() and (not self.is_disabled() or self.is_enabled())"""
+        }
+    }
 
-    is_enabled = """
+    is_enabled = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Someday I'll have a real implementation, but for now I just:
         return False"""
+        }
+    }
 
-    is_disabled = """
+    is_disabled = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Someday I'll have a real implementation, but for now I just:
         return True"""
+        }
+    }
 
-    is_operational = """
+    is_operational = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Someday I'll have a real implementation, but for now I just:
         return False"""
+        }
+    }
 
 
 class OsidSession:
 
-    import_statements = [
-        'import socket',
-        '# import inflection',
-        'import datetime',
-        'from ..primitives import Id',
-        'from ..primitives import Type',
-        'from dlkit.abstract_osid.osid import errors',
-        'from bson.objectid import ObjectId',
-        'from importlib import import_module',
-        'from ..locale.objects import Locale',
-        'from ..utilities import PHANTOM_ROOT_IDENTIFIER',
-        'from ..utilities import JSONClientValidated',
-        'from ..utilities import get_provider_manager',
-        'from ..utilities import is_authenticated_with_proxy',
-        'from ..utilities import get_authenticated_agent_id_with_proxy',
-        'from ..utilities import get_authenticated_agent_with_proxy',
-        'from ..utilities import get_effective_agent_id_with_proxy',
-        'from ..utilities import get_effective_agent_with_proxy',
-        'from ..utilities import get_locale_with_proxy',
-        'from ..utilities import make_catalog_map',
-        'from ..utilities import camel_to_under',
-        'from ..cataloging.objects import Catalog',
-        'from .. import types',
-        'COMPARATIVE = 0',
-        'PLENARY = 1',
-        'FEDERATED = 0',
-        'ISOLATED = 1',
-        'EFFECTIVE = 0',
-        'ANY_EFFECTIVE = 1',
-        'CREATED = True',
-        'UPDATED = True',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'import socket',
+                '# import inflection',
+                'import datetime',
+                'from ..primitives import Id',
+                'from ..primitives import Type',
+                'from dlkit.abstract_osid.osid import errors',
+                'from bson.objectid import ObjectId',
+                'from importlib import import_module',
+                'from ..locale.objects import Locale',
+                'from ..utilities import PHANTOM_ROOT_IDENTIFIER',
+                'from ..utilities import JSONClientValidated',
+                'from ..utilities import get_provider_manager',
+                'from ..utilities import is_authenticated_with_proxy',
+                'from ..utilities import get_authenticated_agent_id_with_proxy',
+                'from ..utilities import get_authenticated_agent_with_proxy',
+                'from ..utilities import get_effective_agent_id_with_proxy',
+                'from ..utilities import get_effective_agent_with_proxy',
+                'from ..utilities import get_locale_with_proxy',
+                'from ..utilities import make_catalog_map',
+                'from ..utilities import camel_to_under',
+                'from ..cataloging.objects import Catalog',
+                'from .. import types',
+                'COMPARATIVE = 0',
+                'PLENARY = 1',
+                'FEDERATED = 0',
+                'ISOLATED = 1',
+                'EFFECTIVE = 0',
+                'ANY_EFFECTIVE = 1',
+                'CREATED = True',
+                'UPDATED = True',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self):
         self._proxy = None
         self._runtime = None
@@ -746,43 +1007,99 @@ class OsidSession:
         except (KeyError, ValueError):
             raise errors.NotFound()
         collection.save(obj_map)"""
+        }
+    }
 
-    get_locale = """
+    get_locale = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return get_locale_with_proxy(self._proxy)"""
+        }
+    }
 
-    is_authenticated = """
+    is_authenticated = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return is_authenticate_with_proxy(self._proxy)"""
+        }
+    }
 
-    get_authenticated_agent_id = """
+    get_authenticated_agent_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return get_authenticated_agent_id_with_proxy(self._proxy)"""
+        }
+    }
 
-    get_authenticated_agent = """
+    get_authenticated_agent = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return get_authenticated_agent_with_proxy(self._proxy)"""
+        }
+    }
 
-    get_effective_agent_id = """
+    get_effective_agent_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return get_effective_agent_id_with_proxy(self._proxy)"""
+        }
+    }
 
-    get_effective_agent = """
+    get_effective_agent = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return get_effective_agent_id_with_proxy(self._proxy)  # Currently raises Unimplemented"""
+        }
+    }
 
-    supports_transactions = """
+    supports_transactions = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return False"""
+        }
+    }
 
-    startTransaction = """
+    start_transaction = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not supports_transactions:
             raise errors.Unsupported('transactions ore not supported for this session')"""
+        }
+    }
 
 
 class OsidObject:
 
-    import_statements = [
-        'from ..primitives import Type',
-        'from ..primitives import DisplayText',
-        'from dlkit.abstract_osid.osid import errors',
-        'from .. import types',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Type',
+                'from ..primitives import DisplayText',
+                'from dlkit.abstract_osid.osid import errors',
+                'from .. import types',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'osid.OsidObject'
 
     def __init__(self, osid_object_map, runtime=None, **kwargs):
@@ -825,14 +1142,32 @@ class OsidObject:
         return obj_map
 
     object_map = property(get_object_map)"""
+        }
+    }
 
-    get_display_name = """
+    get_display_name = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return DisplayText(self._my_map['displayName'])"""
+        }
+    }
 
-    get_description = """
+    get_description = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return DisplayText(self._my_map['description'])"""
+        }
+    }
 
-    get_genus_type = """
+    get_genus_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         try:
             # Try to stand up full Type objects if they can be found
             # (Also need to LOOK FOR THE TYPE IN types or through type lookup)
@@ -841,57 +1176,92 @@ class OsidObject:
         except:
             # If that doesn't work, return the id only type, still useful for comparison.
             return Type(idstr=self._my_map['genusTypeId'])"""
+        }
+    }
 
-    is_of_genus_type = """
+    is_of_genus_type = {
+        'python': {
+            'json':  """
+    def ${method_name}(self, genus_type):
+        ${doc_string}
         return genus_type == Type(idstr=self._my_map['genusTypeId'])"""
+        }
+    }
 
 
 class OsidCatalog:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'osid.OsidCatalog'
 
     def __init__(self, **kwargs):
         OsidObject.__init__(self, **kwargs)
         # Should we initialize Sourceable?
-        # Should we initialize Federatable?
-    """
+        # Should we initialize Federatable?"""
+        }
+    }
 
 
 class OsidRule:
 
-    has_rule = """
+    has_rule = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Someday I'll have a real implementation, but for now I just:
         return False"""
+        }
+    }
 
-    get_rule_id = """
+    get_rule_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Someday I'll have a real implementation, but for now I just:
         raise errors.IllegalState()"""
+        }
+    }
 
-    get_rule = """
+    get_rule = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Someday I'll have a real implementation, but for now I just:
         raise errors.IllegalState()"""
+        }
+    }
 
 
 class OsidForm:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import default_mdata',
-        'from .metadata import Metadata',
-        'from ..utilities import get_locale_with_proxy',
-        'from ..utilities import update_display_text_defaults',
-        'from ..utilities import is_string',
-        'import uuid',
-        'from decimal import Decimal',
-        'from dlkit.abstract_osid.id.primitives import Id as abc_id',
-        'from dlkit.abstract_osid.type.primitives import Type as abc_type',
-        'from dlkit.abstract_osid.calendaring.primitives import DateTime as abc_datetime',
-        'from dlkit.abstract_osid.calendaring.primitives import Duration as abc_duration'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from dlkit.abstract_osid.osid import errors',
+                'from . import default_mdata',
+                'from .metadata import Metadata',
+                'from ..utilities import get_locale_with_proxy',
+                'from ..utilities import update_display_text_defaults',
+                'from ..utilities import is_string',
+                'import uuid',
+                'from decimal import Decimal',
+                'from dlkit.abstract_osid.id.primitives import Id as abc_id',
+                'from dlkit.abstract_osid.type.primitives import Type as abc_type',
+                'from dlkit.abstract_osid.calendaring.primitives import DateTime as abc_datetime',
+                'from dlkit.abstract_osid.calendaring.primitives import Duration as abc_duration'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     # pylint: disable=no-self-use
     # MUCH OF THIS SHOULD BE MOVED TO A UTILITY MODULE
 
@@ -1136,55 +1506,117 @@ class OsidForm:
         if set_results is not None and inpt in set_results:
             return True
         return False"""
+        }
+    }
 
-    is_for_update = """
+    is_for_update = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return self._for_update"""
+        }
+    }
 
-    get_default_locale = """
+    get_default_locale = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         from ..locale.objects import Locale
         # If no constructor arguments are given it is expected that the
         # locale service will return the default Locale.
         return get_locale_with_proxy(self._proxy)"""
+        }
+    }
 
-    get_locales = """
+    get_locales = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # Someday I might have a real implementation
         # For now only default Locale is supported
         from ..locale.objects import LocaleList
         return LocaleList([])"""
+        }
+    }
 
-    set_locale = """
+    set_locale = {
+        'python': {
+            'json': """
+    def ${method_name}(self, language_type, script_type):
+        ${doc_string}
         # Someday I might have a real implementation
         # For now only default Locale is supported
         self._locale_map['languageType'] = language_type
         self._locale_map['scriptType'] = script_type"""
+        }
+    }
 
-    get_journal_comment_metadata = """
+    get_journal_comment_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return Metadata(**self._mdata['journal_comment'])"""
+        }
+    }
 
-    set_journal_comment = """
+    set_journal_comment = {
+        'python': {
+            'json': """
+    def ${method_name}(self, comment):
+        ${doc_string}
         self._my_map['journal_comment'] = self._get_display_text(comment, self.get_journal_comment_metadata())"""
+        }
+    }
 
-    is_valid = """
+    is_valid = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # It is assumed that all setter methods check validity so there
         # should never be a state where invalid data exists in the form.
         # And if you believe that...
         return True"""
+        }
+    }
 
-    get_validation_messages = """
+    get_validation_messages = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # See note above
         return []"""
+        }
+    }
 
-    get_invalid_metadata = """
+    get_invalid_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # See notes above
         return []"""
+        }
+    }
 
 
 class OsidExtensibleForm:
-    import_statements = [
-        'import importlib',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'import importlib',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, **kwargs):
         osid_markers.Extensible.__init__(self, **kwargs)
 
@@ -1220,19 +1652,27 @@ class OsidExtensibleForm:
             return True
         else:
             return False"""
+        }
+    }
 
 
 class OsidTemporalForm:
 
-    import_statements = [
-        'from ..primitives import Id',
-        'from dlkit.abstract_osid.osid import errors',
-        'import datetime',
-        'from . import default_mdata',
-        'from .metadata import Metadata',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import Id',
+                'from dlkit.abstract_osid.osid import errors',
+                'import datetime',
+                'from . import default_mdata',
+                'from .metadata import Metadata',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = "osid.OsidTemporalForm"
 
     def __init__(self):
@@ -1251,48 +1691,87 @@ class OsidTemporalForm:
         # pylint: disable=attribute-defined-outside-init
         # this method is called from descendent __init__
         self._my_map['startDate'] = self._mdata['start_date']['default_date_time_values'][0]
-        self._my_map['endDate'] = self._mdata['end_date']['default_date_time_values'][0]
-"""
+        self._my_map['endDate'] = self._mdata['end_date']['default_date_time_values'][0]"""
+        }
+    }
 
-    get_start_date_metadata = """
+    get_start_date_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         metadata = dict(self._mdata['start_date'])
         metadata.update({'existing_date_time_values': self._my_map['startDate']})
         return Metadata(**metadata)"""
+        }
+    }
 
-    set_start_date = """
+    set_start_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self, date):
+        ${doc_string}
         if self.get_start_date_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_start_date_metadata()):
             raise errors.InvalidArgument()
         # self._my_map['startDate'] = self._get_date_map(date)
         self._my_map['startDate'] = date"""
+        }
+    }
 
-    clear_start_date = """
+    clear_start_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_start_date_metadata().is_read_only() or
                 self.get_start_date_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['startDate'] = self._mdata['start_date']['default_date_time_values'][0]"""
+        }
+    }
 
-    get_end_date_metadata = """
+    get_end_date_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         metadata = dict(self._mdata['end_date'])
         metadata.update({'existing_date_time_values': self._my_map['endDate']})
         return Metadata(**metadata)"""
+        }
+    }
 
-    set_end_date = """
+    set_end_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self, date):
+        ${doc_string}
         if self.get_end_date_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_date_time(date, self.get_end_date_metadata()):
             raise errors.InvalidArgument()
         # self._my_map['endDate'] = self._get_date_map(date)
         self._my_map['endDate'] = date"""
+        }
+    }
 
-    clear_end_date = """
+    clear_end_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_end_date_metadata().is_read_only() or
                 self.get_end_date_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['endDate'] = self._mdata['end_date']['default_date_time_values'][0]"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     # This should go in a utility module:
     def _get_date_map(self, date):
         return {
@@ -1304,11 +1783,15 @@ class OsidTemporalForm:
             'second': date.second,
             'microsecond': date.microsecond,
         }"""
+        }
+    }
 
 
 class OsidContainableForm:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self):
         self._mdata = None
         self._sequestered_default = None
@@ -1321,11 +1804,23 @@ class OsidContainableForm:
 
     def _init_map(self):
         self._my_map['sequestered'] = self._sequestered_default"""
+        }
+    }
 
-    get_sequestered_metadata = """
+    get_sequestered_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return Metadata(**self._mdata['sequestered'])"""
+        }
+    }
 
-    set_sequestered = """
+    set_sequestered = {
+        'python': {
+            'json': """
+    def ${method_name}(self, sequestered):
+        ${doc_string}
         if sequestered is None:
             raise errors.NullArgument()
         if self.get_sequestered_metadata().is_read_only():
@@ -1333,17 +1828,27 @@ class OsidContainableForm:
         if not isinstance(sequestered, bool):
             raise errors.InvalidArgument()
         self._my_map['sequestered'] = sequestered"""
+        }
+    }
 
-    clear_sequestered = """
+    clear_sequestered = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_sequestered_metadata().is_read_only() or
                 self.get_sequestered_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['sequestered'] = self._sequestered_default"""
+        }
+    }
 
 
 class OsidSourceableForm:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self):
         self._mdata = None
         self._provider_default = None
@@ -1377,31 +1882,61 @@ class OsidSourceableForm:
             self._my_map['providerId'] = self._provider_default
         self._my_map['brandingIds'] = self._branding_default
         self._my_map['license'] = dict(self._license_default)"""
+        }
+    }
 
-    get_provider_metadata = """
+    get_provider_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         metadata = dict(self._mdata['provider'])
         metadata.update({'existing_id_values': self._my_map['providerId']})
         return Metadata(**metadata)"""
+        }
+    }
 
-    set_provider = """
+    set_provider = {
+        'python': {
+            'json': """
+    def ${method_name}(self, provider_id):
+        ${doc_string}
         if self.get_provider_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_id(provider_id):
             raise errors.InvalidArgument()
         self._my_map['providerId'] = str(provider_id)"""
+        }
+    }
 
-    clear_provider = """
+    clear_provider = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_provider_metadata().is_read_only() or
                 self.get_provider_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['providerId'] = self._provider_default"""
+        }
+    }
 
-    get_branding_metadata = """
+    get_branding_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         metadata = dict(self._mdata['branding'])
         metadata.update({'existing_id_values': self._my_map['brandingIds']})
         return Metadata(**metadata)"""
+        }
+    }
 
-    set_branding = """
+    set_branding = {
+        'python': {
+            'json': """
+    def ${method_name}(self, asset_ids):
+        ${doc_string}
         if self.get_branding_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_input(asset_ids, self.get_branding_metadata(), array=True):
@@ -1410,38 +1945,70 @@ class OsidSourceableForm:
         for asset_id in asset_ids:
             branding_ids.append(str(asset_id))
         self._my_map['brandingIds'] = branding_ids"""
+        }
+    }
 
-    clear_branding = """
+    clear_branding = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_branding_metadata().is_read_only() or
                 self.get_branding_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['brandingIds'] = self._branding_default"""
+        }
+    }
 
-    get_license_metadata = """
+    get_license_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         metadata = dict(self._mdata['license'])
         metadata.update({'existing_string_values': self._my_map['license']})
         return Metadata(**metadata)"""
+        }
+    }
 
-    set_license = """
+    set_license = {
+        'python': {
+            'json': """
+    def ${method_name}(self, license_):
+        ${doc_string}
         self._my_map['license'] = self._get_display_text(license_, self.get_license_metadata())"""
+        }
+    }
 
-    clear_license = """
+    clear_license = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_license_metadata().is_read_only() or
                 self.get_license_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['license'] = dict(self._license_default)"""
+        }
+    }
 
 
 class OsidFederateableForm:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self):
         pass"""
+        }
+    }
 
 
 class OsidOperableForm:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self):
         # Need to implement someday
         pass
@@ -1452,21 +2019,28 @@ class OsidOperableForm:
 
     def _init_map(self):
         # Need to implement someday
-        pass
-"""
+        pass"""
+        }
+    }
 
 
 class OsidObjectForm:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import default_mdata',
-        'from .metadata import Metadata',
-        'from dlkit.abstract_osid.locale.primitives import DisplayText as abc_display_text',
-        'from ..utilities import update_display_text_defaults',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from . import default_mdata',
+                'from .metadata import Metadata',
+                'from dlkit.abstract_osid.locale.primitives import DisplayText as abc_display_text',
+                'from ..utilities import update_display_text_defaults',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = "osid.OsidObjectForm"
 
     def __init__(self, osid_object_map=None, **kwargs):  # removed record_types=None, runtime=None,
@@ -1506,59 +2080,116 @@ class OsidObjectForm:
         self._my_map['displayName'] = dict(self._display_name_default)
         self._my_map['description'] = dict(self._description_default)
         self._my_map['genusTypeId'] = self._genus_type_default
-        OsidExtensibleForm._init_map(self, record_types)
-"""
+        OsidExtensibleForm._init_map(self, record_types)"""
+        }
+    }
 
-    get_display_name_metadata = """
+    get_display_name_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         metadata = dict(self._mdata['display_name'])
         metadata.update({'existing_string_values': self._my_map['displayName']['text']})
         return Metadata(**metadata)"""
+        }
+    }
 
-    set_display_name = """
+    set_display_name = {
+        'python': {
+            'json': """
+    def ${method_name}(self, display_name):
+        ${doc_string}
         self._my_map['displayName'] = self._get_display_text(display_name, self.get_display_name_metadata())"""
+        }
+    }
 
-    clear_display_name = """
+    clear_display_name = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_display_name_metadata().is_read_only() or
                 self.get_display_name_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['displayName'] = dict(self._display_name_default)"""
+        }
+    }
 
-    get_description_metadata = """
+    get_description_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         metadata = dict(self._mdata['description'])
         metadata.update({'existing_string_values': self._my_map['description']['text']})
         return Metadata(**metadata)"""
+        }
+    }
 
-    set_description = """
+    set_description = {
+        'python': {
+            'json': """
+    def ${method_name}(self, description):
+        ${doc_string}
         self._my_map['description'] = self._get_display_text(description, self.get_description_metadata())"""
+        }
+    }
 
-    clear_description = """
+    clear_description = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_description_metadata().is_read_only() or
                 self.get_description_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['description'] = dict(self._description_default)"""
+        }
+    }
 
-    get_genus_type_metadata = """
+    get_genus_type_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         metadata = dict(self._mdata['genus_type'])
         metadata.update({'existing_string_values': self._my_map['genusTypeId']})
         return Metadata(**metadata)"""
+        }
+    }
 
-    set_genus_type = """
+    set_genus_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, genus_type):
+        ${doc_string}
         if self.get_genus_type_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_type(genus_type):
             raise errors.InvalidArgument()
         self._my_map['genusTypeId'] = str(genus_type)"""
+        }
+    }
 
-    clear_genus_type = """
+    clear_genus_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_genus_type_metadata().is_read_only() or
                 self.get_genus_type_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['genusTypeId'] = self._genus_type_default"""
+        }
+    }
 
 
 class OsidRelationshipForm:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, **kwargs):
         OsidTemporalForm.__init__(self)
         OsidObjectForm.__init__(self, **kwargs)
@@ -1570,11 +2201,15 @@ class OsidRelationshipForm:
     def _init_map(self, record_types=None, **kwargs):
         OsidTemporalForm._init_map(self)
         OsidObjectForm._init_map(self, record_types=record_types, **kwargs)"""
+        }
+    }
 
 
 class OsidCatalogForm:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, **kwargs):
         OsidSourceableForm.__init__(self)
         OsidFederateableForm.__init__(self)
@@ -1588,18 +2223,25 @@ class OsidCatalogForm:
     def _init_map(self, record_types=None, **kwargs):
         OsidSourceableForm._init_map(self, **kwargs)
         OsidFederateableForm._init_map(self)
-        OsidObjectForm._init_map(self, record_types)
-"""
+        OsidObjectForm._init_map(self, record_types)"""
+        }
+    }
 
 
 class OsidList:
-    import_statements = [
-        'from pymongo.cursor import Cursor',
-        'from ..utilities import OsidListList, is_string',
-        'import itertools'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from pymongo.cursor import Cursor',
+                'from ..utilities import OsidListList, is_string',
+                'import itertools'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, iter_object=None, runtime=None, proxy=None):
         if iter_object is None:
             iter_object = []
@@ -1673,44 +2315,70 @@ class OsidList:
     def len(self):
         \"\"\"Returns number of available elements\"\"\"
         return self.available()"""
+        }
+    }
 
-    has_next = """
+    has_next = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if self._count is not None:
             # If count is available, use it
             return bool(self._count)
         else:
             # otherwise we have no idea
             return True"""
+        }
+    }
 
-    available = """
+    available = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if self._count is not None:
             # If count is available, use it
             return self._count
         else:
             # We have no idea.
             return 0  # Don't know what to do here"""
+        }
+    }
 
-    skip = """
+    skip = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         try:
             self._iter_object.skip(n)
         except AttributeError:
             for i in range(0, n):
-                self.next()"""
+                next(self)"""
+        }
+    }
 
 
 class OsidQuery:
 
-    import_statements = [
-        'import re',
-        'from ..primitives import Type',
-        'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
-        'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))',
-        'from .. import utilities',
-        'from collections import OrderedDict'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'import re',
+                'from ..primitives import Type',
+                'from dlkit.abstract_osid.osid import errors',
+                'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
+                'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))',
+                'from .. import utilities',
+                'from collections import OrderedDict'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, runtime):
         self._records = OrderedDict()
         # _load_records is in OsidExtensibleQuery:
@@ -1848,24 +2516,37 @@ class OsidQuery:
                 del self._query_terms[match_key]
         except KeyError:
             pass"""
-
-    match_keyword_arg_template = {
-        1: 'DEFAULT_STRING_MATCH_TYPE',
-        2: True
+        }
     }
 
-    match_keyword = """
+    match_keyword = {
+        'python': {
+            'json': """
+    def ${method_name}(self, keyword, string_match_type=DEFAULT_STRING_MATCH_TYPE, match=True):
+        ${doc_string}
         # Note: this currently ignores match argument
         match_value = self._get_string_match_value(keyword, string_match_type)
         for field_name in self._keyword_fields:
             if field_name not in self._keyword_terms:
                 self._keyword_terms[field_name] = {'$in': list()}
             self._keyword_terms[field_name]['$in'].append(match_value)"""
+        }
+    }
 
-    clear_keyword_terms = """
+    clear_keyword_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._keyword_terms = {}"""
+        }
+    }
 
-    match_any = """
+    match_any = {
+        'python': {
+            'json': """
+    def ${method_name}(self, match):
+        ${doc_string}
         match_key = '_id'
         param = '$exists'
         if match:
@@ -1876,33 +2557,63 @@ class OsidQuery:
             self._query_terms[match_key][param] = flag
         else:
             self._query_terms[match_key] = {param: flag}"""
+        }
+    }
 
-    clear_any_terms = """
+    clear_any_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         # How to implement this?"""
+        }
+    }
 
 
 class OsidIdentifiableQuery:
 
-    import_statements = [
-        'from bson.objectid import ObjectId'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from bson.objectid import ObjectId'
+            ]
+        }
+    }
 
-    match_id = """
+    match_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, id_, match):
+        ${doc_string}
         self._add_match('_id', ObjectId(id_.get_identifier()))"""
+        }
+    }
 
-    clear_id_terms = """
+    clear_id_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._clear_terms('_id')"""
+        }
+    }
 
 
 class OsidExtensibleQuery:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'import importlib',
-        'from ..primitives import Id',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'import importlib',
+                'from ..primitives import Id',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def _load_records(self, record_type_idstrs):
         \"\"\"Loads query records\"\"\"
         for record_type_idstr in record_type_idstrs:
@@ -1917,132 +2628,216 @@ class OsidExtensibleQuery:
         module = importlib.import_module(record_type_data['module_path'])
         record = getattr(module, record_type_data['query_record_class_name'])
         self._records[record_type_idstr] = record(self)"""
+        }
+    }
 
-    match_record_type = """
+    match_record_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, record_type, match):
+        ${doc_string}
         self._add_match('recordTypeIds', str(record_type), match)"""
+        }
+    }
 
 
 class OsidObjectQuery:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Type',
-        'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
-        'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..primitives import Type',
+                'from dlkit.primordium.locale.types.string import get_type_data as get_string_type_data',
+                'DEFAULT_STRING_MATCH_TYPE = Type(**get_string_type_data(\'WORDIGNORECASE\'))'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, runtime):
         OsidQuery.__init__(self, runtime)"""
-
-    match_display_name_arg_template = {
-        1: 'DEFAULT_STRING_MATCH_TYPE',
-        2: True
+        }
     }
 
-    match_display_name = """
+    match_display_name = {
+        'python': {
+            'json': """
+    def ${method_name}(self, display_name, string_match_type=DEFAULT_STRING_MATCH_TYPE, match=True):
+        ${doc_string}
         self._match_display_text('displayName', display_name, string_match_type, match)"""
-
-    match_any_display_name = """
-        raise errors.Unimplemented()"""
-
-    clear_display_name_terms = """
-        self._clear_terms('displayName.text')"""
-
-    match_description_arg_template = {
-        1: 'DEFAULT_STRING_MATCH_TYPE',
-        2: True
+        }
     }
 
-    match_description = """
-        self._match_display_text('description', description, string_match_type, match)"""
-
-    match_genus_type = """
-        self._add_match('genusTypeId', str(genus_type), match)"""
-
-    match_any_description = """
+    match_any_display_name = {
+        'python': {
+            'json': """
+    def ${method_name}(self, match):
+        ${doc_string}
         raise errors.Unimplemented()"""
+        }
+    }
 
-    clear_description_terms = """
+    clear_display_name_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        self._clear_terms('displayName.text')"""
+        }
+    }
+
+    match_description = {
+        'python': {
+            'json': """
+    def ${method_name}(self, description, string_match_type=DEFAULT_STRING_MATCH_TYPE, match):
+        ${doc_string}
+        self._match_display_text('description', description, string_match_type, match)"""
+        }
+    }
+
+    match_genus_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, genus_type, match):
+        ${doc_string}
+        self._add_match('genusTypeId', str(genus_type), match)"""
+        }
+    }
+
+    match_any_description = {
+        'python': {
+            'json': """
+    def ${method_name}(self, match):
+        ${doc_string}
+        raise errors.Unimplemented()"""
+        }
+    }
+
+    clear_description_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._clear_terms('description.text')"""
+        }
+    }
 
-    clear_genus_type_terms = """
+    clear_genus_type_terms = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         self._clear_terms('genusTypeId')"""
+        }
+    }
 
 
 class OsidQueryInspector:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
 
 class OsidRecord:
 
-    consider_init = """
-    def __init__(self):
-        # This is set in implemented Records.  Should super __init__
-        self._implemented_record_type_identifiers = None
+    # consider_init = """
+    # def __init__(self):
+    #     # This is set in implemented Records.  Should super __init__
+    #     self._implemented_record_type_identifiers = None
+    #
+    # def __iter__(self):
+    #     for attr in dir(self):
+    #         if not attr.startswith('__'):
+    #             yield attr
+    #
+    # def __getitem__(self, item):
+    #     return getattr(self, item)"""
 
-    def __iter__(self):
-        for attr in dir(self):
-            if not attr.startswith('__'):
-                yield attr
-
-    def __getitem__(self, item):
-        return getattr(self, item)"""
-
-    implements_record_type = """
+    implements_record_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, record_type):
+        ${doc_string}
         return record_type.get_identifier() in self._implemented_record_type_identifiers"""
+        }
+    }
 
 
 class Metadata:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.primordium.locale.primitives import DisplayText'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from dlkit.primordium.locale.primitives import DisplayText'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, **kwargs):
         self._kwargs = kwargs"""
+        }
+    }
 
-    get_element_id_template = """
-        # Implemented from template for osid.Metadata.get_element_id_template
-        return self._kwargs['${var_name}']"""
-
-    get_element_label_template = """
-        # Implemented from template for osid.Metadata.get_element_id_template
-        return DisplayText(self._kwargs['${var_name}'])"""
-
-    get_minimum_cardinal_template = """
-        # Implemented from template for osid.Metadata.get_minimum_cardinal
-        if self._kwargs['syntax'] not in ${syntax_list}:
-            raise errors.IllegalState()
-        return self._kwargs['${var_name}']"""
-
-    supports_coordinate_type_template = """
-        # Implemented from template for osid.Metadata.supports_coordinate_type
-        if self._kwargs['syntax'] not in ${syntax_list}:
-            raise errors.IllegalState()
-        return ${arg0_name} in self.get_${var_name}"""
-
-    get_existing_cardinal_values_template = """
-        # Implemented from template for osid.Metadata.get_existing_cardinal_values_template
-        # This template may only work well for very primitive return types, like string or cardinal.
-        # Need to update it to support DisplayName, or Id etc.
-        if self._kwargs['syntax'] not in ${syntax_list}:
-            raise errors.IllegalState()
-        return self._kwargs['${var_name}']"""
+#     get_element_id_template = {
+#         'python': {
+#             'json': """
+#     def ${method_name}(self):
+#         ${doc_string}
+#         # Implemented from template for osid.Metadata.get_element_id_template
+#         return self._kwargs['${var_name}']"""
+#         }
+#     }
+#
+#     get_element_label_template = """
+#         # Implemented from template for osid.Metadata.get_element_id_template
+#         return DisplayText(self._kwargs['${var_name}'])"""
+#
+#     get_minimum_cardinal_template = """
+#         # Implemented from template for osid.Metadata.get_minimum_cardinal
+#         if self._kwargs['syntax'] not in ${syntax_list}:
+#             raise errors.IllegalState()
+#         return self._kwargs['${var_name}']"""
+#
+#     supports_coordinate_type_template = """
+#         # Implemented from template for osid.Metadata.supports_coordinate_type
+#         if self._kwargs['syntax'] not in ${syntax_list}:
+#             raise errors.IllegalState()
+#         return ${arg0_name} in self.get_${var_name}"""
+#
+#     get_existing_cardinal_values_template = """
+#         # Implemented from template for osid.Metadata.get_existing_cardinal_values_template
+#         # This template may only work well for very primitive return types, like string or cardinal.
+#         # Need to update it to support DisplayName, or Id etc.
+#         if self._kwargs['syntax'] not in ${syntax_list}:
+#             raise errors.IllegalState()
+#         return self._kwargs['${var_name}']"""
 
 
 class OsidNode:
 
-    import_statements = [
-        'from dlkit.primordium.id.primitives import Id',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.primordium.id.primitives import Id',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, node_map):
         self._my_map = node_map
 
@@ -2053,34 +2848,74 @@ class OsidNode:
     id_ = property(fget=get_id)
 
     ident = property(fget=get_id)"""
+        }
+    }
 
-    is_root = """
+    is_root = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return self._my_map['root']"""
+        }
+    }
 
-    has_parents = """
+    has_parents = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return bool(self._my_map['parentNodes'])"""
+        }
+    }
 
-    get_parent_ids = """
+    get_parent_ids = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         id_list = []
         from ..id.objects import IdList
         for parent_node in self._my_map['parentNodes']:
             id_list.append(str(parent_node.ident))
         return IdList(id_list)"""
+        }
+    }
 
-    is_leaf = """
+    is_leaf = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return self._my_map['leaf']"""
+        }
+    }
 
-    has_children = """
+    has_children = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return bool(self._my_map['childNodes'])"""
+        }
+    }
 
-    get_child_ids = """
+    get_child_ids = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         id_list = []
         from ..id.objects import IdList
         for child_node in self._my_map['childNodes']:
             id_list.append(str(child_node.ident))
         return IdList(id_list)"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_node_map(self):
         node_map = dict(self._my_map)
         node_map['parentNodes'] = []
@@ -2090,38 +2925,58 @@ class OsidNode:
         for node in self._my_map['childNodes']:
             node_map['childNodes'].append(node.get_node_map())
         return node_map"""
+        }
+    }
 
 
 class Property:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
 
 class OsidReceiver:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
 
 class OsidSearchOrder:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
 
 class OsidSearch:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.primordium.id.primitives import Id',
-        'from collections import OrderedDict'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from dlkit.primordium.id.primitives import Id',
+                'from collections import OrderedDict'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, runtime):
         self._records = OrderedDict()
         # _load_records is in OsidExtensibleQuery:
@@ -2142,8 +2997,14 @@ class OsidSearch:
             pass
         self._limit_result_set_start = None
         self._limit_result_set_end = None"""
+        }
+    }
 
-    limit_result_set = """
+    limit_result_set = {
+        'python': {
+            'json': """
+    def ${method_name}(self, start, end):
+        ${doc_string}
         if not isinstance(start, int) or not isinstance(end, int):
             raise errors.InvalidArgument('start and end arguments must be integers.')
         if end <= start:
@@ -2163,6 +3024,8 @@ class OsidSearch:
     @property
     def end(self):
         return self._limit_result_set_end"""
+        }
+    }
 
 
 class OsidSearchResults:
@@ -2170,8 +3033,14 @@ class OsidSearchResults:
     import_statements = [
     ]
 
-    get_result_size = """
+    get_result_size = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return self._results.count(True)"""
+        }
+    }
 
 
 class OsidTemporalQuery:
@@ -2179,7 +3048,11 @@ class OsidTemporalQuery:
 
     ]
 
-    match_date = """
+    match_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self, from_, to, match):
+        ${doc_string}
         if match:
             if to < from_:
                 raise errors.InvalidArgument('end date must be >= start date when match = True')
@@ -2191,8 +3064,14 @@ class OsidTemporalQuery:
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
+        }
+    }
 
-    match_start_date = """
+    match_start_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self, start, end, match):
+        ${doc_string}
         if match:
             if end < start:
                 raise errors.InvalidArgument('end date must be >= start date when match = True')
@@ -2202,8 +3081,14 @@ class OsidTemporalQuery:
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
+        }
+    }
 
-    match_end_date = """
+    match_end_date = {
+        'python': {
+            'json': """
+    def ${method_name}(self, start, end, match):
+        ${doc_string}
         if match:
             if end < start:
                 raise errors.InvalidArgument('end date must be >= start date when match = True')
@@ -2213,3 +3098,5 @@ class OsidTemporalQuery:
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
+        }
+    }

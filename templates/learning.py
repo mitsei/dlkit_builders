@@ -1,17 +1,23 @@
 class ObjectiveRequisiteSession:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from . import objects',
-        'from ..utilities import JSONClientValidated',
-        'from bson.objectid import ObjectId',
-        'from ..types import Relationship',
-        'UPDATED = True',
-        'CREATED = True'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..primitives import Id',
+                'from . import objects',
+                'from ..utilities import JSONClientValidated',
+                'from bson.objectid import ObjectId',
+                'from ..types import Relationship',
+                'UPDATED = True',
+                'CREATED = True'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         self._catalog_class = objects.Objective
         self._catalog_name = 'ObjectiveBank'
@@ -24,6 +30,8 @@ class ObjectiveRequisiteSession:
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
         self._forms = dict()"""
+        }
+    }
 
     # get_requisite_objectives_template = """
     #     # Implemented from template for
@@ -67,13 +75,19 @@ class ObjectiveRequisiteSession:
 
 class ObjectiveRequisiteAssignmentSession:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..types import Relationship'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..primitives import Id',
+                'from ..types import Relationship'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         self._catalog_class = objects.Objective
         self._catalog_name = 'ObjectiveBank'
@@ -86,6 +100,8 @@ class ObjectiveRequisiteAssignmentSession:
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
         self._forms = dict()"""
+        }
+    }
 
     # assign_objective_requisite_import_templates = [
     #     'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}',
@@ -221,17 +237,17 @@ class ObjectiveRequisiteAssignmentSession:
     #     return obj_form"""
 
 
-class Activity:
+# class Activity:
 
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..id.objects import IdList',
-    ]
-
-    import_statements = [
-        'from ..id.objects import IdList',
-    ]
+    # import_statements_pattern = [
+    #     'from dlkit.abstract_osid.osid import errors',
+    #     'from ..primitives import Id',
+    #     'from ..id.objects import IdList',
+    # ]
+    #
+    # import_statements = [
+    #     'from ..id.objects import IdList',
+    # ]
 
     # get_objective_id_template = """
     #     # Implemented from template for osid.learning.Activity.get_objective_id
@@ -262,9 +278,9 @@ class Activity:
     # This is actually used by Grading.GradeSystem.is_based_on_grades
     # Something wrong with our patterns, if it isn't going to the source pattern of
     # Resource.Resource.is_group_template...
-    is_asset_based_activity_template = """
-        # Implemented from template for osid.learning.Activity.is_asset_based_activity_template
-        return self._my_map['${var_name_mixed}']"""
+    # is_asset_based_activity_template = """
+    #     # Implemented from template for osid.learning.Activity.is_asset_based_activity_template
+    #     return self._my_map['${var_name_mixed}']"""
 
     # get_asset_ids_template = """
     #     # Implemented from template for osid.learning.Activity.get_asset_ids_template
@@ -285,7 +301,9 @@ class Activity:
 
 
 class ObjectiveHierarchySession:
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.Objective
@@ -307,10 +325,14 @@ class ObjectiveHierarchySession:
                identifier='OBJECTIVE'),
             proxy=self._proxy
         )"""
+        }
+    }
 
 
 class ObjectiveHierarchyDesignSession:
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, *args, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.Objective
@@ -332,16 +354,24 @@ class ObjectiveHierarchyDesignSession:
                identifier='OBJECTIVE'),
             proxy=self._proxy
         )"""
+        }
+    }
 
 
 class ObjectiveSequencingSession:
-    import_statements_pattern = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..types import Relationship'
-    ]
+    import_statements_pattern = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..primitives import Id',
+                'from ..types import Relationship'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
         self._catalog_class = objects.Objective
         self._catalog_name = 'ObjectiveBank'
@@ -354,11 +384,17 @@ class ObjectiveSequencingSession:
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
         self._forms = dict()"""
+        }
+    }
 
 
 class ProficiencyForm:
 
-    set_level = """
+    set_level = {
+        'python': {
+            'json': """
+    def ${method_name}(self, grade):
+        ${doc_string}
         if self.get_level_metadata().is_read_only():
             raise errors.NoAccess()
         if not self._is_valid_id(grade):
@@ -371,17 +407,27 @@ class ProficiencyForm:
         if not self._is_valid_id(grade_id):
             raise errors.InvalidArgument()
         self._my_map['levelId'] = str(grade_id)"""
+        }
+    }
 
-    clear_level = """
+    clear_level = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if (self.get_level_metadata().is_read_only() or
                 self.get_level_metadata().is_required()):
             raise errors.NoAccess()
         self._my_map['levelId'] = self._level_default
         self._my_map['level'] = self._level_default"""
+        }
+    }
 
 
 class ProficiencyQuery:
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, runtime):
         self._namespace = '${pkg_name}.${object_name}'
         self._runtime = runtime
@@ -390,15 +436,26 @@ class ProficiencyQuery:
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidObjectQuery.__init__(self, runtime)
-"""
+        osid_queries.OsidObjectQuery.__init__(self, runtime)"""
+        }
+    }
 
-    match_level_id = """
+    match_level_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, grade_id, match):
+        ${doc_string}
         if not isinstance(grade_id, Id):
             raise errors.InvalidArgument()
         self._add_match('levelId', str(grade_id), match)"""
+        }
+    }
 
-    match_completion = """
+    match_completion = {
+        'python': {
+            'json': """
+    def ${method_name}(self, start, end, match):
+        ${doc_string}
         try:
             start = float(start)
         except ValueError:
@@ -411,25 +468,41 @@ class ProficiencyQuery:
             if end < start:
                 raise errors.InvalidArgument('end value must be >= start value when match = True')
             self._query_terms['completion'] = {
-                '$gte': start,
-                '$lte': end
+                '$$gte': start,
+                '$$lte': end
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
+        }
+    }
 
-    match_resource_id = """
+    match_resource_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, resource_id):
+        ${doc_string}
         if not isinstance(resource_id, Id):
             raise errors.InvalidArgument()
         self._add_match('resourceId', str(resource_id), match)"""
+        }
+    }
 
-    match_objective_id = """
+    match_objective_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, objective_id):
+        ${doc_string}
         if not isinstance(objective_id, Id):
             raise errors.InvalidArgument()
         self._add_match('objectiveId', str(objective_id), match)"""
+        }
+    }
 
 
 class Proficiency:
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_object_map(self):
         obj_map = dict(self._my_map)
         if obj_map['startDate'] is not None:
@@ -456,3 +529,5 @@ class Proficiency:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+        }
+    }

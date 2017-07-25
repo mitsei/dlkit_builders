@@ -1,46 +1,46 @@
-
-class ResourceProfile:
-
-    import_statements_pattern = [
-        'from ..primitives import Type',
-        'from ..type.objects import TypeList',
-        'from . import sessions',
-        'from dlkit.abstract_osid.osid import errors',
-        'from . import profile',
-        'from ..utilities import get_registry',
-    ]
-
-    supports_visible_federation_template = """
-        # Implemented from template for
-        # osid.resource.ResourceProfile.supports_visible_federation
-        return '${method_name}' in profile.SUPPORTS"""
-
-    supports_resource_lookup_template = """
-        # Implemented from template for
-        # osid.resource.ResourceProfile.supports_resource_lookup
-        return '${method_name}' in profile.SUPPORTS"""
-
-    get_resource_record_types_template = """
-        # Implemented from template for
-        # osid.resource.ResourceProfile.get_resource_record_types_template
-        record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
-        record_types = []
-        for record_type_map in record_type_maps:
-            record_types.append(Type(**record_type_maps[record_type_map]))
-        return TypeList(record_types)"""
-
-    supports_resource_record_type_template = """
-        # Implemented from template for
-        # osid.resource.ResourceProfile.supports_resource_record_type_template
-        record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
-        supports = False
-        for record_type_map in record_type_maps:
-            if (${arg0_name}.get_authority() == record_type_maps[record_type_map]['authority'] and
-                    ${arg0_name}.get_identifier_namespace() == record_type_maps[record_type_map]['namespace'] and
-                    ${arg0_name}.get_identifier() == record_type_maps[record_type_map]['identifier']):
-                supports = True
-        return supports"""
-
+#
+# class ResourceProfile:
+#
+#     import_statements_pattern = [
+#         'from ..primitives import Type',
+#         'from ..type.objects import TypeList',
+#         'from . import sessions',
+#         'from dlkit.abstract_osid.osid import errors',
+#         'from . import profile',
+#         'from ..utilities import get_registry',
+#     ]
+#
+#     supports_visible_federation_template = """
+#         # Implemented from template for
+#         # osid.resource.ResourceProfile.supports_visible_federation
+#         return '${method_name}' in profile.SUPPORTS"""
+#
+#     supports_resource_lookup_template = """
+#         # Implemented from template for
+#         # osid.resource.ResourceProfile.supports_resource_lookup
+#         return '${method_name}' in profile.SUPPORTS"""
+#
+#     get_resource_record_types_template = """
+#         # Implemented from template for
+#         # osid.resource.ResourceProfile.get_resource_record_types_template
+#         record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
+#         record_types = []
+#         for record_type_map in record_type_maps:
+#             record_types.append(Type(**record_type_maps[record_type_map]))
+#         return TypeList(record_types)"""
+#
+#     supports_resource_record_type_template = """
+#         # Implemented from template for
+#         # osid.resource.ResourceProfile.supports_resource_record_type_template
+#         record_type_maps = get_registry('${object_name_upper}_RECORD_TYPES', self._runtime)
+#         supports = False
+#         for record_type_map in record_type_maps:
+#             if (${arg0_name}.get_authority() == record_type_maps[record_type_map]['authority'] and
+#                     ${arg0_name}.get_identifier_namespace() == record_type_maps[record_type_map]['namespace'] and
+#                     ${arg0_name}.get_identifier() == record_type_maps[record_type_map]['identifier']):
+#                 supports = True
+#         return supports"""
+#
 
 # class ResourceManager:
 
@@ -886,13 +886,19 @@ class ResourceProfile:
 
 class ResourceAgentSession:
 
-    import_statements = [
-        'from .simple_agent import Agent',
-        'from ..id.objects import IdList',
-        'from ..authentication.objects import AgentList'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from .simple_agent import Agent',
+                'from ..id.objects import IdList',
+                'from ..authentication.objects import AgentList'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _session_namespace = 'resource.ResourceAgentSession'
 
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
@@ -908,23 +914,41 @@ class ResourceAgentSession:
             cat_name='Bin',
             cat_class=objects.Bin)
         self._forms = dict()"""
+        }
+    }
 
-    get_resource_id_by_agent = """
+    get_resource_id_by_agent = {
+        'python': {
+            'json': """
+    def ${method_name}(self, agent_id):
+        ${doc_string}
         return self.get_resource_by_agent(agent_id).get_id()"""
+        }
+    }
 
-    get_resource_by_agent = """
+    get_resource_by_agent = {
+        'python': {
+            'json': """
+    def ${method_name}(self, agent_id):
+        ${doc_string}
         collection = JSONClientValidated('resource',
                                          collection='Resource',
                                          runtime=self._runtime)
         result = collection.find_one(
-            dict({'agentIds': {'$in': [str(agent_id)]}},
+            dict({'agentIds': {'$$in': [str(agent_id)]}},
                  **self._view_filter()))
         return objects.Resource(
             osid_object_map=result,
             runtime=self._runtime,
             proxy=self._proxy)"""
+        }
+    }
 
-    get_agent_ids_by_resource = """
+    get_agent_ids_by_resource = {
+        'python': {
+            'json': """
+    def ${method_name}(self, resource_id):
+        ${doc_string}
         collection = JSONClientValidated('resource',
                                          collection='Resource',
                                          runtime=self._runtime)
@@ -936,17 +960,27 @@ class ResourceAgentSession:
         else:
             result = IdList(resource['agentIds'])
         return result"""
+        }
+    }
 
-    get_agents_by_resource = """
+    get_agents_by_resource = {
+        'python': {
+            'json': """
+    def ${method_name}(self, resource_id):
+        ${doc_string}
         agent_list = []
         for agent_id in self.get_agent_ids_by_resource(resource_id):
             agent_list.append(Agent(agent_id))
         return AgentList(agent_list)"""
+        }
+    }
 
 
 class ResourceAgentAssignmentSession:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _session_namespace = 'resource.ResourceAgentAssignmentSession'
 
     def __init__(self, catalog_id=None, proxy=None, runtime=None):
@@ -962,8 +996,14 @@ class ResourceAgentAssignmentSession:
             cat_name='Bin',
             cat_class=objects.Bin)
         self._forms = dict()"""
+        }
+    }
 
-    assign_agent_to_resource = """
+    assign_agent_to_resource = {
+        'python': {
+            'json': """
+    def ${method_name}(self, agent_id, resource_id):
+        ${doc_string}
         # Should check for existence of Agent? We may mever manage them.
         collection = JSONClientValidated('resource',
                                          collection='Resource',
@@ -982,8 +1022,14 @@ class ResourceAgentAssignmentSession:
         else:
             resource['agentIds'].append(str(agent_id))
         collection.save(resource)"""
+        }
+    }
 
-    unassign_agent_from_resource = """
+    unassign_agent_from_resource = {
+        'python': {
+            'json': """
+    def ${method_name}(self, agent_id, resource_id):
+        ${doc_string}
         collection = JSONClientValidated('resource',
                                          collection='Resource',
                                          runtime=self._runtime)
@@ -994,6 +1040,8 @@ class ResourceAgentAssignmentSession:
         except (KeyError, ValueError):
             raise errors.NotFound('agent_id not assigned to resource')
         collection.save(resource)"""
+        }
+    }
 
 
 # class BinLookupSession:
@@ -1674,7 +1722,9 @@ class Resource:
     #     get_resource_record_template = """
     #         return self._get_record(${arg0_name})"""
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_object_map(self):
         obj_map = dict(self._my_map)
         if 'agentIds' in obj_map:
@@ -1682,6 +1732,8 @@ class Resource:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 # class ResourceQuery:

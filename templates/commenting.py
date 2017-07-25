@@ -58,14 +58,28 @@ from .resource import ResourceQuerySession
 
 class Comment:
 
-    import_statements = [
-        'from ..primitives import DisplayText',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..primitives import DisplayText',
+            ]
+        }
+    }
 
-    get_commenting_agent_id = """
+    get_commenting_agent_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return self.get_commentor_id()"""
+        }
+    }
 
-    get_commenting_agent = """
+    get_commenting_agent = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.has_commentor():
             raise errors.IllegalState('this Comment has no commenting_agent')
         try:
@@ -84,8 +98,12 @@ class Comment:
             raise errors.OperationFailed()
         else:
             return osid_object"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def has_commentor(self):
         return bool(self._my_map['commentorId'])
 
@@ -95,10 +113,16 @@ class Comment:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 class CommentQuery:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }

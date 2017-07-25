@@ -2,7 +2,9 @@
 class AssessmentAuthoringManager:
 
     # The following is here only until Tom fixes spec and adds these methods
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     @utilities.remove_null_proxy_kwarg
     @utilities.arguments_not_none
     def get_assessment_part_item_session(self, *args, **kwargs):
@@ -102,12 +104,16 @@ class AssessmentAuthoringManager:
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         # pylint: disable=no-member
         return sessions.AssessmentPartItemDesignSession(bank_id, runtime=self._runtime)"""
+        }
+    }
 
 
 class AssessmentAuthoringProxyManager:
 
     # The following is here only until Tom fixes spec and adds these methods
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     @utilities.arguments_not_none
     def get_assessment_part_item_session(self, proxy):
         \"\"\"Gets the ``OsidSession`` associated with the assessment part item service.
@@ -195,11 +201,15 @@ class AssessmentAuthoringProxyManager:
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         # pylint: disable=no-member
         return sessions.AssessmentPartItemDesignSession(bank_id, proxy=proxy, runtime=self._runtime)"""
+        }
+    }
 
 
 class AssessmentPartLookupSession:
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     @utilities.arguments_not_none
     def get_assessment_parts_for_assessment_part(self, assessment_part_id):
         \"\"\"Gets an ``AssessmentPart`` for the given assessment part.
@@ -223,26 +233,36 @@ class AssessmentPartLookupSession:
             dict({'assessmentPartId': str(assessment_part_id)},
                  **self._view_filter()))
         return objects.AssessmentPartList(result, runtime=self._runtime)"""
+        }
+    }
 
 
 class AssessmentPartAdminSession:
-    import_statements = [
-        'from . import objects',
-        'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartForm as ABCAssessmentPartForm',
-        'from dlkit.abstract_osid.id.primitives import Id as ABCId',
-        'from dlkit.json_.assessment.assessment_utilities import get_assessment_part_lookup_session',
-        'DESCENDING = -1',
-        'ASCENDING = 1',
-        'CREATED = True',
-        'UPDATED = True',
-        'ACTIVE = 0',
-        'ANY_STATUS = 1',
-        'SEQUESTERED = 0',
-        'UNSEQUESTERED = 1',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from . import objects',
+                'from dlkit.abstract_osid.osid import errors',
+                'from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPartForm as ABCAssessmentPartForm',
+                'from dlkit.abstract_osid.id.primitives import Id as ABCId',
+                'from dlkit.json_.assessment.assessment_utilities import get_assessment_part_lookup_session',
+                'DESCENDING = -1',
+                'ASCENDING = 1',
+                'CREATED = True',
+                'UPDATED = True',
+                'ACTIVE = 0',
+                'ANY_STATUS = 1',
+                'SEQUESTERED = 0',
+                'UNSEQUESTERED = 1',
+            ]
+        }
+    }
 
-    get_assessment_part_form_for_create_for_assessment_part = """
+    get_assessment_part_form_for_create_for_assessment_part = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_part_id, assessment_part_record_types):
+        ${doc_string}
         if not isinstance(assessment_part_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
         for arg in assessment_part_record_types:
@@ -276,8 +296,14 @@ class AssessmentPartAdminSession:
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
+        }
+    }
 
-    get_assessment_part_form_for_update = """
+    get_assessment_part_form_for_update = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_part_id):
+        ${doc_string}
         collection = JSONClientValidated('assessment_authoring',
                                          collection='AssessmentPart',
                                          runtime=self._runtime)
@@ -305,8 +331,14 @@ class AssessmentPartAdminSession:
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
+        }
+    }
 
-    delete_assessment_part = """
+    delete_assessment_part = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_part_id):
+        ${doc_string}
         # Should be implemented from template for
         # osid.learning.ObjectiveAdminSession.delete_objective_template
         # but need to handle magic part delete ...
@@ -331,15 +363,25 @@ class AssessmentPartAdminSession:
             part.delete()
         except AttributeError:
             collection.delete_one({'_id': ObjectId(assessment_part_id.get_identifier())})"""
+        }
+    }
 
 
 class AssessmentPartItemSession:
 
-    import_statements = [
-        'ISOLATED = 1',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'ISOLATED = 1',
+            ]
+        }
+    }
 
-    get_assessment_part_items = """
+    get_assessment_part_items = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_part_id):
+        ${doc_string}
         mgr = self._get_provider_manager('ASSESSMENT_AUTHORING', local=True)
         lookup_session = mgr.get_assessment_part_lookup_session(proxy=self._proxy)
         if self._catalog_view == ISOLATED:
@@ -351,47 +393,67 @@ class AssessmentPartItemSession:
         lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
         return lookup_session.get_items_by_ids(item_ids)"""
+        }
+    }
 
-    old_get_assessment_part_items = """
-        collection = JSONClientValidated('assessment_authoring',
-                                         collection='AssessmentPart',
-                                         runtime=self._runtime)
-        assessment_part = collection.find_one(
-            dict({'_id': ObjectId(assessment_part_id.get_identifier())},
-                 **self._view_filter()))
-        if 'itemIds' not in assessment_part:
-            raise errors.NotFound('no Items are assigned to this AssessmentPart')
-        item_ids = []
-        for idstr in assessment_part['itemIds']:
-            item_ids.append(Id(idstr))
-        mgr = self._get_provider_manager('ASSESSMENT')
-        lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
-        lookup_session.use_federated_bank_view()
-        return lookup_session.get_items_by_ids(item_ids)"""
+    # old_get_assessment_part_items = """
+    #     collection = JSONClientValidated('assessment_authoring',
+    #                                      collection='AssessmentPart',
+    #                                      runtime=self._runtime)
+    #     assessment_part = collection.find_one(
+    #         dict({'_id': ObjectId(assessment_part_id.get_identifier())},
+    #              **self._view_filter()))
+    #     if 'itemIds' not in assessment_part:
+    #         raise errors.NotFound('no Items are assigned to this AssessmentPart')
+    #     item_ids = []
+    #     for idstr in assessment_part['itemIds']:
+    #         item_ids.append(Id(idstr))
+    #     mgr = self._get_provider_manager('ASSESSMENT')
+    #     lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
+    #     lookup_session.use_federated_bank_view()
+    #     return lookup_session.get_items_by_ids(item_ids)"""
 
 
 class AssessmentPart:
 
     # Is there a way to template this so that all sub-package objects get a catalog import?
-    import_statements = [
-        'from ..assessment.objects import Bank, ItemList',
-        'from ..id.objects import IdList',
-        'from ..primitives import Type',
-        'from dlkit.abstract_osid.osid import errors',
-        'from dlkit.json_.assessment.assessment_utilities import get_assessment_part_lookup_session, get_item_lookup_session',
-        """SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
+    import_statements = {
+        'python': {
+            'json': [
+                'from ..assessment.objects import Bank, ItemList',
+                'from ..id.objects import IdList',
+                'from ..primitives import Type',
+                'from dlkit.abstract_osid.osid import errors',
+                'from dlkit.json_.assessment.assessment_utilities import get_assessment_part_lookup_session, get_item_lookup_session',
+                """SIMPLE_SEQUENCE_RECORD_TYPE = Type(**{
     'authority': 'ODL.MIT.EDU',
     'namespace': 'osid-object',
     'identifier': 'simple-child-sequencing'})""",
-    ]
+            ]
+        }
+    }
 
-    is_section = """
+    is_section = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return not self.is_sequestered()"""
+        }
+    }
 
-    has_parent_part = """
+    has_parent_part = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return bool('assessmentPartId' in self._my_map and self._my_map['assessmentPartId'])"""
+        }
+    }
 
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_child_ids(self):
         \"\"\"Gets the child ``Ids`` of this assessment part.\"\"\"
         return IdList(self._my_map['childIds'])
@@ -482,36 +544,64 @@ class AssessmentPart:
         session.use_unsequestered_assessment_part_view()
         session.use_federated_bank_view()
         return session"""
+        }
+    }
 
-    get_assessment_part = """
+    get_assessment_part = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.has_parent_part():
             raise errors.IllegalState('no parent part')
         lookup_session = self._get_assessment_part_lookup_session()
         return lookup_session.get_assessment_part(self.get_assessment_part_id())"""
+        }
+    }
 
-    get_assessment_part_id = """
+    get_assessment_part_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.has_parent_part():
             raise errors.IllegalState('no parent part')
         return Id(self._my_map['assessmentPartId'])"""
+        }
+    }
 
-    get_child_assessment_part_ids = """
+    get_child_assessment_part_ids = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.has_children():
             raise errors.IllegalState('no children assessment parts')
         return IdList(self._my_map['childIds'])"""
+        }
+    }
 
-    get_child_assessment_parts = """
+    get_child_assessment_parts = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         if not self.has_children():
             raise errors.IllegalState('no children assessment parts')
         # only returned unsequestered children?
         lookup_session = self._get_assessment_part_lookup_session()
         lookup_session.use_sequestered_assessment_part_view()
         return lookup_session.get_assessment_parts_by_ids(self.get_child_ids())"""
+        }
+    }
 
 
 class AssessmentPartForm:
 
     # Why is this a special initter?
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'assessment_authoring.AssessmentPart'
 
     def __init__(self, **kwargs):
@@ -577,9 +667,13 @@ class AssessmentPartForm:
         self._my_map['weight'] = self._weight_default
         if self._supports_simple_sequencing():
             self._my_map['childIds'] = []"""
+        }
+    }
 
     # Need to add metadata as well, but perhaps these should be in record extension
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def set_items_sequential(self, sequential):
         if not self._supports_simple_sequencing:
             raise AttributeError('This Assessment Part does not support simple child sequencing')
@@ -658,11 +752,15 @@ class AssessmentPartForm:
 
     def _supports_simple_sequencing(self):
         return bool(str(SIMPLE_SEQUENCE_RECORD_TYPE) in self._my_map['recordTypeIds'])"""
+        }
+    }
 
 
 class SequenceRuleForm:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, **kwargs):
         osid_objects.OsidObjectForm.__init__(self, object_name='SEQUENCE_RULE', **kwargs)
         self._mdata = default_mdata.get_sequence_rule_mdata()
@@ -687,13 +785,25 @@ class SequenceRuleForm:
         self._my_map['assessmentPartId'] = str(kwargs['assessment_part_id'])
         self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]
         self._my_map['appliedAssessmentPartIds'] = []"""
+        }
+    }
 
-    get_applied_assessment_parts_metadata = """
+    get_applied_assessment_parts_metadata = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         raise errors.Unimplemented()"""
+        }
+    }
 
 
 class SequenceRuleAdminSession:
-    get_sequence_rule_form_for_create = """
+    get_sequence_rule_form_for_create = {
+        'python': {
+            'json': """
+    def ${method_name}(self, sequence_rule_record_types):
+        ${doc_string}
         for arg in sequence_rule_record_types:
             if not isinstance(arg, ABCId):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
@@ -716,10 +826,14 @@ class SequenceRuleAdminSession:
                 assessment_part_id=assessment_part_id)
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
+        }
+    }
 
 
 class SequenceRuleQuery:
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, runtime):
         self._namespace = 'assessment_authoring.SequenceRuleQuery'
         self._runtime = runtime
@@ -729,10 +843,16 @@ class SequenceRuleQuery:
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
         osid_queries.OsidRuleQuery.__init__(self, runtime)"""
+        }
+    }
 
 
 class SequenceRuleLookupSession:
-    get_sequence_rules_for_assessment = """
+    get_sequence_rules_for_assessment = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_id):
+        ${doc_string}
         # First, recursively get all the partIds for the assessment
         def get_all_children_part_ids(part):
             child_ids = []
@@ -763,6 +883,8 @@ class SequenceRuleLookupSession:
                                          collection='SequenceRule',
                                          runtime=self._runtime)
         result = collection.find(
-            dict({'assessmentPartId': {'$in': id_strs}},
+            dict({'assessmentPartId': {'$$in': id_strs}},
                  **self._view_filter()))
         return objects.SequenceRuleList(result, runtime=self._runtime)"""
+        }
+    }

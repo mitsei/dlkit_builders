@@ -1,15 +1,21 @@
 
 class AuthorizationSession:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..primitives import Id',
-        'from ..osid.sessions import OsidSession',
-        'from ..utilities import JSONClientValidated',
-        'from . import objects'
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..primitives import Id',
+                'from ..osid.sessions import OsidSession',
+                'from ..utilities import JSONClientValidated',
+                'from . import objects'
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         self._catalog_class = objects.Vault
         self._catalog_name = 'Vault'
@@ -140,11 +146,23 @@ class AuthorizationSession:
             parent_ids = self._get_hierarchy_session(hierarchy_id).get_parents(qualifier_id)
             parent_id_list = [str(parent_id) for parent_id in parent_ids]
         return parent_id_list"""
+        }
+    }
 
-    can_access_authorizations = """
+    can_access_authorizations = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         return True"""
+        }
+    }
 
-    is_authorized = """
+    is_authorized = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
         collection = JSONClientValidated('authorization',
                                          collection='Authorization',
                                          runtime=self._runtime)
@@ -157,7 +175,7 @@ class AuthorizationSession:
                     collection.find_one(
                         {'agentId': str(agent_id),
                          'functionId': str(function_id),
-                         'qualifierId': {'$in': parent_id_list}})
+                         'qualifierId': {'$$in': parent_id_list}})
                 except errors.NotFound:
                     for parent_id in parent_id_list:
                         if is_parent_authorized(Id(parent_id)):
@@ -189,7 +207,7 @@ class AuthorizationSession:
             collection.find_one(
                 {'agentId': str(agent_id),
                  'functionId': str(function_id),
-                 'qualifierId': {'$in': idstr_list}})
+                 'qualifierId': {'$$in': idstr_list}})
 
         # Otherwise check for implicit authorization through inheritance:
         except errors.NotFound:
@@ -202,11 +220,17 @@ class AuthorizationSession:
                 return False
         else:
             return True"""
+        }
+    }
 
 
 class AuthorizationLookupSession:
 
-    get_authorizations_for_agent_and_function = """
+    get_authorizations_for_agent_and_function = {
+        'python': {
+            'json': """
+    def ${method_name}(self, agent_id, function_id):
+        ${doc_string}
         collection = JSONClientValidated('authorization',
                                          collection='Authorization',
                                          runtime=self._runtime)
@@ -214,18 +238,27 @@ class AuthorizationLookupSession:
             dict({'agentId': str(agent_id),
                   'functionId': str(function_id)},
                  **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.AuthorizationList(result, runtime=self._runtime)
-"""
+        return objects.AuthorizationList(result, runtime=self._runtime)"""
+        }
+    }
 
 
 class AuthorizationAdminSession:
 
-    import_statements = [
-        'from dlkit.abstract_osid.id.primitives import Id as ABCId',
-        'from dlkit.abstract_osid.type.primitives import Type as ABCType',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.id.primitives import Id as ABCId',
+                'from dlkit.abstract_osid.type.primitives import Type as ABCType',
+            ]
+        }
+    }
 
-    create_authorization = """
+    create_authorization = {
+        'python': {
+            'json': """
+    def ${method_name}(self, authorization_form):
+        ${doc_string}
         # TODO: not using the create_resource template
         # because want to prevent duplicate authorizations
         collection = JSONClientValidated('authorization',
@@ -263,8 +296,14 @@ class AuthorizationAdminSession:
             proxy=self._proxy)
 
         return result"""
+        }
+    }
 
-    get_authorization_form_for_create_for_agent = """
+    get_authorization_form_for_create_for_agent = {
+        'python': {
+            'json': """
+    def ${method_name}(self, agent_id, function_id, qualifier_id, authorization_record_types):
+        ${doc_string}
         if not isinstance(agent_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
         if not isinstance(function_id, ABCId):
@@ -297,10 +336,15 @@ class AuthorizationAdminSession:
                 proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form
-"""
+        return obj_form"""
+        }
+    }
 
-    get_authorization_form_for_create_for_resource = """
+    get_authorization_form_for_create_for_resource = {
+        'python': {
+            'json': """
+    def ${method_name}(self, resource_id, function_id, qualifier_id, authorization_record_types):
+        ${doc_string}
         if not isinstance(resource_id, ABCId):
             raise errors.InvalidArgument('argument is not a valid OSID Id')
         if not isinstance(function_id, ABCId):
@@ -332,18 +376,25 @@ class AuthorizationAdminSession:
                 proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form
-"""
+        return obj_form"""
+        }
+    }
 
 
 class AuthorizationForm:
 
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-        'from ..osid import objects as osid_objects',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from ..osid import objects as osid_objects',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _namespace = 'authorization.Authorization'
 
     def __init__(self, **kwargs):
@@ -372,10 +423,14 @@ class AuthorizationForm:
             self._my_map['agentId'] = str(kwargs['agent_id'])
         if 'resource_id' in kwargs:
             self._my_map['resourceId'] = str(kwargs['resource_id'])"""
+        }
+    }
 
 
 class Authorization:
-    additional_methods = """
+    additional_methods = {
+        'python': {
+            'json': """
     def get_object_map(self):
         obj_map = dict(self._my_map)
         if obj_map['startDate'] is not None:
@@ -401,14 +456,22 @@ class Authorization:
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""
+        }
+    }
 
 
 class AuthorizationQuery:
-    import_statements = [
-        'from dlkit.abstract_osid.osid import errors',
-    ]
+    import_statements = {
+        'python': {
+            'json': [
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     def __init__(self, runtime):
         self._namespace = 'authorization.Authorization'
         self._runtime = runtime
@@ -417,24 +480,49 @@ class AuthorizationQuery:
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidObjectQuery.__init__(self, runtime)
-"""
+        osid_queries.OsidObjectQuery.__init__(self, runtime)"""
+        }
+    }
 
-    match_agent_id = """
+    match_agent_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, agent_id, match):
+        ${doc_string}
         self._add_match('agentId', str(agent_id), bool(match))"""
+        }
+    }
 
-    match_function_id = """
+    match_function_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, function_id, match):
+        ${doc_string}
         self._add_match('functionId', str(function_id), bool(match))"""
+        }
+    }
 
-    match_qualifier_id = """
+    match_qualifier_id = {
+        'python': {
+            'json': """
+    def ${method_name}(self, qualifier_id, match):
+        ${doc_string}
         self._add_match('qualifierId', str(qualifier_id), bool(match))"""
+        }
+    }
 
 
 class VaultLookupSession:
-    get_vaults_by_genus_type = """
+    get_vaults_by_genus_type = {
+        'python': {
+            'json': """
+    def ${method_name}(self, vault_genus_type):
+        ${doc_string}
         collection = JSONClientValidated('authorization',
                                          collection='Vault',
                                          runtime=self._runtime)
-        result = collection.find({'genusTypeId': {'$in': [str(vault_genus_type)]}}).sort('_id', DESCENDING)
+        result = collection.find({'genusTypeId': {'$$in': [str(vault_genus_type)]}}).sort('_id', DESCENDING)
 
         return objects.VaultList(result, runtime=self._runtime)"""
+        }
+    }

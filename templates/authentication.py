@@ -1,6 +1,8 @@
 class Agent:
 
-    init = """
+    init = {
+        'python': {
+            'json': """
     _authority = 'Django_user_service'
     _namespace = 'authentication.Agent'
 
@@ -36,3 +38,5 @@ class Agent:
     def get_description(self):
         from ..locale.primitives import DisplayText
         return DisplayText('the agent Id for ' + self.get_display_name().get_text())"""
+        }
+    }

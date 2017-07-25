@@ -11,7 +11,7 @@ def map_osid_patterns(interface, package, index):
         if (interface['shortname'] == 'Metadata' and
                 method['name'] in ['get_element_label', 'get_instructions']):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid.Metadata.get_element_label',
+                pattern='osid_metadata.GenericMetadata.get_element_label',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -23,7 +23,7 @@ def map_osid_patterns(interface, package, index):
                 'supports_' not in method['name'] and
                 len(method['errors']) == 0):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid.Metadata.get_element_id',
+                pattern='osid_metadata.GenericMetadata.get_element_id',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -41,7 +41,7 @@ def map_osid_patterns(interface, package, index):
                 if s.strip('`').isupper() and s.strip('`') != 'ILLEGAL_STATE':
                     syntax_list.append(s.strip('`'))
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid.Metadata.get_minimum_cardinal',
+                pattern='osid_metadata.GenericMetadata.get_minimum_cardinal',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -60,7 +60,7 @@ def map_osid_patterns(interface, package, index):
                 if s.isupper() and s not in ['ILLEGAL_STATE', 'NULL_ARGUMENT']:
                     syntax_list.append(s)
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid.Metadata.supports_coordinate_type',
+                pattern='osid_metadata.GenericMetadata.supports_coordinate_type',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -78,7 +78,7 @@ def map_osid_patterns(interface, package, index):
                 if s.isupper() and s not in ['ILLEGAL_STATE', 'NULL_ARGUMENT']:
                     syntax_list.append(s)
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid.Metadata.get_existing_cardinal_values',
+                pattern='osid_metadata.GenericMetadata.get_existing_cardinal_values',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -107,7 +107,7 @@ def map_type_patterns(interface, package, index):
 
         if method['name'] == 'get_next_type':
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceList.get_next_resource',
+                pattern='osid_list.GenericObjectList.get_next_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -116,7 +116,7 @@ def map_type_patterns(interface, package, index):
 
         elif method['name'] == 'get_next_types':
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceList.get_next_resources',
+                pattern='osid_list.GenericObjectList.get_next_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -143,7 +143,7 @@ def map_id_patterns(interface, package, index):
 
         if method['name'] == 'get_next_id':
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceList.get_next_resource',
+                pattern='osid_list.GenericObjectList.get_next_object',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
@@ -152,7 +152,7 @@ def map_id_patterns(interface, package, index):
 
         elif method['name'] == 'get_next_ids':
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='resource.ResourceList.get_next_resources',
+                pattern='osid_list.GenericObjectList.get_next_objects',
                 kwargs=dict(interface_name=interface['shortname'],
                             package_name=package['name'],
                             module_name=interface['category'],
