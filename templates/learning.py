@@ -237,11 +237,11 @@ class ObjectiveRequisiteAssignmentSession:
     #     return obj_form"""
 
 
-# class Activity:
+class Activity:
 
-    # import_statements_pattern = [
-    #     'from dlkit.abstract_osid.osid import errors',
-    #     'from ..primitives import Id',
+    # import_statements = [
+    #     # 'from dlkit.abstract_osid.osid import errors',
+    #     # 'from ..primitives import Id',
     #     'from ..id.objects import IdList',
     # ]
     #
@@ -266,14 +266,32 @@ class ObjectiveRequisiteAssignmentSession:
     #     lookup_session.use_federated_${return_cat_name_under}_view()
     #     return lookup_session.get_${return_type_under}(self.get_${var_name}_id())"""
 
-    # is_course_based_activity = """
-    #     return bool(self._my_map['courseIds'])"""
-    #
-    # is_assessment_based_activity = """
-    #     return bool(self._my_map['assessmentIds'])"""
-    #
-    # is_asset_based_activity = """
-    #     return bool(self._my_map['assetIds'])"""
+    is_course_based_activity = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        return bool(self._my_map['courseIds'])"""
+        }
+    }
+
+    is_assessment_based_activity = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        return bool(self._my_map['assessmentIds'])"""
+        }
+    }
+
+    is_asset_based_activity = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        return bool(self._my_map['assetIds'])"""
+        }
+    }
 
     # This is actually used by Grading.GradeSystem.is_based_on_grades
     # Something wrong with our patterns, if it isn't going to the source pattern of

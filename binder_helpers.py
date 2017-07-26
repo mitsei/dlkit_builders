@@ -160,7 +160,9 @@ def remove_plural(string):
     if string in _plural_to_singular:
         return _plural_to_singular[string]
     else:
-        return string[:-1]
+        if len(string) > 1 and string[-1] == 's':
+            return string[:-1]
+        return string
 
 
 # This little function is used to convert each osid method name

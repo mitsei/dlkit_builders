@@ -591,6 +591,42 @@ class GradeSystemAdminSession:
         }
     }
 
+    # Need to override the template because of the extra ``grade_system_id`` argument
+    can_create_grades = {
+        'python': {
+            'json': """
+    def ${method_name}(self, grade_system_id):
+        ${doc_string}
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+        }
+    }
+
+    # Need to override the template because of the extra ``grade_system_id`` argument
+    can_delete_grades = {
+        'python': {
+            'json': """
+    def ${method_name}(self, grade_system_id):
+        ${doc_string}
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+        }
+    }
+
+    # Need to override the template because of the extra ``grade_system_id`` argument
+    can_create_grade_with_record_types = {
+        'python': {
+            'json': """
+    def ${method_name}(self, grade_system_id, grade_record_types):
+        ${doc_string}
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+        }
+    }
+
 
 class GradebookColumnSummary:
     import_statements = {

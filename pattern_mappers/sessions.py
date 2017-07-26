@@ -2959,7 +2959,7 @@ def map_session_patterns(interface, package, index):
         elif (interface['shortname'] in ['AssetCompositionDesignSession', 'AssessmentPartItemDesignSession'] and
                 method['name'].startswith('remove_')):
             index[interface['shortname'] + '.' + method['name']] = dict(
-                pattern='osid_session.GenericObjectContainableDesignSession.remove_object',
+                pattern='osid_session.GenericObjectContainableDesignSession.remove_object_from_containable',
                 kwargs=make_twargs(index,
                                    package,
                                    interface,

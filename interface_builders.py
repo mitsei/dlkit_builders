@@ -207,7 +207,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             two_word_objects = ['assessment_part', 'sequence_rule', 'grade_entry',
                                 'log_entry', 'grade_system', 'gradebook_column',
                                 'asset_content', 'assessment_offered', 'assessment_taken',
-                                'assessment_section']
+                                'assessment_section', 'objective_bank']
 
             object_name_ = under_to_camel(underscore_name.split('_')[0])
 

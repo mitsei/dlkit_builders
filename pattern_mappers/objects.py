@@ -378,6 +378,7 @@ def map_object_form_patterns(interface, package, index):
                             method_name=method['name'],
                             var_name=var_name,
                             arg0_name=method['args'][0]['var_name'],
+                            arg0_type_full=method['args'][0]['arg_type'],
                             syntax='TYPE'))
 
         # ObjectForm methods that clear all of persisted Types. Note

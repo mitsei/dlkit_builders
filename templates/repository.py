@@ -1310,7 +1310,7 @@ class Composition:
     # Naming conventions.  The pattern mapper expected get_child_ids.  The second
     # should otherwise come from the template for learning.Activity.get_asset_ids
     get_children_ids = {
-        'pythohn': {
+        'python': {
             'json': """
     def ${method_name}(self):
         ${doc_string}

@@ -327,7 +327,7 @@ class GenericObjectLookupSession(object):
                                          runtime=self._runtime)
         id_str_list = [str(id_) for id_ in ${arg0_name}]
         result = collection.find(
-            dict({'${arg0_object_mixed}Id': {$$in: id_str_list}},
+            dict({'${arg0_object_mixed}Id': {'$$in': id_str_list}},
                  **self._view_filter()))
         return objects.${return_type}(result, runtime=self._runtime)"""
         }
@@ -389,7 +389,7 @@ class GenericObjectAdminSession(object):
     can_create_object_with_record_types_template = {
         'python': {
             'json': """
-    def ${method_name}(self):
+    def ${method_name}(self, ${arg0_name}):
         ${doc_string}
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
@@ -1304,7 +1304,7 @@ class GenericObjectCatalogAssignmentSession(object):
     get_assignable_catalog_ids_for_object_template = {
         'python': {
             'json': """
-    def ${method_name}(self, ${arg0_name}):
+    def ${method_name}(self, ${arg0_name}, ${arg1_name}):
         ${doc_string}
         ${pattern_name}
         # This will likely be overridden by an authorization adapter

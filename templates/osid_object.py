@@ -5,6 +5,7 @@ class GenericObject(object):
                 'from dlkit.abstract_osid.osid import errors',
                 'from ..primitives import Id, DateTime, Duration, DisplayText',
                 'from ..utilities import get_registry',
+                'from ..id.objects import IdList',
                 'from decimal import Decimal']
         }
     }

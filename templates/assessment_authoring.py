@@ -366,6 +366,38 @@ class AssessmentPartAdminSession:
         }
     }
 
+    # Need to override the template because of the extra ``assessment_part_id`` argument
+    update_assessment_part = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_part_id, assessment_part_form):
+        ${doc_string}
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='AssessmentPart',
+                                         runtime=self._runtime)
+        if not isinstance(assessment_part_form, ABCAssessmentPartForm):
+            raise errors.InvalidArgument('argument type is not an AssessmentPartForm')
+        if not assessment_part_form.is_for_update():
+            raise errors.InvalidArgument('the AssessmentPartForm is for update only, not create')
+        try:
+            if self._forms[assessment_part_form.get_id().get_identifier()] == UPDATED:
+                raise errors.IllegalState('assessment_part_form already used in an update transaction')
+        except KeyError:
+            raise errors.Unsupported('assessment_part_form did not originate from this session')
+        if not assessment_part_form.is_valid():
+            raise errors.InvalidArgument('one or more of the form elements is invalid')
+        collection.save(assessment_part_form._my_map)
+
+        self._forms[assessment_part_form.get_id().get_identifier()] = UPDATED
+
+        # Note: this is out of spec. The OSIDs don't require an object to be returned:
+        return objects.AssessmentPart(
+            osid_object_map=assessment_part_form._my_map,
+            runtime=self._runtime,
+            proxy=self._proxy)"""
+        }
+    }
+
 
 class AssessmentPartItemSession:
 
@@ -802,7 +834,7 @@ class SequenceRuleAdminSession:
     get_sequence_rule_form_for_create = {
         'python': {
             'json': """
-    def ${method_name}(self, sequence_rule_record_types):
+    def ${method_name}(self, assessment_part_id, next_assessment_part_id, sequence_rule_record_types):
         ${doc_string}
         for arg in sequence_rule_record_types:
             if not isinstance(arg, ABCId):
@@ -884,6 +916,26 @@ class SequenceRuleLookupSession:
                                          runtime=self._runtime)
         result = collection.find(
             dict({'assessmentPartId': {'$$in': id_strs}},
+                 **self._view_filter()))
+        return objects.SequenceRuleList(result, runtime=self._runtime)"""
+        }
+    }
+
+    # Need to override the get_subjugated_objects_for_objects template because of the ``next_assessment_part_id`` arg
+    get_sequence_rules_for_assessment_parts = {
+        'python': {
+            'json': """
+    def ${method_name}(self, assessment_part_id, next_assessment_part_id):
+        ${doc_string}
+        # NOTE: This implementation currently ignores plenary view
+        collection = JSONClientValidated('assessment_authoring',
+                                         collection='SequenceRule',
+                                         runtime=self._runtime)
+        id_str_list = [str(id_) for id_ in assessment_part_id]
+        next_id_str_list = [str(id_) for id_ in next_assessment_part_id]
+        result = collection.find(
+            dict({'assessmentPartId': {'$$in': id_str_list},
+                  'nextAssessmentPartId': {'$$in': next_id_str_list}},
                  **self._view_filter()))
         return objects.SequenceRuleList(result, runtime=self._runtime)"""
         }

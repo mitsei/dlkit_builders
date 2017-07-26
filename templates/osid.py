@@ -846,7 +846,7 @@ class OsidSession:
                                          collection=pkg_name + 'Ids',
                                          runtime=self._runtime)
         try:
-            result = collection.find_one({'aliasIds': {'$in': [str(id_)]}})
+            result = collection.find_one({'aliasIds': {'$$in': [str(id_)]}})
         except errors.NotFound:
             return id_
         else:
@@ -864,7 +864,7 @@ class OsidSession:
                                          collection=pkg_name + 'Ids',
                                          runtime=self._runtime)
         try:
-            result = collection.find_one({'aliasIds': {'$in': [str(equivalent_id)]}})
+            result = collection.find_one({'aliasIds': {'$$in': [str(equivalent_id)]}})
         except errors.NotFound:
             pass
         else:
@@ -972,8 +972,8 @@ class OsidSession:
         if self._is_phantom_root_federated():
             return {}
         idstr_list = self._get_catalog_idstrs()
-        return {'assigned' + self._catalog_name + 'Ids': {'$in': idstr_list}}
-        # return {'assigned' + utilities.format_catalog(self._catalog_name) + 'Ids': {'$in': idstr_list}}
+        return {'assigned' + self._catalog_name + 'Ids': {'$$in': idstr_list}}
+        # return {'assigned' + utilities.format_catalog(self._catalog_name) + 'Ids': {'$$in': idstr_list}}
 
     def _assign_object_to_catalog(self, obj_id, cat_id):
         pkg_name = obj_id.get_identifier_namespace().split('.')[0]
@@ -2413,9 +2413,9 @@ class OsidQuery:
     def _add_match(self, match_key, match_value, match=True):
         \"\"\"Adds a match key/value\"\"\"
         if match:
-            inin = '$in'
+            inin = '$$in'
         else:
-            inin = '$nin'
+            inin = '$$nin'
         if match_key in self._query_terms:
             if inin in self._query_terms[match_key]:
                 self._query_terms[match_key][inin].append(match_value)
@@ -2434,9 +2434,9 @@ class OsidQuery:
     def _match_minimum_decimal(self, match_key, decimal_value, match=True):
         \"\"\"Matches a minimum decimal value\"\"\"
         if match:
-            gtelt = '$gte'
+            gtelt = '$$gte'
         else:
-            gtelt = '$lt'
+            gtelt = '$$lt'
         if match_key in self._query_terms:
             self._query_terms[match_key][gtelt] = decimal_value
         else:
@@ -2446,9 +2446,9 @@ class OsidQuery:
     def _match_maximum_decimal(self, match_key, decimal_value, match=True):
         \"\"\"Matches a minimum decimal value\"\"\"
         if match:
-            ltegt = '$lte'
+            ltegt = '$$lte'
         else:
-            ltegt = '$gt'
+            ltegt = '$$gt'
         if match_key in self._query_terms:
             self._query_terms[match_key][ltegt] = decimal_value
         else:
@@ -2458,9 +2458,9 @@ class OsidQuery:
     def _match_minimum_date_time(self, match_key, date_time_value, match=True):
         \"\"\"Matches a minimum date time value\"\"\"
         if match:
-            gtelt = '$gte'
+            gtelt = '$$gte'
         else:
-            gtelt = '$lt'
+            gtelt = '$$lt'
         if match_key in self._query_terms:
             self._query_terms[match_key][gtelt] = date_time_value
         else:
@@ -2470,9 +2470,9 @@ class OsidQuery:
     def _match_maximum_date_time(self, match_key, date_time_value, match=True):
         \"\"\"Matches a maximum date time value\"\"\"
         if match:
-            gtelt = '$lte'
+            gtelt = '$$lte'
         else:
-            gtelt = '$gt'
+            gtelt = '$$gt'
         if match_key in self._query_terms:
             self._query_terms[match_key][gtelt] = date_time_value
         else:
@@ -2488,11 +2488,11 @@ class OsidQuery:
     def _clear_minimum_terms(self, match_key):
         \"\"\"clears minimum match_key term values\"\"\"
         try:  # clear match = True case
-            del self._query_terms[match_key]['$gte']
+            del self._query_terms[match_key]['$$gte']
         except KeyError:
             pass
         try:  # clear match = False case
-            del self._query_terms[match_key]['$lt']
+            del self._query_terms[match_key]['$$lt']
         except KeyError:
             pass
         try:
@@ -2504,11 +2504,11 @@ class OsidQuery:
     def _clear_maximum_terms(self, match_key):
         \"\"\"clears maximum match_key term values\"\"\"
         try:  # clear match = True case
-            del self._query_terms[match_key]['$lte']
+            del self._query_terms[match_key]['$$lte']
         except KeyError:
             pass
         try:  # clear match = False case
-            del self._query_terms[match_key]['$gt']
+            del self._query_terms[match_key]['$$gt']
         except KeyError:
             pass
         try:
@@ -2528,8 +2528,8 @@ class OsidQuery:
         match_value = self._get_string_match_value(keyword, string_match_type)
         for field_name in self._keyword_fields:
             if field_name not in self._keyword_terms:
-                self._keyword_terms[field_name] = {'$in': list()}
-            self._keyword_terms[field_name]['$in'].append(match_value)"""
+                self._keyword_terms[field_name] = {'$$in': list()}
+            self._keyword_terms[field_name]['$$in'].append(match_value)"""
         }
     }
 
@@ -2548,7 +2548,7 @@ class OsidQuery:
     def ${method_name}(self, match):
         ${doc_string}
         match_key = '_id'
-        param = '$exists'
+        param = '$$exists'
         if match:
             flag = 'true'
         else:
@@ -3057,10 +3057,10 @@ class OsidTemporalQuery:
             if to < from_:
                 raise errors.InvalidArgument('end date must be >= start date when match = True')
             self._query_terms['startDate'] = {
-                '$gte': from_
+                '$$gte': from_
             }
             self._query_terms['endDate'] = {
-                '$lte': to
+                '$$lte': to
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
@@ -3076,8 +3076,8 @@ class OsidTemporalQuery:
             if end < start:
                 raise errors.InvalidArgument('end date must be >= start date when match = True')
             self._query_terms['startDate'] = {
-                '$gte': start,
-                '$lte': end
+                '$$gte': start,
+                '$$lte': end
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
@@ -3093,8 +3093,8 @@ class OsidTemporalQuery:
             if end < start:
                 raise errors.InvalidArgument('end date must be >= start date when match = True')
             self._query_terms['endDate'] = {
-                '$gte': start,
-                '$lte': end
+                '$$gte': start,
+                '$$lte': end
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
