@@ -1,5 +1,7 @@
+from .osid_session import GenericAdapterSession
 
-# class RepositoryProfile:
+
+class RepositoryProfile:
 
     # get_coordinate_types_template = """
     #     # Implemented from template for
@@ -10,6 +12,20 @@
     #     # Implemented from template for
     #     # osid.repository.RepositoryProfile.supports_coordinate_type
     #     return False"""
+    additional_methods = {
+        'python': {
+            'services': """
+    def get_asset_content_lookup_session(self, *args, **kwargs):
+        \"\"\"Pass through to provider \"\"\"
+        return self._provider_manager.get_asset_content_lookup_session(*args, **kwargs)
+
+    asset_content_lookup_session = property(fget=get_asset_content_lookup_session)
+
+    def get_asset_content_lookup_session_for_repository(self, *args, **kwargs):
+        \"\"\"Pass through to provider \"\"\"
+        return self._provider_manager.get_asset_content_lookup_session_for_repository(args, kwargs)"""
+        }
+    }
 
 
 class RepositoryManager:
@@ -656,7 +672,11 @@ class AssetAdminSession:
             osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
             runtime=self._runtime,
             proxy=self._proxy)
-        return result"""
+        return result""",
+            'services': """
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    def duplicate_asset(self, asset_id):
+        return self._get_provider_session('asset_admin_session').duplicate_asset(asset_id)"""
         }
     }
 
@@ -1479,7 +1499,11 @@ class CompositionAdminSession:
             osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
             runtime=self._runtime,
             proxy=self._proxy)
-        return result"""
+        return result""",
+            'services': """
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    def duplicate_composition(self, composition_id):
+        return self._get_provider_session('composition_admin_session').duplicate_composition(composition_id)"""
         }
     }
 
@@ -1545,7 +1569,8 @@ class CompositionRepositorySession:
         if 'assignedRepositoryIds' in composition._my_map:
             for idstr in composition._my_map['assignedRepositoryIds']:
                 id_list.append(Id(idstr))
-        return IdList(id_list)"""
+        return IdList(id_list)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1625,5 +1650,73 @@ class AssetQuerySession:
         return objects.AssetContentList(matching_asset_contents,
                                         runtime=self._runtime,
                                         proxy=self._proxy)"""
+        }
+    }
+
+
+class Repository:
+    additional_methods = {
+        'python': {
+            'services': """
+
+    def can_lookup_asset_contents(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetContentLookupSession.can_lookup_asset_contents
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_content_lookup_session').can_lookup_asset_contents(*args, **kwargs)
+
+    def get_asset_content(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetContentLookupSession.get_asset_content
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_content_lookup_session').get_asset_content(*args, **kwargs)
+
+    def get_asset_contents_by_ids(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetContentLookupSession.get_asset_contents_by_ids
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_content_lookup_session').get_asset_contents_by_ids(*args, **kwargs)
+
+    def get_asset_contents_by_genus_type(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetContentLookupSession.get_asset_contents_by_genus_type
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_content_lookup_session').get_asset_contents_by_genus_type(*args, **kwargs)
+
+    def get_asset_contents_by_parent_genus_type(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetContentLookupSession.get_asset_contents_by_parent_genus_type
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_content_lookup_session').get_asset_contents_by_parent_genus_type(*args, **kwargs)
+
+    def get_asset_contents_by_record_type(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetContentLookupSession.get_asset_contents_by_record_type
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_content_lookup_session').get_asset_contents_by_record_type(*args, **kwargs)
+
+    def get_asset_contents_for_asset(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetContentLookupSession.get_asset_contents_for_asset
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_content_lookup_session').get_asset_contents_for_asset(*args, **kwargs)
+
+    def get_asset_contents_by_genus_type_for_asset(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetContentLookupSession.get_asset_contents_by_genus_type_for_asset
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_content_lookup_session').get_asset_contents_by_genus_type_for_asset(*args, **kwargs)
+
+    def get_asset_content_query(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetQuerySession.get_asset_content_query
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_query_session').get_asset_content_query(*args, **kwargs)
+
+    def get_asset_contents_by_query(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssetQuerySession.get_asset_contents_by_query
+            Out-of-band, non-OSID convenience method
+        \"\"\"
+        return self._get_provider_session('asset_query_session').get_asset_contents_by_query(*args, **kwargs)"""
         }
     }

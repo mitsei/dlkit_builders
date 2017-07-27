@@ -1,4 +1,6 @@
-#
+from .osid_session import GenericAdapterSession
+
+
 # class ResourceProfile:
 #
 #     import_statements_pattern = [
@@ -922,7 +924,8 @@ class ResourceAgentSession:
             'json': """
     def ${method_name}(self, agent_id):
         ${doc_string}
-        return self.get_resource_by_agent(agent_id).get_id()"""
+        return self.get_resource_by_agent(agent_id).get_id()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -940,7 +943,8 @@ class ResourceAgentSession:
         return objects.Resource(
             osid_object_map=result,
             runtime=self._runtime,
-            proxy=self._proxy)"""
+            proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -959,7 +963,8 @@ class ResourceAgentSession:
             result = IdList([])
         else:
             result = IdList(resource['agentIds'])
-        return result"""
+        return result""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -971,7 +976,8 @@ class ResourceAgentSession:
         agent_list = []
         for agent_id in self.get_agent_ids_by_resource(resource_id):
             agent_list.append(Agent(agent_id))
-        return AgentList(agent_list)"""
+        return AgentList(agent_list)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1021,7 +1027,8 @@ class ResourceAgentAssignmentSession:
             resource['agentIds'] = [str(agent_id)]
         else:
             resource['agentIds'].append(str(agent_id))
-        collection.save(resource)"""
+        collection.save(resource)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1039,7 +1046,8 @@ class ResourceAgentAssignmentSession:
             resource['agentIds'].remove(str(agent_id))
         except (KeyError, ValueError):
             raise errors.NotFound('agent_id not assigned to resource')
-        collection.save(resource)"""
+        collection.save(resource)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 

@@ -15,12 +15,18 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/services'
-        self._template_dir = self._abs_path + '/kitosid_templates'
+        self._template_dir = self._abs_path + '/templates'
 
         self._class = 'services'
 
     def _clean_up_impl(self, impl, interface, method):
-        un_impl_doc = '{}\"\"\"Pass through to provider unimplemented\"\"\"\n'.format(self._dind)
+        if interface['shortname'].endswith('ProxyManager') and impl == '':
+            # Don't build this, let it fall through to the regular Manager
+            return ''
+
+        un_impl_doc = '{0}\n{1}\"\"\"Pass through to provider unimplemented\"\"\"\n'.format(self._get_method_sig(method,
+                                                                                                                 interface),
+                                                                                            self._dind)
 
         if impl == '' and method['args']:
             impl = ('{}{}raise Unimplemented(\'Unimplemented in dlkit.services - ' +
@@ -31,8 +37,9 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                                                                                          self._dind)
         return impl
 
-    def _compile_method(self, args, decorators, method_doc, method_impl):
-        return method_impl
+    def _compile_method(self, args, decorators, method_impl):
+        if method_impl != '':
+            return method_impl
 
     def _confirm_build_method(self, impl_class, method_name):
         # Check if this method is marked to be skipped (the assumption
@@ -158,9 +165,11 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
             pass
         elif interface_name.endswith('Manager') and 'session' in method_name:
             if self.patterns[method_name[4:].split('_for_')[0] + '.is_manager_session']:
-                template_name = self.last(pattern) + '_managertemplate'
+                # template_name = self.last(pattern) + '_managertemplate'
+                template_name = self.last(pattern) + '_template'
             elif self.patterns[method_name[4:].split('_for_')[0] + '.is_catalog_session']:
-                template_name = self.last(pattern) + '_catalogtemplate'
+                # template_name = self.last(pattern) + '_catalogtemplate'
+                template_name = self.last(pattern) + '_template'
         return template_name
 
     @staticmethod
@@ -346,7 +355,7 @@ DISABLED = -1"""
             init_methods = self._wrap(init_methods) + '\n'
 
         if additional_methods:
-            methods += additional_methods
+            methods += '\n\n{0}'.format(additional_methods)
 
         sub_package_methods = self._get_sub_package_methods(interface)
         if sub_package_methods != '':

@@ -1,3 +1,5 @@
+from .osid_session import GenericAdapterSession
+
 
 class AuthorizationSession:
 
@@ -219,7 +221,8 @@ class AuthorizationSession:
             else:
                 return False
         else:
-            return True"""
+            return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -336,7 +339,8 @@ class AuthorizationAdminSession:
                 proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -376,7 +380,8 @@ class AuthorizationAdminSession:
                 proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 

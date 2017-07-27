@@ -96,8 +96,10 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
             if method['args']:
                 context['args_kwargs_or_nothing'] = '*args, **kwargs'
+                context['args_kwargs_method_sig'] = 'self, *args, **kwargs'
             else:
                 context['args_kwargs_or_nothing'] = ''
+                context['args_kwargs_method_sig'] = 'self'
 
             if context['interface_name_under'].endswith('_session'):
                 context['session_shortname_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
@@ -282,6 +284,7 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
         self._confirm_build_method(impl_class, method_n)
         context = self._get_method_context(method, interface)
+        context['pattern_name'] = self.get_pattern_name(pattern)
         template_name = self._get_template_name(pattern, interface_sn, method_n)
 
         # Check if there is a 'by hand' implementation available for this method
@@ -296,7 +299,6 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
             if self._is('services') and getattr(template_class, template_name) is None:
                 raise SkipMethod()
 
-            context['pattern_name'] = self.get_pattern_name(pattern)
             impl = self.get_impl_from_templates(template_class, template_name)
 
         # always pass through the context to get things like ``doc_string``
@@ -363,34 +365,34 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 continue
 
             try:
-                method_str = self._make_method(method, interface)
-                if method_str.strip():  # to suppress new lines in unimplemented methods
-                    body.append(method_str)
+                impl = self._make_method(method, interface)
             except SkipMethod:
                 # Only expected from kitosid / services builder
                 pass
             else:
-                if not self._is('tests') and not self._is('test_authz'):  # Should be a boolean flag, something like if self._make_properties (returns boolean)
-                    # Here is where we add the Python properties stuff:
-                    if argless_get(method):
-                        body.append(simple_property('get', method))
-                    elif one_arg_set(method):
-                        if (simple_property('del', method)) in body:
-                            body.remove(simple_property('del', method))
-                            body.append(set_and_del_property(method))
-                        else:
-                            body.append(simple_property('set', method))
-                    elif argless_clear(method):
-                        if (simple_property('set', method)) in body:
-                            body.remove(simple_property('set', method))
-                            body.append(set_and_del_property(method))
-                        else:
-                            body.append(simple_property('del', method))
+                if bool(impl):
+                    body.append(impl)
+                    if not self._is('tests') and not self._is('test_authz'):
+                        # Here is where we add the Python properties stuff:
+                        if argless_get(method):
+                            body.append(simple_property('get', method))
+                        elif one_arg_set(method):
+                            if (simple_property('del', method)) in body:
+                                body.remove(simple_property('del', method))
+                                body.append(set_and_del_property(method))
+                            else:
+                                body.append(simple_property('set', method))
+                        elif argless_clear(method):
+                            if (simple_property('set', method)) in body:
+                                body.remove(simple_property('set', method))
+                                body.append(set_and_del_property(method))
+                            else:
+                                body.append(simple_property('del', method))
 
-                    if method['name'] == 'get_id':
-                            body.append(simple_property('get', method, 'ident'))
-                    if method['name'] == 'get_identifier_namespace':
-                            body.append(simple_property('get', method, 'namespace'))
+                        if method['name'] == 'get_id':
+                                body.append(simple_property('get', method, 'ident'))
+                        if method['name'] == 'get_identifier_namespace':
+                                body.append(simple_property('get', method, 'namespace'))
         return '\n\n'.join(body)
 
 

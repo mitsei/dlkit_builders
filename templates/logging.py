@@ -1,3 +1,6 @@
+from .osid_session import GenericAdapterSession
+
+
 class LoggingSession:
 
     import_statements = {
@@ -34,7 +37,8 @@ class LoggingSession:
         ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 

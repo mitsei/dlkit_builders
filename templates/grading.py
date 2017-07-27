@@ -1,3 +1,5 @@
+from .osid_session import GenericAdapterSession
+
 
 class GradeEntryAdminSession:
 
@@ -46,7 +48,8 @@ class GradeEntryAdminSession:
                 proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -72,7 +75,8 @@ class GradeEntryAdminSession:
             proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -451,7 +455,8 @@ class GradebookColumnLookupSession:
         summary_map['gradebookColumnId'] = str(gradebook_column.ident)
         return GradebookColumnSummary(osid_object_map=summary_map,
                                       runtime=self._runtime,
-                                      proxy=self._proxy)"""
+                                      proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -495,7 +500,8 @@ class GradebookColumnAdminSession:
         objects.GradebookColumn(osid_object_map=gradebook_column_map,
                                 runtime=self._runtime,
                                 proxy=self._proxy)._delete()
-        collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})"""
+        collection.delete_one({'_id': ObjectId(gradebook_column_id.get_identifier())})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -534,7 +540,8 @@ class GradebookColumnAdminSession:
         return objects.GradebookColumn(
             osid_object_map=gradebook_column_form._my_map,
             runtime=self._runtime,
-            proxy=self._proxy)"""
+            proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -599,7 +606,8 @@ class GradeSystemAdminSession:
         ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -611,7 +619,8 @@ class GradeSystemAdminSession:
         ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -623,7 +632,8 @@ class GradeSystemAdminSession:
         ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 

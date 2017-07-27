@@ -1,3 +1,5 @@
+from .osid_session import GenericAdapterSession
+
 
 class AssessmentManager:
 
@@ -98,7 +100,8 @@ class AssessmentSession:
         ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -107,7 +110,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_taken_id):
         ${doc_string}
-        return self._get_assessment_taken(assessment_taken_id).has_started()"""
+        return self._get_assessment_taken(assessment_taken_id).has_started()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -116,7 +120,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_taken_id):
         ${doc_string}
-        return self._get_assessment_taken(assessment_taken_id).has_ended()"""
+        return self._get_assessment_taken(assessment_taken_id).has_ended()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -136,7 +141,8 @@ class AssessmentSession:
             assessment_taken_map['ended'] = True
             collection.save(assessment_taken_map)
         else:
-            raise errors.IllegalState()"""
+            raise errors.IllegalState()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -145,7 +151,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_taken_id):
         ${doc_string}
-        return self._get_assessment_taken(assessment_taken_id).get_assessment_offered().are_sections_sequential()"""
+        return self._get_assessment_taken(assessment_taken_id).get_assessment_offered().are_sections_sequential()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -155,7 +162,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_taken_id):
         ${doc_string}
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
-        return assessment_taken._get_first_assessment_section()"""
+        return assessment_taken._get_first_assessment_section()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -169,7 +177,8 @@ class AssessmentSession:
         except errors.IllegalState:
             return False
         else:
-            return True"""
+            return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -179,7 +188,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
-        return assessment_taken._get_next_assessment_section(assessment_section_id)"""
+        return assessment_taken._get_next_assessment_section(assessment_section_id)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -193,7 +203,8 @@ class AssessmentSession:
         except errors.IllegalState:
             return False
         else:
-            return True"""
+            return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -203,7 +214,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
-        return assessment_taken._get_previous_assessment_section(assessment_section_id)"""
+        return assessment_taken._get_previous_assessment_section(assessment_section_id)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -212,7 +224,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
-        return get_section_util(assessment_section_id, runtime=self._runtime, proxy=self._proxy)"""
+        return get_section_util(assessment_section_id, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -222,7 +235,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_taken_id):
         ${doc_string}
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
-        return assessment_taken._get_assessment_sections()"""
+        return assessment_taken._get_assessment_sections()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -231,7 +245,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).is_complete()"""
+        return self.get_assessment_section(assessment_section_id).is_complete()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -244,7 +259,8 @@ class AssessmentSession:
         for section in self.get_assessment_sections(assessment_taken_id):
             if not section.is_complete():
                 section_list.append(section)
-        return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -256,7 +272,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         return get_section_util(assessment_section_id,
-                                runtime=self._runtime)._assessment_taken.has_started()"""
+                                runtime=self._runtime)._assessment_taken.has_started()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -267,7 +284,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         return get_section_util(assessment_section_id,
-                                runtime=self._runtime).is_over()"""
+                                runtime=self._runtime).is_over()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -282,7 +300,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).are_items_sequential()"""
+        return self.get_assessment_section(assessment_section_id).are_items_sequential()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -291,7 +310,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).get_first_question()"""
+        return self.get_assessment_section(assessment_section_id).get_first_question()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -305,7 +325,8 @@ class AssessmentSession:
         except errors.IllegalState:
             return False
         else:
-            return True"""
+            return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -314,7 +335,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id)"""
+        return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -328,7 +350,8 @@ class AssessmentSession:
         except errors.IllegalState:
             return False
         else:
-            return True"""
+            return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -337,7 +360,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id, reverse=True)"""
+        return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id, reverse=True)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -346,7 +370,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).get_question(question_id=item_id)"""
+        return self.get_assessment_section(assessment_section_id).get_question(question_id=item_id)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -356,7 +381,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         # Does this want to return a blocking list of available questions?
-        return self.get_assessment_section(assessment_section_id).get_questions()"""
+        return self.get_assessment_section(assessment_section_id).get_questions()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -415,7 +441,8 @@ class AssessmentSession:
             proxy=self._proxy)
         obj_form._for_update = False  # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -449,7 +476,8 @@ class AssessmentSession:
             raise errors.InvalidArgument('one or more of the form elements is invalid')
         answer_form._my_map['_id'] = ObjectId()
         self.get_assessment_section(assessment_section_id).submit_response(item_id, answer_form)
-        self._forms[answer_form.get_id().get_identifier()] = SUBMITTED"""
+        self._forms[answer_form.get_id().get_identifier()] = SUBMITTED""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -459,7 +487,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
         # add conditional: if the assessment or part allows us to skip:
-        self.get_assessment_section(assessment_section_id).submit_response(item_id, None)"""
+        self.get_assessment_section(assessment_section_id).submit_response(item_id, None)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -468,7 +497,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).is_question_answered(item_id)"""
+        return self.get_assessment_section(assessment_section_id).is_question_answered(item_id)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -477,7 +507,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).get_questions(answered=False)"""
+        return self.get_assessment_section(assessment_section_id).get_questions(answered=False)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -487,7 +518,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         # There's probably a more efficient way to implement this:
-        return bool(self.get_unanswered_questions(assessment_section_id).available())"""
+        return bool(self.get_unanswered_questions(assessment_section_id).available())""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -499,7 +531,8 @@ class AssessmentSession:
         questions = self.get_unanswered_questions(assessment_section_id)
         if not questions.available():
             raise errors.IllegalState('There are no more unanswered questions available')
-        return questions.next()"""
+        return questions.next()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -514,7 +547,8 @@ class AssessmentSession:
         except errors.IllegalState:
             return False
         else:
-            return True"""
+            return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -531,7 +565,8 @@ class AssessmentSession:
                     return questions.next()
                 else:
                     raise errors.IllegalState('No next unanswered question is available')
-        raise errors.NotFound('item_id is not found in Section')"""
+        raise errors.NotFound('item_id is not found in Section')""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -546,7 +581,8 @@ class AssessmentSession:
         except errors.IllegalState:
             return False
         else:
-            return True"""
+            return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -565,7 +601,8 @@ class AssessmentSession:
                 return previous_question
             else:
                 previous_question = question
-        raise errors.NotFound('item_id is not found in Section')"""
+        raise errors.NotFound('item_id is not found in Section')""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -574,7 +611,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).get_response(question_id=item_id)"""
+        return self.get_assessment_section(assessment_section_id).get_response(question_id=item_id)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -583,7 +621,8 @@ class AssessmentSession:
             'json': """
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
-        return self.get_assessment_section(assessment_section_id).get_responses()"""
+        return self.get_assessment_section(assessment_section_id).get_responses()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -596,7 +635,8 @@ class AssessmentSession:
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
         # Should probably check to see if responses can be cleared, but how?
-        self.get_assessment_section(assessment_section_id).submit_response(item_id, None)"""
+        self.get_assessment_section(assessment_section_id).submit_response(item_id, None)""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -608,7 +648,8 @@ class AssessmentSession:
         if (not self.has_assessment_section_begun(assessment_section_id) or
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
-        self.get_assessment_section(assessment_section_id).finish()"""
+        self.get_assessment_section(assessment_section_id).finish()""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -640,7 +681,8 @@ class AssessmentSession:
                                              runtime=self._runtime)
             collection.save(assessment_taken_map)
         else:
-            raise errors.IllegalState()"""
+            raise errors.IllegalState()""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -660,7 +702,8 @@ class AssessmentSession:
         except errors.IllegalState:
             return False
         else:
-            return True"""
+            return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -671,7 +714,8 @@ class AssessmentSession:
         ${doc_string}
         if self.is_answer_available(assessment_section_id, item_id):
             return self.get_assessment_section(assessment_section_id).get_answers(question_id=item_id)
-        raise errors.IllegalState()"""
+        raise errors.IllegalState()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -730,7 +774,8 @@ class AssessmentResultsSession:
         ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -753,7 +798,14 @@ class AssessmentResultsSession:
                                                  proxy=self._proxy)
                 for question in section._my_map['questions']:
                     item_list.append(ils.get_item(Id(question['questionId'])))
-        return ItemList(item_list)"""
+        return ItemList(item_list)""",
+            'services': GenericAdapterSession.method['python']['services']
+        }
+    }
+
+    get_assessment_taken_responses = {
+        'python': {
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -773,7 +825,8 @@ class AssessmentResultsSession:
                                                  runtime=self._runtime,
                                                  proxy=self._proxy)
                 response_list.append(section.get_responses())
-        return ResponseList(response_list)"""
+        return ResponseList(response_list)""",
+            'services': GenericAdapterSession.method['python']['services']
          }
     }
 
@@ -783,7 +836,8 @@ class AssessmentResultsSession:
     def ${method_name}(self):
         ${doc_string}
         # not implemented yet
-        return False"""
+        return False""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -793,7 +847,8 @@ class AssessmentResultsSession:
     def ${method_name}(self):
         ${doc_string}
         # not implemented yet and are_results_available is False
-        raise errors.IllegalState()"""
+        raise errors.IllegalState()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -892,7 +947,8 @@ class ItemAdminSession:
         self._forms[question_form.get_id().get_identifier()] = CREATED
         return objects.Question(osid_object_map=question_form._my_map,
                                 runtime=self._runtime,
-                                proxy=self._proxy)"""
+                                proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -909,7 +965,8 @@ class ItemAdminSession:
         item = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
 
         item['question'] = None
-        collection.save(item)"""
+        collection.save(item)""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -936,7 +993,8 @@ class ItemAdminSession:
                                         runtime=self._runtime,
                                         proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -979,7 +1037,8 @@ class ItemAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.Question(osid_object_map=question_form._my_map,
                                 runtime=self._runtime,
-                                proxy=self._proxy)"""
+                                proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1010,7 +1069,11 @@ class ItemAdminSession:
             osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
             runtime=self._runtime,
             proxy=self._proxy)
-        return result"""
+        return result""",
+            'services': """
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    def duplicate_item(self, item_id):
+        return self._get_provider_session('item_admin_session').duplicate_item(item_id)"""
         }
     }
 
@@ -1082,7 +1145,8 @@ class AssessmentAdminSession:
                                          collection='Assessment',
                                          runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
-        remove_children_parts(str(assessment_id))"""
+        remove_children_parts(str(assessment_id))""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1113,7 +1177,11 @@ class AssessmentAdminSession:
             osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
             runtime=self._runtime,
             proxy=self._proxy)
-        return result"""
+        return result""",
+            'services': """
+    # This is out of spec, but used by the EdX / LORE record extensions...
+    def duplicate_assessment(self, assessment_id):
+        return self._get_provider_session('assessment_admin_session').duplicate_assessment(assessment_id)"""
         }
     }
 
@@ -1160,7 +1228,8 @@ class AssessmentTakenLookupSession:
             dict({'assessmentOfferedId': str(assessment_offered_id),
                   'takingAgentId': str(resource_id)},
                  **self._view_filter())).sort('_id', DESCENDING)
-        return objects.AssessmentTakenList(result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.AssessmentTakenList(result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1191,7 +1260,8 @@ class AssessmentTakenLookupSession:
                  **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result,
                                            runtime=self._runtime,
-                                           proxy=self._proxy)"""
+                                           proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1319,7 +1389,8 @@ class AssessmentTakenAdminSession:
         return objects.AssessmentTaken(
             osid_object_map=collection.find_one({'_id': insert_result.inserted_id}),
             runtime=self._runtime,
-            proxy=self._proxy)"""
+            proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1365,7 +1436,8 @@ class AssessmentTakenAdminSession:
                 proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1424,7 +1496,8 @@ class AssessmentBasicAuthoringSession:
         ${doc_string}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': AssessmentSession.can_take_assessments['python']['services']
         }
     }
 
@@ -1435,7 +1508,8 @@ class AssessmentBasicAuthoringSession:
         ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
-        return self._part_item_session.get_assessment_part_items(self._get_first_part_id(assessment_id))"""
+        return self._part_item_session.get_assessment_part_items(self._get_first_part_id(assessment_id))""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1446,7 +1520,15 @@ class AssessmentBasicAuthoringSession:
         ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
-        self._part_item_design_session.add_item(item_id, self._get_first_part_id(assessment_id))"""
+        self._part_item_design_session.add_item(item_id, self._get_first_part_id(assessment_id))""",
+            'services': """
+    def add_item(self, *args, **kwargs):
+        \"\"\"Pass through to provider methods.\"\"\"
+        try:
+            self._get_provider_session('assessment_basic_authoring_session').add_item(*args, **kwargs)
+        except InvalidArgument:
+            self._get_sub_package_provider_session(
+                'assessment_authoring', 'assessment_part_item_design_session').add_item(*args, **kwargs)"""
         }
     }
 
@@ -1457,7 +1539,15 @@ class AssessmentBasicAuthoringSession:
         ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
-        self._part_item_design_session.remove_item(item_id, self._get_first_part_id(assessment_id))"""
+        self._part_item_design_session.remove_item(item_id, self._get_first_part_id(assessment_id))""",
+            'services': """
+    def remove_item(self, *args, **kwargs):
+        \"\"\"Pass through to provider methods.\"\"\"
+        try:
+            self._get_provider_session('assessment_basic_authoring_session').remove_item(*args, **kwargs)
+        except InvalidArgument:
+            self._get_sub_package_provider_session(
+                'assessment_authoring', 'assessment_part_item_design_session').remove_item(*args, **kwargs)"""
         }
     }
 
@@ -1468,7 +1558,8 @@ class AssessmentBasicAuthoringSession:
         ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
-        self._part_item_design_session.move_item_behind(item_id, self._get_first_part_id(assessment_id), preceeding_item_id)"""
+        self._part_item_design_session.move_item_behind(item_id, self._get_first_part_id(assessment_id), preceeding_item_id)""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -1479,7 +1570,15 @@ class AssessmentBasicAuthoringSession:
         ${doc_string}
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
-        self._part_item_design_session.order_items(item_ids, self._get_first_part_id(assessment_id))"""
+        self._part_item_design_session.order_items(item_ids, self._get_first_part_id(assessment_id))""",
+            'services': """
+    def order_items(self, *args, **kwargs):
+        \"\"\"Pass through to provider methods.\"\"\"
+        try:
+            self._get_provider_session('assessment_basic_authoring_session').order_items(*args, **kwargs)
+        except InvalidArgument:
+            self._get_sub_package_provider_session(
+                'assessment_authoring', 'assessment_part_item_design_session').order_items(*args, **kwargs)"""
         }
     }
 
@@ -2487,7 +2586,8 @@ class AssessmentQuerySession:
                 result = collection.find(query_terms).sort('_id', DESCENDING)
             else:
                 result = []
-            return objects.AssessmentList(result, runtime=self._runtime, proxy=self._proxy)"""
+            return objects.AssessmentList(result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2932,6 +3032,197 @@ class ItemSearchSession:
 #         return self._get_record(bank_record_type)"""
 
 
+class Bank:
+    init = {
+        'python': {
+            'services': """
+    # Overriding generic catalog init template because of ``self._sub_package_provider_managers``
+    # WILL THIS EVER BE CALLED DIRECTLY - OUTSIDE OF A MANAGER?
+    def __init__(self, provider_manager, catalog, runtime, proxy, **kwargs):
+        self._provider_manager = provider_manager
+        self._catalog = catalog
+        self._runtime = runtime
+        osid.OsidObject.__init__(self, self._catalog)  # This is to initialize self._object
+        osid.OsidSession.__init__(self, proxy)  # This is to initialize self._proxy
+        self._catalog_id = catalog.get_id()
+        self._provider_sessions = kwargs
+        self._session_management = AUTOMATIC
+        self._bank_view = DEFAULT
+        self._object_views = dict()
+        self._operable_views = dict()
+        self._containable_views = dict()
+        self._sub_package_provider_managers = dict()
+    
+    def _set_bank_view(self, session):
+        \"\"\"Sets the underlying bank view to match current view\"\"\"
+        if self._bank_view == FEDERATED:
+            try:
+                session.use_federated_bank_view()
+            except AttributeError:
+                pass
+        else:
+            try:
+                session.use_isolated_bank_view()
+            except AttributeError:
+                pass
+
+    def _set_object_view(self, session):
+        \"\"\"Sets the underlying object views to match current view\"\"\"
+        for obj_name in self._object_views:
+            if self._object_views[obj_name] == PLENARY:
+                try:
+                    getattr(session, 'use_plenary_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+            else:
+                try:
+                    getattr(session, 'use_comparative_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+
+    def _set_containable_view(self, session):
+        \"\"\"Sets the underlying containable views to match current view\"\"\"
+        for obj_name in self._containable_views:
+            if self._containable_views[obj_name] == SEQUESTERED:
+                try:
+                    getattr(session, 'use_sequestered_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+            else:
+                try:
+                    getattr(session, 'use_unsequestered_' + obj_name + '_view')()
+                except AttributeError:
+                    pass
+
+    def _set_operable_view(self, session):
+        \"\"\"Sets the underlying operable views to match current view\"\"\"
+        pass
+
+    def _get_provider_session(self, session_name):
+        \"\"\"Returns the requested provider session.\"\"\"
+        agent_key = self._get_agent_key()
+        if session_name in self._provider_sessions[agent_key]:
+            return self._provider_sessions[agent_key][session_name]
+        else:
+            session_class = getattr(self._provider_manager, 'get_' + session_name + '_for_bank')
+            if self._proxy is None:
+                if 'notification_session' in session_name:
+                    # Is there something else we should do about the receiver field?
+                    session = session_class('fake receiver', self._catalog.get_id())
+                else:
+                    session = session_class(self._catalog.get_id())
+            else:
+                if 'notification_session' in session_name:
+                    # Is there something else we should do about the receiver field?
+                    session = session_class('fake receiver', self._catalog.get_id(), self._proxy)
+                else:
+                    session = session_class(self._catalog.get_id(), self._proxy)
+            self._set_bank_view(session)
+            self._set_object_view(session)
+            self._set_operable_view(session)
+            self._set_containable_view(session)
+            if self._session_management != DISABLED:
+                self._provider_sessions[agent_key][session_name] = session
+            return session
+
+    def _get_sub_package_provider_manager(self, sub_package_name):
+        if sub_package_name in self._sub_package_provider_managers:
+            return self._sub_package_provider_managers[sub_package_name]
+        config = self._runtime.get_configuration()
+        parameter_id = Id('parameter:{0}ProviderImpl@dlkit_service'.format(sub_package_name))
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        if self._proxy is None:
+            # need to add version argument
+            sub_package = self._runtime.get_manager(sub_package_name.upper(), provider_impl)
+        else:
+            # need to add version argument
+            sub_package = self._runtime.get_proxy_manager(sub_package_name.upper(), provider_impl)
+        self._sub_package_provider_managers[sub_package_name] = sub_package
+        return sub_package
+
+    def _get_sub_package_provider_session(self, sub_package, session_name, proxy=None):
+        \"\"\"Gets the session from a sub-package\"\"\"
+        agent_key = self._get_agent_key()
+        if session_name in self._provider_sessions[agent_key]:
+            return self._provider_sessions[agent_key][session_name]
+        else:
+            manager = self._get_sub_package_provider_manager(sub_package)
+            session = self._instantiate_session('get_' + session_name + '_for_bank',
+                                                proxy=self._proxy,
+                                                manager=manager)
+            self._set_bank_view(session)
+            self._set_object_view(session)
+            self._set_operable_view(session)
+            self._set_containable_view(session)
+            if self._session_management != DISABLED:
+                self._provider_sessions[agent_key][session_name] = session
+            return session
+
+    def _instantiate_session(self, method_name, proxy=None, manager=None, *args, **kwargs):
+        \"\"\"Instantiates a provider session\"\"\"
+        if manager is None:
+            manager = self._provider_manager
+
+        session_class = getattr(manager, method_name)
+        if proxy is None:
+            try:
+                return session_class(bank_id=self._catalog_id, *args, **kwargs)
+            except AttributeError:
+                return session_class(*args, **kwargs)
+        else:
+            try:
+                return session_class(bank_id=self._catalog_id, proxy=proxy, *args, **kwargs)
+            except AttributeError:
+                return session_class(proxy=proxy, *args, **kwargs)
+    
+    def get_bank_id(self):
+        \"\"\"Gets the Id of this bank.\"\"\"
+        return self._catalog_id
+
+    def get_bank(self):
+        \"\"\"Strange little method to assure conformance for inherited Sessions.\"\"\"
+        return self
+
+    def get_objective_hierarchy_id(self):
+        \"\"\"WHAT am I doing here?\"\"\"
+        return self._catalog_id
+
+    def get_objective_hierarchy(self):
+        \"\"\"WHAT am I doing here?\"\"\"
+        return self
+
+    def __getattr__(self, name):
+        if '_catalog' in self.__dict__:
+            try:
+                return self._catalog[name]
+            except AttributeError:
+                pass
+        raise AttributeError
+
+    def close_sessions(self):
+        \"\"\"Close all sessions currently being managed by this Manager to save memory.\"\"\"
+        if self._session_management != MANDATORY:
+            self._provider_sessions = dict()
+        else:
+            raise IllegalState()
+
+    def use_automatic_session_management(self):
+        \"\"\"Session state will be saved until closed by consumers.\"\"\"
+        self._session_management = AUTOMATIC
+
+    def use_mandatory_session_management(self):
+        \"\"\"Session state will always be saved and can not be closed by consumers.\"\"\"
+        # Session state will be saved and can not be closed by consumers
+        self._session_management = MANDATORY
+
+    def disable_session_management(self):
+        \"\"\"Session state will never be saved.\"\"\"
+        self._session_management = DISABLED
+        self.close_sessions()"""
+        }
+    }
+
+
 class BankQuery:
     import_statements = {
         'python': {
@@ -2951,5 +3242,68 @@ class BankQuery:
         bank_descendants = self._get_descendant_catalog_ids(bank_id)
         identifiers = [ObjectId(i.identifier) for i in bank_descendants]
         self._query_terms['_id'] = {'$$in': identifiers}"""
+        }
+    }
+
+
+class MyAssessmentTakenSession:
+
+    can_get_my_taken_assessments = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        ${doc_string}
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').can_get_my_taken_assessments()"""
+        }
+    }
+
+    get_assessments_started_during = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        ${doc_string}
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_started_during(*args, **kwargs)"""
+        }
+    }
+
+    get_assessments_started = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        ${doc_string}
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_started()"""
+        }
+    }
+
+    get_assessments_in_progress_during = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        ${doc_string}
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress_during(*args, **kwargs)"""
+        }
+    }
+
+    get_assessments_in_progress = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        ${doc_string}
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress()"""
+        }
+    }
+
+    get_assessments_completed = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        ${doc_string}
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_completed()"""
         }
     }

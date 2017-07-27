@@ -824,10 +824,15 @@ class Templates(Utilities):
         # temporarily accept both cases until we get all the templates converted over to dicts
         template_impl = getattr(class_, name_)
         if isinstance(template_impl, dict):
-            return stripn(template_impl[self._language][self._class])
+            if (self._language in template_impl and
+                    self._class in template_impl[self._language]):
+                return stripn(template_impl[self._language][self._class])
+            return ''
         return stripn(template_impl)
 
     def get_pattern_name(self, pattern):
+        if pattern == '':
+            return '# Not templated -- check the hand-built implementations'
         return '# Built from: {0}/{1}'.format(self._get_relative_template_dir(),
                                               pattern)
 

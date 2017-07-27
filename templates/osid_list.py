@@ -19,6 +19,17 @@ class GenericObjectList(object):
     def next(self):
         return self._get_next_object(${return_type})
 
+    __next__ = next""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Gets next object\"\"\"
+        ${pattern_name}
+        return next(self)
+
+    def next(self):
+        \"\"\"next method for enumerator\"\"\"
+        return self._get_next_object(${return_type})
+
     __next__ = next"""
         }
     }
@@ -28,6 +39,10 @@ class GenericObjectList(object):
             'json': """
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
+        ${pattern_name}
+        return self._get_next_n(${return_type}List, number=${arg0_name})""",
+            'services': """
+    def ${method_name}(self, ${arg0_name}):
         ${pattern_name}
         return self._get_next_n(${return_type}List, number=${arg0_name})"""
         }

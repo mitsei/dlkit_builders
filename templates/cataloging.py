@@ -1,3 +1,6 @@
+from .osid_session import GenericAdapterSession
+
+
 class CatalogSession:
 
     get_ids_by_catalog = {
@@ -80,7 +83,8 @@ class CatalogAdminSession:
                                          runtime=self._runtime)
         if not isinstance(catalog_id, ABCId):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        collection.delete_one({'_id': ObjectId(catalog_id.get_identifier())})"""
+        collection.delete_one({'_id': ObjectId(catalog_id.get_identifier())})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 

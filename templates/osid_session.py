@@ -1,3 +1,77 @@
+class GenericAdapterSession(object):
+    method = {
+        'python': {
+            'services': """
+    def ${method_name}(${args_kwargs_method_sig}):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+        }
+    }
+
+    method_return_catalog = {
+        'python': {
+            'services': """
+    def ${method_name}(${args_kwargs_method_sig}):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        return ${return_type}(
+            self._provider_manager,
+            self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs),
+            self._runtime,
+            self._proxy)"""
+        }
+    }
+
+    method_return_catalog_list = {
+        'python': {
+            'services': """
+    def ${method_name}(${args_kwargs_method_sig}):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        catalogs = self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)
+        cat_list = []
+        for cat in catalogs:
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
+        return ${return_type}(cat_list)"""
+        }
+    }
+
+    method_return_catalog_list_no_args = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        catalogs = self._get_provider_session('${interface_name_under}').${method_name}()
+        cat_list = []
+        for cat in catalogs:
+            cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
+        return ${return_type}(cat_list)"""
+        }
+    }
+
+    method_without_return = {
+        'python': {
+            'services': """
+    def ${method_name}(${args_kwargs_method_sig}):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+        }
+    }
+
+    sub_package_method = {
+        'python': {
+            'services': """
+    def ${method_name}(${args_kwargs_method_sig}):
+        \"\"\"Pass through to sub package provider method\"\"\"
+        ${pattern_name}
+        return self._get_sub_package_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+        }
+    }
+
+
 class GenericContainableObjectLookupSession(object):
     import_statements_pattern = {
         'python': {
@@ -48,7 +122,18 @@ class GenericContainableObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._status_view = ACTIVE"""
+        self._status_view = ACTIVE""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._operable_views['${object_name_under}'] = ACTIVE
+        # self._get_provider_session('${interface_name_under}')  # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -58,7 +143,18 @@ class GenericContainableObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._status_view = ANY_STATUS"""
+        self._status_view = ANY_STATUS""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._operable_views['${object_name_under}'] = ANY_STATUS
+        # self._get_provider_session('${interface_name_under}')  # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -68,7 +164,18 @@ class GenericContainableObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._sequestered_view = SEQUESTERED"""
+        self._sequestered_view = SEQUESTERED""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._containable_views['${object_name_under}'] = SEQUESTERED
+        # self._get_provider_session('${interface_name_under}')  # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -78,7 +185,18 @@ class GenericContainableObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._sequestered_view = UNSEQUESTERED"""
+        self._sequestered_view = UNSEQUESTERED""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._containable_views['${object_name_under}'] = UNSEQUESTERED
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -133,7 +251,8 @@ class GenericObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        return self._catalog_id"""
+        return self._catalog_id""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -143,7 +262,8 @@ class GenericObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        return self._catalog"""
+        return self._catalog""",
+            'services': GenericAdapterSession.method_return_catalog['python']['services']
         }
     }
 
@@ -155,7 +275,8 @@ class GenericObjectLookupSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -165,7 +286,18 @@ class GenericObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._use_comparative_object_view()"""
+        self._use_comparative_object_view()""",
+            'services': """
+    def ${method_name}(self):
+        ${pattern_name}
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        self._object_views['${object_name_under}'] = COMPARATIVE
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -175,7 +307,18 @@ class GenericObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._use_plenary_object_view()"""
+        self._use_plenary_object_view()""",
+            'services': """
+    def ${method_name}(self):
+        ${pattern_name}
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        self._object_views[\'${object_name_under}\'] = PLENARY
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -185,7 +328,18 @@ class GenericObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._use_federated_catalog_view()"""
+        self._use_federated_catalog_view()""",
+            'services': """
+    def ${method_name}(self):
+        ${pattern_name}
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        self._${cat_name_under}_view = FEDERATED
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -195,7 +349,18 @@ class GenericObjectLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._use_isolated_catalog_view()"""
+        self._use_isolated_catalog_view()""",
+            'services': """
+    def ${method_name}(self):
+        ${pattern_name}
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        self._${cat_name_under}_view = ISOLATED
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -212,7 +377,8 @@ class GenericObjectLookupSession(object):
         result = collection.find_one(
             dict({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name_replace}').get_identifier())},
                  **self._view_filter()))
-        return objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -239,7 +405,8 @@ class GenericObjectLookupSession(object):
                 if object_map['_id'] == object_id:
                     sorted_result.append(object_map)
                     break
-        return objects.${return_type}(sorted_result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(sorted_result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -256,7 +423,8 @@ class GenericObjectLookupSession(object):
         result = collection.find(
             dict({'genusTypeId': str(${arg0_name})},
                  **self._view_filter())).sort('_id', DESCENDING)
-        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -267,7 +435,8 @@ class GenericObjectLookupSession(object):
         ${doc_string}
         ${pattern_name}
         # STILL NEED TO IMPLEMENT!!!
-        return objects.${return_type}([])"""
+        return objects.${return_type}([])""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -278,7 +447,8 @@ class GenericObjectLookupSession(object):
         ${doc_string}
         ${pattern_name}
         # STILL NEED TO IMPLEMENT!!!
-        return objects.${return_type}([])"""
+        return objects.${return_type}([])""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -293,7 +463,8 @@ class GenericObjectLookupSession(object):
                                          collection='${object_name}',
                                          runtime=self._runtime)
         result = collection.find(self._view_filter()).sort('_id', DESCENDING)
-        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -311,7 +482,8 @@ class GenericObjectLookupSession(object):
         result = collection.find(
             dict({'${arg0_object_mixed}Id': str(${arg0_name})},
                  **self._view_filter()))
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -329,7 +501,8 @@ class GenericObjectLookupSession(object):
         result = collection.find(
             dict({'${arg0_object_mixed}Id': {'$$in': id_str_list}},
                  **self._view_filter()))
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -382,7 +555,8 @@ class GenericObjectAdminSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -394,7 +568,8 @@ class GenericObjectAdminSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -429,7 +604,8 @@ class GenericObjectAdminSession(object):
                 effective_agent_id=self.get_effective_agent_id(),
                 proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -469,7 +645,8 @@ class GenericObjectAdminSession(object):
             runtime=self._runtime,
             proxy=self._proxy)
 
-        return result"""
+        return result""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -481,7 +658,8 @@ class GenericObjectAdminSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -512,7 +690,8 @@ class GenericObjectAdminSession(object):
         obj_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -579,7 +758,8 @@ class GenericObjectAdminSession(object):
         return objects.${return_type}(
             osid_object_map=${arg0_name}._my_map,
             runtime=self._runtime,
-            proxy=self._proxy)"""
+            proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -591,7 +771,8 @@ class GenericObjectAdminSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -619,7 +800,8 @@ class GenericObjectAdminSession(object):
                  **self._view_filter()))
 
         objects.${object_name}(osid_object_map=${object_name_under}_map, runtime=self._runtime, proxy=self._proxy)._delete()
-        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
+        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -631,7 +813,8 @@ class GenericObjectAdminSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -641,7 +824,8 @@ class GenericObjectAdminSession(object):
     def ${method_name}(self, ${arg0_name}, ${arg1_name}):
         ${doc_string}
         ${pattern_name}
-        self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})"""
+        self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -685,7 +869,8 @@ class GenericObjectAdminSession(object):
                 proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -756,7 +941,8 @@ class GenericObjectNotificationSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = True"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = True""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -766,11 +952,12 @@ class GenericObjectNotificationSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = False"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = False""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
-    acknowledge_notification_template = {
+    acknowledge_object_notification_template = {
         'python': {
             'json': """
     def ${method_name}(self, notification_id):
@@ -779,7 +966,8 @@ class GenericObjectNotificationSession(object):
         try:
             del MONGO_LISTENER.notifications[notification_id]
         except KeyError:
-            pass"""
+            pass""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -789,7 +977,8 @@ class GenericObjectNotificationSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['i'] = True"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['i'] = True""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -799,7 +988,8 @@ class GenericObjectNotificationSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = True"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = True""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -812,7 +1002,8 @@ class GenericObjectNotificationSession(object):
         if not MONGO_LISTENER.receivers[self._ns][self._receiver]['u']:
             MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = []
         if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['u'], list):
-            MONGO_LISTENER.receivers[self._ns][self._receiver]['u'].append(${arg0_name}.get_identifier())"""
+            MONGO_LISTENER.receivers[self._ns][self._receiver]['u'].append(${arg0_name}.get_identifier())""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -822,7 +1013,8 @@ class GenericObjectNotificationSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = True"""
+        MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = True""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -835,7 +1027,14 @@ class GenericObjectNotificationSession(object):
         if not MONGO_LISTENER.receivers[self._ns][self._receiver]['d']:
             MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = []
         if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['d'], list):
-            MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())"""
+            MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
+        }
+    }
+
+    can_register_for_object_notifications_template = {
+        'python': {
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -892,7 +1091,8 @@ class GenericRelationshipLookupSession(object):
         for ${object_name_under} in self.get_${object_name_plural_under}():
             if overlap(${arg0_name}, ${arg1_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -909,7 +1109,8 @@ class GenericRelationshipLookupSession(object):
         result = collection.find(
             dict({'${source_name_mixed}Id': str(${arg0_name})},
                  **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -923,7 +1124,8 @@ class GenericRelationshipLookupSession(object):
         for ${object_name_under} in self.get_${object_name_plural_under}_for_${source_name}(${arg0_name}):
             if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -941,7 +1143,8 @@ class GenericRelationshipLookupSession(object):
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   'genusTypeId': str(${arg1_name})},
                  **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -955,7 +1158,8 @@ class GenericRelationshipLookupSession(object):
         for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${source_name}():
             if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -972,7 +1176,8 @@ class GenericRelationshipLookupSession(object):
         result = collection.find(
             dict({'${destination_name_mixed}Id': str(${arg0_name})},
                  **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -986,7 +1191,8 @@ class GenericRelationshipLookupSession(object):
         for ${object_name_under} in self.get_${object_name_plural_under}_for_${destination_name}():
             if overlap(${arg1_name}, ${arg2_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1004,7 +1210,8 @@ class GenericRelationshipLookupSession(object):
             dict({'${destination_name_mixed}Id': str(${arg0_name}),
                   'genusTypeId': str(${arg1_name})},
                  **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1018,7 +1225,8 @@ class GenericRelationshipLookupSession(object):
         for ${object_name_under} in self.get_${object_name_plural_under}_by_genus_type_for_${destination_name}():
             if overlap(${arg2_name}, ${arg3_name}, ${object_name_under}.start_date, ${object_name_under}.end_date):
                 ${object_name_under}_list.append(${object_name_under})
-        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)"""
+        return objects.${object_name}List(${object_name_under}_list, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1036,7 +1244,8 @@ class GenericRelationshipLookupSession(object):
             dict({'${source_name_mixed}Id': str(${arg0_name}),
                   '${destination_name_mixed}Id': str(${arg1_name})},
                  **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1055,7 +1264,8 @@ class GenericRelationshipLookupSession(object):
                   '${destination_name_mixed}Id': str(${arg1_name}),
                   'genusTypeId': str(${arg2_name})},
                  **self._view_filter())).sort('_sort_id', ASCENDING)
-        return objects.${object_name}List(result, runtime=self._runtime)"""
+        return objects.${object_name}List(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1079,7 +1289,8 @@ class GenericRelationshipLookupSession(object):
                                          collection='${object_name}',
                                          runtime=self._runtime)
         result = collection.find({'_id': {'$$in': destination_ids}})
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1089,7 +1300,8 @@ class GenericRelationshipLookupSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1112,7 +1324,8 @@ class GenericRelationshipLookupSession(object):
                                          collection='${object_name}',
                                          runtime=self._runtime)
         result = collection.find({'_id': {'$$in': source_ids}})
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1147,7 +1360,8 @@ class GenericObjectCatalogSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1160,7 +1374,8 @@ class GenericObjectCatalogSession(object):
         id_list = []
         for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_under}(${arg0_name}):
             id_list.append(${object_name_under}.get_id())
-        return IdList(id_list)"""
+        return IdList(id_list)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1173,7 +1388,8 @@ class GenericObjectCatalogSession(object):
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${object_name_under}_lookup_session_for_${cat_name_under}(${arg0_name}, proxy=self._proxy)
         lookup_session.use_isolated_${cat_name_under}_view()
-        return lookup_session.get_${object_name_plural_under}()"""
+        return lookup_session.get_${object_name_plural_under}()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1186,7 +1402,8 @@ class GenericObjectCatalogSession(object):
         id_list = []
         for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_plural_under}(${arg0_name}):
             id_list.append(${object_name_under}.get_id())
-        return IdList(id_list)"""
+        return IdList(id_list)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1200,7 +1417,8 @@ class GenericObjectCatalogSession(object):
         for ${cat_name_under}_id in ${arg0_name}:
             ${object_name_under}_list += list(
                 self.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
-        return objects.${return_type}(${object_name_under}_list)"""
+        return objects.${return_type}(${object_name_under}_list)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1217,7 +1435,8 @@ class GenericObjectCatalogSession(object):
         id_list = []
         for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
             id_list.append(Id(idstr))
-        return IdList(id_list)"""
+        return IdList(id_list)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1230,7 +1449,8 @@ class GenericObjectCatalogSession(object):
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         return lookup_session.get_${cat_name_plural_under}_by_ids(
-            self.get_${cat_name_under}_ids_by_${object_name_under}(${arg0_name}))"""
+            self.get_${cat_name_under}_ids_by_${object_name_under}(${arg0_name}))""",
+            'services': GenericAdapterSession.method_return_catalog_list['python']['services']
         }
     }
 
@@ -1266,7 +1486,8 @@ class GenericObjectCatalogAssignmentSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1280,7 +1501,8 @@ class GenericObjectCatalogAssignmentSession(object):
         # handled in a service adapter above the pay grade of this impl.
         if ${arg0_name}.get_identifier() == '000000000000000000000000':
             return False
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1297,7 +1519,8 @@ class GenericObjectCatalogAssignmentSession(object):
         id_list = []
         for ${cat_name_under} in ${cat_name_plural_under}:
             id_list.append(${cat_name_under}.get_id())
-        return IdList(id_list)"""
+        return IdList(id_list)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1308,7 +1531,8 @@ class GenericObjectCatalogAssignmentSession(object):
         ${doc_string}
         ${pattern_name}
         # This will likely be overridden by an authorization adapter
-        return self.get_assignable_${cat_name_under}_ids(${arg0_name})"""
+        return self.get_assignable_${cat_name_under}_ids(${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1321,7 +1545,8 @@ class GenericObjectCatalogAssignmentSession(object):
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
-        self._assign_object_to_catalog(${arg0_name}, ${arg1_name})"""
+        self._assign_object_to_catalog(${arg0_name}, ${arg1_name})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -1334,7 +1559,8 @@ class GenericObjectCatalogAssignmentSession(object):
         mgr = self._get_provider_manager('${package_name_replace_upper}', local=True)
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
-        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})"""
+        self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -1349,7 +1575,8 @@ class GenericObjectCatalogAssignmentSession(object):
             self.unassign_${object_name_under}_from_${cat_name_under}(${arg0_name}, ${arg1_name})
         except:  # something went wrong, roll back assignment to ${arg2_name}
             self.unassign_${object_name_under}_from_${cat_name_under}(${arg0_name}, ${arg2_name})
-            raise"""
+            raise""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -1396,7 +1623,8 @@ class GenericObjectQuerySession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1408,7 +1636,8 @@ class GenericObjectQuerySession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1418,7 +1647,8 @@ class GenericObjectQuerySession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        return queries.${return_type}(runtime=self._runtime)"""
+        return queries.${return_type}(runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1452,7 +1682,8 @@ class GenericObjectQuerySession(object):
             result = collection.find(query_terms).sort('_id', DESCENDING)
         else:
             result = []
-        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1507,7 +1738,18 @@ class GenericCatalogLookupSession(object):
         ${pattern_name}
         self._catalog_view = COMPARATIVE
         if self._catalog_session is not None:
-            self._catalog_session.use_comparative_catalog_view()"""
+            self._catalog_session.use_comparative_catalog_view()""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._${cat_name_under}_view = COMPARATIVE
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -1519,7 +1761,18 @@ class GenericCatalogLookupSession(object):
         ${pattern_name}
         self._catalog_view = PLENARY
         if self._catalog_session is not None:
-            self._catalog_session.use_plenary_catalog_view()"""
+            self._catalog_session.use_plenary_catalog_view()""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._${cat_name_under}_view = PLENARY
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass"""
         }
     }
 
@@ -1544,7 +1797,8 @@ class GenericCatalogLookupSession(object):
             # Try creating an orchestrated ${cat_name}.  Let it raise errors.NotFound()
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
 
-        return objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method_return_catalog['python']['services']
         }
     }
 
@@ -1566,7 +1820,8 @@ class GenericCatalogLookupSession(object):
                                          runtime=self._runtime)
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method_return_catalog_list['python']['services']
         }
     }
 
@@ -1584,7 +1839,8 @@ class GenericCatalogLookupSession(object):
                                          runtime=self._runtime)
         result = collection.find().sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method_return_catalog_list_no_args['python']['services']
         }
     }
 
@@ -1602,7 +1858,26 @@ class GenericCatalogLookupSession(object):
                                          runtime=self._runtime)
         result = collection.find({"genusTypeId": str(${arg0_name})}).sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method_return_catalog_list['python']['services']
+        }
+    }
+
+    get_catalogs_by_parent_genus_type_template = {
+        'python': {
+            'services': GenericAdapterSession.method_return_catalog_list['python']['services']
+        }
+    }
+
+    get_catalogs_by_record_type_template = {
+        'python': {
+            'services': GenericAdapterSession.method_return_catalog_list['python']['services']
+        }
+    }
+
+    get_catalogs_by_provider_template = {
+        'python': {
+            'services': GenericAdapterSession.method_return_catalog_list['python']['services']
         }
     }
 
@@ -1616,7 +1891,8 @@ class GenericCatalogLookupSession(object):
         # handled in a service adapter above the pay grade of this impl.
         if self._catalog_session is not None:
             return self._catalog_session.can_lookup_catalogs()
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1653,7 +1929,8 @@ class GenericCatalogQuerySession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1665,7 +1942,8 @@ class GenericCatalogQuerySession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1675,7 +1953,8 @@ class GenericCatalogQuerySession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        return queries.${return_type}(runtime=self._runtime)"""
+        return queries.${return_type}(runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1693,7 +1972,8 @@ class GenericCatalogQuerySession(object):
                                          runtime=self._runtime)
         result = collection.find(query_terms).sort('_id', DESCENDING)
 
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1740,7 +2020,8 @@ class GenericCatalogAdminSession(object):
         # handled in a service adapter above the pay grade of this impl.
         if self._catalog_session is not None:
             return self._catalog_session.can_create_catalogs()
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1754,7 +2035,8 @@ class GenericCatalogAdminSession(object):
         # handled in a service adapter above the pay grade of this impl.
         if self._catalog_session is not None:
             return self._catalog_session.can_create_catalog_with_record_types(catalog_record_types=${arg0_name})
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1789,7 +2071,8 @@ class GenericCatalogAdminSession(object):
                 effective_agent_id=self.get_effective_agent_id(),
                 proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
         self._forms[result.get_id().get_identifier()] = not CREATED
-        return result"""
+        return result""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1831,7 +2114,8 @@ class GenericCatalogAdminSession(object):
             runtime=self._runtime,
             proxy=self._proxy)
 
-        return result"""
+        return result""",
+            'services': GenericAdapterSession.method_return_catalog['python']['services']
         }
     }
 
@@ -1861,7 +2145,8 @@ class GenericCatalogAdminSession(object):
         cat_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
 
-        return cat_form"""
+        return cat_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1875,7 +2160,8 @@ class GenericCatalogAdminSession(object):
         # handled in a service adapter above the pay grade of this impl.
         if self._catalog_session is not None:
             return self._catalog_session.can_update_catalogs()
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1914,7 +2200,8 @@ class GenericCatalogAdminSession(object):
         self._forms[${arg0_name}.get_id().get_identifier()] = UPDATED
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned
-        return objects.${return_type}(osid_object_map=${arg0_name}._my_map, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.${return_type}(osid_object_map=${arg0_name}._my_map, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method_return_catalog['python']['services']
         }
     }
 
@@ -1928,7 +2215,8 @@ class GenericCatalogAdminSession(object):
         # handled in a service adapter above the pay grade of this impl.
         if self._catalog_session is not None:
             return self._catalog_session.can_delete_catalogs()
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -1959,7 +2247,8 @@ class GenericCatalogAdminSession(object):
                                                  runtime=self._runtime)
             if obj_collection.find({'assigned${cat_name}Ids': {'$$in': [str(${arg0_name})]}}).count() != 0:
                 raise errors.IllegalState('catalog is not empty')
-        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
+        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -1971,7 +2260,8 @@ class GenericCatalogAdminSession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.alias_catalog(catalog_id=${arg0_name}, alias_id=alias_id)
-        self._alias_id(primary_id=${arg0_name}, equivalent_id=alias_id)"""
+        self._alias_id(primary_id=${arg0_name}, equivalent_id=alias_id)""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -2048,7 +2338,8 @@ class GenericCatalogHierarchySession(object):
         # handled in a service adapter above the pay grade of this impl.
         if self._catalog_session is not None:
             return self._catalog_session.can_access_catalog_hierarchy()
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2060,7 +2351,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.get_catalog_hierarchy_id()
-        return self._hierarchy_session.get_hierarchy_id()"""
+        return self._hierarchy_session.get_hierarchy_id()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2072,7 +2364,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.get_catalog_hierarchy()
-        return self._hierarchy_session.get_hierarchy()"""
+        return self._hierarchy_session.get_hierarchy()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2084,7 +2377,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.get_root_catalog_ids()
-        return self._hierarchy_session.get_roots()"""
+        return self._hierarchy_session.get_roots()""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2098,7 +2392,8 @@ class GenericCatalogHierarchySession(object):
             return self._catalog_session.get_root_catalogs()
         return ${cat_name}LookupSession(
             self._proxy,
-            self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_root_${cat_name_under}_ids()))"""
+            self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_root_${cat_name_under}_ids()))""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2110,7 +2405,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.has_parent_catalogs(catalog_id=${arg0_name})
-        return self._hierarchy_session.has_parents(id_=${arg0_name})"""
+        return self._hierarchy_session.has_parents(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2122,7 +2418,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.is_parent_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
-        return self._hierarchy_session.is_parent(id_=${arg1_name}, parent_id=${arg0_name})"""
+        return self._hierarchy_session.is_parent(id_=${arg1_name}, parent_id=${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2134,7 +2431,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.get_parent_catalog_ids(catalog_id=${arg0_name})
-        return self._hierarchy_session.get_parents(id_=${arg0_name})"""
+        return self._hierarchy_session.get_parents(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2149,7 +2447,8 @@ class GenericCatalogHierarchySession(object):
         return ${cat_name}LookupSession(
             self._proxy,
             self._runtime).get_${cat_name_plural_under}_by_ids(
-                list(self.get_parent_${cat_name_under}_ids(${arg0_name})))"""
+                list(self.get_parent_${cat_name_under}_ids(${arg0_name})))""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2161,7 +2460,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.is_ancestor_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
-        return self._hierarchy_session.is_ancestor(id_=${arg0_name}, ancestor_id=${arg1_name})"""
+        return self._hierarchy_session.is_ancestor(id_=${arg0_name}, ancestor_id=${arg1_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2173,7 +2473,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.has_child_catalogs(catalog_id=${arg0_name})
-        return self._hierarchy_session.has_children(id_=${arg0_name})"""
+        return self._hierarchy_session.has_children(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2185,7 +2486,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.is_child_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
-        return self._hierarchy_session.is_child(id_=${arg1_name}, child_id=${arg0_name})"""
+        return self._hierarchy_session.is_child(id_=${arg1_name}, child_id=${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2197,7 +2499,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.get_child_catalog_ids(catalog_id=${arg0_name})
-        return self._hierarchy_session.get_children(id_=${arg0_name})"""
+        return self._hierarchy_session.get_children(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2212,7 +2515,8 @@ class GenericCatalogHierarchySession(object):
         return ${cat_name}LookupSession(
             self._proxy,
             self._runtime).get_${cat_name_plural_under}_by_ids(
-                list(self.get_child_${cat_name_under}_ids(${arg0_name})))"""
+                list(self.get_child_${cat_name_under}_ids(${arg0_name})))""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2224,7 +2528,8 @@ class GenericCatalogHierarchySession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.is_descendant_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
-        return self._hierarchy_session.is_descendant(id_=${arg0_name}, descendant_id=${arg1_name})"""
+        return self._hierarchy_session.is_descendant(id_=${arg0_name}, descendant_id=${arg1_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2244,7 +2549,8 @@ class GenericCatalogHierarchySession(object):
             id_=${arg0_name},
             ancestor_levels=${arg1_name},
             descendant_levels=${arg2_name},
-            include_siblings=${arg3_name})"""
+            include_siblings=${arg3_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2258,7 +2564,8 @@ class GenericCatalogHierarchySession(object):
             ${arg0_name}=${arg0_name},
             ${arg1_name}=${arg1_name},
             ${arg2_name}=${arg2_name},
-            ${arg3_name}=${arg3_name})._my_map, runtime=self._runtime, proxy=self._proxy)"""
+            ${arg3_name}=${arg3_name})._my_map, runtime=self._runtime, proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2310,7 +2617,8 @@ class GenericCatalogHierarchyDesignSession(object):
         # handled in a service adapter above the pay grade of this impl.
         if self._catalog_session is not None:
             return self._catalog_session.can_modify_catalog_hierarchy()
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2322,7 +2630,8 @@ class GenericCatalogHierarchyDesignSession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.add_root_catalog(catalog_id=${arg0_name})
-        return self._hierarchy_session.add_root(id_=${arg0_name})"""
+        return self._hierarchy_session.add_root(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -2334,7 +2643,8 @@ class GenericCatalogHierarchyDesignSession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.remove_root_catalog(catalog_id=${arg0_name})
-        return self._hierarchy_session.remove_root(id_=${arg0_name})"""
+        return self._hierarchy_session.remove_root(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -2346,7 +2656,8 @@ class GenericCatalogHierarchyDesignSession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.add_child_catalog(catalog_id=${arg0_name}, child_id=${arg1_name})
-        return self._hierarchy_session.add_child(id_=${arg0_name}, child_id=${arg1_name})"""
+        return self._hierarchy_session.add_child(id_=${arg0_name}, child_id=${arg1_name})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -2358,7 +2669,8 @@ class GenericCatalogHierarchyDesignSession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.remove_child_catalog(catalog_id=${arg0_name}, child_id=${arg1_name})
-        return self._hierarchy_session.remove_child(id_=${arg0_name}, child_id=${arg1_name})"""
+        return self._hierarchy_session.remove_child(id_=${arg0_name}, child_id=${arg1_name})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -2370,7 +2682,8 @@ class GenericCatalogHierarchyDesignSession(object):
         ${pattern_name}
         if self._catalog_session is not None:
             return self._catalog_session.remove_child_catalogs(catalog_id=${arg0_name})
-        return self._hierarchy_session.remove_children(id_=${arg0_name})"""
+        return self._hierarchy_session.remove_children(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -2413,7 +2726,8 @@ class GenericObjectContainableSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2437,7 +2751,8 @@ class GenericObjectContainableSession(object):
         mgr = self._get_provider_manager('${package_name_replace_upper}')
         lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_${cat_name_under}_view()
-        return lookup_session.get_${object_name_plural_under}_by_ids(${object_name_under}_ids)"""
+        return lookup_session.get_${object_name_plural_under}_by_ids(${object_name_under}_ids)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2453,7 +2768,8 @@ class GenericObjectContainableSession(object):
         result = collection.find(
             dict({'${object_name_mixed}Ids': {'$$in': [str(${arg0_name})]}},
                  **self._view_filter())).sort('_id', DESCENDING)
-        return objects.${return_type}(result, runtime=self._runtime)"""
+        return objects.${return_type}(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2495,7 +2811,8 @@ class GenericObjectContainableDesignSession(object):
         ${pattern_name}
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2533,7 +2850,8 @@ class GenericObjectContainableDesignSession(object):
                 ${containable_object_name_under}['${object_name_mixed}Ids'].append(str(${arg0_name}))
         else:
             ${containable_object_name_under}['${object_name_mixed}Ids'] = [str(${arg0_name})]
-        collection.save(${containable_object_name_under})"""
+        collection.save(${containable_object_name_under})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2548,7 +2866,8 @@ class GenericObjectContainableDesignSession(object):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${arg1_name})
         ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_ahead(${arg0_name}, ${arg2_name}, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
-        collection.save(${containable_object_name_under}_map)"""
+        collection.save(${containable_object_name_under}_map)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2563,7 +2882,8 @@ class GenericObjectContainableDesignSession(object):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${arg1_name})
         ${containable_object_name_under}_map['${object_name_mixed}Ids'] = move_id_behind(${arg0_name}, ${arg2_name}, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
-        collection.save(${containable_object_name_under}_map)"""
+        collection.save(${containable_object_name_under}_map)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2578,7 +2898,8 @@ class GenericObjectContainableDesignSession(object):
             raise errors.InvalidArgument('the argument is not a valid OSID Id')
         ${containable_object_name_under}_map, collection = self._get_${containable_object_name_under}_collection(${arg1_name})
         ${containable_object_name_under}_map['${object_name_mixed}Ids'] = order_ids(${arg0_name}, ${containable_object_name_under}_map['${object_name_mixed}Ids'])
-        collection.save(${containable_object_name_under}_map)"""
+        collection.save(${containable_object_name_under}_map)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2606,7 +2927,8 @@ class GenericObjectContainableDesignSession(object):
         ${containable_object_name_under}_map = collection.find_one({'_id': ObjectId(${containable_object_name_under}_id.get_identifier())})
         if '${object_name_mixed}Ids' not in ${containable_object_name_under}_map:
             raise errors.NotFound('no ${object_name_plural} are assigned to this ${containable_object_name}')
-        return ${containable_object_name_under}_map, collection"""
+        return ${containable_object_name_under}_map, collection""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2654,7 +2976,8 @@ class GenericObjectSearchSession:
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        return searches.${return_type}(runtime=self._runtime)"""
+        return searches.${return_type}(runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2688,7 +3011,8 @@ class GenericObjectSearchSession:
             result = collection.find(query_terms)[${arg1_name}.start:${arg1_name}.end]
         else:
             result = collection.find(query_terms)
-        return searches.${return_type}(result, dict(${arg0_name}._query_terms), runtime=self._runtime)"""
+        return searches.${return_type}(result, dict(${arg0_name}._query_terms), runtime=self._runtime)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2730,7 +3054,8 @@ class GenericRelationshipAdminSession(object):
                 proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2776,7 +3101,8 @@ class GenericRelationshipAdminSession(object):
                 proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2805,7 +3131,8 @@ class GenericRelationshipAdminSession(object):
         rfc.set_display_name('${object_name} Requisite')
         rfc.set_description('An ${object_name} Requisite created by the ${object_name}RequisiteAssignmentSession')
         rfc.set_genus_type(requisite_type)
-        ras.create_relationship(rfc)"""
+        ras.create_relationship(rfc)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2837,7 +3164,8 @@ class GenericRelationshipAdminSession(object):
             raise errors.IllegalState('no ${object_name} found')
         for relationship in relationships:
             if str(relationship.get_destination_id()) == str(${arg1_name}):
-                ras.delete_relationship(relationship.ident)"""
+                ras.delete_relationship(relationship.ident)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2895,7 +3223,8 @@ class GenericDependentObjectAdminSession(object):
         return ${return_type}(
             osid_object_map=${arg0_name}._my_map,
             runtime=self._runtime,
-            proxy=self._proxy)"""
+            proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2922,7 +3251,8 @@ class GenericDependentObjectAdminSession(object):
             proxy=self._proxy)
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -2973,7 +3303,8 @@ class GenericDependentObjectAdminSession(object):
         return ${aggregated_object_name}(
             osid_object_map=${arg0_name}._my_map,
             runtime=self._runtime,
-            proxy=self._proxy)"""
+            proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -3005,7 +3336,8 @@ class GenericDependentObjectAdminSession(object):
             osid_object_map=${aggregated_object_name_under}_map,
             runtime=self._runtime,
             proxy=self._proxy)._delete()
-        collection.save(${object_name_under})"""
+        collection.save(${object_name_under})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -3049,7 +3381,8 @@ class GenericRequisiteObjectAdminSession:
         collection = JSONClientValidated('${package_name_replace}',
                                          collection='${object_name}',
                                          runtime=self._runtime)
-        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})"""
+        collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})""",
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
@@ -3080,7 +3413,8 @@ class GenericObjectHierarchySession(object):
         return objects.${return_type}(
             result,
             runtime=self._runtime,
-            proxy=self._proxy)"""
+            proxy=self._proxy)""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -3102,7 +3436,8 @@ class GenericObjectHierarchySession(object):
                 result,
                 runtime=self._runtime,
                 proxy=self._proxy)
-        raise errors.IllegalState('no children')"""
+        raise errors.IllegalState('no children')""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -3114,7 +3449,8 @@ class GenericObjectHierarchyDesignSession(object):
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
         ${pattern_name}
-        return self._hierarchy_session.add_root(id_=${arg0_name})"""
+        return self._hierarchy_session.add_root(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -3124,7 +3460,8 @@ class GenericObjectHierarchyDesignSession(object):
     def ${method_name}(self, ${arg0_name}, ${arg1_name}):
         ${doc_string}
         ${pattern_name}
-        return self._hierarchy_session.add_child(id_=${arg0_name}, child_id=${arg1_name})"""
+        return self._hierarchy_session.add_child(id_=${arg0_name}, child_id=${arg1_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -3134,7 +3471,8 @@ class GenericObjectHierarchyDesignSession(object):
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
         ${pattern_name}
-        return self._hierarchy_session.remove_root(id_=${arg0_name})"""
+        return self._hierarchy_session.remove_root(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -3144,7 +3482,8 @@ class GenericObjectHierarchyDesignSession(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        return True"""
+        return True""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -3154,7 +3493,8 @@ class GenericObjectHierarchyDesignSession(object):
     def ${method_name}(self, ${arg0_name}, ${arg1_name}):
         ${doc_string}
         ${pattern_name}
-        return self._hierarchy_session.remove_child(id_=${arg0_name}, child_id=${arg1_name})"""
+        return self._hierarchy_session.remove_child(id_=${arg0_name}, child_id=${arg1_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
 
@@ -3164,6 +3504,7 @@ class GenericObjectHierarchyDesignSession(object):
     def ${method_name}(self, ${arg0_name}):
         ${doc_string}
         ${pattern_name}
-        return self._hierarchy_session.remove_children(id_=${arg0_name})"""
+        return self._hierarchy_session.remove_children(id_=${arg0_name})""",
+            'services': GenericAdapterSession.method['python']['services']
         }
     }
