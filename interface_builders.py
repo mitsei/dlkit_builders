@@ -330,8 +330,13 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             if self.package['name'] != 'osid' and not self._flagged_for_implementation(inf):
                 continue
             if type_check_method(inf, self.package['name']):
+                additional_methods = self._additional_methods(inf)
                 methods += '\n##\n# The following methods are from {}\n\n'.format(inf['fullname'])
                 methods += self.make_methods(inf)
+
+                if additional_methods:
+                    methods += '\n\n{0}'.format(additional_methods)
+
                 inherited_imports = self.get_methods_templated_imports(self._abc_pkg_name(abc=False),
                                                                        inf)
         return methods, inherited_imports
@@ -372,9 +377,11 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             if hasattr(template_class, 'init_template'):
                 context = self._get_init_context(init_pattern, interface)
                 context['pattern_name'] = self.get_pattern_name('{0}.init_template'.format(init_pattern))
-                template = string.Template(self.get_impl_from_templates(template_class, 'init_template'))
+                template_str = self.get_impl_from_templates(template_class, 'init_template')
+                if bool(template_str):
+                    template = string.Template(template_str)
 
-                return template.substitute(context) + '\n'
+                    return template.substitute(context) + '\n'
 
         return ''
 

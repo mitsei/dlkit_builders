@@ -123,7 +123,7 @@ class AssetLookupSession:
     #                                      runtime=self._runtime)
     #     asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
     #     result = collection.find_one(
-    #         dict({'assetContents._id': {'$in': [asset_content_identifier]}},
+    #         dict({'assetContents._id': {'$$in': [asset_content_identifier]}},
     #              **self._view_filter()))
     #     # if a match is not found, NotFound exception will be thrown by find_one, so
     #     # the below should always work
@@ -302,7 +302,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
                                          runtime=self._runtime)
         asset_content_identifier = ObjectId(self._get_id(asset_content_id, 'repository').get_identifier())
         result = collection.find_one(
-            dict({'assetContents._id': {'$in': [asset_content_identifier]}},
+            dict({'assetContents._id': {'$$in': [asset_content_identifier]}},
                  **self._view_filter()))
         # if a match is not found, NotFound exception will be thrown by find_one, so
         # the below should always work
@@ -339,7 +339,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
         object_id_list = [ObjectId(self._get_id(i, 'repository').get_identifier()) for i in asset_content_ids]
 
         results = collection.find(
-            dict({'assetContents._id': {'$in': object_id_list}},
+            dict({'assetContents._id': {'$$in': object_id_list}},
                  **self._view_filter()))
         # if a match is not found, NotFound exception will be thrown by find_one, so
         # the below should always work
@@ -373,7 +373,7 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
                                          collection='Asset',
                                          runtime=self._runtime)
         results = collection.find(
-            dict({'assetContents.genusTypeId': {'$in': [str(asset_content_genus_type)]}},
+            dict({'assetContents.genusTypeId': {'$$in': [str(asset_content_genus_type)]}},
                  **self._view_filter()))
         # if a match is not found, NotFound exception will be thrown by find_one, so
         # the below should always work
@@ -1593,12 +1593,12 @@ class AssetQuerySession:
             content_term = 'assetContents.{0}'.format(term)
             or_list.append({content_term: asset_content_query._keyword_terms[term]})
         if or_list:
-            and_list.append({'$or': or_list})
+            and_list.append({'$$or': or_list})
         view_filter = self._view_filter()
         if view_filter:
             and_list.append(view_filter)
         if and_list:
-            query_terms = {'$and': and_list}
+            query_terms = {'$$and': and_list}
         collection = JSONClientValidated('repository',
                                          collection='Asset',
                                          runtime=self._runtime)
@@ -1619,7 +1619,7 @@ class AssetQuerySession:
                             if key == split_terms[1]:
                                 search_value = asset_content_query._query_terms[term]
                                 if isinstance(search_value, dict):
-                                    search_value = search_value['$in'][0]
+                                    search_value = search_value['$$in'][0]
                                 if isinstance(search_value, re._pattern_type):
                                     # then we need to do a regex comparison on the content value
                                     if search_value.match(value) is None:

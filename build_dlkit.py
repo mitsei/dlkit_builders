@@ -225,7 +225,7 @@ class BaseBuilder(Utilities):
         # of append.
         impl_class = self._impl_class(interface)
         if hasattr(impl_class, 'additional_methods'):
-            additional_methods = getattr(impl_class, 'additional_methods')
+            additional_methods = self.get_impl_from_templates(impl_class, 'additional_methods')
 
         # add in the init context, to get some package template vars
         if interface['shortname'] + '.init_pattern' in self.patterns:
@@ -578,7 +578,7 @@ except ImportError:
             # extra newlines generated in self._additional_classes
             methods += additional_classes
 
-        if init_methods:
+        if bool(init_methods):
             init_methods = self._wrap(init_methods) + '\n'
 
         if methods:

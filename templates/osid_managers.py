@@ -21,6 +21,28 @@ class GenericAdapterProfileAndManager(object):
         }
     }
 
+    sub_package_method = {
+        'python': {
+            'services': """
+    def ${method_name}(self, *args, **kwargs):
+        \"\"\"Pass through to sub package provider method\"\"\"
+        ${pattern_name}
+        return self._get_sub_package_provider_manager(
+            '${package_name_replace_reserved}').${method_original_name}(*args, **kwargs)"""
+        }
+    }
+
+    sub_package_method_no_args = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to sub package provider method\"\"\"
+        ${pattern_name}
+        return self._get_sub_package_provider_manager(
+            '${package_name_replace_reserved}').${method_original_name}()"""
+        }
+    }
+
 
 class GenericProfile(object):
     import_statements_pattern = {

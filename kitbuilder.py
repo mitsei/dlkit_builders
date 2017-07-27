@@ -1,9 +1,11 @@
 import glob
 import json
-
 import inflection
+import sys
 
-from build_dlkit import BaseBuilder
+from importlib import import_module
+
+from build_dlkit import BaseBuilder, ABS_PATH
 from binder_helpers import SkipMethod, fix_reserved_word
 from interface_builders import InterfaceBuilder
 
@@ -16,6 +18,7 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/services'
         self._template_dir = self._abs_path + '/templates'
+        self.sub_package = None
 
         self._class = 'services'
 
@@ -131,6 +134,7 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
         # check the packages directory for related sub-packages
         sub_package_methods = ''
         current_package = self.package['name']
+        self.sub_package = None
 
         for json_file in glob.glob(self._package_directory()):
             sub_package_prefix = '{}_'.format(current_package)
@@ -148,6 +152,8 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                     with open(pattern_file, 'r') as sub_package_patterns:
                         self.patterns.update(json.load(sub_package_patterns))
 
+                    # create ``self.sub_package`` so the templates are read in from the sub-package directory?
+                    self.sub_package = sub_package
                     for sub_inf in sub_package['interfaces']:
                         sub_interface_name = sub_inf['shortname']
                         if self._is_matching_interface(interface, sub_inf):
@@ -157,6 +163,7 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                                                                                                         sub_package['name'],
                                                                                                         sub_interface_name)
                                 sub_package_methods += sub_methods
+        self.sub_package = None
         return sub_package_methods
 
     def _get_template_name(self, pattern, interface_name, method_name):
@@ -217,6 +224,26 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                 return True
             else:
                 return False
+
+    def _load_impl_class(self, interface_name, package_name=None):
+        # Try loading hand-built implementations class for this interface
+        if package_name is None:
+            package_name = self.package['name']
+        # If this is a sub_package, grab the imports from there, instead
+        if self.sub_package is not None:
+            package_name = self.replace(fix_reserved_word(self.sub_package['name']))
+
+        impl_class = None
+        try:
+            if ABS_PATH not in sys.path:
+                sys.path.insert(0, ABS_PATH)
+            impls = import_module(self._package_templates(package_name))
+        except ImportError:
+            pass
+        else:
+            if hasattr(impls, interface_name):
+                impl_class = getattr(impls, interface_name)
+        return impl_class
 
     def _package_directory(self):
         if self.package_maps[-1] != '/':

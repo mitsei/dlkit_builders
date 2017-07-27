@@ -76,30 +76,36 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         context['arg_list'] = ', '.join(arg_list)
 
         context['method_name'] = method['name']
+        context['method_original_name'] = method['name']
+        if 'original_name' in method:
+            context['method_original_name'] = method['original_name']
         context['doc_string'] = self._build_method_doc(method)
+
+        # need a default values for the templates
+        context['args_kwargs_or_nothing'] = ''
+        context['args_kwargs_method_sig'] = 'self'
+
+        if method['args']:
+            context['args_kwargs_or_nothing'] = '*args, **kwargs'
+            context['args_kwargs_method_sig'] = 'self, *args, **kwargs'
+
+        context['interface_name'] = interface['shortname']
+        context['interface_name_under'] = camel_to_under(context['interface_name'])
+        context['interface_name_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
 
         if 'package_name' in context:
             # Add keyword arguments to template kwargs that are particular
             # to the json implementation
-            fixed_package_name = fix_reserved_word(self.package['name'], is_module=True)
+            fixed_package_name = fix_reserved_word(context['package_name'], is_module=True)
             context['app_name'] = self._app_name()
             context['implpkg_name'] = self._abc_pkg_name(abc=False, reserved_word=False)
             context['abcapp_name'] = self._app_name()
             context['abcpkg_name'] = self._abc_pkg_name(abc=False)
-            context['interface_name_under'] = camel_to_under(context['interface_name'])
-            context['interface_name_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
-            context['package_name_caps'] = self.replace(self.package['name'].title(), desired='')
-            context['package_name_upper'] = self.package['name'].upper()
-            context['package_name_replace'] = self.replace(self.package['name'])
+            context['package_name_caps'] = self.replace(context['package_name'].title(), desired='')
+            context['package_name_upper'] = context['package_name'].upper()
+            context['package_name_replace'] = self.replace(context['package_name'])
             context['package_name_replace_reserved'] = self.replace(fixed_package_name)
-            context['package_name_replace_upper'] = self.replace(self.package['name']).upper()
-
-            if method['args']:
-                context['args_kwargs_or_nothing'] = '*args, **kwargs'
-                context['args_kwargs_method_sig'] = 'self, *args, **kwargs'
-            else:
-                context['args_kwargs_or_nothing'] = ''
-                context['args_kwargs_method_sig'] = 'self'
+            context['package_name_replace_upper'] = self.replace(context['package_name']).upper()
 
             if context['interface_name_under'].endswith('_session'):
                 context['session_shortname_dot'] = '.'.join(context['interface_name_under'].split('_')[:-1])
@@ -262,10 +268,17 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         return self._compile_method(args, decorators, method_impl)
 
     def _make_method_impl(self, method, interface):
+        def templated_language_exists(template_, method_):
+            return (self._language in getattr(template_, method_) and
+                    self._class in getattr(template_, method_)[self._language])
+
         impl = ''
         templates = None
         interface_sn = interface['shortname']
         method_n = method['name']
+
+        if 'original_name' in method:
+            method_n = method['original_name']
 
         self._update_implemented_view_methods(method, interface)
 
@@ -283,18 +296,23 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                     template_class = getattr(templates, pattern.split('.')[-2])
 
         self._confirm_build_method(impl_class, method_n)
+
         context = self._get_method_context(method, interface)
         context['pattern_name'] = self.get_pattern_name(pattern)
+
         template_name = self._get_template_name(pattern, interface_sn, method_n)
 
         # Check if there is a 'by hand' implementation available for this method
         if (impl_class and
-                hasattr(impl_class, method_n)):
+                hasattr(impl_class, method_n) and
+                templated_language_exists(impl_class, method_n)):
             impl = self.get_impl_from_templates(impl_class, method_n)
+            context['pattern_name'] = self.get_pattern_name('')  # do this to make sure overrides have the right comment
         # If there is no 'by hand' implementation, get the template for the
         # method implementation that serves as the pattern, if one exists.
         elif (template_class and
-              hasattr(template_class, template_name)):
+              hasattr(template_class, template_name) and
+              templated_language_exists(template_class, template_name)):
 
             if self._is('services') and getattr(template_class, template_name) is None:
                 raise SkipMethod()
@@ -342,13 +360,12 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
         if package_name is None:
             package_name = self.package['name']
 
-        for method in interface['methods']:
+        for method in list(interface['methods']):
             if self._in(['json', 'tests']):
                 if method['name'] == 'read' and interface['shortname'] == 'DataInputStream':
                     method['name'] = 'read_to_buffer'
             elif self._in(['services']):
-                if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentResultsSession':
-                    method['name'] = 'get_taken_items'
+                method['original_name'] = method['name']
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentBasicAuthoringSession':
                     method['name'] = 'get_assessment_items'
                 if method['name'] == 'get_items' and interface['shortname'] == 'AssessmentPartItemSession':
@@ -370,6 +387,10 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 # Only expected from kitosid / services builder
                 pass
             else:
+                if self._in(['services']):
+                    # clean this up. For some reason it's getting crufty and stuck around in memory
+                    method['name'] = method['original_name']
+                    del method['original_name']
                 if bool(impl):
                     body.append(impl)
                     if not self._is('tests') and not self._is('test_authz'):

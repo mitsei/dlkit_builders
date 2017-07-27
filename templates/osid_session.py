@@ -3,9 +3,9 @@ class GenericAdapterSession(object):
         'python': {
             'services': """
     def ${method_name}(${args_kwargs_method_sig}):
-        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        \"\"\"Pass through to provider ${interface_name}.${method_original_name}\"\"\"
         ${pattern_name}
-        return self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+        return self._get_provider_session('${interface_name_under}').${method_original_name}(${args_kwargs_or_nothing})"""
         }
     }
 
@@ -13,11 +13,11 @@ class GenericAdapterSession(object):
         'python': {
             'services': """
     def ${method_name}(${args_kwargs_method_sig}):
-        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        \"\"\"Pass through to provider ${interface_name}.${method_original_name}\"\"\"
         ${pattern_name}
         return ${return_type}(
             self._provider_manager,
-            self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs),
+            self._get_provider_session('${interface_name_under}').${method_original_name}(*args, **kwargs),
             self._runtime,
             self._proxy)"""
         }
@@ -27,9 +27,9 @@ class GenericAdapterSession(object):
         'python': {
             'services': """
     def ${method_name}(${args_kwargs_method_sig}):
-        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        \"\"\"Pass through to provider ${interface_name}.${method_original_name}\"\"\"
         ${pattern_name}
-        catalogs = self._get_provider_session('${interface_name_under}').${method_name}(*args, **kwargs)
+        catalogs = self._get_provider_session('${interface_name_under}').${method_original_name}(*args, **kwargs)
         cat_list = []
         for cat in catalogs:
             cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
@@ -41,9 +41,9 @@ class GenericAdapterSession(object):
         'python': {
             'services': """
     def ${method_name}(self):
-        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        \"\"\"Pass through to provider ${interface_name}.${method_original_name}\"\"\"
         ${pattern_name}
-        catalogs = self._get_provider_session('${interface_name_under}').${method_name}()
+        catalogs = self._get_provider_session('${interface_name_under}').${method_original_name}()
         cat_list = []
         for cat in catalogs:
             cat_list.append(${cat_name}(self._provider_manager, cat, self._runtime, self._proxy))
@@ -55,19 +55,33 @@ class GenericAdapterSession(object):
         'python': {
             'services': """
     def ${method_name}(${args_kwargs_method_sig}):
-        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        \"\"\"Pass through to provider ${interface_name}.${method_original_name}\"\"\"
         ${pattern_name}
-        self._get_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+        self._get_provider_session('${interface_name_under}').${method_original_name}(${args_kwargs_or_nothing})"""
         }
     }
 
     sub_package_method = {
         'python': {
             'services': """
-    def ${method_name}(${args_kwargs_method_sig}):
+    def ${method_name}(self, *args, **kwargs):
         \"\"\"Pass through to sub package provider method\"\"\"
         ${pattern_name}
-        return self._get_sub_package_provider_session('${interface_name_under}').${method_name}(${args_kwargs_or_nothing})"""
+        return self._get_sub_package_provider_session(
+            '${package_name_replace_reserved}',
+            '${interface_name_under}').${method_original_name}(*args, **kwargs)"""
+        }
+    }
+
+    sub_package_method_no_args = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to sub package provider method\"\"\"
+        ${pattern_name}
+        return self._get_sub_package_provider_session(
+            '${package_name_replace_reserved}',
+            '${interface_name_under}').${method_original_name}()"""
         }
     }
 

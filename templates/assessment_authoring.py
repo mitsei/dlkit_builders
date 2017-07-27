@@ -1,5 +1,170 @@
+from .osid_managers import GenericAdapterProfileAndManager
+from .osid_session import GenericAdapterSession
+
+
+class AssessmentAuthoringProfile:
+    get_assessment_part_record_types = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    get_assessment_part_search_record_types = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    get_sequence_rule_enabler_record_types = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    get_sequence_rule_enabler_search_record_types = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    get_sequence_rule_record_types = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    get_sequence_rule_search_record_types = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    supports_assessment_part_admin = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    supports_assessment_part_lookup = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    supports_assessment_part_item = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    supports_assessment_part_item_design = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    supports_sequence_rule_admin = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    supports_sequence_rule_lookup = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    supports_assessment_part_query = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
+        }
+    }
+
 
 class AssessmentAuthoringManager:
+    get_sequence_rule_lookup_session = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_sequence_rule_lookup_session_for_bank = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_part_lookup_session = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_part_lookup_session_for_bank = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_part_query_session = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_part_query_session_for_bank = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_part_admin_session = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_part_admin_session_for_bank = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_sequence_rule_admin_session = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_sequence_rule_admin_session_for_bank = {
+        'python': {
+            'services': """
+    def ${method_name}(self, *args, **kwargs):
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_admin_session_for_bank(*args, **kwargs)
+
+    def get_assessment_part_item_session(self, *args, **kwargs):
+        \"\"\"Pass through to provider method\"\"\"
+        # Missing in the spec
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session(*args, **kwargs)
+
+    def get_assessment_part_item_session_for_bank(self, *args, **kwargs):
+        \"\"\"Pass through to provider method\"\"\"
+        # Missing in the spec
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_session_for_bank(*args, **kwargs)
+
+    def get_assessment_part_item_design_session(self, *args, **kwargs):
+        \"\"\"Pass through to provider method\"\"\"
+        # Missing in the spec
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_design_session(*args, **kwargs)
+
+    def get_assessment_part_item_design_session_for_bank(self, *args, **kwargs):
+        \"\"\"Pass through to provider method\"\"\"
+        # Missing in the spec
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_item_design_session_for_bank(*args, **kwargs)"""
+        }
+    }
 
     # The following is here only until Tom fixes spec and adds these methods
     additional_methods = {
@@ -206,6 +371,89 @@ class AssessmentAuthoringProxyManager:
 
 
 class AssessmentPartLookupSession:
+    get_assessment_part = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_parts = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_parts_for_assessment = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_parts_by_genus_type = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_parts_by_parent_genus_type = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_parts_by_record_type = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_parts_by_ids = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    can_lookup_assessment_parts = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    use_sequestered_assessment_part_view = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider AssessmentPartLookupSession.use_sequestered_assessment_part_view\"\"\"
+        # Does this need to be re-implemented to match the other non-sub-package view setters?
+        self._containable_views['assessment_part'] = SEQUESTERED
+        self._get_sub_package_provider_session('assessment_authoring',
+                                               'assessment_part_lookup_session')
+        for session in self._provider_sessions:
+            for provider_session_name, provider_session in self._provider_sessions[session].items():
+                try:
+                    provider_session.use_sequestered_assessment_part_view()
+                except AttributeError:
+                    pass"""
+        }
+    }
+
+    use_unsequestered_assessment_part_view = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider AssessmentPartLookupSession.use_unsequestered_assessment_part_view\"\"\"
+        # Does this need to be re-implemented to match the other non-sub-package view setters?
+        self._containable_views['assessment_part'] = UNSEQUESTERED
+        self._get_sub_package_provider_session('assessment_authoring',
+                                               'assessment_part_lookup_session')
+        for session in self._provider_sessions:
+            for provider_session_name, provider_session in self._provider_sessions[session].items():
+                try:
+                    provider_session.use_unsequestered_assessment_part_view()
+                except AttributeError:
+                    pass"""
+        }
+    }
 
     additional_methods = {
         'python': {
@@ -237,6 +485,20 @@ class AssessmentPartLookupSession:
     }
 
 
+class AssessmentPartQuerySession:
+    get_assessment_part_query = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    can_search_assessment_parts = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method_no_args['python']['services']
+        }
+    }
+
+
 class AssessmentPartAdminSession:
     import_statements = {
         'python': {
@@ -255,6 +517,38 @@ class AssessmentPartAdminSession:
                 'SEQUESTERED = 0',
                 'UNSEQUESTERED = 1',
             ]
+        }
+    }
+
+    get_assessment_part_form_for_create_for_assessment = {
+        'python': {
+            'services': """
+    def ${method_name}(self, *args, **kwargs):
+        ${pattern_name}
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').get_assessment_part_form_for_create_for_assessment(*args, **kwargs)"""
+        }
+    }
+
+    can_create_assessment_parts = {
+        'python': {
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider AssessmentPartAdminSession.can_create_assessment_parts\"\"\"
+        ${pattern_name}
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').can_create_assessment_parts()"""
+        }
+    }
+
+    can_create_assessment_part_with_record_types = {
+        'python': {
+            'services': """
+    def ${method_name}(self, *args, **kwargs):
+        \"\"\"Pass through to provider AssessmentPartAdminSession.can_create_assessment_part_with_record_types\"\"\"
+        ${pattern_name}
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_admin_session').can_create_assessment_part_with_record_types(*args, **kwargs)"""
         }
     }
 
@@ -295,7 +589,8 @@ class AssessmentPartAdminSession:
             mdata=mdata)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.sub_package_method['python']['services']
         }
     }
 
@@ -330,7 +625,8 @@ class AssessmentPartAdminSession:
                                               mdata=mdata)
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.sub_package_method['python']['services']
         }
     }
 
@@ -362,7 +658,8 @@ class AssessmentPartAdminSession:
             part = apls.get_assessment_part(assessment_part_id)
             part.delete()
         except AttributeError:
-            collection.delete_one({'_id': ObjectId(assessment_part_id.get_identifier())})"""
+            collection.delete_one({'_id': ObjectId(assessment_part_id.get_identifier())})""",
+            'services': GenericAdapterSession.sub_package_method['python']['services']
         }
     }
 
@@ -424,7 +721,20 @@ class AssessmentPartItemSession:
         mgr = self._get_provider_manager('ASSESSMENT')
         lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
-        return lookup_session.get_items_by_ids(item_ids)"""
+        return lookup_session.get_items_by_ids(item_ids)""",
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_parts_by_item = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    can_access_assessment_part_items = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
         }
     }
 
@@ -444,6 +754,50 @@ class AssessmentPartItemSession:
     #     lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
     #     lookup_session.use_federated_bank_view()
     #     return lookup_session.get_items_by_ids(item_ids)"""
+
+
+class AssessmentPartItemDesignSession:
+    can_design_assessment_parts = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_part_items = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    add_item = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    move_item_ahead = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    move_item_behind = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    remove_items = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    order_items = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
 
 
 class AssessmentPart:
@@ -857,7 +1211,44 @@ class SequenceRuleAdminSession:
                 next_assessment_part_id=next_assessment_part_id,
                 assessment_part_id=assessment_part_id)
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
-        return obj_form"""
+        return obj_form""",
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    can_create_sequence_rule = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    can_delete_sequence_rules = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    can_update_sequence_rules = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method_no_args['python']['services']
+        }
+    }
+
+    create_sequence_rule = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    delete_sequence_rule = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_sequence_rule_form_for_update = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
         }
     }
 
@@ -917,7 +1308,8 @@ class SequenceRuleLookupSession:
         result = collection.find(
             dict({'assessmentPartId': {'$$in': id_strs}},
                  **self._view_filter()))
-        return objects.SequenceRuleList(result, runtime=self._runtime)"""
+        return objects.SequenceRuleList(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.sub_package_method['python']['services']
         }
     }
 
@@ -937,6 +1329,25 @@ class SequenceRuleLookupSession:
             dict({'assessmentPartId': {'$$in': id_str_list},
                   'nextAssessmentPartId': {'$$in': next_id_str_list}},
                  **self._view_filter()))
-        return objects.SequenceRuleList(result, runtime=self._runtime)"""
+        return objects.SequenceRuleList(result, runtime=self._runtime)""",
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    can_lookup_sequence_rules = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_sequence_rule = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
+        }
+    }
+
+    get_sequence_rules = {
+        'python': {
+            'services': GenericAdapterSession.sub_package_method['python']['services']
         }
     }

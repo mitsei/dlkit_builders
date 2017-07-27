@@ -1146,7 +1146,7 @@ class AssessmentAdminSession:
                                          runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
         remove_children_parts(str(assessment_id))""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services']
         }
     }
 
