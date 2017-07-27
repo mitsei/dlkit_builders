@@ -219,11 +219,17 @@ class BaseBuilder(Utilities):
         # hand built methods to be included at the end of the class definition. These
         # need to be coded in the impl_class as a string with the
         # attribute name 'additional_methods'
+        # Per request by birdland@mit.edu July 27, 2017, we change this behavior to
+        # have ``additional_methods`` override ``additional_methods_pattern`` instead
+        # of append.
         impl_class = self._impl_class(interface)
         if hasattr(impl_class, 'additional_methods'):
-            additional_methods += getattr(impl_class, 'additional_methods')
+            additional_methods = getattr(impl_class, 'additional_methods')
 
-        return additional_methods
+        # add in the init context, to get some package template vars
+        init_context = self._get_init_context('', interface)
+        template = string.Template(additional_methods)
+        return template.substitute(init_context)
 
     def _append_inherited_imports(self, imports, interface):
         # Iterate through any inherited interfaces and check if an import statement is
