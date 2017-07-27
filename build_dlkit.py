@@ -366,10 +366,18 @@ class BaseBuilder(Utilities):
         if package_name in ['type', 'proxy']:
             is_catalog_session = False
         elif (interface['category'] == 'sessions' and
-                interface['shortname'].startswith('GradebookColumn')):
-            is_catalog_session = True
+                interface['shortname'] in [
+                    'LogEntryLogSession',
+                    'LogEntryLogAssignmentSession',
+                    'GradebookColumnGradebookSession',
+                    'GradebookColumnGradebookAssignmentSession',
+                ]):
+            is_catalog_session = False
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].startswith('LogEntry')):
+            is_catalog_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('GradebookColumn')):
             is_catalog_session = True
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
@@ -391,10 +399,18 @@ class BaseBuilder(Utilities):
         if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
             is_manager_session = True
         elif (interface['category'] == 'sessions' and
-                interface['shortname'].startswith('GradebookColumn')):
-            is_manager_session = False
+                interface['shortname'] in [
+                    'LogEntryLogSession',
+                    'LogEntryLogAssignmentSession',
+                    'GradebookColumnGradebookSession',
+                    'GradebookColumnGradebookAssignmentSession',
+                ]):
+            is_manager_session = True
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].startswith('LogEntry')):
+            is_manager_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('GradebookColumn')):
             is_manager_session = False
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):

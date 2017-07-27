@@ -15,9 +15,12 @@ def map_manager_patterns(interface, package, index):
         index['impl_log']['managers'][interface['shortname']][method['name']] = ['mapped', 'unimplemented']
         lookup_style = False
         for session_type in LOOKUP_STYLE_SESSIONS:
+            # Is there a better way to find the oddballs here?
             if (method['return_type'].split('.')[-1].endswith(session_type) and
-                    index['package_catalog_caps'] not in method['return_type'].split('.')[-1]):
-                lookup_style = True
+                    (index['package_catalog_caps'] not in method['return_type'].split('.')[-1] or
+                     method['return_type'].split('.')[-1].startswith('LogEntry') or
+                     method['return_type'].split('.')[-1].startswith('GradebookColumn'))):
+                lookup_style = True                
                 object_name = (method['return_type']).split('.')[-1][:-len(session_type)]
 
         ##################################################################

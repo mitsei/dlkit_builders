@@ -1,4 +1,4 @@
-"""TestAuthZ templates for ${object_name_under} interfaces"""
+"""TestAuthZ templates for resource interfaces"""
 
 class ResourceLookupSession:
 
@@ -265,7 +265,7 @@ def authorization_session_class_fixture(request):
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
-            for catalog in request.cls.${pkg_name}_mgr.get_${cat_name_under}s():
+            for catalog in request.cls.${pkg_name}_mgr.get_${cat_name_under_plural}():
                 for obj in catalog.get_${object_name_under_plural}():
                     catalog.delete_${object_name_under}(obj.ident)
                 request.cls.${pkg_name}_mgr.delete_${cat_name_under}(catalog.ident)
@@ -382,9 +382,9 @@ JANE_PROXY = PROXY_SESSION.get_proxy(JANE_CONDITION)
 
 BLUE_TYPE = Type(authority='BLUE',
                  namespace='BLUE',
-                 identifier='BLUE')
+                 identifier='BLUE')"""
 
-
+    additional_methods_pattern = """
 @pytest.fixture(scope="function")
 def authz_adapter_class_fixture(request):
     request.cls.${object_name_under}_id_lists = []
@@ -412,9 +412,9 @@ def authz_adapter_class_fixture(request):
                 for ${object_name_under}_id in request.cls.${object_name_under}_id_lists[index]:
                     ${cat_name_under}_.delete_${object_name_under}(${object_name_under}_id)
 
-    request.addfinalizer(test_tear_down)
+    request.addfinalizer(test_tear_down)"""
 
-
+    additional_classes_template = """
 @pytest.mark.usefixtures("authz_adapter_class_fixture")
 class Test${object_name}AuthzAdapter(TestAuthorizationSession):
 

@@ -31,6 +31,31 @@ class LoggingSession:
         lefc.set_timestamp(DateTime.utcnow())"""
 
 
+class LogEntryLookupSession:
+
+    can_read_log = """
+        \"\"\"Tests if this user can read the log.
+
+        A return of true does not guarantee successful authorization. A
+        return of false indicates that it is known all methods in this
+        session will result in a ``PermissionDenied``. This is intended
+        as a hint to an application that may opt not to offer reading
+        operations.
+
+        return: (boolean) - ``false`` if reading methods are not
+                authorized, ``true`` otherwise
+        *compliance: mandatory -- This method must be implemented.*
+
+        \"\"\"
+        return self.can_lookup_log_entries()
+
+    def can_lookup_log_entries(self):
+        \"\"\"Tests if a user can read logs :)\"\"\"
+        # NOTE: It is expected that real authentication hints will be
+        # handled in a service adapter above the pay grade of this impl.
+        return True"""
+
+
 class LogEntryAdminSession:
     import_statements_pattern = [
         'from ..primitives import DateTime'

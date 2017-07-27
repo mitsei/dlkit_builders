@@ -285,7 +285,8 @@ def fix_bad_name(name, optional_match_term=None):
         'supports_authorizatin_batch': 'supports_authorization_batch',
         'supports_authorizatin_rules': 'supports_authorization_rules',
         'get_compoitions_by_repositories': 'get_compositions_by_repositories',
-        'osid.assessment.AssessmentNotificationSession': 'osid.assessment.ItemNotificationSession'
+        'osid.assessment.AssessmentNotificationSession': 'osid.assessment.ItemNotificationSession',
+        'osid.grading.GradeSystemGradebookSession': 'osid.grading.GradeSystemGradebookAssignmentSession'
     }
 
     if optional_match_term == 'get_composition_query_session':
@@ -294,6 +295,8 @@ def fix_bad_name(name, optional_match_term=None):
                                  'get_composition_search_session_for_repository']:
         name = 'osid.repository.CompositionSearchSession'
     elif optional_match_term == 'get_item_notification_session_for_bank':
+        name = bad_names_map[name]
+    elif optional_match_term == 'get_grade_system_gradebook_assignment_session':
         name = bad_names_map[name]
     else:
         if name in bad_names_map:
