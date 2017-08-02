@@ -364,7 +364,9 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 continue
 
             try:
-                body.append(self._make_method(method, interface))
+                method_str = self._make_method(method, interface)
+                if method_str.strip():  # to suppress new lines in unimplemented methods
+                    body.append(method_str)
             except SkipMethod:
                 # Only expected from kitosid / services builder
                 pass

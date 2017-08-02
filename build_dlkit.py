@@ -227,7 +227,11 @@ class BaseBuilder(Utilities):
             additional_methods = getattr(impl_class, 'additional_methods')
 
         # add in the init context, to get some package template vars
-        init_context = self._get_init_context('', interface)
+        if interface['shortname'] + '.init_pattern' in self.patterns:
+            init_pattern = self.patterns[interface['shortname'] + '.init_pattern']
+        else:
+            init_pattern = ''
+        init_context = self._get_init_context(init_pattern, interface)
         template = string.Template(additional_methods)
         return template.substitute(init_context)
 

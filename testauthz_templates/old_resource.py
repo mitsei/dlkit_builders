@@ -22,15 +22,11 @@ class ResourceLookupSession:
     ]
 
     init_template = """
+
 REQUEST = proxy_example.SimpleRequest()
 CONDITION = PROXY_SESSION.get_proxy_condition()
 CONDITION.set_http_request(REQUEST)
 PROXY = PROXY_SESSION.get_proxy(CONDITION)
-
-JANE_REQUEST = proxy_example.SimpleRequest(username='jane_doe')
-JANE_CONDITION = PROXY_SESSION.get_proxy_condition()
-JANE_CONDITION.set_http_request(JANE_REQUEST)
-JANE_PROXY = PROXY_SESSION.get_proxy(JANE_CONDITION)
 
 LOOKUP_${object_name_upper}_FUNCTION_ID = Id(**{'identifier': 'lookup', 'namespace': '${pkg_name_replaced}.${object_name}', 'authority': 'ODL.MIT.EDU'})
 SEARCH_${object_name_upper}_FUNCTION_ID = Id(**{'identifier': 'search', 'namespace': '${pkg_name_replaced}.${object_name}', 'authority': 'ODL.MIT.EDU'})
@@ -51,12 +47,11 @@ ALIAS_ID = Id(**{'identifier': 'ALIAS', 'namespace': 'ALIAS', 'authority': 'ALIA
 AGENT_ID = Id(**{'identifier': 'jane_doe', 'namespace': 'osid.agent.Agent', 'authority': 'MIT-ODL'})
 NEW_TYPE = Type(**{'identifier': 'NEW', 'namespace': 'MINE', 'authority': 'YOURS'})
 NEW_TYPE_2 = Type(**{'identifier': 'NEW 2', 'namespace': 'MINE', 'authority': 'YOURS'})
-BLUE_TYPE = Type(authority='BLUE', namespace='BLUE', identifier='BLUE')
 
 
 @pytest.fixture(scope="class",
                 params=['TEST_SERVICE'])
-def authz_adapter_class_fixture(request):
+def authorization_session_class_fixture(request):
     request.cls.service_config = request.param
     request.cls.authz_mgr = Runtime().get_manager(
         'AUTHORIZATION',
@@ -194,15 +189,6 @@ def authz_adapter_class_fixture(request):
         request.cls.${pkg_name_replaced}_mgr.add_child_${cat_name_under}(request.cls.${cat_name_under}_id_list[1], request.cls.${cat_name_under}_id_list[4])
         request.cls.${pkg_name_replaced}_mgr.add_child_${cat_name_under}(request.cls.${cat_name_under}_id_list[2], request.cls.${cat_name_under}_id_list[5])
 
-        # The hierarchy should look like this. (t) indicates where lookup is
-        # explicitely authorized:
-        #
-        #            _____ 0 _____
-        #           |             |
-        #        _ 1(t) _         2     not in hierarchy
-        #       |        |        |
-        #       3        4       5(t)      6     7(t)   (the 'blue' ${object_name_under} in ${cat_name_under} 2 is also assigned to ${cat_name_under} 7)
-
         request.cls.svc_mgr = Runtime().get_service_manager(
             'AUTHORIZATION',
             proxy=PROXY,
@@ -278,10 +264,10 @@ def authz_adapter_class_fixture(request):
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
-            # for catalog in request.cls.${pkg_name_replaced}_mgr.get_${cat_name_under_plural}():
-            #     for obj in catalog.get_${object_name_under_plural}():
-            #         catalog.delete_${object_name_under}(obj.ident)
-            #     request.cls.${pkg_name_replaced}_mgr.delete_${cat_name_under}(catalog.ident)
+            for catalog in request.cls.${pkg_name_replaced}_mgr.get_${cat_name_under_plural}():
+                for obj in catalog.get_${object_name_under_plural}():
+                    catalog.delete_${object_name_under}(obj.ident)
+                request.cls.${pkg_name_replaced}_mgr.delete_${cat_name_under}(catalog.ident)
             for vault in request.cls.vault_lookup_session.get_vaults():
                 lookup_session = request.cls.authz_mgr.get_authorization_lookup_session_for_vault(vault.ident)
                 admin_session = request.cls.authz_mgr.get_authorization_admin_session_for_vault(vault.ident)
@@ -289,7 +275,113 @@ def authz_adapter_class_fixture(request):
                     admin_session.delete_authorization(authz.ident)
                 request.cls.vault_admin_session.delete_vault(vault.ident)
 
-    request.addfinalizer(class_tear_down)"""
+        # The hierarchy should look like this. (t) indicates where lookup is
+        # explicitely authorized:
+        #
+        #            _____ 0 _____
+        #           |             |
+        #        _ 1(t) _         2     not in hierarchy
+        #       |        |        |
+        #       3        4       5(t)      6     7(t)   (the 'blue' ${object_name_under} in ${cat_name_under} 2 is also assigned to ${cat_name_under} 7)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def authorization_session_test_fixture(request):
+    request.cls.session = request.cls.catalog
+
+
+@pytest.mark.usefixtures("authorization_session_class_fixture", "authorization_session_test_fixture")
+class TestAuthorizationSession(object):
+    \"\"\"Tests for AuthorizationSession\"\"\"
+    def test_get_vault_id(self):
+        \"\"\"Tests get_vault_id\"\"\"
+        if not is_never_authz(self.service_config):
+            assert self.catalog.get_vault_id() == self.catalog.ident
+
+    def test_get_vault(self):
+        \"\"\"Tests get_vault\"\"\"
+        # is this test really needed?
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.catalog.get_vault(), ABCVault)
+
+    def test_can_access_authorizations(self):
+        \"\"\"Tests can_access_authorizations\"\"\"
+        if is_never_authz(self.service_config):
+            pass  # no object to call the method on?
+        else:
+            with pytest.raises(errors.Unimplemented):
+                self.session.can_access_authorizations()
+
+    def test_is_authorized(self):
+        \"\"\"Tests is_authorized\"\"\"
+        if not is_never_authz(self.service_config):
+            assert not self.catalog.is_authorized(AGENT_ID, LOOKUP_${object_name_upper}_FUNCTION_ID, self.${cat_name_under}_id_list[0])
+
+    def test_is_authorized_1(self):
+        \"\"\"Tests is_authorized 1\"\"\"
+        if not is_never_authz(self.service_config):
+            assert self.catalog.is_authorized(AGENT_ID, LOOKUP_${object_name_upper}_FUNCTION_ID, self.${cat_name_under}_id_list[1])
+
+    def test_is_authorized_3(self):
+        \"\"\"Tests is_authorized 3\"\"\"
+        if not is_never_authz(self.service_config):
+            assert self.catalog.is_authorized(AGENT_ID, LOOKUP_${object_name_upper}_FUNCTION_ID, self.${cat_name_under}_id_list[3])
+
+    def test_is_authorized_4(self):
+        \"\"\"Tests is_authorized 4\"\"\"
+        if not is_never_authz(self.service_config):
+            assert self.catalog.is_authorized(AGENT_ID, LOOKUP_${object_name_upper}_FUNCTION_ID, self.${cat_name_under}_id_list[4])
+
+    def test_is_authorized_2(self):
+        \"\"\"Tests is_authorized 2\"\"\"
+        if not is_never_authz(self.service_config):
+            assert not self.catalog.is_authorized(AGENT_ID, LOOKUP_${object_name_upper}_FUNCTION_ID, self.${cat_name_under}_id_list[2])
+
+    def test_is_authorized_5(self):
+        \"\"\"Tests is_authorized 5\"\"\"
+        if not is_never_authz(self.service_config):
+            assert self.catalog.is_authorized(AGENT_ID, LOOKUP_${object_name_upper}_FUNCTION_ID, self.${cat_name_under}_id_list[5])
+
+    def test_is_authorized_6(self):
+        \"\"\"Tests is_authorized 5\"\"\"
+        if not is_never_authz(self.service_config):
+            assert not self.catalog.is_authorized(AGENT_ID, LOOKUP_${object_name_upper}_FUNCTION_ID, self.${cat_name_under}_id_list[6])
+
+    def test_is_authorized_7(self):
+        \"\"\"Tests is_authorized 5\"\"\"
+        if not is_never_authz(self.service_config):
+            assert self.catalog.is_authorized(AGENT_ID, LOOKUP_${object_name_upper}_FUNCTION_ID, self.${cat_name_under}_id_list[7])
+
+    def test_get_authorization_condition(self):
+        \"\"\"Tests get_authorization_condition\"\"\"
+        if is_never_authz(self.service_config):
+            pass  # no object to call the method on?
+        elif uses_cataloging(self.service_config):
+            pass  # cannot call the _get_record() methods on catalogs
+        else:
+            with pytest.raises(errors.Unimplemented):
+                self.session.get_authorization_condition(True)
+
+    def test_is_authorized_on_condition(self):
+        \"\"\"Tests is_authorized_on_condition\"\"\"
+        if is_never_authz(self.service_config):
+            pass  # no object to call the method on?
+        elif uses_cataloging(self.service_config):
+            pass  # cannot call the _get_record() methods on catalogs
+        else:
+            with pytest.raises(errors.Unimplemented):
+                self.session.is_authorized_on_condition(True, True, True, True)
+
+JANE_REQUEST = proxy_example.SimpleRequest(username='jane_doe')
+JANE_CONDITION = PROXY_SESSION.get_proxy_condition()
+JANE_CONDITION.set_http_request(JANE_REQUEST)
+JANE_PROXY = PROXY_SESSION.get_proxy(JANE_CONDITION)
+
+BLUE_TYPE = Type(authority='BLUE',
+                 namespace='BLUE',
+                 identifier='BLUE')"""
 
     additional_methods_pattern = """
 @pytest.fixture(scope="function")
@@ -322,8 +414,8 @@ def authz_adapter_test_fixture(request):
     request.addfinalizer(test_tear_down)"""
 
     additional_classes_template = """
-@pytest.mark.usefixtures("authz_adapter_class_fixture", "authz_adapter_test_fixture")
-class Test${object_name}AuthzAdapter(object):
+@pytest.mark.usefixtures("authz_adapter_test_fixture")
+class Test${object_name}AuthzAdapter(TestAuthorizationSession):
 
     def test_lookup_${cat_name_under}_0_plenary_isolated(self):
         if not is_never_authz(self.service_config):

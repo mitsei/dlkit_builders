@@ -83,7 +83,6 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
         self._append_templated_imports(imports, interface)
         return imports
 
-
     def _compile_method(self, args, decorators, method_sig, method_doc, method_impl):
         if not method_impl.strip():
             return ''
@@ -97,7 +96,6 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
             return self._wrap('{0}\n{1}\n{2}'.format(method_doc,
                                                      method_sig,
                                                      method_impl))
-
 
     def _wrap(self, text):
         return text
@@ -130,6 +128,32 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
         return '"""TestAuthZ implementations of {0}.{1}"""'.format(
             package_name,
             interface['shortname'].split('LookupSession')[0])
+
+    def module_body(self, interface):
+        inheritance = self._get_class_inheritance(interface)
+        init_methods = self._make_init_methods(interface)
+        methods = self.make_methods(interface)
+        additional_methods = self._additional_methods(interface)
+        additional_classes = self._additional_classes(interface)
+
+        if additional_methods:
+            methods += additional_methods
+
+        if additional_classes:
+            # extra newlines generated in self._additional_classes
+            methods += additional_classes
+
+        if init_methods:
+            init_methods = self._wrap(init_methods)
+
+        if methods:
+            methods = '\n{0}\n'.format(methods)
+
+        body = '\n\n{0}\n{1}\n{2}{3}'.format(self.class_sig(interface, inheritance),
+                                             self._wrap(self.class_doc(interface)),
+                                             init_methods,
+                                             methods)
+        return body
 
     def _make_osid(self, file_name):
         # Overrides for implementing java style
@@ -169,8 +193,6 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
                 continue
             imports = self._get_module_imports(modules, interface)  # DONT NEED modules in this method?
             body = self.module_body(interface)
-            # OLD Python style: self._update_module_imports(modules, interface)
-            # OLD Python style: self.update_module_body(modules, interface)
             if body.strip():
                 self.write_class(interface, imports, body)
 
