@@ -184,9 +184,20 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                     num_matches += 1
 
             if num_matches == num_parent_parts:
+                # This will catch things like AssessmentAuthoringManager -> AssessmentManager
                 return True
-            else:
-                return False
+
+            # Now we need to catch multi-word sub-package things like
+            #   AssessmentPartBankSession -> AssessmentManager
+            # Might be easier to just hardcode these here...not sure how to automagically figure it out
+            subpackage_mapping = {
+                'AssessmentManager': ['AssessmentPartBankSession', 'AssessmentPartBankAssignmentSession']
+            }
+
+            if parent_name in subpackage_mapping.keys() and child_name in subpackage_mapping[parent_name]:
+                return True
+
+            return False
         else:
             # catalog / objects
             # check if potential_parent['shortname'].lower() has a corresponding
