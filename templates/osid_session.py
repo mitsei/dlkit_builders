@@ -1,11 +1,77 @@
+from copy import deepcopy
+
+
+def generic_authz_hint_generator(authz_function):
+    return """
+    def ${{method_name}}(self):
+        ${{pattern_name}}
+        return self._can('{0}')""".format(authz_function)
+
+
+def generic_authz_hint_with_arg_generator(authz_function):
+    return """
+    def ${{method_name}}(self, ${{arg0_name}}):
+        ${{pattern_name}}
+        # This would like to be a real implementation someday:
+        if ${{arg0_name}} is None:
+            raise NullArgument('${{arg0_name}} cannot be None')  # Just 'cause the spec says to :)
+        return self._can('{0}')""".format(authz_function)
+
+
+def generic_authz_method_generator(authz_function):
+    return """
+    def ${{method_name}}(${{args_kwargs_method_sig}}):
+        ${{pattern_name}}
+        if not self._can('{0}'):
+            raise PermissionDenied()
+        return self._provider_session.${{method_name}}(${{args_kwargs_or_nothing}})""".format(authz_function)
+
+
+def generic_authz_method_can_for_generator(authz_function):
+    return """
+    def ${{method_name}}(${{args_kwargs_method_sig}}):
+        ${{pattern_name}}
+        if not self._can_for_${{object_name_under}}('alias', ${{object_name_under}}_id):
+            raise PermissionDenied()
+        return self._provider_session.${{method_name}}(${{args_kwargs_or_nothing}})""".format(authz_function)
+
+
+def generic_authz_method_without_return_generator(authz_function):
+    return """
+    def ${{method_name}}(${{args_kwargs_method_sig}}):
+        ${{pattern_name}}
+        if not self._can('{0}'):
+            raise PermissionDenied()
+        self._provider_session.${{method_name}}(${{args_kwargs_or_nothing}})""".format(authz_function)
+
+
 class GenericAdapterSession(object):
+    init = {
+        'python': {
+            'authz': """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        # This needs to be done right
+        # Build from authority in config
+        self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
+        self._id_namespace = '${pkg_name_replaced}.${cat_name}'"""
+        }
+    }
+
     method = {
         'python': {
             'services': """
     def ${method_name}(${args_kwargs_method_sig}):
         \"\"\"Pass through to provider ${interface_name}.${method_original_name}\"\"\"
         ${pattern_name}
-        return self._get_provider_session('${interface_name_under}').${method_original_name}(${args_kwargs_or_nothing})"""
+        return self._get_provider_session('${interface_name_under}').${method_original_name}(${args_kwargs_or_nothing})""",
+            'authz': generic_authz_method_generator
+        }
+    }
+
+    method_can_for = {
+        'python': {
+            'authz': generic_authz_method_can_for_generator
         }
     }
 
@@ -57,7 +123,8 @@ class GenericAdapterSession(object):
     def ${method_name}(${args_kwargs_method_sig}):
         \"\"\"Pass through to provider ${interface_name}.${method_original_name}\"\"\"
         ${pattern_name}
-        self._get_provider_session('${interface_name_under}').${method_original_name}(${args_kwargs_or_nothing})"""
+        self._get_provider_session('${interface_name_under}').${method_original_name}(${args_kwargs_or_nothing})""",
+            'authz': generic_authz_method_without_return_generator
         }
     }
 
@@ -82,6 +149,46 @@ class GenericAdapterSession(object):
         return self._get_sub_package_provider_session(
             '${package_name_replace_reserved}',
             '${interface_name_under}').${method_original_name}()"""
+        }
+    }
+
+    authz_hint = {
+        'python': {
+            'authz': generic_authz_hint_generator
+        }
+    }
+
+    authz_hint_with_arg_check = {
+        'python': {
+            'authz': generic_authz_hint_with_arg_generator
+        }
+    }
+
+    authz_pass_through_with_return = {
+        'python': {
+            'authz': """
+    def ${method_name}(self):
+        ${pattern_name}
+        return self._provider_session.${method_name}()"""
+        }
+    }
+
+    authz_pass_through_without_return = {
+        'python': {
+            'authz': """
+    def ${method_name}(${args_kwargs_method_sig}):
+        ${pattern_name}
+        self._provider_session.${method_name}(${args_kwargs_or_nothing})"""
+        }
+    }
+
+    authz_can_with_query = {
+        'python': {
+            'authz': """
+    def ${method_name}(self):
+        ${pattern_name}
+        return (self._can('${func_name}') or
+                bool(self._get_overriding_catalog_ids('${func_name}')))"""
         }
     }
 
@@ -235,6 +342,9 @@ class GenericObjectLookupSession(object):
                 'ASCENDING = 1',
                 'CREATED = True',
                 'UPDATED = True'
+            ],
+            'authz': [
+                'from ..osid.osid_errors import NotFound, NullArgument'
             ]
         }
     }
@@ -255,7 +365,47 @@ class GenericObjectLookupSession(object):
             db_name='${pkg_name_replaced}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
-        self._kwargs = kwargs"""
+        self._kwargs = kwargs""",
+            'authz': """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
+        self.use_federated_${cat_name_under}_view()
+        self.use_comparative_${object_name_under}_view()
+        self._auth_${cat_name_under}_ids = None
+        self._unauth_${cat_name_under}_ids = None
+
+    def _try_overriding_${cat_name_under_plural}(self, query):
+        if self._get_overriding_catalog_ids('lookup') is not None:
+            for catalog_id in self._get_overriding_catalog_ids('lookup'):
+                query.match_${cat_name_under}_id(catalog_id, match=True)
+        return self._query_session.get_${object_name_under_plural}_by_query(query), query
+
+    def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
+        if self._can('lookup', ${cat_name_under}_id):
+            return []  # Don't go further - assumes authorizations inherited
+        else:
+            unauth_list = [str(${cat_name_under}_id)]
+        if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
+            for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
+                unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
+        return unauth_list
+
+    def _try_harder(self, query):
+        results, query = self._try_overriding_${cat_name_under_plural}(query)
+        if self._is_isolated_catalog_view():
+            if results.available() or self._is_comparative_object_view():
+                return results
+        if self._is_plenary_object_view():
+            return results
+        if self._hierarchy_session is None or self._query_session is None:
+            return results
+        if self._unauth_${cat_name_under}_ids is None:
+            self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
+        for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
+            query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        return self._query_session.get_${object_name_under_plural}_by_query(query)"""
         }
     }
 
@@ -266,7 +416,8 @@ class GenericObjectLookupSession(object):
         ${doc_string}
         ${pattern_name}
         return self._catalog_id""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_pass_through_with_return['python']['authz']
         }
     }
 
@@ -277,7 +428,8 @@ class GenericObjectLookupSession(object):
         ${doc_string}
         ${pattern_name}
         return self._catalog""",
-            'services': GenericAdapterSession.method_return_catalog['python']['services']
+            'services': GenericAdapterSession.method_return_catalog['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -290,7 +442,8 @@ class GenericObjectLookupSession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_can_with_query['python']['authz']
         }
     }
 
@@ -311,7 +464,12 @@ class GenericObjectLookupSession(object):
             try:
                 session.${method_name}()
             except AttributeError:
-                pass"""
+                pass""",
+            'authz': """
+    def ${method_name}(self):
+        ${pattern_name}
+        self._use_comparative_object_view()
+        self._provider_session.${method_name}()"""
         }
     }
 
@@ -332,7 +490,12 @@ class GenericObjectLookupSession(object):
             try:
                 session.${method_name}()
             except AttributeError:
-                pass"""
+                pass""",
+            'authz': """
+    def ${method_name}(self):
+        ${pattern_name}
+        self._use_plenary_object_view()
+        self._provider_session.${method_name}()"""
         }
     }
 
@@ -353,7 +516,14 @@ class GenericObjectLookupSession(object):
             try:
                 session.${method_name}()
             except AttributeError:
-                pass"""
+                pass""",
+            'authz': """
+    def ${method_name}(self):
+        ${pattern_name}
+        self._use_federated_catalog_view()
+        self._provider_session.${method_name}()
+        if self._query_session:
+            self._query_session.${method_name}()"""
         }
     }
 
@@ -374,7 +544,14 @@ class GenericObjectLookupSession(object):
             try:
                 session.${method_name}()
             except AttributeError:
-                pass"""
+                pass""",
+            'authz': """
+    def ${method_name}(self):
+        ${pattern_name}
+        self._use_isolated_catalog_view()
+        self._provider_session.${method_name}()
+        if self._query_session:
+            self._query_session.${method_name}()"""
         }
     }
 
@@ -392,7 +569,19 @@ class GenericObjectLookupSession(object):
             dict({'_id': ObjectId(self._get_id(${arg0_name}, '${package_name_replace}').get_identifier())},
                  **self._view_filter()))
         return objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.${method_name}(${arg0_name})
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_id(${arg0_name}, match=True)
+        results = self._try_harder(query)
+        if results.available():
+            return results.next()
+        raise NotFound()"""
         }
     }
 
@@ -420,7 +609,17 @@ class GenericObjectLookupSession(object):
                     sorted_result.append(object_map)
                     break
         return objects.${return_type}(sorted_result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.${method_name}(${arg0_name})
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_${object_name_under}_query()
+        for ${object_name_under}_id in (${arg0_name}):
+            query.match_id(${object_name_under}_id, match=True)
+        return self._try_harder(query)"""
         }
     }
 
@@ -438,7 +637,16 @@ class GenericObjectLookupSession(object):
             dict({'genusTypeId': str(${arg0_name})},
                  **self._view_filter())).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.${method_name}(${arg0_name})
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_genus_type(${arg0_name}, match=True)
+        return self._try_harder(query)"""
         }
     }
 
@@ -450,7 +658,16 @@ class GenericObjectLookupSession(object):
         ${pattern_name}
         # STILL NEED TO IMPLEMENT!!!
         return objects.${return_type}([])""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.${method_name}(${arg0_name})
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_parent_genus_type(${arg0_name}, match=True)
+        return self._try_harder(query)"""
         }
     }
 
@@ -462,7 +679,16 @@ class GenericObjectLookupSession(object):
         ${pattern_name}
         # STILL NEED TO IMPLEMENT!!!
         return objects.${return_type}([])""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.${method_name}(${arg0_name})
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_record_type(${arg0_name}, match=True)
+        return self._try_harder(query)"""
         }
     }
 
@@ -478,7 +704,16 @@ class GenericObjectLookupSession(object):
                                          runtime=self._runtime)
         result = collection.find(self._view_filter()).sort('_id', DESCENDING)
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.${method_name}()
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_any(match=True)
+        return self._try_harder(query)"""
         }
     }
 
@@ -497,7 +732,16 @@ class GenericObjectLookupSession(object):
             dict({'${arg0_object_mixed}Id': str(${arg0_name})},
                  **self._view_filter()))
         return objects.${return_type}(result, runtime=self._runtime)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.${method_name}(${arg0_name})
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_${object_name_under}_query()
+        query.match_${arg0_object_under}_id(${arg0_name}, match=True)
+        return self._try_harder(query)"""
         }
     }
 
@@ -516,7 +760,17 @@ class GenericObjectLookupSession(object):
             dict({'${arg0_object_mixed}Id': {'$$in': id_str_list}},
                  **self._view_filter()))
         return objects.${return_type}(result, runtime=self._runtime)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.${method_name}(${arg0_name})
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_${object_name_under}_query()
+        for ${object_name_under}_id in (${arg0_name}):
+            query.match_${arg0_object_under}_id(${object_name_under}_id, match=True)
+        return self._try_harder(query)"""
         }
     }
 
@@ -557,7 +811,34 @@ class GenericObjectAdminSession(object):
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
         self._forms = dict()
-        self._kwargs = kwargs"""
+        self._kwargs = kwargs""",
+            'authz': """
+    ${pattern_name}
+    def __init__(self, provider_manager, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
+        self._overriding_${cat_name_under}_ids = None
+        if self._proxy is not None:
+            try:
+                self._object_catalog_session = provider_manager.get_${object_name_under}_${cat_name_under}_session(self._proxy)
+            except (Unimplemented, AttributeError):
+                pass
+        else:
+            try:
+                self._object_catalog_session = provider_manager.get_${object_name_under}_${cat_name_under}_session()
+                self.get_${cat_name_under}_ids_by_${object_name_under} = self._object_catalog_session.get_${cat_name_under}_ids_by_${object_name_under}
+            except (Unimplemented, AttributeError):
+                pass
+
+    def _get_overriding_${cat_name_under}_ids(self):
+        if self._overriding_${cat_name_under}_ids is None:
+            self._overriding_${cat_name_under}_ids = self._get_overriding_catalog_ids('lookup')
+        return self._overriding_${cat_name_under}_ids
+
+    def _can_for_${object_name_under}(self, func_name, ${object_name_under}_id):
+        \"\"\"Checks if agent can perform function for object\"\"\"
+        return self._can_for_object(func_name, ${object_name_under}_id, 'get_${cat_name_under}_ids_for_${object_name_under}')"""
         }
     }
 
@@ -570,7 +851,8 @@ class GenericObjectAdminSession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('create')
         }
     }
 
@@ -583,7 +865,8 @@ class GenericObjectAdminSession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint_with_arg_check['python']['authz']('create')
         }
     }
 
@@ -619,7 +902,8 @@ class GenericObjectAdminSession(object):
                 proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('create')
         }
     }
 
@@ -660,7 +944,8 @@ class GenericObjectAdminSession(object):
             proxy=self._proxy)
 
         return result""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('create')
         }
     }
 
@@ -673,7 +958,8 @@ class GenericObjectAdminSession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_can_with_query['python']['authz']
         }
     }
 
@@ -705,7 +991,18 @@ class GenericObjectAdminSession(object):
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        if not self._can_for_${object_name_under}('update', ${object_name_under}_id):
+            raise PermissionDenied()
+        return self._provider_session.${method_name}(${arg0_name})
+
+    def duplicate_${object_name_under}(self, ${object_name_under}_id):
+        if not self._can('update'):
+            raise PermissionDenied()
+        return self._provider_session.duplicate_${object_name_under}(${arg0_name})"""
         }
     }
 
@@ -773,7 +1070,8 @@ class GenericObjectAdminSession(object):
             osid_object_map=${arg0_name}._my_map,
             runtime=self._runtime,
             proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('create')
         }
     }
 
@@ -786,7 +1084,8 @@ class GenericObjectAdminSession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_can_with_query['python']['authz']
         }
     }
 
@@ -815,7 +1114,8 @@ class GenericObjectAdminSession(object):
 
         objects.${object_name}(osid_object_map=${object_name_under}_map, runtime=self._runtime, proxy=self._proxy)._delete()
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_can_for['python']['authz']('delete')
         }
     }
 
@@ -828,7 +1128,8 @@ class GenericObjectAdminSession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_can_with_query['python']['authz']
         }
     }
 
@@ -839,7 +1140,8 @@ class GenericObjectAdminSession(object):
         ${doc_string}
         ${pattern_name}
         self._alias_id(primary_id=${arg0_name}, equivalent_id=${arg1_name})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_can_for['python']['authz']('alias')
         }
     }
 
@@ -884,7 +1186,8 @@ class GenericObjectAdminSession(object):
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('create')
         }
     }
 
@@ -945,7 +1248,12 @@ class GenericObjectNotificationSession(object):
     def __del__(self):
         \"\"\"Make sure the receiver is removed from the listener\"\"\"
         del MONGO_LISTENER.receivers[self._ns][self._receiver]
-        super(${interface_name}, self).__del__()"""
+        super(${interface_name}, self).__del__()""",
+            'authz': """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'"""
         }
     }
 
@@ -956,7 +1264,8 @@ class GenericObjectNotificationSession(object):
         ${doc_string}
         ${pattern_name}
         MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = True""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.authz_pass_through_without_return['python']['authz']
         }
     }
 
@@ -967,7 +1276,8 @@ class GenericObjectNotificationSession(object):
         ${doc_string}
         ${pattern_name}
         MONGO_LISTENER.receivers[self._ns][self._receiver]['reliable'] = False""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.authz_pass_through_without_return['python']['authz']
         }
     }
 
@@ -981,7 +1291,8 @@ class GenericObjectNotificationSession(object):
             del MONGO_LISTENER.notifications[notification_id]
         except KeyError:
             pass""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.authz_pass_through_without_return['python']['authz']
         }
     }
 
@@ -992,7 +1303,8 @@ class GenericObjectNotificationSession(object):
         ${doc_string}
         ${pattern_name}
         MONGO_LISTENER.receivers[self._ns][self._receiver]['i'] = True""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('register')
         }
     }
 
@@ -1003,7 +1315,8 @@ class GenericObjectNotificationSession(object):
         ${doc_string}
         ${pattern_name}
         MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = True""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('register')
         }
     }
 
@@ -1017,7 +1330,8 @@ class GenericObjectNotificationSession(object):
             MONGO_LISTENER.receivers[self._ns][self._receiver]['u'] = []
         if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['u'], list):
             MONGO_LISTENER.receivers[self._ns][self._receiver]['u'].append(${arg0_name}.get_identifier())""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('register')
         }
     }
 
@@ -1028,7 +1342,8 @@ class GenericObjectNotificationSession(object):
         ${doc_string}
         ${pattern_name}
         MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = True""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('register')
         }
     }
 
@@ -1042,13 +1357,15 @@ class GenericObjectNotificationSession(object):
             MONGO_LISTENER.receivers[self._ns][self._receiver]['d'] = []
         if isinstance(MONGO_LISTENER.receivers[self._ns][self._receiver]['d'], list):
             MONGO_LISTENER.receivers[self._ns][self._receiver]['d'].append(${arg0_name}.get_identifier())""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('register')
         }
     }
 
     can_register_for_object_notifications_template = {
         'python': {
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('register')
         }
     }
 
@@ -1073,7 +1390,7 @@ class GenericRelationshipLookupSession(object):
         }
     }
 
-    init_template = GenericObjectLookupSession.init_template
+    init_template = deepcopy(GenericObjectLookupSession.init_template)
 
     use_effective_relationship_view_template = {
         'python': {
@@ -1362,7 +1679,8 @@ class GenericObjectCatalogSession(object):
     def __init__(self, proxy=None, runtime=None, **kwargs):
         OsidSession._init_catalog(self, proxy, runtime)
         self._catalog_view = COMPARATIVE
-        self._kwargs = kwargs"""
+        self._kwargs = kwargs""",
+            'authz': GenericAdapterSession.init['python']['authz']
         }
     }
 
@@ -1375,7 +1693,8 @@ class GenericObjectCatalogSession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('lookup')
         }
     }
 
@@ -1389,7 +1708,8 @@ class GenericObjectCatalogSession(object):
         for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_under}(${arg0_name}):
             id_list.append(${object_name_under}.get_id())
         return IdList(id_list)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1403,7 +1723,8 @@ class GenericObjectCatalogSession(object):
         lookup_session = mgr.get_${object_name_under}_lookup_session_for_${cat_name_under}(${arg0_name}, proxy=self._proxy)
         lookup_session.use_isolated_${cat_name_under}_view()
         return lookup_session.get_${object_name_plural_under}()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1417,7 +1738,8 @@ class GenericObjectCatalogSession(object):
         for ${object_name_under} in self.get_${object_name_plural_under}_by_${cat_name_plural_under}(${arg0_name}):
             id_list.append(${object_name_under}.get_id())
         return IdList(id_list)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1432,7 +1754,8 @@ class GenericObjectCatalogSession(object):
             ${object_name_under}_list += list(
                 self.get_${object_name_plural_under}_by_${cat_name_under}(${cat_name_under}_id))
         return objects.${return_type}(${object_name_under}_list)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1450,7 +1773,8 @@ class GenericObjectCatalogSession(object):
         for idstr in ${object_name_under}._my_map['assigned${cat_name}Ids']:
             id_list.append(Id(idstr))
         return IdList(id_list)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1464,7 +1788,8 @@ class GenericObjectCatalogSession(object):
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         return lookup_session.get_${cat_name_plural_under}_by_ids(
             self.get_${cat_name_under}_ids_by_${object_name_under}(${arg0_name}))""",
-            'services': GenericAdapterSession.method_return_catalog_list['python']['services']
+            'services': GenericAdapterSession.method_return_catalog_list['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1488,7 +1813,8 @@ class GenericObjectCatalogAssignmentSession(object):
         OsidSession._init_catalog(self, proxy, runtime)
         self._catalog_name = '${cat_name}'
         self._forms = dict()
-        self._kwargs = kwargs"""
+        self._kwargs = kwargs""",
+            'authz': GenericAdapterSession.init['python']['authz']
         }
     }
 
@@ -1501,7 +1827,8 @@ class GenericObjectCatalogAssignmentSession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('assign')
         }
     }
 
@@ -1516,7 +1843,11 @@ class GenericObjectCatalogAssignmentSession(object):
         if ${arg0_name}.get_identifier() == '000000000000000000000000':
             return False
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        return self._can('${func_name}', qualifier_id=${arg0_name})"""
         }
     }
 
@@ -1534,7 +1865,8 @@ class GenericObjectCatalogAssignmentSession(object):
         for ${cat_name_under} in ${cat_name_plural_under}:
             id_list.append(${cat_name_under}.get_id())
         return IdList(id_list)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('assign')
         }
     }
 
@@ -1546,7 +1878,8 @@ class GenericObjectCatalogAssignmentSession(object):
         ${pattern_name}
         # This will likely be overridden by an authorization adapter
         return self.get_assignable_${cat_name_under}_ids(${arg0_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('assign')
         }
     }
 
@@ -1560,7 +1893,8 @@ class GenericObjectCatalogAssignmentSession(object):
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
         self._assign_object_to_catalog(${arg0_name}, ${arg1_name})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('assign')
         }
     }
 
@@ -1574,7 +1908,8 @@ class GenericObjectCatalogAssignmentSession(object):
         lookup_session = mgr.get_${cat_name_under}_lookup_session(proxy=self._proxy)
         lookup_session.get_${cat_name_under}(${arg1_name})  # to raise NotFound
         self._unassign_object_from_catalog(${arg0_name}, ${arg1_name})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('assign')
         }
     }
 
@@ -1590,7 +1925,8 @@ class GenericObjectCatalogAssignmentSession(object):
         except:  # something went wrong, roll back assignment to ${arg2_name}
             self.unassign_${object_name_under}_from_${cat_name_under}(${arg0_name}, ${arg2_name})
             raise""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('assign')
         }
     }
 
@@ -1605,6 +1941,9 @@ class GenericObjectQuerySession(object):
                 'from . import queries',
                 'DESCENDING = -1',
                 'ASCENDING = 1'
+            ],
+            'authz': [
+                'from ..utilities import QueryWrapper'
             ]
         }
     }
@@ -1625,7 +1964,49 @@ class GenericObjectQuerySession(object):
             db_name='${pkg_name_replaced}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
-        self._kwargs = kwargs"""
+        self._kwargs = kwargs""",
+            'authz': """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
+        self.use_federated_${cat_name_under}_view()
+        self._unauth_${cat_name_under}_ids = None
+
+    def _try_overriding_${cat_name_under_plural}(self, query):
+        if self._get_overriding_catalog_ids('search') is not None:
+            for ${cat_name_under}_id in self._get_overriding_catalog_ids('search'):
+                query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
+        return self._query_session.get_${object_name_under_plural}_by_query(query), query
+
+    def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
+        if self._can('search', ${cat_name_under}_id):
+            return []  # Don't go further - assumes authorizations inherited
+        else:
+            unauth_list = [str(${cat_name_under}_id)]
+        if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
+            for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
+                unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
+        return unauth_list
+
+    def _try_harder(self, query):
+        results, query = self._try_overriding_${cat_name_under_plural}(query)
+        if self._is_isolated_catalog_view():
+            if results.available():
+                return results
+        if self._hierarchy_session is None or self._query_session is None:
+            return results
+        if self._unauth_${cat_name_under}_ids is None:
+            self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
+        for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
+            query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        return self._query_session.get_${object_name_under_plural}_by_query(query)
+
+    class ${object_name}QueryWrapper(QueryWrapper):
+        \"\"\"Wrapper for ${object_name}Queries to override match_${cat_name_under}_id method\"\"\"
+
+        def match_${cat_name_under}_id(self, ${cat_name_under}_id, match=True):
+            self._cat_id_args_list.append({'${cat_name_under}_id': ${cat_name_under}_id, 'match': match})"""
         }
     }
 
@@ -1651,7 +2032,8 @@ class GenericObjectQuerySession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_can_with_query['python']['authz']
         }
     }
 
@@ -1662,7 +2044,15 @@ class GenericObjectQuerySession(object):
         ${doc_string}
         ${pattern_name}
         return queries.${return_type}(runtime=self._runtime)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if (not self._can('search') and
+                self._is_isolated_catalog_view()):
+            raise PermissionDenied()
+        else:
+            return self.${object_name}QueryWrapper(self._provider_session.${method_name}())"""
         }
     }
 
@@ -1697,7 +2087,21 @@ class GenericObjectQuerySession(object):
         else:
             result = []
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        if not hasattr(${arg0_name}, '_cat_id_args_list'):
+            raise Unsupported('${arg0_name} not from this session')
+        for kwargs in ${arg0_name}._cat_id_args_list:
+            if self._can('search', kwargs['${cat_name_under}_id']):
+                ${arg0_name}._provider_query.match_${cat_name_under}_id(**kwargs)
+        if self._can('search'):
+            return self._provider_session.${method_name}(${arg0_name})
+        self._check_search_conditions()
+        result = self._try_harder(${arg0_name})
+        ${arg0_name}._provider_query.clear_${cat_name_under}_terms()
+        return result"""
         }
     }
 
@@ -1705,7 +2109,7 @@ class GenericObjectQuerySession(object):
 class GenericRelationshipQuerySession(object):
     import_statements_pattern = GenericObjectQuerySession.import_statements_pattern
 
-    init_template = GenericObjectQuerySession.init_template
+    init_template = deepcopy(GenericObjectQuerySession.init_template)
 
 
 class GenericCatalogLookupSession(object):
@@ -1740,7 +2144,8 @@ class GenericCatalogLookupSession(object):
             self._catalog_session = self._cataloging_manager.get_catalog_lookup_session()
             self._catalog_session.use_comparative_catalog_view()
         self._catalog_view = COMPARATIVE
-        self._kwargs = kwargs"""
+        self._kwargs = kwargs""",
+            'authz': GenericAdapterSession.init['python']['authz']
         }
     }
 
@@ -1763,7 +2168,8 @@ class GenericCatalogLookupSession(object):
             try:
                 session.${method_name}()
             except AttributeError:
-                pass"""
+                pass""",
+            'authz': GenericAdapterSession.authz_pass_through_without_return['python']['authz']
         }
     }
 
@@ -1786,7 +2192,8 @@ class GenericCatalogLookupSession(object):
             try:
                 session.${method_name}()
             except AttributeError:
-                pass"""
+                pass""",
+            'authz': GenericAdapterSession.authz_pass_through_without_return['python']['authz']
         }
     }
 
@@ -1812,7 +2219,8 @@ class GenericCatalogLookupSession(object):
             result = self._create_orchestrated_cat(${arg0_name}, '${package_name}', '${cat_name}')
 
         return objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method_return_catalog['python']['services']
+            'services': GenericAdapterSession.method_return_catalog['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1835,7 +2243,8 @@ class GenericCatalogLookupSession(object):
         result = collection.find({'_id': {'$$in': catalog_id_list}}).sort('_id', DESCENDING)
 
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method_return_catalog_list['python']['services']
+            'services': GenericAdapterSession.method_return_catalog_list['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1854,7 +2263,8 @@ class GenericCatalogLookupSession(object):
         result = collection.find().sort('_id', DESCENDING)
 
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method_return_catalog_list_no_args['python']['services']
+            'services': GenericAdapterSession.method_return_catalog_list_no_args['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1873,7 +2283,8 @@ class GenericCatalogLookupSession(object):
         result = collection.find({"genusTypeId": str(${arg0_name})}).sort('_id', DESCENDING)
 
         return objects.${return_type}(result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method_return_catalog_list['python']['services']
+            'services': GenericAdapterSession.method_return_catalog_list['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1906,7 +2317,8 @@ class GenericCatalogLookupSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.can_lookup_catalogs()
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('lookup')
         }
     }
 
@@ -1931,7 +2343,8 @@ class GenericCatalogQuerySession(object):
         if self._cataloging_manager is not None:
             self._catalog_session = self._cataloging_manager.get_catalog_query_session()
         self._forms = dict()
-        self._kwargs = kwargs"""
+        self._kwargs = kwargs""",
+            'authz': GenericAdapterSession.init['python']['authz']
         }
     }
 
@@ -1944,7 +2357,8 @@ class GenericCatalogQuerySession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('query')
         }
     }
 
@@ -1957,7 +2371,8 @@ class GenericCatalogQuerySession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('search')
         }
     }
 
@@ -1968,7 +2383,8 @@ class GenericCatalogQuerySession(object):
         ${doc_string}
         ${pattern_name}
         return queries.${return_type}(runtime=self._runtime)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('search')
         }
     }
 
@@ -1987,7 +2403,8 @@ class GenericCatalogQuerySession(object):
         result = collection.find(query_terms).sort('_id', DESCENDING)
 
         return objects.${return_type}(result, runtime=self._runtime)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('search')
         }
     }
 
@@ -2020,7 +2437,8 @@ class GenericCatalogAdminSession(object):
         if self._cataloging_manager is not None:
             self._catalog_session = self._cataloging_manager.get_catalog_admin_session()
         self._forms = dict()
-        self._kwargs = kwargs"""
+        self._kwargs = kwargs""",
+            'authz': GenericAdapterSession.init['python']['authz']
         }
     }
 
@@ -2035,7 +2453,8 @@ class GenericCatalogAdminSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.can_create_catalogs()
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('create')
         }
     }
 
@@ -2050,7 +2469,8 @@ class GenericCatalogAdminSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.can_create_catalog_with_record_types(catalog_record_types=${arg0_name})
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint_with_arg_check['python']['authz']('create')
         }
     }
 
@@ -2086,7 +2506,8 @@ class GenericCatalogAdminSession(object):
                 proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
         self._forms[result.get_id().get_identifier()] = not CREATED
         return result""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('create')
         }
     }
 
@@ -2129,7 +2550,8 @@ class GenericCatalogAdminSession(object):
             proxy=self._proxy)
 
         return result""",
-            'services': GenericAdapterSession.method_return_catalog['python']['services']
+            'services': GenericAdapterSession.method_return_catalog['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('create')
         }
     }
 
@@ -2160,7 +2582,8 @@ class GenericCatalogAdminSession(object):
         self._forms[cat_form.get_id().get_identifier()] = not UPDATED
 
         return cat_form""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('update')
         }
     }
 
@@ -2175,7 +2598,8 @@ class GenericCatalogAdminSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.can_update_catalogs()
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('update')
         }
     }
 
@@ -2215,7 +2639,8 @@ class GenericCatalogAdminSession(object):
 
         # Note: this is out of spec. The OSIDs don't require an object to be returned
         return objects.${return_type}(osid_object_map=${arg0_name}._my_map, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method_return_catalog['python']['services']
+            'services': GenericAdapterSession.method_return_catalog['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('update')
         }
     }
 
@@ -2230,7 +2655,8 @@ class GenericCatalogAdminSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.can_delete_catalogs()
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('delete')
         }
     }
 
@@ -2262,7 +2688,8 @@ class GenericCatalogAdminSession(object):
             if obj_collection.find({'assigned${cat_name}Ids': {'$$in': [str(${arg0_name})]}}).count() != 0:
                 raise errors.IllegalState('catalog is not empty')
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('delete')
         }
     }
 
@@ -2275,7 +2702,8 @@ class GenericCatalogAdminSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.alias_catalog(catalog_id=${arg0_name}, alias_id=alias_id)
         self._alias_id(primary_id=${arg0_name}, equivalent_id=alias_id)""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('alias')
         }
     }
 
@@ -2338,7 +2766,8 @@ class GenericCatalogHierarchySession(object):
                 Id(authority='${pkg_name_upper}',
                    namespace='CATALOG',
                    identifier='${cat_name_upper}'),
-                proxy=self._proxy)"""
+                proxy=self._proxy)""",
+            'authz': GenericAdapterSession.init['python']['authz']
         }
     }
 
@@ -2353,7 +2782,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.can_access_catalog_hierarchy()
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('access')
         }
     }
 
@@ -2366,7 +2796,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.get_catalog_hierarchy_id()
         return self._hierarchy_session.get_hierarchy_id()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_pass_through_with_return['python']['authz']
         }
     }
 
@@ -2379,7 +2810,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.get_catalog_hierarchy()
         return self._hierarchy_session.get_hierarchy()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2392,7 +2824,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.get_root_catalog_ids()
         return self._hierarchy_session.get_roots()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2407,7 +2840,8 @@ class GenericCatalogHierarchySession(object):
         return ${cat_name}LookupSession(
             self._proxy,
             self._runtime).get_${cat_name_plural_under}_by_ids(list(self.get_root_${cat_name_under}_ids()))""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2420,7 +2854,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.has_parent_catalogs(catalog_id=${arg0_name})
         return self._hierarchy_session.has_parents(id_=${arg0_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2433,7 +2868,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.is_parent_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
         return self._hierarchy_session.is_parent(id_=${arg1_name}, parent_id=${arg0_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2446,7 +2882,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.get_parent_catalog_ids(catalog_id=${arg0_name})
         return self._hierarchy_session.get_parents(id_=${arg0_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2462,7 +2899,8 @@ class GenericCatalogHierarchySession(object):
             self._proxy,
             self._runtime).get_${cat_name_plural_under}_by_ids(
                 list(self.get_parent_${cat_name_under}_ids(${arg0_name})))""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2475,7 +2913,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.is_ancestor_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
         return self._hierarchy_session.is_ancestor(id_=${arg0_name}, ancestor_id=${arg1_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2488,7 +2927,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.has_child_catalogs(catalog_id=${arg0_name})
         return self._hierarchy_session.has_children(id_=${arg0_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2501,7 +2941,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.is_child_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
         return self._hierarchy_session.is_child(id_=${arg1_name}, child_id=${arg0_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2514,7 +2955,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.get_child_catalog_ids(catalog_id=${arg0_name})
         return self._hierarchy_session.get_children(id_=${arg0_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2530,7 +2972,8 @@ class GenericCatalogHierarchySession(object):
             self._proxy,
             self._runtime).get_${cat_name_plural_under}_by_ids(
                 list(self.get_child_${cat_name_under}_ids(${arg0_name})))""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2543,7 +2986,8 @@ class GenericCatalogHierarchySession(object):
         if self._catalog_session is not None:
             return self._catalog_session.is_descendant_of_catalog(id_=${arg0_name}, catalog_id=${arg1_name})
         return self._hierarchy_session.is_descendant(id_=${arg0_name}, descendant_id=${arg1_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2564,7 +3008,8 @@ class GenericCatalogHierarchySession(object):
             ancestor_levels=${arg1_name},
             descendant_levels=${arg2_name},
             include_siblings=${arg3_name})""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2579,7 +3024,8 @@ class GenericCatalogHierarchySession(object):
             ${arg1_name}=${arg1_name},
             ${arg2_name}=${arg2_name},
             ${arg3_name}=${arg3_name})._my_map, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -2617,7 +3063,8 @@ class GenericCatalogHierarchyDesignSession(object):
                 Id(authority='${pkg_name_upper}',
                    namespace='CATALOG',
                    identifier='${cat_name_upper}'),
-                proxy=self._proxy)"""
+                proxy=self._proxy)""",
+            'authz': GenericAdapterSession.init['python']['authz']
         }
     }
 
@@ -2632,7 +3079,8 @@ class GenericCatalogHierarchyDesignSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.can_modify_catalog_hierarchy()
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('modify')
         }
     }
 
@@ -2645,7 +3093,8 @@ class GenericCatalogHierarchyDesignSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.add_root_catalog(catalog_id=${arg0_name})
         return self._hierarchy_session.add_root(id_=${arg0_name})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('modify')
         }
     }
 
@@ -2658,7 +3107,8 @@ class GenericCatalogHierarchyDesignSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.remove_root_catalog(catalog_id=${arg0_name})
         return self._hierarchy_session.remove_root(id_=${arg0_name})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('modify')
         }
     }
 
@@ -2671,7 +3121,8 @@ class GenericCatalogHierarchyDesignSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.add_child_catalog(catalog_id=${arg0_name}, child_id=${arg1_name})
         return self._hierarchy_session.add_child(id_=${arg0_name}, child_id=${arg1_name})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('modify')
         }
     }
 
@@ -2684,7 +3135,8 @@ class GenericCatalogHierarchyDesignSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.remove_child_catalog(catalog_id=${arg0_name}, child_id=${arg1_name})
         return self._hierarchy_session.remove_child(id_=${arg0_name}, child_id=${arg1_name})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('modify')
         }
     }
 
@@ -2697,7 +3149,8 @@ class GenericCatalogHierarchyDesignSession(object):
         if self._catalog_session is not None:
             return self._catalog_session.remove_child_catalogs(catalog_id=${arg0_name})
         return self._hierarchy_session.remove_children(id_=${arg0_name})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('modify')
         }
     }
 
@@ -2991,7 +3444,15 @@ class GenericObjectSearchSession:
         ${doc_string}
         ${pattern_name}
         return searches.${return_type}(runtime=self._runtime)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            # This still needs to be updated to work with authz overrides:
+            'authz': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        if not self._can('search'):
+            raise PermissionDenied()
+        return self._provider_session.${method_name}()"""
         }
     }
 
@@ -3026,7 +3487,15 @@ class GenericObjectSearchSession:
         else:
             result = collection.find(query_terms)
         return searches.${return_type}(result, dict(${arg0_name}._query_terms), runtime=self._runtime)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            # This still needs to be updated to work with authz overrides:
+            'authz': """
+    def ${method_name}(self, ${arg0_name}, ${arg1_name}):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        if not self._can('search'):
+            raise PermissionDenied()
+        return self._provider_session.${method_name}(${arg0_name}, ${arg1_name})"""
         }
     }
 
@@ -3238,7 +3707,8 @@ class GenericDependentObjectAdminSession(object):
             osid_object_map=${arg0_name}._my_map,
             runtime=self._runtime,
             proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('create')
         }
     }
 
@@ -3266,7 +3736,8 @@ class GenericDependentObjectAdminSession(object):
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('update')
         }
     }
 
@@ -3318,7 +3789,8 @@ class GenericDependentObjectAdminSession(object):
             osid_object_map=${arg0_name}._my_map,
             runtime=self._runtime,
             proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('update')
         }
     }
 
@@ -3351,7 +3823,8 @@ class GenericDependentObjectAdminSession(object):
             runtime=self._runtime,
             proxy=self._proxy)._delete()
         collection.save(${object_name_under})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('delete')
         }
     }
 

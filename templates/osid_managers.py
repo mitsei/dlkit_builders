@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 class GenericAdapterProfileAndManager(object):
     method_no_args = {
         'python': {
@@ -62,7 +65,21 @@ class GenericProfile(object):
         'python': {
             'services': """
     def __init__(self):
-        self._provider_manager = None"""
+        self._provider_manager = None""",
+            'authz': """
+    def __init__(self):
+        osid_managers.OsidProfile.__init__(self)
+
+    def _get_hierarchy_session(self, proxy=None):
+        if proxy is not None:
+            try:
+                return self._provider_manager.get_${cat_name_under}_hierarchy_session(proxy)
+            except errors.Unimplemented:
+                return None
+        try:
+            return self._provider_manager.get_${cat_name_under}_hierarchy_session()
+        except errors.Unimplemented:
+            return None"""
         }
     }
 
@@ -73,7 +90,8 @@ class GenericProfile(object):
         ${doc_string}
         ${pattern_name}
         return '${method_name}' in profile.SUPPORTS""",
-            'services': GenericAdapterProfileAndManager.method_no_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
+            'authz': GenericAdapterProfileAndManager.method_no_args['python']['services']
         }
     }
 
@@ -84,7 +102,8 @@ class GenericProfile(object):
         ${doc_string}
         ${pattern_name}
         return '${method_name}' in profile.SUPPORTS""",
-            'services': GenericAdapterProfileAndManager.method_no_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
+            'authz': GenericAdapterProfileAndManager.method_no_args['python']['services']
         }
     }
 
@@ -99,7 +118,8 @@ class GenericProfile(object):
         for record_type_map in record_type_maps:
             record_types.append(Type(**record_type_maps[record_type_map]))
         return TypeList(record_types)""",
-            'services': GenericAdapterProfileAndManager.method_no_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
+            'authz': GenericAdapterProfileAndManager.method_no_args['python']['services']
         }
     }
 
@@ -271,7 +291,18 @@ class GenericManager(object):
     def disable_session_management(self):
         \"\"\"Session state will never be saved\"\"\"
         self._session_management = DISABLED
-        self.close_sessions()"""
+        self.close_sessions()""",
+            'authz': """
+    def __init__(self):
+        ${pkg_name_replaced_caps}Profile.__init__(self)
+
+    def initialize(self, runtime):
+        osid_managers.OsidManager.initialize(self, runtime)
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:${pkg_name_replaced}ProviderImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        self._provider_manager = runtime.get_manager('${pkg_name_replaced_upper}', provider_impl)
+        # need to add version argument"""
         }
     }
 
@@ -286,11 +317,33 @@ class GenericManager(object):
         if 'proxy' in kwargs:
             return ${return_module}.${return_type}(proxy=kwargs['proxy'], runtime=self._runtime)
         return ${return_module}.${return_type}(runtime=self._runtime)""",
-            'services': GenericAdapterProfileAndManager.method_with_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_with_args['python']['services'],
+            'authz': """
+    def ${method_name}(self):
+        ${pattern_name}
+        try:
+            query_session = self._provider_manager.get_${object_name_under}_query_session()
+            query_session.use_federated_${cat_name_under}_view()
+        except errors.Unimplemented:
+            query_session = None
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            hierarchy_session=self._get_hierarchy_session(),
+            query_session=query_session)"""
         }
     }
 
-    get_object_admin_session_template = get_object_lookup_session_template
+    get_object_admin_session_template = deepcopy(get_object_lookup_session_template)
+    get_object_admin_session_template['python']['authz'] = """
+    def ${method_name}(self):
+        ${pattern_name}
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)"""
 
     get_object_lookup_session_for_catalog_template = {
         'python': {
@@ -310,11 +363,33 @@ class GenericManager(object):
                 proxy=kwargs['proxy'],
                 runtime=self._runtime)
         return ${return_module}.${return_type}(${arg0_name}, runtime=self._runtime)""",
-            'services': GenericAdapterProfileAndManager.method_with_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_with_args['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        try:
+            query_session = self._provider_manager.get_${object_name_under}_query_session_for_${cat_name_under}(${arg0_name})
+            query_session.use_federated_${cat_name_under}_view()
+        except Unimplemented:
+            query_session = None
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            hierarchy_session=self._get_hierarchy_session(),
+            query_session=query_session)"""
         }
     }
 
-    get_object_admin_session_for_catalog_template = get_object_lookup_session_for_catalog_template
+    get_object_admin_session_for_catalog_template = deepcopy(get_object_lookup_session_for_catalog_template)
+    get_object_admin_session_for_catalog_template['python']['authz'] = """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)"""
 
     get_object_notification_session_template = {
         'python': {
@@ -331,7 +406,15 @@ class GenericManager(object):
                 runtime=self._runtime,
                 receiver=${arg0_name})
         return ${return_module}.${return_type}(runtime=self._runtime, receiver=${arg0_name})""",
-            'services': GenericAdapterProfileAndManager.method_with_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_with_args['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}):
+        ${pattern_name}
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)"""
         }
     }
 
@@ -357,7 +440,15 @@ class GenericManager(object):
             catalog_id=${arg1_name},
             runtime=self._runtime,
             receiver=${arg0_name})""",
-            'services': GenericAdapterProfileAndManager.method_with_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_with_args['python']['services'],
+            'authz': """
+    def ${method_name}(self, ${arg0_name}, ${arg1_name}):
+        ${pattern_name}
+        return getattr(sessions, '${return_type}')(
+            provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)"""
         }
     }
 
@@ -368,6 +459,17 @@ class GenericProxyManager(object):
             'json': """
     ${pattern_name}
     def __init__(self):
-        osid_managers.OsidProxyManager.__init__(self)"""
+        osid_managers.OsidProxyManager.__init__(self)""",
+            'authz': """
+    def __init__(self):
+        ${pkg_name_replaced_caps}Profile.__init__(self)
+
+    def initialize(self, runtime):
+        osid_managers.OsidProxyManager.initialize(self, runtime)
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:${pkg_name_replaced}ProviderImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        self._provider_manager = runtime.get_proxy_manager('${pkg_name_replaced_upper}', provider_impl)
+        # need to add version argument"""
         }
     }

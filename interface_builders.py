@@ -36,7 +36,9 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
     def _copy_package_helpers(self):
         if not self._is('abc'):
             package_helper_dir = self._template(self.replace(self.package['name']) + '_helpers')
-            for helper_file in glob.glob(package_helper_dir + '/*.py'):
+            package_helper_dir = '{0}/{1}/*.py'.format(package_helper_dir,
+                                                       self._class)
+            for helper_file in glob.glob(package_helper_dir):
                 if self._is('services'):
                     shutil.copy(helper_file, self._root_dir)
                 else:
@@ -460,7 +462,9 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         if not self._is('abc') and not self._is('mdata'):
             # Copy general config and primitive files, etc into the
             # implementation root directory:
-            for helper_file in glob.glob(self._template('helpers') + '/*.py'):
+            helper_dir = '{0}/{1}/*.py'.format(self._template('helpers'),
+                                               self._class)
+            for helper_file in glob.glob(helper_dir):
                 shutil.copy(helper_file, self._root_dir)
         else:
             # copy over the abc_errors.py file to abstract_osid.osid.errors.py

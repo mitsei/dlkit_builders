@@ -14,11 +14,11 @@ class ResourceProfile:
         if proxy is not None:
             try:
                 return self._provider_manager.get_${cat_name_under}_hierarchy_session(proxy)
-            except Unimplemented:
+            except errors.Unimplemented:
                 return None
         try:
             return self._provider_manager.get_${cat_name_under}_hierarchy_session()
-        except Unimplemented:
+        except errors.Unimplemented:
             return None
 """
 

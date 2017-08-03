@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 class GenericCatalogQuery(object):
     import_statements_pattern = {
         'python': {
@@ -76,7 +79,7 @@ class GenericObjectQuery(object):
         }
     }
 
-    clear_simple_terms_template = GenericCatalogQuery.clear_simple_terms_template
+    clear_simple_terms_template = deepcopy(GenericCatalogQuery.clear_simple_terms_template)
 
     match_catalog_id_template = {
         'python': {

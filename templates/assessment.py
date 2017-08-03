@@ -89,7 +89,12 @@ class AssessmentSession:
             cat_name='Bank',
             cat_class=objects.Bank)
         self._forms = dict()
-        self._assessments_taken = dict()"""
+        self._assessments_taken = dict()""",
+            'authz': """
+    def __init__(self, **kwargs):
+        osid_sessions.OsidSession.__init__(self, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
+        self._id_namespace = 'assessment.Assessment'"""
         }
     }
 
@@ -101,7 +106,8 @@ class AssessmentSession:
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('take')
         }
     }
 
@@ -111,7 +117,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_taken_id):
         ${doc_string}
         return self._get_assessment_taken(assessment_taken_id).has_started()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -121,7 +128,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_taken_id):
         ${doc_string}
         return self._get_assessment_taken(assessment_taken_id).has_ended()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -142,7 +150,8 @@ class AssessmentSession:
             collection.save(assessment_taken_map)
         else:
             raise errors.IllegalState()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -152,7 +161,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_taken_id):
         ${doc_string}
         return self._get_assessment_taken(assessment_taken_id).get_assessment_offered().are_sections_sequential()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -163,7 +173,8 @@ class AssessmentSession:
         ${doc_string}
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         return assessment_taken._get_first_assessment_section()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -178,7 +189,8 @@ class AssessmentSession:
             return False
         else:
             return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -189,7 +201,8 @@ class AssessmentSession:
         ${doc_string}
         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
         return assessment_taken._get_next_assessment_section(assessment_section_id)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -204,7 +217,8 @@ class AssessmentSession:
             return False
         else:
             return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -215,7 +229,8 @@ class AssessmentSession:
         ${doc_string}
         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
         return assessment_taken._get_previous_assessment_section(assessment_section_id)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -225,7 +240,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         return get_section_util(assessment_section_id, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -236,7 +252,8 @@ class AssessmentSession:
         ${doc_string}
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         return assessment_taken._get_assessment_sections()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -246,7 +263,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).is_complete()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -260,7 +278,8 @@ class AssessmentSession:
             if not section.is_complete():
                 section_list.append(section)
         return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -273,7 +292,8 @@ class AssessmentSession:
         ${doc_string}
         return get_section_util(assessment_section_id,
                                 runtime=self._runtime)._assessment_taken.has_started()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -285,7 +305,8 @@ class AssessmentSession:
         ${doc_string}
         return get_section_util(assessment_section_id,
                                 runtime=self._runtime).is_over()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -301,7 +322,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).are_items_sequential()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -311,7 +333,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_first_question()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -326,7 +349,8 @@ class AssessmentSession:
             return False
         else:
             return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -336,7 +360,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -351,7 +376,8 @@ class AssessmentSession:
             return False
         else:
             return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -361,7 +387,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id, reverse=True)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -371,7 +398,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_question(question_id=item_id)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -382,7 +410,8 @@ class AssessmentSession:
         ${doc_string}
         # Does this want to return a blocking list of available questions?
         return self.get_assessment_section(assessment_section_id).get_questions()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -442,7 +471,8 @@ class AssessmentSession:
         obj_form._for_update = False  # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -477,7 +507,8 @@ class AssessmentSession:
         answer_form._my_map['_id'] = ObjectId()
         self.get_assessment_section(assessment_section_id).submit_response(item_id, answer_form)
         self._forms[answer_form.get_id().get_identifier()] = SUBMITTED""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('take')
         }
     }
 
@@ -488,7 +519,8 @@ class AssessmentSession:
         ${doc_string}
         # add conditional: if the assessment or part allows us to skip:
         self.get_assessment_section(assessment_section_id).submit_response(item_id, None)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -498,7 +530,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).is_question_answered(item_id)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -508,7 +541,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_questions(answered=False)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -519,7 +553,8 @@ class AssessmentSession:
         ${doc_string}
         # There's probably a more efficient way to implement this:
         return bool(self.get_unanswered_questions(assessment_section_id).available())""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -532,7 +567,8 @@ class AssessmentSession:
         if not questions.available():
             raise errors.IllegalState('There are no more unanswered questions available')
         return questions.next()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -548,7 +584,8 @@ class AssessmentSession:
             return False
         else:
             return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -566,7 +603,8 @@ class AssessmentSession:
                 else:
                     raise errors.IllegalState('No next unanswered question is available')
         raise errors.NotFound('item_id is not found in Section')""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -582,7 +620,8 @@ class AssessmentSession:
             return False
         else:
             return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -602,7 +641,8 @@ class AssessmentSession:
             else:
                 previous_question = question
         raise errors.NotFound('item_id is not found in Section')""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -612,7 +652,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id, item_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_response(question_id=item_id)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -622,7 +663,8 @@ class AssessmentSession:
     def ${method_name}(self, assessment_section_id):
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_responses()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -636,7 +678,8 @@ class AssessmentSession:
             raise errors.IllegalState()
         # Should probably check to see if responses can be cleared, but how?
         self.get_assessment_section(assessment_section_id).submit_response(item_id, None)""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('take')
         }
     }
 
@@ -649,7 +692,8 @@ class AssessmentSession:
                 self.is_assessment_section_over(assessment_section_id)):
             raise errors.IllegalState()
         self.get_assessment_section(assessment_section_id).finish()""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('take')
         }
     }
 
@@ -682,7 +726,8 @@ class AssessmentSession:
             collection.save(assessment_taken_map)
         else:
             raise errors.IllegalState()""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('take')
         }
     }
 
@@ -703,7 +748,8 @@ class AssessmentSession:
             return False
         else:
             return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -715,7 +761,8 @@ class AssessmentSession:
         if self.is_answer_available(assessment_section_id, item_id):
             return self.get_assessment_section(assessment_section_id).get_answers(question_id=item_id)
         raise errors.IllegalState()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('take')
         }
     }
 
@@ -763,7 +810,12 @@ class AssessmentResultsSession:
             runtime,
             db_name='assessment',
             cat_name='Bank',
-            cat_class=objects.Bank)"""
+            cat_class=objects.Bank)""",
+            'authz': """
+    def __init__(self, **kwargs):
+        osid_sessions.OsidSession.__init__(self, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
+        self._id_namespace = 'assessment.AssessmentResults'"""
         }
     }
 
@@ -775,7 +827,8 @@ class AssessmentResultsSession:
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('access')
         }
     }
 
@@ -799,13 +852,15 @@ class AssessmentResultsSession:
                 for question in section._my_map['questions']:
                     item_list.append(ils.get_item(Id(question['questionId'])))
         return ItemList(item_list)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
     get_assessment_taken_responses = {
         'python': {
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -826,7 +881,8 @@ class AssessmentResultsSession:
                                                  proxy=self._proxy)
                 response_list.append(section.get_responses())
         return ResponseList(response_list)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
          }
     }
 
@@ -837,7 +893,8 @@ class AssessmentResultsSession:
         ${doc_string}
         # not implemented yet
         return False""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -848,7 +905,8 @@ class AssessmentResultsSession:
         ${doc_string}
         # not implemented yet and are_results_available is False
         raise errors.IllegalState()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -966,7 +1024,8 @@ class ItemAdminSession:
 
         item['question'] = None
         collection.save(item)""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('delete')
         }
     }
 
@@ -1045,6 +1104,7 @@ class ItemAdminSession:
     additional_methods = {
         'python': {
             'json': """
+
     # This is out of spec, but used by the EdX / LORE record extensions...
     @utilities.arguments_not_none
     def duplicate_item(self, item_id):
@@ -1146,7 +1206,8 @@ class AssessmentAdminSession:
                                          runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
         remove_children_parts(str(assessment_id))""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('delete')
         }
     }
 
@@ -1229,7 +1290,18 @@ class AssessmentTakenLookupSession:
                   'takingAgentId': str(resource_id)},
                  **self._view_filter())).sort('_id', DESCENDING)
         return objects.AssessmentTakenList(result, runtime=self._runtime, proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': """
+    @raise_null_argument
+    def get_assessments_taken_for_taker_and_assessment_offered(self, resource_id, assessment_offered_id):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.get_assessments_taken_for_taker_and_assessment_offered(resource_id, assessment_offered_id)
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_assessment_taken_query()
+        query.match_taking_agent_id(resource_id, match=True)
+        query.match_assessment_offered_id(assessment_offered_id, match=True)
+        return self._try_harder(query)"""
         }
     }
 
@@ -1497,7 +1569,8 @@ class AssessmentBasicAuthoringSession:
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': AssessmentSession.can_take_assessments['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('author')
         }
     }
 
@@ -1509,7 +1582,8 @@ class AssessmentBasicAuthoringSession:
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         return self._part_item_session.get_assessment_part_items(self._get_first_part_id(assessment_id))""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('author')
         }
     }
 
@@ -1528,7 +1602,8 @@ class AssessmentBasicAuthoringSession:
             self._get_provider_session('assessment_basic_authoring_session').add_item(*args, **kwargs)
         except InvalidArgument:
             self._get_sub_package_provider_session(
-                'assessment_authoring', 'assessment_part_item_design_session').add_item(*args, **kwargs)"""
+                'assessment_authoring', 'assessment_part_item_design_session').add_item(*args, **kwargs)""",
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('author')
         }
     }
 
@@ -1547,7 +1622,8 @@ class AssessmentBasicAuthoringSession:
             self._get_provider_session('assessment_basic_authoring_session').remove_item(*args, **kwargs)
         except InvalidArgument:
             self._get_sub_package_provider_session(
-                'assessment_authoring', 'assessment_part_item_design_session').remove_item(*args, **kwargs)"""
+                'assessment_authoring', 'assessment_part_item_design_session').remove_item(*args, **kwargs)""",
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('author')
         }
     }
 
@@ -1559,7 +1635,8 @@ class AssessmentBasicAuthoringSession:
         if assessment_id.get_identifier_namespace() != 'assessment.Assessment':
             raise errors.InvalidArgument
         self._part_item_design_session.move_item_behind(item_id, self._get_first_part_id(assessment_id), preceeding_item_id)""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('author')
         }
     }
 
@@ -1578,7 +1655,8 @@ class AssessmentBasicAuthoringSession:
             self._get_provider_session('assessment_basic_authoring_session').order_items(*args, **kwargs)
         except InvalidArgument:
             self._get_sub_package_provider_session(
-                'assessment_authoring', 'assessment_part_item_design_session').order_items(*args, **kwargs)"""
+                'assessment_authoring', 'assessment_part_item_design_session').order_items(*args, **kwargs)""",
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('author')
         }
     }
 
@@ -3247,14 +3325,24 @@ class BankQuery:
 
 
 class MyAssessmentTakenSession:
+    init = {
+        'python': {
+            'authz': """
+    def __init__(self, **kwargs):
+        osid_sessions.OsidSession.__init__(self, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
+        self._id_namespace = 'assessment.AssessmentTaken'"""
+        }
+    }
 
     can_get_my_taken_assessments = {
         'python': {
             'services': """
     def ${method_name}(self):
-        ${doc_string}
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('my_assessment_taken_session').can_get_my_taken_assessments()"""
+        ${pattern_name}
+        return self._get_provider_session('my_assessment_taken_session').can_get_my_taken_assessments()""",
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('get_my')
         }
     }
 
@@ -3262,9 +3350,10 @@ class MyAssessmentTakenSession:
         'python': {
             'services': """
     def ${method_name}(self):
-        ${doc_string}
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('my_assessment_taken_session').get_assessments_started_during(*args, **kwargs)"""
+        ${pattern_name}
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_started_during(*args, **kwargs)""",
+            'authz': GenericAdapterSession.method['python']['authz']('get_my')
         }
     }
 
@@ -3272,9 +3361,10 @@ class MyAssessmentTakenSession:
         'python': {
             'services': """
     def ${method_name}(self):
-        ${doc_string}
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('my_assessment_taken_session').get_assessments_started()"""
+        ${pattern_name}
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_started()""",
+            'authz': GenericAdapterSession.method['python']['authz']('get_my')
         }
     }
 
@@ -3282,9 +3372,10 @@ class MyAssessmentTakenSession:
         'python': {
             'services': """
     def ${method_name}(self):
-        ${doc_string}
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress_during(*args, **kwargs)"""
+        ${pattern_name}
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress_during(*args, **kwargs)""",
+            'authz': GenericAdapterSession.method['python']['authz']('get_my')
         }
     }
 
@@ -3292,9 +3383,10 @@ class MyAssessmentTakenSession:
         'python': {
             'services': """
     def ${method_name}(self):
-        ${doc_string}
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress()"""
+        ${pattern_name}
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_in_progress()""",
+            'authz': GenericAdapterSession.method['python']['authz']('get_my')
         }
     }
 
@@ -3302,8 +3394,9 @@ class MyAssessmentTakenSession:
         'python': {
             'services': """
     def ${method_name}(self):
-        ${doc_string}
         \"\"\"Pass through to provider method\"\"\"
-        return self._get_provider_session('my_assessment_taken_session').get_assessments_completed()"""
+        ${pattern_name}
+        return self._get_provider_session('my_assessment_taken_session').get_assessments_completed()""",
+            'authz': GenericAdapterSession.method['python']['authz']('get_my')
         }
     }

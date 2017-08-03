@@ -9,13 +9,14 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
             build_dir = self._abs_path
         self._build_dir = build_dir
         self._root_dir = self._build_dir + '/authz_adapter'
-        self._template_dir = self._abs_path + '/azosid_templates'
+        self._template_dir = self._abs_path + '/templates'
 
         self._class = 'authz'
 
     def _clean_up_impl(self, impl, interface, method):
         if impl == '':
-            impl = '{}raise Unimplemented()'.format(self._dind)
+            impl = '{0}\n{1}raise Unimplemented()'.format(self._get_method_sig(method, interface),
+                                                          self._dind)
         return impl
 
     def _get_method_decorators(self, method, interface, args):
@@ -25,7 +26,7 @@ class AZBuilder(InterfaceBuilder, BaseBuilder):
             decorators.append('{0}@raise_null_argument'.format(self._ind))
         return decorators
 
-    def _compile_method(self, args, decorators, method_doc, method_impl):
+    def _compile_method(self, args, decorators, method_impl):
         if decorators:
             decorators = '\n'.join(decorators)
             return decorators + '\n' + method_impl
