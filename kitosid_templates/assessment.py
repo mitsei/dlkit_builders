@@ -54,6 +54,14 @@ class AssessmentAuthoringManager:
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_admin_session_for_bank(*args, **kwargs)"""
 
+    get_assessment_part_bank_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_bank_session(*args, **kwargs)"""
+
+    get_assessment_part_bank_assignment_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return self._get_sub_package_provider_manager('assessment_authoring').get_assessment_part_bank_assignment_session(*args, **kwargs)"""
+
     get_sequence_rule_admin_session = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').get_sequence_rule_admin_session(*args, **kwargs)"""
@@ -115,6 +123,14 @@ class AssessmentAuthoringProxyManager:
     get_assessment_part_admin_session_for_bank = """
         \"\"\"Pass through to provider method\"\"\"
         return AssessmentManager.get_assessment_part_admin_session_for_bank(*args, **kwargs)"""
+
+    get_assessment_part_bank_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_bank_session(*args, **kwargs)"""
+
+    get_assessment_part_bank_assignment_session = """
+        \"\"\"Pass through to provider method\"\"\"
+        return AssessmentManager.get_assessment_part_bank_assignment_session(*args, **kwargs)"""
 
     get_sequence_rule_admin_session = """
         \"\"\"Pass through to provider method\"\"\"
@@ -193,6 +209,12 @@ class AssessmentAuthoringProfile:
     supports_assessment_part_query = """
         \"\"\"Pass through to provider method\"\"\"
         return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_query()"""
+
+    supports_assessment_part_bank = """
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_bank()"""
+
+    supports_assessment_part_bank_assignment = """
+        return self._get_sub_package_provider_manager('assessment_authoring').supports_assessment_part_bank_assignment()"""
 
 
 class MyAssessmentTakenSession:
@@ -501,6 +523,20 @@ class AssessmentPartAdminSession:
         \"\"\"Pass through to provider AssessmentPartAdminSession.can_create_assessment_part_with_record_types\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_admin_session').can_create_assessment_part_with_record_types(*args, **kwargs)"""
+
+
+class AssessmentPartBankSession:
+    can_lookup_assessment_part_bank_mappings = """
+        \"\"\"Pass through to provider AssessmentPartBankSession.can_lookup_assessment_part_bank_mappings\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_bank_session').can_lookup_assessment_part_bank_mappings()"""
+
+
+class AssessmentPartBankAssignmentSession:
+    assign_assessment_part_to_bank = """
+        \"\"\"Pass through to provider AssessmentPartBankAssignmentSession.assign_assessment_part_to_bank\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_bank_assignment_session').assign_assessment_part_to_bank(*args, **kwargs)"""
 
 
 class AssessmentPartItemSession:
