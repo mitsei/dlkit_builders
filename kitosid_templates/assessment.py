@@ -531,12 +531,22 @@ class AssessmentPartBankSession:
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_bank_session').can_lookup_assessment_part_bank_mappings()"""
 
+    get_assessment_part_ids_by_bank = """
+        \"\"\"Pass through to provider AssessmentPartBankSession.get_assessment_part_ids_by_bank\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_bank_session').get_assessment_part_ids_by_bank(*args, **kwargs)"""
+
 
 class AssessmentPartBankAssignmentSession:
     assign_assessment_part_to_bank = """
         \"\"\"Pass through to provider AssessmentPartBankAssignmentSession.assign_assessment_part_to_bank\"\"\"
         return self._get_sub_package_provider_session('assessment_authoring',
                                                       'assessment_part_bank_assignment_session').assign_assessment_part_to_bank(*args, **kwargs)"""
+
+    can_assign_assessment_parts = """
+        \"\"\"Pass through to provider AssessmentPartBankAssignmentSession.can_assign_assessment_parts\"\"\"
+        return self._get_sub_package_provider_session('assessment_authoring',
+                                                      'assessment_part_bank_assignment_session').can_assign_assessment_parts()"""
 
 
 class AssessmentPartItemSession:
