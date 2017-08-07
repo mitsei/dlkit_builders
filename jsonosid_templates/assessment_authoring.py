@@ -333,6 +333,38 @@ class AssessmentPartAdminSession:
             collection.delete_one({'_id': ObjectId(assessment_part_id.get_identifier())})"""
 
 
+class AssessmentPartBankAssignmentSession:
+    unassign_assessment_part_from_bank = """
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = mgr.get_bank_lookup_session(proxy=self._proxy)
+        lookup_session.get_bank(bank_id)  # to raise NotFound
+        self._unassign_object_from_catalog(assessment_part_id, bank_id)"""
+
+    assign_assessment_part_to_bank = """
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = mgr.get_bank_lookup_session(proxy=self._proxy)
+        lookup_session.get_bank(bank_id)  # to raise NotFound
+        self._assign_object_to_catalog(assessment_part_id, bank_id)"""
+
+    get_assignable_bank_ids = """
+        # This will likely be overridden by an authorization adapter
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = mgr.get_bank_lookup_session(proxy=self._proxy)
+        banks = lookup_session.get_banks()
+        id_list = []
+        for bank in banks:
+            id_list.append(bank.get_id())
+        return IdList(id_list)"""
+
+
+class AssessmentPartBankSession:
+    get_banks_by_assessment_part = """
+        mgr = self._get_provider_manager('ASSESSMENT', local=True)
+        lookup_session = mgr.get_bank_lookup_session(proxy=self._proxy)
+        return lookup_session.get_banks_by_ids(
+            self.get_bank_ids_by_assessment_part(assessment_part_id))"""
+
+
 class AssessmentPartItemSession:
 
     import_statements = [
