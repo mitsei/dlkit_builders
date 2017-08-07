@@ -1207,7 +1207,7 @@ class AssessmentAdminSession:
         collection.delete_one({'_id': ObjectId(assessment_id.get_identifier())})
         remove_children_parts(str(assessment_id))""",
             'services': GenericAdapterSession.method_without_return['python']['services'],
-            'authz': GenericAdapterSession.method_without_return['python']['authz']('delete')
+            'authz': GenericAdapterSession.method_can_for['python']['authz']('delete')
         }
     }
 
@@ -1292,7 +1292,6 @@ class AssessmentTakenLookupSession:
         return objects.AssessmentTakenList(result, runtime=self._runtime, proxy=self._proxy)""",
             'services': GenericAdapterSession.method['python']['services'],
             'authz': """
-    @raise_null_argument
     def get_assessments_taken_for_taker_and_assessment_offered(self, resource_id, assessment_offered_id):
         ${pattern_name}
         if self._can('lookup'):
@@ -1557,7 +1556,12 @@ class AssessmentBasicAuthoringSession:
                 proxy=self._proxy,
                 create=True,
                 bank_id=self._catalog_id)
-        return self._first_part_index[assessment_id]"""
+        return self._first_part_index[assessment_id]""",
+            'authz': """
+    def __init__(self, **kwargs):
+        osid_sessions.OsidSession.__init__(self, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
+        self._id_namespace = 'assessment.Assessment'"""
         }
     }
 

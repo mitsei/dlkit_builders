@@ -285,6 +285,11 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
 
         fixed_package_name = fix_reserved_word(self.package['name'], is_module=True)
 
+        session_related_words = ['my', 'session', 'assignment', 'design', 'query', 'admin',
+                                 'notification', 'lookup', 'basic', 'authoring']
+        interface_namespace = '_'.join([word for word in camel_to_under(interface_name).split('_')
+                                        if word not in session_related_words])
+
         return {'app_name': self._app_name(),
                 'implpkg_name': self._abc_pkg_name(abc=False, reserved_word=False),
                 'kitpkg_name': self._abc_pkg_name(abc=False),
@@ -300,6 +305,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 'pkg_name_upper': self.first(self.package['name']).upper(),
                 'interface_name': interface_name,
                 'interface_name_under': camel_to_under(interface_name),
+                'interface_namespace_camel': under_to_camel(interface_namespace),
                 'proxy_interface_name': proxy_manager_name(interface_name),
                 'interface_name_title': interface_name.title(),
                 'instance_initers': instance_initers,

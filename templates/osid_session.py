@@ -31,7 +31,7 @@ def generic_authz_method_can_for_generator(authz_function):
     return """
     def ${{method_name}}(${{args_kwargs_method_sig}}):
         ${{pattern_name}}
-        if not self._can_for_${{object_name_under}}('alias', ${{object_name_under}}_id):
+        if not self._can_for_${{object_name_under}}('{0}', ${{object_name_under}}_id):
             raise PermissionDenied()
         return self._provider_session.${{method_name}}(${{args_kwargs_or_nothing}})""".format(authz_function)
 
@@ -50,11 +50,12 @@ class GenericAdapterSession(object):
         'python': {
             'authz': """
     def __init__(self, *args, **kwargs):
+        ${pattern_name}
         osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         # This needs to be done right
         # Build from authority in config
         self._qualifier_id = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
-        self._id_namespace = '${pkg_name_replaced}.${cat_name}'"""
+        self._id_namespace = '${pkg_name_replaced}.${interface_namespace_camel}'"""
         }
     }
 
@@ -193,141 +194,6 @@ class GenericAdapterSession(object):
     }
 
 
-class GenericContainableObjectLookupSession(object):
-    import_statements_pattern = {
-        'python': {
-            'json': [
-                'ACTIVE = 0',
-                'ANY_STATUS = 1',
-                'SEQUESTERED = 0',
-                'UNSEQUESTERED = 1',
-            ]
-        }
-    }
-
-    init_template = {
-        'python': {
-            'json': """
-    ${pattern_name}
-    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
-        OsidSession.__init__(self)
-        self._catalog_class = objects.${cat_name}
-        self._catalog_name = '${cat_name}'
-        OsidSession._init_object(
-            self,
-            catalog_id,
-            proxy,
-            runtime,
-            db_name='${pkg_name_replaced}',
-            cat_name='${cat_name}',
-            cat_class=objects.${cat_name})
-        self._kwargs = kwargs
-        self._status_view = ACTIVE
-        self._sequestered_view = SEQUESTERED
-
-    def _view_filter(self):
-        \"\"\"
-        Overrides OsidSession._view_filter to add sequestering filter.
-
-        \"\"\"
-        view_filter = OsidSession._view_filter(self)
-        if self._sequestered_view == SEQUESTERED:
-            view_filter['sequestered'] = False
-        return view_filter"""
-        }
-    }
-
-    use_active_containable_view_template = {
-        'python': {
-            'json': """
-    def ${method_name}(self):
-        ${doc_string}
-        ${pattern_name}
-        self._status_view = ACTIVE""",
-            'services': """
-    def ${method_name}(self):
-        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        ${pattern_name}
-        self._operable_views['${object_name_under}'] = ACTIVE
-        # self._get_provider_session('${interface_name_under}')  # To make sure the session is tracked
-        for session in self._get_provider_sessions():
-            try:
-                session.${method_name}()
-            except AttributeError:
-                pass"""
-        }
-    }
-
-    use_any_status_containable_view_template = {
-        'python': {
-            'json': """
-    def ${method_name}(self):
-        ${doc_string}
-        ${pattern_name}
-        self._status_view = ANY_STATUS""",
-            'services': """
-    def ${method_name}(self):
-        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        ${pattern_name}
-        self._operable_views['${object_name_under}'] = ANY_STATUS
-        # self._get_provider_session('${interface_name_under}')  # To make sure the session is tracked
-        for session in self._get_provider_sessions():
-            try:
-                session.${method_name}()
-            except AttributeError:
-                pass"""
-        }
-    }
-
-    use_sequestered_containable_view_template = {
-        'python': {
-            'json': """
-    def ${method_name}(self):
-        ${doc_string}
-        ${pattern_name}
-        self._sequestered_view = SEQUESTERED""",
-            'services': """
-    def ${method_name}(self):
-        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        ${pattern_name}
-        self._containable_views['${object_name_under}'] = SEQUESTERED
-        # self._get_provider_session('${interface_name_under}')  # To make sure the session is tracked
-        for session in self._get_provider_sessions():
-            try:
-                session.${method_name}()
-            except AttributeError:
-                pass"""
-        }
-    }
-
-    use_unsequestered_containable_view_template = {
-        'python': {
-            'json': """
-    def ${method_name}(self):
-        ${doc_string}
-        ${pattern_name}
-        self._sequestered_view = UNSEQUESTERED""",
-            'services': """
-    def ${method_name}(self):
-        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
-        ${pattern_name}
-        self._containable_views['${object_name_under}'] = UNSEQUESTERED
-        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
-        for session in self._get_provider_sessions():
-            try:
-                session.${method_name}()
-            except AttributeError:
-                pass"""
-        }
-    }
-
-
-class GenericContainableObjectQuerySession(object):
-    import_statements_pattern = GenericContainableObjectLookupSession.import_statements_pattern
-
-    init_template = GenericContainableObjectLookupSession.init_template
-
-
 class GenericObjectLookupSession(object):
     import_statements_pattern = {
         'python': {
@@ -352,7 +218,7 @@ class GenericObjectLookupSession(object):
     init_template = {
         'python': {
             'json': """
-    # From: templates/osid_session.py::GenericObjectLookupSession::init_template
+    ${pattern_name}
     def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
         OsidSession.__init__(self)
         self._catalog_class = objects.${cat_name}
@@ -367,6 +233,7 @@ class GenericObjectLookupSession(object):
             cat_class=objects.${cat_name})
         self._kwargs = kwargs""",
             'authz': """
+    ${pattern_name}
     def __init__(self, *args, **kwargs):
         osid_sessions.OsidSession.__init__(self, *args, **kwargs)
         self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
@@ -775,6 +642,189 @@ class GenericObjectLookupSession(object):
     }
 
 
+class GenericContainableObjectLookupSession(object):
+    import_statements_pattern = {
+        'python': {
+            'json': [
+                'ACTIVE = 0',
+                'ANY_STATUS = 1',
+                'SEQUESTERED = 0',
+                'UNSEQUESTERED = 1',
+            ]
+        }
+    }
+
+    init_template = {
+        'python': {
+            'json': """
+    ${pattern_name}
+    def __init__(self, catalog_id=None, proxy=None, runtime=None, **kwargs):
+        OsidSession.__init__(self)
+        self._catalog_class = objects.${cat_name}
+        self._catalog_name = '${cat_name}'
+        OsidSession._init_object(
+            self,
+            catalog_id,
+            proxy,
+            runtime,
+            db_name='${pkg_name_replaced}',
+            cat_name='${cat_name}',
+            cat_class=objects.${cat_name})
+        self._kwargs = kwargs
+        self._status_view = ACTIVE
+        self._sequestered_view = SEQUESTERED
+
+    def _view_filter(self):
+        \"\"\"
+        Overrides OsidSession._view_filter to add sequestering filter.
+
+        \"\"\"
+        view_filter = OsidSession._view_filter(self)
+        if self._sequestered_view == SEQUESTERED:
+            view_filter['sequestered'] = False
+        return view_filter""",
+            'authz': GenericObjectLookupSession.init_template['python']['authz']
+        }
+    }
+
+    use_active_containable_view_template = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
+        self._status_view = ACTIVE""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._operable_views['${object_name_under}'] = ACTIVE
+        # self._get_provider_session('${interface_name_under}')  # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass""",
+            'authz': GenericAdapterSession.authz_pass_through_without_return['python']['authz']
+        }
+    }
+
+    use_any_status_containable_view_template = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
+        self._status_view = ANY_STATUS""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._operable_views['${object_name_under}'] = ANY_STATUS
+        # self._get_provider_session('${interface_name_under}')  # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass""",
+            'authz': GenericAdapterSession.authz_pass_through_without_return['python']['authz']
+        }
+    }
+
+    use_sequestered_containable_view_template = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
+        self._sequestered_view = SEQUESTERED""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._containable_views['${object_name_under}'] = SEQUESTERED
+        # self._get_provider_session('${interface_name_under}')  # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass""",
+            'authz': GenericAdapterSession.authz_pass_through_without_return['python']['authz']
+        }
+    }
+
+    use_unsequestered_containable_view_template = {
+        'python': {
+            'json': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
+        self._sequestered_view = UNSEQUESTERED""",
+            'services': """
+    def ${method_name}(self):
+        \"\"\"Pass through to provider ${interface_name}.${method_name}\"\"\"
+        ${pattern_name}
+        self._containable_views['${object_name_under}'] = UNSEQUESTERED
+        # self._get_provider_session('${interface_name_under}') # To make sure the session is tracked
+        for session in self._get_provider_sessions():
+            try:
+                session.${method_name}()
+            except AttributeError:
+                pass""",
+            'authz': GenericAdapterSession.authz_pass_through_without_return['python']['authz']
+        }
+    }
+
+
+class GenericContainableObjectQuerySession(object):
+    import_statements_pattern = GenericContainableObjectLookupSession.import_statements_pattern
+
+    init_template = deepcopy(GenericContainableObjectLookupSession.init_template)
+    init_template['python']['authz'] = """
+    ${pattern_name}
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_${cat_name_under}_id()
+        self._id_namespace = '${pkg_name_replaced}.${object_name}'
+        self.use_federated_${cat_name_under}_view()
+        self._unauth_${cat_name_under}_ids = None
+
+    def _try_overriding_${cat_name_under_plural}(self, query):
+        if self._get_overriding_catalog_ids('search') is not None:
+            for ${cat_name_under}_id in self._get_overriding_catalog_ids('search'):
+                query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=True)
+        return self._query_session.get_${object_name_under_plural}_by_query(query), query
+
+    def _get_unauth_${cat_name_under}_ids(self, ${cat_name_under}_id):
+        if self._can('search', ${cat_name_under}_id):
+            return []  # Don't go further - assumes authorizations inherited
+        else:
+            unauth_list = [str(${cat_name_under}_id)]
+        if self._hierarchy_session.has_child_${cat_name_under_plural}(${cat_name_under}_id):
+            for child_${cat_name_under}_id in self._hierarchy_session.get_child_${cat_name_under}_ids(${cat_name_under}_id):
+                unauth_list = unauth_list + self._get_unauth_${cat_name_under}_ids(child_${cat_name_under}_id)
+        return unauth_list
+
+    def _try_harder(self, query):
+        results, query = self._try_overriding_${cat_name_under_plural}(query)
+        if self._is_isolated_catalog_view():
+            if results.available():
+                return results
+        if self._hierarchy_session is None or self._query_session is None:
+            return results
+        if self._unauth_${cat_name_under}_ids is None:
+            self._unauth_${cat_name_under}_ids = self._get_unauth_${cat_name_under}_ids(self._qualifier_id)
+        for ${cat_name_under}_id in self._unauth_${cat_name_under}_ids:
+            query._provider_query.match_${cat_name_under}_id(${cat_name_under}_id, match=False)
+        return self._query_session.get_${object_name_under_plural}_by_query(query)
+
+    class ${object_name}QueryWrapper(QueryWrapper):
+        \"\"\"Wrapper for ${object_name}Queries to override match_${cat_name_under}_id method\"\"\"
+
+        def match_${cat_name_under}_id(self, ${cat_name_under}_id, match=True):
+            self._cat_id_args_list.append({'${cat_name_under}_id': ${cat_name_under}_id, 'match': match})"""
+
+
 class GenericObjectAdminSession(object):
     import_statements_pattern = {
         'python': {
@@ -1071,7 +1121,7 @@ class GenericObjectAdminSession(object):
             runtime=self._runtime,
             proxy=self._proxy)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('create')
+            'authz': GenericAdapterSession.method['python']['authz']('update')
         }
     }
 
@@ -1943,7 +1993,8 @@ class GenericObjectQuerySession(object):
                 'ASCENDING = 1'
             ],
             'authz': [
-                'from ..utilities import QueryWrapper'
+                'from ..utilities import QueryWrapper',
+                'from ..osid.osid_errors import Unsupported'
             ]
         }
     }
@@ -3181,7 +3232,15 @@ class GenericObjectContainableSession(object):
             db_name='${pkg_name_replaced}',
             cat_name='${cat_name}',
             cat_class=objects.${cat_name})
-        self._kwargs = kwargs"""
+        self._kwargs = kwargs""",
+            'authz': """
+    def __init__(self, *args, **kwargs):
+        ${pattern_name}
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_bank_id()
+        self._id_namespace = 'assessment_authoring.AssessmentPart'
+        self._auth_bank_ids = None
+        self._unauth_bank_ids = None"""
         }
     }
 
@@ -3194,7 +3253,8 @@ class GenericObjectContainableSession(object):
         # NOTE: It is expected that real authentication hints will be
         # handled in a service adapter above the pay grade of this impl.
         return True""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.authz_pass_through_with_return['python']['authz']
         }
     }
 
@@ -3869,7 +3929,8 @@ class GenericRequisiteObjectAdminSession:
                                          collection='${object_name}',
                                          runtime=self._runtime)
         collection.delete_one({'_id': ObjectId(${arg0_name}.get_identifier())})""",
-            'services': GenericAdapterSession.method_without_return['python']['services']
+            'services': GenericAdapterSession.method_without_return['python']['services'],
+            'authz': GenericAdapterSession.method_can_for['python']['authz']('delete')
         }
     }
 

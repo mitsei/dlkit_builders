@@ -238,14 +238,6 @@ class AssessmentPartAdminSession:
 
 
 class SequenceRuleAdminSession:
-
-    get_sequence_rule_form_for_create = """
-        if not self._can('create'):
-            raise PermissionDenied()
-        return self._provider_session.get_sequence_rule_form_for_create(assessment_part_id, next_assessment_part_id, sequence_rule_record_types)"""
-
-
-class SequenceRuleAdminSession:
     get_sequence_rule_form_for_create = """
         if not self._can('create'):
             raise PermissionDenied()

@@ -3,6 +3,37 @@ from .osid_session import GenericAdapterSession
 
 
 class AssessmentAuthoringProfile:
+    init = {
+        'python': {
+            'authz': """
+    def __init__(self):
+        osid_managers.OsidProfile.__init__(self)
+
+    def _get_hierarchy_session(self, proxy=None):
+        base_package_mgr = self._get_base_package_provider_manager('assessment', proxy)
+        if proxy is not None:
+            try:
+                return base_package_mgr.get_bank_hierarchy_session(proxy)
+            except Unsupported:
+                return None
+        try:
+            return base_package_mgr.get_bank_hierarchy_session()
+        except Unsupported:
+            return None
+
+    def _get_base_package_provider_manager(self, base_package, proxy=None):
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:{0}ProviderImpl@dlkit_service'.format(base_package))
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        if proxy is not None:
+            # need to add version argument
+            return self._my_runtime.get_proxy_manager(base_package.upper(), provider_impl)
+        else:
+            # need to add version argument
+            return self._my_runtime.get_manager(base_package.upper(), provider_impl)"""
+        }
+    }
+
     get_assessment_part_record_types = {
         'python': {
             'services': GenericAdapterProfileAndManager.sub_package_method_no_args['python']['services']
@@ -126,6 +157,18 @@ class AssessmentAuthoringManager:
     }
 
     get_assessment_part_admin_session_for_bank = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_part_bank_session = {
+        'python': {
+            'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
+        }
+    }
+
+    get_assessment_part_bank_assignment_session = {
         'python': {
             'services': GenericAdapterProfileAndManager.sub_package_method['python']['services']
         }
@@ -268,7 +311,39 @@ class AssessmentAuthoringManager:
 
         # Also include check to see if the catalog Id is found otherwise raise errors.NotFound
         # pylint: disable=no-member
-        return sessions.AssessmentPartItemDesignSession(bank_id, runtime=self._runtime)"""
+        return sessions.AssessmentPartItemDesignSession(bank_id, runtime=self._runtime)""",
+            'authz': """
+    def get_assessment_part_item_session(self):
+        return getattr(sessions, 'AssessmentPartItemSession')(
+            provider_session=self._provider_manager.get_assessment_part_item_session(),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)
+
+    assessment_part_item_session = property(fget=get_assessment_part_item_session)
+
+    def get_assessment_part_item_session_for_bank(self, bank_id):
+        return getattr(sessions, 'AssessmentPartItemSession')(
+            provider_session=self._provider_manager.get_assessment_part_item_session_for_bank(bank_id),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)
+
+    def get_assessment_part_item_design_session(self):
+        return getattr(sessions, 'AssessmentPartItemDesignSession')(
+            provider_session=self._provider_manager.get_assessment_part_item_design_session(),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)
+
+    assessment_part_item_design_session = property(fget=get_assessment_part_item_design_session)
+
+    def get_assessment_part_item_design_session_for_bank(self, bank_id):
+        return getattr(sessions, 'AssessmentPartItemDesignSession')(
+            provider_session=self._provider_manager.get_assessment_part_item_design_session_for_bank(bank_id),
+            authz_session=self._get_authz_session(),
+            override_lookup_session=self._get_override_lookup_session(),
+            provider_manager=self._provider_manager)"""
         }
     }
 
@@ -480,7 +555,18 @@ class AssessmentPartLookupSession:
         result = collection.find(
             dict({'assessmentPartId': str(assessment_part_id)},
                  **self._view_filter()))
-        return objects.AssessmentPartList(result, runtime=self._runtime)"""
+        return objects.AssessmentPartList(result, runtime=self._runtime)""",
+            'authz': """
+
+    def get_assessment_parts_for_assessment_part(self, assessment_part_id):
+        # NOT CURRENTLY IN SPEC - Implemented from
+        # osid.assessment_authoring.AssessmentPartLookupSession.additional_methods
+        if self._can('lookup'):
+            return self._provider_session.get_assessment_parts_for_assessment_part(assessment_part_id)
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_assessment_part_query()
+        query.match_assessment_part_id(assessment_part_id, match=True)
+        return self._try_harder(query)"""
         }
     }
 
@@ -722,13 +808,15 @@ class AssessmentPartItemSession:
         lookup_session = mgr.get_item_lookup_session(proxy=self._proxy)
         lookup_session.use_federated_bank_view()
         return lookup_session.get_items_by_ids(item_ids)""",
-            'services': GenericAdapterSession.sub_package_method['python']['services']
+            'services': GenericAdapterSession.sub_package_method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
     get_assessment_parts_by_item = {
         'python': {
-            'services': GenericAdapterSession.sub_package_method['python']['services']
+            'services': GenericAdapterSession.sub_package_method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('access')
         }
     }
 
@@ -759,7 +847,8 @@ class AssessmentPartItemSession:
 class AssessmentPartItemDesignSession:
     can_design_assessment_parts = {
         'python': {
-            'services': GenericAdapterSession.sub_package_method['python']['services']
+            'services': GenericAdapterSession.sub_package_method['python']['services'],
+            'authz': GenericAdapterSession.authz_pass_through_with_return['python']['authz']
         }
     }
 
@@ -771,31 +860,36 @@ class AssessmentPartItemDesignSession:
 
     add_item = {
         'python': {
-            'services': GenericAdapterSession.sub_package_method['python']['services']
+            'services': GenericAdapterSession.sub_package_method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('compose')
         }
     }
 
     move_item_ahead = {
         'python': {
-            'services': GenericAdapterSession.sub_package_method['python']['services']
+            'services': GenericAdapterSession.sub_package_method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('compose')
         }
     }
 
     move_item_behind = {
         'python': {
-            'services': GenericAdapterSession.sub_package_method['python']['services']
+            'services': GenericAdapterSession.sub_package_method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('compose')
         }
     }
 
     remove_items = {
         'python': {
-            'services': GenericAdapterSession.sub_package_method['python']['services']
+            'services': GenericAdapterSession.sub_package_method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('compose')
         }
     }
 
     order_items = {
         'python': {
-            'services': GenericAdapterSession.sub_package_method['python']['services']
+            'services': GenericAdapterSession.sub_package_method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('compose')
         }
     }
 
@@ -1330,7 +1424,17 @@ class SequenceRuleLookupSession:
                   'nextAssessmentPartId': {'$$in': next_id_str_list}},
                  **self._view_filter()))
         return objects.SequenceRuleList(result, runtime=self._runtime)""",
-            'services': GenericAdapterSession.sub_package_method['python']['services']
+            'services': GenericAdapterSession.sub_package_method['python']['services'],
+            'authz': """
+    def ${method_name}(self, *args, **kwargs):
+        ${pattern_name}
+        if self._can('lookup'):
+            return self._provider_session.get_sequence_rules_for_assessment_parts(*args, **kwargs)
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_sequence_rule_query()
+        for sequence_rule_id in (${arg0_name}):
+            query.match_assessment_part_id(sequence_rule_id, match=True)
+        return self._try_harder(query)"""
         }
     }
 

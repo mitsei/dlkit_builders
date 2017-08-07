@@ -324,7 +324,7 @@ class GenericManager(object):
         try:
             query_session = self._provider_manager.get_${object_name_under}_query_session()
             query_session.use_federated_${cat_name_under}_view()
-        except errors.Unimplemented:
+        except Unimplemented:
             query_session = None
         return getattr(sessions, '${return_type}')(
             provider_session=self._provider_manager.${method_name}(),
