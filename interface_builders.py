@@ -209,7 +209,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
             two_word_objects = ['assessment_part', 'sequence_rule', 'grade_entry',
                                 'log_entry', 'grade_system', 'gradebook_column',
                                 'asset_content', 'assessment_offered', 'assessment_taken',
-                                'assessment_section', 'objective_bank']
+                                'assessment_section', 'objective_bank', 'resource_relationship']
 
             object_name_ = under_to_camel(underscore_name.split('_')[0])
 
@@ -370,12 +370,19 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
 
     def _make_init_methods(self, interface):
         templates = None
+        template_str = ''
         init_pattern = ''
 
         impl_class = self._load_impl_class(interface['shortname'],
                                            package_name=self._abc_pkg_name(abc=False, reserved_word=False))
-        if hasattr(impl_class, 'init'):
-            return self.get_impl_from_templates(impl_class, 'init') + '\n'
+        context = self._get_init_context(init_pattern, interface)
+        context['pattern_name'] = self.get_pattern_name('{0}.init_template'.format(init_pattern))
+
+        if (hasattr(impl_class, 'init') and
+                self._language in getattr(impl_class, 'init') and
+                self._class in getattr(impl_class, 'init')[self._language]):
+            template_str = self.get_impl_from_templates(impl_class, 'init')
+
         elif interface['shortname'] + '.init_pattern' in self.patterns:
             init_pattern = self.patterns[interface['shortname'] + '.init_pattern']
             templates = import_module(self._package_templates(self.first(init_pattern)))
@@ -386,10 +393,10 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 context = self._get_init_context(init_pattern, interface)
                 context['pattern_name'] = self.get_pattern_name('{0}.init_template'.format(init_pattern))
                 template_str = self.get_impl_from_templates(template_class, 'init_template')
-                if bool(template_str):
-                    template = string.Template(template_str)
 
-                    return template.substitute(context) + '\n'
+        if bool(template_str):
+            template = string.Template(template_str)
+            return template.substitute(context) + '\n'
 
         return ''
 

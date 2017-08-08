@@ -9,6 +9,12 @@ class OsidProfile:
                 'from ..primitives import Id',
                 'from ..primitives import Type',
                 'from ..utilities import set_json_client'
+            ],
+            'authz': [
+                'COMPARATIVE = 0',
+                'PLENARY = 1',
+                'FEDERATED = 0',
+                'ISOLATED = 1',
             ]
         }
     }
@@ -27,7 +33,63 @@ class OsidProfile:
             raise errors.IllegalState('this manager has already been initialized.')
         self._runtime = runtime
         self._config = runtime.get_configuration()
-        set_json_client(runtime)"""
+        set_json_client(runtime)""",
+            'authz': """
+    def __init__(self):
+        self._provider_manager = None
+        self._my_runtime = None
+
+    def initialize(self, runtime):
+        if runtime is None:
+            raise NullArgument()
+        if self._my_runtime is not None:
+            raise IllegalState('this manager has already been initialized.')
+        self._my_runtime = runtime
+
+    def _get_authz_manager(self):
+        config = self._my_runtime.get_configuration()
+        parameter_id = Id('parameter:authzAuthorityImpl@authz_adapter')
+        provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
+        return self._my_runtime.get_manager('AUTHORIZATION', provider_impl)  # need to add version argument
+
+    def _get_vault_lookup_session(self):
+        return self._get_authz_manager().get_vault_lookup_session()
+
+    def _get_authz_session(self):
+        \"\"\"Gets the AuthorizationSession for the default (bootstrap) typed Vault
+
+        Assumes only one vault of this Type, but it can have children depending on underlying impl.
+
+        \"\"\"
+        from ..utilities import BOOTSTRAP_VAULT_TYPE
+        try:
+            vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(BOOTSTRAP_VAULT_TYPE)
+        except Unimplemented:
+            return self._get_authz_manager().get_authorization_session()
+        if vaults.available():
+            vault = vaults.next()
+            return self._get_authz_manager().get_authorization_session_for_vault(vault.get_id())
+        else:
+            return self._get_authz_manager().get_authorization_session()
+
+    def _get_override_lookup_session(self):
+        \"\"\"Gets the AuthorizationLookupSession for the override typed Vault
+
+        Assumes only one
+
+        \"\"\"
+        from ..utilities import OVERRIDE_VAULT_TYPE
+        try:
+            override_vaults = self._get_vault_lookup_session().get_vaults_by_genus_type(OVERRIDE_VAULT_TYPE)
+        except Unimplemented:
+            return None
+        if override_vaults.available():
+            vault = override_vaults.next()
+        else:
+            return None
+        session = self._get_authz_manager().get_authorization_lookup_session_for_vault(vault.get_id())
+        session.use_isolated_vault_view()
+        return session"""
         }
     }
 
@@ -205,6 +267,9 @@ class OsidManager:
         'python': {
             'json': """
     def __init__(self):
+        OsidProfile.__init__(self)""",
+            'authz': """
+    def __init__(self):
         OsidProfile.__init__(self)"""
         }
     }
@@ -214,7 +279,11 @@ class OsidManager:
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        OsidProfile._initialize_manager(self, runtime)"""
+        OsidProfile._initialize_manager(self, runtime)""",
+            'authz': """
+    def ${method_name}(self, runtime):
+        ${pattern_name}
+        OsidProfile.initialize(self, runtime)"""
         }
     }
 
@@ -246,6 +315,9 @@ class OsidProxyManager:
     init = {
         'python': {
             'json': """
+    def __init__(self):
+        OsidProfile.__init__(self)""",
+            'authz': """
     def __init__(self):
         OsidProfile.__init__(self)"""
         }

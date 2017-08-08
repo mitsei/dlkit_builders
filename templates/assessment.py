@@ -883,7 +883,7 @@ class AssessmentResultsSession:
         return ResponseList(response_list)""",
             'services': GenericAdapterSession.method['python']['services'],
             'authz': GenericAdapterSession.method['python']['authz']('access')
-         }
+        }
     }
 
     are_results_available = {
@@ -3134,7 +3134,7 @@ class Bank:
         self._operable_views = dict()
         self._containable_views = dict()
         self._sub_package_provider_managers = dict()
-    
+
     def _set_bank_view(self, session):
         \"\"\"Sets the underlying bank view to match current view\"\"\"
         if self._bank_view == FEDERATED:
@@ -3256,7 +3256,7 @@ class Bank:
                 return session_class(bank_id=self._catalog_id, proxy=proxy, *args, **kwargs)
             except AttributeError:
                 return session_class(proxy=proxy, *args, **kwargs)
-    
+
     def get_bank_id(self):
         \"\"\"Gets the Id of this bank.\"\"\"
         return self._catalog_id

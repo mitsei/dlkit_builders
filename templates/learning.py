@@ -29,7 +29,14 @@ class ObjectiveRequisiteSession:
             db_name='learning',
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
-        self._forms = dict()"""
+        self._forms = dict()""",
+            'authz': """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_objective_bank_id()
+        self._id_namespace = 'learning.Objective'
+        self._auth_objective_bank_ids = None
+        self._unauth_objective_bank_ids = None"""
         }
     }
 
@@ -99,7 +106,14 @@ class ObjectiveRequisiteAssignmentSession:
             db_name='learning',
             cat_name='ObjectiveBank',
             cat_class=objects.ObjectiveBank)
-        self._forms = dict()"""
+        self._forms = dict()""",
+            'authz': """
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_objective_bank_id()
+        self._id_namespace = 'learning.Objective'
+        self._auth_objective_bank_ids = None
+        self._unauth_objective_bank_ids = None"""
         }
     }
 

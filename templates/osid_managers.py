@@ -46,6 +46,74 @@ class GenericAdapterProfileAndManager(object):
         }
     }
 
+    unimplemented_no_args = {
+        'python': {
+            'manager': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
+        raise Unimplemented()"""
+        }
+    }
+
+    unimplemented_one_arg = {
+        'python': {
+            'manager': """
+    def ${method_name}(self, ${arg0_name}):
+        ${doc_string}
+        ${pattern_name}
+        if ${arg0_name} is None:
+            raise NullArgument('${arg0_name} cannot be None')
+        raise Unimplemented()"""
+        }
+    }
+
+    unimplemented_two_args = {
+        'python': {
+            'manager': """
+    def ${method_name}(self, ${arg0_name}, ${arg1_name}):
+        ${doc_string}
+        ${pattern_name}
+        if ${arg0_name} is None:
+            raise NullArgument('${arg0_name} cannot be None')
+        if ${arg1_name} is None:
+            raise NullArgument('${arg1_name} cannot be None')
+        raise Unimplemented()"""
+        }
+    }
+
+    return_false = {
+        'python': {
+            'manager': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
+        return False"""
+        }
+    }
+
+    return_false_one_arg = {
+        'python': {
+            'manager': """
+    def ${method_name}(self, ${arg0_name}):
+        ${doc_string}
+        ${pattern_name}
+        if ${arg0_name} is None:
+            raise NullArgument('${arg0_name} cannot be None')
+        return False"""
+        }
+    }
+
+    return_typelist = {
+        'python': {
+            'manager': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
+        return TypeList([])"""
+        }
+    }
+
 
 class GenericProfile(object):
     import_statements_pattern = {
@@ -57,6 +125,10 @@ class GenericProfile(object):
                 'from dlkit.abstract_osid.osid import errors',
                 'from . import profile',
                 'from ..utilities import get_registry',
+            ],
+            'manager': [
+                'from ..type.objects import TypeList',
+                'from ..osid.osid_errors import NullArgument',
             ]
         }
     }
@@ -74,11 +146,11 @@ class GenericProfile(object):
         if proxy is not None:
             try:
                 return self._provider_manager.get_${cat_name_under}_hierarchy_session(proxy)
-            except errors.Unimplemented:
+            except Unimplemented:
                 return None
         try:
             return self._provider_manager.get_${cat_name_under}_hierarchy_session()
-        except errors.Unimplemented:
+        except Unimplemented:
             return None"""
         }
     }
@@ -91,7 +163,8 @@ class GenericProfile(object):
         ${pattern_name}
         return '${method_name}' in profile.SUPPORTS""",
             'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
-            'authz': GenericAdapterProfileAndManager.method_no_args['python']['services']
+            'authz': GenericAdapterProfileAndManager.method_no_args['python']['services'],
+            'manager': GenericAdapterProfileAndManager.return_false['python']['manager']
         }
     }
 
@@ -103,7 +176,8 @@ class GenericProfile(object):
         ${pattern_name}
         return '${method_name}' in profile.SUPPORTS""",
             'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
-            'authz': GenericAdapterProfileAndManager.method_no_args['python']['services']
+            'authz': GenericAdapterProfileAndManager.method_no_args['python']['services'],
+            'manager': GenericAdapterProfileAndManager.return_false['python']['manager']
         }
     }
 
@@ -119,7 +193,8 @@ class GenericProfile(object):
             record_types.append(Type(**record_type_maps[record_type_map]))
         return TypeList(record_types)""",
             'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
-            'authz': GenericAdapterProfileAndManager.method_no_args['python']['services']
+            'authz': GenericAdapterProfileAndManager.method_no_args['python']['services'],
+            'manager': GenericAdapterProfileAndManager.return_typelist['python']['manager']
         }
     }
 
@@ -137,7 +212,8 @@ class GenericProfile(object):
                     ${arg0_name}.get_identifier() == record_type_maps[record_type_map]['identifier']):
                 supports = True
         return supports""",
-            'services': GenericAdapterProfileAndManager.method_no_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
+            'manager': GenericAdapterProfileAndManager.return_false_one_arg['python']['manager']
         }
     }
 
@@ -148,7 +224,8 @@ class GenericProfile(object):
         ${doc_string}
         ${pattern_name}
         return TypeList([])""",
-            'services': GenericAdapterProfileAndManager.method_no_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
+            'manager': GenericAdapterProfileAndManager.return_typelist['python']['manager']
         }
     }
 
@@ -159,7 +236,8 @@ class GenericProfile(object):
         ${doc_string}
         ${pattern_name}
         return False""",
-            'services': GenericAdapterProfileAndManager.method_no_args['python']['services']
+            'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
+            'manager': GenericAdapterProfileAndManager.return_false_one_arg['python']['manager']
         }
     }
 
@@ -170,6 +248,10 @@ class GenericManager(object):
         'python': {
             'json': [
                 'from dlkit.abstract_osid.osid import errors',
+            ],
+            'manager': [
+                'from ..osid.osid_errors import Unimplemented',
+                'from ..osid.osid_errors import NullArgument',
             ]
         }
     }
@@ -331,7 +413,8 @@ class GenericManager(object):
             authz_session=self._get_authz_session(),
             override_lookup_session=self._get_override_lookup_session(),
             hierarchy_session=self._get_hierarchy_session(),
-            query_session=query_session)"""
+            query_session=query_session)""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -377,7 +460,8 @@ class GenericManager(object):
             authz_session=self._get_authz_session(),
             override_lookup_session=self._get_override_lookup_session(),
             hierarchy_session=self._get_hierarchy_session(),
-            query_session=query_session)"""
+            query_session=query_session)""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
         }
     }
 
@@ -414,7 +498,8 @@ class GenericManager(object):
             provider_session=self._provider_manager.${method_name}(${arg0_name}),
             authz_session=self._get_authz_session(),
             override_lookup_session=self._get_override_lookup_session(),
-            provider_manager=self._provider_manager)"""
+            provider_manager=self._provider_manager)""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
         }
     }
 
@@ -448,9 +533,14 @@ class GenericManager(object):
             provider_session=self._provider_manager.${method_name}(${arg0_name}, ${arg1_name}),
             authz_session=self._get_authz_session(),
             override_lookup_session=self._get_override_lookup_session(),
-            provider_manager=self._provider_manager)"""
+            provider_manager=self._provider_manager)""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_two_args['python']['manager']
         }
     }
+
+    get_object_smart_catalog_session_template = GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
+
+    get_object_batch_manager_template = GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
 
 
 class GenericProxyManager(object):

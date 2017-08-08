@@ -1,3 +1,5 @@
+from .osid_managers import GenericAdapterProfileAndManager
+
 
 class TypeProfile:
 
@@ -7,7 +9,8 @@ class TypeProfile:
     def ${method_name}(self):
         ${doc_string}
         from . import profile
-        return 'supports_type_lookup' in profile.SUPPORTS"""
+        return 'supports_type_lookup' in profile.SUPPORTS""",
+            'manager': GenericAdapterProfileAndManager.return_false['python']['manager']
         }
     }
 
@@ -17,7 +20,8 @@ class TypeProfile:
     def ${method_name}(self):
         ${doc_string}
         from . import profile
-        return 'supports_type_admin' in profile.SUPPORTS"""
+        return 'supports_type_admin' in profile.SUPPORTS""",
+            'manager': GenericAdapterProfileAndManager.return_false['python']['manager']
         }
     }
 
@@ -28,6 +32,9 @@ class TypeManager:
         'python': {
             'json': [
                 'from dlkit.abstract_osid.osid import errors'
+            ],
+            'manager': [
+                'from ..osid.osid_errors import Unimplemented',
             ]
         }
     }
@@ -101,7 +108,8 @@ class TypeManager:
             session = sessions.TypeLookupSession()
         except AttributeError:
             raise errors.OperationFailed()
-        return session"""
+        return session""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -120,7 +128,8 @@ class TypeManager:
             session = sessions.TypeAdminSession()
         except AttributeError:
             raise errors.OperationFailed()
-        return session"""
+        return session""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -586,6 +595,11 @@ class TypeList:
         'python': {
             'json': [
                 'from dlkit.abstract_osid.osid import errors',
+            ],
+            'manager': [
+                'from ..osid.osid_errors import IllegalState, OperationFailed',
+                'from ..osid.objects import OsidList',
+                'from ..primitives import Type',
             ]
         }
     }
@@ -601,13 +615,28 @@ class TypeList:
         from .primitives import Type
         return self._get_next_object(Type)
 
-    __next__ = next"""
+    __next__ = next""",
+            'manager': """
+    def ${method_name}(self):
+        ${doc_string}
+        return next(self)
+
+    def next(self):
+        from .primitives import Type
+        return self._get_next_object(Type)
+
+    __next__ = next
+    next_type = property(fget=get_next_type)"""
         }
     }
 
     get_next_types = {
         'python': {
             'json': """
+    def ${method_name}(self, n):
+        ${doc_string}
+        return self._get_next_n(n)""",
+            'manager': """
     def ${method_name}(self, n):
         ${doc_string}
         return self._get_next_n(n)"""

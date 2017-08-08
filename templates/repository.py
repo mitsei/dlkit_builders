@@ -481,7 +481,134 @@ class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSessio
             dict({'_id': ObjectId(self._get_id(asset_id, 'repository').get_identifier())},
                  **self._view_filter()))
         asset_content_maps = [ac for ac in result['assetContents'] if ac['genusTypeId'] == str(asset_content_genus_type)]
-        return objects.AssetContentList(asset_content_maps, runtime=self._runtime, proxy=self._proxy)"""
+        return objects.AssetContentList(asset_content_maps, runtime=self._runtime, proxy=self._proxy)""",
+            'authz': """
+
+# This still needs to be updated to work with authz overrides
+class AssetContentLookupSession(abc_repository_sessions.AssetContentLookupSession, osid_sessions.OsidSession):
+    \"\"\"Adapts underlying AssetContentLookupSession methods with authorization checks
+    For now uses the "Asset" namespace authz -- assumes if you can lookup an asset, you can
+     lookup the contents. That could change in the future.
+    \"\"\"
+
+    def __init__(self, *args, **kwargs):
+        osid_sessions.OsidSession.__init__(self, *args, **kwargs)
+        self._qualifier_id = self._provider_session.get_repository_id()
+        self._id_namespace = 'repository.Asset'  # use Asset namespace for things like authz check
+        self.use_federated_repository_view()
+        self._auth_repository_ids = None
+        self._unauth_repository_ids = None
+
+    def _get_unauth_repository_ids(self, repository_id):
+        if self._can('lookup', repository_id):
+            return []  # Don't go further - assumes authorizations inherited
+        else:
+            unauth_list = [str(repository_id)]
+        if self._hierarchy_session.has_child_repositories(repository_id):
+            for child_repository_id in self._hierarchy_session.get_child_repository_ids(repository_id):
+                unauth_list = unauth_list + self._get_unauth_repository_ids(child_repository_id)
+        return unauth_list
+
+    def _try_harder(self, query):
+        if self._hierarchy_session is None or self._query_session is None:
+            # Should probably try to return empty result instead
+            # perhaps through a query.match_any(match = None)?
+            raise PermissionDenied()
+        if self._unauth_repository_ids is None:
+            self._unauth_repository_ids = self._get_unauth_repository_ids(self._qualifier_id)
+        for repository_id in self._unauth_repository_ids:
+            query.match_repository_id(repository_id, match=False)
+        return self._query_session.get_assets_by_query(query)
+
+    def get_repository_id(self):
+        return self._provider_session.get_repository_id()
+
+    repository_id = property(fget=get_repository_id)
+
+    def get_repository(self):
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_repository()
+
+    repository = property(fget=get_repository)
+
+    def can_lookup_asset_contents(self):
+        return self._can('lookup')
+
+    def use_comparative_asset_content_view(self):
+        self._use_comparative_object_view()
+        self._provider_session.use_comparative_asset_content_view()
+
+    def use_plenary_asset_content_view(self):
+        self._use_plenary_object_view()
+        self._provider_session.use_plenary_asset_content_view()
+
+    def use_federated_repository_view(self):
+        self._use_federated_catalog_view()
+        self._provider_session.use_federated_repository_view()
+
+    def use_isolated_repository_view(self):
+        self._use_isolated_catalog_view()
+        self._provider_session.use_isolated_repository_view()
+
+    def get_asset_content(self, asset_content_id):
+        if self._can('lookup'):
+            return self._provider_session.get_asset_content(asset_content_id)
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_asset_content_query()
+        query.match_id(asset_content_id, match=True)
+        results = self._try_harder(query)
+        if results.available() > 0:
+            return results.next()
+        else:
+            raise NotFound()
+
+    def get_asset_contents_by_ids(self, asset_content_ids):
+        if self._can('lookup'):
+            return self._provider_session.get_asset_contents_by_ids(asset_content_ids)
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_asset_content_query()
+        for asset_content_id in (asset_content_ids):
+            query.match_id(asset_content_id, match=True)
+        return self._try_harder(query)
+
+    def get_asset_contents_by_genus_type(self, asset_content_genus_type):
+        if self._can('lookup'):
+            return self._provider_session.get_asset_contents_by_genus_type(asset_content_genus_type)
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_asset_content_query()
+        query.match_genus_type(asset_content_genus_type, match=True)
+        return self._try_harder(query)
+
+    def get_asset_contents_by_parent_genus_type(self, asset_content_genus_type):
+        if self._can('lookup'):
+            return self._provider_session.get_asset_contents_by_parent_genus_type(asset_content_genus_type)
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_asset_content_query()
+        query.match_parent_genus_type(asset_content_genus_type, match=True)
+        return self._try_harder(query)
+
+    def get_asset_contents_by_record_type(self, asset_content_record_type):
+        if self._can('lookup'):
+            return self._provider_session.get_asset_contents_by_record_type(asset_content_record_type)
+        self._check_lookup_conditions()  # raises PermissionDenied
+        query = self._query_session.get_asset_content_query()
+        query.match_record_type(asset_content_record_type, match=True)
+        return self._try_harder(query)
+
+    def get_asset_contents_for_asset(self, asset_id):
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_asset_contents_for_asset(asset_id)
+
+    def get_asset_contents_by_genus_type_for_asset(self, asset_content_genus_type, asset_id):
+        if not self._can('lookup'):
+            raise PermissionDenied()
+        else:
+            return self._provider_session.get_asset_contents_by_genus_type_for_asset(asset_content_genus_type,
+                                                                                     asset_id)"""
         }
     }
 
@@ -1649,7 +1776,28 @@ class AssetQuerySession:
 
         return objects.AssetContentList(matching_asset_contents,
                                         runtime=self._runtime,
-                                        proxy=self._proxy)"""
+                                        proxy=self._proxy)""",
+            'authz': """
+    def get_asset_content_query(self):
+        if not self._can('search'):
+            raise PermissionDenied()
+        else:
+            return self.AssetQueryWrapper(self._provider_session.get_asset_content_query())
+
+    def get_asset_contents_by_query(self, asset_content_query):
+        if not hasattr(asset_content_query, '_cat_id_args_list'):
+            raise Unsupported('asset_content_query not from this session')
+        for kwargs in asset_content_query._cat_id_args_list:
+            if self._can('search', kwargs['repository_id']):
+                asset_content_query._provider_query.match_repository_id(**kwargs)
+        if self._can('search'):
+            return self._provider_session.get_asset_contents_by_query(asset_content_query)
+        elif self._is_isolated_catalog_view():
+            raise PermissionDenied()
+        else:
+            result = self._try_harder(asset_content_query)
+            asset_content_query._provider_query.clear_repository_terms()
+            return result"""
         }
     }
 

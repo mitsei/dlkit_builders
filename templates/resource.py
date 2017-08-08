@@ -1,4 +1,5 @@
 from .osid_session import GenericAdapterSession
+from .osid_managers import GenericAdapterProfileAndManager
 
 
 # class ResourceProfile:
@@ -915,7 +916,14 @@ class ResourceAgentSession:
             db_name='resource',
             cat_name='Bin',
             cat_class=objects.Bin)
-        self._forms = dict()"""
+        self._forms = dict()""",
+            'authz': GenericAdapterSession.init['python']['authz']
+        }
+    }
+
+    can_lookup_resource_agent_mappings = {
+        'python': {
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('lookup')
         }
     }
 
@@ -925,7 +933,8 @@ class ResourceAgentSession:
     def ${method_name}(self, agent_id):
         ${doc_string}
         return self.get_resource_by_agent(agent_id).get_id()""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -944,7 +953,8 @@ class ResourceAgentSession:
             osid_object_map=result,
             runtime=self._runtime,
             proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -964,7 +974,8 @@ class ResourceAgentSession:
         else:
             result = IdList(resource['agentIds'])
         return result""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -977,7 +988,8 @@ class ResourceAgentSession:
         for agent_id in self.get_agent_ids_by_resource(resource_id):
             agent_list.append(Agent(agent_id))
         return AgentList(agent_list)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('lookup')
         }
     }
 
@@ -1001,7 +1013,20 @@ class ResourceAgentAssignmentSession:
             db_name='resource',
             cat_name='Bin',
             cat_class=objects.Bin)
-        self._forms = dict()"""
+        self._forms = dict()""",
+            'authz': GenericAdapterSession.init['python']['authz']
+        }
+    }
+
+    can_assign_agents = {
+        'python': {
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('assign')
+        }
+    }
+
+    can_assign_agents_to_resource = {
+        'python': {
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('assign')
         }
     }
 
@@ -1028,7 +1053,8 @@ class ResourceAgentAssignmentSession:
         else:
             resource['agentIds'].append(str(agent_id))
         collection.save(resource)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('assign')
         }
     }
 
@@ -1047,7 +1073,8 @@ class ResourceAgentAssignmentSession:
         except (KeyError, ValueError):
             raise errors.NotFound('agent_id not assigned to resource')
         collection.save(resource)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'services': GenericAdapterSession.method['python']['services'],
+            'authz': GenericAdapterSession.method['python']['authz']('assign')
         }
     }
 
