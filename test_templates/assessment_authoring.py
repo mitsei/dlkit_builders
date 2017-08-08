@@ -1264,6 +1264,118 @@ def ${interface_name_under}_test_fixture(request):
         request.cls.query = request.cls.catalog.get_assessment_part_query()"""
 
 
+class AssessmentPartBankSession:
+    init = """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def assessment_part_bank_session_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.assessment_part_list = list()
+    request.cls.assessment_part_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentPartBankSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank for Assignment'
+        create_form.description = 'Test Bank for AssessmentPartBankSession tests assignment'
+        request.cls.assigned_catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        assessment_form = request.cls.catalog.get_assessment_form_for_create([])
+        assessment_form.display_name = 'Test Assessment'
+        assessment_form.description = 'Test Assessment for AssessmentPartBankSession tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(assessment_form)
+
+        for num in [0, 1, 2]:
+            create_form = request.cls.catalog.get_assessment_part_form_for_create_for_assessment(request.cls.assessment.ident, [])
+            create_form.display_name = 'Test AssessmentPart ' + str(num)
+            create_form.description = 'Test AssessmentPart for AssessmentPartBankSession tests'
+            obj = request.cls.catalog.create_assessment_part_for_assessment(create_form)
+            request.cls.assessment_part_list.append(obj)
+            request.cls.assessment_part_ids.append(obj.ident)
+        request.cls.svc_mgr.assign_assessment_part_to_bank(
+            request.cls.assessment_part_ids[1], request.cls.assigned_catalog.ident)
+        request.cls.svc_mgr.assign_assessment_part_to_bank(
+            request.cls.assessment_part_ids[2], request.cls.assigned_catalog.ident)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.unassign_assessment_part_from_bank(
+                request.cls.assessment_part_ids[1], request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.unassign_assessment_part_from_bank(
+                request.cls.assessment_part_ids[2], request.cls.assigned_catalog.ident)
+            for obj in request.cls.catalog.get_assessment_parts():
+                request.cls.catalog.delete_assessment_part(obj.ident)
+            request.cls.catalog.delete_assessment(request.cls.assessment.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def assessment_part_bank_session_test_fixture(request):
+    request.cls.session = request.cls.svc_mgr"""
+
+
+class AssessmentPartBankAssignmentSession:
+    init = """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def assessment_part_bank_assignment_session_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.assessment_part_list = list()
+    request.cls.assessment_part_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentPartBankAssignmentSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank for Assignment'
+        create_form.description = 'Test Bank for AssessmentPartBankAssignmentSession tests assignment'
+        request.cls.assigned_catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        assessment_form = request.cls.catalog.get_assessment_form_for_create([])
+        assessment_form.display_name = 'Test Assessment'
+        assessment_form.description = 'Test Assessment for AssessmentPartBankAssignmentSession tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(assessment_form)
+
+        for num in [0, 1, 2]:
+            create_form = request.cls.catalog.get_assessment_part_form_for_create_for_assessment(request.cls.assessment.ident, [])
+            create_form.display_name = 'Test AssessmentPart ' + str(num)
+            create_form.description = 'Test AssessmentPart for AssessmentPartBankAssignmentSession tests'
+            obj = request.cls.catalog.create_assessment_part_for_assessment(create_form)
+            request.cls.assessment_part_list.append(obj)
+            request.cls.assessment_part_ids.append(obj.ident)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessment_parts():
+                request.cls.catalog.delete_assessment_part(obj.ident)
+            request.cls.catalog.delete_assessment(request.cls.assessment.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def assessment_part_bank_assignment_session_test_fixture(request):
+    request.cls.session = request.cls.svc_mgr"""
+
+
 class AssessmentPartAdminSession:
     import_statements = [
         'from dlkit.abstract_osid.assessment_authoring import objects as ABCObjects',
