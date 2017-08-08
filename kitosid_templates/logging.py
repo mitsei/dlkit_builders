@@ -5,6 +5,7 @@ class LoggingSession:
     can_log = """
         return self._get_provider_session('logging_session').can_log()"""
 
+
 class LogEntryLookupSession:
 
     can_read_log = """

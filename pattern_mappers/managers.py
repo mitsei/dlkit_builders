@@ -20,7 +20,7 @@ def map_manager_patterns(interface, package, index):
                     (index['package_catalog_caps'] not in method['return_type'].split('.')[-1] or
                      method['return_type'].split('.')[-1].startswith('LogEntry') or
                      method['return_type'].split('.')[-1].startswith('GradebookColumn'))):
-                lookup_style = True                
+                lookup_style = True
                 object_name = (method['return_type']).split('.')[-1][:-len(session_type)]
 
         ##################################################################

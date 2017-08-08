@@ -1,5 +1,6 @@
 """TestAuthZ templates for assessment interfaces"""
 
+
 class AssessmentOfferedLookupSession:
 
     additional_methods = """
@@ -36,6 +37,7 @@ def authz_adapter_test_fixture(request):
             request.cls.bank_list[0].delete_assessment(request.cls.assessment.ident)
 
     request.addfinalizer(test_tear_down)"""
+
 
 class AssessmentTakenLookupSession:
 

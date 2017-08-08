@@ -380,8 +380,7 @@ class BaseBuilder(Utilities):
                     'LogEntryLogSession',
                     'LogEntryLogAssignmentSession',
                     'GradebookColumnGradebookSession',
-                    'GradebookColumnGradebookAssignmentSession',
-                ]):
+                    'GradebookColumnGradebookAssignmentSession']):
             is_catalog_session = False
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].startswith('LogEntry')):
@@ -413,8 +412,7 @@ class BaseBuilder(Utilities):
                     'LogEntryLogSession',
                     'LogEntryLogAssignmentSession',
                     'GradebookColumnGradebookSession',
-                    'GradebookColumnGradebookAssignmentSession',
-                ]):
+                    'GradebookColumnGradebookAssignmentSession']):
             is_manager_session = True
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].startswith('LogEntry')):

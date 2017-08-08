@@ -19,7 +19,7 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
 
     def _build_method_doc(self, method):
         return '{0}// Tests {1}'.format(self._ind,
-                                       under_to_mixed(method['name']))
+                                        under_to_mixed(method['name']))
 
     def _clean_up_impl(self, impl, interface, method):
         if not impl.strip():
@@ -100,12 +100,16 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
     def _wrap(self, text):
         return text
 
-    ## DON'T NEED FOR THIS BUILDER?
+    # DON'T NEED FOR THIS BUILDER?
     def _write_module_string(self, write_file, module):
         write_file.write('{0}\n\n\n{1}'.format('\n'.join(module['imports']),
                                                module['body']).encode('utf-8'))
 
     def build_this_interface(self, interface):
+        # return (('OsidObject' in interface['inherit_shortnames'] or
+        #         'OsidRelationship' in interface['inherit_shortnames']) and
+        #         'Subjugateable' not in interface['inherit_shortnames'] and
+        #         self._build_this_interface(interface))
         return (interface['shortname'].endswith('LookupSession') and
                 'OsidCatalog' not in interface['inherit_shortnames'])
 
@@ -189,8 +193,10 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
         # The real work starts here.  Iterate through all interfaces to build
         # all the classes for this osid package.
         for interface in self.package['interfaces']:
+            # print '    ', interface['shortname'], 'inherits', interface['inherit_shortnames']
             if not self.build_this_interface(interface):
                 continue
+            print '    building -', interface['shortname']
             imports = self._get_module_imports(modules, interface)  # DONT NEED modules in this method?
             body = self.module_body(interface)
             if body.strip():
@@ -201,7 +207,7 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
     def write_class(self, interface, imports, body):
         # Writes one java class per file:
         if body != '' and len(interface['fullname'].split('.')) != 2:  # Hack to not build osid
-            class_name = 'test_' + camel_to_under(interface['shortname'].split('LookupSession')[0]) + '_authz'
+            class_name = 'test_' + camel_to_under(interface['shortname'][:-13]) + '_authz'
             # module_dir = self._abc_pkg_path(abc=True) + '/authz_tests/'
             module_dir = self._app_name() + '/functional/test_authz/' + self._abc_pkg_name(abc=True) + '/'
             module_path = module_dir + class_name + '.py'

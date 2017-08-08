@@ -1,5 +1,6 @@
 """TestAuthZ templates for resource interfaces"""
 
+
 class ResourceLookupSession:
 
     import_statements_pattern = [
@@ -704,6 +705,4 @@ class Test${object_name}AuthzAdapter(TestAuthorizationSession):
             ${cat_name_under}.use_federated_${cat_name_under}_view()
             query = ${cat_name_under}.get_${object_name_under}_query()
             query.match_display_name('red')
-            assert ${cat_name_under}.get_${object_name_under_plural}_by_query(query).available() == 6
-
-"""
+            assert ${cat_name_under}.get_${object_name_under_plural}_by_query(query).available() == 6"""
