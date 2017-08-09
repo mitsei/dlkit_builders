@@ -38,12 +38,12 @@ SEARCH_${object_name_upper}_FUNCTION_ID = Id(**{'identifier': 'search', 'namespa
 CREATE_${object_name_upper}_FUNCTION_ID = Id(**{'identifier': 'create', 'namespace': '${pkg_name_replaced}.${object_name}', 'authority': 'ODL.MIT.EDU'})
 DELETE_${object_name_upper}_FUNCTION_ID = Id(**{'identifier': 'delete', 'namespace': '${pkg_name_replaced}.${object_name}', 'authority': 'ODL.MIT.EDU'})
 ASSIGN_${object_name_upper}_FUNCTION_ID = Id(**{'identifier': 'assign', 'namespace': '${pkg_name_replaced}.${object_name}${cat_name}', 'authority': 'ODL.MIT.EDU'})
-CREATE_${cat_name_upper}_FUNCTION_ID = Id(**{'identifier': 'create', 'namespace': '${pkg_name_replaced}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
-DELETE_${cat_name_upper}_FUNCTION_ID = Id(**{'identifier': 'delete', 'namespace': '${pkg_name_replaced}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
-LOOKUP_${cat_name_upper}_FUNCTION_ID = Id(**{'identifier': 'lookup', 'namespace': '${pkg_name_replaced}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
-ACCESS_${cat_name_upper}_HIERARCHY_FUNCTION_ID = Id(**{'identifier': 'access', 'namespace': '${pkg_name_replaced}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
-MODIFY_${cat_name_upper}_HIERARCHY_FUNCTION_ID = Id(**{'identifier': 'modify', 'namespace': '${pkg_name_replaced}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
-ROOT_QUALIFIER_ID = Id('${pkg_name_replaced}.${cat_name}%3AROOT%40ODL.MIT.EDU')
+CREATE_${cat_name_upper}_FUNCTION_ID = Id(**{'identifier': 'create', 'namespace': '${base_pkg_name}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
+DELETE_${cat_name_upper}_FUNCTION_ID = Id(**{'identifier': 'delete', 'namespace': '${base_pkg_name}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
+LOOKUP_${cat_name_upper}_FUNCTION_ID = Id(**{'identifier': 'lookup', 'namespace': '${base_pkg_name}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
+ACCESS_${cat_name_upper}_HIERARCHY_FUNCTION_ID = Id(**{'identifier': 'access', 'namespace': '${base_pkg_name}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
+MODIFY_${cat_name_upper}_HIERARCHY_FUNCTION_ID = Id(**{'identifier': 'modify', 'namespace': '${base_pkg_name}.${cat_name}', 'authority': 'ODL.MIT.EDU'})
+ROOT_QUALIFIER_ID = Id('${base_pkg_name}.${cat_name}%3AROOT%40ODL.MIT.EDU')
 BOOTSTRAP_VAULT_TYPE = Type(authority='ODL.MIT.EDU', namespace='authorization.Vault', identifier='bootstrap_vault')
 OVERRIDE_VAULT_TYPE = Type(authority='ODL.MIT.EDU', namespace='authorization.Vault', identifier='override_vault')
 DEFAULT_TYPE = Type(**{'identifier': 'DEFAULT', 'namespace': 'DEFAULT', 'authority': 'DEFAULT'})
@@ -279,10 +279,10 @@ def authz_adapter_class_fixture(request):
 
     def class_tear_down():
         if not is_never_authz(request.cls.service_config):
-            # for catalog in request.cls.${pkg_name_replaced}_mgr.get_${cat_name_under_plural}():
-            #     for obj in catalog.get_${object_name_under_plural}():
-            #         catalog.delete_${object_name_under}(obj.ident)
-            #     request.cls.${pkg_name_replaced}_mgr.delete_${cat_name_under}(catalog.ident)
+            for catalog in request.cls.${pkg_name_replaced}_mgr.get_${cat_name_under_plural}():
+                for obj in catalog.get_${object_name_under_plural}():
+                    catalog.delete_${object_name_under}(obj.ident)
+                request.cls.${pkg_name_replaced}_mgr.delete_${cat_name_under}(catalog.ident)
             for vault in request.cls.vault_lookup_session.get_vaults():
                 lookup_session = request.cls.authz_mgr.get_authorization_lookup_session_for_vault(vault.ident)
                 admin_session = request.cls.authz_mgr.get_authorization_admin_session_for_vault(vault.ident)

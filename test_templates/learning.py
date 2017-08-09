@@ -707,6 +707,56 @@ def ${interface_name_under}_test_fixture(request):
                 self.session.${method_name}(self.fake_id)"""
 
 
+class ActivityQuerySession:
+
+    init = """
+@pytest.fixture(scope="class",
+                params=['TEST_SERVICE'])
+def activity_query_session_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'LEARNING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+
+@pytest.fixture(scope="function")
+def activity_query_session_test_fixture(request):
+    request.cls.activity_list = list()
+    request.cls.activity_ids = list()
+
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ActivityQuerySession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_objective_bank(create_form)
+        create_form = request.cls.catalog.get_objective_form_for_create([])
+        create_form.display_name = 'Test Objective for Assignment'
+        create_form.description = 'Test Objective for ProficiencyObjectiveBankAssignmentSession tests assignment'
+        request.cls.objective = request.cls.catalog.create_objective(create_form)
+        for color in ['Orange', 'Blue', 'Green', 'orange']:
+            create_form = request.cls.catalog.get_activity_form_for_create(request.cls.objective.ident, [])
+            create_form.display_name = 'Test Activity ' + color
+            create_form.description = (
+                'Test Activity for ActivityQuerySession tests, did I mention green')
+            obj = request.cls.catalog.create_activity(create_form)
+            request.cls.activity_list.append(obj)
+            request.cls.activity_ids.append(obj.ident)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_activity_query_session(proxy=PROXY)
+
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_activities():
+                request.cls.catalog.delete_activity(obj.ident)
+            request.cls.catalog.delete_objective(request.cls.objective.ident)
+            request.cls.svc_mgr.delete_objective_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(test_tear_down)"""
+
+
 class ActivityObjectiveBankSession:
     init = """
 @pytest.fixture(scope="class",
@@ -905,6 +955,58 @@ def ${interface_name_under}_test_fixture(request):
         else:
             with pytest.raises(errors.PermissionDenied):
                 self.catalog.delete_activity(self.fake_id)"""
+
+
+class ProficiencyObjectiveBankAssignmentSession:
+
+    init = """
+@pytest.fixture(scope="class",
+                params=['TEST_SERVICE'])
+def proficiency_objective_bank_assignment_session_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.proficiency_list = list()
+    request.cls.proficiency_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'LEARNING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank'
+        create_form.description = 'Test ObjectiveBank for ProficiencyObjectiveBankAssignmentSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_objective_bank(create_form)
+        create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test ObjectiveBank for Assignment'
+        create_form.description = 'Test ObjectiveBank for ProficiencyObjectiveBankAssignmentSession tests assignment'
+        request.cls.assigned_catalog = request.cls.svc_mgr.create_objective_bank(create_form)
+        create_form = request.cls.catalog.get_objective_form_for_create([])
+        create_form.display_name = 'Test Objective for Assignment'
+        create_form.description = 'Test Objective for ProficiencyObjectiveBankAssignmentSession tests assignment'
+        request.cls.objective = request.cls.catalog.create_objective(create_form)
+        for num in [0, 1, 2]:
+            create_form = request.cls.catalog.get_proficiency_form_for_create(request.cls.objective.ident, AGENT_ID, [])
+            create_form.display_name = 'Test Proficiency ' + str(num)
+            create_form.description = 'Test Proficiency for ProficiencyObjectiveBankAssignmentSession tests'
+            obj = request.cls.catalog.create_proficiency(create_form)
+            request.cls.proficiency_list.append(obj)
+            request.cls.proficiency_ids.append(obj.ident)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_proficiencies():
+                request.cls.catalog.delete_proficiency(obj.ident)
+            request.cls.catalog.delete_objective(request.cls.objective.ident)
+            request.cls.svc_mgr.delete_objective_bank(request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.delete_objective_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def proficiency_objective_bank_assignment_session_test_fixture(request):
+    # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
 
 
 class Activity:
