@@ -6,7 +6,7 @@ class ResourceLookupSession:
     import_statements_pattern = [
         'import datetime',
         'import pytest',
-        'from ....utilities.general import is_never_authz, is_no_authz, uses_cataloging',
+        'from tests.utilities.general import is_never_authz, is_no_authz, uses_cataloging',
         'from dlkit.abstract_osid.authorization import objects as ABCObjects',
         'from dlkit.abstract_osid.authorization import queries as ABCQueries',
         'from dlkit.abstract_osid.authorization.objects import Authorization',
@@ -81,96 +81,6 @@ def authz_adapter_class_fixture(request):
         request.cls.authz_admin_session = request.cls.authz_mgr.get_authorization_admin_session_for_vault(request.cls.vault.ident)
         request.cls.override_authz_admin_session = request.cls.authz_mgr.get_authorization_admin_session_for_vault(request.cls.override_vault.ident)
         request.cls.authz_lookup_session = request.cls.authz_mgr.get_authorization_lookup_session_for_vault(request.cls.vault.ident)
-
-        # # Set up ${cat_name} create authorization for current user
-        # create_form = request.cls.authz_admin_session.get_authorization_form_for_create_for_agent(
-        #     PROXY.get_authentication().get_agent_id(),
-        #     CREATE_${cat_name_upper}_FUNCTION_ID,
-        #     ROOT_QUALIFIER_ID,
-        #     [])
-        # create_form.display_name = '${cat_name} Create for ${cat_name} AuthZ'
-        # create_form.description = '${cat_name} Create Authorization for ${cat_name} AuthZ tests'
-        # ${cat_name_under}_create_authz = request.cls.authz_admin_session.create_authorization(create_form)
-        #
-        # # Set up ${cat_name} delete authorization for current user
-        # create_form = request.cls.authz_admin_session.get_authorization_form_for_create_for_agent(
-        #     PROXY.get_authentication().get_agent_id(),
-        #     DELETE_${cat_name_upper}_FUNCTION_ID,
-        #     ROOT_QUALIFIER_ID,
-        #     [])
-        # create_form.display_name = '${cat_name} Delete for ${cat_name} AuthZ'
-        # create_form.description = '${cat_name} Delete Authorization for ${cat_name} AuthZ tests'
-        # ${cat_name_under}_delete_authz = request.cls.authz_admin_session.create_authorization(create_form)
-        #
-        # # Set up ${cat_name} lookup authorization for current user
-        # create_form = request.cls.authz_admin_session.get_authorization_form_for_create_for_agent(
-        #     PROXY.get_authentication().get_agent_id(),
-        #     LOOKUP_${cat_name_upper}_FUNCTION_ID,
-        #     ROOT_QUALIFIER_ID,
-        #     [])
-        # create_form.display_name = '${cat_name} Lookup for ${cat_name} AuthZ'
-        # create_form.description = '${cat_name} Lookup Authorization for AuthorizationSession tests'
-        # ${cat_name_under}_lookup_authz = request.cls.authz_admin_session.create_authorization(create_form)
-        #
-        # # Set up ${cat_name} hierarchy access authorization for current user
-        # create_form = request.cls.authz_admin_session.get_authorization_form_for_create_for_agent(
-        #     PROXY.get_authentication().get_agent_id(),
-        #     ACCESS_${cat_name_upper}_HIERARCHY_FUNCTION_ID,
-        #     ROOT_QUALIFIER_ID,
-        #     [])
-        # create_form.display_name = '${cat_name} Hierarchy Access for ${cat_name} AuthZ'
-        # create_form.description = '${cat_name} Hierarchy Access Authorization for AuthorizationSession tests'
-        # ${cat_name_under}_hierarchy_modify_authz = request.cls.authz_admin_session.create_authorization(create_form)
-        #
-        # # Set up ${cat_name} hierarchy modify authorization for current user
-        # create_form = request.cls.authz_admin_session.get_authorization_form_for_create_for_agent(
-        #     PROXY.get_authentication().get_agent_id(),
-        #     MODIFY_${cat_name_upper}_HIERARCHY_FUNCTION_ID,
-        #     ROOT_QUALIFIER_ID,
-        #     [])
-        # create_form.display_name = '${cat_name} Hierarchy Modify for ${cat_name} AuthZ'
-        # create_form.description = '${cat_name} Hierarchy Modify Authorization for AuthorizationSession tests'
-        # ${cat_name_under}_hierarchy_modify_authz = request.cls.authz_admin_session.create_authorization(create_form)
-        #
-        # # Set up ${object_name} create authorization for current user
-        # create_form = request.cls.authz_admin_session.get_authorization_form_for_create_for_agent(
-        #     PROXY.get_authentication().get_agent_id(),
-        #     CREATE_${object_name_upper}_FUNCTION_ID,
-        #     ROOT_QUALIFIER_ID,
-        #     [])
-        # create_form.display_name = '${object_name} create for ${cat_name} AuthZ'
-        # create_form.description = '${object_name} create Authorization for AuthorizationSession tests'
-        # ${object_name}_create_authz = request.cls.authz_admin_session.create_authorization(create_form)
-        #
-        # # Set up ${object_name} delete authorization for current user
-        # create_form = request.cls.authz_admin_session.get_authorization_form_for_create_for_agent(
-        #     PROXY.get_authentication().get_agent_id(),
-        #     DELETE_${object_name_upper}_FUNCTION_ID,
-        #     ROOT_QUALIFIER_ID,
-        #     [])
-        # create_form.display_name = '${object_name} Delete for ${cat_name} AuthZ'
-        # create_form.description = '${object_name} Delete Authorization for AuthorizationSession tests'
-        # ${object_name_under}_delete_authz = request.cls.authz_admin_session.create_authorization(create_form)
-        #
-        # # Set up ${object_name} - ${cat_name} assignment authorization for current user
-        # create_form = request.cls.authz_admin_session.get_authorization_form_for_create_for_agent(
-        #     PROXY.get_authentication().get_agent_id(),
-        #     ASSIGN_${object_name_upper}_FUNCTION_ID,
-        #     ROOT_QUALIFIER_ID,
-        #     [])
-        # create_form.display_name = '${object_name} Delete for ${cat_name} AuthZ'
-        # create_form.description = '${object_name} Delete Authorization for AuthorizationSession tests'
-        # ${object_name_under}_delete_authz = request.cls.authz_admin_session.create_authorization(create_form)
-        #
-        # # Set up ${object_name} lookup authorization for current user
-        # create_form = request.cls.authz_admin_session.get_authorization_form_for_create_for_agent(
-        #     PROXY.get_authentication().get_agent_id(),
-        #     LOOKUP_${object_name_upper}_FUNCTION_ID,
-        #     ROOT_QUALIFIER_ID,
-        #     [])
-        # create_form.display_name = '${object_name} Lookup for ${cat_name} AuthZ'
-        # create_form.description = '${object_name} Lookup Authorization for AuthorizationSession tests'
-        # ${object_name_under}_lookup_authz = request.cls.authz_admin_session.create_authorization(create_form)
 
         request.cls.${cat_name_under}_list = list()
         request.cls.${cat_name_under}_id_list = list()
