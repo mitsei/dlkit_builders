@@ -70,6 +70,18 @@ class AssessmentSession:
                 'from importlib import import_module',
                 'from .assessment_utilities import get_assessment_section as get_section_util',
                 'from .assessment_utilities import check_effective',
+            ],
+            'tests': [
+                'import datetime',
+                'from dlkit.abstract_osid.assessment.objects import Bank, Answer, AnswerList, AnswerForm',
+                'from dlkit.abstract_osid.assessment.objects import Question, QuestionList',
+                'from dlkit.abstract_osid.assessment.objects import ResponseList',
+                'from dlkit.abstract_osid.assessment.objects import AssessmentSection, AssessmentSectionList',
+                'from dlkit.abstract_osid.assessment.rules import Response',
+                'from dlkit.primordium.calendaring.primitives import DateTime',
+                'from dlkit.primordium.type.primitives import Type',
+                'from dlkit.records import registry',
+                'SEQUENCE_ASSESSMENT = Type(**registry.ASSESSMENT_RECORD_TYPES["simple-child-sequencing"])'
             ]
         }
     }
@@ -94,7 +106,80 @@ class AssessmentSession:
     def __init__(self, **kwargs):
         osid_sessions.OsidSession.__init__(self, **kwargs)
         self._qualifier_id = self._provider_session.get_bank_id()
-        self._id_namespace = 'assessment.Assessment'"""
+        self._id_namespace = 'assessment.Assessment'""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+        create_form = request.cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentSession tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(create_form)
+
+        for number in ['One', 'Two', 'Three', 'Four']:
+            ifc = request.cls.catalog.get_item_form_for_create([])
+            ifc.set_display_name('Test Assessment Item ' + number)
+            ifc.set_description('This is a Test Item Called Number ' + number)
+            test_item = request.cls.catalog.create_item(ifc)
+            form = request.cls.catalog.get_question_form_for_create(test_item.ident, [])
+            request.cls.catalog.create_question(form)
+
+            if number == 'One':
+                form = request.cls.catalog.get_answer_form_for_create(test_item.ident, [])
+                request.cls.catalog.create_answer(form)
+
+            request.cls.catalog.add_item(request.cls.assessment.ident, test_item.ident)
+
+        form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident, [])
+        request.cls.assessment_offered = request.cls.catalog.create_assessment_offered(form)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
+
+    request.cls.session = request.cls.catalog
+
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_assessment_taken_form_for_create(request.cls.assessment_offered.ident, [])
+        request.cls.taken = request.cls.catalog.create_assessment_taken(form)
+
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments():
+                for offered in request.cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                    for taken in request.cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                        request.cls.catalog.delete_assessment_taken(taken.ident)
+                    request.cls.catalog.delete_assessment_offered(offered.ident)
+                request.cls.catalog.delete_assessment(obj.ident)
+            for item in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(item.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(test_tear_down)"""
+        }
+    }
+
+    get_bank = {
+        'python': {
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        # this test should not be needed....
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.catalog, Bank)"""
         }
     }
 
@@ -107,7 +192,11 @@ class AssessmentSession:
         # handled in a service adapter above the pay grade of this impl.
         return True""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.authz_hint['python']['authz']('take')
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        assert isinstance(self.session.can_take_assessments(), bool)"""
         }
     }
 
@@ -118,7 +207,30 @@ class AssessmentSession:
         ${doc_string}
         return self._get_assessment_taken(assessment_taken_id).has_started()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            future_start = DateTime.utcnow() + datetime.timedelta(days=1)
+            form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+            form.set_start_time(DateTime(**{
+                'year': future_start.year,
+                'month': future_start.month,
+                'day': future_start.day,
+                'hour': future_start.hour,
+                'minute': future_start.minute,
+                'second': future_start.second
+            }))
+            future_offered = self.catalog.create_assessment_offered(form)
+            form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
+            future_taken = self.catalog.create_assessment_taken(form)
+            assert not self.session.has_assessment_begun(future_taken.ident)
+
+            assert self.session.has_assessment_begun(self.taken.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.has_assessment_begun(self.fake_id)"""
         }
     }
 
@@ -129,7 +241,21 @@ class AssessmentSession:
         ${doc_string}
         return self._get_assessment_taken(assessment_taken_id).has_ended()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        # There are also other conditions that flag "over", but are not
+        # tested here. Like if the offered goes past the deadline...so we
+        # would have to do a time.sleep(). TODO: add those tests in.
+
+        if not is_never_authz(self.service_config):
+            assert not self.session.is_assessment_over(self.taken.ident)
+            self.session.finish_assessment(self.taken.ident)
+            assert self.session.is_assessment_over(self.taken.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.is_assessment_over(self.fake_id)"""
         }
     }
 
@@ -162,7 +288,15 @@ class AssessmentSession:
         ${doc_string}
         return self._get_assessment_taken(assessment_taken_id).get_assessment_offered().are_sections_sequential()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert not self.session.requires_synchronous_sections(self.taken.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.requires_synchronous_sections(self.fake_id)"""
         }
     }
 
@@ -174,7 +308,16 @@ class AssessmentSession:
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         return assessment_taken._get_first_assessment_section()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            assert isinstance(section, AssessmentSection)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_first_assessment_section(self.fake_id)"""
         }
     }
 
@@ -190,7 +333,16 @@ class AssessmentSession:
         else:
             return True""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            assert not self.session.has_next_assessment_section(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.has_next_assessment_section(self.fake_id)"""
         }
     }
 
@@ -202,7 +354,17 @@ class AssessmentSession:
         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
         return assessment_taken._get_next_assessment_section(assessment_section_id)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            with pytest.raises(errors.IllegalState):
+                self.session.get_next_assessment_section(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_next_assessment_section(self.fake_id)"""
         }
     }
 
@@ -218,7 +380,16 @@ class AssessmentSession:
         else:
             return True""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            assert not self.session.has_previous_assessment_section(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.has_previous_assessment_section(self.fake_id)"""
         }
     }
 
@@ -230,7 +401,17 @@ class AssessmentSession:
         assessment_taken = self.get_assessment_section(assessment_section_id)._assessment_taken
         return assessment_taken._get_previous_assessment_section(assessment_section_id)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            with pytest.raises(errors.IllegalState):
+                self.session.get_previous_assessment_section(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_previous_assessment_section(self.fake_id)"""
         }
     }
 
@@ -241,7 +422,18 @@ class AssessmentSession:
         ${doc_string}
         return get_section_util(assessment_section_id, runtime=self._runtime, proxy=self._proxy)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            test_section = self.session.get_assessment_section(section.ident)
+            assert isinstance(test_section, AssessmentSection)
+            assert str(test_section.ident) == str(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_assessment_section(self.fake_id)"""
         }
     }
 
@@ -253,7 +445,21 @@ class AssessmentSession:
         assessment_taken = self._get_assessment_taken(assessment_taken_id)
         return assessment_taken._get_assessment_sections()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            test_sections = self.session.get_assessment_sections(self.taken.ident)
+            assert isinstance(test_sections, AssessmentSectionList)
+            assert test_sections.available() == 1
+            first_section = test_sections.next()
+            assert isinstance(first_section, AssessmentSection)
+            assert str(first_section.ident) == str(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.get_assessment_sections(self.fake_id)"""
         }
     }
 
@@ -264,7 +470,27 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).is_complete()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            total_questions = questions.available()
+
+            assert not self.session.is_assessment_section_complete(section.ident)
+
+            for index, question in enumerate(questions):
+                form = self.session.get_response_form(section.ident, question.ident)
+                self.session.submit_response(section.ident, question.ident, form)
+                if index < (total_questions - 1):
+                    assert not self.session.is_assessment_section_complete(section.ident)
+                else:
+                    assert self.session.is_assessment_section_complete(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.is_assessment_section_complete(self.fake_id)"""
         }
     }
 
@@ -279,7 +505,32 @@ class AssessmentSession:
                 section_list.append(section)
         return objects.AssessmentSectionList(section_list, runtime=self._runtime, proxy=self._proxy)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+
+            test_sections = self.session.get_incomplete_assessment_sections(self.taken.ident)
+            assert isinstance(test_sections, AssessmentSectionList)
+            assert test_sections.available() == 1
+            first_section = test_sections.next()
+            assert isinstance(first_section, AssessmentSection)
+            assert str(first_section.ident) == str(section.ident)
+
+            for question in questions:
+                form = self.session.get_response_form(section.ident, question.ident)
+                self.session.submit_response(section.ident, question.ident, form)
+
+            self.session._provider_sessions = {}  # need to get rid of the cached taken
+            test_sections = self.session.get_incomplete_assessment_sections(self.taken.ident)
+            assert isinstance(test_sections, AssessmentSectionList)
+            assert test_sections.available() == 0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_incomplete_assessment_sections(self.fake_id)"""
         }
     }
 
@@ -293,7 +544,34 @@ class AssessmentSession:
         return get_section_util(assessment_section_id,
                                 runtime=self._runtime)._assessment_taken.has_started()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            future_start = DateTime.utcnow() + datetime.timedelta(days=1)
+            form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+            form.set_start_time(DateTime(**{
+                'year': future_start.year,
+                'month': future_start.month,
+                'day': future_start.day,
+                'hour': future_start.hour,
+                'minute': future_start.minute,
+                'second': future_start.second
+            }))
+            future_offered = self.catalog.create_assessment_offered(form)
+            form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
+            future_taken = self.catalog.create_assessment_taken(form)
+
+            with pytest.raises(errors.IllegalState):
+                # cannot even get the sectionId to call the method
+                self.catalog.get_first_assessment_section(future_taken.ident)
+
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            assert self.session.has_assessment_section_begun(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.has_assessment_section_begun(self.fake_id)"""
         }
     }
 
@@ -306,7 +584,23 @@ class AssessmentSession:
         return get_section_util(assessment_section_id,
                                 runtime=self._runtime).is_over()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        # There are also other conditions that flag "over", but are not
+        # tested here. Like if the offered goes past the deadline...so we
+        # would have to do a time.sleep(). TODO: add those tests in.
+
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+
+            assert not self.session.is_assessment_section_over(section.ident)
+            self.session.finish_assessment_section(section.ident)
+            assert self.session.is_assessment_section_over(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.is_assessment_section_over(self.fake_id)"""
         }
     }
 
@@ -323,7 +617,16 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).are_items_sequential()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            assert not self.session.requires_synchronous_responses(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.requires_synchronous_responses(self.fake_id)"""
         }
     }
 
@@ -334,7 +637,21 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_first_question()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+
+            test_question = self.session.get_first_question(section.ident)
+            assert isinstance(test_question, Question)
+            assert str(first_question.ident) == str(test_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_first_question(self.fake_id)"""
         }
     }
 
@@ -350,7 +667,25 @@ class AssessmentSession:
         else:
             return True""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+            third_question = questions.next()
+            fourth_question = questions.next()
+
+            assert self.session.has_next_question(section.ident,
+                                                  first_question.ident)
+            assert not self.session.has_next_question(section.ident,
+                                                      fourth_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.has_next_question(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -361,7 +696,28 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+            third_question = questions.next()
+            fourth_question = questions.next()
+
+            test_question = self.session.get_next_question(section.ident,
+                                                           first_question.ident)
+            assert isinstance(test_question, Question)
+            assert str(second_question.ident) == str(test_question.ident)
+
+            with pytest.raises(errors.IllegalState):
+                self.session.get_next_question(section.ident, fourth_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_next_question(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -377,7 +733,25 @@ class AssessmentSession:
         else:
             return True""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+            third_question = questions.next()
+            fourth_question = questions.next()
+
+            assert self.session.has_previous_question(section.ident,
+                                                      fourth_question.ident)
+            assert not self.session.has_previous_question(section.ident,
+                                                          first_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.has_previous_question(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -388,7 +762,28 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_next_question(question_id=item_id, reverse=True)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+            third_question = questions.next()
+            fourth_question = questions.next()
+
+            test_question = self.session.get_previous_question(section.ident,
+                                                               fourth_question.ident)
+            assert isinstance(test_question, Question)
+            assert str(third_question.ident) == str(test_question.ident)
+
+            with pytest.raises(errors.IllegalState):
+                self.session.get_previous_question(section.ident, first_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_previous_question(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -399,7 +794,21 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_question(question_id=item_id)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+
+            test_question = self.session.get_question(section.ident, first_question.ident)
+            assert isinstance(test_question, Question)
+            assert str(test_question.ident) == str(first_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_question(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -411,7 +820,24 @@ class AssessmentSession:
         # Does this want to return a blocking list of available questions?
         return self.get_assessment_section(assessment_section_id).get_questions()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+
+            test_questions = self.session.get_questions(section.ident)
+            assert isinstance(test_questions, QuestionList)
+            assert test_questions.available() == 4
+            first_test_question = test_questions.next()
+            assert isinstance(first_test_question, Question)
+            assert str(first_test_question.ident) == str(first_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_questions(self.fake_id)"""
         }
     }
 
@@ -472,7 +898,20 @@ class AssessmentSession:
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+
+            form = self.session.get_response_form(section.ident, first_question.ident)
+            assert isinstance(form, AnswerForm)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_response_form(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -508,7 +947,26 @@ class AssessmentSession:
         self.get_assessment_section(assessment_section_id).submit_response(item_id, answer_form)
         self._forms[answer_form.get_id().get_identifier()] = SUBMITTED""",
             'services': GenericAdapterSession.method_without_return['python']['services'],
-            'authz': GenericAdapterSession.method_without_return['python']['authz']('take')
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+
+            assert 'missingResponse' in section._my_map['questions'][0]['responses'][0]
+            assert 0 == section._my_map['questions'][0]['responses'][0]['missingResponse']
+
+            form = self.session.get_response_form(section.ident, first_question.ident)
+            self.session.submit_response(section.ident, first_question.ident, form)
+            section = self.catalog.get_assessment_section(section.ident)
+
+            assert 'missingResponse' not in section._my_map['questions'][0]['responses'][0]
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.submit_response(self.fake_id, self.fake_id, 'foo')"""
         }
     }
 
@@ -520,7 +978,26 @@ class AssessmentSession:
         # add conditional: if the assessment or part allows us to skip:
         self.get_assessment_section(assessment_section_id).submit_response(item_id, None)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+
+            assert 'missingResponse' in section._my_map['questions'][0]['responses'][0]
+            assert 0 == section._my_map['questions'][0]['responses'][0]['missingResponse']
+
+            self.session.skip_item(section.ident, first_question.ident)
+            section = self.catalog.get_assessment_section(section.ident)
+
+            assert 'missingResponse' in section._my_map['questions'][0]['responses'][0]
+            assert 1 == section._my_map['questions'][0]['responses'][0]['missingResponse']
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.skip_item(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -531,7 +1008,26 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).is_question_answered(item_id)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+
+            assert not self.session.is_question_answered(section.ident,
+                                                         first_question.ident)
+
+            form = self.session.get_response_form(section.ident, first_question.ident)
+            self.session.submit_response(section.ident, first_question.ident, form)
+
+            assert self.session.is_question_answered(section.ident,
+                                                     first_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.is_question_answered(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -542,7 +1038,32 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_questions(answered=False)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            question_ids = [q.ident for q in questions]
+
+            test_questions = self.session.get_unanswered_questions(section.ident)
+            assert isinstance(test_questions, QuestionList)
+            assert test_questions.available() == 4
+            test_question_ids = [q.ident for q in test_questions]
+            assert question_ids == test_question_ids
+
+            form = self.session.get_response_form(section.ident, question_ids[1])
+            self.session.submit_response(section.ident, question_ids[1], form)
+
+            test_questions = self.session.get_unanswered_questions(section.ident)
+            assert isinstance(test_questions, QuestionList)
+            assert test_questions.available() == 3
+            test_question_ids = [q.ident for q in test_questions]
+            assert question_ids[1] not in test_question_ids
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_unanswered_questions(self.fake_id)"""
         }
     }
 
@@ -554,7 +1075,27 @@ class AssessmentSession:
         # There's probably a more efficient way to implement this:
         return bool(self.get_unanswered_questions(assessment_section_id).available())""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            total_questions = questions.available()
+
+            assert self.session.has_unanswered_questions(section.ident)
+
+            for index, question in enumerate(questions):
+                form = self.session.get_response_form(section.ident, question.ident)
+                self.session.submit_response(section.ident, question.ident, form)
+                if index < (total_questions - 1):
+                    assert self.session.has_unanswered_questions(section.ident)
+                else:
+                    assert not self.session.has_unanswered_questions(section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.has_unanswered_questions(self.fake_id)"""
         }
     }
 
@@ -568,7 +1109,29 @@ class AssessmentSession:
             raise errors.IllegalState('There are no more unanswered questions available')
         return questions.next()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+
+            unanswered_question = self.session.get_first_unanswered_question(section.ident)
+            assert isinstance(unanswered_question, Question)
+            assert str(unanswered_question.ident) == str(first_question.ident)
+
+            form = self.session.get_response_form(section.ident, first_question.ident)
+            self.session.submit_response(section.ident, first_question.ident, form)
+
+            unanswered_question = self.session.get_first_unanswered_question(section.ident)
+            assert isinstance(unanswered_question, Question)
+            assert str(unanswered_question.ident) == str(second_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_first_unanswered_question(self.fake_id)"""
         }
     }
 
@@ -585,7 +1148,31 @@ class AssessmentSession:
         else:
             return True""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+            third_question = questions.next()
+            fourth_question = questions.next()
+
+            assert self.session.has_next_unanswered_question(section.ident,
+                                                             first_question.ident)
+
+            form = self.session.get_response_form(section.ident, second_question.ident)
+            self.session.submit_response(section.ident, second_question.ident, form)
+
+            assert self.session.has_next_unanswered_question(section.ident,
+                                                             first_question.ident)
+            assert not self.session.has_next_unanswered_question(section.ident,
+                                                                 fourth_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.has_next_unanswered_question(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -604,7 +1191,37 @@ class AssessmentSession:
                     raise errors.IllegalState('No next unanswered question is available')
         raise errors.NotFound('item_id is not found in Section')""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+            third_question = questions.next()
+            fourth_question = questions.next()
+
+            test_question = self.session.get_next_unanswered_question(section.ident,
+                                                                      first_question.ident)
+            assert isinstance(test_question, Question)
+            assert str(second_question.ident) == str(test_question.ident)
+
+            form = self.session.get_response_form(section.ident, second_question.ident)
+            self.session.submit_response(section.ident, second_question.ident, form)
+
+            test_question = self.session.get_next_unanswered_question(section.ident,
+                                                                      first_question.ident)
+            assert isinstance(test_question, Question)
+            assert str(third_question.ident) == str(test_question.ident)
+
+            with pytest.raises(errors.IllegalState):
+                self.session.get_next_unanswered_question(section.ident,
+                                                          fourth_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_next_unanswered_question(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -621,7 +1238,31 @@ class AssessmentSession:
         else:
             return True""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+            third_question = questions.next()
+            fourth_question = questions.next()
+
+            assert self.session.has_previous_unanswered_question(section.ident,
+                                                                 fourth_question.ident)
+
+            form = self.session.get_response_form(section.ident, third_question.ident)
+            self.session.submit_response(section.ident, third_question.ident, form)
+
+            assert self.session.has_previous_unanswered_question(section.ident,
+                                                                 fourth_question.ident)
+            assert not self.session.has_previous_unanswered_question(section.ident,
+                                                                     first_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.has_previous_unanswered_question(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -642,7 +1283,37 @@ class AssessmentSession:
                 previous_question = question
         raise errors.NotFound('item_id is not found in Section')""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+            third_question = questions.next()
+            fourth_question = questions.next()
+
+            test_question = self.session.get_previous_unanswered_question(section.ident,
+                                                                          fourth_question.ident)
+            assert isinstance(test_question, Question)
+            assert str(third_question.ident) == str(test_question.ident)
+
+            form = self.session.get_response_form(section.ident, third_question.ident)
+            self.session.submit_response(section.ident, third_question.ident, form)
+
+            test_question = self.session.get_previous_unanswered_question(section.ident,
+                                                                          fourth_question.ident)
+            assert isinstance(test_question, Question)
+            assert str(second_question.ident) == str(test_question.ident)
+
+            with pytest.raises(errors.IllegalState):
+                self.session.get_previous_unanswered_question(section.ident,
+                                                              first_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_previous_unanswered_question(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -653,7 +1324,31 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_response(question_id=item_id)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+
+            test_response = self.session.get_response(section.ident, first_question.ident)
+            assert isinstance(test_response, Response)
+
+            with pytest.raises(errors.IllegalState):
+                test_response.object_map
+
+            form = self.session.get_response_form(section.ident, first_question.ident)
+            self.session.submit_response(section.ident, first_question.ident, form)
+
+            test_response = self.session.get_response(section.ident, first_question.ident)
+            assert isinstance(test_response, Response)
+
+            test_response.object_map
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_response(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -664,7 +1359,25 @@ class AssessmentSession:
         ${doc_string}
         return self.get_assessment_section(assessment_section_id).get_responses()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+
+            test_responses = self.session.get_responses(section.ident)
+            assert isinstance(test_responses, ResponseList)
+            assert test_responses.available() == 4
+            first_response = test_responses.next()
+            assert isinstance(first_response, Response)
+
+            with pytest.raises(errors.IllegalState):
+                first_response.object_map
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_responses(self.fake_id)"""
         }
     }
 
@@ -679,7 +1392,32 @@ class AssessmentSession:
         # Should probably check to see if responses can be cleared, but how?
         self.get_assessment_section(assessment_section_id).submit_response(item_id, None)""",
             'services': GenericAdapterSession.method_without_return['python']['services'],
-            'authz': GenericAdapterSession.method_without_return['python']['authz']('take')
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+
+            assert 'missingResponse' in section._my_map['questions'][0]['responses'][0]
+            assert 0 == section._my_map['questions'][0]['responses'][0]['missingResponse']
+
+            form = self.session.get_response_form(section.ident, first_question.ident)
+            self.session.submit_response(section.ident, first_question.ident, form)
+            section = self.catalog.get_assessment_section(section.ident)
+
+            assert 'missingResponse' not in section._my_map['questions'][0]['responses'][0]
+
+            self.session.clear_response(section.ident, first_question.ident)
+            section = self.catalog.get_assessment_section(section.ident)
+
+            assert 'missingResponse' in section._my_map['questions'][0]['responses'][0]
+            assert 1 == section._my_map['questions'][0]['responses'][0]['missingResponse']
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.clear_response(self.fake_id, self.fake_id)"""
         }
     }
 

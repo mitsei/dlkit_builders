@@ -95,6 +95,10 @@ def map_osid_patterns(interface, package, index):
                             package_name=package['name'],
                             module_name=interface['category'],
                             method_name=method['name']))
+            for arg_index, arg in enumerate(method['args']):
+                arg_dict = {}
+                arg_dict['arg{0}_name'.format(str(arg_index))] = arg['var_name']
+                index[interface['shortname'] + '.' + method['name']]['kwargs'].update(arg_dict)
     return index
 
 
