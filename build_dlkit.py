@@ -996,6 +996,7 @@ if __name__ == '__main__':
             builder.authz()
             builder.manager()
             builder.tests(True)
+            builder.testauthz(True)
             # builder.docs()
             # Create a build-hash file so we know what commit built dlkit
             builder.update_hash_file()
