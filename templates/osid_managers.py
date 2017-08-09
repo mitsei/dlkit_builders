@@ -538,9 +538,9 @@ class GenericManager(object):
         }
     }
 
-    get_object_smart_catalog_session_template = GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
+    get_object_smart_catalog_session_template = GenericAdapterProfileAndManager.unimplemented_one_arg
 
-    get_object_batch_manager_template = GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
+    get_object_batch_manager_template = GenericAdapterProfileAndManager.unimplemented_no_args
 
 
 class GenericProxyManager(object):
