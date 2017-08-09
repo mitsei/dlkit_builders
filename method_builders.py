@@ -321,7 +321,11 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
 
         # always pass through the context to get things like ``doc_string``
         template = string.Template(impl)
-        impl = stripn(template.substitute(context))
+        try:
+            impl = stripn(template.substitute(context))
+        except KeyError:
+            import pdb
+            pdb.set_trace()
 
         return self._clean_up_impl(impl, interface, method)
 

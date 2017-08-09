@@ -1,3 +1,5 @@
+from .osid_managers import GenericAdapterProfileAndManager
+
 
 class OsidProfile:
 
@@ -15,6 +17,9 @@ class OsidProfile:
                 'PLENARY = 1',
                 'FEDERATED = 0',
                 'ISOLATED = 1',
+            ],
+            'manager': [
+                'from .osid_errors import Unimplemented'
             ]
         }
     }
@@ -98,7 +103,8 @@ class OsidProfile:
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        return Id(**profile.ID)"""
+        return Id(**profile.ID)""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -111,7 +117,8 @@ class OsidProfile:
             text=profile.DISPLAYNAME,
             language_type=Type(**profile.LANGUAGETYPE),
             script_type=Type(**profile.SCRIPTTYPE),
-            format_type=Type(**profile.FORMATTYPE))"""
+            format_type=Type(**profile.FORMATTYPE))""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -124,7 +131,8 @@ class OsidProfile:
             text=profile.DESCRIPTION,
             language_type=Type(**profile.LANGUAGETYPE),
             script_type=Type(**profile.SCRIPTTYPE),
-            format_type=Type(**profile.FORMATTYPE))"""
+            format_type=Type(**profile.FORMATTYPE))""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -145,7 +153,8 @@ class OsidProfile:
         # return Version(
         #    components=profile.VERSIONCOMPONENTS,
         #    scheme=Type(**profile.VERSIONSCHEME))
-        raise errors.Unimplemented()"""
+        raise errors.Unimplemented()""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -155,14 +164,15 @@ class OsidProfile:
     def ${method_name}(self):
         ${doc_string}
         # NEED TO IMPLEMENT
-        raise errors.Unimplemented()"""
+        raise errors.Unimplemented()""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
     supports_osid_version = {
         'python': {
             'json': """
-    def ${method_name}(self):
+    def ${method_name}(self, version):
         ${doc_string}
         # THIS ALL NEEDS TO BE FIXED:
         # try:
@@ -176,7 +186,8 @@ class OsidProfile:
         # return Version(
         #    components=profile.OSIDVERSION,
         #    scheme=Type(**profile.VERSIONSCHEME))
-        raise errors.Unimplemented()"""
+        raise errors.Unimplemented()""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
         }
     }
 
@@ -186,7 +197,8 @@ class OsidProfile:
     def ${method_name}(self):
         ${doc_string}
         # NEED TO IMPLEMENT
-        raise errors.Unimplemented()"""
+        raise errors.Unimplemented()""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -196,7 +208,8 @@ class OsidProfile:
     def ${method_name}(self):
         ${doc_string}
         # Perhaps someday I will support journaling
-        return False"""
+        return False""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -206,7 +219,8 @@ class OsidProfile:
     def ${method_name}(self):
         ${doc_string}
         # Perhaps someday I will support journaling
-        return False"""
+        return False""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -216,7 +230,8 @@ class OsidProfile:
     def ${method_name}(self):
         ${doc_string}
         # Perhaps someday I will support journaling
-        raise errors.Unimplemented()"""
+        raise errors.Unimplemented()""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -226,7 +241,8 @@ class OsidProfile:
     def ${method_name}(self):
         ${doc_string}
         # Perhaps someday I will support journaling
-        raise errors.Unimplemented()"""
+        raise errors.Unimplemented()""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -236,7 +252,8 @@ class OsidProfile:
     def ${method_name}(self):
         ${doc_string}
         # NEED TO IMPLEMENT
-        raise errors.Unimplemented()"""
+        raise errors.Unimplemented()""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -244,7 +261,8 @@ class OsidProfile:
         'python': {
             'json': """
         # NEED TO IMPLEMENT
-        raise errors.Unimplemented()"""
+        raise errors.Unimplemented()""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -277,13 +295,26 @@ class OsidManager:
     initialize = {
         'python': {
             'json': """
-    def ${method_name}(self):
+    def ${method_name}(self, runtime):
         ${doc_string}
         OsidProfile._initialize_manager(self, runtime)""",
             'authz': """
     def ${method_name}(self, runtime):
         ${pattern_name}
-        OsidProfile.initialize(self, runtime)"""
+        OsidProfile.initialize(self, runtime)""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
+        }
+    }
+
+    rollback_service = {
+        'python': {
+            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
+        }
+    }
+
+    change_branch = {
+        'python': {
+            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
         }
     }
 
@@ -333,6 +364,14 @@ class OsidProxyManager:
     }
 
 
+class OsidRuntimeProfile:
+    supports_configuration = {
+        'python': {
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
+        }
+    }
+
+
 class OsidRuntimeManager:
 
     import_statements = {
@@ -348,6 +387,28 @@ class OsidRuntimeManager:
             'json': """
     def __init__(self, configuration_key=None):
         self._configuration_key = configuration_key"""
+        }
+    }
+
+    get_manager = {
+        'python': {
+            'manager': """
+    def ${method_name}(self, osid=None, impl_class_name=None, version=None):
+        ${doc_string}
+        ${pattern_name}
+        raise Unimplemented()"""
+        }
+    }
+
+    get_proxy_manager = {
+        'python': {
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
+        }
+    }
+
+    get_configuration = {
+        'python': {
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -627,6 +688,9 @@ class Sourceable:
                 'from dlkit.primordium.id.primitives import Id',
                 'from dlkit.primordium.locale.primitives import DisplayText',
                 'from .. import types'
+            ],
+            'manager': [
+                'from .osid_errors import Unimplemented'
             ]
         }
     }
@@ -638,7 +702,8 @@ class Sourceable:
         ${doc_string}
         if 'providerId' not in self._my_map or not self._my_map['providerId']:
             raise errors.IllegalState('this sourceable object has no provider set')
-        return Id(self._my_map['providerId'])"""
+        return Id(self._my_map['providerId'])""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -652,7 +717,8 @@ class Sourceable:
         mgr = self._get_provider_manager('RESOURCE')
         lookup_session = mgr.get_resource_lookup_session()  # What about the Proxy?
         lookup_session.use_federated_bin_view()
-        return lookup_session.get_resource(self.get_provider_id())"""
+        return lookup_session.get_resource(self.get_provider_id())""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -667,7 +733,8 @@ class Sourceable:
         id_list = []
         for idstr in self._my_map['brandingIds']:
             id_list.append(Id(idstr))
-        return IdList(id_list)"""
+        return IdList(id_list)""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -679,7 +746,8 @@ class Sourceable:
         mgr = self._get_provider_manager('REPOSITORY')
         lookup_session = mgr.get_asset_lookup_session()
         lookup_session.use_federated_repository_view()
-        return lookup_session.get_assets_by_ids(self.get_branding_ids())"""
+        return lookup_session.get_assets_by_ids(self.get_branding_ids())""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -694,7 +762,8 @@ class Sourceable:
         return DisplayText(text='',
                            language_type=types.Language().get_type_data('DEFAULT'),
                            format_type=types.Format().get_type_data('DEFAULT'),
-                           script_type=types.Script().get_type_data('DEFAULT'))"""
+                           script_type=types.Script().get_type_data('DEFAULT'))""",
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
         }
     }
 
@@ -2506,6 +2575,37 @@ class OsidList:
 
     def len(self):
         \"\"\"Returns number of available elements\"\"\"
+        return self.available()""",
+            'authz': """
+    def __init__(self, iter_object=None, count=None, db_prefix='', runtime=None):
+        if iter_object is None:
+            iter_object = []
+        if count is not None:
+            self._count = count
+        elif isinstance(iter_object, dict) or isinstance(iter_object, list):
+            self._count = len(iter_object)
+        else:
+            self._count = None
+        self._runtime = runtime
+        self._db_prefix = db_prefix
+        self._iter_object = iter(iter_object)
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        \"\"\"Iterator 'next' method\"\"\"
+        try:
+            next_object = next(self._iter_object)
+        except:
+            raise
+        if self._count is not None:
+            self._count -= 1
+        return next_object
+
+    __next__ = next
+
+    def len(self):
         return self.available()"""
         }
     }
@@ -2515,6 +2615,16 @@ class OsidList:
             'json': """
     def ${method_name}(self):
         ${doc_string}
+        if self._count is not None:
+            # If count is available, use it
+            return bool(self._count)
+        else:
+            # otherwise we have no idea
+            return True""",
+            'manager': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
         if self._count is not None:
             # If count is available, use it
             return bool(self._count)
@@ -2534,6 +2644,16 @@ class OsidList:
             return self._count
         else:
             # We have no idea.
+            return 0  # Don't know what to do here""",
+            'manager': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
+        if self._count is not None:
+            # If count is available, use it
+            return self._count
+        else:
+            # We have no idea.
             return 0  # Don't know what to do here"""
         }
     }
@@ -2547,7 +2667,13 @@ class OsidList:
             self._iter_object.skip(n)
         except AttributeError:
             for i in range(0, n):
-                next(self)"""
+                next(self)""",
+            'manager': """
+    def ${method_name}(self):
+        ${doc_string}
+        ${pattern_name}
+        # STILL NEED TO IMPLEMENT THIS ###
+        pass"""
         }
     }
 

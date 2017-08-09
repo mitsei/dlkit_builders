@@ -556,8 +556,9 @@ except ImportError:
     def interface_maps(self, interface_maps_dir):
         self._interface_maps_dir = self._make_dir(interface_maps_dir)
 
-    @staticmethod
-    def is_proxy_manager(interface):
+    def is_proxy_manager(self, interface):
+        if self.package['name'] == 'proxy':
+            return 'ProxyProxyManager' in interface['shortname']
         return 'ProxyManager' in interface['shortname']
 
     def module_body(self, interface):
