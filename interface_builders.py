@@ -290,6 +290,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
                 'implpkg_name': self._abc_pkg_name(abc=False, reserved_word=False),
                 'kitpkg_name': self._abc_pkg_name(abc=False),
                 'pkg_name': self.package['name'],
+                'base_pkg_name': self.package['name'].split('.')[0],
                 'base_pkg_name_reserved': fixed_package_name.split('.')[0],
                 'pkg_name_caps': self.first(self.package['name']).title(),
                 'pkg_name_replaced': self.replace(self.package['name']),
@@ -422,7 +423,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         self.write_modules(modules)
 
     def _package_to_be_implemented(self):
-        if self._is('tests') and self.package['name'] not in packages_to_test:
+        if (self._is('tests') or self._is('test_authz')) and self.package['name'] not in packages_to_test:
             return False
 
         if self.package['name'] not in managers_to_implement:

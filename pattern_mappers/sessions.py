@@ -1201,7 +1201,8 @@ def map_session_patterns(interface, package, index):
                 method['return_type'] == 'boolean'):
             pattern = 'resource.ResourceLookupSession.can_lookup_resources'
 
-            if interface['shortname'].startswith(index['package_catalog_caps']):
+            # if interface['shortname'].startswith(index['package_catalog_caps']):
+            if interface['shortname'].replace('LookupSession', '') == index['package_catalog_caps']:
                 pattern = 'resource.BinLookupSession.can_lookup_bins'
 
             index[interface['shortname'] + '.' + method['name']] = dict(

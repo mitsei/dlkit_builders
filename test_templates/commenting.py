@@ -59,6 +59,110 @@ def ${interface_name_under}_test_fixture(request):
     request.cls.session = request.cls.catalog"""
 
 
+class CommentBookSession:
+
+    init = """
+@pytest.fixture(scope="class",
+                params=['TEST_SERVICE'])
+def comment_book_session_class_fixture(request):
+    # From test_templates/resource.py::ResourceBinSession::init_template
+    request.cls.service_config = request.param
+    request.cls.comment_list = list()
+    request.cls.comment_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'COMMENTING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_book_form_for_create([])
+        create_form.display_name = 'Test Book'
+        create_form.description = 'Test Book for CommentBookSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_book(create_form)
+        create_form = request.cls.svc_mgr.get_book_form_for_create([])
+        create_form.display_name = 'Test Book for Assignment'
+        create_form.description = 'Test Book for CommentBookSession tests assignment'
+        request.cls.assigned_catalog = request.cls.svc_mgr.create_book(create_form)
+        for num in [0, 1, 2]:
+            create_form = request.cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+            create_form.display_name = 'Test Comment ' + str(num)
+            create_form.description = 'Test Comment for CommentBookSession tests'
+            obj = request.cls.catalog.create_comment(create_form)
+            request.cls.comment_list.append(obj)
+            request.cls.comment_ids.append(obj.ident)
+        request.cls.svc_mgr.assign_comment_to_book(
+            request.cls.comment_ids[1], request.cls.assigned_catalog.ident)
+        request.cls.svc_mgr.assign_comment_to_book(
+            request.cls.comment_ids[2], request.cls.assigned_catalog.ident)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.unassign_comment_from_book(
+                request.cls.comment_ids[1], request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.unassign_comment_from_book(
+                request.cls.comment_ids[2], request.cls.assigned_catalog.ident)
+            for obj in request.cls.catalog.get_comments():
+                request.cls.catalog.delete_comment(obj.ident)
+            request.cls.svc_mgr.delete_book(request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.delete_book(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def comment_book_session_test_fixture(request):
+    # From test_templates/resource.py::ResourceBinSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
+
+
+class CommentBookAssignmentSession:
+
+    init = """
+@pytest.fixture(scope="class",
+                params=['TEST_SERVICE'])
+def comment_book_assignment_session_class_fixture(request):
+    # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+    request.cls.service_config = request.param
+    request.cls.comment_list = list()
+    request.cls.comment_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'COMMENTING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_book_form_for_create([])
+        create_form.display_name = 'Test Book'
+        create_form.description = 'Test Book for CommentBookAssignmentSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_book(create_form)
+        create_form = request.cls.svc_mgr.get_book_form_for_create([])
+        create_form.display_name = 'Test Book for Assignment'
+        create_form.description = 'Test Book for CommentBookAssignmentSession tests assignment'
+        request.cls.assigned_catalog = request.cls.svc_mgr.create_book(create_form)
+        for num in [0, 1, 2]:
+            create_form = request.cls.catalog.get_comment_form_for_create(AGENT_ID, [])
+            create_form.display_name = 'Test Comment ' + str(num)
+            create_form.description = 'Test Comment for CommentBookAssignmentSession tests'
+            obj = request.cls.catalog.create_comment(create_form)
+            request.cls.comment_list.append(obj)
+            request.cls.comment_ids.append(obj.ident)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_comments():
+                request.cls.catalog.delete_comment(obj.ident)
+            request.cls.svc_mgr.delete_book(request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.delete_book(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def comment_book_assignment_session_test_fixture(request):
+    # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
+
+
 class CommentForm:
     import_statements = [
         'from dlkit.runtime import PROXY_SESSION, proxy_example',

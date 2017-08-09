@@ -88,7 +88,7 @@ class ResourceManager:
 
     get_resource_admin_session_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceManager.get_resource_lookup_session_template
+        # osid.resource.ResourceManager.get_resource_admin_session_template
         return getattr(sessions, '${return_type}')(
             provider_session=self._provider_manager.${method_name}(),
             authz_session=self._get_authz_session(),
@@ -175,7 +175,7 @@ class ResourceProxyManager:
 
     get_resource_admin_session_template = """
         # Implemented from azosid template for -
-        # osid.resource.ResourceManager.get_resource_lookup_session_template
+        # osid.resource.ResourceManager.get_resource_admin_session_template
         return getattr(sessions, '${return_type}')(
             provider_session=self._provider_manager.${method_name}(proxy),
             authz_session=self._get_authz_session(),

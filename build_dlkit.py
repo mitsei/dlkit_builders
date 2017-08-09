@@ -227,7 +227,11 @@ class BaseBuilder(Utilities):
             additional_methods = getattr(impl_class, 'additional_methods')
 
         # add in the init context, to get some package template vars
-        init_context = self._get_init_context('', interface)
+        if interface['shortname'] + '.init_pattern' in self.patterns:
+            init_pattern = self.patterns[interface['shortname'] + '.init_pattern']
+        else:
+            init_pattern = ''
+        init_context = self._get_init_context(init_pattern, interface)
         template = string.Template(additional_methods)
         return template.substitute(init_context)
 
@@ -372,10 +376,17 @@ class BaseBuilder(Utilities):
         if package_name in ['type', 'proxy']:
             is_catalog_session = False
         elif (interface['category'] == 'sessions' and
-                interface['shortname'].startswith('GradebookColumn')):
-            is_catalog_session = True
+                interface['shortname'] in [
+                    'LogEntryLogSession',
+                    'LogEntryLogAssignmentSession',
+                    'GradebookColumnGradebookSession',
+                    'GradebookColumnGradebookAssignmentSession']):
+            is_catalog_session = False
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].startswith('LogEntry')):
+            is_catalog_session = True
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('GradebookColumn')):
             is_catalog_session = True
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
@@ -397,10 +408,17 @@ class BaseBuilder(Utilities):
         if package_name in ['type', 'proxy'] and interface['category'] == 'sessions':
             is_manager_session = True
         elif (interface['category'] == 'sessions' and
-                interface['shortname'].startswith('GradebookColumn')):
-            is_manager_session = False
+                interface['shortname'] in [
+                    'LogEntryLogSession',
+                    'LogEntryLogAssignmentSession',
+                    'GradebookColumnGradebookSession',
+                    'GradebookColumnGradebookAssignmentSession']):
+            is_manager_session = True
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].startswith('LogEntry')):
+            is_manager_session = False
+        elif (interface['category'] == 'sessions' and
+                interface['shortname'].startswith('GradebookColumn')):
             is_manager_session = False
         elif (interface['category'] == 'sessions' and
                 interface['shortname'].endswith(patterns['package_catalog_caps'] + 'Session')):
@@ -869,6 +887,13 @@ class Builder(Utilities):
         else:
             TestBuilder(build_dir=self.build_dir).make()
 
+    def testauthz(self, create_parent_dir=False):
+        from testauthzbuilder import TestAuthZBuilder
+        if create_parent_dir:
+            TestAuthZBuilder(build_dir=self.build_dir + '/../tests').make()
+        else:
+            TestAuthZBuilder(build_dir=self.build_dir).make()
+
     def update_hash_file(self):
         """Create / update a simple file that keeps track of what
          builder commit was used to generate the files"""
@@ -901,6 +926,7 @@ if __name__ == '__main__':
         print("  services: build the dlkit convenience service impls")
         print("  manager: build the manager_impls base classes")
         print("  tests: build the tests")
+        print("  testauthz: builds special object tests for authz adaptation")
         print("  docs: build the documentation in Sphinx format")
         print("  --all: build all of the above")
         print("  --buildto <directory>: the target build-to directory")
@@ -934,6 +960,7 @@ if __name__ == '__main__':
                     'services',
                     'manager',
                     'tests',
+                    'testauthz',
                     'docs',
                     'help',
                     '?']
@@ -1007,6 +1034,10 @@ if __name__ == '__main__':
                 if '--buildto' not in sys.argv:
                     raise AttributeError('tests requires a --buildto when built individually')
                 builder.tests(non_test_build)
+            if 'testauthz' in sys.argv:
+                if '--buildto' not in sys.argv:
+                    raise AttributeError('testauthz requires a --buildto when built individually')
+                builder.testauthz(non_test_build)
             if 'docs' in sys.argv:
                 builder.docs()
             # Create a build-hash file so we know what commit built dlkit

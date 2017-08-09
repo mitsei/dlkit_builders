@@ -364,12 +364,14 @@ class MethodBuilder(BaseBuilder, Templates, Utilities):
                 continue
 
             try:
-                body.append(self._make_method(method, interface))
+                method_str = self._make_method(method, interface)
+                if method_str.strip():  # to suppress new lines in unimplemented methods
+                    body.append(method_str)
             except SkipMethod:
                 # Only expected from kitosid / services builder
                 pass
             else:
-                if not self._is('tests'):
+                if not self._is('tests') and not self._is('test_authz'):  # Should be a boolean flag, something like if self._make_properties (returns boolean)
                     # Here is where we add the Python properties stuff:
                     if argless_get(method):
                         body.append(simple_property('get', method))

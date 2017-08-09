@@ -150,7 +150,6 @@ class KitBuilder(InterfaceBuilder, BaseBuilder):
                                                                                                         sub_package['name'],
                                                                                                         sub_interface_name)
                                 sub_package_methods += sub_methods
-
         return sub_package_methods
 
     def _get_template_name(self, pattern, interface_name, method_name):
