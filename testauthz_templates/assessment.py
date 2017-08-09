@@ -17,8 +17,8 @@ def authz_adapter_test_fixture(request):
             request.cls.${object_name_under}_id_lists.append([])
             for color in ['Red', 'Blue', 'Red']:
                 create_form = ${cat_name_under}_.get_${object_name_under}_form_for_create(request.cls.assessment.ident, [])
-                create_form.display_name = color + ' ' + str(count) + ' ${object_name}'
-                create_form.description = color + ' ${object_name_under} for authz adapter tests from ${cat_name} number ' + str(count)
+                create_form.display_name = color + ' ' + str(count) + ' AssessmentOfferd'
+                create_form.description = color + ' ${object_name_under} for authz adapter tests from AssessmentOfferd number ' + str(count)
                 if color == 'Blue':
                     create_form.genus_type = BLUE_TYPE
                 ${object_name_under} = ${cat_name_under}_.create_${object_name_under}(create_form)
