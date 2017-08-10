@@ -63,7 +63,7 @@ class CommentBookSession:
 
     init = """
 @pytest.fixture(scope="class",
-                params=['TEST_SERVICE'])
+                params=${test_service_configs})
 def comment_book_session_class_fixture(request):
     # From test_templates/resource.py::ResourceBinSession::init_template
     request.cls.service_config = request.param
@@ -119,7 +119,7 @@ class CommentBookAssignmentSession:
 
     init = """
 @pytest.fixture(scope="class",
-                params=['TEST_SERVICE'])
+                params=${test_service_configs})
 def comment_book_assignment_session_class_fixture(request):
     # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
     request.cls.service_config = request.param
