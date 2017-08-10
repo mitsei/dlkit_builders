@@ -678,28 +678,28 @@ class ResourceBinSession:
         # osid.resource.ResourceBinSession.get_resource_ids_by_bin
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.${method_name}(${cat_name_under}_id)"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_resources_by_bin_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_resources_by_bin_template
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.${method_name}(${cat_name_under}_id)"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_resource_ids_by_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_resource_ids_by_bins
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.${method_name}(${cat_name_under}_ids)"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_resources_by_bins_template = """
         # Implemented from azosid template for -
         # osid.resource.ResourceBinSession.get_resources_by_bins
         if not self._can('lookup'):
             raise PermissionDenied()
-        return self._provider_session.${method_name}(${cat_name_under}_ids)"""
+        return self._provider_session.${method_name}(${arg0_name})"""
 
     get_bin_ids_by_resource_template = """
         # Implemented from azosid template for -

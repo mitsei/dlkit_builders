@@ -711,7 +711,7 @@ class ActivityQuerySession:
 
     init = """
 @pytest.fixture(scope="class",
-                params=['TEST_SERVICE'])
+                params=${test_service_configs})
 def activity_query_session_class_fixture(request):
     request.cls.service_config = request.param
     request.cls.svc_mgr = Runtime().get_service_manager(
@@ -961,7 +961,7 @@ class ProficiencyObjectiveBankAssignmentSession:
 
     init = """
 @pytest.fixture(scope="class",
-                params=['TEST_SERVICE'])
+                params=${test_service_configs})
 def proficiency_objective_bank_assignment_session_class_fixture(request):
     request.cls.service_config = request.param
     request.cls.proficiency_list = list()
