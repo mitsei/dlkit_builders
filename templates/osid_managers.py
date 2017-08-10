@@ -114,6 +114,118 @@ class GenericAdapterProfileAndManager(object):
         }
     }
 
+    assert_bool = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        assert isinstance(self.mgr.${method_name}(), bool)"""
+        }
+    }
+
+    assert_type_list = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        assert isinstance(self.mgr.${method_name}(), abc_type_list)"""
+        }
+    }
+
+    get_session_no_proxy = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}()"""
+        }
+    }
+
+    get_session_with_proxy = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(PROXY)
+        with pytest.raises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+        }
+    }
+
+    get_session_with_receiver_no_proxy = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.receiver)
+        with pytest.raises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+        }
+    }
+
+    get_session_with_receiver_proxy = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.receiver, proxy=PROXY)
+        with pytest.raises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+        }
+    }
+
+    get_session_with_catalog_no_proxy = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.catalog_id)
+        with pytest.raises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+        }
+    }
+
+    get_session_with_catalog_proxy = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.catalog_id, PROXY)
+        with pytest.raises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+        }
+    }
+
+    get_session_with_catalog_and_receiver_no_proxy = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.receiver, self.catalog_id)
+        with pytest.raises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+        }
+    }
+
+    get_session_with_catalog_receiver_proxy = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if self.svc_mgr.supports_${support_check}():
+            self.svc_mgr.${method_name}(self.receiver, self.catalog_id, proxy=PROXY)
+        with pytest.raises(errors.NullArgument):
+            self.svc_mgr.${method_name}()"""
+        }
+    }
+
 
 class GenericProfile(object):
     import_statements_pattern = {
@@ -129,6 +241,17 @@ class GenericProfile(object):
             'manager': [
                 'from ..type.objects import TypeList',
                 'from ..osid.osid_errors import NullArgument',
+            ],
+            'tests': [
+                'from dlkit.runtime import PROXY_SESSION, proxy_example',
+                'from dlkit.runtime.managers import Runtime',
+                'REQUEST = proxy_example.SimpleRequest()',
+                'CONDITION = PROXY_SESSION.get_proxy_condition()',
+                'CONDITION.set_http_request(REQUEST)',
+                'PROXY = PROXY_SESSION.get_proxy(CONDITION)',
+                'from dlkit.primordium.type.primitives import Type',
+                'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+                'from dlkit.abstract_osid.type.objects import TypeList as abc_type_list'
             ]
         }
     }
@@ -151,7 +274,21 @@ class GenericProfile(object):
         try:
             return self._provider_manager.get_${cat_name_under}_hierarchy_session()
         except Unimplemented:
-            return None"""
+            return None""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
         }
     }
 
@@ -164,7 +301,8 @@ class GenericProfile(object):
         return '${method_name}' in profile.SUPPORTS""",
             'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
             'authz': GenericAdapterProfileAndManager.method_no_args['python']['services'],
-            'manager': GenericAdapterProfileAndManager.return_false['python']['manager']
+            'manager': GenericAdapterProfileAndManager.return_false['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.assert_bool['python']['tests']
         }
     }
 
@@ -177,7 +315,8 @@ class GenericProfile(object):
         return '${method_name}' in profile.SUPPORTS""",
             'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
             'authz': GenericAdapterProfileAndManager.method_no_args['python']['services'],
-            'manager': GenericAdapterProfileAndManager.return_false['python']['manager']
+            'manager': GenericAdapterProfileAndManager.return_false['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.assert_bool['python']['tests']
         }
     }
 
@@ -194,7 +333,8 @@ class GenericProfile(object):
         return TypeList(record_types)""",
             'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
             'authz': GenericAdapterProfileAndManager.method_no_args['python']['services'],
-            'manager': GenericAdapterProfileAndManager.return_typelist['python']['manager']
+            'manager': GenericAdapterProfileAndManager.return_typelist['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.assert_type_list['python']['tests']
         }
     }
 
@@ -213,7 +353,8 @@ class GenericProfile(object):
                 supports = True
         return supports""",
             'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
-            'manager': GenericAdapterProfileAndManager.return_false_one_arg['python']['manager']
+            'manager': GenericAdapterProfileAndManager.return_false_one_arg['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.assert_bool['python']['tests']
         }
     }
 
@@ -225,7 +366,8 @@ class GenericProfile(object):
         ${pattern_name}
         return TypeList([])""",
             'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
-            'manager': GenericAdapterProfileAndManager.return_typelist['python']['manager']
+            'manager': GenericAdapterProfileAndManager.return_typelist['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.assert_type_list['python']['tests']
         }
     }
 
@@ -237,7 +379,8 @@ class GenericProfile(object):
         ${pattern_name}
         return False""",
             'services': GenericAdapterProfileAndManager.method_no_args['python']['services'],
-            'manager': GenericAdapterProfileAndManager.return_false_one_arg['python']['manager']
+            'manager': GenericAdapterProfileAndManager.return_false_one_arg['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.assert_bool['python']['tests']
         }
     }
 
@@ -252,6 +395,9 @@ class GenericManager(object):
             'manager': [
                 'from ..osid.osid_errors import Unimplemented',
                 'from ..osid.osid_errors import NullArgument',
+            ],
+            'tests': [
+                'from dlkit.abstract_osid.osid import errors'
             ]
         }
     }
@@ -384,7 +530,42 @@ class GenericManager(object):
         parameter_id = Id('parameter:${pkg_name_replaced}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         self._provider_manager = runtime.get_manager('${pkg_name_replaced_upper}', provider_impl)
-        # need to add version argument"""
+        # need to add version argument""",
+            'tests': """
+class NotificationReceiver(object):
+    # Implemented from resource.ResourceManager
+    pass
+
+
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from resource.ResourceManager
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${pkg_name} manager tests'
+        catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog_id = catalog.get_id()
+        request.cls.receiver = NotificationReceiver()
+    else:
+        request.cls.catalog_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog_id)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Implemented from resource.ResourceManager
+    pass"""
         }
     }
 
@@ -414,7 +595,8 @@ class GenericManager(object):
             override_lookup_session=self._get_override_lookup_session(),
             hierarchy_session=self._get_hierarchy_session(),
             query_session=query_session)""",
-            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager']
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.get_session_no_proxy['python']['tests']
         }
     }
 
@@ -461,7 +643,8 @@ class GenericManager(object):
             override_lookup_session=self._get_override_lookup_session(),
             hierarchy_session=self._get_hierarchy_session(),
             query_session=query_session)""",
-            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
+            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.get_session_with_catalog_no_proxy['python']['tests']
         }
     }
 
@@ -499,7 +682,8 @@ class GenericManager(object):
             authz_session=self._get_authz_session(),
             override_lookup_session=self._get_override_lookup_session(),
             provider_manager=self._provider_manager)""",
-            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager']
+            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.get_session_with_receiver_no_proxy['python']['tests']
         }
     }
 
@@ -534,16 +718,36 @@ class GenericManager(object):
             authz_session=self._get_authz_session(),
             override_lookup_session=self._get_override_lookup_session(),
             provider_manager=self._provider_manager)""",
-            'manager': GenericAdapterProfileAndManager.unimplemented_two_args['python']['manager']
+            'manager': GenericAdapterProfileAndManager.unimplemented_two_args['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.get_session_with_catalog_and_receiver_no_proxy['python']['tests']
         }
     }
 
-    get_object_smart_catalog_session_template = GenericAdapterProfileAndManager.unimplemented_one_arg
+    get_object_smart_catalog_session_template = {
+        'python': {
+            'manager': GenericAdapterProfileAndManager.unimplemented_one_arg['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.get_session_no_proxy['python']['tests']
+        }
+    }
 
-    get_object_batch_manager_template = GenericAdapterProfileAndManager.unimplemented_no_args
+    get_object_batch_manager_template = {
+        'python': {
+            'manager': GenericAdapterProfileAndManager.unimplemented_no_args['python']['manager'],
+            'tests': GenericAdapterProfileAndManager.get_session_no_proxy['python']['tests']
+        }
+    }
 
 
 class GenericProxyManager(object):
+    import_statements_template = {
+        'python': {
+            'tests': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from dlkit.primordium.id.primitives import Id'
+            ]
+        }
+    }
+
     init_template = {
         'python': {
             'json': """
@@ -560,6 +764,83 @@ class GenericProxyManager(object):
         parameter_id = Id('parameter:${pkg_name_replaced}ProviderImpl@authz_adapter')
         provider_impl = config.get_value_by_parameter(parameter_id).get_string_value()
         self._provider_manager = runtime.get_proxy_manager('${pkg_name_replaced_upper}', provider_impl)
-        # need to add version argument"""
+        # need to add version argument""",
+            'tests': """
+class NotificationReceiver(object):
+    # Implemented from resource.ResourceProxyManager
+    pass
+
+
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # Implemented from resource.ResourceProxyManager
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${pkg_name} proxy manager tests'
+        catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.catalog_id = catalog.get_id()
+    else:
+        request.cls.catalog_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+    request.cls.receiver = NotificationReceiver()
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog_id)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Implemented from resource.ResourceProxyManager
+    pass"""
+        }
+    }
+
+    get_object_lookup_session_template = {
+        'python': {
+            'tests': GenericAdapterProfileAndManager.get_session_with_proxy['python']['tests']
+        }
+    }
+
+    get_object_admin_session_template = deepcopy(get_object_lookup_session_template)
+
+    get_object_lookup_session_for_catalog_template = {
+        'python': {
+            'tests': GenericAdapterProfileAndManager.get_session_with_catalog_proxy['python']['tests']
+        }
+    }
+
+    get_object_admin_session_for_catalog_template = deepcopy(get_object_lookup_session_for_catalog_template)
+
+    get_object_notification_session_template = {
+        'python': {
+            'tests': GenericAdapterProfileAndManager.get_session_with_receiver_proxy['python']['tests']
+        }
+    }
+
+    get_object_notification_session_for_catalog_template = {
+        'python': {
+            'tests': GenericAdapterProfileAndManager.get_session_with_catalog_receiver_proxy['python']['tests']
+        }
+    }
+
+    get_object_smart_catalog_session_template = {
+        'python': {
+            'tests': GenericAdapterProfileAndManager.get_session_with_proxy['python']['tests']
+        }
+    }
+
+    get_object_batch_proxy_manager_template = {
+        'python': {
+            'tests': GenericAdapterProfileAndManager.get_session_with_proxy['python']['tests']
         }
     }

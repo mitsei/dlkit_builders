@@ -7,6 +7,18 @@ class GenericObjectSearch(object):
                 'from ..primitives import Id',
                 'from ..osid import searches as osid_searches',
                 'from ..utilities import get_registry',
+            ],
+            'tests': [
+                'from dlkit.runtime import PROXY_SESSION, proxy_example',
+                'from dlkit.runtime.managers import Runtime',
+                'REQUEST = proxy_example.SimpleRequest()',
+                'CONDITION = PROXY_SESSION.get_proxy_condition()',
+                'CONDITION.set_http_request(REQUEST)',
+                'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.type.primitives import Type',
+                'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+                'from dlkit.abstract_osid.osid import errors',
             ]
         }
     }
@@ -25,7 +37,32 @@ class GenericObjectSearch(object):
         self._id_list = None
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)"""
+        osid_searches.OsidSearch.__init__(self, runtime)""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::ResourceSearch::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+    create_form.display_name = 'Test catalog'
+    create_form.description = 'Test catalog description'
+    request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+
+    def class_tear_down():
+        request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceSearch::init_template
+    request.cls.search = request.cls.catalog.get_${object_name_under}_search()"""
         }
     }
 

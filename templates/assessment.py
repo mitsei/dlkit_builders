@@ -2779,7 +2779,42 @@ class Question:
         if 'item_id' in kwargs:
             self._item_id = kwargs['item_id']
         else:
-            self._item_id = Id(kwargs['osid_object_map']['itemId'])"""
+            self._item_id = Id(kwargs['osid_object_map']['itemId'])""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        item_form = request.cls.catalog.get_item_form_for_create([])
+        item_form.display_name = 'Item'
+        request.cls.item = request.cls.catalog.create_item(item_form)
+
+        form = request.cls.catalog.get_question_form_for_create(request.cls.item.ident, [])
+        form.display_name = 'Test question'
+        request.cls.question = request.cls.catalog.create_question(form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.object = request.cls.question"""
         }
     }
 
@@ -2839,7 +2874,181 @@ class Question:
     }
 
 
+class QuestionForm:
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        item_form = request.cls.catalog.get_item_form_for_create([])
+        item_form.display_name = 'Item'
+        request.cls.item = request.cls.catalog.create_item(item_form)
+
+        request.cls.form = request.cls.catalog.get_question_form_for_create(request.cls.item.ident, [])
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
+        }
+    }
+
+
+class QuestionQuery:
+    import_statements = {
+        'python': {
+            'tests': [
+                'from dlkit.json_.assessment.queries import QuestionQuery'
+            ]
+        }
+    }
+
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Since the session isn't implemented, we just construct a QuestionQuery directly
+    if not is_never_authz(request.cls.service_config):
+        request.cls.query = QuestionQuery(runtime=request.cls.catalog._runtime)"""
+        }
+    }
+
+
+class QuestionList:
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for QuestionList tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    from dlkit.json_.assessment.objects import QuestionList
+    request.cls.question_list = list()
+    request.cls.question_ids = list()
+    if not is_never_authz(request.cls.service_config):
+        for num in [0, 1]:
+            item_form = request.cls.catalog.get_item_form_for_create([])
+            item_form.display_name = 'Item'
+            item = request.cls.catalog.create_item(item_form)
+
+            create_form = request.cls.catalog.get_question_form_for_create(item.ident, [])
+            create_form.display_name = 'Test Question ' + str(num)
+            create_form.description = 'Test Question for QuestionList tests'
+            obj = request.cls.catalog.create_question(create_form)
+            request.cls.question_list.append(obj)
+            request.cls.question_ids.append(obj.ident)
+    request.cls.question_list = QuestionList(request.cls.question_list)"""
+        }
+    }
+
+
 class Answer:
+
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        item_form = request.cls.catalog.get_item_form_for_create([])
+        item_form.display_name = 'Item'
+        request.cls.item = request.cls.catalog.create_item(item_form)
+
+        form = request.cls.catalog.get_answer_form_for_create(request.cls.item.ident, [])
+        form.display_name = 'Test answer'
+        request.cls.answer = request.cls.catalog.create_answer(form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        request.cls.object = request.cls.answer"""
+        }
+    }
 
     additional_methods = {
         'python': {
@@ -2854,14 +3063,285 @@ class Answer:
     }
 
 
+class AnswerForm:
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        item_form = request.cls.catalog.get_item_form_for_create([])
+        item_form.display_name = 'Item'
+        request.cls.item = request.cls.catalog.create_item(item_form)
+
+        request.cls.form = request.cls.catalog.get_answer_form_for_create(request.cls.item.ident, [])
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
+        }
+    }
+
+
+class AnswerQuery:
+    import_statements = {
+        'python': {
+            'tests': [
+                'from dlkit.json_.assessment.queries import AnswerQuery'
+            ]
+        }
+    }
+
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # Since the session isn't implemented, we just construct a AnswerQuery directly
+    if not is_never_authz(request.cls.service_config):
+        request.cls.query = AnswerQuery(runtime=request.cls.catalog._runtime)"""
+        }
+    }
+
+
+class AnswerList:
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AnswerList tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    from dlkit.json_.assessment.objects import AnswerList
+    request.cls.answer_list = list()
+    request.cls.answer_ids = list()
+    if not is_never_authz(request.cls.service_config):
+        for num in [0, 1]:
+            item_form = request.cls.catalog.get_item_form_for_create([])
+            item_form.display_name = 'Item'
+            item = request.cls.catalog.create_item(item_form)
+
+            create_form = request.cls.catalog.get_answer_form_for_create(item.ident, [])
+            create_form.display_name = 'Test Answer ' + str(num)
+            create_form.description = 'Test Answer for AnswerList tests'
+            obj = request.cls.catalog.create_answer(create_form)
+            request.cls.answer_list.append(obj)
+            request.cls.answer_ids.append(obj.ident)
+    request.cls.answer_list = AnswerList(request.cls.answer_list)"""
+        }
+    }
+
+
 class Item:
+
+    import_statements = {
+        'python': {
+            'tests': [
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.type.primitives import Type',
+                'from dlkit.json_.assessment.objects import Question, AnswerList',
+                'from dlkit.json_.id.objects import IdList',
+                'from dlkit.json_.learning.objects import ObjectiveList'
+            ]
+        }
+    }
+
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.lsvc_mgr = Runtime().get_service_manager(
+        'LEARNING',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        create_form = request.cls.lsvc_mgr.get_objective_bank_form_for_create([])
+        create_form.display_name = 'Test objective bank'
+        create_form.description = 'Test objective bank description'
+        request.cls.bank = request.cls.lsvc_mgr.create_objective_bank(create_form)
+        request.cls.objectives = list()
+        for _ in range(2):
+            form = request.cls.bank.get_objective_form_for_create([])
+            objective = request.cls.bank.create_objective(form)
+            request.cls.objectives.append(objective)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+            for obj in request.cls.bank.get_objectives():
+                request.cls.bank.delete_objective(obj.ident)
+            request.cls.lsvc_mgr.delete_objective_bank(request.cls.bank.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_item_form_for_create([])
+        form.display_name = 'Test object'
+        form.set_learning_objectives([request.cls.objectives[0].ident,
+                                      request.cls.objectives[1].ident])
+        request.cls.item = request.cls.catalog.create_item(form)
+
+        form = request.cls.catalog.get_question_form_for_create(request.cls.item.ident, [])
+        request.cls.catalog.create_question(form)
+
+        form = request.cls.catalog.get_answer_form_for_create(request.cls.item.ident, [])
+        form.set_genus_type(Type('answer-genus%3Aright-answer%40ODL.MIT.EDU'))
+        request.cls.catalog.create_answer(form)
+
+        request.cls.item = request.cls.catalog.get_item(request.cls.item.ident)
+        request.cls.object = request.cls.item"""
+        }
+    }
+
+    get_learning_objective_ids = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            lo_ids = self.item.get_learning_objective_ids()
+            assert isinstance(lo_ids, IdList)
+            assert lo_ids.available() == 2
+            assert str(next(lo_ids)) == str(self.objectives[0].ident)
+            assert str(next(lo_ids)) == str(self.objectives[1].ident)"""
+        }
+    }
+
+    get_learning_objectives = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            los = self.item.get_learning_objectives()
+            assert isinstance(los, ObjectiveList)
+            assert los.available() == 2
+            assert str(next(los).ident) == str(self.objectives[0].ident)
+            assert str(next(los).ident) == str(self.objectives[1].ident)"""
+        }
+    }
+
+    get_answer_ids = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            answer_ids = self.item.get_answer_ids()
+            assert isinstance(answer_ids, IdList)
+            assert answer_ids.available() == 1"""
+        }
+    }
+
+    get_answers = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            answers = self.item.get_answers()
+            assert isinstance(answers, AnswerList)
+            assert answers.available() == 1
+            assert str(next(answers).genus_type) == 'answer-genus%3Aright-answer%40ODL.MIT.EDU'"""
+        }
+    }
 
     get_question_id = {
         'python': {
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        return self.get_question().get_id()"""
+        return self.get_question().get_id()""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            question_id = self.item.get_question_id()
+            assert isinstance(question_id, Id)
+            assert str(question_id) == str(self.item.ident)"""
         }
     }
 
@@ -2874,7 +3354,14 @@ class Item:
         question_map['learningObjectiveIds'] = self._my_map['learningObjectiveIds']
         return Question(osid_object_map=question_map,
                         runtime=self._runtime,
-                        proxy=self._proxy)"""
+                        proxy=self._proxy)""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            question = self.item.get_question()
+            assert isinstance(question, Question)
+            assert str(question.ident) == str(self.item.ident)"""
         }
     }
 
@@ -3161,7 +3648,152 @@ class AssessmentOffered:
                 'from ..primitives import DateTime',
                 'from ..primitives import Duration',
                 'from dlkit.abstract_osid.osid import errors',
+            ],
+            'tests': [
+                'import datetime',
+                'from dlkit.primordium.calendaring.primitives import DateTime, Duration',
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.json_.assessment.objects import Assessment'
             ]
+        }
+    }
+
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        form = request.cls.catalog.get_assessment_form_for_create([])
+        form.display_name = 'Assessment'
+        request.cls.assessment = request.cls.catalog.create_assessment(form)
+
+        form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident, [])
+        form.display_name = 'Test assessment offered'
+        form.set_start_time(DateTime.utcnow())
+        form.set_duration(Duration(hours=1))
+        deadline = DateTime.utcnow() + datetime.timedelta(days=4)
+        form.set_deadline(DateTime(year=deadline.year,
+                                   month=deadline.month,
+                                   day=deadline.day,
+                                   hour=deadline.hour,
+                                   minute=deadline.minute,
+                                   second=deadline.second,
+                                   microsecond=deadline.microsecond))
+        request.cls.object = request.cls.catalog.create_assessment_offered(form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments():
+                for offered in request.cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                    request.cls.catalog.delete_assessment_offered(offered.ident)
+                request.cls.catalog.delete_assessment(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
+        }
+    }
+
+    get_assessment_id = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_assessment_id(), Id)
+            assert str(self.object.get_assessment_id()) == str(self.assessment.ident)"""
+        }
+    }
+
+    get_assessment = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_assessment(), Assessment)
+            assert str(self.object.get_assessment().ident) == str(self.assessment.ident)"""
+        }
+    }
+
+    has_rubric = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set rubricId?
+        if not is_never_authz(self.service_config):
+            pytest.raises(KeyError,
+                          self.object.has_rubric)"""
+        }
+    }
+
+    get_rubric = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set rubricId?
+        if not is_never_authz(self.service_config):
+            pytest.raises(KeyError,
+                          self.object.get_rubric)"""
+        }
+    }
+
+    get_rubric_id = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set rubricId?
+        if not is_never_authz(self.service_config):
+            pytest.raises(KeyError,
+                          self.object.get_rubric_id)"""
+        }
+    }
+
+    is_graded = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set graded?
+        if not is_never_authz(self.service_config):
+            pytest.raises(KeyError,
+                          self.object.is_graded)"""
+        }
+    }
+
+    is_scored = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set scored?
+        if not is_never_authz(self.service_config):
+            pytest.raises(KeyError,
+                          self.object.is_scored)"""
         }
     }
 
@@ -3271,6 +3903,114 @@ class AssessmentOffered:
     }
 
 
+class AssessmentOfferedForm:
+    import_statements_pattern = {
+        'python': {
+            'tests': [
+                'from dlkit.primordium.calendaring.primitives import DateTime, Duration'
+            ]
+        }
+    }
+
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentOfferedLookupSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+        create_form = request.cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentOfferedLookupSession tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(create_form)
+
+        request.cls.form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident,
+                                                                                      [])
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments_offered():
+                request.cls.catalog.delete_assessment_offered(obj.ident)
+            for obj in request.cls.catalog.get_assessments():
+                request.cls.catalog.delete_assessment(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        request.cls.form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident,
+                                                                                      [])"""
+        }
+    }
+
+
+class AssessmentOfferedList:
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentOfferedList tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+        create_form = request.cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentOfferedList tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(create_form)
+
+        request.cls.form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident,
+                                                                                      [])
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments_offered():
+                request.cls.catalog.delete_assessment_offered(obj.ident)
+            for obj in request.cls.catalog.get_assessments():
+                request.cls.catalog.delete_assessment(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    from dlkit.json_.assessment.objects import AssessmentOfferedList
+    request.cls.assessment_offered_list = list()
+    request.cls.assessment_offered_ids = list()
+    if not is_never_authz(request.cls.service_config):
+        for num in [0, 1]:
+            form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident,
+                                                                              [])
+            form.display_name = 'Test AssessmentOffered ' + str(num)
+            form.description = 'Test AssessmentOffered for AssessmentOfferedList tests'
+            obj = request.cls.catalog.create_assessment_offered(form)
+            request.cls.assessment_offered_list.append(obj)
+            request.cls.assessment_offered_ids.append(obj.ident)
+    request.cls.assessment_offered_list = AssessmentOfferedList(request.cls.assessment_offered_list)"""
+        }
+    }
+
+
 class AssessmentOfferedQuery:
 
     # match_start_time_template = """
@@ -3305,6 +4045,15 @@ class AssessmentTaken:
                 'from bson.objectid import ObjectId',
                 'from ..primitives import DateTime, DisplayText',
                 'ASSESSMENT_AUTHORITY = \'assessment-session\''
+            ],
+            'tests': [
+                'from decimal import Decimal',
+                'from dlkit.abstract_osid.osid import errors',
+                'from dlkit.json_.assessment.objects import AssessmentOffered',
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.type.primitives import Type',
+                'from dlkit.records import registry',
+                'SEQUENCE_ASSESSMENT = Type(**registry.ASSESSMENT_RECORD_TYPES["simple-child-sequencing"])'
             ]
         }
     }
@@ -3317,7 +4066,145 @@ class AssessmentTaken:
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='ASSESSMENT_TAKEN', **kwargs)
         self._catalog_name = 'Bank'
-        self._assessment_sections = dict()"""
+        self._assessment_sections = dict()""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        form = request.cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
+        form.display_name = 'Assessment'
+        request.cls.assessment = request.cls.catalog.create_assessment(form)
+
+        form = request.cls.catalog.get_item_form_for_create([])
+        form.display_name = 'Test item'
+        request.cls.item = request.cls.catalog.create_item(form)
+
+        form = request.cls.catalog.get_question_form_for_create(request.cls.item.ident, [])
+        request.cls.catalog.create_question(form)
+        request.cls.item = request.cls.catalog.get_item(request.cls.item.ident)
+
+        request.cls.catalog.add_item(request.cls.assessment.ident, request.cls.item.ident)
+        request.cls.assessment = request.cls.catalog.get_assessment(request.cls.assessment.ident)
+
+        form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident, [])
+        form.display_name = 'Test assessment offered'
+        request.cls.offered = request.cls.catalog.create_assessment_offered(form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments():
+                for offered in request.cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                    for taken in request.cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                        request.cls.catalog.delete_assessment_taken(taken.ident)
+                    request.cls.catalog.delete_assessment_offered(offered.ident)
+                request.cls.catalog.delete_assessment(obj.ident)
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_assessment_taken_form_for_create(request.cls.offered.ident,
+                                                                        [])
+        request.cls.object = request.cls.catalog.create_assessment_taken(form)
+
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.catalog.delete_assessment_taken(request.cls.object.ident)
+
+    request.addfinalizer(test_tear_down)"""
+        }
+    }
+
+    get_assessment_offered_id = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_assessment_offered_id(), Id)
+            assert str(self.object.get_assessment_offered_id()) == str(self.offered.ident)"""
+        }
+    }
+
+    get_assessment_offered = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_assessment_offered(), AssessmentOffered)
+            assert str(self.object.get_assessment_offered().ident) == str(self.offered.ident)"""
+        }
+    }
+
+    has_rubric = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # This may be an error in the spec -- not in _my_map
+        # since there are no form methods to set this value?
+        if not is_never_authz(self.service_config):
+            pytest.raises(KeyError,
+                          self.object.${method_name})"""
+        }
+    }
+
+    get_rubric = {
+        'python': {
+            'tests': has_rubric['python']['tests']
+        }
+    }
+
+    get_rubric_id = {
+        'python': {
+            'tests': has_rubric['python']['tests']
+        }
+    }
+
+    is_graded = {
+        'python': {
+            'tests': has_rubric['python']['tests']
+        }
+    }
+
+    is_scored = {
+        'python': {
+            'tests': has_rubric['python']['tests']
+        }
+    }
+
+    get_score_system = {
+        'python': {
+            'tests': has_rubric['python']['tests']
+        }
+    }
+
+    get_score_system_id = {
+        'python': {
+            'tests': has_rubric['python']['tests']
+        }
+    }
+
+    get_feedback = {
+        'python': {
+            'tests': has_rubric['python']['tests']
         }
     }
 
@@ -3487,7 +4374,13 @@ class AssessmentTaken:
         if self._my_map['takerId']:
             return Id(self._my_map['takerId'])
         else:
-            return Id(self._my_map['takingAgentId'])"""
+            return Id(self._my_map['takingAgentId'])""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_taker_id(), Id)
+            assert str(self.object.get_taker_id()) == str(self.catalog._proxy.get_effective_agent_id())"""
         }
     }
 
@@ -3500,12 +4393,41 @@ class AssessmentTaken:
     #     }
     # }
 
+
+    get_taker = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.Unimplemented):
+                self.object.get_taker()"""
+        }
+    }
+
+    get_taking_agent = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.Unimplemented):
+                self.object.get_taking_agent()"""
+        }
+    }
+
     get_taking_agent_id = {
         'python': {
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        return Id(self._my_map['takingAgentId'])"""
+        return Id(self._my_map['takingAgentId'])""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_taking_agent_id(), Id)
+            assert str(self.object.get_taking_agent_id()) == str(self.catalog._proxy.get_effective_agent_id())"""
         }
     }
 
@@ -3527,7 +4449,13 @@ class AssessmentTaken:
         if assessment_offered.has_start_time():
             return DateTime.utcnow() >= assessment_offered.get_start_time()
         else:
-            return True"""
+            return True""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # tests if the assessment has begun
+        if not is_never_authz(self.service_config):
+            assert self.object.has_started()"""
         }
     }
 
@@ -3548,7 +4476,23 @@ class AssessmentTaken:
                             hour=start_time.hour,
                             minute=start_time.minute,
                             second=start_time.second,
-                            microsecond=start_time.microsecond)"""
+                            microsecond=start_time.microsecond)""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # tests if the taker has started the assessment
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.IllegalState):
+                self.object.actual_start_time
+            # Also test the other branches of this method
+            form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
+                                                                     [])
+            taken = self.catalog.create_assessment_taken(form)
+            section = self.catalog.get_first_assessment_section(taken.ident)
+            section.get_questions()
+            taken = self.catalog.get_assessment_taken(taken.ident)
+            assert isinstance(taken.actual_start_time, DateTime)
+            self.catalog.delete_assessment_taken(taken.ident)"""
         }
     }
 
@@ -3573,7 +4517,13 @@ class AssessmentTaken:
         elif assessment_offered.has_duration() and self._my_map['actualStartTime'] is not None:
             return now >= self._my_map['actualStartTime'] + assessment_offered.get_duration()
         else:
-            return False"""
+            return False""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # tests if the assessment is over
+        if not is_never_authz(self.service_config):
+            assert not self.object.has_ended()"""
         }
     }
 
@@ -3593,7 +4543,26 @@ class AssessmentTaken:
                         hour=completion_time.hour,
                         minute=completion_time.minute,
                         second=completion_time.second,
-                        microsecond=completion_time.microsecond)"""
+                        microsecond=completion_time.microsecond)""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # tests if the taker has "finished" the assessment
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.IllegalState):
+                self.object.completion_time
+            # Also test the other branches of this method
+            form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
+                                                                     [])
+            taken = self.catalog.create_assessment_taken(form)
+            section = self.catalog.get_first_assessment_section(taken.ident)
+            section.get_questions()
+
+            self.catalog.finish_assessment(taken.ident)
+
+            taken = self.catalog.get_assessment_taken(taken.ident)
+            assert isinstance(taken.completion_time, DateTime)
+            self.catalog.delete_assessment_taken(taken.ident)"""
         }
     }
 
@@ -3608,7 +4577,24 @@ class AssessmentTaken:
         if self._my_map['completionTime'] is not None:
             return self.get_completion_time() - self.get_actual_start_time()
         else:
-            raise errors.IllegalState()"""
+            raise errors.IllegalState()""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.IllegalState):
+                self.object.time_spent
+            # Also test the other branches of this method
+            form = self.catalog.get_assessment_taken_form_for_create(self.offered.ident,
+                                                                     [])
+            taken = self.catalog.create_assessment_taken(form)
+            section = self.catalog.get_first_assessment_section(taken.ident)
+            section.get_questions()
+
+            self.catalog.finish_assessment(taken.ident)
+            taken = self.catalog.get_assessment_taken(taken.ident)
+            assert isinstance(taken.time_spent, datetime.timedelta)
+            self.catalog.delete_assessment_taken(taken.ident)"""
         }
     }
 
@@ -3643,6 +4629,50 @@ class AssessmentTakenForm:
         }
     }
 
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentTakenForm tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+        create_form = request.cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentTakenForm tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(create_form)
+        create_form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident, [])
+        create_form.display_name = 'Test AssessmentOffered'
+        create_form.description = 'Test AssessmentOffered for AssessmentTakenForm tests'
+        request.cls.assessment_offered = request.cls.catalog.create_assessment_offered(create_form)
+
+        request.cls.form = request.cls.catalog.get_assessment_taken_form_for_create(request.cls.assessment_offered.ident, [])
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments_offered():
+                request.cls.catalog.delete_assessment_offered(obj.ident)
+            for obj in request.cls.catalog.get_assessments():
+                request.cls.catalog.delete_assessment(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
+        }
+    }
+
 
 class AssessmentTakenQuery:
     match_taking_agent_id = {
@@ -3664,6 +4694,70 @@ class AssessmentTakenQuery:
     }
 
 
+class AssessmentTakenList:
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentTakenList tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+        create_form = request.cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentTakenList tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(create_form)
+
+        form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident,
+                                                                          [])
+        request.cls.assessment_offered = request.cls.catalog.create_assessment_offered(form)
+
+        request.cls.form = request.cls.catalog.get_assessment_taken_form_for_create(request.cls.assessment_offered.ident,
+                                                                                    [])
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments_taken():
+                request.cls.catalog.delete_assessment_taken(obj.ident)
+            for obj in request.cls.catalog.get_assessments_offered():
+                request.cls.catalog.delete_assessment_offered(obj.ident)
+            for obj in request.cls.catalog.get_assessments():
+                request.cls.catalog.delete_assessment(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    from dlkit.json_.assessment.objects import AssessmentTakenList
+    request.cls.assessment_taken_list = list()
+    request.cls.assessment_taken_ids = list()
+    if not is_never_authz(request.cls.service_config):
+        for num in [0, 1]:
+            form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident,
+                                                                              [])
+            form.display_name = 'Test AssessmentOffered ' + str(num)
+            form.description = 'Test AssessmentOffered for AssessmentTakenList tests'
+            obj = request.cls.catalog.create_assessment_offered(form)
+
+            form = request.cls.catalog.get_assessment_taken_form_for_create(obj.ident, [])
+            obj = request.cls.catalog.create_assessment_taken(form)
+            request.cls.assessment_taken_list.append(obj)
+            request.cls.assessment_taken_ids.append(obj.ident)
+    request.cls.assessment_taken_list = AssessmentTakenList(request.cls.assessment_taken_list)"""
+        }
+    }
+
+
 class AssessmentQuery:
     # TODO: These all seem wrong, now that we have AssessmentParts??
     match_item_id = {
@@ -3671,7 +4765,16 @@ class AssessmentQuery:
             'json': """
     def ${method_name}(self, item_id, match):
         ${doc_string}
-        self._add_match('itemIds', str(item_id), match)"""
+        self._add_match('itemIds', str(item_id), match)""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+            self.query.match_item_id(test_id, match=True)
+            assert self.query._query_terms['itemIds'] == {
+                '$$in': [str(test_id)]
+            }"""
         }
     }
 
@@ -3680,7 +4783,16 @@ class AssessmentQuery:
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        self._clear_terms('itemIds')"""
+        self._clear_terms('itemIds')""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+            self.query.match_item_id(test_id, match=True)
+            assert 'itemIds' in self.query._query_terms
+            self.query.clear_item_id_terms()
+            assert 'itemIds' not in self.query._query_terms"""
         }
     }
 
@@ -3782,6 +4894,14 @@ class AssessmentSection:
                 'import json',
                 'UNANSWERED = 0',
                 'NULL_RESPONSE = 1',
+            ],
+            'tests': [
+                'from dlkit.abstract_osid.osid import errors',
+                'from dlkit.json_.assessment.objects import AssessmentTaken',
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.type.primitives import Type',
+                'from dlkit.records import registry',
+                'SEQUENCE_ASSESSMENT = Type(**registry.ASSESSMENT_RECORD_TYPES["simple-child-sequencing"])'
             ]
         }
     }
@@ -3927,7 +5047,215 @@ class AssessmentSection:
                 return self._assessment_part[name]
             except AttributeError:
                 return object.__getattribute__(self, name)
-        return object.__getattribute__(self, name)"""
+        return object.__getattribute__(self, name)""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        form = request.cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
+        form.display_name = 'Assessment'
+        request.cls.assessment = request.cls.catalog.create_assessment(form)
+
+        form = request.cls.catalog.get_item_form_for_create([])
+        form.display_name = 'Test item'
+        request.cls.item = request.cls.catalog.create_item(form)
+
+        form = request.cls.catalog.get_question_form_for_create(request.cls.item.ident, [])
+        request.cls.catalog.create_question(form)
+        request.cls.item = request.cls.catalog.get_item(request.cls.item.ident)
+
+        request.cls.catalog.add_item(request.cls.assessment.ident, request.cls.item.ident)
+        request.cls.assessment = request.cls.catalog.get_assessment(request.cls.assessment.ident)
+
+        form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident, [])
+        form.display_name = 'Test assessment offered'
+        request.cls.offered = request.cls.catalog.create_assessment_offered(form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments():
+                for offered in request.cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                    for taken in request.cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                        request.cls.catalog.delete_assessment_taken(taken.ident)
+                    request.cls.catalog.delete_assessment_offered(offered.ident)
+                request.cls.catalog.delete_assessment(obj.ident)
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_assessment_taken_form_for_create(request.cls.offered.ident,
+                                                                        [])
+        request.cls.taken = request.cls.catalog.create_assessment_taken(form)
+        request.cls.section = request.cls.catalog.get_first_assessment_section(request.cls.taken.ident)
+        request.cls.object = request.cls.section
+
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.catalog.delete_assessment_taken(request.cls.taken.ident)
+
+    request.addfinalizer(test_tear_down)"""
+        }
+    }
+
+    get_assessment_taken_id = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.section.get_assessment_taken_id(), Id)
+            assert str(self.section.get_assessment_taken_id()) == str(self.taken.ident)"""
+        }
+    }
+
+    get_assessment_taken = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.section.get_assessment_taken(), AssessmentTaken)
+            assert str(self.section.get_assessment_taken().ident) == str(self.taken.ident)"""
+        }
+    }
+
+    has_allocated_time = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.Unimplemented):
+                self.section.has_allocated_time()"""
+        }
+    }
+
+    get_allocated_time = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.Unimplemented):
+                self.section.get_allocated_time()"""
+        }
+    }
+
+    are_items_sequential = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # This does not throw an exception because of the SIMPLE_SEQUENCE record
+        if not is_never_authz(self.service_config):
+            assert not self.section.are_items_sequential()"""
+        }
+    }
+
+    are_items_shuffled = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # This does not throw an exception because of the SIMPLE_SEQUENCE record
+        if not is_never_authz(self.service_config):
+            assert not self.section.are_items_shuffled()"""
+        }
+    }
+
+
+class AssessmentSectionList:
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentSectionList tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+        create_form = request.cls.catalog.get_assessment_form_for_create([])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentSectionList tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(create_form)
+
+        request.cls.form = request.cls.catalog.get_assessment_part_form_for_create_for_assessment(request.cls.assessment.ident,
+                                                                                                  [])
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments():
+                request.cls.catalog.delete_assessment(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    from dlkit.json_.assessment.objects import AssessmentSectionList
+    request.cls.assessment_section_list = list()
+    request.cls.assessment_section_ids = list()
+
+    if not is_never_authz(request.cls.service_config):
+        for num in [0, 1]:
+            form = request.cls.catalog.get_assessment_part_form_for_create_for_assessment(request.cls.assessment.ident, [])
+
+            obj = request.cls.catalog.create_assessment_part_for_assessment(form)
+
+            request.cls.assessment_section_list.append(obj)
+            request.cls.assessment_section_ids.append(obj.ident)
+    request.cls.assessment_section_list = AssessmentSectionList(request.cls.assessment_section_list)"""
+        }
+    }
+
+    get_next_assessment_section = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPart
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.assessment_section_list.get_next_assessment_section(), AssessmentPart)"""
+        }
+    }
+
+    get_next_assessment_sections = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        from dlkit.abstract_osid.assessment.objects import AssessmentSectionList
+        from dlkit.abstract_osid.assessment_authoring.objects import AssessmentPart
+        if not is_never_authz(self.service_config):
+            new_list = self.assessment_section_list.get_next_assessment_sections(2)
+            assert isinstance(new_list, AssessmentSectionList)
+            for item in new_list:
+                assert isinstance(item, AssessmentPart)"""
         }
     }
 
@@ -4015,7 +5343,11 @@ class Response:
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        return self._item_id"""
+        return self._item_id""",
+            'tests': """
+    @pytest.mark.skip('unimplemented test')
+    def test_${method_name}(self):
+        pass"""
         }
     }
 
@@ -4041,7 +5373,11 @@ class Response:
                 item = ils.get_item(real_item_id)
             else:
                 raise errors.NotFound()
-        return item.get_question()"""
+        return item.get_question()""",
+            'tests': """
+    @pytest.mark.skip('unimplemented test')
+    def test_${method_name}(self):
+        pass"""
         }
     }
 
@@ -4054,7 +5390,11 @@ class Response:
             raise errors.Unsupported()
         if str(item_record_type) not in self._records:
             raise errors.Unimplemented()
-        return self._records[str(item_record_type)]"""
+        return self._records[str(item_record_type)]""",
+            'tests': """
+    @pytest.mark.skip('unimplemented test')
+    def test_${method_name}(self):
+        pass"""
         }
     }
 
@@ -4093,14 +5433,136 @@ class Response:
     }
 
 
+class ResponseList:
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ResponseList tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+        create_form = request.cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentSession tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(create_form)
+
+        for number in ['One', 'Two', 'Three', 'Four']:
+            ifc = request.cls.catalog.get_item_form_for_create([])
+            ifc.set_display_name('Test Assessment Item ' + number)
+            ifc.set_description('This is a Test Item Called Number ' + number)
+            test_item = request.cls.catalog.create_item(ifc)
+            form = request.cls.catalog.get_question_form_for_create(test_item.ident, [])
+            request.cls.catalog.create_question(form)
+
+            if number == 'One':
+                form = request.cls.catalog.get_answer_form_for_create(test_item.ident, [])
+                request.cls.catalog.create_answer(form)
+
+            request.cls.catalog.add_item(request.cls.assessment.ident, test_item.ident)
+
+        form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident, [])
+        request.cls.assessment_offered = request.cls.catalog.create_assessment_offered(form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments():
+                for offered in request.cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                    for taken in request.cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                        request.cls.catalog.delete_assessment_taken(taken.ident)
+                    request.cls.catalog.delete_assessment_offered(offered.ident)
+                request.cls.catalog.delete_assessment(obj.ident)
+            for obj in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(obj.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_assessment_taken_form_for_create(request.cls.assessment_offered.ident, [])
+        request.cls.taken = request.cls.catalog.create_assessment_taken(form)
+
+        section = request.cls.catalog.get_first_assessment_section(request.cls.taken.ident)
+        questions = section.get_questions()
+        first_question = questions.next()
+
+        for num in [0, 1]:
+            create_form = request.cls.catalog.get_response_form(section.ident, first_question.ident)
+            request.cls.catalog.submit_response(section.ident, first_question.ident, create_form)
+
+        request.cls.response_list = request.cls.catalog.get_responses(section.ident)
+        request.cls.object = request.cls.response_list"""
+        }
+    }
+
+    get_next_response = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        from dlkit.abstract_osid.assessment.rules import Response
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.response_list.get_next_response(), Response)"""
+        }
+    }
+
+    get_next_responses = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        from dlkit.abstract_osid.assessment.objects import ResponseList
+        from dlkit.abstract_osid.assessment.rules import Response
+        if not is_never_authz(self.service_config):
+            new_list = self.response_list.get_next_responses(2)
+            assert isinstance(new_list, ResponseList)
+            for item in new_list:
+                assert isinstance(item, Response)"""
+        }
+    }
+
+
 class ItemQuery:
+    import_statement = {
+        'python': {
+            'tests': [
+                'from dlkit.primordium.id.primitives import Id'
+            ]
+        }
+    }
 
     match_learning_objective_id = {
         'python': {
             'json': """
     def ${method_name}(self, objective_id, match):
         ${doc_string}
-        self._add_match('learningObjectiveIds', str(objective_id), bool(match))"""
+        self._add_match('learningObjectiveIds', str(objective_id), bool(match))""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+            if is_no_authz(self.service_config):
+                assert 'learningObjectiveIds' not in self.query._query_terms
+
+            self.query.match_learning_objective_id(test_id, match=True)
+
+            if is_no_authz(self.service_config):
+                assert self.query._query_terms['learningObjectiveIds'] == {
+                    '$$in': [str(test_id)]
+                }"""
         }
     }
 
@@ -4109,7 +5571,21 @@ class ItemQuery:
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        self._clear_terms('learningObjectiveIds')"""
+        self._clear_terms('learningObjectiveIds')""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+            self.query.match_learning_objective_id(test_id, match=True)
+
+            if is_no_authz(self.service_config):
+                assert 'learningObjectiveIds' in self.query._query_terms
+
+            self.query.clear_learning_objective_id_terms()
+
+            if is_no_authz(self.service_config):
+                assert 'learningObjectiveIds' not in self.query._query_terms"""
         }
     }
 
@@ -4128,7 +5604,21 @@ class ItemQuery:
             self._query_terms[match_key][param] = flag
         else:
             self._query_terms[match_key] = {param: flag}
-        self._query_terms[match_key]['$$nin'] = [[], ['']]"""
+        self._query_terms[match_key]['$$nin'] = [[], ['']]""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            if is_no_authz(self.service_config):
+                assert 'learningObjectiveIds' not in self.query._query_terms
+
+            self.query.match_any_learning_objective(match=True)
+
+            if is_no_authz(self.service_config):
+                assert self.query._query_terms['learningObjectiveIds'] == {
+                    '$$exists': 'true',
+                    '$$nin': [[], ['']]
+                }"""
         }
     }
 
@@ -4137,10 +5627,84 @@ class ItemQuery:
             'json': """
     def ${method_name}(self):
         ${doc_string}
-        self._clear_terms('learningObjectiveIds')"""
+        self._clear_terms('learningObjectiveIds')""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            self.query.match_any_learning_objective(match=True)
+
+            if is_no_authz(self.service_config):
+                assert 'learningObjectiveIds' in self.query._query_terms
+
+            self.query.clear_learning_objective_terms()
+
+            if is_no_authz(self.service_config):
+                assert 'learningObjectiveIds' not in self.query._query_terms"""
         }
     }
 
+
+class ItemSearch:
+    import_statements = {
+        'python': {
+            'tests': [
+                'from dlkit.runtime import PROXY_SESSION, proxy_example',
+                'from dlkit.runtime.managers import Runtime',
+                'REQUEST = proxy_example.SimpleRequest()',
+                'CONDITION = PROXY_SESSION.get_proxy_condition()',
+                'CONDITION.set_http_request(REQUEST)',
+                'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.type.primitives import Type',
+                'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
+
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.search = request.cls.catalog.get_item_search()"""
+        }
+    }
+
+    search_among_items = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert self.search._id_list is None
+            fake_list = [self.catalog.ident]
+            self.search.search_among_items(fake_list)
+            assert self.search._id_list == fake_list"""
+        }
+    }
 
 # class ItemSearch:
 #
@@ -4166,6 +5730,70 @@ class ItemQuery:
 #     search_among_items = """
 #         self._id_list = item_ids"""
 
+
+class ItemSearchResults:
+    import_statements = {
+        'python': {
+            'tests': [
+                'from dlkit.runtime import PROXY_SESSION, proxy_example',
+                'from dlkit.runtime.managers import Runtime',
+                'REQUEST = proxy_example.SimpleRequest()',
+                'CONDITION = PROXY_SESSION.get_proxy_condition()',
+                'CONDITION.set_http_request(REQUEST)',
+                'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.type.primitives import Type',
+                'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+                'from dlkit.abstract_osid.osid import errors',
+            ]
+        }
+    }
+
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        request.cls.query = request.cls.catalog.get_item_query()
+        request.cls.search_obj = request.cls.catalog.get_item_search()
+        request.cls.search = request.cls.catalog.get_items_by_search(request.cls.query, request.cls.search_obj)"""
+        }
+    }
+
+    get_items = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        from dlkit.abstract_osid.assessment.objects import ItemList
+        if not is_never_authz(self.service_config):
+            items = self.search.get_items()
+            assert isinstance(items, ItemList)
+            assert items.available() == 0"""
+        }
+    }
 
 # class ItemSearchResults:
 #
@@ -4415,7 +6043,31 @@ class BankQuery:
         # any bank
         bank_descendants = self._get_descendant_catalog_ids(bank_id)
         identifiers = [ObjectId(i.identifier) for i in bank_descendants]
-        self._query_terms['_id'] = {'$$in': identifiers}"""
+        self._query_terms['_id'] = {'$$in': identifiers}""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert '_id' not in self.query._query_terms
+            self.query.match_ancestor_bank_id(self.fake_id, True)
+            assert self.query._query_terms['_id'] == {
+                '$$in': []
+            }"""
+        }
+    }
+
+
+class BankForm:
+    get_bank_form_record = {
+        'python': {
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if uses_cataloging(self.service_config):
+            pass  # cannot call the _get_record() methods on catalogs
+        elif not is_never_authz(self.service_config):
+            with pytest.raises(errors.Unsupported):
+                self.object.get_bank_form_record(DEFAULT_TYPE)"""
         }
     }
 

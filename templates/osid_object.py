@@ -6,7 +6,18 @@ class GenericObject(object):
                 'from ..primitives import Id, DateTime, Duration, DisplayText',
                 'from ..utilities import get_registry',
                 'from ..id.objects import IdList',
-                'from decimal import Decimal']
+                'from decimal import Decimal'],
+            'tests': [
+                'from dlkit.runtime import PROXY_SESSION, proxy_example',
+                'from dlkit.runtime.managers import Runtime',
+                'REQUEST = proxy_example.SimpleRequest()',
+                'CONDITION = PROXY_SESSION.get_proxy_condition()',
+                'CONDITION.set_http_request(REQUEST)',
+                'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+                'from dlkit.primordium.type.primitives import Type',
+                'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+                'from dlkit.abstract_osid.osid import errors'
+            ]
         }
     }
 
@@ -22,7 +33,39 @@ class GenericObject(object):
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, object_name='${object_name_upper}', **kwargs)
         self._catalog_name = '${cat_name}'
-${instance_initers}"""
+${instance_initers}""",
+            'tests': """
+${pattern_name}
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+
+        form = request.cls.catalog.get_${object_name_under}_form_for_create([])
+        form.display_name = 'Test object'
+        request.cls.object = request.cls.catalog.create_${object_name_under}(form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_${object_name_under_plural}():
+                request.cls.catalog.delete_${object_name_under}(obj.ident)
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    pass"""
         }
     }
 
@@ -32,7 +75,12 @@ ${instance_initers}"""
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        return bool(self._my_map['${var_name_mixed}'])"""
+        return bool(self._my_map['${var_name_mixed}'])""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.${method_name}(), bool)"""
         }
     }
 
@@ -65,7 +113,12 @@ ${instance_initers}"""
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        return bool(self._my_map['${var_name_mixed}Id'])"""
+        return bool(self._my_map['${var_name_mixed}Id'])""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.${method_name}(), bool)"""
         }
     }
 
@@ -78,7 +131,13 @@ ${instance_initers}"""
         if not bool(self._my_map['${var_name_mixed}Id']):
             raise errors.IllegalState('${var_name} not set')
         else:
-            return ${return_type}(self._my_map['${var_name_mixed}Id'])"""
+            return ${return_type}(self._my_map['${var_name_mixed}Id'])""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            pytest.raises(errors.IllegalState,
+                          self.object.${method_name})"""
         }
     }
 
@@ -96,7 +155,13 @@ ${instance_initers}"""
         lookup_session = mgr.get_${return_type_under}_lookup_session(proxy=getattr(self, "_proxy", None))
         lookup_session.use_federated_${return_cat_name_under}_view()
         osid_object = lookup_session.get_${return_type_under}(self.get_${var_name}_id())
-        return osid_object"""
+        return osid_object""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            pytest.raises(errors.IllegalState,
+                          self.object.${method_name})"""
         }
     }
 
@@ -120,7 +185,12 @@ ${instance_initers}"""
             return bool(self._my_map['${var_name_mixed}'])
         except KeyError:
             pass
-        return False"""
+        return False""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.${method_name}(), bool)"""
         }
     }
 
@@ -156,7 +226,13 @@ ${instance_initers}"""
         ${pattern_name}
         if not self.has_${var_name}():
             raise errors.IllegalState('${var_name} not set')
-        return Decimal(str(self._my_map['${var_name_mixed}']))"""
+        return Decimal(str(self._my_map['${var_name_mixed}']))""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.${method_name}(), Decimal)
+            assert self.object.${method_name}() == Decimal(0.0)"""
         }
     }
 
@@ -170,7 +246,15 @@ ${instance_initers}"""
         ${pattern_name}
         if not self.has_${var_name}():
             raise errors.IllegalState('${var_name} not set')
-        return int(self._my_map['${var_name_mixed}'])"""
+        return int(self._my_map['${var_name_mixed}'])""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        # Our implementation is probably wrong -- there is no "${var_name}" setter
+        # in the form / spec...so unclear how the value gets here.
+        if not is_never_authz(self.service_config):
+            pytest.raises(KeyError,
+                          self.object.${method_name})"""
         }
     }
 
@@ -187,7 +271,11 @@ ${instance_initers}"""
         if not self.has_${var_name}():
             raise errors.IllegalState('${var_name} not set')
         dt = self._my_map['${var_name_mixed}']
-        return DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)"""
+        return DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond)""",
+            'tests': """
+    def test_${method_name}(self):
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_start_time(), DateTime)"""
         }
     }
 
@@ -201,7 +289,12 @@ ${instance_initers}"""
         ${pattern_name}
         if not self.has_${var_name}():
             raise errors.IllegalState('${var_name} not set')
-        return Duration(**self._my_map['${var_name_mixed}'])"""
+        return Duration(**self._my_map['${var_name_mixed}'])""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.object.get_duration(), Duration)"""
         }
     }
 

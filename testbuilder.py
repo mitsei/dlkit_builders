@@ -47,7 +47,9 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
             test_object = remove_plural(interface['category'])
             if is_search() or is_unimplemented_node():
                 # We don't have any search stuff implemented yet
-                impl = '{0}pass'.format(self._dind)
+                impl = '{0}@pytest.mark.skip(\'unimplemented test\')\n{1}\n{2}pass'.format(self._ind,
+                                                                                           self._get_method_sig(method, interface),
+                                                                                           self._dind)
             elif (len(method['args']) > 0 and
                     ((is_catalog() and
                       is_record_method()) or
@@ -55,29 +57,32 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
                      (not is_catalog() and not is_record_method()))):
                 # i.e. AssessmentManager.get_bank_record() throws Unimplemented()
                 # i.e. Question.get_question_record() throws Unsupported()
-                impl = """        if is_never_authz(self.service_config):
+                impl = """{0}\n        if is_never_authz(self.service_config):
             pass  # no object to call the method on?
         elif uses_cataloging(self.service_config):
             pass  # cannot call the _get_record() methods on catalogs
         else:
             with pytest.raises(errors.Unimplemented):
-                self.{0}.{1}({2})""".format(test_object,
+                self.{1}.{2}({3})""".format(self._get_method_sig(method, interface),
+                                            test_object,
                                             method['name'],
                                             ', '.join((len(method['args']) * ['True'])))
             elif method['name'].endswith('_record'):
-                impl = """        if is_never_authz(self.service_config):
+                impl = """{0}\n        if is_never_authz(self.service_config):
             pass  # no object to call the method on?
         else:
             with pytest.raises(errors.Unsupported):
-                self.{0}.{1}({2})""".format(test_object,
+                self.{1}.{2}({3})""".format(self._get_method_sig(method, interface),
+                                            test_object,
                                             method['name'],
                                             ', '.join((len(method['args']) * ['True'])))
             else:
-                impl = """        if is_never_authz(self.service_config):
+                impl = """{0}\n        if is_never_authz(self.service_config):
             pass  # no object to call the method on?
         else:
             with pytest.raises(errors.Unimplemented):
-                self.{0}.{1}()""".format(test_object,
+                self.{1}.{2}()""".format(self._get_method_sig(method, interface),
+                                         test_object,
                                          method['name'])
         else:
             context = self._get_method_context(method, interface)
@@ -92,14 +97,14 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
 
     def _get_method_sig(self, method, interface):
         args = self._get_method_args(method, interface)
-        method_impl = self._make_method_impl(method, interface)
+        # method_impl = self._make_method_impl(method, interface)
         method_sig = '{}def test_{}({}):'.format(self._ind,
                                                  method['name'],
                                                  ', '.join(args))
 
-        if method_impl == '{}pass'.format(self._dind):
-            method_sig = '{}@pytest.mark.skip(\'unimplemented test\')\n{}'.format(self._ind,
-                                                                                  method_sig)
+        # if method_impl == '{}pass'.format(self._dind):
+        #     method_sig = '{}@pytest.mark.skip(\'unimplemented test\')\n{}'.format(self._ind,
+        #                                                                           method_sig)
 
         return method_sig
 
@@ -172,6 +177,10 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
 
         if methods:
             methods = '\n' + methods
+
+
+        if fixture_methods:
+            fixture_methods = '\n{0}'.format(fixture_methods)
 
         body = '\n\n{0}\n{1}\n{2}{3}'.format(fixture_methods,
                                              self.class_sig(interface, inheritance),

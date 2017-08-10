@@ -8,6 +8,18 @@ class GenericCatalogQuery(object):
                 'from ..primitives import Id',
                 'from ..id.objects import IdList',
                 'from ..utilities import get_registry',
+            ],
+            'tests': [
+                'from dlkit.runtime import PROXY_SESSION, proxy_example',
+                'from dlkit.runtime.managers import Runtime',
+                'REQUEST = proxy_example.SimpleRequest()',
+                'CONDITION = PROXY_SESSION.get_proxy_condition()',
+                'CONDITION.set_http_request(REQUEST)',
+                'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.type.primitives import Type',
+                'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+                'from dlkit.abstract_osid.osid import errors',
             ]
         }
     }
@@ -37,7 +49,36 @@ class GenericCatalogQuery(object):
             for child_id in hts.get_children(catalog_id):
                 descendants += list(self._get_descendant_catalog_ids(child_id))
                 descendants.append(child_id)
-        return IdList(descendants)"""
+        return IdList(descendants)""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    ${pattern_name}
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.fake_id = Id('resource.Resource%3A1%40ODL.MIT.EDU')
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    ${pattern_name}
+    if not is_never_authz(request.cls.service_config):
+        request.cls.query = request.cls.svc_mgr.get_${cat_name_under}_query()"""
         }
     }
 
@@ -47,7 +88,18 @@ class GenericCatalogQuery(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._clear_terms('${var_name_mixed}')"""
+        self._clear_terms('${var_name_mixed}')""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if is_no_authz(self.service_config):
+            self.query._query_terms['${var_name_mixed}'] = 'foo'
+
+        if not is_never_authz(self.service_config):
+            self.query.${method_name}()
+
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' not in self.query._query_terms"""
         }
     }
 
@@ -59,6 +111,19 @@ class GenericObjectQuery(object):
                 'from dlkit.abstract_osid.osid import errors',
                 'from ..primitives import Id',
                 'from ..utilities import get_registry',
+            ],
+            'tests': [
+                'from dlkit.runtime import PROXY_SESSION, proxy_example',
+                'from dlkit.runtime.managers import Runtime',
+                'REQUEST = proxy_example.SimpleRequest()',
+                'CONDITION = PROXY_SESSION.get_proxy_condition()',
+                'CONDITION.set_http_request(REQUEST)',
+                'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+                'from dlkit.primordium.id.primitives import Id',
+                'from dlkit.primordium.type.primitives import Type',
+                'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+                'from dlkit.abstract_osid.osid import errors',
+                'from dlkit.primordium.calendaring.primitives import DateTime'
             ]
         }
     }
@@ -75,11 +140,47 @@ class GenericObjectQuery(object):
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidObjectQuery.__init__(self, runtime)"""
+        osid_queries.OsidObjectQuery.__init__(self, runtime)""",
+            'tests': """
+${pattern_name}
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    # From test_templates/resource.py::ResourceQuery::init_template
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test catalog'
+        create_form.description = 'Test catalog description'
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/resource.py::ResourceQuery::init_template
+    request.cls.query = request.cls.catalog.get_${object_name_under}_query()"""
         }
     }
 
     clear_simple_terms_template = deepcopy(GenericCatalogQuery.clear_simple_terms_template)
+    clear_simple_terms_template['python']['tests'] = """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if is_no_authz(self.service_config):
+            self.query._query_terms['${var_name_mixed}'] = 'foo'
+        self.query.${method_name}()
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' not in self.query._query_terms"""
 
     match_catalog_id_template = {
         'python': {
@@ -87,7 +188,17 @@ class GenericObjectQuery(object):
     def ${method_name}(self, ${arg0_name}, ${arg1_name}):
         ${doc_string}
         ${pattern_name}
-        self._add_match('assigned${cat_name}Ids', str(${arg0_name}), ${arg1_name})"""
+        self._add_match('assigned${cat_name}Ids', str(${arg0_name}), ${arg1_name})""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.${method_name}(test_id, match=True)
+
+        if is_no_authz(self.service_config):
+            assert self.query._query_terms['assigned${cat_name}Ids'] == {
+                '$$in': [str(test_id)]
+            }"""
         }
     }
 
@@ -97,7 +208,17 @@ class GenericObjectQuery(object):
     def ${method_name}(self):
         ${doc_string}
         ${pattern_name}
-        self._clear_terms('assigned${cat_name}Ids')"""
+        self._clear_terms('assigned${cat_name}Ids')""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_${var_name}(test_id, match=True)
+        if is_no_authz(self.service_config):
+            assert 'assigned${cat_name}Ids' in self.query._query_terms
+        self.query.${method_name}()
+        if is_no_authz(self.service_config):
+            assert 'assigned${cat_name}Ids' not in self.query._query_terms"""
         }
     }
 
@@ -107,11 +228,32 @@ class GenericObjectQuery(object):
     def ${method_name}(self, ${arg0_name}, ${arg1_name}):
         ${doc_string}
         ${pattern_name}
-        self._add_match('${var_name_mixed}', str(${arg0_name}), ${arg1_name})"""
+        self._add_match('${var_name_mixed}', str(${arg0_name}), ${arg1_name})""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' not in self.query._query_terms
+        self.query.${method_name}(test_id, match=True)
+        if is_no_authz(self.service_config):
+            assert self.query._query_terms['${var_name_mixed}'] == {
+                '$$in': [str(test_id)]
+            }"""
         }
     }
 
-    clear_id_attribute_terms_template = clear_simple_terms_template
+    clear_id_attribute_terms_template = deepcopy(clear_simple_terms_template)
+    clear_id_attribute_terms_template['python']['tests'] = """
+    def test_${method_name}(self):
+        ${pattern_name}
+        test_id = Id('osid.Osid%3Afake%40ODL.MIT.EDU')
+        self.query.match_${var_name}(test_id, match=True)
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' in self.query._query_terms
+        self.query.${method_name}()
+        if is_no_authz(self.service_config):
+            assert '${var_name_mixed}' not in self.query._query_terms"""
 
     match_date_time_template = {
         'python': {
@@ -120,6 +262,17 @@ class GenericObjectQuery(object):
         ${doc_string}
         ${pattern_name}
         self._match_minimum_date_time('${var_name_mixed}', ${arg0_name}, match)
-        self._match_maximum_date_time('${var_name_mixed}', ${arg1_name}, match)"""
+        self._match_maximum_date_time('${var_name_mixed}', ${arg1_name}, match)""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            start_time = DateTime.utcnow()
+            end_time = DateTime.utcnow()
+            self.query.${method_name}(start_time, end_time, match=True)
+            assert self.query._query_terms['${var_name_mixed}'] == {
+                '$$gte': start_time,
+                '$$lte': end_time
+            }"""
         }
     }

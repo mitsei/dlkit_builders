@@ -565,7 +565,7 @@ except ImportError:
         inheritance = self._get_class_inheritance(interface)
         init_methods = self._make_init_methods(interface)
 
-        if self.is_proxy_manager(interface):
+        if self.is_proxy_manager(interface) and not self._in(['tests', 'testauthz']):
             methods = ''
         else:
             methods = self.make_methods(interface)

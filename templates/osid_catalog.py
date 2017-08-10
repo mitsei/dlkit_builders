@@ -4,6 +4,9 @@ class GenericCatalogNode(object):
             'json': [
                 'from ..utilities import get_provider_manager',
                 'from dlkit.primordium.id.primitives import Id',
+            ],
+            'tests': [
+                'from dlkit.abstract_osid.osid.objects import OsidCatalog'
             ]
         }
     }
@@ -27,7 +30,66 @@ class GenericCatalogNode(object):
             node_map['parentNodes'].append(${object_name_under}_node.get_object_node_map())
         for ${object_name_under}_node in self.get_child_${object_name_under}_nodes():
             node_map['childNodes'].append(${object_name_under}_node.get_object_node_map())
-        return node_map"""
+        return node_map""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    ${pattern_name}
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        create_form.display_name = 'Test ${cat_name}'
+        create_form.description = 'Test ${cat_name} for ${interface_name} tests'
+        request.cls.catalog = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+        request.cls.${object_name_under}_ids = list()
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    ${pattern_name}
+    from dlkit.json_.${pkg_name_replaced_reserved}.objects import ${interface_name}
+    request.cls.${object_name_under}_list = list()
+    if not is_never_authz(request.cls.service_config):
+        for num in [0, 1]:
+            create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+            create_form.display_name = 'Test ${object_name} ' + str(num)
+            create_form.description = 'Test ${object_name} for ${interface_name} tests'
+            obj = request.cls.svc_mgr.create_${cat_name_under}(create_form)
+            request.cls.${object_name_under}_list.append(${interface_name}(
+                obj.object_map,
+                runtime=request.cls.svc_mgr._runtime,
+                proxy=request.cls.svc_mgr._proxy))
+            request.cls.${object_name_under}_ids.append(obj.ident)
+        # Not put the catalogs in a hierarchy
+        request.cls.svc_mgr.add_root_${cat_name_under}(request.cls.${object_name_under}_list[0].ident)
+        request.cls.svc_mgr.add_child_${cat_name_under}(
+            request.cls.${object_name_under}_list[0].ident,
+            request.cls.${object_name_under}_list[1].ident)
+
+        request.cls.object = request.cls.svc_mgr.get_${cat_name_under}_nodes(
+            request.cls.${object_name_under}_list[0].ident, 0, 5, False)
+
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.remove_child_${cat_name_under}(
+                request.cls.${object_name_under}_list[0].ident,
+                request.cls.${object_name_under}_list[1].ident)
+            request.cls.svc_mgr.remove_root_${cat_name_under}(request.cls.${object_name_under}_list[0].ident)
+            for node in request.cls.${object_name_under}_list:
+                request.cls.svc_mgr.delete_${cat_name_under}(node.ident)
+
+    request.addfinalizer(test_tear_down)"""
         }
     }
 
@@ -40,7 +102,14 @@ class GenericCatalogNode(object):
         if self._lookup_session is None:
             mgr = get_provider_manager('${package_name_upper}', runtime=self._runtime, proxy=self._proxy)
             self._lookup_session = mgr.get_${object_name_under}_lookup_session(proxy=getattr(self, "_proxy", None))
-        return self._lookup_session.get_${object_name_under}(Id(self._my_map['id']))"""
+        return self._lookup_session.get_${object_name_under}(Id(self._my_map['id']))""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}
+        if not is_never_authz(self.service_config):
+            assert isinstance(self.${cat_name_under}_list[0].${method_name}(), OsidCatalog)
+            assert str(self.${cat_name_under}_list[0].${method_name}().ident) == str(self.${cat_name_under}_list[0].ident)"""
         }
     }
 
@@ -57,7 +126,20 @@ class GenericCatalogNode(object):
                 runtime=self._runtime,
                 proxy=self._proxy,
                 lookup_session=self._lookup_session))
-        return ${return_type}(parent_${object_name_under}_nodes)"""
+        return ${return_type}(parent_${object_name_under}_nodes)""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}NodeList
+        if not is_never_authz(self.service_config):
+            node = self.svc_mgr.get_${cat_name_under}_nodes(
+                self.${cat_name_under}_list[1].ident,
+                1,
+                0,
+                False)
+            assert isinstance(node.${method_name}(), ${cat_name}NodeList)
+            assert node.${method_name}().available() == 1
+            assert str(node.${method_name}().next().ident) == str(self.${cat_name_under}_list[0].ident)"""
         }
     }
 
@@ -74,7 +156,20 @@ class GenericCatalogNode(object):
                 runtime=self._runtime,
                 proxy=self._proxy,
                 lookup_session=self._lookup_session))
-        return ${return_type}(parent_${object_name_under}_nodes)"""
+        return ${return_type}(parent_${object_name_under}_nodes)""",
+            'tests': """
+    def test_${method_name}(self):
+        ${pattern_name}
+        from dlkit.abstract_osid.${package_name_replace_reserved}.objects import ${cat_name}NodeList
+        if not is_never_authz(self.service_config):
+            node = self.svc_mgr.get_${cat_name_under}_nodes(
+                self.${cat_name_under}_list[0].ident,
+                0,
+                1,
+                False)
+            assert isinstance(node.${method_name}(), ${cat_name}NodeList)
+            assert node.${method_name}().available() == 1
+            assert str(node.${method_name}().next().ident) == str(self.${cat_name_under}_list[1].ident)"""
         }
     }
 
@@ -84,6 +179,17 @@ class GenericCatalog(object):
         'python': {
             'json': [
                 'import importlib',
+            ],
+            'tests': [
+                'from dlkit.runtime import PROXY_SESSION, proxy_example',
+                'from dlkit.runtime.managers import Runtime',
+                'REQUEST = proxy_example.SimpleRequest()',
+                'CONDITION = PROXY_SESSION.get_proxy_condition()',
+                'CONDITION.set_http_request(REQUEST)',
+                'PROXY = PROXY_SESSION.get_proxy(CONDITION)\n',
+                'from dlkit.primordium.type.primitives import Type',
+                'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+                'from dlkit.abstract_osid.osid import errors',
             ]
         }
     }
@@ -234,6 +340,36 @@ class GenericCatalog(object):
     def disable_session_management(self):
         \"\"\"Session state will never be saved."\"\"
         self._session_management = DISABLED
-        self.close_sessions()"""
+        self.close_sessions()""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    ${pattern_name}
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        '${pkg_name_upper}',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+
+    def class_tear_down():
+        pass
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    ${pattern_name}
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
+        form.display_name = 'for testing'
+        request.cls.object = request.cls.svc_mgr.create_${cat_name_under}(form)
+
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.delete_${cat_name_under}(request.cls.object.ident)
+
+    request.addfinalizer(test_tear_down)"""
         }
     }

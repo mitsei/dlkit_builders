@@ -1247,12 +1247,12 @@ def map_list_patterns(interface, package, index):
     object_name = interface['shortname'][:-4]
     if is_catalog(index, object_name):
         # then this is a catalog, not an object!
-        index[interface['shortname'] + '.init_pattern'] = 'resource.BinList'
+        index[interface['shortname'] + '.init_pattern'] = 'osid_list.GenericCatalogList'
     elif is_catalog_node(index, object_name):
         # then this is a catalog node, so part of a hierarchy
-        index[interface['shortname'] + '.init_pattern'] = 'resource.BinNodeList'
+        index[interface['shortname'] + '.init_pattern'] = 'osid_list.GenericCatalogNodeList'
     else:
-        index[interface['shortname'] + '.init_pattern'] = 'osid_object.GenericObjectList'
+        index[interface['shortname'] + '.init_pattern'] = 'osid_list.GenericObjectList'
 
     for method in interface['methods']:
         var_name = method['name'].split('_', 2)[-1]

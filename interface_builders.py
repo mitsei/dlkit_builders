@@ -60,7 +60,7 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
 
         # Seed the inheritance list with this interface's abc_osid
         if self._is('tests'):
-            inheritance = ['object']
+            return '(object)'
         elif not self._is('manager') and self.package['name'] != 'osid' and interface['category'] == 'managers':
             inheritance = []
             last_inheritance = [get_full_interface_class()]
@@ -72,28 +72,27 @@ class InterfaceBuilder(MethodBuilder, Mapper, BaseBuilder, Templates, Utilities)
         # Iterate through any inherited interfaces and build the inheritance
         # list for this interface. Also, check if an import statement is
         # required and append to the appropriate module's import list.
-        if not self._is('tests'):
-            for i in interface['inheritance']:
-                pkg_name = self._abc_pkg_name(package_name=i['pkg_name'], abc=self._is('abc'))
-                unknown_module_protection = ''
-                inherit_category = self.get_interface_module(pkg_name, i['name'], True)
-                if inherit_category == 'UNKNOWN_MODULE':
-                    unknown_module_protection = '\"\"\"'
+        for i in interface['inheritance']:
+            pkg_name = self._abc_pkg_name(package_name=i['pkg_name'], abc=self._is('abc'))
+            unknown_module_protection = ''
+            inherit_category = self.get_interface_module(pkg_name, i['name'], True)
+            if inherit_category == 'UNKNOWN_MODULE':
+                unknown_module_protection = '\"\"\"'
 
-                if (i['pkg_name'] == self.package['name'] and
-                        inherit_category == interface['category']):
-                    inheritance.append(i['name'])
-                else:
-                    if self._is('services') and i['pkg_name'] != self.package['name']:
-                        inheritance.append(i['pkg_name'] + '.' + i['name'])
+            if (i['pkg_name'] == self.package['name'] and
+                    inherit_category == interface['category']):
+                inheritance.append(i['name'])
+            else:
+                if self._is('services') and i['pkg_name'] != self.package['name']:
+                    inheritance.append(i['pkg_name'] + '.' + i['name'])
 
-                    if not self._is('services'):
-                        inheritance.append(unknown_module_protection +
-                                           pkg_name + '_' +
-                                           inherit_category + '.' + i['name'] +
-                                           unknown_module_protection)
+                if not self._is('services'):
+                    inheritance.append(unknown_module_protection +
+                                       pkg_name + '_' +
+                                       inherit_category + '.' + i['name'] +
+                                       unknown_module_protection)
 
-        if self._in(['json', 'stub', 'services', 'authz', 'tests', 'manager']):
+        if self._in(['json', 'stub', 'services', 'authz', 'manager']):
             # Check to see if there are any additional inheritances required
             # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
             # TO ALLOW INSERTING THE INHERITANCE IN A PARTICULAR ORDER.
