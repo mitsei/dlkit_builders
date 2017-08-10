@@ -155,7 +155,11 @@ class GenericAdapterSession(object):
 
     authz_hint = {
         'python': {
-            'authz': generic_authz_hint_generator
+            'authz': generic_authz_hint_generator,
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        assert isinstance(self.session.${method_name}(), bool)"""
         }
     }
 
@@ -1237,7 +1241,17 @@ class GenericObjectAdminSession(object):
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('create')
+            'authz': GenericAdapterSession.method['python']['authz']('create'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            form = self.session.get_${object_name_under}_form_for_create(self.osid_object.ident, [])
+            assert isinstance(form, objects.${object_name}Form)
+            assert not form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_${object_name_under}_form_for_create(self.fake_id, [])"""
         }
     }
 
@@ -3847,7 +3861,20 @@ class GenericDependentObjectAdminSession(object):
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('update')
+            'authz': GenericAdapterSession.method['python']['authz']('update'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            form = self.session.get_${object_name_under}_form_for_create(self.osid_object.ident, [])
+            ${object_name_under} = self.session.create_${object_name_under}(form)
+
+            form = self.session.get_${object_name_under}_form_for_update(${object_name_under}.ident)
+            assert isinstance(form, objects.${object_name}Form)
+            assert form.is_for_update()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_${object_name_under}_form_for_update(self.fake_id)"""
         }
     }
 
@@ -3900,7 +3927,24 @@ class GenericDependentObjectAdminSession(object):
             runtime=self._runtime,
             proxy=self._proxy)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('update')
+            'authz': GenericAdapterSession.method['python']['authz']('update'),
+            'tests':  """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            form = self.session.get_${object_name_under}_form_for_create(self.osid_object.ident, [])
+            form.display_name = 'first name'
+            ${object_name_under} = self.session.create_${object_name_under}(form)
+            assert ${object_name_under}.display_name.text == 'first name'
+
+            form = self.session.get_${object_name_under}_form_for_update(${object_name_under}.ident)
+            form.display_name = 'second name'
+            ${object_name_under} = self.session.update_${object_name_under}(form)
+            assert isinstance(${object_name_under}, objects.${object_name})
+            assert ${object_name_under}.display_name.text == 'second name'
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.update_${object_name_under}('foo')"""
         }
     }
 
@@ -3934,7 +3978,30 @@ class GenericDependentObjectAdminSession(object):
             proxy=self._proxy)._delete()
         collection.save(${object_name_under})""",
             'services': GenericAdapterSession.method_without_return['python']['services'],
-            'authz': GenericAdapterSession.method_without_return['python']['authz']('delete')
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('delete'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            with pytest.raises(TypeError):
+                self.osid_object.get_${object_name_under}()
+
+            form = self.session.get_${object_name_under}_form_for_create(self.osid_object.ident, [])
+            ${object_name_under} = self.session.create_${object_name_under}(form)
+            updated_${aggregated_object_name_under} = self.catalog.get_${aggregated_object_name_under}(self.osid_object.ident)
+            assert isinstance(updated_${aggregated_object_name_under}.get_${object_name_under}(), ${object_name})
+
+            with pytest.raises(errors.NotFound):
+                self.session.delete_${object_name_under}(Id('fake.Package%3A000000000000000000000000%40ODL.MIT.EDU'))
+
+            self.session.delete_${object_name_under}(${object_name_under}.ident)
+            updated_${aggregated_object_name_under} = self.catalog.get_${aggregated_object_name_under}(self.osid_object.ident)
+
+            with pytest.raises(TypeError):
+                updated_${aggregated_object_name_under}.get_${object_name_under}()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.delete_${object_name_under}(self.fake_id)"""
         }
     }
 

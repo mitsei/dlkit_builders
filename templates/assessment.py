@@ -193,10 +193,7 @@ def ${interface_name_under}_test_fixture(request):
         return True""",
             'services': GenericAdapterSession.method['python']['services'],
             'authz': GenericAdapterSession.authz_hint['python']['authz']('take'),
-            'tests': """
-    def ${method_name}(self):
-        ${pattern_name}
-        assert isinstance(self.session.can_take_assessments(), bool)"""
+            'tests': GenericAdapterSession.authz_hint['python']['tests']
         }
     }
 
@@ -1431,7 +1428,37 @@ def ${interface_name_under}_test_fixture(request):
             raise errors.IllegalState()
         self.get_assessment_section(assessment_section_id).finish()""",
             'services': GenericAdapterSession.method_without_return['python']['services'],
-            'authz': GenericAdapterSession.method_without_return['python']['authz']('take')
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            future_start = DateTime.utcnow() + datetime.timedelta(days=1)
+            form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+            form.set_start_time(DateTime(**{
+                'year': future_start.year,
+                'month': future_start.month,
+                'day': future_start.day,
+                'hour': future_start.hour,
+                'minute': future_start.minute,
+                'second': future_start.second
+            }))
+            future_offered = self.catalog.create_assessment_offered(form)
+            form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
+            future_taken = self.catalog.create_assessment_taken(form)
+            with pytest.raises(errors.IllegalState):
+                self.catalog.get_first_assessment_section(future_taken.ident)
+
+            first_section = self.catalog.get_first_assessment_section(self.taken.ident)
+            assert 'completionTime' not in first_section._my_map
+            self.session.finish_assessment_section(first_section.ident)
+
+            with pytest.raises(errors.IllegalState):
+                # it is over, so can't GET the section now
+                self.catalog.get_assessment_section(first_section.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.finish_assessment_section(self.fake_id)"""
         }
     }
 
@@ -1465,7 +1492,34 @@ def ${interface_name_under}_test_fixture(request):
         else:
             raise errors.IllegalState()""",
             'services': GenericAdapterSession.method_without_return['python']['services'],
-            'authz': GenericAdapterSession.method_without_return['python']['authz']('take')
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            future_start = DateTime.utcnow() + datetime.timedelta(days=1)
+            form = self.catalog.get_assessment_offered_form_for_create(self.assessment.ident, [])
+            form.set_start_time(DateTime(**{
+                'year': future_start.year,
+                'month': future_start.month,
+                'day': future_start.day,
+                'hour': future_start.hour,
+                'minute': future_start.minute,
+                'second': future_start.second
+            }))
+            future_offered = self.catalog.create_assessment_offered(form)
+            form = self.catalog.get_assessment_taken_form_for_create(future_offered.ident, [])
+            future_taken = self.catalog.create_assessment_taken(form)
+            with pytest.raises(errors.IllegalState):
+                self.session.finish_assessment(future_taken.ident)
+
+            assert self.taken._my_map['completionTime'] is None
+            self.session.finish_assessment(self.taken.ident)
+            taken = self.catalog.get_assessment_taken(self.taken.ident)
+            assert taken._my_map['completionTime'] is not None
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.finish_assessment(self.fake_id)"""
         }
     }
 
@@ -1487,7 +1541,29 @@ def ${interface_name_under}_test_fixture(request):
         else:
             return True""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+
+            assert not self.session.is_answer_available(section.ident,
+                                                        second_question.ident)
+
+            form = self.session.get_response_form(section.ident, first_question.ident)
+            self.session.submit_response(section.ident, first_question.ident, form)
+
+            answers = self.session.get_answers(section.ident, first_question.ident)
+            assert isinstance(answers, AnswerList)
+            assert self.session.is_answer_available(section.ident,
+                                                    first_question.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.is_answer_available(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -1500,7 +1576,29 @@ def ${interface_name_under}_test_fixture(request):
             return self.get_assessment_section(assessment_section_id).get_answers(question_id=item_id)
         raise errors.IllegalState()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('take')
+            'authz': GenericAdapterSession.method['python']['authz']('take'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+            first_question = questions.next()
+            second_question = questions.next()
+
+            with pytest.raises(errors.IllegalState):
+                self.session.get_answers(section.ident, second_question.ident)
+
+            form = self.session.get_response_form(section.ident, first_question.ident)
+            self.session.submit_response(section.ident, first_question.ident, form)
+
+            answers = self.session.get_answers(section.ident, first_question.ident)
+            assert isinstance(answers, AnswerList)
+            assert answers.available() == 1
+            assert isinstance(answers.next(), Answer)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_answers(self.fake_id, self.fake_id)"""
         }
     }
 
@@ -1531,6 +1629,11 @@ class AssessmentResultsSession:
                 'from ..primitives import Id',
                 'from .objects import ItemList',
                 'from .objects import ResponseList',
+            ],
+            'tests': [
+                'from dlkit.primordium.type.primitives import Type',
+                'from dlkit.records import registry',
+                'SEQUENCE_ASSESSMENT = Type(**registry.ASSESSMENT_RECORD_TYPES["simple-child-sequencing"])'
             ]
         }
     }
@@ -1553,7 +1656,64 @@ class AssessmentResultsSession:
     def __init__(self, **kwargs):
         osid_sessions.OsidSession.__init__(self, **kwargs)
         self._qualifier_id = self._provider_session.get_bank_id()
-        self._id_namespace = 'assessment.AssessmentResults'"""
+        self._id_namespace = 'assessment.AssessmentResults'""",
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for AssessmentResultsSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+        create_form = request.cls.catalog.get_assessment_form_for_create([SEQUENCE_ASSESSMENT])
+        create_form.display_name = 'Test Assessment'
+        create_form.description = 'Test Assessment for AssessmentResultsSession tests'
+        request.cls.assessment = request.cls.catalog.create_assessment(create_form)
+
+        for number in ['One', 'Two', 'Three', 'Four']:
+            ifc = request.cls.catalog.get_item_form_for_create([])
+            ifc.set_display_name('Test Assessment Item ' + number)
+            ifc.set_description('This is a Test Item Called Number ' + number)
+            test_item = request.cls.catalog.create_item(ifc)
+
+            form = request.cls.catalog.get_question_form_for_create(test_item.ident, [])
+            request.cls.catalog.create_question(form)
+
+            request.cls.catalog.add_item(request.cls.assessment.ident, test_item.ident)
+
+        form = request.cls.catalog.get_assessment_offered_form_for_create(request.cls.assessment.ident, [])
+        request.cls.assessment_offered = request.cls.catalog.create_assessment_offered(form)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments():
+                for offered in request.cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                    for taken in request.cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                        request.cls.catalog.delete_assessment_taken(taken.ident)
+                    request.cls.catalog.delete_assessment_offered(offered.ident)
+                request.cls.catalog.delete_assessment(obj.ident)
+            for item in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(item.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.session = request.cls.svc_mgr.get_assessment_results_session(proxy=request.cls.catalog._proxy)
+    if not is_never_authz(request.cls.service_config):
+        form = request.cls.catalog.get_assessment_taken_form_for_create(request.cls.assessment_offered.ident, [])
+        request.cls.taken = request.cls.catalog.create_assessment_taken(form)"""
         }
     }
 
@@ -1566,7 +1726,8 @@ class AssessmentResultsSession:
         # handled in a service adapter above the pay grade of this impl.
         return True""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.authz_hint['python']['authz']('access')
+            'authz': GenericAdapterSession.authz_hint['python']['authz']('access'),
+            'tests': GenericAdapterSession.authz_hint['python']['tests']
         }
     }
 
@@ -1591,7 +1752,17 @@ class AssessmentResultsSession:
                     item_list.append(ils.get_item(Id(question['questionId'])))
         return ItemList(item_list)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('access')
+            'authz': GenericAdapterSession.method['python']['authz']('access'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            section.get_questions()
+            assert self.session.get_items(self.taken.ident).available() == 4
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_items(self.fake_id)"""
         }
     }
 
@@ -1620,7 +1791,25 @@ class AssessmentResultsSession:
                 response_list.append(section.get_responses())
         return ResponseList(response_list)""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('access')
+            'authz': GenericAdapterSession.method['python']['authz']('access'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            section = self.catalog.get_first_assessment_section(self.taken.ident)
+            questions = section.get_questions()
+
+            test_responses = self.session.get_responses(self.taken.ident)
+            assert isinstance(test_responses, ResponseList)
+            assert test_responses.available() == 4
+            first_response = test_responses.next()
+            assert isinstance(first_response, Response)
+
+            with pytest.raises(errors.IllegalState):
+                first_response.object_map
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_responses(self.fake_id)"""
         }
     }
 
@@ -1632,7 +1821,15 @@ class AssessmentResultsSession:
         # not implemented yet
         return False""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('access')
+            'authz': GenericAdapterSession.method['python']['authz']('access'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert not self.session.are_results_available(self.assessment.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.are_results_available(self.fake_id)"""
         }
     }
 
@@ -1644,7 +1841,15 @@ class AssessmentResultsSession:
         # not implemented yet and are_results_available is False
         raise errors.IllegalState()""",
             'services': GenericAdapterSession.method['python']['services'],
-            'authz': GenericAdapterSession.method['python']['authz']('access')
+            'authz': GenericAdapterSession.method['python']['authz']('access'),
+            'tests': """
+    def ${method_name}(self):
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.IllegalState):
+                self.session.get_grade_entries(self.assessment.ident)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.get_grade_entries(self.fake_id)"""
         }
     }
 
@@ -1660,7 +1865,63 @@ class ItemAdminSession:
                 'from ..utilities import JSONClientValidated',
                 'UPDATED = True',
                 'CREATED = True'
+            ],
+            'tests': [
+                'from dlkit.abstract_osid.assessment import objects',
+                'from dlkit.primordium.type.primitives import Type',
+                'DEFAULT_TYPE = Type(**{\'identifier\': \'DEFAULT\', \'namespace\': \'DEFAULT\', \'authority\': \'DEFAULT\'})',
+                'NEW_TYPE = Type(**{\'identifier\': \'NEW\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+                'NEW_TYPE_2 = Type(**{\'identifier\': \'NEW 2\', \'namespace\': \'MINE\', \'authority\': \'YOURS\'})',
+                'from dlkit.primordium.id.primitives import Id',
+                'ALIAS_ID = Id(**{\'identifier\': \'ALIAS\', \'namespace\': \'ALIAS\', \'authority\': \'ALIAS\'})',
             ]
+        }
+    }
+
+    init = {
+        'python': {
+            'tests': """
+@pytest.fixture(scope="class",
+                params=${test_service_configs})
+def ${interface_name_under}_class_fixture(request):
+    request.cls.service_config = request.param
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'ASSESSMENT',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_bank_form_for_create([])
+        create_form.display_name = 'Test Bank'
+        create_form.description = 'Test Bank for ItemAdminSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_bank(create_form)
+    else:
+        request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_assessments():
+                for offered in request.cls.catalog.get_assessments_offered_for_assessment(obj.ident):
+                    for taken in request.cls.catalog.get_assessments_taken_for_assessment_offered(offered.ident):
+                        request.cls.catalog.delete_assessment_taken(taken.ident)
+                    request.cls.catalog.delete_assessment_offered(offered.ident)
+                request.cls.catalog.delete_assessment(obj.ident)
+            for item in request.cls.catalog.get_items():
+                request.cls.catalog.delete_item(item.ident)
+            request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    if not is_never_authz(request.cls.service_config):
+        request.cls.form = request.cls.catalog.get_item_form_for_create([])
+        request.cls.form.display_name = 'new Item'
+        request.cls.form.description = 'description of Item'
+        request.cls.form.set_genus_type(NEW_TYPE)
+        request.cls.osid_object = request.cls.catalog.create_item(request.cls.form)
+    request.cls.session = request.cls.catalog"""
         }
     }
 
@@ -1744,7 +2005,39 @@ class ItemAdminSession:
         return objects.Question(osid_object_map=question_form._my_map,
                                 runtime=self._runtime,
                                 proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            with pytest.raises(TypeError):
+                # question_map = dict(self._my_map['question'])
+                # TypeError: 'NoneType' object is not iterable
+                self.osid_object.get_question()
+
+            form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+            self.session.create_question(form)
+            updated_item = self.catalog.get_item(self.osid_object.ident)
+            assert isinstance(updated_item.get_question(), Question)
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.create_question('foo')"""
+        }
+    }
+
+    create_answer = {
+        'python': {
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert self.osid_object.get_answers().available() == 0
+            form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+            self.session.create_answer(form)
+            updated_item = self.catalog.get_item(self.osid_object.ident)
+            assert updated_item.get_answers().available() == 1
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.catalog.create_answer('foo')"""
         }
     }
 
@@ -1763,37 +2056,99 @@ class ItemAdminSession:
         item['question'] = None
         collection.save(item)""",
             'services': GenericAdapterSession.method_without_return['python']['services'],
-            'authz': GenericAdapterSession.method_without_return['python']['authz']('delete')
+            'authz': GenericAdapterSession.method_without_return['python']['authz']('delete'),
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            with pytest.raises(TypeError):
+                # question_map = dict(self._my_map['question'])
+                # TypeError: 'NoneType' object is not iterable
+                self.osid_object.get_question()
+
+            form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+            question = self.session.create_question(form)
+            updated_item = self.catalog.get_item(self.osid_object.ident)
+            assert isinstance(updated_item.get_question(), Question)
+
+            with pytest.raises(errors.NotFound):
+                self.session.delete_question(Id('fake.Package%3A000000000000000000000000%40ODL.MIT.EDU'))
+
+            self.session.delete_question(question.ident)
+            updated_item = self.catalog.get_item(self.osid_object.ident)
+
+            with pytest.raises(TypeError):
+                updated_item.get_question()
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.delete_question(self.fake_id)"""
         }
     }
 
-    get_question_form_for_update_import_templates = {
+    delete_answer = {
         'python': {
-            'json': [
-                'from dlkit.abstract_osid.id.primitives import Id as ABCId'
-            ]
+            'tests': """
+    def ${method_name}(self):
+        ${pattern_name}
+        if not is_never_authz(self.service_config):
+            assert self.osid_object.get_answers().available() == 0
+            form = self.session.get_answer_form_for_create(self.osid_object.ident, [])
+            answer = self.session.create_answer(form)
+            updated_item = self.catalog.get_item(self.osid_object.ident)
+            assert updated_item.get_answers().available() == 1
+
+            with pytest.raises(errors.NotFound):
+                self.session.delete_answer(Id('fake.Package%3A000000000000000000000000%40ODL.MIT.EDU'))
+
+            self.session.delete_answer(answer.ident)
+            updated_item = self.catalog.get_item(self.osid_object.ident)
+            assert updated_item.get_answers().available() == 0
+        else:
+            with pytest.raises(errors.PermissionDenied):
+                self.session.delete_answer(self.fake_id)"""
         }
     }
 
-    get_question_form_for_update = {
-        'python': {
-            'json': """
-    def ${method_name}(self, question_id):
-        ${doc_string}
-        collection = JSONClientValidated('assessment',
-                                         collection='Item',
-                                         runtime=self._runtime)
-        if not isinstance(question_id, ABCId):
-            raise errors.InvalidArgument('the argument is not a valid OSID Id')
-        document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
-        obj_form = objects.QuestionForm(osid_object_map=document['question'],
-                                        runtime=self._runtime,
-                                        proxy=self._proxy)
-        self._forms[obj_form.get_id().get_identifier()] = not UPDATED
-        return obj_form""",
-            'services': GenericAdapterSession.method['python']['services']
-        }
-    }
+    # get_question_form_for_update_import_templates = {
+    #     'python': {
+    #         'json': [
+    #             'from dlkit.abstract_osid.id.primitives import Id as ABCId'
+    #         ]
+    #     }
+    # }
+    #
+    # get_question_form_for_update = {
+    #     'python': {
+    #         'json': """
+    # def ${method_name}(self, question_id):
+    #     ${doc_string}
+    #     collection = JSONClientValidated('assessment',
+    #                                      collection='Item',
+    #                                      runtime=self._runtime)
+    #     if not isinstance(question_id, ABCId):
+    #         raise errors.InvalidArgument('the argument is not a valid OSID Id')
+    #     document = collection.find_one({'question._id': ObjectId(question_id.get_identifier())})
+    #     obj_form = objects.QuestionForm(osid_object_map=document['question'],
+    #                                     runtime=self._runtime,
+    #                                     proxy=self._proxy)
+    #     self._forms[obj_form.get_id().get_identifier()] = not UPDATED
+    #     return obj_form""",
+    #         'services': GenericAdapterSession.method['python']['services'],
+    #         'tests': """
+    # def ${method_name}(self):
+    #     ${pattern_name}
+    #     if not is_never_authz(self.service_config):
+    #         form = self.session.get_question_form_for_create(self.osid_object.ident, [])
+    #         question = self.session.create_question(form)
+    #
+    #         form = self.session.get_question_form_for_update(question.ident)
+    #         assert isinstance(form, objects.QuestionForm)
+    #         assert form.is_for_update()
+    #     else:
+    #         with pytest.raises(errors.PermissionDenied):
+    #             self.session.get_question_form_for_update(self.fake_id)"""
+    #     }
+    # }
 
     update_question_import_templates = {
         'python': {
@@ -1834,8 +2189,7 @@ class ItemAdminSession:
         # Note: this is out of spec. The OSIDs don't require an object to be returned:
         return objects.Question(osid_object_map=question_form._my_map,
                                 runtime=self._runtime,
-                                proxy=self._proxy)""",
-            'services': GenericAdapterSession.method['python']['services']
+                                proxy=self._proxy)"""
         }
     }
 
