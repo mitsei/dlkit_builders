@@ -248,3 +248,96 @@ def ${interface_name_under}_class_fixture(request):
 def ${interface_name_under}_test_fixture(request):
     # Since the session isn't implemented, we just construct a LogQuery directly
     request.cls.query = LogQuery(runtime=request.cls.catalog._runtime)"""
+
+
+class LogEntryLookupSession:
+    # override this -- typically templated from ResourceLookupSession::get_resource
+    # Now that we have the QuerySession, will throw NotFound instead of PermissionDenied
+    get_log_entry = """
+        if not is_never_authz(self.service_config):
+            self.catalog.use_isolated_log_view()
+            obj = self.catalog.get_log_entry(self.log_entry_list[0].ident)
+            assert obj.ident == self.log_entry_list[0].ident
+            self.catalog.use_federated_log_view()
+            obj = self.catalog.get_log_entry(self.log_entry_list[0].ident)
+            assert obj.ident == self.log_entry_list[0].ident
+        else:
+            with pytest.raises(errors.NotFound):
+                self.catalog.get_log_entry(self.fake_id)"""
+
+    # override this -- typically templated from ResourceLookupSession::get_resources_by_ids
+    # Now that we have the QuerySession, will return empty list
+    get_log_entries_by_ids = """
+        from dlkit.abstract_osid.logging_.objects import LogEntryList
+        objects = self.catalog.get_log_entries_by_ids(self.log_entry_ids)
+        assert isinstance(objects, LogEntryList)
+        self.catalog.use_federated_log_view()
+        objects = self.catalog.get_log_entries_by_ids(self.log_entry_ids)
+        assert isinstance(objects, LogEntryList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    # override this -- typically templated from ResourceLookupSession::get_resources_by_genus_type
+    # Now that we have the QuerySession, will return empty list
+    get_log_entries_by_genus_type = """
+        from dlkit.abstract_osid.logging_.objects import LogEntryList
+        objects = self.catalog.get_log_entries_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, LogEntryList)
+        self.catalog.use_federated_log_view()
+        objects = self.catalog.get_log_entries_by_genus_type(DEFAULT_GENUS_TYPE)
+        assert isinstance(objects, LogEntryList)
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0"""
+
+    # override this -- typically templated from ResourceLookupSession::get_resources_by_parent_genus_type
+    # Now that we have the QuerySession, will throw Unimplemented instead of PermissionDenied
+    get_log_entries_by_parent_genus_type = """
+        from dlkit.abstract_osid.logging_.objects import LogEntryList
+        if not is_never_authz(self.service_config):
+            objects = self.catalog.get_log_entries_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert isinstance(objects, LogEntryList)
+            self.catalog.use_federated_log_view()
+            objects = self.catalog.get_log_entries_by_parent_genus_type(DEFAULT_GENUS_TYPE)
+            assert objects.available() == 0
+            assert isinstance(objects, LogEntryList)
+        else:
+            with pytest.raises(errors.Unimplemented):
+                # because the never_authz "tries harder" and runs the actual query...
+                #    whereas above the method itself in JSON returns an empty list
+                self.catalog.get_log_entries_by_parent_genus_type(DEFAULT_GENUS_TYPE)"""
+
+    # override this -- typically templated from ResourceLookupSession::get_resources_by_record_type
+    # Now that we have the QuerySession, will return empty list
+    get_log_entries_by_record_type = """
+        from dlkit.abstract_osid.logging_.objects import LogEntryList
+        objects = self.catalog.get_log_entries_by_record_type(DEFAULT_TYPE)
+        assert isinstance(objects, LogEntryList)
+        self.catalog.use_federated_log_view()
+        objects = self.catalog.get_log_entries_by_record_type(DEFAULT_TYPE)
+        assert objects.available() == 0
+        assert isinstance(objects, LogEntryList)"""
+
+    # override this -- typically templated from ResourceLookupSession::get_resources
+    # Now that we have the QuerySession, will return empty list
+    get_log_entries = """
+        from dlkit.abstract_osid.logging_.objects import LogEntryList
+        objects = self.catalog.get_log_entries()
+        assert isinstance(objects, LogEntryList)
+        self.catalog.use_federated_log_view()
+        objects = self.catalog.get_log_entries()
+        assert isinstance(objects, LogEntryList)
+
+        if not is_never_authz(self.service_config):
+            assert objects.available() > 0
+        else:
+            assert objects.available() == 0
+
+    def test_get_log_entry_with_alias(self):
+        if not is_never_authz(self.service_config):
+            self.catalog.alias_log_entry(self.log_entry_ids[0], ALIAS_ID)
+            obj = self.catalog.get_log_entry(ALIAS_ID)
+            assert obj.get_id() == self.log_entry_ids[0]"""
