@@ -789,6 +789,134 @@ def ${interface_name_under}_test_fixture(request):
                     [])"""
 
 
+class AuthorizationVaultSession:
+
+    init = """
+@pytest.fixture(scope="class",
+                params=['TEST_SERVICE', 'TEST_SERVICE_ALWAYS_AUTHZ', 'TEST_SERVICE_NEVER_AUTHZ', 'TEST_SERVICE_CATALOGING'])
+def authorization_vault_session_class_fixture(request):
+    # From test_templates/resource.py::ResourceBinSession::init_template
+    request.cls.service_config = request.param
+    request.cls.authorization_list = list()
+    request.cls.authorization_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'AUTHORIZATION',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_vault_form_for_create([])
+        create_form.display_name = 'Test Vault'
+        create_form.description = 'Test Vault for AuthorizationVaultSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_vault(create_form)
+        create_form = request.cls.svc_mgr.get_vault_form_for_create([])
+        create_form.display_name = 'Test Vault for Assignment'
+        create_form.description = 'Test Vault for AuthorizationVaultSession tests assignment'
+        request.cls.assigned_catalog = request.cls.svc_mgr.create_vault(create_form)
+        agent_id = Id(authority='TEST', namespace='authentication.Agent', identifier='A_USER')
+        for num in [0, 1, 2]:
+            # Note that the json authorization service seems picky about ids.  Need to review.
+            func_namespace = 'resource.Resource'
+            func_authority = 'TEST'
+            if num == 1:
+                func_identifier = 'lookup'
+            elif num == 2:
+                func_identifier = 'query'
+            else:
+                func_identifier = 'admin'
+            function_id = Id(authority=func_authority, namespace=func_namespace, identifier=func_identifier)
+            qualifier_id = Id(authority='TEST', namespace='authorization.Qualifier', identifier='TEST_' + str(num))
+            create_form = request.cls.catalog.get_authorization_form_for_create_for_agent(agent_id, function_id, qualifier_id, [])
+            create_form.display_name = 'Test Authorization ' + str(num)
+            create_form.description = 'Test Authorization for AuthorizationVaultSession tests'
+            obj = request.cls.catalog.create_authorization(create_form)
+            request.cls.authorization_list.append(obj)
+            request.cls.authorization_ids.append(obj.ident)
+        request.cls.svc_mgr.assign_authorization_to_vault(
+            request.cls.authorization_ids[1], request.cls.assigned_catalog.ident)
+        request.cls.svc_mgr.assign_authorization_to_vault(
+            request.cls.authorization_ids[2], request.cls.assigned_catalog.ident)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.svc_mgr.unassign_authorization_from_vault(
+                request.cls.authorization_ids[1], request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.unassign_authorization_from_vault(
+                request.cls.authorization_ids[2], request.cls.assigned_catalog.ident)
+            for obj in request.cls.catalog.get_authorizations():
+                request.cls.catalog.delete_authorization(obj.ident)
+            request.cls.svc_mgr.delete_vault(request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.delete_vault(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def authorization_vault_session_test_fixture(request):
+    # From test_templates/resource.py::ResourceBinSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
+
+
+class AuthorizationVaultAssignmentSession:
+
+    init = """
+@pytest.fixture(scope="class",
+                params=['TEST_SERVICE', 'TEST_SERVICE_ALWAYS_AUTHZ', 'TEST_SERVICE_NEVER_AUTHZ', 'TEST_SERVICE_CATALOGING'])
+def authorization_vault_assignment_session_class_fixture(request):
+    # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+    request.cls.service_config = request.param
+    request.cls.authorization_list = list()
+    request.cls.authorization_ids = list()
+    request.cls.svc_mgr = Runtime().get_service_manager(
+        'AUTHORIZATION',
+        proxy=PROXY,
+        implementation=request.cls.service_config)
+    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    if not is_never_authz(request.cls.service_config):
+        create_form = request.cls.svc_mgr.get_vault_form_for_create([])
+        create_form.display_name = 'Test Vault'
+        create_form.description = 'Test Vault for AuthorizationVaultAssignmentSession tests'
+        request.cls.catalog = request.cls.svc_mgr.create_vault(create_form)
+        create_form = request.cls.svc_mgr.get_vault_form_for_create([])
+        create_form.display_name = 'Test Vault for Assignment'
+        create_form.description = 'Test Vault for AuthorizationVaultAssignmentSession tests assignment'
+        request.cls.assigned_catalog = request.cls.svc_mgr.create_vault(create_form)
+        agent_id = Id(authority='TEST', namespace='authentication.Agent', identifier='A_USER')
+        for num in [0, 1, 2]:
+            # Note that the json authorization service seems picky about ids.  Need to review.
+            func_namespace = 'resource.Resource'
+            func_authority = 'TEST'
+            if num == 1:
+                func_identifier = 'lookup'
+            elif num == 2:
+                func_identifier = 'query'
+            else:
+                func_identifier = 'admin'
+            function_id = Id(authority=func_authority, namespace=func_namespace, identifier=func_identifier)
+            qualifier_id = Id(authority='TEST', namespace='authorization.Qualifier', identifier='TEST_' + str(num))
+            create_form = request.cls.catalog.get_authorization_form_for_create_for_agent(agent_id, function_id, qualifier_id, [])
+            create_form.display_name = 'Test Authorization ' + str(num)
+            create_form.description = 'Test Authorization for AuthorizationVaultAssignmentSession tests'
+            obj = request.cls.catalog.create_authorization(create_form)
+            request.cls.authorization_list.append(obj)
+            request.cls.authorization_ids.append(obj.ident)
+
+    def class_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            for obj in request.cls.catalog.get_authorizations():
+                request.cls.catalog.delete_authorization(obj.ident)
+            request.cls.svc_mgr.delete_vault(request.cls.assigned_catalog.ident)
+            request.cls.svc_mgr.delete_vault(request.cls.catalog.ident)
+
+    request.addfinalizer(class_tear_down)
+
+
+@pytest.fixture(scope="function")
+def authorization_vault_assignment_session_test_fixture(request):
+    # From test_templates/resource.py::ResourceBinAssignmentSession::init_template
+    request.cls.session = request.cls.svc_mgr"""
+
+
 class VaultNodeList:
     init = """"""
     get_next_vault_node = """"""
