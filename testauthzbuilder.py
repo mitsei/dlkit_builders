@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 from build_dlkit import BaseBuilder
 from interface_builders import InterfaceBuilder
+from config import objects_to_implement
 from binder_helpers import under_to_caps, under_to_mixed, camel_to_mixed, camel_to_under, remove_plural
 
 
@@ -42,8 +43,81 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
 
     def _get_init_context(self, init_pattern, interface):
         context = super(TestAuthZBuilder, self)._get_init_context(init_pattern, interface)
-        # Add additional context mappings here
+        if init_pattern == 'commenting.CommentLookupSession':
+            print '    building relationship -', interface['shortname']
+            obj_name_under = camel_to_under(interface['shortname'].replace('LookupSession', ''))
+            try:
+                source_type = self.patterns['package_relationships_detail'][obj_name_under]['source_type']
+            except KeyError:
+                source_type = 'KEY_ERROR'
+            try:
+                destination_type = self.patterns['package_relationships_detail'][obj_name_under]['destination_type']
+            except KeyError:
+                destination_type = 'KEY_ERROR'
+            print '        source_type =', source_type
+            print '        destination_type =', destination_type
+            # source_obj_name = source_type.split('.')[-1]
+            # source_pkg_name = source_type.split('.')[-2]
+            # destination_obj_name = destination_type.split('.')[-1]
+            # destination_pkg_name = destination_type.split('.')[-2]
+            context['create_source_object'] = self.get_create_object(source_type, obj_name_under)
+            context['create_destination_object'] = self.get_create_object(destination_type, obj_name_under)
+            if context['create_destination_object'] == context['create_source_object']:
+                context['create_destination_object'] = ''
+            context['relationship_form_args'] = self.get_relationship_form_args(source_type, destination_type)
+            source_tear_down = self.get_object_tear_down(source_type)
+            destination_tear_down = self.get_object_tear_down(destination_type)
+            context['tear_down_source_and_dest'] = source_tear_down
+            if destination_tear_down != source_tear_down:
+                context['tear_down_source_and_dest'] += destination_tear_down
         return context
+
+    def get_create_object(self, object_type, relationship_object_name_under):
+        if object_type in ['UNKNOWN', 'osid.authentication.Agent']:
+            return ''
+        elif object_type.split('.')[-1] in self.patterns['package_cataloged_objects_caps']:
+            cat_name_under = self.patterns['package_catalog_under']
+            object_name = object_type.split('.')[-1]
+            object_name_under = camel_to_under(object_name)
+            relationship_object_name = under_to_caps(relationship_object_name_under)
+            return """
+        create_form = request.cls.{0}_list[0].get_{1}_form_for_create([])
+        create_form.display_name = '{2} for {3} Tests'
+        create_form.description = '{2} for authz adapter tests for {3}'
+        request.cls.{1} = request.cls.{0}_list[0].create_{1}(create_form)""".format(cat_name_under,
+                                                                                    object_name_under,
+                                                                                    object_name,
+                                                                                    relationship_object_name)
+        else:
+            object_name = object_type.split('.')[-1]
+            object_name_under = camel_to_under(object_name)
+            pkg_name = object_type.split('.')[1]
+            return """
+        {0}_id = Id(authority='TEST', namespace='{1}.{2}', identifier='TEST')""".format(object_name_under,
+                                                                                        pkg_name,
+                                                                                        object_name)
+
+    def get_relationship_form_args(self, source_type, destination_type):
+        arg_list = []
+        for object_type in [source_type, destination_type]:
+            if object_type == 'UNKNOWN':
+                pass
+            elif object_type == 'osid.authentication.Agent':
+                arg_list.append('AGENT_ID')
+            elif object_type.split('.')[-1] in self.patterns['package_cataloged_objects_caps']:
+                arg_list.append('request.cls.' + camel_to_under(object_type.split('.')[-1]) + '.ident')
+            else:
+                arg_list.append(camel_to_under(object_type.split('.')[-1]) + '_id')
+        arg_list.append('[]')
+        return ', '.join(arg_list)
+
+    def get_object_tear_down(self, object_type):
+        if object_type.split('.')[-1] in self.patterns['package_cataloged_objects_caps']:
+            cat_name_under = self.patterns['package_catalog_under']
+            object_name_under = camel_to_under(object_type.split('.')[-1])
+            return '\n            request.cls.{0}_list[0].delete_{1}(request.cls.{1}.ident)'.format(cat_name_under, object_name_under)
+        else:
+            return ''
 
     def _get_method_sig(self, method, interface):
         method_sig = ''
@@ -114,8 +188,11 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
             return False  # Until we figure out why its not building properly in services
         if interface['shortname'] in ['FunctionLookupSession', 'QualifierLookupSession']:
             return False  # Until we can properly implement these in json impls
+        if interface['shortname'] in ['GradeEntryLookupSession']:
+            return False  # GradeEntries can't be assigned to catalogs
         return (interface['shortname'].endswith('LookupSession') and
-                'OsidCatalog' not in interface['inherit_shortnames'])
+                'OsidCatalog' not in interface['inherit_shortnames'] and
+                interface['shortname'][:-13] in objects_to_implement)
 
     def class_doc(self, interface):
         return ''
@@ -197,7 +274,7 @@ class TestAuthZBuilder(InterfaceBuilder, BaseBuilder):
         # The real work starts here.  Iterate through all interfaces to build
         # all the classes for this osid package.
         for interface in self.package['interfaces']:
-            # print '    ', interface['shortname'], 'inherits', interface['inherit_shortnames']
+            '    ', interface['shortname'], 'inherits', interface['inherit_shortnames']
             if not self.build_this_interface(interface):
                 continue
             print '    building -', interface['shortname']
