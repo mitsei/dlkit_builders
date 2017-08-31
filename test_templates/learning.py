@@ -87,13 +87,18 @@ class ObjectiveRequisiteAssignmentSession:
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
     request.cls.service_config = request.param
-    request.cls.requisite_list = list()
-    request.cls.requisite_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
     request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.requisite_list = list()
+    request.cls.requisite_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -113,7 +118,9 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for catalog in request.cls.svc_mgr.get_objective_banks():
                 for obj_id in request.cls.requisite_ids:
@@ -122,12 +129,7 @@ def ${interface_name_under}_class_fixture(request):
                     catalog.delete_objective(obj.ident)
                 request.cls.svc_mgr.delete_objective_bank(catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
     assign_objective_requisite_template = """
         # From test_templates/learning.py::ObjectiveRequsiteAssignmentSession::assign_objective_requisite_template
@@ -654,13 +656,18 @@ class ActivityLookupSession:
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
     request.cls.service_config = request.param
-    request.cls.activity_list = list()
-    request.cls.activity_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.activity_list = list()
+    request.cls.activity_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -680,7 +687,9 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for catalog in request.cls.svc_mgr.get_objective_banks():
                 for obj in catalog.get_activities():
@@ -689,22 +698,25 @@ def ${interface_name_under}_class_fixture(request):
                     catalog.delete_objective(obj.ident)
                 request.cls.svc_mgr.delete_objective_bank(catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
     get_activities_for_objective_template = """
         # From test_templates/learning.py::ActivityLookupSession::get_activities_for_objective_template
-        if not is_never_authz(self.service_config):
+        if self.svc_mgr.supports_${object_name_under}_query():
             results = self.session.${method_name}(self.${arg0_object_under}.ident)
-            assert results.available() == 2
             assert isinstance(results, ABCObjects.${return_type_list_object}List)
+            if not is_never_authz(self.service_config):
+                assert results.available() == 2
+            else:
+                assert results.available() == 0
         else:
-            with pytest.raises(errors.PermissionDenied):
-                self.session.${method_name}(self.fake_id)"""
+            if not is_never_authz(self.service_config):
+                results = self.session.${method_name}(self.${arg0_object_under}.ident)
+                assert results.available() == 2
+                assert isinstance(results, ABCObjects.${return_type_list_object}List)
+            else:
+                with pytest.raises(errors.PermissionDenied):
+                    self.session.${method_name}(self.fake_id)"""
 
 
 class ActivityQuerySession:
@@ -1329,13 +1341,18 @@ class ProficiencyLookupSession:
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
     request.cls.service_config = request.param
-    request.cls.proficiency_list = list()
-    request.cls.proficiency_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         'LEARNING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('objective.objective%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('objective.objective%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.proficiency_list = list()
+    request.cls.proficiency_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_objective_bank_form_for_create([])
         create_form.display_name = 'Test ObjectiveBank'
@@ -1357,7 +1374,9 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for catalog in request.cls.svc_mgr.get_objective_banks():
                 for obj in catalog.get_proficiencies():
@@ -1366,12 +1385,7 @@ def ${interface_name_under}_class_fixture(request):
                     catalog.delete_objective(obj.ident)
                 request.cls.svc_mgr.delete_objective_bank(catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
 
 class ProficiencyForm:

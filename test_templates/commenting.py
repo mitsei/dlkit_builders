@@ -21,13 +21,19 @@ class CommentLookupSession:
 def ${interface_name_under}_class_fixture(request):
     # From test_templates/commenting.py::CommentLookupSession::init_template
     request.cls.service_config = request.param
-    request.cls.${object_name_under}_list = list()
-    request.cls.${object_name_under}_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         '${pkg_name_upper}',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    # From test_templates/commenting.py::CommentLookupSession::init_template
+    request.cls.${object_name_under}_list = list()
+    request.cls.${object_name_under}_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_${cat_name_under}_form_for_create([])
         create_form.display_name = 'Test ${cat_name}'
@@ -43,20 +49,16 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for catalog in request.cls.svc_mgr.get_${cat_name_under_plural}():
                 for obj in catalog.get_${object_name_under_plural}():
                     catalog.delete_${object_name_under}(obj.ident)
                 request.cls.svc_mgr.delete_${cat_name_under}(catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    # From test_templates/commenting.py::CommentLookupSession::init_template
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
 
 class CommentBookSession:

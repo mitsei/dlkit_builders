@@ -1180,13 +1180,18 @@ class AssessmentOfferedLookupSession:
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
     request.cls.service_config = request.param
-    request.cls.assessment_offered_list = list()
-    request.cls.assessment_offered_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         'ASSESSMENT',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.assessment_offered_list = list()
+    request.cls.assessment_offered_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
@@ -1206,7 +1211,9 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for obj in request.cls.catalog.get_assessments_offered():
                 request.cls.catalog.delete_assessment_offered(obj.ident)
@@ -1214,12 +1221,7 @@ def ${interface_name_under}_class_fixture(request):
                 request.cls.catalog.delete_assessment(obj.ident)
             request.cls.svc_mgr.delete_bank(request.cls.catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
 
 class AssessmentTakenLookupSession:
@@ -1229,13 +1231,18 @@ class AssessmentTakenLookupSession:
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
     request.cls.service_config = request.param
-    request.cls.assessment_taken_list = list()
-    request.cls.assessment_taken_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         'ASSESSMENT',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.assessment_taken_list = list()
+    request.cls.assessment_taken_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_bank_form_for_create([])
         create_form.display_name = 'Test Bank'
@@ -1259,7 +1266,9 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for catalog in request.cls.svc_mgr.get_banks():
                 for obj in catalog.get_assessments():
@@ -1272,28 +1281,20 @@ def ${interface_name_under}_class_fixture(request):
                     catalog.delete_item(obj.ident)
                 request.cls.svc_mgr.delete_bank(catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
     # This is hand built, but there may be a pattern to try to map, specifically
     # getting objects for another package object and a persisted id thingy
     get_assessments_taken_for_taker_and_assessment_offered = """
         from dlkit.abstract_osid.assessment.objects import AssessmentTakenList
+        takens = self.session.get_assessments_taken_for_taker_and_assessment_offered(
+            self.catalog._proxy.get_effective_agent_id(),
+            self.assessment_offered.ident)
+        assert isinstance(takens, AssessmentTakenList)
         if not is_never_authz(self.service_config):
-            takens = self.session.get_assessments_taken_for_taker_and_assessment_offered(
-                self.catalog._proxy.get_effective_agent_id(),
-                self.assessment_offered.ident)
-            assert isinstance(takens, AssessmentTakenList)
             assert takens.available() == 2
         else:
-            with pytest.raises(errors.PermissionDenied):
-                self.session.get_assessments_taken_for_taker_and_assessment_offered(
-                    self.fake_id,
-                    self.fake_id)"""
+            assert takens.available() == 0"""
 
     get_assessments_taken_for_assessment = """
         from dlkit.abstract_osid.assessment.objects import AssessmentTakenList
