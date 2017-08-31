@@ -21,6 +21,15 @@ class AssessmentManager:
         return Bank(self._provider_manager, session.get_bank(), self._runtime, self._proxy, assessment_taken_admin_session = session)"""
 
 
+# Ideally we would figure out a way to do this in the builder, for all subpackages...
+class AssessmentProfile:
+    import_statements = [
+        'from dlkit.manager_impls.assessment_authoring import managers as assessment_authoring_managers'
+    ]
+
+    inheritance = ['assessment_authoring_managers.AssessmentAuthoringProfile']
+
+
 class AssessmentAuthoringManager:
     get_sequence_rule_lookup_session = """
         \"\"\"Pass through to provider method\"\"\"
