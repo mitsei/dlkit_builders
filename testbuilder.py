@@ -106,7 +106,9 @@ class TestBuilder(InterfaceBuilder, BaseBuilder):
     def _update_module_imports(self, modules, interface):
         imports = modules[interface['category']]['imports']
         self.append(imports, 'import pytest')
-        self.append(imports, 'from ..utilities.general import is_never_authz, is_no_authz, uses_cataloging')
+        self.append(
+            imports,
+            'from ..utilities.general import is_never_authz, is_no_authz, uses_cataloging, uses_filesystem_only')
 
         # Check to see if there are any additional inheritances required
         # by the implementation patterns.  THIS MAY WANT TO BE REDESIGNED
