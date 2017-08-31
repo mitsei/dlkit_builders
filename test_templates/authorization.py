@@ -33,7 +33,7 @@ def ${interface_name_under}_class_fixture(request):
     request.cls.authz_mgr = Runtime().get_manager(
         'AUTHORIZATION',
         implementation='JSON_1')
-    if not is_never_authz(request.cls.service_config):
+    if not is_never_authz(request.cls.service_config) and not uses_filesystem_only(request.cls.service_config):
         request.cls.vault_admin_session = request.cls.authz_mgr.get_vault_admin_session()
         request.cls.vault_lookup_session = request.cls.authz_mgr.get_vault_lookup_session()
 
@@ -268,43 +268,58 @@ def ${interface_name_under}_class_fixture(request):
 def ${interface_name_under}_test_fixture(request):
     request.cls.session = request.cls.catalog"""
 
+    get_vault_id = """
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
+            assert self.catalog.get_vault_id() == self.catalog.ident"""
+
+    get_vault = """
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
+            assert isinstance(self.catalog.get_vault(), ABCVault)"""
+
+    can_access_authorizations = """
+        if is_never_authz(self.service_config) or uses_filesystem_only(self.service_config):
+            pass  # no object to call the method on?
+        else:
+            with pytest.raises(errors.Unimplemented):
+                self.session.can_access_authorizations()"""
+
     is_authorized = """
-        if not is_never_authz(self.service_config):
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
             assert not self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[0])
 
     def test_is_authorized_1(self):
         \"\"\"Tests is_authorized 1\"\"\"
-        if not is_never_authz(self.service_config):
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
             assert self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[1])
 
     def test_is_authorized_3(self):
         \"\"\"Tests is_authorized 3\"\"\"
-        if not is_never_authz(self.service_config):
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
             assert self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[3])
 
     def test_is_authorized_4(self):
         \"\"\"Tests is_authorized 4\"\"\"
-        if not is_never_authz(self.service_config):
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
             assert self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[4])
 
     def test_is_authorized_2(self):
         \"\"\"Tests is_authorized 2\"\"\"
-        if not is_never_authz(self.service_config):
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
             assert not self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[2])
 
     def test_is_authorized_5(self):
         \"\"\"Tests is_authorized 5\"\"\"
-        if not is_never_authz(self.service_config):
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
             assert self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[5])
 
     def test_is_authorized_6(self):
         \"\"\"Tests is_authorized 5\"\"\"
-        if not is_never_authz(self.service_config):
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
             assert not self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[6])
 
     def test_is_authorized_7(self):
         \"\"\"Tests is_authorized 5\"\"\"
-        if not is_never_authz(self.service_config):
+        if not is_never_authz(self.service_config) and not uses_filesystem_only(self.service_config):
             assert self.catalog.is_authorized(AGENT_ID, LOOKUP_RESOURCE_FUNCTION_ID, self.bin_id_list[7])
 """
 
@@ -319,13 +334,18 @@ class AuthorizationLookupSession:
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
     request.cls.service_config = request.param
-    request.cls.authorization_list = list()
-    request.cls.authorization_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         'AUTHORIZATION',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.authorization_list = list()
+    request.cls.authorization_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_vault_form_for_create([])
         create_form.display_name = 'Test Vault'
@@ -345,28 +365,24 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for catalog in request.cls.svc_mgr.get_vaults():
                 for obj in catalog.get_authorizations():
                     catalog.delete_authorization(obj.ident)
                 request.cls.svc_mgr.delete_vault(catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
     get_authorizations_for_function = """
+        results = self.session.get_authorizations_for_function(LOOKUP_RESOURCE_FUNCTION_ID)
+        assert isinstance(results, AuthorizationList)
         if not is_never_authz(self.service_config):
-            results = self.session.get_authorizations_for_function(LOOKUP_RESOURCE_FUNCTION_ID)
             assert results.available() == 2
-            assert isinstance(results, AuthorizationList)
         else:
-            with pytest.raises(errors.PermissionDenied):
-                self.session.get_authorizations_for_function(LOOKUP_RESOURCE_FUNCTION_ID)"""
+            assert results.available() == 0"""
 
 
 class AuthorizationForm:
