@@ -219,15 +219,20 @@ class GradebookColumnLookupSession:
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
     request.cls.service_config = request.param
-    request.cls.grade_entry_list = list()
-    request.cls.grade_entry_ids = list()
-    request.cls.gradebook_column_list = list()
-    request.cls.gradebook_column_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         'GRADING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.grade_entry_list = list()
+    request.cls.grade_entry_ids = list()
+    request.cls.gradebook_column_list = list()
+    request.cls.gradebook_column_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test Gradebook'
@@ -260,7 +265,9 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for catalog in request.cls.svc_mgr.get_gradebooks():
                 for obj in catalog.get_grade_entries():
@@ -271,12 +278,7 @@ def ${interface_name_under}_class_fixture(request):
                     catalog.delete_grade_system(obj.ident)
                 request.cls.svc_mgr.delete_gradebook(catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
     # skip this one until gradebook column summary is supported
     get_gradebook_column_summary = """
@@ -284,7 +286,7 @@ def ${interface_name_under}_test_fixture(request):
             assert isinstance(self.catalog.get_gradebook_column_summary(self.gradebook_column_ids[0]),
                               GradebookColumnSummary)
         else:
-            with pytest.raises(errors.PermissionDenied):
+            with pytest.raises(errors.NotFound):
                 self.catalog.get_gradebook_column_summary(self.fake_id)"""
 
 
@@ -309,15 +311,20 @@ class GradeEntryLookupSession:
                 params=${test_service_configs})
 def ${interface_name_under}_class_fixture(request):
     request.cls.service_config = request.param
-    request.cls.grade_entry_list = list()
-    request.cls.grade_entry_ids = list()
-    request.cls.gradebook_column_list = list()
-    request.cls.gradebook_column_ids = list()
     request.cls.svc_mgr = Runtime().get_service_manager(
         'GRADING',
         proxy=PROXY,
         implementation=request.cls.service_config)
-    request.cls.fake_id = Id('resource.Resource%3Afake%40DLKIT.MIT.EDU')
+    request.cls.fake_id = Id('resource.Resource%3A000000000000000000000000%40DLKIT.MIT.EDU')
+
+
+@pytest.fixture(scope="function")
+def ${interface_name_under}_test_fixture(request):
+    request.cls.grade_entry_list = list()
+    request.cls.grade_entry_ids = list()
+    request.cls.gradebook_column_list = list()
+    request.cls.gradebook_column_ids = list()
+
     if not is_never_authz(request.cls.service_config):
         create_form = request.cls.svc_mgr.get_gradebook_form_for_create([])
         create_form.display_name = 'Test Gradebook'
@@ -349,7 +356,9 @@ def ${interface_name_under}_class_fixture(request):
     else:
         request.cls.catalog = request.cls.svc_mgr.get_${interface_name_under}(proxy=PROXY)
 
-    def class_tear_down():
+    request.cls.session = request.cls.catalog
+
+    def test_tear_down():
         if not is_never_authz(request.cls.service_config):
             for catalog in request.cls.svc_mgr.get_gradebooks():
                 for obj in catalog.get_grade_entries():
@@ -360,12 +369,7 @@ def ${interface_name_under}_class_fixture(request):
                     catalog.delete_grade_system(obj.ident)
                 request.cls.svc_mgr.delete_gradebook(catalog.ident)
 
-    request.addfinalizer(class_tear_down)
-
-
-@pytest.fixture(scope="function")
-def ${interface_name_under}_test_fixture(request):
-    request.cls.session = request.cls.catalog"""
+    request.addfinalizer(test_tear_down)"""
 
     get_grade_entries_for_gradebook_column_on_date = """
         end_date = DateTime.utcnow() + datetime.timedelta(days=5)
