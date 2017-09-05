@@ -1595,7 +1595,7 @@ class OsidCatalogForm:
 class OsidList:
     import_statements = [
         'from pymongo.cursor import Cursor',
-        'from ..utilities import OsidListList, is_string',
+        'from ..utilities import OsidListList, is_string, ListFiller',
         'import itertools'
     ]
 
@@ -1610,7 +1610,7 @@ class OsidList:
             iter_object = itertools.chain(*iter_object)
         elif isinstance(iter_object, dict) or isinstance(iter_object, list):
             self._count = len(iter_object)
-        elif isinstance(iter_object, Cursor):
+        elif isinstance(iter_object, (Cursor, ListFiller)):
             self._count = iter_object.count(True)
         else:
             self._count = None
