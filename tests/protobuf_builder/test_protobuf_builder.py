@@ -22,7 +22,8 @@ def proto_builder_message_test_fixture(request):
             'actual_start_time': 'osid.calendaring.DateTime',
             'completion_time': 'osid.calendaring.DateTime',
             'score': 'decimal',
-            'grade': 'osid.id.Id'
+            'grade': 'osid.id.Id',
+            'items': 'osid.id.Id[]'
         }
     }
     request.cls.result = request.cls.builder.generate_protobuf_message(request.cls.interface)
@@ -36,21 +37,23 @@ class TestProtoBuilderMessages(object):
 
         assert isinstance(self.result[self.object_name], dict)
         assert '_imports' in self.result[self.object_name]
+        assert '_type' in self.result[self.object_name]
+        assert self.result[self.object_name]['_type'] == 'message'
+        assert 'body' in self.result[self.object_name]
         assert len(self.result[self.object_name]['_imports']) == 3
-        for variable in self.interface[self.object_name].keys():
-            assert variable in self.result[self.object_name].keys()
-
-    def test_generate_protobuf_message_handles_primordium_imports(self):
-        assert self.result[self.object_name]['grade'] == 'Id'
-        assert 'dlkit/primordium/id/primitives.proto' in self.result[self.object_name]['_imports']
-
-    def test_generate_protobuf_message_handles_osid_package_imports(self):
-        assert self.result[self.object_name]['bank'] == 'OsidCatalog'
-        assert 'osid/objects.proto' in self.result[self.object_name]['_imports']
-
-    def test_generate_protobuf_message_handles_proto_types(self):
-        assert self.result[self.object_name]['actual_start_time'] == 'google.protobuf.Timestamp'
-        assert self.result[self.object_name]['completion_time'] == 'google.protobuf.Timestamp'
+        for proto_import in self.result[self.object_name]['_imports']:
+            assert 'import' in proto_import
+        assert self.result[self.object_name]['body'] == """
+message AssessmentTaken {
+  google.protobuf.Timestamp actual_start_time = 1;
+  Id assessment_offered = 2;
+  OsidCatalog bank = 3;
+  google.protobuf.Timestamp completion_time = 4;
+  Id grade = 5;
+  IdList items = 6;
+  float score = 7;
+  Id taker = 8;
+}"""
 
     def test_generate_protobuf_message_includes_object_name(self):
         assert len(self.result.keys()) == 1
@@ -68,15 +71,27 @@ def proto_builder_service_test_fixture(request):
         }, {
             'name': 'get_items_by_parent_genus_type',
             'args': [{
-                'var_name': 'item_genus_type'
+                'arg_type': 'osid.type.Type'
             }],
             'return_type': 'osid.assessment.ItemList'
         }, {
             'name': 'get_item',
             'args': [{
-                'var_name': 'item_id'
+                'arg_type': 'osid.id.Id'
             }],
             'return_type': 'osid.assessment.Item'
+        }, {
+            'name': 'get_items_by_ids',
+            'args': [{
+                'arg_type': 'osid.id.IdList'
+            }],
+            'return_type': 'osid.assessment.ItemList'
+        }, {
+            'name': 'fake_method',
+            'args': [{
+                'arg_type': 'boolean'
+            }],
+            'return_type': 'osid.id.IdList'
         }]
     }
     request.cls.result = request.cls.builder.generate_grpc_service(request.cls.interface)
@@ -89,21 +104,77 @@ class TestProtoBuilderServices(object):
         assert isinstance(self.result, dict)
 
         assert isinstance(self.result[self.session_name], dict)
-        assert len(self.result[self.session_name].keys()) == 3
-        for method in self.interface['methods']:
-            assert under_to_mixed(method['name']) in self.result[self.session_name].keys()
+        assert '_imports' in self.result[self.session_name]
+        assert '_type' in self.result[self.session_name]
+        assert self.result[self.session_name]['_type'] == 'service'
+        assert 'body' in self.result[self.session_name]
 
-    def test_generate_grpc_service_handles_list_returns(self):
-        assert self.result[self.session_name]['getItemsByParentGenusType']['returns'] == 'stream Item'
+        assert self.result[self.session_name]['body'] == """
+service ItemLookupSession {
+  rpc GetBankId() returns (Id) {}
+  rpc GetItemsByParentGenusType(dlkit.primordium.type.primitives.Type) returns (stream Item) {}
+  rpc GetItem(dlkit.primordium.id.primitives.Id) returns (Item) {}
+  rpc GetItemsByIds(dlkit.primordium.id.primitives.IdList) returns (stream Item) {}
+  rpc FakeMethod(bool) returns (stream Id) {}
+}"""
 
-    def test_generate_grpc_service_handles_no_args(self):
-        assert self.result[self.session_name]['getBankId']['args'] == []
+    def test_generate_grpc_service_includes_session_name(self):
+        assert len(self.result.keys()) == 1
+        assert self.result.keys()[0] == self.interface['shortname']
 
-    def test_generate_grpc_service_handles_genus_type_args(self):
-        assert self.result[self.session_name]['getItemsByParentGenusType']['args'][0] == 'GenusType'
 
-    def test_generate_grpc_service_handles_id_type_args(self):
-        assert self.result[self.session_name]['getItem']['args'][0] == 'Id'
+@pytest.fixture(scope='function')
+def proto_builder_unify_imports_test_fixture(request):
+    request.cls.proto_data = [{
+        'Object1': {
+            '_imports': ['foo', 'bar', 'baz']
+        },
+    }, {
+        'Session1': {
+            '_imports': ['bar', 'bim', 'bop']
+        }
+    }]
+    request.cls.result = request.cls.builder.unify_imports(request.cls.proto_data)
 
-    def test_generate_grpc_service_handles_package_return_object(self):
-        assert self.result[self.session_name]['getItem']['returns'] == 'Item'
+
+@pytest.mark.usefixtures('proto_builder_class_fixture', 'proto_builder_unify_imports_test_fixture')
+class TestProtoBuilderUnifyImports(object):
+    def test_unify_imports_returns_list(self):
+        assert isinstance(self.result, list)
+
+    def test_unify_imports_removes_duplicates(self):
+        assert len(self.result) == 5
+
+
+@pytest.fixture(scope='function')
+def proto_builder_unify_bodies_test_fixture(request):
+    request.cls.proto_data = [{
+        'Object1': {
+            'body': 'foo',
+            '_type': 'message'
+        },
+    }, {
+        'Session1': {
+            'body': 'bar',
+            '_type': 'service'
+        }
+    }, {
+        'Object2': {
+            'body': 'bim',
+            '_type': 'message'
+        }
+    }]
+    request.cls.result = request.cls.builder.unify_bodies(request.cls.proto_data)
+
+
+@pytest.mark.usefixtures('proto_builder_class_fixture', 'proto_builder_unify_bodies_test_fixture')
+class TestProtoBuilderUnifyBodies(object):
+    def test_unify_bodies_returns_list(self):
+        assert isinstance(self.result, list)
+
+    def test_unify_bodies_orders_messages_first(self):
+        # There really should never be duplicates, but just in case...
+        assert len(self.result) == 3
+        assert self.result[0] == 'foo'
+        assert self.result[1] == 'bim'
+        assert self.result[2] == 'bar'
