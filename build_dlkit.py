@@ -876,6 +876,10 @@ class Builder(Utilities):
         from managerutilbuilder import ManagerUtilBuilder
         ManagerUtilBuilder(build_dir=self.build_dir).make()
 
+    def proto(self):
+        from protobuf_builder import ProtoBuilder
+        ProtoBuilder(build_dir=self.build_dir).make()
+
     def services(self):
         from kitbuilder import KitBuilder
         KitBuilder(build_dir=self.build_dir).make()
@@ -928,6 +932,7 @@ if __name__ == '__main__':
         print("  tests: build the tests")
         print("  testauthz: builds special object tests for authz adaptation")
         print("  docs: build the documentation in Sphinx format")
+        print("  proto: build the Protocol Buffer .proto files")
         print("  --all: build all of the above")
         print("  --buildto <directory>: the target build-to directory")
         print("")
@@ -1042,5 +1047,7 @@ if __name__ == '__main__':
             if 'docs' in sys.argv:
                 builder.docs()
             # Create a build-hash file so we know what commit built dlkit
+            if 'proto' in sys.argv:
+                builder.proto()
             builder.update_hash_file()
     sys.exit(0)
