@@ -23,7 +23,7 @@ def proto_builder_message_test_fixture(request):
             'completion_time': 'osid.calendaring.DateTime',
             'score': 'decimal',
             'grade': 'osid.id.Id',
-            'items': 'osid.id.Id[]'
+            'items': 'osid.id.Id[]',
         }
     }
     request.cls.result = request.cls.builder.generate_protobuf_message(request.cls.interface)
@@ -43,21 +43,33 @@ class TestProtoBuilderMessages(object):
         assert len(self.result[self.object_name]['_imports']) == 3
         for proto_import in self.result[self.object_name]['_imports']:
             assert 'import' in proto_import
+
         assert self.result[self.object_name]['body'] == """
 message AssessmentTaken {
   google.protobuf.Timestamp actual_start_time = 1;
-  Id assessment_offered = 2;
-  OsidCatalog bank = 3;
+  dlkit.primordium.id.primitives.Id assessment_offered = 2;
+  dlkit.proto.osid.OsidCatalog bank = 3;
   google.protobuf.Timestamp completion_time = 4;
-  Id grade = 5;
-  IdList items = 6;
+  dlkit.primordium.id.primitives.Id grade = 5;
+  dlkit.primordium.id.primitives.IdList items = 6;
   float score = 7;
-  Id taker = 8;
+  dlkit.primordium.id.primitives.Id taker = 8;
 }"""
 
     def test_generate_protobuf_message_includes_object_name(self):
         assert len(self.result.keys()) == 1
         assert self.result.keys()[0] == self.interface.keys()[0]
+
+    def test_generate_protobuf_message_handles_list_objects(self):
+        interface = {
+            'QuestionList': {
+            }
+        }
+        result = self.builder.generate_protobuf_message(interface)
+        assert result['QuestionList']['body'] == """
+message QuestionList {
+  repeated Question = 1;
+}"""
 
 
 @pytest.fixture(scope='function')

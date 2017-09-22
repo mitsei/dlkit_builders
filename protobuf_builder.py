@@ -6,12 +6,23 @@ from binder_helpers import under_to_camel
 from build_dlkit import PatternBuilder
 from interface_builders import InterfaceBuilder
 
+IMPORT_MAPPING = {
+    'osid.id.Id': 'dlkit/primordium/id/primitives.proto',
+    'osid.calendaring.DateTime': 'google/protobuf/timestamp.proto',  # a Google built-in one?
+    'osid.calendaring.Duration': 'dlkit/primordium/calendaring/primitives.proto',
+    'osid.locale.DisplayText': 'dlkit/primordium/locale/primitives.proto',
+    'OsidCatalog': 'osid/objects.proto',
+    # Where to get IdList from??
+}
+
 TYPE_MAPPING = {
     'decimal': 'float',
     'cardinal': 'sint32',
     'boolean': 'bool',
     'osid.calendaring.DateTime': 'google.protobuf.Timestamp',
-    'osid.id.Id[]': 'IdList'
+    'osid.id.Id[]': 'dlkit.primordium.id.primitives.IdList',
+    'osid.id.Id': 'dlkit.primordium.id.primitives.Id',
+    'OsidCatalog': 'dlkit.proto.osid.OsidCatalog'
 }
 
 
@@ -175,7 +186,7 @@ message Assessment {
             """
             if full_name in TYPE_MAPPING:
                 return TYPE_MAPPING[full_name]
-            if '.' in full_name:
+            elif '.' in full_name:
                 return full_name.split('.')[-1]
 
             return full_name
@@ -190,15 +201,6 @@ message Assessment {
         if not isinstance(protobuf_message[object_name], dict):
             raise TypeError('protobuf_message value must be a dict')
 
-        import_mapping = {
-            'osid.id.Id': 'dlkit/primordium/id/primitives.proto',
-            'osid.calendaring.DateTime': 'google/protobuf/timestamp.proto',  # a Google built-in one?
-            'osid.calendaring.Duration': 'dlkit/primordium/calendaring/primitives.proto',
-            'osid.locale.DisplayText': 'dlkit/primordium/locale/primitives.proto',
-            'OsidCatalog': 'osid/objects.proto',
-            # Where to get IdList from??
-        }
-
         result = {
             object_name: {
                 '_imports': [],
@@ -206,17 +208,22 @@ message Assessment {
             }
         }
         message_fields = []
-        variable_counter = 1
-        # Not sure if we want to have the fields sorted a certain way....we might care at some point
-        for variable, variable_type in iter(sorted(protobuf_message[object_name].items())):
-            if variable_type in import_mapping:
-                proto_import = 'import "{0}";'.format(import_mapping[variable_type])
-                if proto_import not in result[object_name]['_imports']:
-                    result[object_name]['_imports'].append(proto_import)
-            message_fields.append('  {0} {1} = {2};'.format(extract_base_message_name(variable_type),
-                                                            variable,
-                                                            str(variable_counter)))
-            variable_counter += 1
+
+        if object_name.endswith('List'):
+            message_fields.append('  repeated {0} = 1;'.format(object_name.replace('List', '')))
+        else:
+            variable_counter = 1
+
+            # Not sure if we want to have the fields sorted a certain way....we might care at some point
+            for variable, variable_type in iter(sorted(protobuf_message[object_name].items())):
+                if variable_type in IMPORT_MAPPING:
+                    proto_import = 'import "{0}";'.format(IMPORT_MAPPING[variable_type])
+                    if proto_import not in result[object_name]['_imports']:
+                        result[object_name]['_imports'].append(proto_import)
+                message_fields.append('  {0} {1} = {2};'.format(extract_base_message_name(variable_type),
+                                                                variable,
+                                                                str(variable_counter)))
+                variable_counter += 1
         result[object_name]['body'] = """
 message {0} {{
 {1}
@@ -325,8 +332,6 @@ message {0} {{
         """ create the proto3 file that defines all the Catalogs and Objects for the given package """
         if not os.path.isfile(package_map_file):
             raise TypeError('package_map_file must be a path to a file')
-        import pdb
-        pdb.set_trace()
         proto_data = []
         for protobuf_message in self.get_package_elements(package_map_file, 'objects'):
             # treat objects as protobuf messages
