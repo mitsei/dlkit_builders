@@ -2,6 +2,7 @@ import glob
 import json
 import os
 
+from binder_helpers import under_to_mixed
 from build_dlkit import PatternBuilder
 from interface_builders import InterfaceBuilder
 
@@ -51,8 +52,14 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
         this method would return:
         {
             'BookService': {
-                'GetBook': ('GetBookRequest', 'Book'),
-                'QueryBooks': ('QueryBooksRequest', 'stream Book')
+                'GetBook': {
+                    'args': ['GetBookRequest'],
+                    'returns': 'Book'
+                },
+                'QueryBooks': {
+                    'args': ['QueryBooksRequest']
+                    'returns': 'stream Book'
+                }
             }
         }
 
@@ -62,7 +69,58 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
           rpc QueryBooks(QueryBooksRequest) returns (stream Book) {}
         }
         """
-        pass
+        def get_return_text(return_type):
+            """
+            For 'ResourceList', should return 'stream Resource'
+            For 'Resource', should return 'Resource'
+            """
+            return_type_without_package = return_type.split('.')[-1]
+            if return_type_without_package.endswith('List'):
+                return 'stream {0}'.format(return_type_without_package.replace('List', ''))
+            return return_type_without_package
+
+        def get_arg_message_name(arg_name):
+            """
+            Need to translate the argument name into the proto message "type", i.e.
+
+            item_genus_type => GenusType
+            bank_id => Id
+
+            But for proto-defined messages in this package, it would just be the name in mixedCase
+            """
+            # TODO: see if these exceptions can get moved somewhere with the maps in ``generate_protobuf_message``
+            if 'genus_type' in arg_name:
+                return 'GenusType'
+            elif '_id' in arg_name:
+                return 'Id'
+            return arg_name
+
+        if not isinstance(grpc_service, dict):
+            raise TypeError('grpc_service must be a dict')
+        if 'shortname' not in grpc_service:
+            raise KeyError('grpc_service must contain a shortname')
+        if 'methods' not in grpc_service:
+            raise KeyError('grpc_service must contain a list of methods')
+
+        service_name = grpc_service['shortname']
+
+        if not isinstance(grpc_service['methods'], list):
+            raise TypeError('grpc_service methods must be a list')
+
+        result = {
+            service_name: {
+            }
+        }
+        for method in grpc_service['methods']:
+            method_name = under_to_mixed(method['name'])
+            result[service_name][method_name] = {
+                'args': []
+            }
+            for arg in method['args']:
+                result[service_name][method_name]['args'].append(get_arg_message_name(arg['var_name']))
+            result[service_name][method_name]['returns'] = get_return_text(method['return_type'])
+
+        return result
 
     def generate_protobuf_message(self, protobuf_message):
         """
@@ -145,7 +203,9 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
         }
         for variable, variable_type in protobuf_message[object_name].items():
             if variable_type in import_mapping:
-                result[object_name]['_imports'].append(import_mapping[variable_type])
+                proto_import = import_mapping[variable_type]
+                if proto_import not in result[object_name]['_imports']:
+                    result[object_name]['_imports'].append(proto_import)
             result[object_name][variable] = extract_base_message_name(variable_type)
 
         return result
