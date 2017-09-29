@@ -1,8 +1,9 @@
 import glob
 import json
 import os
+import subprocess
 
-from binder_helpers import under_to_camel
+from binder_helpers import under_to_camel, make_plural, camel_to_under
 from build_dlkit import PatternBuilder
 from interface_builders import InterfaceBuilder
 
@@ -11,18 +12,34 @@ IMPORT_MAPPING = {
     'osid.calendaring.DateTime': 'google/protobuf/timestamp.proto',  # a Google built-in one?
     'osid.calendaring.Duration': 'dlkit/primordium/calendaring/primitives.proto',
     'osid.locale.DisplayText': 'dlkit/primordium/locale/primitives.proto',
-    'OsidCatalog': 'osid/objects.proto',
-    # Where to get IdList from??
+    'osid.locale.Locale': 'dlkit/primordium/locale/primitives.proto',
+    'osid.type.Type': 'dlkit/primordium/type/primitives.proto',
+    'OsidCatalog': 'dlkit/proto/osid.proto',
+    'osid.authentication.Agent': 'dlkit/proto/authentication.proto',
+    'osid.hierarchy.Hierarchy': 'dlkit/proto/hierarchy.proto',
+    'osid.hierarchy.Node': 'dlkit/proto/hierarchy.proto',
+    'osid.grading.GradeEntry': 'dlkit/proto/grading.proto',
+    'osid.transaction.Transaction': 'dlkit/proto/transaction.proto'
 }
 
 TYPE_MAPPING = {
     'decimal': 'float',
     'cardinal': 'sint32',
     'boolean': 'bool',
+    'timestamp': 'google.protobuf.Timestamp',
     'osid.calendaring.DateTime': 'google.protobuf.Timestamp',
-    'osid.id.Id[]': 'dlkit.primordium.id.primitives.IdList',
+    'osid.calendaring.Duration': 'dlkit.primordium.calendaring.primitives.Duration',
     'osid.id.Id': 'dlkit.primordium.id.primitives.Id',
-    'OsidCatalog': 'dlkit.proto.osid.OsidCatalog'
+    'Id': 'dlkit.primordium.id.primitives.Id',
+    'osid.type.Type': 'dlkit.primordium.type.primitives.Type',
+    'Type': 'dlkit.primordium.type.primitives.Type',
+    'osid.locale.Locale': 'dlkit.proto.locale.Locale',
+    'OsidCatalog': 'dlkit.proto.osid.OsidCatalog',
+    'osid.authentication.Agent': 'dlkit.proto.authentication.Agent',
+    'osid.hierarchy.Hierarchy': 'dlkit.proto.hierarchy.Hierarchy',
+    'osid.hierarchy.Node': 'dlkit.proto.hierarchy.Node',
+    'osid.grading.GradeEntry': 'dlkit.proto.grading.GradeEntry',
+    'osid.transaction.Transaction': 'dlkit.proto.transaction.Transaction'
 }
 
 
@@ -36,6 +53,137 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
         self._template_dir = self._abs_path + '/proto_templates'
 
         self._class = 'proto'
+
+    def compile_proto_files(self):
+        """For each *.proto file in dlkit/proto and dlkit/primordium, call ``protoc``:
+
+        grpc_tools.protoc --proto_path=. --python_out=. --grpc_python_out=. *.proto   (basically)
+
+        https://grpc.io/docs/quickstart/python.html
+        """
+        for proto_file in glob.iglob('{0}/**/*.proto'.format(self._build_dir)):
+            directory = os.path.dirname(proto_file)
+            filename = os.path.basename(proto_file)
+            call_list = ['python',
+                         '-m',
+                         'grpc_tools.protoc',
+                         '-I', '../dlkit-pip/',
+                         '--proto_path', directory,
+                         '--python_out', directory,
+                         '--grpc_python_out', directory,
+                         filename]
+            try:
+                subprocess.check_call(call_list)
+            except OSError:
+                raise RuntimeError('Running the proto builder requires having protoc installed.')
+
+    def define_grpc_services(self, package_map_file):
+        """split this out for testing -- just grab all the data from the interface sessions"""
+        if not os.path.isfile(package_map_file):
+            raise TypeError('package_map_file must be a path to a file')
+        proto_data = []
+        for grpc_service in self.get_package_elements(package_map_file, 'sessions'):
+            # treat sessions as grpc services
+            # Also need to generate the SessionRequest message, that will get passed into
+            #   the service RPC
+            for method in grpc_service['methods']:
+                proto_data.append(self.generate_protobuf_message(self.format_method_to_protobuf_reply_msg(method),
+                                                                 package_map_file))
+                proto_data.append(self.generate_protobuf_message(self.format_method_to_protobuf_request_msg(method),
+                                                                 package_map_file))
+            proto_data.append(self.generate_grpc_service(grpc_service))
+        return proto_data
+
+    def define_protobuf_messages(self, package_map_file):
+        """split this out for testing -- just grab all the data from the interface objects"""
+        def osid_list_exception():
+            return {
+                'Osid': {
+                    '_imports': [],
+                    '_type': 'message',
+                    'body': """
+message Osid {
+}"""
+                }
+            }
+
+        if not os.path.isfile(package_map_file):
+            raise TypeError('package_map_file must be a path to a file')
+        proto_data = []
+        for protobuf_message in self.get_package_elements(package_map_file, 'objects'):
+            # treat objects as protobuf messages
+            proto_data.append(self.generate_protobuf_message(protobuf_message,
+                                                             package_map_file))
+            # Exception for OsidList, because the repeated "Osid" object doesn't exist, so we have to make it...
+            if protobuf_message.keys()[0] == 'OsidList':
+                proto_data.append(osid_list_exception())
+        return proto_data
+
+    def format_method_to_protobuf_reply_msg(self, method_definition):
+        """
+        Given a method definition from a package.json file, reformat it into the expected input format
+        for ``generate_protobuf_message``, for an RPC reply.
+
+        i.e. given {
+            'name': 'get_items_by_ids',
+            'args': [{
+                'arg_type': 'osid.id.IdList',
+                'var_name': 'item_ids'
+            }],
+            'return_type': 'osid.assessment.ItemList'
+        }
+
+        this method will return {
+            'GetItemsByIdsReply': {
+                'items': 'osid.assessment.ItemList'
+            }
+        }
+        """
+        reply_name = '{0}Reply'.format(under_to_camel(method_definition['name']))
+        result = {
+            reply_name: {}
+        }
+        return_type = method_definition['return_type']
+        if return_type != '':
+            return_type_last = return_type.split('.')[-1]
+            if self.is_list(return_type):
+                return_variable = make_plural(camel_to_under(self.make_non_list(return_type_last)))
+            elif return_type == 'boolean':
+                # Let's give the variable a clearer name than "boolean" in the message definition
+                return_variable = method_definition['name']
+            else:
+                return_variable = camel_to_under(return_type_last)
+            result[reply_name][return_variable] = return_type
+        return result
+
+    @staticmethod
+    def format_method_to_protobuf_request_msg(method_definition):
+        """
+        Given a method definition from a package.json file, reformat it into the expected input format
+        for ``generate_protobuf_message``, for an RPC Request.
+
+        i.e. given {
+            'name': 'get_items_by_ids',
+            'args': [{
+                'arg_type': 'osid.id.IdList',
+                'var_name': 'item_ids'
+            }],
+            'return_type': 'osid.assessment.ItemList'
+        }
+
+        this method will return {
+            'GetItemsByIdsRequest': {
+                'item_ids': 'osid.id.IdList'
+            }
+        }
+        """
+        request_name = '{0}Request'.format(under_to_camel(method_definition['name']))
+        result = {
+            request_name: {}
+        }
+        for argument in method_definition['args']:
+            result[request_name][argument['var_name']] = argument['arg_type']
+        return result
 
     @staticmethod
     def generate_grpc_service(grpc_service):
@@ -57,12 +205,14 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
             'methods': [{
                 'name': 'GetBook',
                 'args': [{
+                    'arg_type': 'Book',
                     'var_name': 'GetBookRequest'
                 }],
                 'return_type': 'Book'
             }, {
                 'name': 'QueryBooks',
                 'args': [{
+                    'arg_type': 'BookQuery',
                     'var_name': 'QueryBooksRequest'
                 }],
                 'return_type': 'Book[]'
@@ -73,6 +223,7 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
         {
             'BookService': {
                 '_imports': [],
+                '_type': 'service',
                 'body': \"\"\"
 service BookService {
   rpc GetBook(GetBookRequest) returns (Book) {}
@@ -81,36 +232,6 @@ service BookService {
             }
         }
         """
-        def get_return_text(return_type):
-            """
-            For 'ResourceList', should return 'stream Resource'
-            For 'Resource', should return 'Resource'
-            """
-            return_type_without_package = return_type.split('.')[-1]
-            if return_type_without_package.endswith('List'):
-                return 'stream {0}'.format(return_type_without_package.replace('List', ''))
-            return return_type_without_package
-
-        def get_arg_type(arg_type):
-            """
-            Need to translate the argument type into the proto message "type", i.e.
-
-            item_genus_type => GenusType
-            bank_id => Id
-
-            But for proto-defined messages in this package, it would just be the name in mixedCase
-            """
-            # TODO: see if these exceptions can get moved somewhere with the maps in ``generate_protobuf_message``
-            if arg_type.endswith('Type'):
-                return 'dlkit.primordium.type.primitives.Type'
-            elif arg_type.endswith('IdList'):
-                return 'dlkit.primordium.id.primitives.IdList'  # ?? This doesn't exist...
-            elif arg_type.endswith('Id'):
-                return 'dlkit.primordium.id.primitives.Id'
-            elif arg_type in TYPE_MAPPING:
-                return TYPE_MAPPING[arg_type]
-            return arg_type
-
         if not isinstance(grpc_service, dict):
             raise TypeError('grpc_service must be a dict')
         if 'shortname' not in grpc_service:
@@ -130,15 +251,16 @@ service BookService {
             }
         }
         service_fields = []
+        # For some reason we're getting duplicates in the package_map?
+        defined_rpcs = []
         for method in grpc_service['methods']:
             method_name = under_to_camel(method['name'])
             # TODO: Handle any imports here?
-            service_args = []
-            for arg in method['args']:
-                service_args.append(get_arg_type(arg['arg_type']))
-            service_fields.append('  rpc {0}({1}) returns ({2}) {{}}'.format(method_name,
-                                                                             ', '.join(service_args),
-                                                                             get_return_text(method['return_type'])))
+            if method_name not in defined_rpcs:
+                service_fields.append('  rpc {0}({1}) returns ({2}) {{}}'.format(method_name,
+                                                                                 '{0}Request'.format(method_name),
+                                                                                 '{0}Reply'.format(method_name)))
+                defined_rpcs.append(method_name)
         result[service_name]['body'] = """
 service {0} {{
 {1}
@@ -147,10 +269,10 @@ service {0} {{
 
         return result
 
-    @staticmethod
-    def generate_protobuf_message(protobuf_message):
+    def generate_protobuf_message(self, protobuf_message, package_map_file):
         """
         given the data for an object, return a protobuf-style message
+        use the package_map_file to guard against same-package imports, i.e. osid.proto importing OsidCatalog
 
         :param protobuf_message: dictionary with persisted and initialized data
         :return: JSON-ish format of the message definition: {
@@ -171,6 +293,7 @@ service {0} {{
         {
             'Assessment': {
                 '_imports': ['osid/objects.proto', '../primordium/id/primitives.proto'],
+                '_type': 'message',
                 'body': \"\"\"
 message Assessment {
   OsidCatalog bank = 1;
@@ -184,12 +307,25 @@ message Assessment {
                 For something like 'OsidCatalog', returns OsidCatalog
                 For something with a built-in type, like 'decimal', return the proto version ('float')
             """
-            if full_name in TYPE_MAPPING:
+            if self.is_same_package(package_map_file, full_name):
+                return full_name.split('.')[-1]
+            elif full_name in TYPE_MAPPING:
                 return TYPE_MAPPING[full_name]
             elif '.' in full_name:
                 return full_name.split('.')[-1]
 
             return full_name
+
+        def format_message(_repeated, _variable_type, _variable_name, count):
+            """DRY -- we use this several times in various configs, so extracting it here"""
+            if _repeated:
+                return '  repeated {0} {1} = {2};'.format(extract_base_message_name(_variable_type),
+                                                          _variable_name,
+                                                          str(count))
+            else:
+                return '  {0} {1} = {2};'.format(extract_base_message_name(_variable_type),
+                                                 _variable_name,
+                                                 str(count))
 
         if not isinstance(protobuf_message, dict):
             raise TypeError('protobuf_message must be a dict')
@@ -209,20 +345,33 @@ message Assessment {
         }
         message_fields = []
 
-        if object_name.endswith('List'):
-            message_fields.append('  repeated {0} = 1;'.format(object_name.replace('List', '')))
+        if self.is_list(object_name):
+            non_list_name = self.make_non_list(object_name)
+            variable_name = make_plural(camel_to_under(non_list_name))
+            if non_list_name == 'Type':
+                # Need to make an exception because TypeList here repeats the primordium Type.
+                # There is no Type object in the type package itself.
+                non_list_name = 'dlkit.primordium.type.primitives.Type'
+            message_fields.append(format_message(True, non_list_name, variable_name, 1))
         else:
             variable_counter = 1
 
             # Not sure if we want to have the fields sorted a certain way....we might care at some point
             for variable, variable_type in iter(sorted(protobuf_message[object_name].items())):
-                if variable_type in IMPORT_MAPPING:
+                repeated = False
+                if self.is_list(variable_type):
+                    variable_type = self.make_non_list(variable_type)
+                    repeated = True
+
+                if variable_type in IMPORT_MAPPING and not self.is_same_package(package_map_file, variable_type):
                     proto_import = 'import "{0}";'.format(IMPORT_MAPPING[variable_type])
                     if proto_import not in result[object_name]['_imports']:
                         result[object_name]['_imports'].append(proto_import)
-                message_fields.append('  {0} {1} = {2};'.format(extract_base_message_name(variable_type),
-                                                                variable,
-                                                                str(variable_counter)))
+
+                message_fields.append(format_message(repeated,
+                                                     variable_type,
+                                                     variable,
+                                                     variable_counter))
                 variable_counter += 1
         result[object_name]['body'] = """
 message {0} {{
@@ -243,7 +392,9 @@ message {0} {{
         with open(package_map_file, 'rb') as package_map_handle:
             package_map = json.load(package_map_handle)
             for interface in package_map['interfaces']:
-                if element_type == 'objects' and interface['category'] in [element_type, 'queries', 'searches']:
+                if element_type == 'objects' and interface['category'] in [element_type, 'queries',
+                                                                           'searches', 'rules',
+                                                                           'search_orders', 'query_inspectors']:
                     # Objects also include queries and searches
                     # for objects, we actually need to check the pattern_map
                     #   file, to get ``Object.persisted_data``
@@ -302,6 +453,28 @@ message {0} {{
                 data[interface].update(pattern[initialized_key])
             return data
 
+    @staticmethod
+    def is_list(variable_name):
+        """Many of the variables in the spec end with List or []. We need to detect those
+            when formatting messages / services so that we can apply the correct ``repeated``
+            or ``stream`` label"""
+        return variable_name.endswith('List') or variable_name.endswith('[]')
+
+    @staticmethod
+    def is_same_package(package_map_file, variable_name):
+        """Because we don't want circular imports
+            BUT also need to route primitives to dlkit/primordium (i.e. the osid package imports osid.id.Id)
+        """
+        if variable_name in ['osid.id.Id', 'osid.calendaring.DateTime', 'osid.locale.Locale', 'osid.type.Type']:
+            return False
+        package_name = os.path.basename(package_map_file).split('.')[0]
+        if package_name == 'osid':
+            if variable_name == 'OsidCatalog':
+                return True
+        else:
+            return package_name in variable_name.lower()
+        return False
+
     def make(self):
         # Generate the proto files for all of the Catalogs and Objects
         for xosid_file in glob.glob(self.xosid_dir + '/*' + self.xosid_ext):
@@ -321,28 +494,35 @@ message {0} {{
             # Generate a grpc adapter on top, that converts all the passed data into gRPC streams?
             self.make_grpc_adapter(json_file)
 
+        # do this after all .proto files are defined
+        self.compile_proto_files()
+
     def make_grpc_adapter(self, package_map_file):
         """ Add a gRPC adapter, like https://github.com/improbable-eng/grpc-web
-        This should take the regular Python classes and somehow "merge" them / wrap the proto buf classes?
+        This should take the regular dlkit Python classes and somehow "merge" them / wrap the proto buf classes?
         And then send the protobuf data back, instead of JSON?
         """
         pass
+
+    @staticmethod
+    def make_non_list(variable_name):
+        """Many of the variables in the spec end with List or []. We need to change those when
+            formatting messages / services to the non-list version. i.e. ItemList => Item"""
+        return variable_name.replace('[]', '').replace('List', '')
 
     def make_proto_files(self, package_map_file):
         """ create the proto3 file that defines all the Catalogs and Objects for the given package """
         if not os.path.isfile(package_map_file):
             raise TypeError('package_map_file must be a path to a file')
         proto_data = []
-        for protobuf_message in self.get_package_elements(package_map_file, 'objects'):
-            # treat objects as protobuf messages
-            proto_data.append(self.generate_protobuf_message(protobuf_message))
-        for grpc_service in self.get_package_elements(package_map_file, 'sessions'):
-            # treat sessions as grpc services
-            proto_data.append(self.generate_grpc_service(grpc_service))
+        proto_data += self.define_protobuf_messages(package_map_file)
+        proto_data += self.define_grpc_services(package_map_file)
         # do nothing with managers?
-        self.write_proto_file(package_map_file, proto_data)
 
-        # TODO: Compile the proto files with protoc ?
+        # remove duplicates, like GetBankIdRequest
+        proto_data = self.remove_duplicate_entries(proto_data)
+
+        self.write_proto_file(package_map_file, proto_data)
 
     @staticmethod
     def package_name(package_map_file):
@@ -368,6 +548,22 @@ message {0} {{
         return proto_file_name
 
     @staticmethod
+    def remove_duplicate_entries(proto_data):
+        """For many of the sessions, there will be duplicate / identical "Request" objects, like
+        GetBankIdRequest.
+
+        Remove the duplicates (assuming the same message name means they are identical?)
+        """
+        used_keys = []
+        unique_proto_data = []
+        for message in proto_data:
+            message_name = message.keys()[0]
+            if message_name not in used_keys:
+                unique_proto_data.append(message)
+                used_keys.append(message_name)
+        return unique_proto_data
+
+    @staticmethod
     def unify_bodies(proto_data):
         """From a list of messages / services, extract the ``body`` of all entries into
         a single list.
@@ -389,13 +585,13 @@ message {0} {{
     @staticmethod
     def unify_imports(proto_data):
         """From a list of messages / services, extract all the ``_imports`` into
-        a single list"""
+        a single list and sort them alphabetically"""
         unified_imports = []
         for proto_blob in proto_data:
             object_name = proto_blob.keys()[0]
             if '_imports' in proto_blob[object_name]:
                 unified_imports += proto_blob[object_name]['_imports']
-        return list(set(unified_imports))
+        return sorted(list(set(unified_imports)))
 
     def write_proto_file(self, package_map_file, proto_data):
         """ Write the given proto data to a ``.proto`` file.
