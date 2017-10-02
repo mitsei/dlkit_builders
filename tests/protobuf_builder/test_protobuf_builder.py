@@ -101,6 +101,43 @@ message GetAgencyReply {
 }"""
         assert result['GetAgencyReply']['_imports'] == []
 
+    def test_generate_protobuf_message_handles_osid_syntax(self):
+        interface = {
+            'Parameter': {
+                'syntax': 'osid.Syntax'
+            }
+        }
+        result = self.builder.generate_protobuf_message(interface,
+                                                        'configuration.json')
+        assert result['Parameter']['body'] == """
+message Parameter {
+  enum Syntax {
+    NONE = 0;
+    BOOLEAN = 1;
+    BYTE = 2;
+    CARDINAL = 3;
+    COORDINATE = 4;
+    CURRENCY = 5;
+    DATETIME = 6;
+    DECIMAL = 7;
+    DISPLAYTEXT = 8;
+    DISTANCE = 9;
+    DURATION = 10;
+    HEADING = 11;
+    ID = 12;
+    INTEGER = 13;
+    OBJECT = 14;
+    SPATIALUNIT = 15;
+    SPEED = 16;
+    STRING = 17;
+    TIME = 18;
+    TYPE = 19;
+    VERSION = 20;
+  }
+  Syntax syntax = 1;
+}"""
+        assert result['Parameter']['_imports'] == []
+
 
 @pytest.fixture(scope='function')
 def proto_builder_service_test_fixture(request):
@@ -330,6 +367,39 @@ class TestProtoBuilderFormatReplyMessage(object):
         assert result[expected_name].keys()[0] == 'is_question_answered'
         assert result[expected_name]['is_question_answered'] == 'boolean'
 
+    def test_format_method_to_protobuf_reply_msg_skips_blacklist_items(self):
+        method_definition = {
+            'name': 'start_transaction',
+            'args': [],
+            'return_type': 'osid.transaction.Transaction'
+        }
+        result = self.builder.format_method_to_protobuf_reply_msg(method_definition)
+        assert len(result['StartTransactionReply'].keys()) == 0
+
+        method_definition = {
+            'name': 'get_authenticated_agent',
+            'args': [],
+            'return_type': 'osid.authentication.Agent'
+        }
+        result = self.builder.format_method_to_protobuf_reply_msg(method_definition)
+        assert len(result['GetAuthenticatedAgentReply'].keys()) == 0
+
+        method_definition = {
+            'name': 'get_effective_agent',
+            'args': [],
+            'return_type': 'osid.authentication.Agent'
+        }
+        result = self.builder.format_method_to_protobuf_reply_msg(method_definition)
+        assert len(result['GetEffectiveAgentReply'].keys()) == 0
+
+        method_definition = {
+            'name': 'get_locale',
+            'args': [],
+            'return_type': 'osid.locale.Locale'
+        }
+        result = self.builder.format_method_to_protobuf_reply_msg(method_definition)
+        assert len(result['GetLocaleReply'].keys()) == 0
+
 
 @pytest.fixture(scope='function')
 def proto_builder_define_grpc_services_test_fixture(request):
@@ -414,6 +484,14 @@ class TestProtoBuilderHelperMethods(object):
         assert self.builder.is_list('Id[]')
         assert self.builder.is_list('Type[]')
 
+    def test_is_primitive(self):
+        assert not self.builder.is_primitive('osid.locale.Locale')
+        assert not self.builder.is_primitive('osid.OsidCatalog')
+
+        assert self.builder.is_primitive('osid.id.Id')
+        assert self.builder.is_primitive('osid.calendaring.DateTime')
+        assert self.builder.is_primitive('osid.type.Type')
+
     def test_is_same_package(self):
         assert not self.builder.is_same_package('osidy.json', 'OsidCatalog')
         assert not self.builder.is_same_package('package_maps/assessment.json', 'OsidCatalog')
@@ -426,3 +504,80 @@ class TestProtoBuilderHelperMethods(object):
         assert self.builder.make_non_list('Item') == 'Item'
         assert self.builder.make_non_list('ItemList') == 'Item'
         assert self.builder.make_non_list('Id[]') == 'Id'
+
+    def test_osid_blacklist(self):
+        assert self.builder.osid_blacklist('GetAuthenticatedAgentReply')
+        assert self.builder.osid_blacklist('GetEffectiveAgentReply')
+        assert self.builder.osid_blacklist('GetLocaleReply')
+        assert self.builder.osid_blacklist('StartTransactionReply')
+        assert not self.builder.osid_blacklist('somethingElse')
+
+
+@pytest.fixture(scope='function')
+def proto_builder_get_pattern_persisted_data_test_fixture(request):
+    def return_fixture_objects(*args):
+        """Mock this out to always return our fixture pattern_map file"""
+        this_directory = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(this_directory, os.pardir, 'fixtures', 'pattern_maps', 'assessment-objects.json')
+
+    request.cls.builder._package_pattern_file = return_fixture_objects
+
+    request.cls.result = request.cls.builder.get_pattern_persisted_data({
+        'foo': 'bar'
+    }, {
+        'inherit_shortnames': ['OsidObject'],
+        'shortname': 'Item'
+    })
+
+
+@pytest.mark.usefixtures('proto_builder_class_fixture', 'proto_builder_get_pattern_persisted_data_test_fixture')
+class TestProtoBuilderGetPatternPersistedData(object):
+    def test_get_pattern_persisted_data_correctly_appends_inherited_fields_for_osid_object(self):
+        keys = self.result['Item'].keys()
+
+        assert 'description' in keys
+        assert 'displayName' in keys
+        assert 'id' in keys
+        assert 'genusTypeId' in keys
+        assert 'recordTypeIds' in keys
+
+    def test_get_pattern_persisted_data_correctly_appends_inherited_fields_for_osid_catalog(self):
+        result = self.builder.get_pattern_persisted_data({
+            'foo': 'bar'
+        }, {
+            'inherit_shortnames': ['OsidCatalog'],
+            'shortname': 'Item'
+        })
+        keys = result['Item'].keys()
+
+        assert 'description' in keys
+        assert 'displayName' in keys
+        assert 'id' in keys
+        assert 'genusTypeId' in keys
+        assert 'recordTypeIds' in keys
+
+    def test_get_pattern_persisted_data_correctly_appends_inherited_fields_for_item(self):
+        result = self.builder.get_pattern_persisted_data({
+            'foo': 'bar'
+        }, {
+            'inherit_shortnames': ['Aggregateable'],
+            'shortname': 'Item'
+        })
+        keys = result['Item'].keys()
+
+        assert 'question' in keys
+        assert result['Item']['question'] == 'Question'
+        assert 'answers' in keys
+        assert result['Item']['answers'] == 'AnswerList'
+
+    def test_get_pattern_persisted_data_correctly_appends_inherited_fields_for_asset(self):
+        result = self.builder.get_pattern_persisted_data({
+            'foo': 'bar'
+        }, {
+            'inherit_shortnames': ['Aggregateable'],
+            'shortname': 'Asset'
+        })
+        keys = result['Asset'].keys()
+
+        assert 'asset_contents' in keys
+        assert result['Asset']['asset_contents'] == 'AssetContentList'

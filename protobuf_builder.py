@@ -1,3 +1,5 @@
+# TODO: Include docstrings so that ``protoc`` includes them in the final build?
+
 import glob
 import json
 import os
@@ -11,35 +13,84 @@ IMPORT_MAPPING = {
     'osid.id.Id': 'dlkit/primordium/id/primitives.proto',
     'osid.calendaring.DateTime': 'google/protobuf/timestamp.proto',  # a Google built-in one?
     'osid.calendaring.Duration': 'dlkit/primordium/calendaring/primitives.proto',
+    'osid.calendaring.Time': 'dlkit/primordium/calendaring/primitives.proto',
     'osid.locale.DisplayText': 'dlkit/primordium/locale/primitives.proto',
-    'osid.locale.Locale': 'dlkit/primordium/locale/primitives.proto',
     'osid.type.Type': 'dlkit/primordium/type/primitives.proto',
     'OsidCatalog': 'dlkit/proto/osid.proto',
+    'osid.assessment.Bank': 'dlkit/proto/assessment.proto',
+    'osid.assessment.Item': 'dlkit/proto/assessment.proto',
+    'osid.authentication.Agency': 'dlkit/proto/authentication.proto',
     'osid.authentication.Agent': 'dlkit/proto/authentication.proto',
     'osid.hierarchy.Hierarchy': 'dlkit/proto/hierarchy.proto',
     'osid.hierarchy.Node': 'dlkit/proto/hierarchy.proto',
+    'osid.acknowledgement.BillingNode': 'dlkit/proto/hierarchy.proto',  # bug in spec for GroupHierarchySession
+    'osid.financials.Currency': 'dlkit/primordium/financials/unimplemented_primitives.proto',
+    'osid.grading.Grade': 'dlkit/proto/grading.proto',
     'osid.grading.GradeEntry': 'dlkit/proto/grading.proto',
-    'osid.transaction.Transaction': 'dlkit/proto/transaction.proto'
+    'osid.installation.Version': 'dlkit/primordium/installation/primitives.proto',
+    'osid.mapping.Coordinate': 'dlkit/primordium/mapping/coordinate_primitives.proto',
+    'osid.mapping.Distance': 'dlkit/primordium/mapping/unimplemented_primitives.proto',
+    'osid.mapping.SpatialUnit': 'dlkit/primordium/mapping/spatial_units.proto',
+    'osid.mapping.Speed': 'dlkit/primordium/mapping/unimplemented_primitives.proto',
+    'osid.resource.Resource': 'dlkit/proto/resource.proto',
+    'osid.transport.DataInputStream': 'dlkit/primordium/transport/objects.proto',
 }
 
 TYPE_MAPPING = {
     'decimal': 'float',
     'cardinal': 'sint32',
+    'integer': 'sint32',
     'boolean': 'bool',
+    'byte': 'bytes',
+    'object': 'bytes',  # could also do a protobuf Map, except we can't define all possible type combinations...
     'timestamp': 'google.protobuf.Timestamp',
     'osid.calendaring.DateTime': 'google.protobuf.Timestamp',
+    'DateTime': 'google.protobuf.Timestamp',
     'osid.calendaring.Duration': 'dlkit.primordium.calendaring.primitives.Duration',
+    'Duration': 'dlkit.primordium.calendaring.primitives.Duration',
+    'osid.calendaring.Time': 'dlkit.primordium.calendaring.primitives.Time',
+    'Time': 'dlkit.primordium.calendaring.primitives.Time',
     'osid.id.Id': 'dlkit.primordium.id.primitives.Id',
     'Id': 'dlkit.primordium.id.primitives.Id',
     'osid.type.Type': 'dlkit.primordium.type.primitives.Type',
     'Type': 'dlkit.primordium.type.primitives.Type',
-    'osid.locale.Locale': 'dlkit.proto.locale.Locale',
+    'osid.locale.DisplayText': 'dlkit.primordium.locale.primitives.DisplayText',
     'OsidCatalog': 'dlkit.proto.osid.OsidCatalog',
+    'osid.assessment.Bank': 'dlkit.proto.assessment.Bank',
+    'osid.assessment.Item': 'dlkit.proto.assessment.Item',
+    'osid.authentication.Agency': 'dlkit.proto.authentication.Agency',
     'osid.authentication.Agent': 'dlkit.proto.authentication.Agent',
     'osid.hierarchy.Hierarchy': 'dlkit.proto.hierarchy.Hierarchy',
     'osid.hierarchy.Node': 'dlkit.proto.hierarchy.Node',
+    'osid.acknowledgement.BillingNode': 'dlkit.proto.hierarchy.Node',  # bug in spec for GroupHierarchySession
+    'osid.financials.Currency': 'dlkit.primordium.financials.unimplemented_primitives.Currency',
+    'Currency': 'dlkit.primordium.financials.unimplemented_primitives.Currency',
+    'osid.grading.Grade': 'dlkit.proto.grading.Grade',
     'osid.grading.GradeEntry': 'dlkit.proto.grading.GradeEntry',
-    'osid.transaction.Transaction': 'dlkit.proto.transaction.Transaction'
+    'osid.installation.Version': 'dlkit.primordium.installation.primitives.Version',
+    'Version': 'dlkit.primordium.installation.primitives.Version',
+    'osid.mapping.Coordinate': 'dlkit.primordium.mapping.coordinate_primitives.Coordinate',
+    'Coordinate': 'dlkit.primordium.mapping.coordinate_primitives.Coordinate',
+    'osid.mapping.Distance': 'dlkit.primordium.mapping.unimplemented_primitives.Distance',
+    'Distance': 'dlkit.primordium.mapping.unimplemented_primitives.Distance',
+    'osid.mapping.SpatialUnit': 'dlkit.primordium.mapping.spatial_units.SpatialUnit',
+    'SpatialUnit': 'dlkit.primordium.mapping.spatial_units.SpatialUnit',
+    'osid.mapping.Speed': 'dlkit.primordium.mapping.unimplemented_primitives.Speed',
+    'Speed': 'dlkit.primordium.mapping.unimplemented_primitives.Speed',
+    'osid.resource.Resource': 'dlkit.proto.resource.Resource',
+    'osid.transport.DataInputStream': 'dlkit.primordium.transport.objects.DataInputStream',
+    'DataInputStream': 'dlkit.primordium.transport.objects.DataInputStream'
+}
+
+# Is there a way to generate this map?
+AGGREGATEABLE_MAPPING = {
+    'Item': {
+        'question': 'Question',
+        'answers': 'AnswerList'
+    },
+    'Asset': {
+        'asset_contents': 'AssetContentList'
+    }
 }
 
 
@@ -63,6 +114,10 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
         """
         for proto_file in glob.iglob('{0}/**/*.proto'.format(self._build_dir)):
             directory = os.path.dirname(proto_file)
+            # Don't use  separate build directory because it seems to compile the wrong paths for import
+            #   i.e. using a build directory will result in _pb2.py files that import from ``dlkit.proto``,
+            #        instead of ``dlkit.proto.build``
+            # proto_output = os.path.join(directory, 'build')
             filename = os.path.basename(proto_file)
             call_list = ['python',
                          '-m',
@@ -75,7 +130,7 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
             try:
                 subprocess.check_call(call_list)
             except OSError:
-                raise RuntimeError('Running the proto builder requires having protoc installed.')
+                raise RuntimeError('Running the proto builder requires having grpcio-tools installed.')
 
     def define_grpc_services(self, package_map_file):
         """split this out for testing -- just grab all the data from the interface sessions"""
@@ -139,10 +194,16 @@ message Osid {
             }
         }
         """
+        if not isinstance(method_definition, dict):
+            raise TypeError('method_definition must be a dictionary')
         reply_name = '{0}Reply'.format(under_to_camel(method_definition['name']))
         result = {
             reply_name: {}
         }
+
+        if self.osid_blacklist(reply_name):
+            return result
+
         return_type = method_definition['return_type']
         if return_type != '':
             return_type_last = return_type.split('.')[-1]
@@ -156,8 +217,7 @@ message Osid {
             result[reply_name][return_variable] = return_type
         return result
 
-    @staticmethod
-    def format_method_to_protobuf_request_msg(method_definition):
+    def format_method_to_protobuf_request_msg(self, method_definition):
         """
         Given a method definition from a package.json file, reformat it into the expected input format
         for ``generate_protobuf_message``, for an RPC Request.
@@ -177,10 +237,16 @@ message Osid {
             }
         }
         """
+        if not isinstance(method_definition, dict):
+            raise TypeError('method_definition must be a dictionary')
         request_name = '{0}Request'.format(under_to_camel(method_definition['name']))
         result = {
             request_name: {}
         }
+
+        if self.osid_blacklist(request_name):
+            return result
+
         for argument in method_definition['args']:
             result[request_name][argument['var_name']] = argument['arg_type']
         return result
@@ -307,7 +373,10 @@ message Assessment {
                 For something like 'OsidCatalog', returns OsidCatalog
                 For something with a built-in type, like 'decimal', return the proto version ('float')
             """
-            if self.is_same_package(package_map_file, full_name):
+            if self.is_primitive(full_name):
+                # This takes precedence over everything else
+                return TYPE_MAPPING[full_name]
+            elif self.is_same_package(package_map_file, full_name):
                 return full_name.split('.')[-1]
             elif full_name in TYPE_MAPPING:
                 return TYPE_MAPPING[full_name]
@@ -318,6 +387,33 @@ message Assessment {
 
         def format_message(_repeated, _variable_type, _variable_name, count):
             """DRY -- we use this several times in various configs, so extracting it here"""
+            # osid.Syntax is special -- make it an enum
+            if _variable_type == 'osid.Syntax':
+                return """  enum Syntax {{
+    NONE = 0;
+    BOOLEAN = 1;
+    BYTE = 2;
+    CARDINAL = 3;
+    COORDINATE = 4;
+    CURRENCY = 5;
+    DATETIME = 6;
+    DECIMAL = 7;
+    DISPLAYTEXT = 8;
+    DISTANCE = 9;
+    DURATION = 10;
+    HEADING = 11;
+    ID = 12;
+    INTEGER = 13;
+    OBJECT = 14;
+    SPATIALUNIT = 15;
+    SPEED = 16;
+    STRING = 17;
+    TIME = 18;
+    TYPE = 19;
+    VERSION = 20;
+  }}
+  Syntax {0} = {1};""".format(_variable_name, str(count))
+
             if _repeated:
                 return '  repeated {0} {1} = {2};'.format(extract_base_message_name(_variable_type),
                                                           _variable_name,
@@ -335,7 +431,7 @@ message Assessment {
         object_name = protobuf_message.keys()[0]
 
         if not isinstance(protobuf_message[object_name], dict):
-            raise TypeError('protobuf_message value must be a dict')
+            raise TypeError('protobuf_message["{0}"] must be a dict'.format(object_name))
 
         result = {
             object_name: {
@@ -349,7 +445,7 @@ message Assessment {
             non_list_name = self.make_non_list(object_name)
             variable_name = make_plural(camel_to_under(non_list_name))
             if non_list_name == 'Type':
-                # Need to make an exception because TypeList here repeats the primordium Type.
+                # Need to make an exception because TypeList here needs to repeat the primordium Type.
                 # There is no Type object in the type package itself.
                 non_list_name = 'dlkit.primordium.type.primitives.Type'
             message_fields.append(format_message(True, non_list_name, variable_name, 1))
@@ -363,7 +459,8 @@ message Assessment {
                     variable_type = self.make_non_list(variable_type)
                     repeated = True
 
-                if variable_type in IMPORT_MAPPING and not self.is_same_package(package_map_file, variable_type):
+                if (variable_type in IMPORT_MAPPING and
+                        (self.is_primitive(variable_type) or not self.is_same_package(package_map_file, variable_type))):
                     proto_import = 'import "{0}";'.format(IMPORT_MAPPING[variable_type])
                     if proto_import not in result[object_name]['_imports']:
                         result[object_name]['_imports'].append(proto_import)
@@ -399,14 +496,32 @@ message {0} {{
                     # for objects, we actually need to check the pattern_map
                     #   file, to get ``Object.persisted_data``
                     yield self.get_pattern_persisted_data(package_map,
-                                                          interface['shortname'])
+                                                          interface)
                 elif interface['category'] == element_type:
                     yield interface
                 else:
                     continue
 
     def get_pattern_persisted_data(self, package, interface):
-        """ We want to return the combined persisted and initialized data for the given interface, i.e.
+        """
+        We want to return the combined persisted and initialized data for the given interface. Because protobuf3
+        cannot inherit / extend from other classes, we also need to find all the inherited object fields.
+
+        **NOTE** Will most likely have to hard-code some of the markers / osid data patterns. Not sure how to
+                 automatically generate them...right now it appears they could come from the ``Form`` objects,
+                 but might be messy to grab and incomplete. i.e. OsidIdentifiableForm does not have any
+                 methods / data for the ``id`` field, so how would we know to generate it? Is this
+                 implementation-dependent?
+
+        Example:
+          (From package_maps/assessment.json)
+            "AssessmentTaken": {
+              "inherit_fullnames": [
+                 "osid.OsidObject"
+              ]
+          }
+
+          (From pattern_maps/assessment.json)
             "AssessmentTaken.persisted_data": {
               "bank": "OsidCatalog",
               "taker": "osid.id.Id",
@@ -424,6 +539,7 @@ message {0} {{
             We just want the simplified (and unified) dictionary:
             {
                 "AssessmentTaken": {
+                    "displayName": "
                     "bank": "OsidCatalog",
                     "taker": "osid.id.Id",
                     "assessment_offered": "osid.id.Id"
@@ -436,21 +552,36 @@ message {0} {{
         """
         if not isinstance(package, dict):
             raise TypeError('package must be a dictionary')
+        if not isinstance(interface, dict):
+            raise TypeError('interface must be a dictionary')
+        inheritance = interface['inherit_shortnames']
+        object_name = interface['shortname']
         with open(self._package_pattern_file(package), 'rb') as pattern_file:
             pattern = json.load(pattern_file)
-            persisted_key = '{0}.persisted_data'.format(interface)
-            initialized_key = '{0}.initialized_data'.format(interface)
+            persisted_key = '{0}.persisted_data'.format(object_name)
+            initialized_key = '{0}.initialized_data'.format(object_name)
             data = {
-                interface: {}
+                object_name: {}
             }
+            if any(base_object in inheritance for base_object in ['OsidObject', 'OsidCatalog']):
+                data[object_name] = {
+                    'displayName': 'osid.locale.DisplayText',
+                    'description': 'osid.locale.DisplayText',
+                    'genusTypeId': 'osid.type.Type',
+                    'id': 'osid.id.Id',
+                    'recordTypeIds': 'osid.type.Type[]'
+                }
+            if 'Aggregateable' in inheritance and object_name in AGGREGATEABLE_MAPPING:
+                # hardcode from a map for now...
+                data[object_name].update(AGGREGATEABLE_MAPPING[object_name])
 
             if persisted_key not in pattern and initialized_key not in pattern:
                 return data
 
             if persisted_key in pattern:
-                data[interface].update(pattern[persisted_key])
+                data[object_name].update(pattern[persisted_key])
             if initialized_key in pattern:
-                data[interface].update(pattern[initialized_key])
+                data[object_name].update(pattern[initialized_key])
             return data
 
     @staticmethod
@@ -461,12 +592,20 @@ message {0} {{
         return variable_name.endswith('List') or variable_name.endswith('[]')
 
     @staticmethod
+    def is_primitive(variable_name):
+        """to make sure all primordium imports go there, even for "same packages". """
+        return (variable_name in ['osid.id.Id', 'osid.calendaring.DateTime',
+                                  'osid.calendaring.Duration', 'osid.calendaring.Time',
+                                  'osid.type.Type', 'osid.installation.Version',
+                                  'osid.transport.DataInputStream'] or
+                variable_name in ['Id', 'DateTime', 'Duration',
+                                  'Time', 'Type', 'Version',
+                                  'DataInputStream'])
+
+    @staticmethod
     def is_same_package(package_map_file, variable_name):
-        """Because we don't want circular imports
-            BUT also need to route primitives to dlkit/primordium (i.e. the osid package imports osid.id.Id)
+        """Because we don't want recursive imports
         """
-        if variable_name in ['osid.id.Id', 'osid.calendaring.DateTime', 'osid.locale.Locale', 'osid.type.Type']:
-            return False
         package_name = os.path.basename(package_map_file).split('.')[0]
         if package_name == 'osid':
             if variable_name == 'OsidCatalog':
@@ -523,6 +662,21 @@ message {0} {{
         proto_data = self.remove_duplicate_entries(proto_data)
 
         self.write_proto_file(package_map_file, proto_data)
+
+    @staticmethod
+    def osid_blacklist(message_name):
+        """
+        From either a Reply or a Request message (for a session), in the OSID package, we blacklist a set
+          of methods for now, because they inherit from other packages. This creates recursive imports,
+          which breaks the protoc compiler. Since we currently don't support or use these methods, and we assume
+          the OSID package is a "base" package with no dependencies,
+          we just blacklist them. This may change in the future, if we implement these methods.
+
+        :param message_name: string, like "GetAuthenticatedAgentReply"
+        :return: boolean, True or False
+        """
+        return message_name in ['GetAuthenticatedAgentReply', 'GetEffectiveAgentReply',
+                                'StartTransactionReply', 'GetLocaleReply']
 
     @staticmethod
     def package_name(package_map_file):
@@ -610,7 +764,9 @@ message {0} {{
         unified_imports = self.unify_imports(proto_data)
         unified_bodies = self.unify_bodies(proto_data)
 
-        file_data = """syntax = "proto3";
+        file_data = """// This file is auto-generated by ``protobuf_builder.py``
+// DO NOT EDIT THIS BY HAND!
+syntax = "proto3";
 
 package dlkit.proto.{0};
 
