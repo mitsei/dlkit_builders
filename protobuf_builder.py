@@ -112,23 +112,16 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
         if build_dir is None:
             build_dir = self._abs_path
         self._build_dir = build_dir
-        self._root_dir = self._build_dir + '/proto'
-        self._template_dir = self._abs_path + '/proto_templates'
+        self._root_dir = self._build_dir + '/grpc_adapter'
+        self._template_dir = self._abs_path + '/grpc_templates'
 
         self._class = 'proto'
 
     def build_this_interface(self, interface):
-        """override the one in build_dlkit.py because we need query_inspectors"""
+        """override the one in build_dlkit.py ... so we build only what is in the config (mostly)"""
         if (interface['category'] == 'sessions' and
                 interface['shortname'] not in sessions_to_implement):
             return False
-
-        # if (self.package['name'] != 'osid' and
-        #         interface['category'] in ['objects', 'queries',
-        #                                   'searches', 'rules',
-        #                                   'search_orders', 'query_inspectors'] and
-        #         not any(interface['shortname'].startswith(object_name) for object_name in objects_to_implement)):
-        #     return False
 
         if interface['category'] == 'managers':
             return False
@@ -143,22 +136,28 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
         https://grpc.io/docs/quickstart/python.html
         """
         for proto_file in glob.iglob('{0}/**/*.proto'.format(self._build_dir)):
-            directory = os.path.dirname(proto_file)
+            build_directory, dlkit_dir = os.path.split(self._build_dir)
+            proto_path = proto_file.replace(build_directory + '/', '')
             # Don't use  separate build directory because it seems to compile the wrong paths for import
             #   i.e. using a build directory will result in _pb2.py files that import from ``dlkit.proto``,
             #        instead of ``dlkit.proto.build``
             # proto_output = os.path.join(directory, 'build')
-            filename = os.path.basename(proto_file)
+
+            # Also, in order to get the _pb2.py file imports correct for grpc, we need to build from the
+            #   parent directory of `dlkit`.
+
+            # Both issues related to: https://github.com/google/protobuf/issues/1491
+            #                         https://github.com/grpc/grpc/issues/9575
             call_list = ['python',
                          '-m',
                          'grpc_tools.protoc',
-                         '-I', '../dlkit-pip/',
-                         '--proto_path', directory,
-                         '--python_out', directory,
-                         '--grpc_python_out', directory,
-                         filename]
+                         '-I', '.',
+                         '--python_out=.',
+                         '--grpc_python_out=.',
+                         proto_path]
             try:
-                subprocess.check_call(call_list)
+                subprocess.check_call(call_list,
+                                      cwd=build_directory)
             except OSError:
                 raise RuntimeError('Running the proto builder requires having grpcio-tools installed.')
 
@@ -676,6 +675,8 @@ message {0} {{
         """ Add a gRPC adapter, like https://github.com/improbable-eng/grpc-web
         This should take the regular dlkit Python classes and somehow "merge" them / wrap the proto buf classes?
         And then send the protobuf data back, instead of JSON?
+
+        We probably need some new templates...
         """
         pass
 
