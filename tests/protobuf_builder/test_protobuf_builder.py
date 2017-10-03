@@ -220,6 +220,18 @@ service ItemLookupSession {
   rpc GetBankId(GetBankIdRequest) returns (GetBankIdReply) {}
 }"""
 
+    def test_generate_grpc_service_adds_non_package_imports_for_streaming_replies(self):
+        interface = {
+            'shortname': 'ItemLookupSession',
+            'methods': [{
+                'name': 'get_grades',
+                'args': [],
+                'return_type': 'osid.grading.GradeEntry'
+            }]
+        }
+        result = self.builder.generate_grpc_service(interface)
+        assert len(result[self.session_name]['_imports']) == 0
+
 
 @pytest.fixture(scope='function')
 def proto_builder_unify_imports_test_fixture(request):
@@ -494,12 +506,17 @@ class TestProtoBuilderHelperMethods(object):
         assert self.builder.is_primitive('osid.type.Type')
 
     def test_is_same_package(self):
-        assert not self.builder.is_same_package('osidy.json', 'OsidCatalog')
-        assert not self.builder.is_same_package('package_maps/assessment.json', 'OsidCatalog')
-        assert not self.builder.is_same_package('osid.json', 'osid.id.Id')
+        self.builder.package_map_file = 'osidy.json'
+        assert not self.builder.is_same_package('OsidCatalog')
+        self.builder.package_map_file = 'package_maps/assessment.json'
+        assert not self.builder.is_same_package('OsidCatalog')
+        self.builder.package_map_file = 'osid.json'
+        assert not self.builder.is_same_package('osid.id.Id')
 
-        assert self.builder.is_same_package('osid.json', 'OsidCatalog')
-        assert self.builder.is_same_package('package_maps/authentication.json', 'osid.authentication.Agent')
+        self.builder.package_map_file = 'osid.json'
+        assert self.builder.is_same_package('OsidCatalog')
+        self.builder.package_map_file = 'package_maps/authentication.json'
+        assert self.builder.is_same_package('osid.authentication.Agent')
 
     def test_make_non_list(self):
         assert self.builder.make_non_list('Item') == 'Item'

@@ -209,7 +209,7 @@ message Osid {
         if self.is_primitive(full_name):
             # This takes precedence over everything else
             return TYPE_MAPPING[full_name]
-        elif self.is_same_package(self.package_map_file, full_name):
+        elif self.is_same_package(full_name):
             return full_name.split('.')[-1]
         elif full_name in TYPE_MAPPING:
             return TYPE_MAPPING[full_name]
@@ -364,13 +364,18 @@ service BookService {
         defined_rpcs = []
         for method in grpc_service['methods']:
             method_name = under_to_camel(method['name'])
-            # TODO: Handle any imports here?
             if method_name not in defined_rpcs:
                 if self.is_list(method['return_type']):
+                    # Handle any imports of streaming, non-primitive, non-same-package messages
+                    message_object = self.make_non_list(method['return_type'])
+                    if not self.is_primitive(message_object) and not self.is_same_package(message_object):
+                        if message_object in IMPORT_MAPPING:
+                            result[service_name]['_imports'].append('import "{0}";'.format(IMPORT_MAPPING[message_object]))
+
                     service_fields.append(
                         '  rpc {0}({1}) returns (stream {2}) {{}}'.format(method_name,
                                                                           '{0}Request'.format(method_name),
-                                                                          self.extract_base_message_name(self.make_non_list(method['return_type']))))
+                                                                          self.extract_base_message_name(message_object)))
                 else:
                     service_fields.append('  rpc {0}({1}) returns ({2}) {{}}'.format(method_name,
                                                                                      '{0}Request'.format(method_name),
@@ -419,7 +424,7 @@ message Assessment {
         """
         def append_imports(_variable_type):
             if (_variable_type in IMPORT_MAPPING and
-                    (self.is_primitive(_variable_type) or not self.is_same_package(self.package_map_file, _variable_type))):
+                    (self.is_primitive(_variable_type) or not self.is_same_package(_variable_type))):
                 proto_import = 'import "{0}";'.format(IMPORT_MAPPING[_variable_type])
                 if proto_import not in result[object_name]['_imports']:
                     result[object_name]['_imports'].append(proto_import)
@@ -640,11 +645,10 @@ message {0} {{
                                   'Time', 'Type', 'Version',
                                   'DataInputStream'])
 
-    @staticmethod
-    def is_same_package(package_map_file, variable_name):
+    def is_same_package(self, variable_name):
         """Because we don't want recursive imports
         """
-        package_name = os.path.basename(package_map_file).split('.')[0]
+        package_name = os.path.basename(self.package_map_file).split('.')[0]
         if package_name == 'osid':
             if variable_name == 'OsidCatalog':
                 return True
