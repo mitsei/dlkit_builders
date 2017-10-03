@@ -7,7 +7,7 @@ import subprocess
 
 from binder_helpers import under_to_camel, make_plural, camel_to_under
 from build_dlkit import PatternBuilder
-from config import sessions_to_implement, objects_to_implement
+from config import sessions_to_implement
 from interface_builders import InterfaceBuilder
 
 IMPORT_MAPPING = {
@@ -171,10 +171,9 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
             # Also need to generate the SessionRequest message, that will get passed into
             #   the service RPC
             for method in grpc_service['methods']:
-                proto_data.append(self.generate_protobuf_message(self.format_method_to_protobuf_reply_msg(method),
-                                                                 package_map_file))
-                proto_data.append(self.generate_protobuf_message(self.format_method_to_protobuf_request_msg(method),
-                                                                 package_map_file))
+                if not self.is_list(method['return_type']):
+                    proto_data.append(self.generate_protobuf_message(self.format_method_to_protobuf_reply_msg(method)))
+                proto_data.append(self.generate_protobuf_message(self.format_method_to_protobuf_request_msg(method)))
             proto_data.append(self.generate_grpc_service(grpc_service))
         return proto_data
 
@@ -196,12 +195,28 @@ message Osid {
         proto_data = []
         for protobuf_message in self.get_package_elements(package_map_file, 'objects'):
             # treat objects as protobuf messages
-            proto_data.append(self.generate_protobuf_message(protobuf_message,
-                                                             package_map_file))
+            proto_data.append(self.generate_protobuf_message(protobuf_message))
             # Exception for OsidList, because the repeated "Osid" object doesn't exist, so we have to make it...
             if protobuf_message.keys()[0] == 'OsidList':
                 proto_data.append(osid_list_exception())
         return proto_data
+
+    def extract_base_message_name(self, full_name):
+        """ For something like 'osid.id.Id' returns Id
+            For something like 'OsidCatalog', returns OsidCatalog
+            For something with a built-in type, like 'decimal', return the proto version ('float')
+        """
+        if self.is_primitive(full_name):
+            # This takes precedence over everything else
+            return TYPE_MAPPING[full_name]
+        elif self.is_same_package(self.package_map_file, full_name):
+            return full_name.split('.')[-1]
+        elif full_name in TYPE_MAPPING:
+            return TYPE_MAPPING[full_name]
+        elif '.' in full_name:
+            return full_name.split('.')[-1]
+
+        return full_name
 
     def format_method_to_protobuf_reply_msg(self, method_definition):
         """
@@ -280,8 +295,7 @@ message Osid {
             result[request_name][argument['var_name']] = argument['arg_type']
         return result
 
-    @staticmethod
-    def generate_grpc_service(grpc_service):
+    def generate_grpc_service(self, grpc_service):
         """
         given an interface definition, return a gRPC service block based
         on the interface['methods']
@@ -352,9 +366,15 @@ service BookService {
             method_name = under_to_camel(method['name'])
             # TODO: Handle any imports here?
             if method_name not in defined_rpcs:
-                service_fields.append('  rpc {0}({1}) returns ({2}) {{}}'.format(method_name,
-                                                                                 '{0}Request'.format(method_name),
-                                                                                 '{0}Reply'.format(method_name)))
+                if self.is_list(method['return_type']):
+                    service_fields.append(
+                        '  rpc {0}({1}) returns (stream {2}) {{}}'.format(method_name,
+                                                                          '{0}Request'.format(method_name),
+                                                                          self.extract_base_message_name(self.make_non_list(method['return_type']))))
+                else:
+                    service_fields.append('  rpc {0}({1}) returns ({2}) {{}}'.format(method_name,
+                                                                                     '{0}Request'.format(method_name),
+                                                                                     '{0}Reply'.format(method_name)))
                 defined_rpcs.append(method_name)
         result[service_name]['body'] = """
 service {0} {{
@@ -364,7 +384,7 @@ service {0} {{
 
         return result
 
-    def generate_protobuf_message(self, protobuf_message, package_map_file):
+    def generate_protobuf_message(self, protobuf_message):
         """
         given the data for an object, return a protobuf-style message
         use the package_map_file to guard against same-package imports, i.e. osid.proto importing OsidCatalog
@@ -399,27 +419,10 @@ message Assessment {
         """
         def append_imports(_variable_type):
             if (_variable_type in IMPORT_MAPPING and
-                    (self.is_primitive(_variable_type) or not self.is_same_package(package_map_file, _variable_type))):
+                    (self.is_primitive(_variable_type) or not self.is_same_package(self.package_map_file, _variable_type))):
                 proto_import = 'import "{0}";'.format(IMPORT_MAPPING[_variable_type])
                 if proto_import not in result[object_name]['_imports']:
                     result[object_name]['_imports'].append(proto_import)
-
-        def extract_base_message_name(full_name):
-            """ For something like 'osid.id.Id' returns Id
-                For something like 'OsidCatalog', returns OsidCatalog
-                For something with a built-in type, like 'decimal', return the proto version ('float')
-            """
-            if self.is_primitive(full_name):
-                # This takes precedence over everything else
-                return TYPE_MAPPING[full_name]
-            elif self.is_same_package(package_map_file, full_name):
-                return full_name.split('.')[-1]
-            elif full_name in TYPE_MAPPING:
-                return TYPE_MAPPING[full_name]
-            elif '.' in full_name:
-                return full_name.split('.')[-1]
-
-            return full_name
 
         def format_message(_repeated, _variable_type, _variable_name, count):
             """DRY -- we use this several times in various configs, so extracting it here"""
@@ -451,11 +454,11 @@ message Assessment {
   Syntax {0} = {1};""".format(_variable_name, str(count))
 
             if _repeated:
-                return '  repeated {0} {1} = {2};'.format(extract_base_message_name(_variable_type),
+                return '  repeated {0} {1} = {2};'.format(self.extract_base_message_name(_variable_type),
                                                           _variable_name,
                                                           str(count))
             else:
-                return '  {0} {1} = {2};'.format(extract_base_message_name(_variable_type),
+                return '  {0} {1} = {2};'.format(self.extract_base_message_name(_variable_type),
                                                  _variable_name,
                                                  str(count))
 
@@ -517,7 +520,7 @@ message {0} {{
             raise ValueError('package_map_file must be a path to a file')
         with open(package_map_file, 'rb') as package_map_handle:
             package_map = json.load(package_map_handle)
-            self.package = package_map
+            self.package_map_file = package_map_file
             for interface in package_map['interfaces']:
                 if not self.build_this_interface(interface):
                     continue

@@ -10,6 +10,7 @@ from ...protobuf_builder import ProtoBuilder
 @pytest.fixture(scope='class')
 def proto_builder_class_fixture(request):
     request.cls.builder = ProtoBuilder()
+    request.cls.builder.package_map_file = 'tests/fixtures/package_maps/assessment.json'
 
 
 @pytest.fixture(scope='function')
@@ -26,8 +27,7 @@ def proto_builder_message_test_fixture(request):
             'items': 'osid.id.Id[]',
         }
     }
-    request.cls.result = request.cls.builder.generate_protobuf_message(request.cls.interface,
-                                                                       'assessment.json')
+    request.cls.result = request.cls.builder.generate_protobuf_message(request.cls.interface)
     request.cls.object_name = request.cls.result.keys()[0]
 
 
@@ -66,8 +66,7 @@ message AssessmentTaken {
             'QuestionList': {
             }
         }
-        result = self.builder.generate_protobuf_message(interface,
-                                                        'assessment.json')
+        result = self.builder.generate_protobuf_message(interface)
         assert result['QuestionList']['body'] == """
 message QuestionList {
   repeated Question questions = 1;
@@ -79,8 +78,9 @@ message QuestionList {
                 'no_catalog': 'OsidCatalog'
             }
         }
-        result = self.builder.generate_protobuf_message(interface,
-                                                        'osid.json')
+        self.builder.package_map_file = 'tests/fixtures/package_maps/osid.json'
+        result = self.builder.generate_protobuf_message(interface)
+
         assert result['OsidCatalog']['body'] == """
 message OsidCatalog {
   OsidCatalog no_catalog = 1;
@@ -93,8 +93,8 @@ message OsidCatalog {
                 'agent': 'osid.authentication.Agent'
             }
         }
-        result = self.builder.generate_protobuf_message(interface,
-                                                        'authentication.json')
+        self.builder.package_map_file = 'tests/fixtures/package_maps/authentication.json'
+        result = self.builder.generate_protobuf_message(interface)
         assert result['GetAgencyReply']['body'] == """
 message GetAgencyReply {
   Agent agent = 1;
@@ -107,8 +107,8 @@ message GetAgencyReply {
                 'syntax': 'osid.Syntax'
             }
         }
-        result = self.builder.generate_protobuf_message(interface,
-                                                        'configuration.json')
+        self.builder.package_map_file = 'tests/fixtures/package_maps/configuration.json'
+        result = self.builder.generate_protobuf_message(interface)
         assert result['Parameter']['body'] == """
 message Parameter {
   enum Syntax {
@@ -191,10 +191,10 @@ class TestProtoBuilderServices(object):
         assert self.result[self.session_name]['body'] == """
 service ItemLookupSession {
   rpc GetBankId(GetBankIdRequest) returns (GetBankIdReply) {}
-  rpc GetItemsByParentGenusType(GetItemsByParentGenusTypeRequest) returns (GetItemsByParentGenusTypeReply) {}
+  rpc GetItemsByParentGenusType(GetItemsByParentGenusTypeRequest) returns (stream Item) {}
   rpc GetItem(GetItemRequest) returns (GetItemReply) {}
-  rpc GetItemsByIds(GetItemsByIdsRequest) returns (GetItemsByIdsReply) {}
-  rpc FakeMethod(FakeMethodRequest) returns (FakeMethodReply) {}
+  rpc GetItemsByIds(GetItemsByIdsRequest) returns (stream Item) {}
+  rpc FakeMethod(FakeMethodRequest) returns (stream dlkit.primordium.id.primitives.Id) {}
 }"""
 
     def test_generate_grpc_service_includes_session_name(self):
@@ -425,8 +425,9 @@ class TestProtoBuilderDefineGRPCServices(object):
         assert number_services == 1
 
         service = services[0]
-        assert service[service.keys()[0]]['body'].count('rpc') == len(request_messages)
-        assert service[service.keys()[0]]['body'].count('rpc') == len(reply_messages)
+        body = service[service.keys()[0]]['body']
+        assert body.count('rpc') == len(request_messages)
+        assert body.count('rpc') == len(reply_messages) + body.count('stream')
 
 
 @pytest.fixture(scope='function')
