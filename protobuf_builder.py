@@ -7,15 +7,19 @@ import subprocess
 
 from binder_helpers import under_to_camel, make_plural, camel_to_under
 from build_dlkit import PatternBuilder
+from config import sessions_to_implement, objects_to_implement
 from interface_builders import InterfaceBuilder
 
 IMPORT_MAPPING = {
     'osid.id.Id': 'dlkit/primordium/id/primitives.proto',
+    'Id': 'dlkit/primordium/id/primitives.proto',
     'osid.calendaring.DateTime': 'google/protobuf/timestamp.proto',  # a Google built-in one?
+    'osid.calendaring.DateTimeInterval': 'dlkit/primordium/calendaring/primitives.proto',
     'osid.calendaring.Duration': 'dlkit/primordium/calendaring/primitives.proto',
     'osid.calendaring.Time': 'dlkit/primordium/calendaring/primitives.proto',
     'osid.locale.DisplayText': 'dlkit/primordium/locale/primitives.proto',
     'osid.type.Type': 'dlkit/primordium/type/primitives.proto',
+    'Type': 'dlkit/primordium/type/primitives.proto',
     'OsidCatalog': 'dlkit/proto/osid.proto',
     'osid.assessment.Bank': 'dlkit/proto/assessment.proto',
     'osid.assessment.Item': 'dlkit/proto/assessment.proto',
@@ -29,8 +33,11 @@ IMPORT_MAPPING = {
     'osid.grading.GradeEntry': 'dlkit/proto/grading.proto',
     'osid.installation.Version': 'dlkit/primordium/installation/primitives.proto',
     'osid.mapping.Coordinate': 'dlkit/primordium/mapping/coordinate_primitives.proto',
+    'Coordinate': 'dlkit/primordium/mapping/coordinate_primitives.proto',
     'osid.mapping.Distance': 'dlkit/primordium/mapping/unimplemented_primitives.proto',
+    # 'osid.mapping.Location': 'dlkit/primordium/mapping/unimplemented_primitives.proto',
     'osid.mapping.SpatialUnit': 'dlkit/primordium/mapping/spatial_units.proto',
+    'SpatialUnit': 'dlkit/primordium/mapping/spatial_units.proto',
     'osid.mapping.Speed': 'dlkit/primordium/mapping/unimplemented_primitives.proto',
     'osid.resource.Resource': 'dlkit/proto/resource.proto',
     'osid.transport.DataInputStream': 'dlkit/primordium/transport/objects.proto',
@@ -43,9 +50,12 @@ TYPE_MAPPING = {
     'boolean': 'bool',
     'byte': 'bytes',
     'object': 'bytes',  # could also do a protobuf Map, except we can't define all possible type combinations...
+    'UNKNOWN': 'dlkit.primordium.id.primitives.Id',  # currently this only happens to Ontology.Relevance...
     'timestamp': 'google.protobuf.Timestamp',
     'osid.calendaring.DateTime': 'google.protobuf.Timestamp',
     'DateTime': 'google.protobuf.Timestamp',
+    'osid.calendaring.DateTimeInterval': 'dlkit.primordium.calendaring.primitives.DateTimeInterval',
+    'DateTimeInterval': 'dlkit.primordium.calendaring.primitives.DateTimeInterval',
     'osid.calendaring.Duration': 'dlkit.primordium.calendaring.primitives.Duration',
     'Duration': 'dlkit.primordium.calendaring.primitives.Duration',
     'osid.calendaring.Time': 'dlkit.primordium.calendaring.primitives.Time',
@@ -73,6 +83,8 @@ TYPE_MAPPING = {
     'Coordinate': 'dlkit.primordium.mapping.coordinate_primitives.Coordinate',
     'osid.mapping.Distance': 'dlkit.primordium.mapping.unimplemented_primitives.Distance',
     'Distance': 'dlkit.primordium.mapping.unimplemented_primitives.Distance',
+    # 'osid.mapping.Location': 'dlkit.primordium.mapping.unimplemented_primitives.Location',
+    # 'Location': 'dlkit.primordium.mapping.unimplemented_primitives.Location',
     'osid.mapping.SpatialUnit': 'dlkit.primordium.mapping.spatial_units.SpatialUnit',
     'SpatialUnit': 'dlkit.primordium.mapping.spatial_units.SpatialUnit',
     'osid.mapping.Speed': 'dlkit.primordium.mapping.unimplemented_primitives.Speed',
@@ -104,6 +116,24 @@ class ProtoBuilder(InterfaceBuilder, PatternBuilder):
         self._template_dir = self._abs_path + '/proto_templates'
 
         self._class = 'proto'
+
+    def build_this_interface(self, interface):
+        """override the one in build_dlkit.py because we need query_inspectors"""
+        if (interface['category'] == 'sessions' and
+                interface['shortname'] not in sessions_to_implement):
+            return False
+
+        # if (self.package['name'] != 'osid' and
+        #         interface['category'] in ['objects', 'queries',
+        #                                   'searches', 'rules',
+        #                                   'search_orders', 'query_inspectors'] and
+        #         not any(interface['shortname'].startswith(object_name) for object_name in objects_to_implement)):
+        #     return False
+
+        if interface['category'] == 'managers':
+            return False
+
+        return True
 
     def compile_proto_files(self):
         """For each *.proto file in dlkit/proto and dlkit/primordium, call ``protoc``:
@@ -368,6 +398,13 @@ message Assessment {
             }
         }
         """
+        def append_imports(_variable_type):
+            if (_variable_type in IMPORT_MAPPING and
+                    (self.is_primitive(_variable_type) or not self.is_same_package(package_map_file, _variable_type))):
+                proto_import = 'import "{0}";'.format(IMPORT_MAPPING[_variable_type])
+                if proto_import not in result[object_name]['_imports']:
+                    result[object_name]['_imports'].append(proto_import)
+
         def extract_base_message_name(full_name):
             """ For something like 'osid.id.Id' returns Id
                 For something like 'OsidCatalog', returns OsidCatalog
@@ -444,10 +481,7 @@ message Assessment {
         if self.is_list(object_name):
             non_list_name = self.make_non_list(object_name)
             variable_name = make_plural(camel_to_under(non_list_name))
-            if non_list_name == 'Type':
-                # Need to make an exception because TypeList here needs to repeat the primordium Type.
-                # There is no Type object in the type package itself.
-                non_list_name = 'dlkit.primordium.type.primitives.Type'
+            append_imports(non_list_name)
             message_fields.append(format_message(True, non_list_name, variable_name, 1))
         else:
             variable_counter = 1
@@ -459,11 +493,7 @@ message Assessment {
                     variable_type = self.make_non_list(variable_type)
                     repeated = True
 
-                if (variable_type in IMPORT_MAPPING and
-                        (self.is_primitive(variable_type) or not self.is_same_package(package_map_file, variable_type))):
-                    proto_import = 'import "{0}";'.format(IMPORT_MAPPING[variable_type])
-                    if proto_import not in result[object_name]['_imports']:
-                        result[object_name]['_imports'].append(proto_import)
+                append_imports(variable_type)
 
                 message_fields.append(format_message(repeated,
                                                      variable_type,
@@ -488,8 +518,12 @@ message {0} {{
             raise ValueError('package_map_file must be a path to a file')
         with open(package_map_file, 'rb') as package_map_handle:
             package_map = json.load(package_map_handle)
+            self.package = package_map
             for interface in package_map['interfaces']:
-                if element_type == 'objects' and interface['category'] in [element_type, 'queries',
+                if not self.build_this_interface(interface):
+                    continue
+
+                if element_type == 'objects' and interface['category'] in ['objects', 'queries',
                                                                            'searches', 'rules',
                                                                            'search_orders', 'query_inspectors']:
                     # Objects also include queries and searches
@@ -596,9 +630,11 @@ message {0} {{
         """to make sure all primordium imports go there, even for "same packages". """
         return (variable_name in ['osid.id.Id', 'osid.calendaring.DateTime',
                                   'osid.calendaring.Duration', 'osid.calendaring.Time',
+                                  'osid.mapping.Coordinate', 'osid.mapping.SpatialUnit',
                                   'osid.type.Type', 'osid.installation.Version',
                                   'osid.transport.DataInputStream'] or
                 variable_name in ['Id', 'DateTime', 'Duration',
+                                  'Coordinate', 'SpatialUnit',
                                   'Time', 'Type', 'Version',
                                   'DataInputStream'])
 

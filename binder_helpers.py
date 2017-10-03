@@ -143,7 +143,8 @@ _singular_to_plural = {
     'log_entry': 'log_entries',
     'LogEntry': 'LogEntries',
     'search': 'searches',
-    'Search': 'Searches'
+    'Search': 'Searches',
+    'property': 'properties'
 }
 
 _plural_to_singular = {v: k for k, v in _singular_to_plural.items()}
