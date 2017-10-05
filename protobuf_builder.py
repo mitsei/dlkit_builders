@@ -460,11 +460,11 @@ message Assessment {
 
             if _repeated:
                 return '  repeated {0} {1} = {2};'.format(self.extract_base_message_name(_variable_type),
-                                                          _variable_name,
+                                                          camel_to_under(_variable_name),
                                                           str(count))
             else:
                 return '  {0} {1} = {2};'.format(self.extract_base_message_name(_variable_type),
-                                                 _variable_name,
+                                                 camel_to_under(_variable_name),
                                                  str(count))
 
         if not isinstance(protobuf_message, dict):
