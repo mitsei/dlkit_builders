@@ -818,8 +818,11 @@ def get_registry(entry, runtime):
         return {}
 
 def get_record(data_sets, record_type, data_key):
-    """Returns a record class"""
-    record_type_data = data_sets[record_type.get_identifier()]
+    """Returns a record class or None"""
+    try:
+        record_type_data = data_sets[record_type.get_identifier()]
+    except KeyError:
+        return None
     module = import_module(record_type_data['module_path'])
     return getattr(module, record_type_data[data_key], None)
 
@@ -828,11 +831,26 @@ def get_records(object_name, record_types, data_key, runtime):
     records = []
     data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
     for record_type in reversed(record_types):
-        record = get_record(data_sets, record_types, data_key)
+        record = get_record(data_sets, record_type, data_key)
         if record is not None:
             records.append(record)
     return tuple(records)
 
+# def get_all_query_records(object_name, runtime):
+#     """Returns a tuple of all query record classes
+#
+#     Perhaps this should be done only once per object_name at runtime
+#     since the list of records will not change.
+#
+#     """
+#     records = []
+#     data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
+#     for data_set in data_sets:
+#         record_type_data = data_sets[record_type.get_identifier()]
+#         module = import_module(record_type_data['module_path'])
+#         record.append(getattr(module, record_type_data['query_record_class_name']))
+#     return records
+    
 def is_authenticated_with_proxy(proxy):
     """Given a Proxy, checks whether a user is authenticated"""
     if proxy is None:
@@ -841,7 +859,6 @@ def is_authenticated_with_proxy(proxy):
         return proxy.get_authentication().is_valid()
     else:
         return False
-
 
 def get_authenticated_agent_id_with_proxy(proxy):
     """Given a Proxy, returns the Id of the authenticated Agent"""

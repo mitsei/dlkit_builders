@@ -209,10 +209,11 @@ class Extensible:
         # and invoke this osid.Extensible.__new__ with the proper arguments.
         # See osid.OsidObject and osid.OsidObjectForm for examples.
         if record_types is not None:
+            data_key = object_type.lower() + '_record_class_name'
             cls = type(object_name + object_type,
                       get_records(inflection.underscore(object_name).upper(),
                                            record_types,
-                                           'object_record_class_name',
+                                           data_key,
                                            runtime) + (cls,), {})
         return super(Extensible, cls).__new__(cls)
 
@@ -816,7 +817,7 @@ class OsidObject:
     def __new__(cls, osid_object_map, runtime=None, **kwargs):
         object_name = cls._namespace.split('.')[-1]
         record_types = [Type(rtype_id) for rtype_id in osid_object_map['recordTypeIds']]
-        return osid_markers.Extensible.__new__(cls, object_name, '', record_types, runtime)
+        return osid_markers.Extensible.__new__(cls, object_name, 'Object', record_types, runtime)
 
     def __init__(self, osid_object_map, runtime=None, **kwargs):
         osid_markers.Identifiable.__init__(self, runtime=runtime)
@@ -1240,20 +1241,9 @@ class OsidExtensibleForm:
         self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _get_record(self, record_type):
-        \"\"\"This overrides _get_record in osid.Extensible.
-
-        Perhaps we should leverage it somehow?
-
-        \"\"\"
-        # if (not self.has_record_type(record_type) and
-        #         record_type.get_identifier() not in self._record_type_data_sets):
-        #     raise errors.Unsupported()
-        # if str(record_type) not in self._records:
-        #     record_initialized = self._init_record(str(record_type))
-        #     if record_initialized and str(record_type) not in self._my_map['recordTypeIds']:
-        #         self._my_map['recordTypeIds'].append(str(record_type))
+        \"\"\"This overrides _get_record in osid.Extensible.\"\"\"
         try:
-            return Extensible._get_record(self, record_type)
+            return osid_markers.Extensible._get_record(self, record_type)
         except errors.Unsupported:
             self.add_form_record(record_type)
         return self
@@ -1261,16 +1251,16 @@ class OsidExtensibleForm:
     def add_form_record(self, record_type):
         \"\"\"Adds a record to this object. Should to be associated with a morphable record type\"\"\"
         object_name = self._namespace.split('.')[-1].upper()
-        data_sets = get_registry(object_name + '_RECORD_TYPES', self._runtime)
-        record_class = get_record(self._all_supported_record_type_data_sets,
-                                  record_type,
-                                  'form_record_class_name')
+        data_sets = utilities.get_registry(object_name + '_RECORD_TYPES', self._runtime)
+        record_class = utilities.get_record(data_sets,
+                                            record_type,
+                                            'form_record_class_name')
         if record_class is None:
             raise errors.Unsupported
         self.__class__.__bases__ = (record_class,) + self.__class__.__bases__
-        record_class.__init__(self)
-        record_class._init_metadata(self)
-        record_class._init_map(self)
+        record_class.__init__(self, block_super=True)
+        record_class._init_metadata(self, block_super=True)
+        record_class._init_map(self, block_super=True)
         self._my_map['recordTypeIds'].append(str(record_type))
 
     # def _init_record(self, record_type_idstr):
@@ -1775,13 +1765,9 @@ class OsidQuery:
     ]
 
     init = """
-    def __init__(self, runtime):
-        self._records = OrderedDict()
-        # _load_records is in OsidExtensibleQuery:
-        # _all_supported_record_type_ids comes from inheriting query object
-        # THIS SHOULD BE RE-DONE:
-        self._load_records(self._all_supported_record_type_ids)
-        self._runtime = runtime
+    def __init__(self, runtime=None, **kwargs):
+        # self._load_records(self._all_supported_record_type_ids)
+        # self._runtime = runtime
         self._query_terms = {}
         self._keyword_terms = {}
         self._keyword_fields = ['displayName.text', 'description.text']
@@ -1964,9 +1950,21 @@ class OsidExtensibleQuery:
         'from dlkit.abstract_osid.osid import errors',
         'import importlib',
         'from ..primitives import Id',
+        'from ..primitives import Type'
     ]
 
     init = """
+    def __new__(cls, osid_object_map=None, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
+        # The following is not optimal since it means the registry is traversed twice:
+        record_types = [Type(data_set) for data_set in utilities.get_registry(object_name, runtime)]
+        return osid_markers.Extensible.__new__(cls, object_name, 'Query', record_types, runtime)
+
+    def __init__(self, runtime=None, proxy=None, **kwargs):
+        # self._supported_record_type_ids = []
+        self._runtime = runtime
+        self._proxy = proxy
+
     def _load_records(self, record_type_idstrs):
         \"\"\"Loads query records\"\"\"
         for record_type_idstr in record_type_idstrs:
@@ -1986,6 +1984,13 @@ class OsidExtensibleQuery:
         self._add_match('recordTypeIds', str(record_type), match)"""
 
 
+class OsidSourceableQuery:
+
+    init = """
+    def __init__(self, **kwargs):
+        pass"""
+
+
 class OsidObjectQuery:
 
     import_statements = [
@@ -1996,8 +2001,9 @@ class OsidObjectQuery:
     ]
 
     init = """
-    def __init__(self, runtime):
-        OsidQuery.__init__(self, runtime)"""
+    def __init__(self, **kwargs):
+        OsidQuery.__init__(self, **kwargs)
+        OsidExtensibleQuery.__init__(self, **kwargs)"""
 
     match_display_name_arg_template = {
         1: 'DEFAULT_STRING_MATCH_TYPE',
@@ -2034,6 +2040,14 @@ class OsidObjectQuery:
         self._clear_terms('genusTypeId')"""
 
 
+class OsidCatalogQuery:
+
+    init = """
+    def __init__(self, **kwargs):
+        OsidObjectQuery.__init__(self, **kwargs)
+        OsidSourceableQuery.__init__(self, **kwargs)"""
+
+
 class OsidQueryInspector:
 
     import_statements = [
@@ -2043,18 +2057,28 @@ class OsidQueryInspector:
 
 class OsidRecord:
 
-    consider_init = """
-    def __init__(self):
+    init = """
+    def __init__(self, block_super=False, **kwargs):
         # This is set in implemented Records.  Should super __init__
-        self._implemented_record_type_identifiers = None
+        # self._implemented_record_type_identifiers = None
+        if not block_super:
+            super(OsidRecord, self).__init__(**kwargs)
 
-    def __iter__(self):
-        for attr in dir(self):
-            if not attr.startswith('__'):
-                yield attr
+    def _init_metadata(self, block_super=False, **kwargs):
+        if not block_super:
+            super(OsidRecord, self)._init_metadata(**kwargs)
 
-    def __getitem__(self, item):
-        return getattr(self, item)"""
+    def _init_map(self, block_super=False, **kwargs):
+        if not block_super:
+            super(OsidRecord, self)._init_map(**kwargs)
+
+    # def __iter__(self):
+    #     for attr in dir(self):
+    #         if not attr.startswith('__'):
+    #             yield attr
+    #
+    # def __getitem__(self, item):
+    #     return getattr(self, item)"""
 
     implements_record_type = """
         return record_type.get_identifier() in self._implemented_record_type_identifiers"""
@@ -2182,28 +2206,32 @@ class OsidSearch:
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from dlkit.primordium.id.primitives import Id',
-        'from collections import OrderedDict'
+        'from collections import OrderedDict',
+        'from . import rules as osid_rules'
     ]
 
     init = """
+    def __new__(cls, **kwargs):
+        return osid_rules.OsidCondition.__new__(cls, 'Search', **kwargs)
+
     def __init__(self, runtime):
-        self._records = OrderedDict()
-        # _load_records is in OsidExtensibleQuery:
-        # _all_supported_record_type_ids comes from inheriting query object
-        # THIS SHOULD BE RE-DONE:
-        self._load_records(self._all_supported_record_type_ids)
-        self._runtime = runtime
-        self._query_terms = {}
-        self._keyword_terms = {}
-        self._keyword_fields = ['displayName.text', 'description.text']
-        try:
-            # Try to get additional keyword fields from the runtime, if available:
-            config = runtime.get_configuration()
-            parameter_id = Id('parameter:keywordFields@json')
-            additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
-            self._keyword_fields += additional_keyword_fields[self._namespace]
-        except (AttributeError, KeyError, errors.NotFound):
-            pass
+        # self._records = OrderedDict()
+        # # _load_records is in OsidExtensibleQuery:
+        # # _all_supported_record_type_ids comes from inheriting query object
+        # # THIS SHOULD BE RE-DONE:
+        # self._load_records(self._all_supported_record_type_ids)
+        # self._runtime = runtime
+        # self._query_terms = {}
+        # self._keyword_terms = {}
+        # self._keyword_fields = ['displayName.text', 'description.text']
+        # try:
+        #     # Try to get additional keyword fields from the runtime, if available:
+        #     config = runtime.get_configuration()
+        #     parameter_id = Id('parameter:keywordFields@json')
+        #     additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
+        #     self._keyword_fields += additional_keyword_fields[self._namespace]
+        # except (AttributeError, KeyError, errors.NotFound):
+        #     pass
         self._limit_result_set_start = None
         self._limit_result_set_end = None"""
 
@@ -2229,10 +2257,35 @@ class OsidSearch:
         return self._limit_result_set_end"""
 
 
-class OsidSearchResults:
+class OsidResult:
 
     import_statements = [
     ]
+
+    init = """
+    def __new__(cls, record_key, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
+        record_types = list()  # Need to get this from registry
+        return osid_markers.Extensible.__new__(cls, object_name, record_key, record_types, runtime)
+
+    def __init__(self, **kwargs):
+        osid_markers.Extensible.__init__(self, **kwargs)"""
+
+class OsidSearchResults:
+
+    import_statements = [
+        'from . import rules as osid_rules'
+    ]
+
+    init = """
+    def __new__(cls, **kwargs):
+        return osid_rules.OsidResult.__new__(cls, 'SearchResults', **kwargs)
+
+    def __init__(self, results, query_terms, **kwargs):
+        self._results = results
+        self._query_terms = query_terms
+        self.retrieved = False
+        osid_rules.OsidResult.__init__(self, **kwargs)"""
 
     get_result_size = """
         return self._results.count(True)"""
@@ -2277,3 +2330,11 @@ class OsidTemporalQuery:
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
+
+class OsidCondition:
+
+    init = """
+    def __new__(cls, record_key, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
+        record_types = list()  # Need to get this from registry
+        return osid_markers.Extensible.__new__(cls, object_name, record_key, record_types, runtime)"""

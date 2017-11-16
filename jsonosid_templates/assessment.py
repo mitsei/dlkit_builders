@@ -2072,6 +2072,9 @@ class Response:
     init = """
     _namespace = 'assessment.Response'
 
+    def __new__(cls, *args, **kwargs):
+        return super(Response, cls).__new__(cls, record_key='', **kwargs)
+
     def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, section=None, **kwargs):
         from .objects import Answer
         self._submission_time = osid_object_map['submissionTime']

@@ -401,7 +401,7 @@ class ResourceSearchSession:
             result = collection.find(query_terms)[${arg1_name}.start:${arg1_name}.end]
         else:
             result = collection.find(query_terms)
-        return searches.${return_type}(result, dict(${arg0_name}._query_terms), runtime=self._runtime)"""
+        return searches.${return_type}(results=result, query_terms=dict(${arg0_name}._query_terms), runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
@@ -1636,6 +1636,11 @@ class Resource:
     init_template = """
     _namespace = '${implpkg_name}.${interface_name}'
 
+    def __new__(cls, **kwargs):
+        if not kwargs:
+            return object.__new__(cls)  # To support things like deepcopy
+        return super(${interface_name}, cls).__new__(cls, **kwargs)
+
     def __init__(self, **kwargs):
         osid_objects.OsidObject.__init__(self, **kwargs)
         self._catalog_name = '${cat_name}'
@@ -1693,16 +1698,11 @@ class ResourceQuery:
     ]
 
     init_template = """
-    def __init__(self, runtime):
-        self._namespace = '${pkg_name_replaced}.${object_name}'
-        self._runtime = runtime
-        record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
-        self._all_supported_record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_ids = []
-        for data_set in record_type_data_sets:
-            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidObjectQuery.__init__(self, runtime)
-"""
+    _namespace = '${pkg_name_replaced}.${object_name}'
+
+    def __init__(self, **kwargs):
+        osid_queries.OsidObjectQuery.__init__(self, **kwargs)
+        self._catalog_name = '${cat_name}'"""
 
     clear_group_terms_template = """
         # Implemented from template for osid.resource.ResourceQuery.clear_group_terms
@@ -1735,17 +1735,20 @@ class ResourceSearch:
     ]
 
     init_template = """
-    def __init__(self, runtime):
-        self._namespace = '${pkg_name}.${object_name}'
-        self._runtime = runtime
-        record_type_data_sets = get_registry('RESOURCE_RECORD_TYPES', runtime)
-        self._record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_ids = []
+    _namespace = '${implpkg_name}.${object_name}'
+
+    def __init__(self, **kwargs):
+        # Removed on 10/5/17:
+        # self._namespace = '${pkg_name}.${object_name}'
+        # self._runtime = runtime
+        # record_type_data_sets = get_registry('RESOURCE_RECORD_TYPES', runtime)
+        # self._record_type_data_sets = record_type_data_sets
+        # self._all_supported_record_type_data_sets = record_type_data_sets
+        # self._all_supported_record_type_ids = []
+        # for data_set in record_type_data_sets:
+        #     self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
         self._id_list = None
-        for data_set in record_type_data_sets:
-            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_searches.OsidSearch.__init__(self, runtime)"""
+        osid_searches.OsidSearch.__init__(self, **kwargs)"""
 
     search_among_resources_template = """
         self._id_list = ${arg0_name}"""
@@ -1760,14 +1763,15 @@ class ResourceSearchResults:
     ]
 
     init_template = """
-    def __init__(self, results, query_terms, runtime):
-        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
-        # self._results = [r for r in results]
-        self._namespace = '${pkg_name}.${object_name}'
-        self._results = results
-        self._query_terms = query_terms
-        self._runtime = runtime
-        self.retrieved = False"""
+    _namespace = '${pkg_name}.${object_name}'
+
+    def __init__(self, **kwargs):  # removed results, query_terms, runtime on 10/18/17
+        # # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+        # # self._results = [r for r in results]
+        # self._results = results
+        # self._query_terms = query_terms
+        # self.retrieved = False
+        osid_searches.OsidSearchResults.__init__(self, **kwargs)"""
 
     get_resources_template = """
         if self.retrieved:
@@ -1810,7 +1814,6 @@ ${metadata_super_initers}        ${init_object}._init_metadata(self, **kwargs)
 ${map_super_initers}        ${init_object}._init_map(self, record_types=record_types)
 ${persisted_initers}"""
 
-    # this needs to be re-designed to know about variable syntax type
     get_group_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
         metadata = dict(self._mdata['${var_name}'])
@@ -1936,14 +1939,10 @@ class BinQuery:
     ]
 
     init_template = """
-    def __init__(self, runtime):
-        self._runtime = runtime
-        record_type_data_sets = get_registry('${cat_name_upper}_RECORD_TYPES', runtime)
-        self._all_supported_record_type_data_sets = record_type_data_sets
-        self._all_supported_record_type_ids = []
-        for data_set in record_type_data_sets:
-            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidCatalogQuery.__init__(self, runtime)
+    _namespace = '${implpkg_name}.${object_name}'
+
+    def __init__(self, **kwargs):
+        osid_queries.OsidCatalogQuery.__init__(self, **kwargs)
 
     def _get_descendant_catalog_ids(self, catalog_id):
         hm = self._get_provider_manager('HIERARCHY')
