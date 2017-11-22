@@ -918,23 +918,15 @@ class AssessmentTakenAdminSession:
             # no deadline set
             pass
 
-        if assessment_taken_record_types == []:
-            # WHY are we passing bank_id = self._catalog_id below, seems redundant:
-            obj_form = objects.AssessmentTakenForm(
-                bank_id=self._catalog_id,
-                assessment_offered_id=assessment_offered_id,
-                catalog_id=self._catalog_id,
-                runtime=self._runtime,
-                proxy=self._proxy)
-        else:
-            obj_form = objects.AssessmentTakenForm(
-                bank_id=self._catalog_id,
-                record_types=assessment_taken_record_types,
-                assessment_offered_id=assessment_offered_id,
-                catalog_id=self._catalog_id,
-                runtime=self._runtime,
-                proxy=self._proxy)
-        obj_form._for_update = False
+        obj_form = objects.AssessmentTakenForm(record_types=assessment_taken_record_types,
+                                               runtime=self._runtime,
+                                               proxy=self._proxy)
+        obj_form._init_metadata()
+        obj_form._init_map(bank_id=self._catalog_id,
+                           assessment_offered_id=assessment_offered_id,
+                           effective_agent_id=self.get_effective_agent_id())
+
+        # obj_form._for_update = False  # set in form constructor
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
@@ -1323,9 +1315,10 @@ class AssessmentForm:
     def __init__(self, **kwargs):
         osid_objects.OsidObjectForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_assessment_mdata()
-        self._init_metadata(**kwargs)
-        if not self.is_for_update():
-            self._init_map(**kwargs)
+        # The following are now being called in the AdminSession:
+        # self._init_metadata(**kwargs)
+        # if not self.is_for_update():
+        #     self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"

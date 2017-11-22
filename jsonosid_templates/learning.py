@@ -200,23 +200,17 @@ class ActivityAdminSession:
         for arg in ${arg1_name}:
             if not isinstance(arg, ABC${arg1_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg1_type}')
-        if ${arg1_name} == []:
-            # WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                ${arg0_name}=${arg0_name},
-                catalog_id=self._catalog_id,
-                runtime=self._runtime,
-                proxy=self._proxy)
-        else:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                record_types=${arg1_name},
-                ${arg0_name}=${arg0_name},
-                catalog_id=self._catalog_id,
-                runtime=self._runtime,
-                proxy=self._proxy)
-        obj_form._for_update = False
+
+        obj_form = objects.${return_type}(
+            record_types=${arg1_name},
+            runtime=self._runtime,
+            proxy=self._proxy)
+        obj_form._init_metadata()
+        obj_form._init_map(${cat_name_under}_id=self._catalog_id,
+                           ${arg0_name}=${arg0_name},
+                           effective_agent_id=self.get_effective_agent_id())
+
+        # obj_form._for_update = False  # set in Form constructor
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 

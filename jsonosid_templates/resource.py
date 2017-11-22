@@ -460,19 +460,15 @@ class ResourceAdminSession:
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
-        if ${arg0_name} == []:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id(),
-                proxy=self._proxy)
-        else:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                record_types=${arg0_name},
-                runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id(),
-                proxy=self._proxy)
+        obj_form = objects.${return_type}(
+            # ${cat_name_under}_id=self._catalog_id,
+            record_types=${arg0_name},
+            runtime=self._runtime,
+            # effective_agent_id=self.get_effective_agent_id(),
+            proxy=self._proxy)
+        obj_form._init_metadata()
+        obj_form._init_map(${cat_name_under}_id=self._catalog_id,
+                           effective_agent_id=self.get_effective_agent_id())
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
@@ -532,6 +528,7 @@ class ResourceAdminSession:
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
         obj_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
+        obj_form._init_metadata()
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
@@ -1164,19 +1161,15 @@ class BinAdminSession:
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
-        if ${arg0_name} == []:
-            result = objects.${return_type}(
-                runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id(),
-                proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
-        else:
-            result = objects.${return_type}(
-                record_types=${arg0_name},
-                runtime=self._runtime,
-                effective_agent_id=self.get_effective_agent_id(),
-                proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
-        self._forms[result.get_id().get_identifier()] = not CREATED
-        return result"""
+        ${return_type_under} = objects.${return_type}(
+            record_types=${arg0_name},
+            runtime=self._runtime,
+            effective_agent_id=self.get_effective_agent_id(),
+            proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
+        ${return_type_under}._init_metadata()
+        ${return_type_under}._init_map()
+        self._forms[${return_type_under}.get_id().get_identifier()] = not CREATED
+        return ${return_type_under}"""
 
     create_bin_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
@@ -1227,10 +1220,11 @@ class BinAdminSession:
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        cat_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
-        self._forms[cat_form.get_id().get_identifier()] = not UPDATED
+        ${return_type_under} = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
+        ${return_type_under}._init_metadata()
+        self._forms[${return_type_under}.get_id().get_identifier()] = not UPDATED
 
-        return cat_form"""
+        return ${return_type_under}"""
 
     can_update_bins_template = """
         # Implemented from template for
@@ -1801,9 +1795,10 @@ class ResourceForm:
     def __init__(self, **kwargs):
         ${init_object}.__init__(self, **kwargs)
         self._mdata = default_mdata.get_${object_name_under}_mdata()
-        self._init_metadata(**kwargs)
-        if not self.is_for_update():
-            self._init_map(**kwargs)
+        # The following are now being called in the AdminSession:
+        # self._init_metadata(**kwargs)
+        # if not self.is_for_update():
+        #     self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
