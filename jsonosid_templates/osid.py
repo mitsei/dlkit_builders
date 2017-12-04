@@ -194,19 +194,33 @@ class Identifiable:
 class Extensible:
 
     import_statements = [
+        'import inflection',
         'from ..primitives import Id',
         'from ..primitives import Type',
         'from importlib import import_module',
         'from ..utilities import get_provider_manager',
-        'from ..utilities import get_registry',
-        'from collections import OrderedDict'
+        # 'from ..utilities import get_registry',
+        'from ..utilities import get_records',
     ]
 
     init = """
-    def __init__(self, object_name, runtime=None, proxy=None, **kwargs):
-        self._records = OrderedDict()
+    def __new__(cls, object_name, object_type, record_types, runtime, **kwargs):
+        # NOTE: All classes that inherit from osid.Extensible must override __new__
+        # and invoke this osid.Extensible.__new__ with the proper arguments.
+        # See osid.OsidObject and osid.OsidObjectForm for examples.
+        if record_types:
+            data_key = object_type.lower() + '_record_class_name'
+            cls = type(object_name + object_type,
+                       get_records(inflection.underscore(object_name).upper(),
+                                   record_types,
+                                   data_key,
+                                   runtime) + (cls,), {})
+        return super(Extensible, cls).__new__(cls)
+
+    def __init__(self, runtime=None, proxy=None, **kwargs):
+        # self._records = {}
         self._supported_record_type_ids = []
-        self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
+        # self._record_type_data_sets = get_registry(object_name + '_RECORD_TYPES', runtime)
         self._runtime = runtime
         self._proxy = proxy
 
@@ -218,71 +232,78 @@ class Extensible:
     def __getitem__(self, item):
         return getattr(self, item)
 
-    def __getattribute__(self, name):
-        if not name.startswith('_'):
-            if '_records' in self.__dict__:
-                for record in reversed(self._records):
-                    try:
-                        return self._records[record][name]
-                    except AttributeError:
-                        pass
-        return object.__getattribute__(self, name)
-
-    def __getattr__(self, name):
-        if '_records' in self.__dict__:
-            for record in reversed(self._records):
-                try:
-                    return self._records[record][name]
-                except AttributeError:
-                    pass
-        raise AttributeError()
+    # def __getattribute__(self, name):
+    #     if not name.startswith('_'):
+    #         if '_records' in self.__dict__:
+    #             for record in self._records:
+    #                 try:
+    #                     return self._records[record][name]
+    #                 except AttributeError:
+    #                     pass
+    #     return object.__getattribute__(self, name)
+    #
+    # THIS DID NOT WORK:
+    # def __getattribute__(self, name):
+    #     if not name.startswith('_'):
+    #         if len(self.__class__.__bases__) > 1:
+    #             # Records override base class and each other in reverse order:
+    #             for record_class in reversed(self.__class__.__bases__[1:]):
+    #                 try:
+    #                     return record_class[name] # Need self somehow?
+    #                 except AttributeError:
+    #                     pass
+    #     return object.__getattribute__(self, name)
+    #
+    # def __getattr__(self, name):
+    #     if '_records' in self.__dict__:
+    #         for record in self._records:
+    #             try:
+    #                 return self._records[record][name]
+    #             except AttributeError:
+    #                 pass
+    #     raise AttributeError()
 
     def _get_record(self, record_type):
-        \"\"\"Get the record string type value given the record_type.\"\"\"
+        \"\"\"Get the record for the given record_type. Really just self\"\"\"
         if not self.has_record_type(record_type):
             raise errors.Unsupported()
-        if str(record_type) not in self._records:
-            raise errors.Unimplemented()
-        return self._records[str(record_type)]
+        return self
 
-    def _load_records(self, record_type_idstrs):
-        \"\"\"Load all records from given record_type_idstrs.\"\"\"
-        for record_type_idstr in record_type_idstrs:
-            self._init_record(record_type_idstr)
-
-    def _init_records(self, record_types):
-        \"\"\"Initalize all records for this form.\"\"\"
-        for record_type in record_types:
-            # This conditional was inserted on 7/11/14. It may prove problematic:
-            if str(record_type) not in self._my_map['recordTypeIds']:
-                record_initialized = self._init_record(str(record_type))
-                if record_initialized:
-                    self._my_map['recordTypeIds'].append(str(record_type))
-
-    def _init_record(self, record_type_idstr):
-        \"\"\"Initialize the record identified by the record_type_idstr.\"\"\"
-        import importlib
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['object_record_class_name'], None)
-        # only add recognized records ... so apps don't break
-        # if new records are injected by another app
-        if record is not None:
-            self._records[record_type_idstr] = record(self)
-            return True
-        else:
-            return False
+    # def _load_records(self, record_type_idstrs):
+    #     \"\"\"Load all records from given record_type_idstrs.\"\"\"
+    #     for record_type_idstr in record_type_idstrs:
+    #         self._init_record(record_type_idstr)
+    #
+    # def _init_records(self, record_types):
+    #     \"\"\"Initalize all records for this form.\"\"\"
+    #     for record_type in record_types:
+    #         # This conditional was inserted on 7/11/14. It may prove problematic:
+    #         if str(record_type) not in self._my_map['recordTypeIds']:
+    #             record_initialized = self._init_record(str(record_type))
+    #             if record_initialized:
+    #                 self._my_map['recordTypeIds'].append(str(record_type))
+    #
+    # def _init_record(self, record_type_idstr):
+    #     \"\"\"Initialize the record identified by the record_type_idstr.\"\"\"
+    #     import importlib
+    #     record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+    #     module = importlib.import_module(record_type_data['module_path'])
+    #     record = getattr(module, record_type_data['object_record_class_name'], None)
+    #     # only add recognized records ... so apps don't break
+    #     # if new records are injected by another app
+    #     if record is not None:
+    #         self._records[record_type_idstr] = record(self)
+    #         return True
+    #     else:
+    #         return False
 
     def _delete(self):
-        \"\"\"Override this method in inheriting objects to perform special clearing operations.\"\"\"
-        try:
-            for record in self._records:
-                try:
-                    self._records[record]._delete()
-                except AttributeError:
-                    pass
-        except AttributeError:
-            pass
+        \"\"\"Override this method in inheriting objects to perform special clearing operations.
+
+        And make sure to call super if you do
+
+        \"\"\"
+        pass
 
     def _get_provider_manager(self, osid, local=False):
         \"\"\"Gets the most appropriate provider manager depending on config.\"\"\"
@@ -785,11 +806,16 @@ class OsidObject:
     init = """
     _namespace = 'osid.OsidObject'
 
+    def __new__(cls, osid_object_map, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
+        record_types = [Type(rtype_id) for rtype_id in osid_object_map['recordTypeIds']]
+        return osid_markers.Extensible.__new__(cls, object_name, 'Object', record_types, runtime)
+
     def __init__(self, osid_object_map, runtime=None, **kwargs):
         osid_markers.Identifiable.__init__(self, runtime=runtime)
         osid_markers.Extensible.__init__(self, runtime=runtime, **kwargs)
         self._my_map = osid_object_map
-        self._load_records(osid_object_map['recordTypeIds'])
+        # self._load_records(osid_object_map['recordTypeIds'])
 
     def get_object_map(self, obj_map=None):
         if obj_map is None:
@@ -810,14 +836,19 @@ class OsidObject:
             # catalogs do not have this attribute
             pass
 
-        try:  # Need to implement records for catalogs one of these days
-            for record in self._records:
-                try:
-                    self._records[record]._update_object_map(obj_map)
-                except AttributeError:
-                    pass
-        except AttributeError:
-            pass
+        # try:  # Need to implement records for catalogs one of these days
+        #     for record in self._records:
+        #         try:
+        #             self._records[record]._update_object_map(obj_map)
+        #         except AttributeError:
+        #             pass
+        # except AttributeError:
+        #     pass
+        for record_class in self.__class__.__bases__[1:]:
+            try:
+                record_class._update_object_map(self, obj_map)
+            except AttributeError:
+                pass
 
         obj_map.update(
             {'type': self._namespace.split('.')[-1],
@@ -900,6 +931,9 @@ class OsidForm:
     def __init__(self, runtime=None, proxy=None, **kwargs):
         self._identifier = str(uuid.uuid4())
         self._mdata = None
+        self._journal_comment = None
+        self._journal_comment_default = None
+        self._validation_messages = None
         self._for_update = None
         self._runtime = None  # This is now being set in Extensible by higher order objects
         self._proxy = None  # This is now being set in Extensible by higher order objects
@@ -917,9 +951,6 @@ class OsidForm:
 
     def _init_metadata(self):
         \"\"\"Initialize OsidObjectForm metadata.\"\"\"
-
-        # pylint: disable=attribute-defined-outside-init
-        # this method is called from descendent __init__
         self._mdata.update(default_mdata.get_osid_form_mdata())
         update_display_text_defaults(self._mdata['journal_comment'], self._locale_map)
         for element_name in self._mdata:
@@ -1180,46 +1211,62 @@ class OsidForm:
 
 
 class OsidExtensibleForm:
+
     import_statements = [
         'import importlib',
     ]
 
     init = """
+    def __new__(cls, osid_object_map=None, record_types=None, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
+        if osid_object_map is not None:
+            record_types = [Type(rtype_id) for rtype_id in osid_object_map['recordTypeIds']]
+        return osid_markers.Extensible.__new__(cls, object_name, 'Form', record_types, runtime)
+
     def __init__(self, **kwargs):
         osid_markers.Extensible.__init__(self, **kwargs)
 
     def _init_map(self, record_types):
         self._my_map['recordTypeIds'] = []
         if record_types is not None:
-            self._init_records(record_types)
+            self._my_map['recordTypeIds'] = [str(rtype) for rtype in record_types]
         self._supported_record_type_ids = self._my_map['recordTypeIds']
 
     def _get_record(self, record_type):
-        \"\"\"This overrides _get_record in osid.Extensible.
+        \"\"\"This overrides _get_record in osid.Extensible.\"\"\"
+        try:
+            return osid_markers.Extensible._get_record(self, record_type)
+        except errors.Unsupported:
+            self.add_form_record(record_type)
+        return self
 
-        Perhaps we should leverage it somehow?
+    def add_form_record(self, record_type):
+        \"\"\"Adds a record to this object. Should to be associated with a morphable record type\"\"\"
+        object_name = self._namespace.split('.')[-1].upper()
+        data_sets = utilities.get_registry(object_name + '_RECORD_TYPES', self._runtime)
+        record_class = utilities.get_record(data_sets,
+                                            record_type,
+                                            'form_record_class_name')
+        if record_class is None:
+            raise errors.Unsupported
+        self.__class__ = type(object_name + 'Form',
+                              (record_class, self.__class__,), {})
+        record_class.__init__(self, block_super=True)
+        record_class._init_metadata(self, block_super=True)
+        record_class._init_map(self, block_super=True)
+        self._my_map['recordTypeIds'].append(str(record_type))
 
-        \"\"\"
-        if (not self.has_record_type(record_type) and
-                record_type.get_identifier() not in self._record_type_data_sets):
-            raise errors.Unsupported()
-        if str(record_type) not in self._records:
-            record_initialized = self._init_record(str(record_type))
-            if record_initialized and str(record_type) not in self._my_map['recordTypeIds']:
-                self._my_map['recordTypeIds'].append(str(record_type))
-        return self._records[str(record_type)]
-
-    def _init_record(self, record_type_idstr):
-        \"\"\"Override this from osid.Extensible because Forms use a different
-        attribute in record_type_data.\"\"\"
-        record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['form_record_class_name'])
-        if record is not None:
-            self._records[record_type_idstr] = record(self)
-            return True
-        else:
-            return False"""
+    # def _init_record(self, record_type_idstr):
+    #     \"\"\"Override this from osid.Extensible because Forms use a different
+    #     attribute in record_type_data.\"\"\"
+    #     record_type_data = self._record_type_data_sets[Id(record_type_idstr).get_identifier()]
+    #     module = importlib.import_module(record_type_data['module_path'])
+    #     record = getattr(module, record_type_data['form_record_class_name'])
+    #     if record is not None:
+    #         self._records[record_type_idstr] = record(self)
+    #         return True
+    #     else:
+    #         return False"""
 
 
 class OsidTemporalForm:
@@ -1469,7 +1516,7 @@ class OsidObjectForm:
     init = """
     _namespace = "osid.OsidObjectForm"
 
-    def __init__(self, osid_object_map=None, **kwargs):  # removed record_types=None, runtime=None,
+    def __init__(self, osid_object_map=None, **kwargs):
         self._display_name_default = None
         self._description_default = None
         self._genus_type_default = None
@@ -1478,7 +1525,6 @@ class OsidObjectForm:
         if osid_object_map is not None:
             self._for_update = True
             self._my_map = osid_object_map
-            self._load_records(osid_object_map['recordTypeIds'])
         else:
             self._for_update = False
             self._my_map = {}
@@ -1500,7 +1546,7 @@ class OsidObjectForm:
         if 'mdata' in kwargs:
             self._mdata.update(kwargs['mdata'])
 
-    def _init_map(self, record_types=None):
+    def _init_map(self, record_types=None, **kwargs):
         \"\"\"Initialize map for form\"\"\"
         OsidForm._init_map(self)
         self._my_map['displayName'] = dict(self._display_name_default)
@@ -1711,13 +1757,9 @@ class OsidQuery:
     ]
 
     init = """
-    def __init__(self, runtime):
-        self._records = OrderedDict()
-        # _load_records is in OsidExtensibleQuery:
-        # _all_supported_record_type_ids comes from inheriting query object
-        # THIS SHOULD BE RE-DONE:
-        self._load_records(self._all_supported_record_type_ids)
-        self._runtime = runtime
+    def __init__(self, runtime=None, **kwargs):
+        # self._load_records(self._all_supported_record_type_ids)
+        # self._runtime = runtime
         self._query_terms = {}
         self._keyword_terms = {}
         self._keyword_fields = ['displayName.text', 'description.text']
@@ -1900,26 +1942,48 @@ class OsidExtensibleQuery:
         'from dlkit.abstract_osid.osid import errors',
         'import importlib',
         'from ..primitives import Id',
+        'from ..primitives import Type',
+        'import inflection'
     ]
 
     init = """
-    def _load_records(self, record_type_idstrs):
-        \"\"\"Loads query records\"\"\"
-        for record_type_idstr in record_type_idstrs:
-            try:
-                self._init_record(record_type_idstr)
-            except (ImportError, KeyError):
-                pass
+    def __new__(cls, osid_object_map=None, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
+        # The following is not optimal since it means the registry is traversed twice:
+        record_types = [Type(data_set) for data_set in utilities.get_registry(
+            inflection.underscore(object_name).upper() + '_RECORD_TYPES',
+            runtime)]
+        return osid_markers.Extensible.__new__(cls, object_name, 'Query', record_types, runtime)
 
-    def _init_record(self, record_type_idstr):
-        \"\"\"Initializes a query record\"\"\"
-        record_type_data = self._all_supported_record_type_data_sets[Id(record_type_idstr).get_identifier()]
-        module = importlib.import_module(record_type_data['module_path'])
-        record = getattr(module, record_type_data['query_record_class_name'])
-        self._records[record_type_idstr] = record(self)"""
+    def __init__(self, runtime=None, proxy=None, **kwargs):
+        # self._supported_record_type_ids = []
+        self._runtime = runtime
+        self._proxy = proxy
+
+    # def _load_records(self, record_type_idstrs):
+    #     \"\"\"Loads query records\"\"\"
+    #     for record_type_idstr in record_type_idstrs:
+    #         try:
+    #             self._init_record(record_type_idstr)
+    #         except (ImportError, KeyError):
+    #             pass
+    #
+    # def _init_record(self, record_type_idstr):
+    #     \"\"\"Initializes a query record\"\"\"
+    #     record_type_data = self._all_supported_record_type_data_sets[Id(record_type_idstr).get_identifier()]
+    #     module = importlib.import_module(record_type_data['module_path'])
+    #     record = getattr(module, record_type_data['query_record_class_name'])
+    #     self._records[record_type_idstr] = record(self)"""
 
     match_record_type = """
         self._add_match('recordTypeIds', str(record_type), match)"""
+
+
+class OsidSourceableQuery:
+
+    init = """
+    def __init__(self, **kwargs):
+        pass"""
 
 
 class OsidObjectQuery:
@@ -1932,8 +1996,9 @@ class OsidObjectQuery:
     ]
 
     init = """
-    def __init__(self, runtime):
-        OsidQuery.__init__(self, runtime)"""
+    def __init__(self, **kwargs):
+        OsidQuery.__init__(self, **kwargs)
+        OsidExtensibleQuery.__init__(self, **kwargs)"""
 
     match_display_name_arg_template = {
         1: 'DEFAULT_STRING_MATCH_TYPE',
@@ -1970,6 +2035,14 @@ class OsidObjectQuery:
         self._clear_terms('genusTypeId')"""
 
 
+class OsidCatalogQuery:
+
+    init = """
+    def __init__(self, **kwargs):
+        OsidObjectQuery.__init__(self, **kwargs)
+        OsidSourceableQuery.__init__(self, **kwargs)"""
+
+
 class OsidQueryInspector:
 
     import_statements = [
@@ -1979,18 +2052,28 @@ class OsidQueryInspector:
 
 class OsidRecord:
 
-    consider_init = """
-    def __init__(self):
+    init = """
+    def __init__(self, block_super=False, **kwargs):
         # This is set in implemented Records.  Should super __init__
-        self._implemented_record_type_identifiers = None
+        # self._implemented_record_type_identifiers = None
+        if not block_super:
+            super(OsidRecord, self).__init__(**kwargs)
 
-    def __iter__(self):
-        for attr in dir(self):
-            if not attr.startswith('__'):
-                yield attr
+    def _init_metadata(self, block_super=False, **kwargs):
+        if not block_super:
+            super(OsidRecord, self)._init_metadata(**kwargs)
 
-    def __getitem__(self, item):
-        return getattr(self, item)"""
+    def _init_map(self, block_super=False, **kwargs):
+        if not block_super:
+            super(OsidRecord, self)._init_map(**kwargs)
+
+    # def __iter__(self):
+    #     for attr in dir(self):
+    #         if not attr.startswith('__'):
+    #             yield attr
+    #
+    # def __getitem__(self, item):
+    #     return getattr(self, item)"""
 
     implements_record_type = """
         return record_type.get_identifier() in self._implemented_record_type_identifiers"""
@@ -2118,28 +2201,32 @@ class OsidSearch:
     import_statements = [
         'from dlkit.abstract_osid.osid import errors',
         'from dlkit.primordium.id.primitives import Id',
-        'from collections import OrderedDict'
+        'from collections import OrderedDict',
+        'from . import rules as osid_rules'
     ]
 
     init = """
+    def __new__(cls, **kwargs):
+        return osid_rules.OsidCondition.__new__(cls, 'Search', **kwargs)
+
     def __init__(self, runtime):
-        self._records = OrderedDict()
-        # _load_records is in OsidExtensibleQuery:
-        # _all_supported_record_type_ids comes from inheriting query object
-        # THIS SHOULD BE RE-DONE:
-        self._load_records(self._all_supported_record_type_ids)
-        self._runtime = runtime
-        self._query_terms = {}
-        self._keyword_terms = {}
-        self._keyword_fields = ['displayName.text', 'description.text']
-        try:
-            # Try to get additional keyword fields from the runtime, if available:
-            config = runtime.get_configuration()
-            parameter_id = Id('parameter:keywordFields@json')
-            additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
-            self._keyword_fields += additional_keyword_fields[self._namespace]
-        except (AttributeError, KeyError, errors.NotFound):
-            pass
+        # self._records = OrderedDict()
+        # # _load_records is in OsidExtensibleQuery:
+        # # _all_supported_record_type_ids comes from inheriting query object
+        # # THIS SHOULD BE RE-DONE:
+        # self._load_records(self._all_supported_record_type_ids)
+        # self._runtime = runtime
+        # self._query_terms = {}
+        # self._keyword_terms = {}
+        # self._keyword_fields = ['displayName.text', 'description.text']
+        # try:
+        #     # Try to get additional keyword fields from the runtime, if available:
+        #     config = runtime.get_configuration()
+        #     parameter_id = Id('parameter:keywordFields@json')
+        #     additional_keyword_fields = config.get_value_by_parameter(parameter_id).get_object_value()
+        #     self._keyword_fields += additional_keyword_fields[self._namespace]
+        # except (AttributeError, KeyError, errors.NotFound):
+        #     pass
         self._limit_result_set_start = None
         self._limit_result_set_end = None"""
 
@@ -2165,10 +2252,36 @@ class OsidSearch:
         return self._limit_result_set_end"""
 
 
-class OsidSearchResults:
+class OsidResult:
 
     import_statements = [
     ]
+
+    init = """
+    def __new__(cls, record_key, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
+        record_types = list()  # Need to get this from registry
+        return osid_markers.Extensible.__new__(cls, object_name, record_key, record_types, runtime)
+
+    def __init__(self, **kwargs):
+        osid_markers.Extensible.__init__(self, **kwargs)"""
+
+
+class OsidSearchResults:
+
+    import_statements = [
+        'from . import rules as osid_rules'
+    ]
+
+    init = """
+    def __new__(cls, **kwargs):
+        return osid_rules.OsidResult.__new__(cls, 'SearchResults', **kwargs)
+
+    def __init__(self, results, query_terms, **kwargs):
+        self._results = results
+        self._query_terms = query_terms
+        self.retrieved = False
+        osid_rules.OsidResult.__init__(self, **kwargs)"""
 
     get_result_size = """
         return self._results.count(True)"""
@@ -2213,3 +2326,18 @@ class OsidTemporalQuery:
             }
         else:
             raise errors.InvalidArgument('match = False not currently supported')"""
+
+
+class OsidCondition:
+    import_statements = [
+        'import inflection',
+        'from dlkit.primordium.type.primitives import Type'
+    ]
+
+    init = """
+    def __new__(cls, record_key, runtime=None, **kwargs):
+        object_name = cls._namespace.split('.')[-1]
+        record_types = [Type(data_set) for data_set in utilities.get_registry(
+            inflection.underscore(object_name).upper() + '_RECORD_TYPES',
+            runtime)]
+        return osid_markers.Extensible.__new__(cls, object_name, record_key, record_types, runtime)"""

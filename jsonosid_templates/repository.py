@@ -519,6 +519,7 @@ class AssetAdminSession:
             osid_object_map=result,
             runtime=self._runtime,
             proxy=self._proxy)
+        obj_form._init_metadata()
         obj_form._for_update = True
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
@@ -1039,7 +1040,7 @@ class Asset:
     _namespace = 'repository.Asset'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, object_name='ASSET', **kwargs)
+        osid_objects.OsidObject.__init__(self, **kwargs)
         self._catalog_name = 'Repository'
         if self.is_composition():
             self._composition = self.get_composition()

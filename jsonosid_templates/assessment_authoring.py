@@ -255,24 +255,27 @@ class AssessmentPartAdminSession:
         child_parts = lookup_session.get_assessment_parts_for_assessment_part(assessment_part_id)
         mdata = {}
         # Check for underlying Parts, whether Sections and set appropriate mdata overrides:
-        if child_parts.available == 0:
-            pass
+        # if child_parts.available() == 0:
+        #     pass
+        # else:
+        mdata['sequestered'] = {}
+        mdata['sequestered']['is_read_only'] = True
+        mdata['sequestered']['is_required'] = True
+        if child_parts.available() > 0 and child_parts.next().is_section():
+            mdata['sequestered']['default_boolean_values'] = [False]
         else:
-            mdata['sequestered'] = {}
-            mdata['sequestered']['is_read_only'] = True
-            mdata['sequestered']['is_required'] = True
-            if child_parts.available() > 0 and child_parts.next().is_section():
-                mdata['sequestered']['default_boolean_values'] = [False]
-            else:
-                mdata['sequestered']['default_boolean_values'] = [True]
+            mdata['sequestered']['default_boolean_values'] = [True]
         # WHY are we passing bank_id = self._catalog_id below, seems redundant:
         obj_form = objects.AssessmentPartForm(
-            bank_id=self._catalog_id,
             record_types=assessment_part_record_types,
-            assessment_part_id=assessment_part_id,
-            catalog_id=self._catalog_id,
             runtime=self._runtime,
-            mdata=mdata)
+            proxy=self._proxy)
+        obj_form._init_metadata()
+        obj_form._init_map(bank_id=self._catalog_id,
+                           assessment_part_id=assessment_part_id,
+                           effective_agent_id=self.get_effective_agent_id(),
+                           record_types=assessment_part_record_types,
+                           mdata=mdata)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
@@ -302,6 +305,7 @@ class AssessmentPartAdminSession:
                                               runtime=self._runtime,
                                               proxy=self._proxy,
                                               mdata=mdata)
+        obj_form._init_metadata()
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
@@ -549,11 +553,11 @@ class AssessmentPartForm:
     def __init__(self, **kwargs):
         osid_objects.OsidContainableForm.__init__(self)
         osid_objects.OsidOperableForm.__init__(self)
-        osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT_PART', **kwargs)
+        osid_objects.OsidObjectForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_assessment_part_mdata()
-        self._init_metadata(**kwargs)
-        if not self.is_for_update():
-            self._init_map(**kwargs)
+        # self._init_metadata(**kwargs)
+        # if not self.is_for_update():
+        #     self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
@@ -724,6 +728,13 @@ class SequenceRuleForm:
         raise errors.Unimplemented()"""
 
 
+class SequenceRule:
+    additional_methods = """
+    def _evaluates_true(self):
+        \"\"\"should be overridden somewhere? Not in spec.\"\"\"
+        return False"""
+
+
 class SequenceRuleAdminSession:
     get_sequence_rule_form_for_create = """
         for arg in sequence_rule_record_types:
@@ -752,15 +763,16 @@ class SequenceRuleAdminSession:
 
 class SequenceRuleQuery:
     init = """
+    _namespace = 'assessment_authoring.SequenceRuleQuery'
+
     def __init__(self, runtime):
-        self._namespace = 'assessment_authoring.SequenceRuleQuery'
         self._runtime = runtime
         record_type_data_sets = get_registry('SEQUENCE_RULE_QUERY_RECORD_TYPES', runtime)
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidRuleQuery.__init__(self, runtime)"""
+        osid_queries.OsidRuleQuery.__init__(self, runtime=runtime)"""
 
 
 class SequenceRuleLookupSession:

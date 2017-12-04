@@ -347,7 +347,7 @@ class AuthorizationForm:
     _namespace = 'authorization.Authorization'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidRelationshipForm.__init__(self, object_name='AUTHORIZATION', **kwargs)
+        osid_objects.OsidRelationshipForm.__init__(self, **kwargs)
         self._mdata = default_mdata.get_authorization_mdata()  # Don't know if we need default mdata for this
         self._init_metadata(**kwargs)
 
@@ -409,15 +409,16 @@ class AuthorizationQuery:
     ]
 
     init = """
+    _namespace = 'authorization.Authorization'
+
     def __init__(self, runtime):
-        self._namespace = 'authorization.Authorization'
         self._runtime = runtime
         record_type_data_sets = get_registry('AUTHORIZATION_RECORD_TYPES', runtime)
         self._all_supported_record_type_data_sets = record_type_data_sets
         self._all_supported_record_type_ids = []
         for data_set in record_type_data_sets:
             self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
-        osid_queries.OsidObjectQuery.__init__(self, runtime)
+        osid_queries.OsidObjectQuery.__init__(self, runtime=runtime)
 """
 
     match_agent_id = """

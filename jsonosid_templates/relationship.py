@@ -177,25 +177,18 @@ class RelationshipAdminSession:
         for arg in ${arg2_name}:
             if not isinstance(arg, ABC${arg2_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg2_type}')
-        if ${arg2_name} == []:
-            # WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                ${arg0_name}=${arg0_name},
-                ${arg1_name}=${arg1_name},
-                catalog_id=self._catalog_id,
-                runtime=self._runtime,
-                proxy=self._proxy)
-        else:
-            obj_form = objects.${return_type}(
-                ${cat_name_under}_id=self._catalog_id,
-                record_types=${arg2_name},
-                ${arg0_name}=${arg0_name},
-                ${arg1_name}=${arg1_name},
-                catalog_id=self._catalog_id,
-                runtime=self._runtime,
-                proxy=self._proxy)
-        obj_form._for_update = False
+
+        obj_form = objects.${return_type}(
+            record_types=${arg2_name},
+            runtime=self._runtime,
+            proxy=self._proxy)
+        obj_form._init_metadata()
+        obj_form._init_map(
+            ${cat_name_under}_id=self._catalog_id,
+            ${arg0_name}=${arg0_name},
+            ${arg1_name}=${arg1_name},
+            effective_agent_id=self.get_effective_agent_id())
+        # obj_form._for_update = False  # set in form constructor
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
