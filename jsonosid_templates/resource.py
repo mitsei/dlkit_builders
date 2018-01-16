@@ -401,7 +401,7 @@ class ResourceSearchSession:
             result = collection.find(query_terms)[${arg1_name}.start:${arg1_name}.end]
         else:
             result = collection.find(query_terms)
-        return searches.${return_type}(results=result, query_terms=dict(${arg0_name}._query_terms), runtime=self._runtime)"""
+        return searches.${return_type}(result, dict(${arg0_name}._query_terms), runtime=self._runtime)"""
 
 
 class ResourceAdminSession:
@@ -460,16 +460,19 @@ class ResourceAdminSession:
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
-        obj_form = objects.${return_type}(
-            # ${cat_name_under}_id=self._catalog_id,
-            record_types=${arg0_name},
-            runtime=self._runtime,
-            # effective_agent_id=self.get_effective_agent_id(),
-            proxy=self._proxy)
-        obj_form._init_metadata()
-        obj_form._init_map(${cat_name_under}_id=self._catalog_id,
-                           effective_agent_id=self.get_effective_agent_id(),
-                           record_types=${arg0_name})
+        if ${arg0_name} == []:
+            obj_form = objects.${return_type}(
+                ${cat_name_under}_id=self._catalog_id,
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
+        else:
+            obj_form = objects.${return_type}(
+                ${cat_name_under}_id=self._catalog_id,
+                record_types=${arg0_name},
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
@@ -529,7 +532,6 @@ class ResourceAdminSession:
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
         obj_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
-        obj_form._init_metadata()
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
@@ -1162,17 +1164,19 @@ class BinAdminSession:
         for arg in ${arg0_name}:
             if not isinstance(arg, ABC${arg0_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg0_type}')
-        ${return_type_under} = objects.${return_type}(
-            record_types=${arg0_name},
-            runtime=self._runtime,
-            effective_agent_id=self.get_effective_agent_id(),
-            proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
-        ${return_type_under}._init_metadata()
-        ${return_type_under}._init_map(
-            record_types=${arg0_name},
-            effective_agent_id=self.get_effective_agent_id())
-        self._forms[${return_type_under}.get_id().get_identifier()] = not CREATED
-        return ${return_type_under}"""
+        if ${arg0_name} == []:
+            result = objects.${return_type}(
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
+        else:
+            result = objects.${return_type}(
+                record_types=${arg0_name},
+                runtime=self._runtime,
+                effective_agent_id=self.get_effective_agent_id(),
+                proxy=self._proxy)  # Probably don't need effective agent id now that we have proxy in form.
+        self._forms[result.get_id().get_identifier()] = not CREATED
+        return result"""
 
     create_bin_import_templates = [
         'from ${arg0_abcapp_name}.${arg0_abcpkg_name}.${arg0_module} import ${arg0_type} as ABC${arg0_type}'
@@ -1223,11 +1227,10 @@ class BinAdminSession:
             raise errors.InvalidArgument('the argument is not a valid OSID ${arg0_type}')
         result = collection.find_one({'_id': ObjectId(${arg0_name}.get_identifier())})
 
-        ${return_type_under} = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
-        ${return_type_under}._init_metadata()
-        self._forms[${return_type_under}.get_id().get_identifier()] = not UPDATED
+        cat_form = objects.${return_type}(osid_object_map=result, runtime=self._runtime, proxy=self._proxy)
+        self._forms[cat_form.get_id().get_identifier()] = not UPDATED
 
-        return ${return_type_under}"""
+        return cat_form"""
 
     can_update_bins_template = """
         # Implemented from template for
@@ -1633,13 +1636,8 @@ class Resource:
     init_template = """
     _namespace = '${implpkg_name}.${interface_name}'
 
-    def __new__(cls, **kwargs):
-        if not kwargs:
-            return object.__new__(cls)  # To support things like deepcopy
-        return super(${interface_name}, cls).__new__(cls, **kwargs)
-
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='${object_name_upper}', **kwargs)
         self._catalog_name = '${cat_name}'
 ${instance_initers}"""
 
@@ -1695,11 +1693,16 @@ class ResourceQuery:
     ]
 
     init_template = """
-    _namespace = '${pkg_name_replaced}.${object_name}'
-
-    def __init__(self, **kwargs):
-        osid_queries.OsidObjectQuery.__init__(self, **kwargs)
-        self._catalog_name = '${cat_name}'"""
+    def __init__(self, runtime):
+        self._namespace = '${pkg_name_replaced}.${object_name}'
+        self._runtime = runtime
+        record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidObjectQuery.__init__(self, runtime)
+"""
 
     clear_group_terms_template = """
         # Implemented from template for osid.resource.ResourceQuery.clear_group_terms
@@ -1732,20 +1735,17 @@ class ResourceSearch:
     ]
 
     init_template = """
-    _namespace = '${implpkg_name}.${object_name}'
-
-    def __init__(self, **kwargs):
-        # Removed on 10/5/17:
-        # self._namespace = '${pkg_name}.${object_name}'
-        # self._runtime = runtime
-        # record_type_data_sets = get_registry('RESOURCE_RECORD_TYPES', runtime)
-        # self._record_type_data_sets = record_type_data_sets
-        # self._all_supported_record_type_data_sets = record_type_data_sets
-        # self._all_supported_record_type_ids = []
-        # for data_set in record_type_data_sets:
-        #     self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+    def __init__(self, runtime):
+        self._namespace = '${pkg_name}.${object_name}'
+        self._runtime = runtime
+        record_type_data_sets = get_registry('RESOURCE_RECORD_TYPES', runtime)
+        self._record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
         self._id_list = None
-        osid_searches.OsidSearch.__init__(self, **kwargs)"""
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_searches.OsidSearch.__init__(self, runtime)"""
 
     search_among_resources_template = """
         self._id_list = ${arg0_name}"""
@@ -1760,15 +1760,14 @@ class ResourceSearchResults:
     ]
 
     init_template = """
-    _namespace = '${pkg_name}.${object_name}'
-
-    def __init__(self, **kwargs):  # removed results, query_terms, runtime on 10/18/17
-        # # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
-        # # self._results = [r for r in results]
-        # self._results = results
-        # self._query_terms = query_terms
-        # self.retrieved = False
-        osid_searches.OsidSearchResults.__init__(self, **kwargs)"""
+    def __init__(self, results, query_terms, runtime):
+        # if you don't iterate, then .count() on the cursor is an inaccurate representation of limit / skip
+        # self._results = [r for r in results]
+        self._namespace = '${pkg_name}.${object_name}'
+        self._results = results
+        self._query_terms = query_terms
+        self._runtime = runtime
+        self.retrieved = False"""
 
     get_resources_template = """
         if self.retrieved:
@@ -1796,12 +1795,11 @@ class ResourceForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, **kwargs):
-        ${init_object}.__init__(self, **kwargs)
+        ${init_object}.__init__(self, object_name='${object_name_upper}', **kwargs)
         self._mdata = default_mdata.get_${object_name_under}_mdata()
-        # The following are now being called in the AdminSession:
-        # self._init_metadata(**kwargs)
-        # if not self.is_for_update():
-        #     self._init_map(**kwargs)
+        self._init_metadata(**kwargs)
+        if not self.is_for_update():
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
@@ -1812,6 +1810,7 @@ ${metadata_super_initers}        ${init_object}._init_metadata(self, **kwargs)
 ${map_super_initers}        ${init_object}._init_map(self, record_types=record_types)
 ${persisted_initers}"""
 
+    # this needs to be re-designed to know about variable syntax type
     get_group_metadata_template = """
         # Implemented from template for osid.resource.ResourceForm.get_group_metadata_template
         metadata = dict(self._mdata['${var_name}'])
@@ -1889,7 +1888,7 @@ class Bin:
     _namespace = '${implpkg_name}.${interface_name}'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidCatalog.__init__(self, **kwargs)"""
+        osid_objects.OsidCatalog.__init__(self, object_name='${object_name_upper}', **kwargs)"""
 
 # Someday we need to support templating for additional_methods_pattern:
 #     additional_methods_pattern = """
@@ -1909,8 +1908,11 @@ class BinForm:
     _namespace = '${implpkg_name}.${object_name}'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidCatalogForm.__init__(self, **kwargs)
+        osid_objects.OsidCatalogForm.__init__(self, object_name='${object_name_upper}', **kwargs)
         self._mdata = default_mdata.get_${object_name_under}_mdata()
+        self._init_metadata(**kwargs)
+        if not self.is_for_update():
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
@@ -1934,10 +1936,14 @@ class BinQuery:
     ]
 
     init_template = """
-    _namespace = '${implpkg_name}.${object_name}'
-
-    def __init__(self, **kwargs):
-        osid_queries.OsidCatalogQuery.__init__(self, **kwargs)
+    def __init__(self, runtime):
+        self._runtime = runtime
+        record_type_data_sets = get_registry('${cat_name_upper}_RECORD_TYPES', runtime)
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidCatalogQuery.__init__(self, runtime)
 
     def _get_descendant_catalog_ids(self, catalog_id):
         hm = self._get_provider_manager('HIERARCHY')

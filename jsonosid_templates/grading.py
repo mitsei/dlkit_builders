@@ -15,18 +15,27 @@ class GradeEntryAdminSession:
         for arg in grade_entry_record_types:
             if not isinstance(arg, ABCType):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID Type')
-        obj_form = objects.GradeEntryForm(
-            record_types=grade_entry_record_types,
-            effective_agent_id=self.get_effective_agent_id(),  # needed here to set a property in __init__
-            gradebook_column_id=gradebook_column_id,  # needed here to get gradeSystemId
-            runtime=self._runtime,
-            proxy=self._proxy)
-        obj_form._init_metadata()
-        obj_form._init_map(gradebook_id=self._catalog_id,
-                           gradebook_column_id=gradebook_column_id,
-                           resource_id=resource_id,
-                           effective_agent_id=self.get_effective_agent_id(),
-                           record_types=grade_entry_record_types)
+        if grade_entry_record_types == []:
+            # WHY are we passing gradebook_id = self._catalog_id below, seems redundant:
+            # Probably don't need effective agent id since form can now get that from proxy.
+            obj_form = objects.GradeEntryForm(
+                gradebook_id=self._catalog_id,
+                gradebook_column_id=gradebook_column_id,
+                resource_id=resource_id,
+                effective_agent_id=str(self.get_effective_agent_id()),
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
+        else:
+            obj_form = objects.GradeEntryForm(
+                gradebook_id=self._catalog_id,
+                record_types=grade_entry_record_types,
+                gradebook_column_id=gradebook_column_id,
+                resource_id=resource_id,
+                effective_agent_id=str(self.get_effective_agent_id()),
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
         obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
@@ -47,7 +56,6 @@ class GradeEntryAdminSession:
             effective_agent_id=str(self.get_effective_agent_id()),
             runtime=self._runtime,
             proxy=self._proxy)
-        obj_form._init_metadata()
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
 
         return obj_form"""
@@ -191,7 +199,7 @@ class GradeEntryForm:
     _namespace = 'grading.GradeEntry'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidRelationshipForm.__init__(self, **kwargs)
+        osid_objects.OsidRelationshipForm.__init__(self, object_name='GRADE_ENTRY', **kwargs)
         self._mdata = default_mdata.get_grade_entry_mdata()
         self._effective_agent_id = kwargs['effective_agent_id']
 
@@ -205,6 +213,10 @@ class GradeEntryForm:
         else:
             raise errors.NullArgument('gradebook_column_id required for create forms.')
         self._grade_system = gradebook_column.get_grade_system()
+        self._init_metadata(**kwargs)
+
+        if not self.is_for_update():
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidRelationshipForm._init_metadata(self, **kwargs)
@@ -435,7 +447,7 @@ class GradebookColumnSummary:
     _namespace = 'grading.GradebookColumnSummary'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='GRADEBOOK_COLUMN_SUMMARY', **kwargs)
         self._catalog_name = 'gradebook'
 
         # Not set the entries to be included in the calculation
@@ -483,8 +495,12 @@ class GradebookColumnSummary:
 
 class GradebookColumnSummaryQuery:
     init = """
-    _namespace = 'grading.GradebookColumnSummary'
-
-    def __init__(self, **kwargs):
-        osid_queries.OsidRuleQuery.__init__(self, **kwargs)
-        self._catalog_name = 'Gradebook'"""
+    def __init__(self, runtime):
+        self._namespace = 'grading.GradebookColumnSummaryQuery'
+        self._runtime = runtime
+        record_type_data_sets = get_registry('GRADEBOOK_COLUMN_SUMMARY_QUERY_RECORD_TYPES', runtime)
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidRuleQuery.__init__(self, runtime)"""

@@ -200,18 +200,23 @@ class ActivityAdminSession:
         for arg in ${arg1_name}:
             if not isinstance(arg, ABC${arg1_type}):
                 raise errors.InvalidArgument('one or more argument array elements is not a valid OSID ${arg1_type}')
-
-        obj_form = objects.${return_type}(
-            record_types=${arg1_name},
-            runtime=self._runtime,
-            proxy=self._proxy)
-        obj_form._init_metadata()
-        obj_form._init_map(${cat_name_under}_id=self._catalog_id,
-                           ${arg0_name}=${arg0_name},
-                           effective_agent_id=self.get_effective_agent_id(),
-                           record_types=${arg1_name})
-
-        # obj_form._for_update = False  # set in Form constructor
+        if ${arg1_name} == []:
+            # WHY are we passing ${cat_name_under}_id = self._catalog_id below, seems redundant:
+            obj_form = objects.${return_type}(
+                ${cat_name_under}_id=self._catalog_id,
+                ${arg0_name}=${arg0_name},
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
+        else:
+            obj_form = objects.${return_type}(
+                ${cat_name_under}_id=self._catalog_id,
+                record_types=${arg1_name},
+                ${arg0_name}=${arg0_name},
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
+        obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
@@ -409,11 +414,16 @@ class ProficiencyForm:
 
 class ProficiencyQuery:
     init = """
-    _namespace = 'learning.Proficiency'
-
-    def __init__(self, **kwargs):
-        osid_queries.OsidObjectQuery.__init__(self, **kwargs)
-        self._catalog_name = 'ObjectiveBank'"""
+    def __init__(self, runtime):
+        self._namespace = '${pkg_name}.${object_name}'
+        self._runtime = runtime
+        record_type_data_sets = get_registry('${object_name_upper}_RECORD_TYPES', runtime)
+        self._all_supported_record_type_data_sets = record_type_data_sets
+        self._all_supported_record_type_ids = []
+        for data_set in record_type_data_sets:
+            self._all_supported_record_type_ids.append(str(Id(**record_type_data_sets[data_set])))
+        osid_queries.OsidObjectQuery.__init__(self, runtime)
+"""
 
     match_level_id = """
         if not isinstance(grade_id, Id):
