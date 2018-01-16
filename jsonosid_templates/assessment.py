@@ -238,20 +238,13 @@ class AssessmentSession:
         # Thus endith the hack.
 
         obj_form = objects.AnswerForm(
-            # bank_id=self._catalog_id,
-            record_types=answer_record_types,
-            # item_id=item_id,
-            # catalog_id=self._catalog_id,
-            # assessment_section_id=assessment_section_id,
-            runtime=self._runtime,
-            proxy=self._proxy)
-        obj_form._init_metadata()
-        obj_form._init_map(
             bank_id=self._catalog_id,
             record_types=answer_record_types,
             item_id=item_id,
-            assessment_section_id=assessment_section_id
-        )
+            catalog_id=self._catalog_id,
+            assessment_section_id=assessment_section_id,
+            runtime=self._runtime,
+            proxy=self._proxy)
         obj_form._for_update = False  # This may be redundant
         self._forms[obj_form.get_id().get_identifier()] = not SUBMITTED
         return obj_form"""
@@ -580,7 +573,6 @@ class ItemAdminSession:
         obj_form = objects.QuestionForm(osid_object_map=document['question'],
                                         runtime=self._runtime,
                                         proxy=self._proxy)
-        obj_form._init_metadata()
         self._forms[obj_form.get_id().get_identifier()] = not UPDATED
         return obj_form"""
 
@@ -926,16 +918,23 @@ class AssessmentTakenAdminSession:
             # no deadline set
             pass
 
-        obj_form = objects.AssessmentTakenForm(record_types=assessment_taken_record_types,
-                                               runtime=self._runtime,
-                                               proxy=self._proxy)
-        obj_form._init_metadata()
-        obj_form._init_map(bank_id=self._catalog_id,
-                           record_types=assessment_taken_record_types,
-                           assessment_offered_id=assessment_offered_id,
-                           effective_agent_id=self.get_effective_agent_id())
-
-        # obj_form._for_update = False  # set in form constructor
+        if assessment_taken_record_types == []:
+            # WHY are we passing bank_id = self._catalog_id below, seems redundant:
+            obj_form = objects.AssessmentTakenForm(
+                bank_id=self._catalog_id,
+                assessment_offered_id=assessment_offered_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
+        else:
+            obj_form = objects.AssessmentTakenForm(
+                bank_id=self._catalog_id,
+                record_types=assessment_taken_record_types,
+                assessment_offered_id=assessment_offered_id,
+                catalog_id=self._catalog_id,
+                runtime=self._runtime,
+                proxy=self._proxy)
+        obj_form._for_update = False
         self._forms[obj_form.get_id().get_identifier()] = not CREATED
         return obj_form"""
 
@@ -1020,10 +1019,8 @@ class Question:
     ]
 
     init = """
-    _namespace = "assessment.Question"
-
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='QUESTION', **kwargs)
         self._catalog_name = 'Bank'
         if 'item_id' in kwargs:
             self._item_id = kwargs['item_id']
@@ -1324,12 +1321,11 @@ class AssessmentForm:
     _namespace = 'assessment.Assessment'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObjectForm.__init__(self, **kwargs)
+        osid_objects.OsidObjectForm.__init__(self, object_name='ASSESSMENT', **kwargs)
         self._mdata = default_mdata.get_assessment_mdata()
-        # The following are now being called in the AdminSession:
-        # self._init_metadata(**kwargs)
-        # if not self.is_for_update():
-        #     self._init_map(**kwargs)
+        self._init_metadata(**kwargs)
+        if not self.is_for_update():
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         \"\"\"Initialize form metadata\"\"\"
@@ -1337,9 +1333,9 @@ class AssessmentForm:
         self._rubric_default = self._mdata['rubric']['default_id_values'][0]
         self._level_default = self._mdata['level']['default_id_values'][0]
 
-    def _init_map(self, **kwargs):
+    def _init_map(self, record_types=None, **kwargs):
         \"\"\"Initialize form map\"\"\"
-        osid_objects.OsidObjectForm._init_map(self, **kwargs)
+        osid_objects.OsidObjectForm._init_map(self, record_types=record_types)
         self._my_map['rubricId'] = self._rubric_default
         self._my_map['assignedBankIds'] = [str(kwargs['bank_id'])]
         self._my_map['levelId'] = self._level_default
@@ -1530,7 +1526,7 @@ class AssessmentTaken:
     _namespace = 'assessment.AssessmentTaken'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='ASSESSMENT_TAKEN', **kwargs)
         self._catalog_name = 'Bank'
         self._assessment_sections = dict()"""
 
@@ -1579,11 +1575,7 @@ class AssessmentTaken:
             # This is the first time for this Taken, so start assessment
             # SHOULD THIS USE self._update_available_sections????
             assessment_id = self.get_assessment_offered().get_assessment().get_id()
-            first_part_id = get_first_part_id_for_assessment(assessment_id,
-                                                             runtime=self._runtime,
-                                                             proxy=self._proxy,
-                                                             create=True,
-                                                             bank_id=Id(self._my_map['assignedBankIds'][0]))
+            first_part_id = get_first_part_id_for_assessment(assessment_id, runtime=self._runtime, proxy=self._proxy)
             first_section = self._create_section(first_part_id)
             self._my_map['sections'] = [str(first_section.get_id())]
             self._my_map['actualStartTime'] = DateTime.utcnow()
@@ -1923,7 +1915,7 @@ class AssessmentSection:
     _namespace = 'assessment.AssessmentSection'
 
     def __init__(self, **kwargs):
-        osid_objects.OsidObject.__init__(self, **kwargs)
+        osid_objects.OsidObject.__init__(self, object_name='AssessmentSection', **kwargs)
         self._assessment_part_id = Id(self._my_map['assessmentPartId'])
         self._assessment_taken_id = Id(self._my_map['assessmentTakenId'])
 
@@ -2080,9 +2072,6 @@ class Response:
     init = """
     _namespace = 'assessment.Response'
 
-    def __new__(cls, *args, **kwargs):
-        return super(Response, cls).__new__(cls, record_key='', **kwargs)
-
     def __init__(self, osid_object_map, additional_attempts=None, runtime=None, proxy=None, section=None, **kwargs):
         from .objects import Answer
         self._submission_time = osid_object_map['submissionTime']
@@ -2108,16 +2097,16 @@ class Response:
 
         # Consider that responses may want to have their own records separate
         # from the enclosed Answer records:
-    #     self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', runtime)
-    #     if 'recordTypeIds' in osid_object_map:
-    #         record_type_ids = osid_object_map['recordTypeIds']
-    #     else:
-    #         record_type_ids = []
-    #     self._load_records(record_type_ids)
-    #
-    # def _load_records(self, record_type_idstrs):
-    #     for record_type_idstr in record_type_idstrs:
-    #         self._init_record(record_type_idstr)
+        self._record_type_data_sets = get_registry('RESPONSE_RECORD_TYPES', runtime)
+        if 'recordTypeIds' in osid_object_map:
+            record_type_ids = osid_object_map['recordTypeIds']
+        else:
+            record_type_ids = []
+        self._load_records(record_type_ids)
+
+    def _load_records(self, record_type_idstrs):
+        for record_type_idstr in record_type_idstrs:
+            self._init_record(record_type_idstr)
 
     def __iter__(self):
         for attr in dir(self):

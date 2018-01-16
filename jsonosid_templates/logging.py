@@ -142,11 +142,13 @@ class LogEntryForm:
     ]
 
     init = """
-    _namespace = 'logging.LogEntry'
-
     def __init__(self, **kwargs):
-        osid_objects.OsidObjectForm.__init__(self, **kwargs)
+        osid_objects.OsidObjectForm.__init__(self, object_name='LOG_ENTRY', **kwargs)
         self._mdata = default_mdata.get_log_entry_mdata()
+        self._init_metadata(**kwargs)
+
+        if not self.is_for_update():
+            self._init_map(**kwargs)
 
     def _init_metadata(self, **kwargs):
         osid_objects.OsidObjectForm._init_metadata(self, **kwargs)
