@@ -852,7 +852,7 @@ class OsidObject:
         #             pass
         # except AttributeError:
         #     pass
-        for record_class in self.__class__.__bases__[1:]:
+        for record_class in self.__class__.__bases__:
             try:
                 record_class._update_object_map(self, obj_map)
             except AttributeError:
@@ -1250,14 +1250,15 @@ class OsidExtensibleForm:
 
     def add_form_record(self, record_type):
         \"\"\"Adds a record to this object. Should to be associated with a morphable record type\"\"\"
-        object_name = self._namespace.split('.')[-1].upper()
-        data_sets = utilities.get_registry(object_name + '_RECORD_TYPES', self._runtime)
+        object_name = self._namespace.split('.')[-1]
+        data_sets = utilities.get_registry(object_name.upper() + '_RECORD_TYPES', self._runtime)
         record_class = utilities.get_record(data_sets,
                                             record_type,
                                             'form_record_class_name')
         if record_class is None:
             raise errors.Unsupported
-        self.__class__.__bases__ = (record_class,) + self.__class__.__bases__
+        new_classes = (record_class,) + self.__class__.__bases__
+        self.__class__ = type(object_name + 'Form', new_classes, {})
         record_class.__init__(self, block_super=True)
         record_class._init_metadata(self, block_super=True)
         record_class._init_map(self, block_super=True)
