@@ -2023,7 +2023,8 @@ class AssessmentSection:
                             'day': submit.day,
                             'hour': submit.hour,
                             'minute': submit.minute,
-                            'second': submit.second
+                            'second': submit.second,
+                            'microsecond': submit.microsecond
                         }
                     is_correct = response['isCorrect']
                 question_map.update({
