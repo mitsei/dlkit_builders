@@ -678,7 +678,7 @@ class OsidSession:
                     caching_host = config.get_value_by_parameter(parameter_id).get_string_value()
                 except (AttributeError, KeyError, errors.NotFound):
                     pass
-    
+
                 mc = memcache.Client([caching_host], debug=0)
 
                 catalog_ids = mc.get(key)
