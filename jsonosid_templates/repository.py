@@ -1088,12 +1088,29 @@ class Asset:
     is_copyright_status_known = """
         return bool(self._my_map['copyright']['text'])"""
 
+    get_created_date = """
+        if self._my_map['createdDate'] is None:
+            raise errors.IllegalState('createdDate is None')
+        return self._my_map['createdDate']"""
+
     additional_methods = """
     def get_object_map(self):
         obj_map = dict(self._my_map)
         obj_map['assetContent'] = obj_map['assetContents'] = [ac.object_map
                                                               for ac in self.get_asset_contents()]
         # note: assetContent is deprecated
+
+        if obj_map['createdDate'] is not None:
+            created_date = obj_map['createdDate']
+            obj_map['createdDate'] = {
+                'year': created_date.year,
+                'month': created_date.month,
+                'day': created_date.day,
+                'hour': created_date.hour,
+                'minute': created_date.minute,
+                'second': created_date.second,
+                'microsecond': created_date.microsecond
+            }
         return osid_objects.OsidObject.get_object_map(self, obj_map)
 
     object_map = property(fget=get_object_map)"""

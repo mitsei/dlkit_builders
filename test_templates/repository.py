@@ -658,6 +658,13 @@ class Asset:
         with pytest.raises(errors.IllegalState):
             self.object.get_provider_links()"""
 
+    get_created_date = """
+        with pytest.raises(errors.IllegalState):
+            self.object.get_created_date()
+        fake_data = 'blah'
+        self.object._my_map['createdDate'] = fake_data
+        self.object.get_created_date() == fake_data"""
+
 
 class AssetForm:
 
