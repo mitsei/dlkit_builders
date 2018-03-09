@@ -103,39 +103,43 @@ def ${interface_name_under}_test_fixture(request):
 
     set_priority_template = """
         # From test_templates/logging.py::LogEntryForm::set_priority_template
-        self.form.set_${var_name}(Type('type.Type%3Afake-type-id%40ODL.MIT.EDU'))
-        assert self.form._my_map['${var_name_mixed}'] == 'type.Type%3Afake-type-id%40ODL.MIT.EDU'
-        with pytest.raises(errors.InvalidArgument):
-            self.form.${method_name}(True)"""
+        if not is_never_authz(self.service_config):
+            self.form.set_${var_name}(Type('type.Type%3Afake-type-id%40ODL.MIT.EDU'))
+            assert self.form._my_map['${var_name_mixed}'] == 'type.Type%3Afake-type-id%40ODL.MIT.EDU'
+            with pytest.raises(errors.InvalidArgument):
+                self.form.${method_name}(True)"""
 
     clear_priority_template = """
         # From test_templates/logging.py::LogEntryForm::clear_priority_template
-        self.form.set_${var_name}(Type('type.Type%3Afake-type-id%40ODL.MIT.EDU'))
-        assert self.form._my_map['${var_name_mixed}'] == 'type.Type%3Afake-type-id%40ODL.MIT.EDU'
-        self.form.${method_name}()
-        assert self.form._my_map['${var_name_mixed}Id'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
+        if not is_never_authz(self.service_config):
+            self.form.set_${var_name}(Type('type.Type%3Afake-type-id%40ODL.MIT.EDU'))
+            assert self.form._my_map['${var_name_mixed}'] == 'type.Type%3Afake-type-id%40ODL.MIT.EDU'
+            self.form.${method_name}()
+            assert self.form._my_map['${var_name_mixed}Id'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
     get_priority_metadata_template = """
         # From test_templates/logging.py::LogEntryForm::get_priority_metadata_template
-        mdata = self.form.${method_name}()
-        assert isinstance(mdata, Metadata)
-        assert isinstance(mdata.get_element_id(), ABC_Id)
-        assert isinstance(mdata.get_element_label(), ABC_DisplayText)
-        assert isinstance(mdata.get_instructions(), ABC_DisplayText)
-        assert mdata.get_syntax() == '${syntax}'
-        assert not mdata.is_array()
-        assert isinstance(mdata.is_required(), bool)
-        assert isinstance(mdata.is_read_only(), bool)
-        assert isinstance(mdata.is_linked(), bool)"""
+        if not is_never_authz(self.service_config):
+            mdata = self.form.${method_name}()
+            assert isinstance(mdata, Metadata)
+            assert isinstance(mdata.get_element_id(), ABC_Id)
+            assert isinstance(mdata.get_element_label(), ABC_DisplayText)
+            assert isinstance(mdata.get_instructions(), ABC_DisplayText)
+            assert mdata.get_syntax() == '${syntax}'
+            assert not mdata.is_array()
+            assert isinstance(mdata.is_required(), bool)
+            assert isinstance(mdata.is_read_only(), bool)
+            assert isinstance(mdata.is_linked(), bool)"""
 
     set_timestamp = """
-        test_time = DateTime.utcnow()
-        # By default log entries have this set, so can't use the templated test
-        assert self.form._my_map['timestamp'] is not None
-        self.form.set_timestamp(test_time)
-        assert self.form._my_map['timestamp'] == test_time
-        with pytest.raises(errors.InvalidArgument):
-            self.form.set_timestamp(True)"""
+        if not is_never_authz(self.service_config):
+            test_time = DateTime.utcnow()
+            # By default log entries have this set, so can't use the templated test
+            assert self.form._my_map['timestamp'] is not None
+            self.form.set_timestamp(test_time)
+            assert self.form._my_map['timestamp'] == test_time
+            with pytest.raises(errors.InvalidArgument):
+                self.form.set_timestamp(True)"""
 
 
 class LogEntryQuery:
