@@ -674,19 +674,21 @@ class AssetForm:
 
     set_title_template = """
         # From test_templates/repository.py::AssetForm::set_title_template
-        default_value = self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]
-        assert self.form._my_map['${var_name_mixed}'] == default_value
-        self.form.set_${var_name}('String')
-        assert self.form._my_map['${var_name_mixed}']['text'] == 'String'
-        with pytest.raises(errors.InvalidArgument):
-            self.form.${method_name}(42)"""
+        if not is_never_authz(self.service_config):
+            default_value = self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]
+            assert self.form._my_map['${var_name_mixed}'] == default_value
+            self.form.set_${var_name}('String')
+            assert self.form._my_map['${var_name_mixed}']['text'] == 'String'
+            with pytest.raises(errors.InvalidArgument):
+                self.form.${method_name}(42)"""
 
     clear_title_template = """
         # From test_templates/repository.py::AssetForm::clear_title_template
-        self.form.set_${var_name}('A String to Clear')
-        assert self.form._my_map['${var_name_mixed}']['text'] == 'A String to Clear'
-        self.form.${method_name}()
-        assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
+        if not is_never_authz(self.service_config):
+            self.form.set_${var_name}('A String to Clear')
+            assert self.form._my_map['${var_name_mixed}']['text'] == 'A String to Clear'
+            self.form.${method_name}()
+            assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
     set_created_date = """
         # From test_templates/repository.py::AssetForm::set_created_date
@@ -932,27 +934,31 @@ def ${interface_name_under}_test_fixture(request):
 
     set_url_template = """
         # From test_templates/repository.py::AssetContentForm::set_url_template
-        default_value = self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]
-        assert self.form._my_map['${var_name_mixed}'] == default_value
-        self.form.set_${var_name}('String')
-        assert self.form._my_map['${var_name_mixed}'] == 'String'
-        with pytest.raises(errors.InvalidArgument):
-            self.form.${method_name}(42)"""
+        if not is_never_authz(self.service_config):
+            default_value = self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]
+            assert self.form._my_map['${var_name_mixed}'] == default_value
+            self.form.set_${var_name}('String')
+            assert self.form._my_map['${var_name_mixed}'] == 'String'
+            with pytest.raises(errors.InvalidArgument):
+                self.form.${method_name}(42)"""
 
     clear_url_template = """
         # From test_templates/repository.py::AssetContentForm::clear_url_template
-        self.form.set_${var_name}('A String to Clear')
-        assert self.form._my_map['${var_name_mixed}'] == 'A String to Clear'
-        self.form.${method_name}()
-        assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
+        if not is_never_authz(self.service_config):
+            self.form.set_${var_name}('A String to Clear')
+            assert self.form._my_map['${var_name_mixed}'] == 'A String to Clear'
+            self.form.${method_name}()
+            assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
     set_data = """
-        with pytest.raises(errors.InvalidArgument):
-            self.form.set_data('foo')
-        # TODO: should test setting actual data..."""
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.InvalidArgument):
+                self.form.set_data('foo')
+            # TODO: should test setting actual data..."""
 
     clear_data = """
-        self.form.clear_data()"""
+        if not is_never_authz(self.service_config):
+            self.form.clear_data()"""
 
 
 class AssetContentList:

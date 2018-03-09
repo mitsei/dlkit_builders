@@ -2396,63 +2396,70 @@ def ${interface_name_under}_test_fixture(request):
 
     get_group_metadata_template = """
         # From test_templates/resource.py::ResourceForm::get_group_metadata_template
-        mdata = self.form.${method_name}()
-        assert isinstance(mdata, Metadata)
-        assert isinstance(mdata.get_element_id(), ABC_Id)
-        assert isinstance(mdata.get_element_label(), ABC_DisplayText)
-        assert isinstance(mdata.get_instructions(), ABC_DisplayText)
-        assert mdata.get_syntax() == '${syntax}'
-        assert not mdata.is_array()
-        assert isinstance(mdata.is_required(), bool)
-        assert isinstance(mdata.is_read_only(), bool)
-        assert isinstance(mdata.is_linked(), bool)"""
+        if not is_never_authz(self.service_config):
+            mdata = self.form.${method_name}()
+            assert isinstance(mdata, Metadata)
+            assert isinstance(mdata.get_element_id(), ABC_Id)
+            assert isinstance(mdata.get_element_label(), ABC_DisplayText)
+            assert isinstance(mdata.get_instructions(), ABC_DisplayText)
+            assert mdata.get_syntax() == '${syntax}'
+            assert not mdata.is_array()
+            assert isinstance(mdata.is_required(), bool)
+            assert isinstance(mdata.is_read_only(), bool)
+            assert isinstance(mdata.is_linked(), bool)"""
 
     get_avatar_metadata_template = """
         # From test_templates/resource.py::ResourceForm::get_avatar_metadata_template
-        mdata = self.form.${method_name}()
-        assert isinstance(mdata, Metadata)
-        assert isinstance(mdata.get_element_id(), ABC_Id)
-        assert isinstance(mdata.get_element_label(), ABC_DisplayText)
-        assert isinstance(mdata.get_instructions(), ABC_DisplayText)
-        assert mdata.get_syntax() == '${syntax}'
-        assert not mdata.is_array()
-        assert isinstance(mdata.is_required(), bool)
-        assert isinstance(mdata.is_read_only(), bool)
-        assert isinstance(mdata.is_linked(), bool)"""
+        if not is_never_authz(self.service_config):
+            mdata = self.form.${method_name}()
+            assert isinstance(mdata, Metadata)
+            assert isinstance(mdata.get_element_id(), ABC_Id)
+            assert isinstance(mdata.get_element_label(), ABC_DisplayText)
+            assert isinstance(mdata.get_instructions(), ABC_DisplayText)
+            assert mdata.get_syntax() == '${syntax}'
+            assert not mdata.is_array()
+            assert isinstance(mdata.is_required(), bool)
+            assert isinstance(mdata.is_read_only(), bool)
+            assert isinstance(mdata.is_linked(), bool)"""
 
     set_group_template = """
         # From test_templates/resource.py::ResourceForm::set_group_template
-        self.form.${method_name}(True)
-        assert self.form._my_map['${var_name_mixed}']
-        with pytest.raises(errors.InvalidArgument):
-            self.form.${method_name}('false')"""
+        if not is_never_authz(self.service_config):
+            self.form.${method_name}(True)
+            assert self.form._my_map['${var_name_mixed}']
+            with pytest.raises(errors.InvalidArgument):
+                self.form.${method_name}('false')"""
 
     clear_group_template = """
         # From test_templates/resource.py::ResourceForm::clear_group_template
-        self.form.set_${var_name}(True)
-        assert self.form._my_map['${var_name_mixed}']
-        self.form.${method_name}()
-        assert self.form._my_map['${var_name_mixed}'] is None"""
+        if not is_never_authz(self.service_config):
+            self.form.set_${var_name}(True)
+            assert self.form._my_map['${var_name_mixed}']
+            self.form.${method_name}()
+            assert self.form._my_map['${var_name_mixed}'] is None"""
 
     set_avatar_template = """
         # From test_templates/resource.py::ResourceForm::set_avatar_template
-        assert self.form._my_map['${var_name_mixed}Id'] == ''
-        self.form.set_${var_name}(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))
-        assert self.form._my_map['${var_name_mixed}Id'] == 'repository.Asset%3Afake-id%40ODL.MIT.EDU'
-        with pytest.raises(errors.InvalidArgument):
-            self.form.${method_name}(True)"""
+        if not is_never_authz(self.service_config):
+            assert self.form._my_map['${var_name_mixed}Id'] == ''
+            self.form.set_${var_name}(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))
+            assert self.form._my_map['${var_name_mixed}Id'] == 'repository.Asset%3Afake-id%40ODL.MIT.EDU'
+            with pytest.raises(errors.InvalidArgument):
+                self.form.${method_name}(True)"""
 
     clear_avatar_template = """
         # From test_templates/resource.py::ResourceForm::clear_avatar_template
-        self.form.set_${var_name}(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))
-        assert self.form._my_map['${var_name_mixed}Id'] == 'repository.Asset%3Afake-id%40ODL.MIT.EDU'
-        self.form.${method_name}()
-        assert self.form._my_map['${var_name_mixed}Id'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
+        if not is_never_authz(self.service_config):
+            self.form.set_${var_name}(Id('repository.Asset%3Afake-id%40ODL.MIT.EDU'))
+            assert self.form._my_map['${var_name_mixed}Id'] == 'repository.Asset%3Afake-id%40ODL.MIT.EDU'
+            self.form.${method_name}()
+            assert self.form._my_map['${var_name_mixed}Id'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
 
     get_resource_form_record_template = """
-        with pytest.raises(errors.Unsupported):
-            self.form.${method_name}(Type('osid.Osid%3Afake-record%40ODL.MIT.EDU'))
-        # Here check for a real record?"""
+        if not is_never_authz(self.service_config):
+            with pytest.raises(errors.Unsupported):
+                self.form.${method_name}(Type('osid.Osid%3Afake-record%40ODL.MIT.EDU'))
+            # Here check for a real record?"""
 
 
 class ResourceList:
