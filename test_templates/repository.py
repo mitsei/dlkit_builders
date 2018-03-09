@@ -690,13 +690,14 @@ class AssetForm:
 
     set_created_date = """
         # From test_templates/repository.py::AssetForm::set_created_date
-        default_value = self.form.get_created_date_metadata().get_default_date_time_values()[0]
-        assert self.form._my_map['createdDate'] == default_value
-        now = DateTime.utcnow()
-        self.form.set_created_date(now)
-        assert self.form._my_map['createdDate'] == now
-        with pytest.raises(errors.InvalidArgument):
-            self.form.set_created_date(42)"""
+        if not is_never_authz(self.service_config):
+            default_value = self.form.get_created_date_metadata().get_default_date_time_values()[0]
+            assert self.form._my_map['createdDate'] == default_value
+            now = DateTime.utcnow()
+            self.form.set_created_date(now)
+            assert self.form._my_map['createdDate'] == now
+            with pytest.raises(errors.InvalidArgument):
+                self.form.set_created_date(42)"""
 
 
 class AssetQuery:
