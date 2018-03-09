@@ -668,6 +668,9 @@ class Asset:
 
 
 class AssetForm:
+    import_statements = [
+        'from dlkit.runtime.primitives import DateTime'
+    ]
 
     set_title_template = """
         # From test_templates/repository.py::AssetForm::set_title_template
@@ -684,6 +687,16 @@ class AssetForm:
         assert self.form._my_map['${var_name_mixed}']['text'] == 'A String to Clear'
         self.form.${method_name}()
         assert self.form._my_map['${var_name_mixed}'] == self.form.get_${var_name}_metadata().get_default_${syntax_under}_values()[0]"""
+
+    set_created_date = """
+        # From test_templates/repository.py::AssetForm::set_created_date
+        default_value = self.form.get_created_date_metadata().get_default_created_date_values()[0]
+        assert self.form._my_map['createdDate'] == default_value
+        now = DateTime.utcnow()
+        self.form.set_created_date(now)
+        assert self.form._my_map['createdDate'] == now
+        with pytest.raises(errors.InvalidArgument):
+            self.form.set_created_date(42)"""
 
 
 class AssetQuery:
