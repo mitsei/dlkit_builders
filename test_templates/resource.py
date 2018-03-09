@@ -2379,12 +2379,20 @@ def ${interface_name_under}_class_fixture(request):
         if not is_never_authz(request.cls.service_config):
             request.cls.svc_mgr.delete_${cat_name_under}(request.cls.catalog.ident)
 
+    request.addfinalizer(class_tear_down)
+
 
 @pytest.fixture(scope="function")
 def ${interface_name_under}_test_fixture(request):
     # From test_templates/resource.py::ResourceForm::init_template
     if not is_never_authz(request.cls.service_config):
-        request.cls.form = request.cls.catalog.get_${object_name_under}_form_for_create([])"""
+        request.cls.form = request.cls.catalog.get_${object_name_under}_form_for_create([])
+
+    def test_tear_down():
+        if not is_never_authz(request.cls.service_config):
+            request.cls.form = None
+
+    request.addfinalizer(test_tear_down)"""
 
     get_group_metadata_template = """
         # From test_templates/resource.py::ResourceForm::get_group_metadata_template
